@@ -5,9 +5,7 @@ import com.sprint.mission.exceptions.UserAlreadyExistsException;
 import com.sprint.mission.exceptions.UserIdNotFoundException;
 import com.sprint.mission.service.UserService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JCFUserService implements UserService {
     private static final Map<String, User> data = new HashMap<>();// 유저 id, User객체 (id검색을 빠르게 하기 위함)
@@ -19,7 +17,18 @@ public class JCFUserService implements UserService {
 
     @Override
     public List<User> getUsers(String... ids) {
-        return List.of();
+        List<User> users = new ArrayList<>();
+        for(String id : ids){
+            validateId(id);
+            users.add(data.get(id));
+        }
+
+        return users;
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return data.values().stream().toList();
     }
 
     @Override
@@ -65,7 +74,7 @@ public class JCFUserService implements UserService {
         return data.get(id).getOnlineStatus() == User.Status.ONLINE;
     }
 
-    private static void validateId(String id){
+    private void validateId(String id){
         if (!data.containsKey(id)) {
             throw new UserIdNotFoundException(id);
         }

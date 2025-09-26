@@ -7,6 +7,7 @@ import java.util.List;
 public interface UserService {
     public User getUserById(String id);
     public List<User> getUsers(String... ids);
+    public List<User> getAllUsers();
 
     public void signIn(User user);
 
