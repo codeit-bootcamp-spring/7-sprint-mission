@@ -47,14 +47,14 @@
 ### 2. 도메인 모델링
 
 -   [ ] 디스코드 서비스를 분석하여 각 도메인 모델에 필요한 정보를 도출하고, Java Class로 구현하세요.
--   [ ] **패키지명**: `com.sprint.mission.discodeit.entity`
+-   [x] **패키지명**: `com.sprint.mission.discodeit.entity`
 -   [ ] **도메인 모델 정의**
     -   [ ] **공통 필드**
         -   `id`: 객체를 식별하기 위한 ID (`UUID` 타입)
         -   `createdAt`, `updatedAt`: 객체 생성 및 수정 시간 (유닉스 타임스탬프, `Long` 타입)
-    -   [ ] **`User` 클래스**
-    -   [ ] **`Channel` 클래스**
-    -   [ ] **`Message` 클래스**
+    -   [x] **`User` 클래스**
+    -   [x] **`Channel` 클래스**
+    -   [x] **`Message` 클래스**
 -   [ ] **생성자**
     -   [ ] `id`와 `createdAt`는 생성자 내에서 초기화하세요.
     -   [ ] `id`, `createdAt`, `updatedAt`을 제외한 나머지 필드는 생성자의 파라미터를 통해 초기화하세요.
