@@ -2,12 +2,12 @@ package com.sprint.mission.entity;
 
 import java.util.UUID;
 
-public class Message {
-    private final UUID uuid = UUID.randomUUID();
-    private Long createdAt;
-    private Long updatedAt;
-
+public class Message extends BaseEntity {
     private User sender;
     private User receiver;
 
+    public Message(User sender, User receiver) {
+        this.sender = sender;
+        this.receiver = receiver;
+    }
 }

@@ -3,10 +3,7 @@ package com.sprint.mission.entity;
 import java.time.Instant;
 import java.util.UUID;
 
-public class User {
-    private UUID uuid;
-    private Long createdAt;
-    private Long updatedAt;
+public class User extends BaseEntity {
 
     private String userId;
     private String Passwd;
@@ -14,18 +11,6 @@ public class User {
     private String displayName;
     private String bio;
     private Status onlineStatus;
-
-
-    public User() {
-        this.uuid = UUID.randomUUID();
-        this.createdAt = getUnixTimestamp();
-    }
-
-    private static long getUnixTimestamp() {
-        return Instant.now().getEpochSecond();
-    }
-
-
 
     private enum Status{
         ONLINE("온라인"),
