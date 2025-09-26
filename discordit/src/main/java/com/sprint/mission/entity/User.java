@@ -1,8 +1,5 @@
 package com.sprint.mission.entity;
 
-import java.time.Instant;
-import java.util.UUID;
-
 public class User extends BaseEntity {
 
     private String userId;
@@ -11,6 +8,51 @@ public class User extends BaseEntity {
     private String displayName;
     private String bio;
     private Status onlineStatus;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void updateUserId(String userId) {
+        this.userId = userId;
+        this.updatedAt = getUnixTimestamp();
+    }
+
+    public String getPasswd() {
+        return Passwd;
+    }
+
+    public void updatePasswd(String passwd) {
+        this.updatedAt = getUnixTimestamp();
+        Passwd = passwd;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void updateDisplayName(String displayName) {
+        this.updatedAt = getUnixTimestamp();
+        this.displayName = displayName;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void updateBio(String bio) {
+        this.updatedAt = getUnixTimestamp();
+        this.bio = bio;
+    }
+
+    public Status getOnlineStatus() {
+        return onlineStatus;
+    }
+
+    public void updateOnlineStatus(Status onlineStatus) {
+        this.updatedAt = getUnixTimestamp();
+        this.onlineStatus = onlineStatus;
+    }
 
     private enum Status{
         ONLINE("온라인"),

@@ -4,16 +4,28 @@ import java.time.Instant;
 import java.util.UUID;
 
 public class BaseEntity {
-    private UUID uuid = UUID.randomUUID();
-    private Long createdAt;
-    private Long updatedAt;
+    protected UUID uuid;
+    protected Long createdAt;
+    protected Long updatedAt;
 
     BaseEntity () {
         this.uuid = UUID.randomUUID();
         this.createdAt = getUnixTimestamp();
     }
 
-    private static long getUnixTimestamp() {
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    protected static long getUnixTimestamp() {
         return Instant.now().getEpochSecond();
     }
 

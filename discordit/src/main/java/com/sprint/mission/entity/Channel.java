@@ -19,7 +19,44 @@ public class Channel extends BaseEntity {
         this.moderators = moderators;
     }
 
-    private enum ChannelType {
+    public void updateType(ChannelType type) {
+        this.type = type;
+        updatedAt = getUnixTimestamp();
+    }
+
+    public void updateMembers(List<User> members) {
+        this.members = members;
+        updatedAt = getUnixTimestamp();
+
+    }
+
+    public void updateOnlineUsers(List<User> onlineUsers) {
+        this.onlineUsers = onlineUsers;
+        updatedAt = getUnixTimestamp();
+    }
+
+    public void updateModerators(List<User> moderators) {
+        this.moderators = moderators;
+        updatedAt = getUnixTimestamp();
+    }
+
+    public ChannelType getType() {
+        return type;
+    }
+
+    public List<User> getMembers() {
+        return members;
+    }
+
+    public List<User> getOnlineUsers() {
+        return onlineUsers;
+    }
+
+    public List<User> getModerators() {
+        return moderators;
+    }
+
+    public enum ChannelType {
         TEXT("텍스트"),
         VOICE("음성");
 
