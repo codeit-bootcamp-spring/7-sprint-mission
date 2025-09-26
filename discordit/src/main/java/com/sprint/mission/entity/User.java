@@ -9,11 +9,11 @@ public class User {
     private Long updatedAt;
 
     private String userId;
-    String Passwd;
+    private String Passwd;
 
-    String displayName;
-    String bio;
-    Status onlineStatus;
+    private String displayName;
+    private String bio;
+    private Status onlineStatus;
 
 
     public User() {
