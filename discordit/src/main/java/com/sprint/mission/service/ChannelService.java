@@ -4,21 +4,23 @@ import com.sprint.mission.entity.Channel;
 import com.sprint.mission.entity.User;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ChannelService {
-    public Channel createChannel(Channel.ChannelType type, User moderators); // 초기 운영자 한명일때
-    public Channel createChannel(Channel.ChannelType type, List<User> moderators); // 초기 운영자가 여러명일때
+    public UUID createChannel(String name, Channel.ChannelType type, User... moderators); // 초기 운영자 한명일때
 
-    public List<User> getAllMembers();
-    public List<User> getAllModerators();
+    public void setChannelName(UUID uuid, String name);
 
-    public void addMember(User user);
-    public void addModerator(User user);
+    public List<User> getAllMembers(UUID uuid);
+    public List<User> getAllModerators(UUID uuid);
 
-    public void deleteMember(User user);
-    public void deleteModerator(User user);
+    public void addMember(UUID uuid, User user);
+    public void addModerator(UUID uuid, User user);
 
-    public void addOnlineUser(User user);
-    public void removeOnlineUser(User user);
+    public void deleteMember(UUID uuid, User user);
+    public void deleteModerator(UUID uuid, User user);
+
+    public void addOnlineUser(UUID uuid, User user);
+    public void removeOnlineUser(UUID uuid, User user);
 
 }
