@@ -33,14 +33,9 @@ public class User {
         AWAY("자리비움"),
         DO_NOT_DISTURB("방해금지");
 
-        private final String description;
         Status(String description){
-            this.description = description;
         }
 
-        public String getDescription(){
-            return this.description;
-        }
     }
 
 
