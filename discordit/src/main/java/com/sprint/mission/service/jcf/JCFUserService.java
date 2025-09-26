@@ -1,6 +1,7 @@
 package com.sprint.mission.service.jcf;
 
 import com.sprint.mission.entity.User;
+import com.sprint.mission.exceptions.UserAlreadyExistsException;
 import com.sprint.mission.exceptions.UserIdNotFoundException;
 import com.sprint.mission.service.UserService;
 
@@ -23,6 +24,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public void signIn(User user) {
+        if(data.containsKey(user.getUserId()))
+            throw new UserAlreadyExistsException(user.getUserId());
         data.put(user.getUserId(), user);
     }
 
