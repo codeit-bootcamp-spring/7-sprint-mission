@@ -12,10 +12,10 @@ public interface UserService {
 
     public void deleteUser(String id);
 
-    public void updateUserId(String id);
-    public void updatePasswd(String id);
-    public void updateBio(String id);
-    public void updateOnlineStatus(String id);
+    public void updatePasswd(String id, String passwd);
+    public void updateBio(String id, String bio);
+    public void updateOnlineStatus(String id, User.Status status);
+    public User.Status getOnlineStatus(String id);
 
     public boolean isOnline(String id);
 }

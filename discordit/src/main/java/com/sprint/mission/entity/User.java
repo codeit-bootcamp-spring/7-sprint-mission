@@ -9,6 +9,12 @@ public class User extends BaseEntity {
     private String bio;
     private Status onlineStatus;
 
+    public User(String userId, String passwd, String displayName) {
+        this.userId = userId;
+        Passwd = passwd;
+        this.displayName = displayName;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -54,7 +60,7 @@ public class User extends BaseEntity {
         this.onlineStatus = onlineStatus;
     }
 
-    private enum Status{
+    public enum Status{
         ONLINE("온라인"),
         OFFLINE("오프라인"),
         AWAY("자리비움"),
