@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Message {
+import java.util.function.BiConsumer;
+
+public class Message extends Entity{
 
     private String content;
     private User sender;
@@ -35,5 +37,27 @@ public class Message {
 
     public void setMarkDown(boolean markDown) {
         isMarkDown = markDown;
+    }
+
+    public enum messageElement
+    {
+        CONTENT((x,y) -> x.setContent( (String) y)),
+        IS_MARKDOWN((x,y)->x.setMarkDown( (boolean) y));
+
+        public BiConsumer<Message, Object> setter;
+
+        messageElement(BiConsumer<Message, Object> setter)
+        {
+            this.setter = setter;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "content='" + content + '\'' +
+                ", sender=" + sender.getNickname() +
+                ", isMarkDown=" + isMarkDown +
+                '}';
     }
 }

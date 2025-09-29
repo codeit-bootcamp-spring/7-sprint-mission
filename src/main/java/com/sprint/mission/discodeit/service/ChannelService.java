@@ -8,7 +8,7 @@ public interface ChannelService {
 
     void createChannel(Channel channel);
     void readChannel(Channel channel);
-
+    void readAllChannel();
     void deleteChannel(Channel channel);
     <T> void updateChannel(Channel channel, Channel.channelElement channelElement, T updatedContent);
     void readUpdatedChannel();

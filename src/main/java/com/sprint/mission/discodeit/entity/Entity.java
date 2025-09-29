@@ -7,7 +7,7 @@ public class Entity {
     private UUID id;
     private long createdAt;
     private long updatedAt;
-
+    public static final long DEFAULT_UPDATED_AT = 0L;
     public UUID getId() {
         return id;
     }
@@ -23,7 +23,7 @@ public class Entity {
     public Entity() {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
-        this.updatedAt = 0L;
+        this.updatedAt = DEFAULT_UPDATED_AT;
     }
 
     public void updateEntity(){
