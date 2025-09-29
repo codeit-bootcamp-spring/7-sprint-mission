@@ -8,9 +8,11 @@ public class Message extends Common{
     private long time;
     private String content;
 
+    public Message() {
+    }
 
 
-    public void message(User send,User receiver,String content ){
+    public  Message(User send,User receiver,String content ){
         this.sender = send;
         this.receiver = receiver;
         this.time = System.currentTimeMillis();

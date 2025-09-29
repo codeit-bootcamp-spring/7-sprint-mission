@@ -6,14 +6,23 @@ import com.sprint.mission.discodeit.entity.service.ChannelService;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
 
-    private final List<Channel> channels = new LinkedList<>();;
+    private  final  List<Channel>  channels;
 
-    public JCFChannelService() {
+    private static final JCFChannelService INSTANCE = new JCFChannelService();
 
+    private  JCFChannelService(){
+        channels = new LinkedList<>();
     }
+
+    //이것도 다 똑같다
+    public static JCFChannelService getInstance(){
+        return INSTANCE;
+    }
+
 
 
 
@@ -28,38 +37,48 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public  void read(Channel channel) {
-        System.out.println("===== 채널 정보 =====");
-        System.out.printf("채널 ID: %s%n",channel.getId().toString().replace("-", ""));
-        System.out.printf("생성 시각: %s%n",channel.getCreatedAt());
-        System.out.printf("채널 이름: %s%n",channel.getChannelName());
-        System.out.printf("채널장(boss): %s\n",channel.getBose().getUserNickname());
-        System.out.println("멤버 목록:");
-        for (User u : channel.getUsers()) {
-            System.out.println(" - " + u.getUserNickname());
-        }
-        System.out.println("====================");
+    public  void read(UUID channelId) {
+           channels.stream()
+                   .filter(ch -> ch.getId().equals(channelId))
+                   .forEach(d ->{
+                       System.out.printf("채널 ID: %s\n", d.getId().toString().replace("-", ""));
+                       System.out.printf("생성 시각: %s\n", d.getCreatedAt());
+                       System.out.printf("채널 이름: %s\n", d.getChannelName());
+                       System.out.printf("채널장(boss): %s\n", d.getBose());
+                    });
+
+
+
 
     }
 
     //파라미터 어떻게 해야할것같다
     @Override
-    public void update(Channel channel,String channelName) {
-           channel.setChannelName(channelName);
+    public void update(UUID channelId, String channelName) {
+          return;
     }
 
 
     @Override
     public void readAll() {
-        System.out.println("채널 리스트");
-        for (Channel channel : channels) {
-            System.out.println(" - " + channel.getChannelName());
-        }
+        System.out.printf("%d개의채널 ", channels.size());
+        channels.stream()
+                .forEach(d ->{
+                    System.out.printf("채널 ID: %s\n", d.getId().toString().replace("-", ""));
+                    System.out.printf("생성 시각: %s\n", d.getCreatedAt());
+                    System.out.printf("채널 이름: %s\n", d.getChannelName());
+                    System.out.printf("채널장(boss): %s\n", d.getBose());
+                });
     }
 
     @Override
-    public void delete(Channel channel) {
-           channels.remove(channel);
-        System.out.printf("%s채널이 삭제되었습니다\n",channel.getChannelName());
+    public void delete(UUID channelId) {
+        channels.stream() .filter(u -> u.equals(channelId))
+                          .toList()
+                          .forEach(u-> {
+                              channels.remove(u);
+                             System.out.printf("%s채널이 삭제되었습니다\n",u.getChannelName());
+                });
+
     }
 }
