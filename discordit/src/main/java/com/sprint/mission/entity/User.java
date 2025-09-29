@@ -1,5 +1,7 @@
 package com.sprint.mission.entity;
 
+import java.util.Objects;
+
 public class User extends BaseEntity {
 
     private String userId;
@@ -19,16 +21,11 @@ public class User extends BaseEntity {
         return userId;
     }
 
-    public void updateUserId(String userId) {
-        this.userId = userId;
-        this.updatedAt = getUnixTimestamp();
-    }
-
     public String getPasswd() {
         return Passwd;
     }
 
-    public void updatePasswd(String passwd) {
+    public void setPasswd(String passwd) {
         this.updatedAt = getUnixTimestamp();
         Passwd = passwd;
     }
@@ -37,7 +34,7 @@ public class User extends BaseEntity {
         return displayName;
     }
 
-    public void updateDisplayName(String displayName) {
+    public void setDisplayName(String displayName) {
         this.updatedAt = getUnixTimestamp();
         this.displayName = displayName;
     }
@@ -46,7 +43,7 @@ public class User extends BaseEntity {
         return bio;
     }
 
-    public void updateBio(String bio) {
+    public void setBio(String bio) {
         this.updatedAt = getUnixTimestamp();
         this.bio = bio;
     }
@@ -55,9 +52,21 @@ public class User extends BaseEntity {
         return onlineStatus;
     }
 
-    public void updateOnlineStatus(Status onlineStatus) {
+    public void setOnlineStatus(Status onlineStatus) {
         this.updatedAt = getUnixTimestamp();
         this.onlineStatus = onlineStatus;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(uuid, user.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, displayName);
     }
 
     public enum Status{

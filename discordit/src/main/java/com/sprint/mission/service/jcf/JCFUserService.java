@@ -2,7 +2,7 @@ package com.sprint.mission.service.jcf;
 
 import com.sprint.mission.entity.User;
 import com.sprint.mission.exceptions.UserAlreadyExistsException;
-import com.sprint.mission.exceptions.UserIdNotFoundException;
+import com.sprint.mission.exceptions.UserNotFoundException;
 import com.sprint.mission.service.UserService;
 
 import java.util.*;
@@ -12,17 +12,18 @@ public class JCFUserService implements UserService {
 
     @Override
     public User getUserById(String id) {
-        return null;
+        User user = data.get(id);
+        if(user == null)
+            throw new UserNotFoundException(id);
+        return user;
     }
 
     @Override
     public List<User> getUsers(String... ids) {
         List<User> users = new ArrayList<>();
         for(String id : ids){
-            validateId(id);
-            users.add(data.get(id));
+            users.add(getUserById(id));
         }
-
         return users;
     }
 
@@ -32,51 +33,39 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void signIn(User user) {
-        if(data.containsKey(user.getUserId()))
-            throw new UserAlreadyExistsException(user.getUserId());
-        data.put(user.getUserId(), user);
+    public void signIn(String userId, String passwd, String displayName) {
+        if(data.containsKey(userId))
+            throw new UserAlreadyExistsException(userId);
+        data.put(userId, new User(userId, passwd, displayName));
     }
 
     @Override
     public void deleteUser(String id) {
-        validateId(id);
         data.remove(id);
     }
 
     @Override
-    public void updatePasswd(String id, String passwd) {
-        validateId(id);
-        data.get(id).updatePasswd(passwd);
+    public void setPasswd(String id, String passwd) {
+        getUserById(id).setPasswd(passwd);
     }
 
     @Override
-    public void updateBio(String id, String bio) {
-        validateId(id);
-        data.get(id).updateBio(bio);
+    public void setBio(String id, String bio) {
+        getUserById(id).setBio(bio);
     }
 
     @Override
-    public void updateOnlineStatus(String id, User.Status status) {
-        validateId(id);
-        data.get(id).updateOnlineStatus(status);
+    public void setOnlineStatus(String id, User.Status status) {
+        getUserById(id).setOnlineStatus(status);
     }
 
     @Override
     public User.Status getOnlineStatus(String id) {
-        validateId(id);
-        return data.get(id).getOnlineStatus();
+        return getUserById(id).getOnlineStatus();
     }
 
     @Override
     public boolean isOnline(String id) {
-        validateId(id);
-        return data.get(id).getOnlineStatus() == User.Status.ONLINE;
-    }
-
-    private void validateId(String id){
-        if (!data.containsKey(id)) {
-            throw new UserIdNotFoundException(id);
-        }
+        return getUserById(id).getOnlineStatus() == User.Status.ONLINE;
     }
 }

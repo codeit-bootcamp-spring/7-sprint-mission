@@ -9,13 +9,13 @@ public interface UserService {
     public List<User> getUsers(String... ids);
     public List<User> getAllUsers();
 
-    public void signIn(User user);
+    public void signIn(String userId, String passwd, String displayName);
 
     public void deleteUser(String id);
 
-    public void updatePasswd(String id, String passwd);
-    public void updateBio(String id, String bio);
-    public void updateOnlineStatus(String id, User.Status status);
+    public void setPasswd(String id, String passwd);
+    public void setBio(String id, String bio);
+    public void setOnlineStatus(String id, User.Status status);
     public User.Status getOnlineStatus(String id);
 
     public boolean isOnline(String id);
