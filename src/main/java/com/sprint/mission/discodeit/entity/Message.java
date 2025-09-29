@@ -2,33 +2,26 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-//DM
 public class Message {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
 
+    private String content;
+    private UUID senderId;
 
-    private String[] record;
-//    private 상태 비환성상태?
-
-
-    public Message() {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+    public Message(User user,String content) {
+        UUID senderId = user.getId();
+        this.content = content;
+        this.senderId = senderId;
     }
 
-
-
-    public UUID getId() {
-        return id;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public Long getCreatedAt() {
-        return createdAt;
+    public String getContent() {
+        return content;
     }
 
-    public Long getUpdatedAt() {
-        return updatedAt;
+    public UUID getSenderId() {
+        return senderId;
     }
 }

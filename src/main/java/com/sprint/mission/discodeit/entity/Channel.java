@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 //서버
+
 public class Channel {
 
     private final UUID id;
@@ -15,14 +18,9 @@ public class Channel {
 
     private User manager;
     private String serverName;
-    private int serverLevel;
-    private List<Message> chatRooms=new ArrayList<>();
-    private String topic;
+    private Long serverLevel;
     private boolean isPrivate;
-    private State state;
-    //채널타입
-
-
+    private List<User> Members = new ArrayList<>();
 
 
     public Channel() {
@@ -30,10 +28,22 @@ public class Channel {
         this.createdAt = System.currentTimeMillis();
     }
 
-
-    public void update(){
-        this.updatedAt = System.currentTimeMillis();
+    public void updateServerName(String newServerName){
+        this.updatedAt=System.currentTimeMillis();
+        this.serverName=serverName;
     }
+
+
+    public void updateServeLevel(Long newServerLevel){
+        this.updatedAt=System.currentTimeMillis();
+        this.serverLevel=newServerLevel;
+    }
+
+    public void updatePrivate(boolean b){
+        this.updatedAt=System.currentTimeMillis();
+        this.isPrivate=b;
+    }
+
 
     public UUID getId() {
         return id;
@@ -43,13 +53,57 @@ public class Channel {
         return createdAt;
     }
 
+    public User getManager() {
+        return manager;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public Long getServerLevel() {
+        return serverLevel;
+    }
+
+    public List<User> getMembers() {
+        return Members;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
     public Long getUpdatedAt() {
         return updatedAt;
     }
 
-
-
-    public List<Message> getChatRooms() {
-        return chatRooms;
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
     }
+
+    public void setManager(User manager) {
+        this.manager = manager;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public void setServerLevel(Long serverLevel) {
+        this.serverLevel = serverLevel;
+    }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", manager=" + manager +
+                ", serverName='" + serverName + '\'' +
+                ", serverLevel=" + serverLevel + '\'' +
+                ", isPrivate=" + isPrivate +
+                '}';
+    }
+
 }
