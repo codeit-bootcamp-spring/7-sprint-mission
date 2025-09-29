@@ -173,12 +173,19 @@ public class JavaApplication {
         //user가 서버를 열고 user2 초대
         Channel madeByUserServer = channelService.openChannel(user, "user가 만든 서버", 1L, true);
         channelService.inviteMember(user, madeByUserServer, user2);
+        System.out.println("<서버의 멤버 확인>");
         madeByUserServer.getMembers().forEach(u-> System.out.println(u.getUsername()));
         printLine();
 
         //친구 추가
-        userService.addFriend(user,user2);
-        System.out.println("친구 사이인가요? "+(user.getFriends().contains(user2)&&user2.getFriends().add(user)));
+        userService.sendFriendRequest(user,  user2);
+        List<FriendRequest> receivedFriendRequests = user2.getReceivedFriendRequests();
+        while(!receivedFriendRequests.isEmpty()){
+            FriendRequest request = receivedFriendRequests.remove(0);
+            if(request.getSender()==user){
+                userService.acceptFriendRequest(request);
+            }
+        }
         printLine();
 
 

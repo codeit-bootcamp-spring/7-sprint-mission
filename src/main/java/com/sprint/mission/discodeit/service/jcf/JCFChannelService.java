@@ -90,7 +90,8 @@ public class JCFChannelService implements ChannelService {
         channel.setServerName(serverName);
         channel.setServerLevel(serverLevel);
         channel.setPrivate(isPrivate);
-        user.getMyChannel().add(channel);
+        channel.getMembers().add(user);
+        user.getMyChannels().add(channel);
 
         channels.put(channel.getId(), channel);
         return channel;
@@ -98,7 +99,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     public void inviteMember(User fromUser ,Channel channel, User toUser) {
-        if (!fromUser.getMyChannel().contains(channel)) {
+        if (!fromUser.getMyChannels().contains(channel)) {
             System.out.println("서버에 있지 않습니다.");
             return;
         }

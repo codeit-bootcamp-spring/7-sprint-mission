@@ -81,14 +81,31 @@ public class JCFUserService implements UserService {
         room.getHistory().add(message1);
     }
 
-    public void addFriend(User fromUser, User toUser){
+    public void sendFriendRequest(User fromUser, User toUser){
+        if(getUser(toUser.getId())==null){
+            System.out.println("친구 추가하려는 유저가 존재하지 않습니다.");
+            return;
+        }
         if (fromUser.getFriends().contains(toUser)) {
             System.out.println("이미 친구입니다");
             return;
         }
-        fromUser.getFriends().add(toUser);
-        toUser.getFriends().add(fromUser);
+        FriendRequest friendRequest = new FriendRequest();
+        friendRequest.setSender(fromUser);
+        friendRequest.setReceiver(toUser);
 
+        toUser.getReceivedFriendRequests().add(friendRequest);
+
+    }
+    public List<FriendRequest> getReceivedFriendRequests(User user){
+        List<FriendRequest> receivedFriendRequests = user.getReceivedFriendRequests();
+        return receivedFriendRequests;
+    }
+
+    public void acceptFriendRequest(FriendRequest request){
+        request.getSender().getFriends().add(request.getReceiver());
+        request.getReceiver().getFriends().add(request.getSender());
+        System.out.printf(request.getReceiver().getUsername()+"(이)와 "+request.getSender().getUsername()+"(이)가 친구가 되었습니다.\n");
     }
 
 

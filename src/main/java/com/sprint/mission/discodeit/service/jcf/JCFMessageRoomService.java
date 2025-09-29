@@ -69,7 +69,8 @@ public class JCFMessageRoomService implements MessageRoomService {
     //기능추가
 
     public MessageRoom findOrMakeDM(User user1, User user2){
-        MessageRoom messageRoom = messageRooms.values().stream().filter(m -> m.getParticipants().size() == 2)
+        MessageRoom messageRoom = messageRooms.values().stream()
+                .filter(m->m.getMessageRoomType()==MessageRoomType.DM)
                 .filter(m -> m.getParticipants().contains(user1))
                 .filter(m -> m.getParticipants().contains(user2))
                 .findFirst()

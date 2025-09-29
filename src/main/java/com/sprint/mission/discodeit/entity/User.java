@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.service.jcf.JCFMessageRoomService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,8 +15,9 @@ public class User {
     private String email;
     private String nickname;
     private String phoneNumber;
+    private List<FriendRequest> receivedFriendRequests=new ArrayList<>();
     private List<MessageRoom> MyMessageRooms = new ArrayList<>();
-    private List<Channel> MyChannel = new ArrayList<>();
+    private List<Channel> MyChannels = new ArrayList<>();
     private List<User> friends = new ArrayList<>();
 //    private Language language;
 
@@ -96,12 +95,16 @@ public class User {
         return MyMessageRooms;
     }
 
-    public List<Channel> getMyChannel() {
-        return MyChannel;
+    public List<Channel> getMyChannels() {
+        return MyChannels;
     }
 
     public List<User> getFriends() {
         return friends;
+    }
+
+    public List<FriendRequest> getReceivedFriendRequests() {
+        return receivedFriendRequests;
     }
 
     public void updateUsername(String newUsername){
