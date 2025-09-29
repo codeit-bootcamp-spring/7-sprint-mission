@@ -4,6 +4,7 @@ public class Message extends BaseEntity {
     public String content;
     private String name;
 
+    public Message() {}
     public Message(String message, String name) {
         this.content = message;
         this.name = name;
@@ -19,10 +20,10 @@ public class Message extends BaseEntity {
 
     public String sendMessage(String msg) {
         content = msg;
-        Channel channel = new Channel(name);
-        if (msg != null) {
-            channel.setAlarm(true);
-        }
+//        Channel channel = new Channel(name);
+//        if (msg != null) {
+//            channel.setAlarm(true);
+//        }
         return content;
     }
 }

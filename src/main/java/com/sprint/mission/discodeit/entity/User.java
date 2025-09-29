@@ -3,19 +3,16 @@ package com.sprint.mission.discodeit.entity;
 import java.util.Objects;
 
 public class User extends BaseEntity {
-    private String username;
+    private String username; // 유저 이름 ( 별명 x)
     private String password;
     private String email;
-    private UserState userState;
+    private UserState userState; // 0: 오프라인 , 1: 온라인
 
     public User(String username, String password, String email) {
-        String vn = verifyUsername(username);
-        String vp = verifyPassword(password);
-        String ve = verifyEmail(email);
-        this.username = vn;
-        this.password = vp;
-        this.email = ve;
-        this.userState = UserState.OFFLINE;
+        this.username = verifyUsername(username);
+        this.password = verifyPassword(password);;
+        this.email = verifyEmail(email);
+        this.userState = UserState.ONLINE;
     }
 
     public UserState getUserState() {
@@ -79,7 +76,7 @@ public class User extends BaseEntity {
     private static String verifyUsername(String username) {
         if (username == null || username.isBlank()) {throw new IllegalArgumentException("username cannot be null");}
         String s = username.trim();
-        if (username.length() > 20 || username.length() < 2) { throw new IllegalArgumentException("username length must be between 2 and 20 characters");}
+        if (s.length() > 20 || s.length() < 2) { throw new IllegalArgumentException("username length must be between 2 and 20 characters");}
         return s;
     }
 
@@ -92,7 +89,7 @@ public class User extends BaseEntity {
     private static String verifyEmail(String email) {
         if (email == null || email.isBlank()) {throw new IllegalArgumentException("email cannot be null");}
         String s = email.trim().toLowerCase();
-        if(!email.contains("@")) { throw new IllegalArgumentException("email must contain '@'");}
+        if(!s.contains("@")) { throw new IllegalArgumentException("email must contain '@'");}
         return s;
     }
 }
