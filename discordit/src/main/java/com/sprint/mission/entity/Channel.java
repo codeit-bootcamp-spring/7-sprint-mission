@@ -1,23 +1,19 @@
 package com.sprint.mission.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Channel extends BaseEntity {
 
     private String channelName;
     private ChannelType type;
 
-    private List<User> members; // 채널 등록 멤버 목록
-    private List<User> onlineUsers; // 접속 중 멤버
-    private List<User> moderators;// 운영진
+    private Set<User> members; // 채널 등록 멤버 목록
+    private Set<User> moderators;// 운영진
 
-    public Channel(String channelName, ChannelType type, List<User> moderators) {
+    public Channel(String channelName, ChannelType type, Set<User> moderators) {
         this.channelName = channelName;
         this.type = type;
-        this.members = new ArrayList<>();
-        this.onlineUsers = new ArrayList<>();
+        this.members = new HashSet<>();
         this.moderators = moderators;
     }
 
@@ -37,28 +33,37 @@ public class Channel extends BaseEntity {
         this.type = type;
     }
 
-    public List<User> getMembers() {
+    public Set<User> getMembers() {
         return members;
     }
 
-    public void setMembers(List<User> members) {
+    public void setMembers(Set<User> members) {
         this.members = members;
     }
 
-    public List<User> getOnlineUsers() {
-        return onlineUsers;
+    public void addMember(User user){
+        this.members.add(user);
     }
 
-    public void setOnlineUsers(List<User> onlineUsers) {
-        this.onlineUsers = onlineUsers;
+    public void deleteMember(User user) {
+        this.members.remove(user);
     }
 
-    public List<User> getModerators() {
+    public Set<User> getModerators() {
         return moderators;
     }
 
-    public void setModerators(List<User> moderators) {
+    public void setModerators(Set<User> moderators) {
         this.moderators = moderators;
+    }
+
+    public void addModerator(User user){
+        this.members.add(user);
+        this.moderators.add(user);
+    }
+
+    public void deleteModerator(User user) {
+        this.moderators.remove(user);
     }
 
     public enum ChannelType {
