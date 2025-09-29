@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class JCFUser implements UserService {
-
+    public static final User DELETED_USER = new User("Deleted User", "Deleted User", "Deleted User Email", false);
     public final ArrayList<User> userDB;
     final Map<UUID,String> deletedUser = new HashMap<>();
 
@@ -86,15 +86,22 @@ public class JCFUser implements UserService {
 
     @Override
     public <T> void updateUser(User user, User.userElement userElement, T updatedContent) {
-        BiConsumer<User, Object> editFunction = userElement.setter;
-        Class<? extends BiConsumer> aClass = editFunction.getClass();
-        if(!aClass.isInstance(updatedContent)) {
-            System.out.println("잘못된 타입을 입력했습니다");
+        if (userDB.stream()
+                .noneMatch(u->u.getId()==user.getId())) {
+            System.out.println("유저는 존재하지 않습니다. : " + user.getName());
             return;
         }
-        editFunction.accept(user, updatedContent);
-        user.updateEntity();
-        System.out.printf("유저 변경사항 : %s\n", user.getName());
+
+        BiConsumer<User, Object> editFunction = userElement.setter;
+        try{
+            editFunction.accept(user, updatedContent);
+            user.updateEntity();
+            System.out.printf("유저 변경사항 : %s\n", user.getName());
+        }
+        catch (ClassCastException e){
+            System.out.println("잘못된 타입을 입력했습니다. 올바른 입력값을 넣어주세요");
+        }
+
 
     }
 
@@ -115,12 +122,17 @@ public class JCFUser implements UserService {
 
     @Override
     public void readDeletedUser() {
+        if(deletedUser.isEmpty()) {
+            System.out.println( "삭제된 유저가 없습니다.");
+            return;
+        }
         System.out.println( "===삭제된 유저=== ");
         for(UUID tmp :deletedUser.keySet())
         {
             String value = deletedUser.get(tmp);
             System.out.println(value);
         }
+        System.out.println("==========");
 
 
     }

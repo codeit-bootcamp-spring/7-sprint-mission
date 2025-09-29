@@ -14,13 +14,9 @@ public class UserTest {
         userService.createUser(user1);
         userService.createUser(user2);
         userService.createUser(user3);
-        userService.readAllUser();
-        userService.userDB.stream()
-                        .filter(User::isOnline)
-                                .forEach(System.out::println);
-        userService.deleteUser(user1);
-        userService.deleteUser(user2);
-        userService.deleteUser(user3);
+
+        userService.updateUser(user1, User.userElement.EMAIL,"OfficialHwempire.github.io");
+        userService.updateUser(user2, User.userElement.ONLINE,true);
 
         userService.readDeletedUser();
     }

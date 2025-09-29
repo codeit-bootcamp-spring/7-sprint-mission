@@ -4,8 +4,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import javax.security.auth.callback.CallbackHandler;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,13 +72,7 @@ public class JCFChannel implements ChannelService {
 
     @Override
     public void deleteChannel(Channel channel) {
-        if(channelDB.stream()
-                .noneMatch(c->c.getId()==channel.getId())
-
-        ){
-            System.out.println("No such channel");
-            return;
-        }
+        if(!checkIfChannelExist(channel)) return;
         deletedChannel.put(channel.getId(),channel.getName());
         channelDB.remove(channel);
         System.out.printf("채널을 삭제합니다: %s\n", channel.getName());
@@ -89,15 +81,25 @@ public class JCFChannel implements ChannelService {
 
     @Override
     public <T> void updateChannel(Channel channel, Channel.channelElement channelElement, T updatedContent) {
+        if(!checkIfChannelExist(channel)) return;
+
         BiConsumer<Channel, Object> editFunction = channelElement.setter;
-        Class<? extends BiConsumer> aClass = editFunction.getClass();
-        if(!aClass.isInstance(updatedContent)) {
-            System.out.println("잘못된 타입을 입력했습니다");
-            return;
+
+//        Class<? extends BiConsumer> aClass = editFunction.getClass();
+//        if(!aClass.isInstance(updatedContent)) {
+//            System.out.println("잘못된 타입을 입력했습니다");
+//            return;
+//        }
+        try
+        {
+            editFunction.accept(channel, updatedContent);
+            channel.updateEntity();
+            System.out.printf("채널 내부 정보를 변경했습니다.: %s\n", channel.getName());
+        } catch (ClassCastException e) {
+
+            System.out.println("잘못된 타입을 입력했습니다. 올바른 입력값을 넣어주세요");
         }
-        editFunction.accept(channel, updatedContent);
-        channel.updateEntity();
-        System.out.printf("채널 내부 정보를 변경했습니다.: %s\n", channel.getName());
+
 
     }
 
@@ -118,11 +120,28 @@ public class JCFChannel implements ChannelService {
 
     @Override
     public void readDeletedChannel() {
+        if(deletedChannel.isEmpty()){
+            System.out.println( "삭제된 채널이 없습니다.");
+            return;
+        }
         System.out.println( "===삭제된 채널=== ");
         for(UUID tmp :deletedChannel.keySet()){
             String value = deletedChannel.get(tmp);
             System.out.println(value);
         }
+        System.out.println("==========");
+
+    }
+    public boolean checkIfChannelExist(Channel channel){
+        if(channelDB.stream()
+                .noneMatch(c->c.getId()==channel.getId())
+
+        ){
+            System.out.println("채널은 존재하지 않습니다. : "+ channel.getName());
+
+            return false;
+        }
+        return true;
 
     }
 }

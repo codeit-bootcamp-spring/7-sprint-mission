@@ -18,6 +18,7 @@ public class MessageTest {
         Message m1 = new Message("Hello", user1, false);
         Message m2 = new Message("Hi I am Faker", user2, false);
         Message m3 = new Message("JAVA 를 정상화하네", notInUserDBUser, false);
+
         userService.createUser(user1);
         userService.createUser(user2);
 
@@ -25,12 +26,9 @@ public class MessageTest {
         messageService.createMessage(m2);
         messageService.createMessage(m3);
 
-        messageService.readAllMessage();
-        messageService.updateMessage(m2, Message.messageElement.CONTENT, "I am not Faker I am chovy");
-        messageService.readUpdatedMessage();
-        messageService.deleteMessage(m1);
-        messageService.readDeletedMessage();
-        messageService.readAllMessage();
+        userService.deleteUser(user1);
+
+        messageService.readMessage(m1);
 
 
     }
