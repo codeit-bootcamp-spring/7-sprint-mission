@@ -15,5 +15,6 @@ public interface UserService {
 
     User update(UUID id, User user);      // 수정
 
-    boolean delete(UUID id);              // 삭제
+    void delete(UUID id);              // 삭제
+
 }

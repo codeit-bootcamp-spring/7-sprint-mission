@@ -3,32 +3,38 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserService implements UserService {
+
+    Map<UUID, User> users = new HashMap<>();
+
     @Override
     public User create(User user) {
-        return null;
+        users.put(user.getId(), user);  // 유저 맵에 추가
+        return user;
     }
 
     @Override
     public User read(UUID id) {
-        return null;
+        return users.get(id);   // 유저 정보 출력
     }
 
     @Override
     public List<User> readAll() {
-        return List.of();
+        List<User> userList = new ArrayList<>(users.values());  // users 전체출력
+        userList.sort(Comparator.comparing(User::getCreatedAt));    // 생성일자 오름차순 정렬
+
+        return userList;
     }
 
     @Override
     public User update(UUID id, User user) {
-        return null;
+        return null;    // 뭘 업뎃해야함?
     }
 
     @Override
-    public boolean delete(UUID id) {
-        return false;
+    public void delete(UUID id) {
+        users.remove(id);
     }
 }
