@@ -1,23 +1,32 @@
 package com.sprint.mission.entity;
 
-import java.util.UUID;
-
-public class Message extends BaseEntity {
+public class Message<T extends Receivable> extends BaseEntity {
     private User sender;
-    private User receiver;
+    private Receivable receiver;
     private String message;
 
-    public Message(User sender, User receiver, String message) {
+    public Message(User sender, T receiver, String message) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
+    }
+
+    public void display() {
+        System.out.printf("""
+                [%s] -> [%s] :
+                %s
+                """, sender.getDisplayName(), receiver.getDisplayName(), message);
     }
 
     public User getSender() {
         return sender;
     }
 
-    public User getReceiver() {
+    public Receivable getReceiver() {
         return receiver;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

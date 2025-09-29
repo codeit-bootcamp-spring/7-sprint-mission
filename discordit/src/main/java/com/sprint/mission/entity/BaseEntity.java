@@ -25,6 +25,10 @@ public class BaseEntity {
         return updatedAt;
     }
 
+    public void update() {
+        createdAt = Instant.now().getEpochSecond();
+    }
+
     protected static long getUnixTimestamp() {
         return Instant.now().getEpochSecond();
     }

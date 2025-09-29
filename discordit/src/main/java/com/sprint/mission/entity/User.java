@@ -2,7 +2,7 @@ package com.sprint.mission.entity;
 
 import java.util.Objects;
 
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Receivable {
 
     private String userId;
     private String Passwd;
@@ -30,6 +30,7 @@ public class User extends BaseEntity {
         Passwd = passwd;
     }
 
+    @Override
     public String getDisplayName() {
         return displayName;
     }

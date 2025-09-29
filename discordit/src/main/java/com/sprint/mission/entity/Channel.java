@@ -2,7 +2,7 @@ package com.sprint.mission.entity;
 
 import java.util.*;
 
-public class Channel extends BaseEntity {
+public class Channel extends BaseEntity implements Receivable {
 
     private String channelName;
     private ChannelType type;
@@ -15,10 +15,6 @@ public class Channel extends BaseEntity {
         this.type = type;
         this.members = new HashSet<>();
         this.moderators = moderators;
-    }
-
-    public String getChannelName() {
-        return channelName;
     }
 
     public void setChannelName(String channelName) {
@@ -64,6 +60,11 @@ public class Channel extends BaseEntity {
 
     public void deleteModerator(User user) {
         this.moderators.remove(user);
+    }
+
+    @Override
+    public String getDisplayName() {
+        return channelName;
     }
 
     public enum ChannelType {
