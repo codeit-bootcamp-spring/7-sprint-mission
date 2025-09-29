@@ -1,0 +1,24 @@
+7-sprint-mission/
+ ├── build.gradle
+ ├── settings.gradle
+ └── src
+     └── main
+         └── java
+             └── com
+                 └── sprint
+                     └── mission
+                         └── discodeit
+                             ├── JavaApplication.java
+                             ├── entity
+                             │   ├── BaseEntity.java
+                             │   ├── User.java
+                             │   ├── Channel.java
+                             │   └── Message.java
+                             └── service
+                                 ├── UserService.java
+                                 ├── ChannelService.java
+                                 ├── MessageService.java
+                                 └── jcf
+                                     ├── JCFUserService.java
+                                     ├── JCFChannelService.java
+                                     └── JCFMessageService.java
