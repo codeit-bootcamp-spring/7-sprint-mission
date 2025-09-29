@@ -18,28 +18,30 @@ public class JCFMessageService implements MessageService {
     }
 
 
+
+
     @Override
-    public void create() {
+    public void create(User sender, User receiver, String message) {
 
     }
 
     @Override
-    public void read() {
+    public void read(Message message) {
 
     }
 
     @Override
-    public void readAll() {
+    public void readAll(List<Message> messages) {
 
     }
 
     @Override
-    public void update() {
+    public void update(Message message) {
 
     }
 
     @Override
-    public void delete() {
+    public void delete(Message message) {
 
     }
 }
