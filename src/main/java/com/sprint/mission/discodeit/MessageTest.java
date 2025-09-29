@@ -32,5 +32,6 @@ public class MessageTest {
         messageService.readDeletedMessage();
         messageService.readAllMessage();
 
+
     }
 }

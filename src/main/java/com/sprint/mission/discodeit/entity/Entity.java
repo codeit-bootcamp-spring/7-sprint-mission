@@ -4,8 +4,8 @@ import java.util.UUID;
 
 public class Entity {
 
-    private UUID id;
-    private long createdAt;
+    private final UUID id;
+    private final long createdAt;
     private long updatedAt;
     public static final long DEFAULT_UPDATED_AT = 0L;
     public UUID getId() {

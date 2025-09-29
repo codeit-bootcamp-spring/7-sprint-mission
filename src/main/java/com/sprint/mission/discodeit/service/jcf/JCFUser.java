@@ -5,12 +5,15 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class JCFUser implements UserService {
 
     public final ArrayList<User> userDB;
-    final ArrayList<String> deletedUser = new ArrayList<>();
+    final Map<UUID,String> deletedUser = new HashMap<>();
 
     public JCFUser(ArrayList<User> userDB) {
         this.userDB = userDB;
@@ -28,23 +31,33 @@ public class JCFUser implements UserService {
 
     @Override
     public void readUser(User user) {
-        if(userDB.stream()
-                .noneMatch(u->u.getName().equals(user.getName()))){
-            System.out.println("No such user");
+        if(deletedUser.containsKey(user.getId())){
+            System.out.println(user.getName()+ ": 삭제된 유저입니다.");
             return;
         }
-        System.out.println("User info: "+ user.toString() );
+        if(userDB.stream()
+                .noneMatch(m->m.getId()==user.getId())){
+            System.out.println(" 유저 없습니다. :" + user.getName());
+            return;
+        }
+
+        System.out.println("유저 정보 :"+ user.toString() );
 
     }
 
     public void readUser(User ... users){
         for(User user : users){
-            if(userDB.stream()
-                    .noneMatch(u->u.getName().equals(user.getName()))){
-                System.out.println("No such user");
+            if(deletedUser.containsKey(user.getId())){
+                System.out.println(user.getName() + ": 삭제된 유저입니다.");
                 continue;
             }
-            System.out.println("User info: "+ user.toString() );
+            if(userDB.stream()
+                    .noneMatch(m->m.getId()==user.getId())){
+                System.out.println("유저 없습니다. : " + user.getName());
+                continue;
+            }
+
+            System.out.println("유저 정보: "+ user.toString() );
         }
     }
 
@@ -61,13 +74,13 @@ public class JCFUser implements UserService {
     @Override
     public void deleteUser(User user) {
         if (userDB.stream()
-                .noneMatch(u -> u.getName().equals(user.getName()))) {
-            System.out.println("No such user");
+                .noneMatch(u->u.getId()==user.getId())) {
+            System.out.println("유저는 존재하지 않습니다. : " + user.getName());
             return;
         }
         userDB.remove(user);
-        deletedUser.add(user.getName());
-        System.out.printf("User deleted: %s\n", user.getName());
+        deletedUser.put(user.getId(),user.getName());
+        System.out.printf("유저를 삭제합니다. : %s\n", user.getName());
 
     }
 
@@ -81,7 +94,7 @@ public class JCFUser implements UserService {
         }
         editFunction.accept(user, updatedContent);
         user.updateEntity();
-        System.out.printf("User updated: %s\n", user.getName());
+        System.out.printf("유저 변경사항 : %s\n", user.getName());
 
     }
 
@@ -94,7 +107,7 @@ public class JCFUser implements UserService {
         for (User user : userDB) {
             if (user.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT) {
                 readUser(user);
-                System.out.println(user.getName() + " is Updated at: " + " " + user.getUpdatedAt());
+                System.out.println(user.getName() + " 변경 시간: " + " " + user.getUpdatedAt());
             }
         }
 
@@ -102,7 +115,13 @@ public class JCFUser implements UserService {
 
     @Override
     public void readDeletedUser() {
-        System.out.println("Deleted User = " + deletedUser);
+        System.out.println( "===삭제된 유저=== ");
+        for(UUID tmp :deletedUser.keySet())
+        {
+            String value = deletedUser.get(tmp);
+            System.out.println(value);
+        }
+
 
     }
 }

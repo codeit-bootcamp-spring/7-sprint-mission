@@ -19,6 +19,9 @@ public class UserTest {
                         .filter(User::isOnline)
                                 .forEach(System.out::println);
         userService.deleteUser(user1);
+        userService.deleteUser(user2);
+        userService.deleteUser(user3);
+
         userService.readDeletedUser();
     }
 }

@@ -13,15 +13,9 @@ public class ChannelTest {
 
         channelService.createChannel(channel1);
         channelService.createChannel(channel2);
-        channelService.createChannel(channel3);
 
-        channelService.readAllChannel();
+
         channelService.deleteChannel(channel1);
-        channelService.readDeletedChannel();
-
-        channelService.updateChannel(channel3, Channel.channelElement.DESCRIPTION,false);
-        channelService.readUpdatedChannel();
-        channelService.updateChannel(channel3, Channel.channelElement.IS_PUBLIC,true);
-        channelService.readAllChannel();
+        channelService.readChannel(channel1);
     }
 }
