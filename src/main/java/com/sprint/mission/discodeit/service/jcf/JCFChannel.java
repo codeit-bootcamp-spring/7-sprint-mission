@@ -2,38 +2,71 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Entity;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class JCFChannel implements ChannelService {
-    final ArrayList<Channel> channelDB;
-    final  Map<UUID,String> deletedChannel =new HashMap<>();
-    public JCFChannel(ArrayList<Channel> channelDB) {
-        this.channelDB = channelDB;
+private final ArrayList<Channel> channelDb;
+private final  Map<UUID,String> deletedChannel ;
+    private final JCFDb jcfDb;
+
+
+
+
+    public JCFChannel(JCFDb jcfDb) {
+
+        this.jcfDb = jcfDb;
+this.channelDb = jcfDb.getChannelDb();
+this.deletedChannel = jcfDb.getDeletedChannelDb();
+
     }
-    public JCFChannel() {
-        this.channelDB = new ArrayList<>();
+
+
+    public void addUserToChannel(User user, Channel channel){
+        if(channelDb.stream().noneMatch(u->u.getId()==user.getId())){
+            System.out.println("채널에 등록할 유저가 존재하지 않습니다.");
+            return;
+        }
+        if(channelDb.stream().noneMatch(c->c.getId()==channel.getId())){
+            System.out.println("채널이 존재하지 않습니다.");
+            return;
+        }
+        channel.addUserToChannel(user);
     }
+
+    public void deleteUserFromChannel(User user, Channel channel){
+        if(channelDb.stream().noneMatch(u->u.getId()==user.getId())){
+            System.out.println("채널에 유저가 존재하지 않습니다.");
+            return;
+        }
+        if(channelDb.stream().noneMatch(c->c.getId()==channel.getId())){
+            System.out.println("채널이 존재하지 않습니다.");
+            return;
+        }
+        channel.removeUserFromChannel(user);
+    }
+
+
+
+
 
     @Override
     public void createChannel(Channel channel) {
-        channelDB.add(channel);
+        jcfDb.createChannel(channel);
         System.out.printf("채널이 생성되었습니다 : %s\n", channel.getName());
 
     }
 
     @Override
     public void readChannel(Channel channel) {
-        if(deletedChannel.containsKey(channel.getId())) {
+        if(jcfDb.getDeletedChannelDb().containsKey(channel.getId())) {
             System.out.println(channel.getName() + ": 삭제된 채널입니다.");
             return;
         }
-        if(channelDB.stream()
+        if(jcfDb.getChannelDb().stream()
                 .noneMatch(c->c.getName().equals(channel.getName()))
 
         ){
@@ -52,7 +85,7 @@ public class JCFChannel implements ChannelService {
                 System.out.println(channel.getName()+": 삭제된 채널입니다.");
                 continue;
             }
-            if(channelDB.stream()
+            if(channelDb.stream()
                     .noneMatch(c->c.getId()==channel.getId())
 
             ){
@@ -65,17 +98,14 @@ public class JCFChannel implements ChannelService {
     }
     @Override
     public void readAllChannel() {
-        for (Channel channel : channelDB) {
+        for (Channel channel : channelDb) {
             readChannel(channel);
         }
     }
 
     @Override
     public void deleteChannel(Channel channel) {
-        if(!checkIfChannelExist(channel)) return;
-        deletedChannel.put(channel.getId(),channel.getName());
-        channelDB.remove(channel);
-        System.out.printf("채널을 삭제합니다: %s\n", channel.getName());
+        jcfDb.deleteChannel(channel);
 
     }
 
@@ -105,11 +135,11 @@ public class JCFChannel implements ChannelService {
 
     @Override
     public void readUpdatedChannel() {
-        if (channelDB.stream().noneMatch(c -> c.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT)) {
+        if (channelDb.stream().noneMatch(c -> c.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT)) {
             System.out.println("업데이트 된 채널이 없습니다.");
             return;
         }
-        for(Channel channel : channelDB){
+        for(Channel channel : channelDb){
 
             if(channel.getUpdatedAt()!= Entity.DEFAULT_UPDATED_AT){
                 readChannel(channel);
@@ -133,7 +163,7 @@ public class JCFChannel implements ChannelService {
 
     }
     public boolean checkIfChannelExist(Channel channel){
-        if(channelDB.stream()
+        if(channelDb.stream()
                 .noneMatch(c->c.getId()==channel.getId())
 
         ){
@@ -144,4 +174,11 @@ public class JCFChannel implements ChannelService {
         return true;
 
     }
+    public void showUserInChannel(Channel channel){
+        for(User user : channel.getUsers()){
+            System.out.println(user.getName());
+        }
+    }
+
+
 }

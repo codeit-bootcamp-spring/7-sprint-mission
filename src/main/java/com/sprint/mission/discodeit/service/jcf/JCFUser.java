@@ -12,20 +12,22 @@ import java.util.function.BiConsumer;
 
 public class JCFUser implements UserService {
     public static final User DELETED_USER = new User("Deleted User", "Deleted User", "Deleted User Email", false);
-    public final ArrayList<User> userDB;
-    final Map<UUID,String> deletedUser = new HashMap<>();
+    private final ArrayList<User> userDB;
+    private final Map<UUID,String> deletedUser ;
 
-    public JCFUser(ArrayList<User> userDB) {
-        this.userDB = userDB;
-    }
-    public JCFUser() {
-        this.userDB = new ArrayList<>();
+    private final JCFDb jcfDb;
+
+
+    public JCFUser(JCFDb jcfDb) {
+
+        this.jcfDb = jcfDb;
+        this.userDB = jcfDb.getUserDb();
+        this.deletedUser = jcfDb.getDeletedUserDb();
     }
 
     @Override
     public void createUser(User user) {
-        userDB.add(user);
-        System.out.printf("User created: %s\n", user.getName());
+        jcfDb.createUser(user);
 
     }
 
@@ -73,14 +75,7 @@ public class JCFUser implements UserService {
 
     @Override
     public void deleteUser(User user) {
-        if (userDB.stream()
-                .noneMatch(u->u.getId()==user.getId())) {
-            System.out.println("유저는 존재하지 않습니다. : " + user.getName());
-            return;
-        }
-        userDB.remove(user);
-        deletedUser.put(user.getId(),user.getName());
-        System.out.printf("유저를 삭제합니다. : %s\n", user.getName());
+      jcfDb.deleteUser(user);
 
     }
 
@@ -136,4 +131,5 @@ public class JCFUser implements UserService {
 
 
     }
+
 }

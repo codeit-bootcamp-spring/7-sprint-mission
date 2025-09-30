@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -12,25 +13,23 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class JCFMessage implements MessageService {
-    public final ArrayList<Message> messageDB;
-    final Map<UUID,String> deletedMessage = new HashMap<>();
-    private final JCFUser userService;
+    private final ArrayList<Message> messageDB;
+    private final Map<UUID,String> deletedMessage = new HashMap<>();
+    private final ArrayList<User> userDb;
+
+    private final JCFDb jcfDb;
 
 
-    public JCFMessage(JCFUser userService) {
-        this.messageDB = new ArrayList<>();
-        this.userService = userService;
-    }
 
-    public JCFMessage(JCFUser userService, ArrayList<Message> messageDB) {
-        this.messageDB = messageDB;
-        this.userService = userService;
+    public JCFMessage(JCFDb jcfDb) {
+        this.jcfDb = jcfDb;
+        this.messageDB = jcfDb.getMessageDb();
+        this.userDb = jcfDb.getUserDb();
     }
 
     @Override
     public void createMessage(Message message) {
-        if (
-                userService.userDB.stream()
+        if (userDb.stream()
                         .noneMatch(x -> x.getId() == message.getSender().getId())
 
         ) {
@@ -53,7 +52,7 @@ public class JCFMessage implements MessageService {
             System.out.println("메세지는 존재하지 않습니다 : "+ message.getContent());
             return;
         }
-        changeToDeletedUser(message);
+
 
             System.out.println(message.toString());
 
@@ -73,7 +72,7 @@ public class JCFMessage implements MessageService {
                 continue;
             }
 
-            changeToDeletedUser(message);
+
             System.out.println(message.toString());
         }
     }
@@ -94,7 +93,7 @@ public class JCFMessage implements MessageService {
             System.out.println(" 메세지는 존재하지 않습니다. : "+ message.getContent());
             return;
         }
-        changeToDeletedUser(message);
+
         messageDB.remove(message);
         deletedMessage.put(message.getId(),message.getContent());
         System.out.printf("메세지를 삭제합니다: %s\n", message.getContent());
@@ -108,7 +107,7 @@ public class JCFMessage implements MessageService {
             System.out.println(" 메세지는 존재하지 않습니다. : "+ message.getContent());
             return;
         }
-        changeToDeletedUser(message);
+
         BiConsumer<Message, Object> editFunction = messageElement.setter;
       try{
           editFunction.accept(message, updatedContent);
@@ -129,7 +128,7 @@ public class JCFMessage implements MessageService {
             return;
         }
         for (Message message : messageDB) {
-            changeToDeletedUser(message);
+
             if (message.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT) {
                 readMessage(message);
                 System.out.println(message.getContent() + " 변경 시간: " + " " + message.getUpdatedAt());
@@ -155,9 +154,11 @@ public class JCFMessage implements MessageService {
     }
 
     public void changeToDeletedUser(Message msg){
-        if(userService.deletedUser.containsKey(msg.getSender().getId()))
+        if(jcfDb.getDeletedUserDb().containsKey(msg.getSender().getId()))
         {
             msg.setSender(JCFUser.DELETED_USER);
+            return;
         }
+        System.out.println("아직 유저가 죽지 않앗습니다.");
     }
 }

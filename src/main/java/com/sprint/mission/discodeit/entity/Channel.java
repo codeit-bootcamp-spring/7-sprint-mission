@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import javax.naming.Name;
 import javax.naming.NamingEnumeration;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -12,6 +13,27 @@ public class Channel extends Entity {
     private String description;
     private boolean isPublic;
     private boolean isTextChannel;
+    private final List<User> userDb = new ArrayList<>();
+
+    public void addUserToChannel(User user){
+        userDb.add(user);
+    }
+
+    public List<User> getUserDb() {
+        return userDb;
+    }
+
+    public void removeUserFromChannel(User user){
+
+        if(userDb.contains(user))
+        {
+            userDb.remove(user);
+            return;
+        }
+
+            throw new IllegalArgumentException("채널에 존재하지 않는 유저입니다.");
+
+    }
 
     public Channel(String name, String description, boolean isPublic, boolean isTextChannel) {
         super();
@@ -20,6 +42,7 @@ public class Channel extends Entity {
         this.isPublic = isPublic;
         this.isTextChannel = isTextChannel;
     }
+
 
     public String getName() {
         return name;
@@ -39,6 +62,10 @@ public class Channel extends Entity {
 
     public boolean isPublic() {
         return isPublic;
+    }
+
+    public List<User> getUsers() {
+        return userDb;
     }
 
     public void setPublic(boolean aPublic) {
