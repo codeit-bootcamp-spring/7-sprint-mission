@@ -4,10 +4,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.service.MessageService;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
@@ -28,55 +25,58 @@ public class JCFMessageService implements MessageService {
 
 
     @Override
-    public void create(User sender, User receiver, String message) {
-           messages.add(new Message(sender,receiver,message));
+    public Message create(User sender, User receiver, String message) {
+         Message newMessage = new Message(sender,receiver,message);
+           messages.add(newMessage);
+           return newMessage;
     }
 
     @Override
-    public void read(UUID messageId) {
-        messages.stream()
-                .filter(message -> message.getId().equals(messageId))
-                .forEach(message -> {
-                    System.out.println("보낸 사람 : " + message.getSender());
-                    System.out.println("보낸 사람 : " + message.getSender());
-                    System.out.println("받는 사람 : " + message.getReceiver());
-                    System.out.println("보낸 시각 : " + message.getTime());
-                    System.out.println("메시지 내용 : " + message.getContent());
-                });
+    public Message read(UUID messageId) {
 
+        Message message = messages.stream()
+                .filter(u -> u.getId().equals(messageId))
+                .findFirst()
+                .orElse(null);
+
+        if (message == null) {
+            System.out.println("해당 메시지 없습니다: " + messageId);
+        } else {
+            System.out.println(message);
+        }
+        return message;
     }
 
-    @Override
-    public void readAll() {
-        System.out.printf("%d개의 메시지",messages.size());
-        messages.stream()
-                        .forEach(message -> {
-                            System.out.println("보낸 사람 : " + message.getSender());
-                            System.out.println("보낸 사람 : " + message.getSender());
-                            System.out.println("받는 사람 : " + message.getReceiver());
-                            System.out.println("보낸 시각 : " + message.getTime());
-                            System.out.println("메시지 내용 : " + message.getContent());
 
-                        });
+
+    @Override
+    public List<Message> readAll() {
+
+        System.out.printf("%d개의 메시지@@@\n",messages.size());
+                messages
+                        .forEach(System.out::println);
+        return messages;
     }
 
+
     @Override
-    public void update(UUID messageId,String content) {
-        messages.stream()
+    public Message update(UUID messageId,String content) {
+        Message m = messages.stream()
                 .filter(msg -> msg.getId().equals(messageId))
-                .forEach(msg -> msg.setContent(content));
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("찾는 메시지가 없오: " + messageId));
 
-        // 찾아보니 안전하게 수정이 있다 uuid라
-        // 하나일것같은데 그냥 if present는 안되더라
-             //     .findFirst()
-             //   .ifPresent(msg -> msg.setContent(content));
+        m.setContent(content);
+        m.setUpdatedAt(System.currentTimeMillis());
+        return m;
+
     }
 
+
+
     @Override
-    public void delete(UUID messageId) {
-        messages.stream() .filter(u -> u.equals(messageId))
-                .toList()
-                .forEach(m-> messages.remove(m));
+    public boolean delete(UUID messageId) {
+        return messages.removeIf(u -> u.getId().equals(messageId));
 
     }
 

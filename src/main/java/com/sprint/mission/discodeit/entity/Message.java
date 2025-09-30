@@ -54,10 +54,10 @@ public class Message extends Common{
     @Override
     public String toString() {
         return "Message{" +
-                "sender=" + sender +
-                ", receiver=" + receiver +
-                ", time=" + time +
-                ", content='" + content + '\'' +
+                "발신자 =" + sender +
+                ", 수신자 =" + receiver +
+                ", 생성시간 =" + time +
+                ",  내용 ='" + content + '\'' +
                 '}';
     }
 }

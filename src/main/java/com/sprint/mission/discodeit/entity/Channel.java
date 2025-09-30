@@ -48,8 +48,8 @@ public class Channel extends Common {
     @Override
     public String toString() {
         return "Channel{" +
-                "bose=" + bose +
-                ", users=" + users +
+                "주인=" + bose +
+                ", 유저들=" + users +
                 '}';
     }
 }

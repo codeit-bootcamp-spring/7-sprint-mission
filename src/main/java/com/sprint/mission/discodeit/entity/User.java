@@ -59,10 +59,10 @@ public class User extends Common {
     @Override
     public String toString() {
         return "User{" +
-                "userId='" + userId + '\'' +
-                ", password='" + password + '\'' +
-                ", userName='" + userName + '\'' +
-                ", userNickname='" + userNickname + '\'' +
+                "아이디 = '" + userId + '\'' +
+                ", 비번 = '" + password + '\'' +
+                ", 이름 = '" + userName + '\'' +
+                ", 닉네임 = '" + userNickname + '\'' +
                 '}';
     }
 }

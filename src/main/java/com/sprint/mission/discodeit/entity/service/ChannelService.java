@@ -6,11 +6,13 @@ import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public interface ChannelService {
-    void  create(User user,String channelName);
-    void read(UUID channelId);
-    void readAll();
-    void update(UUID channelId,String channelName);
-    void delete(UUID channelId);
+    Channel  create(User user,String channelName);
+    Channel read(UUID channelId);
+    List<Channel> readAll();
+    Channel update(UUID channelId, Consumer<Channel> updater);
+    boolean delete(UUID channelId);
+
 }

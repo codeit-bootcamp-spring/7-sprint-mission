@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.entity.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.service.ChannelService;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class JCFChannelService implements ChannelService {
 
@@ -28,57 +31,54 @@ public class JCFChannelService implements ChannelService {
 
 
     @Override
-    public  void create(User user,String channelName) {
+    public Channel create(User user,String channelName) {
         Channel ch = new Channel(user,channelName);
         channels.add(ch);
         ch.setChannelName(channelName);
         System.out.printf("%s가 채널을 만들엇습니다\n",user.getUserName());
-
+        return ch;
     }
 
     @Override
-    public  void read(UUID channelId) {
-           channels.stream()
-                   .filter(ch -> ch.getId().equals(channelId))
-                   .forEach(d ->{
-                       System.out.printf("채널 ID: %s\n", d.getId().toString().replace("-", ""));
-                       System.out.printf("생성 시각: %s\n", d.getCreatedAt());
-                       System.out.printf("채널 이름: %s\n", d.getChannelName());
-                       System.out.printf("채널장(boss): %s\n", d.getBose());
-                    });
-
-
-
-
+    public  Channel read(UUID channelId) {
+        Channel channel = channels.stream()
+                .filter(ch -> ch.getId().equals(channelId))
+                .findFirst()
+                .orElse(null);
+        if (channel == null) {
+            System.out.println("해당 채널 없습니다: " + channelId);
+        } else {
+            System.out.println(channel);
+        }
+       return channel;
     }
 
     //파라미터 어떻게 해야할것같다
     @Override
-    public void update(UUID channelId, String channelName) {
-          return;
+    public Channel update(UUID channelId, Consumer<Channel> updater) {
+        System.out.println("수정");
+        return channels.stream()
+                .filter(u -> u.getId().equals(channelId))
+                .findFirst()
+                .map(u -> {
+                    updater.accept(u); // 여러개 가능하게
+                    return u;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + channelId));
     }
 
 
     @Override
-    public void readAll() {
-        System.out.printf("%d개의채널 ", channels.size());
-        channels.stream()
-                .forEach(d ->{
-                    System.out.printf("채널 ID: %s\n", d.getId().toString().replace("-", ""));
-                    System.out.printf("생성 시각: %s\n", d.getCreatedAt());
-                    System.out.printf("채널 이름: %s\n", d.getChannelName());
-                    System.out.printf("채널장(boss): %s\n", d.getBose());
-                });
+    public List<Channel> readAll() {
+        System.out.printf("%d개의 채널@@@\n",channels.size());
+        channels
+                .forEach(System.out::println);
+        return channels;
     }
 
     @Override
-    public void delete(UUID channelId) {
-        channels.stream() .filter(u -> u.equals(channelId))
-                          .toList()
-                          .forEach(u-> {
-                              channels.remove(u);
-                             System.out.printf("%s채널이 삭제되었습니다\n",u.getChannelName());
-                });
+    public boolean delete(UUID channelId) {
+        return channels.removeIf(u -> u.getId().equals(channelId));
 
     }
 }

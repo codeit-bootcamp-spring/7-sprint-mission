@@ -46,7 +46,7 @@ public  class Common {
         return updatedAt;
     }
     //이건 넣어줄수있을듯한데
-    public void setUpdatedAt(System system) {
+    public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
     }
 }
