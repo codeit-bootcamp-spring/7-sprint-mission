@@ -2,14 +2,13 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
- * 사용자(User)와 관련된 비즈니스 로직을 처리하는 서비스 인터페이스입니다.
- * 이 인터페이스는 사용자 생성, 조회, 수정, 삭제(CRUD) 및 기타 사용자 관련 기능을 정의합니다.
+ * 사용자(User) 도메인의 비즈니스 로직을 처리하는 서비스 인터페이스입니다.
+ * 공통 CRUD 기능은 BaseService로부터 상속받습니다.
  */
-public interface UserService {
+public interface UserService extends BaseService<User, UUID> {
 
     /**
      * 새로운 사용자를 생성하고 저장소에 저장합니다.
@@ -71,23 +70,7 @@ public interface UserService {
     void changePassword(UUID userId, String newPassword);
 
     /**
-     * 고유 ID(UUID)를 사용하여 특정 사용자를 조회합니다.
-     *
-     * @param userId 조회할 사용자의 고유 ID
-     * @return 조회된 User 객체
-     * @throws java.util.NoSuchElementException 해당 ID의 사용자가 없을 경우
-     */
-    User findById(UUID userId);
-
-    /**
-     * 저장된 모든 사용자를 조회합니다.
-     *
-     * @return 모든 User 객체를 담은 List, 사용자가 없으면 빈 리스트를 반환
-     */
-    List<User> findAll();
-
-    /**
-     * 사용자 이름(username)을 사용하여 특정 사용자를 조회합니다.
+     * 사용자 이름(username)으로 특정 사용자를 조회합니다.
      *
      * @param username 조회할 사용자의 이름
      * @return 조회된 User 객체
@@ -104,25 +87,6 @@ public interface UserService {
     boolean existsByUsername(String username);
 
     /**
-     * 고유 ID를 사용하여 특정 사용자를 삭제합니다.
-     *
-     * @param userId 삭제할 사용자의 고유 ID
-     */
-    void deleteById(UUID userId);
-
-    /**
-     * 모든 사용자를 삭제합니다.
-     */
-    void deleteAll();
-
-    /**
-     * 전체 사용자 수를 반환합니다.
-     *
-     * @return long 타입의 전체 사용자 수
-     */
-    long count();
-
-    /**
      * 특정 사용자가 '온라인' 상태인지 확인합니다.
      *
      * @param userId 확인할 사용자의 고유 ID
@@ -131,6 +95,7 @@ public interface UserService {
     boolean isOnline(UUID userId);
 
     /**
+     * 특정 사용자가 '오프라인' 상태인지 확인합니다.
      *
      * @param userId 확인할 사용자의 고유 ID
      * @return 오프라인 상태이면 true, 아니면 false

@@ -1,25 +1,21 @@
-import com.sprint.mission.discodeit.entity.State;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.NoSuchElementException;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * JCFUserService의 주요 기능들에 대한 통합 테스트입니다.
- * 실제 UserRepository 인스턴스를 주입하여 서비스와 리포지토리의 상호작용을 함께 검증합니다.
+ * 실제 JCFUserRepository 인스턴스를 주입하여 서비스와 리포지토리의 상호작용을 함께 검증합니다.
  */
 class JCFUserServiceIntegrationTest {
 
     private JCFUserService userService;
-    private UserRepository userRepository;
+    private JCFUserRepository JCFUserRepository;
 
     /**
      * 각 테스트 실행 전에 독립적인 테스트 환경을 구축합니다.
@@ -30,10 +26,10 @@ class JCFUserServiceIntegrationTest {
     void setUp() {
         // 1. 테스트의 '제어권' 하에 있는 새로운 Repository 인스턴스를 생성합니다.
         //    이를 통해 테스트는 데이터 저장소의 상태를 완벽하게 격리하고 제어할 수 있습니다.
-        this.userRepository = new UserRepository();
+        this.JCFUserRepository = new JCFUserRepository();
         // 2. 생성한 Repository를 Service에 '주입'하여 테스트 대상을 설정합니다.
         //    이로써 Service는 우리가 제어하는 데이터 저장소를 바라보게 됩니다.
-        this.userService = new JCFUserService(this.userRepository);
+        this.userService = new JCFUserService(this.JCFUserRepository);
     }
 
     @Test
@@ -53,7 +49,7 @@ class JCFUserServiceIntegrationTest {
 
         // [통합 테스트 핵심] Service의 로직이 Repository에 올바르게 반영되었는지,
         // 데이터의 최종 상태를 직접 확인하여 검증의 신뢰도를 높입니다.
-        User foundUserInRepo = userRepository.findById(createdUser.getId()).get();
+        User foundUserInRepo = JCFUserRepository.findById(createdUser.getId()).get();
         assertThat(foundUserInRepo).isEqualTo(createdUser);
     }
 
