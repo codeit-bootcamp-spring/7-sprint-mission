@@ -90,7 +90,7 @@ public class JCFUserService implements UserService {
     @Override
     public User update(UUID uuid, Consumer<User> updater) {
         System.out.println("수정");
-        return users.stream()
+         return users.stream()
                 .filter(u -> u.getId().equals(uuid))
                 .findFirst()
                 .map(u -> {

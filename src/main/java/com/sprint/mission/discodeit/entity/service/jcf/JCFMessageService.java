@@ -44,12 +44,12 @@ public class JCFMessageService implements MessageService {
         } else {
             System.out.println(message);
         }
-        return message;
+         return message;
     }
 
 
 
-    @Override
+     @Override
     public List<Message> readAll() {
 
         System.out.printf("%d개의 메시지@@@\n",messages.size());
