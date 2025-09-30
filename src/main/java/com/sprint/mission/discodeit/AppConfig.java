@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.repository.MemoryChannelRepository;
+import com.sprint.mission.discodeit.repository.MemoryFriendRequestRepository;
 import com.sprint.mission.discodeit.repository.MemoryMessageRoomRepository;
 import com.sprint.mission.discodeit.repository.MemoryUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFFriendRequestService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageRoomService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
@@ -13,11 +15,12 @@ public class AppConfig {
     private final MemoryUserRepository userRepository=new MemoryUserRepository();
     private final MemoryMessageRoomRepository messageRoomRepository=new MemoryMessageRoomRepository();
     private final MemoryChannelRepository channelRepository = new MemoryChannelRepository();
+    private final MemoryFriendRequestRepository friendRequestRepository = new MemoryFriendRequestRepository();
 
     private final JCFUserService userService = new JCFUserService(userRepository);
     private final JCFMessageRoomService messageRoomService= new JCFMessageRoomService(messageRoomRepository);
     private final JCFChannelService channelService = new JCFChannelService(channelRepository);
-
+    private final JCFFriendRequestService friendRequestService =new JCFFriendRequestService(friendRequestRepository,userService);
 
     //getter
     public JCFUserService userService(){
@@ -31,4 +34,7 @@ public class AppConfig {
         return channelService;
     }
 
+    public JCFFriendRequestService getFriendRequestService() {
+        return friendRequestService;
+    }
 }

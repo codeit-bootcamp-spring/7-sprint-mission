@@ -7,29 +7,31 @@ import java.util.UUID;
 public class FriendRequest {
 
     private final UUID id;
-    private User sender;
-    private User receiver;
+    private UUID senderId;
+    private UUID receiverId;
 
 
     public FriendRequest() {
         this.id = UUID.randomUUID();
     }
 
-    public User getSender() {
-        return sender;
+    public UUID getId() {
+        return id;
     }
 
-    public void setSender(User sender) {
-        this.sender = sender;
+    public UUID getSenderId() {
+        return senderId;
     }
 
-    public User getReceiver() {
-        return receiver;
+    public UUID getReceiverId() {
+        return receiverId;
     }
 
-    public void setReceiver(User receiver) {
-        this.receiver = receiver;
+    public void setSenderId(UUID senderId) {
+        this.senderId = senderId;
     }
 
-
+    public void setReceiverId(UUID receiverId) {
+        this.receiverId = receiverId;
+    }
 }

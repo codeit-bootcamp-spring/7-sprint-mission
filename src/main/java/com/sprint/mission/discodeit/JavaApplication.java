@@ -4,6 +4,7 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.*;
 
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFFriendRequestService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageRoomService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
@@ -22,6 +23,7 @@ public class JavaApplication {
         JCFUserService userService = appConfig.userService();
         JCFMessageRoomService messageRoomService= appConfig.messageRoomService();
         JCFChannelService channelService = appConfig.channelService();
+        JCFFriendRequestService friendRequestService = appConfig.getFriendRequestService();
 
         //User생성 - 필수 필드 입력 안할 시 실패
         User user = new User();
@@ -170,14 +172,17 @@ public class JavaApplication {
         printLine();
 
         //친구 추가
-        userService.sendFriendRequest(user,  user2);
-        List<FriendRequest> receivedFriendRequests = user2.getReceivedFriendRequests();
-        while(!receivedFriendRequests.isEmpty()){
-            FriendRequest request = receivedFriendRequests.remove(0);
-            if(request.getSender()==user){
-                userService.acceptFriendRequest(request);
-            }
-        }
+        friendRequestService.sendFriendRequest(user,  user2.getId());
+        List<FriendRequest> receivedFriendRequests = friendRequestService.getReceivedFriendRequests(user2);
+        FriendRequest friendRequest = receivedFriendRequests.stream()
+                .filter(r -> userService.getUser(r.getSenderId()) == user)
+                .findFirst()
+                .orElseGet(null);
+        friendRequestService.acceptFriendRequest(friendRequest);
+        List<String> friendNameList = user.getFriends().stream().map(friendUser -> friendUser.getUsername()).toList();
+        List<String> friendNameList2 = user2.getFriends().stream().map(friendUser -> friendUser.getUsername()).toList();
+        System.out.println(friendNameList);
+        System.out.println(friendNameList2);
         printLine();
 
 

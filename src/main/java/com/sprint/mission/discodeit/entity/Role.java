@@ -1,5 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
 public enum Role {
-    ADMIN, MODERATOR, MEMBER;
+    ADMIN, MODERATOR,MEMBER;
 }

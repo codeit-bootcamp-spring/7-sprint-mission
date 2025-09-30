@@ -18,7 +18,7 @@ public class Channel {
     private String serverName;
     private Long serverLevel;
     private boolean isPrivate;
-    private List<User> Members = new ArrayList<>();
+    private List<Channel> Members = new ArrayList<>();
 
 
     public Channel() {

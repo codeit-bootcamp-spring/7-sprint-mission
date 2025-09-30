@@ -15,10 +15,10 @@ public class User {
     private String email;
     private String nickname;
     private String phoneNumber;
-    private List<FriendRequest> receivedFriendRequests=new ArrayList<>();
+//    private List<FriendRequest> receivedFriendRequests=new ArrayList<>();
     private List<MessageRoom> MyMessageRooms = new ArrayList<>();
     private List<Channel> MyChannels = new ArrayList<>();
-    private List<User> friends = new ArrayList<>();
+    private List<FriendUser> friends = new ArrayList<>();
 //    private Language language;
 
 
@@ -99,13 +99,10 @@ public class User {
         return MyChannels;
     }
 
-    public List<User> getFriends() {
+    public List<FriendUser> getFriends() {
         return friends;
     }
 
-    public List<FriendRequest> getReceivedFriendRequests() {
-        return receivedFriendRequests;
-    }
 
     public void updateUsername(String newUsername){
         this.updatedAt=System.currentTimeMillis();
