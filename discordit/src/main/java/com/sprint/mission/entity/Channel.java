@@ -19,6 +19,7 @@ public class Channel extends BaseEntity implements Receivable {
 
     public void setChannelName(String channelName) {
         this.channelName = channelName;
+        this.updatedAt = getUnixTimestamp();
     }
 
     public ChannelType getType() {
@@ -27,6 +28,7 @@ public class Channel extends BaseEntity implements Receivable {
 
     public void setType(ChannelType type) {
         this.type = type;
+        this.updatedAt = getUnixTimestamp();
     }
 
     public Set<User> getMembers() {
@@ -35,14 +37,17 @@ public class Channel extends BaseEntity implements Receivable {
 
     public void setMembers(Set<User> members) {
         this.members = members;
+        this.updatedAt = getUnixTimestamp();
     }
 
     public void addMember(User user){
         this.members.add(user);
+        this.updatedAt = getUnixTimestamp();
     }
 
     public void deleteMember(User user) {
         this.members.remove(user);
+        this.updatedAt = getUnixTimestamp();
     }
 
     public Set<User> getModerators() {
@@ -51,15 +56,18 @@ public class Channel extends BaseEntity implements Receivable {
 
     public void setModerators(Set<User> moderators) {
         this.moderators = moderators;
+        this.updatedAt = getUnixTimestamp();
     }
 
     public void addModerator(User user){
         this.members.add(user);
         this.moderators.add(user);
+        this.updatedAt = getUnixTimestamp();
     }
 
     public void deleteModerator(User user) {
         this.moderators.remove(user);
+        this.updatedAt = getUnixTimestamp();
     }
 
     @Override

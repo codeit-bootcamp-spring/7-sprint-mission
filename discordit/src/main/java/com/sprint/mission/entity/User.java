@@ -13,8 +13,9 @@ public class User extends BaseEntity implements Receivable {
 
     public User(String userId, String passwd, String displayName) {
         this.userId = userId;
-        Passwd = passwd;
+        this.Passwd = passwd;
         this.displayName = displayName;
+        this.onlineStatus = Status.OFFLINE;
     }
 
     public String getUserId() {
@@ -28,6 +29,17 @@ public class User extends BaseEntity implements Receivable {
     public void setPasswd(String passwd) {
         this.updatedAt = getUnixTimestamp();
         Passwd = passwd;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId='" + userId + '\'' +
+                ", Passwd='" + Passwd + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", bio='" + bio + '\'' +
+                ", onlineStatus=" + onlineStatus +
+                '}';
     }
 
     @Override

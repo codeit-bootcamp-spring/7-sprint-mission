@@ -1,6 +1,5 @@
 package com.sprint.mission.service.jcf;
 
-import com.sprint.mission.entity.BaseEntity;
 import com.sprint.mission.entity.Message;
 import com.sprint.mission.entity.Receivable;
 import com.sprint.mission.entity.User;
