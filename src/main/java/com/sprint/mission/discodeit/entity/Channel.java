@@ -34,7 +34,7 @@ public class Channel extends BaseEntity {
     public Channel(ChType type, String channelName) {
         if(type == null) { throw new IllegalArgumentException("type cannot be null"); }
         this.type = type;
-        this.channelName = verifyChName(channelName);
+        this.channelName = VerifiedUtils.verifyName(channelName);
     }
 
     public ChType getType() {
@@ -46,7 +46,7 @@ public class Channel extends BaseEntity {
     }
 
     public void setChannelName(String channelName) {
-        String v = verifyChName(channelName);
+        String v = VerifiedUtils.verifyName(channelName);
         if(!v.equals(this.channelName)) {
             this.channelName = v;
             reUpdatedAt();
@@ -69,13 +69,6 @@ public class Channel extends BaseEntity {
 
     public Map<UUID, UserRole> getMembers() {
         return members;
-    }
-
-    private static String verifyChName(String name) {
-    if (name == null || name.isBlank()) {throw new IllegalArgumentException("name cannot be null or blank");}
-        String s = name.trim();
-    if (s.length() > 20 || s.length() < 2) { throw new IllegalArgumentException("name length must be between 2 and 20 characters");}
-        return s;
     }
 
     @Override

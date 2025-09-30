@@ -1,29 +1,84 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.UUID;
+
 public class Message extends BaseEntity {
-    public String content;
-    private String name;
+    private String content;
+    private String userName;
+    private final UUID authorId;
+    private final UUID channelId;
+    private boolean isDeleted;
 
-    public Message() {}
-    public Message(String message, String name) {
-        this.content = message;
-        this.name = name;
+    public Message(String content, String userName, UUID authorId, UUID channelId) {
+        this.content = VerifiedUtils.verifyContent(content);
+        this.userName = VerifiedUtils.verifyName(userName);
+        this.authorId = authorId;
+        this.channelId = channelId;
+        this.isDeleted = false;
     }
 
-    public String getName() {
-        return name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUserName(String name) {
+        if(isDeleted) { throw new IllegalStateException("Cannot set userName on deleted Message"); }
+        String vn = VerifiedUtils.verifyName(name);
+        if(!vn.equals(this.userName)){
+            this.userName = vn;
+            reUpdatedAt();
+        }
     }
 
-    public String sendMessage(String msg) {
-        content = msg;
-//        Channel channel = new Channel(name);
-//        if (msg != null) {
-//            channel.setAlarm(true);
-//        }
+    public String getContent() {
         return content;
+    }
+    public void setContent(String content) {
+        if(isDeleted){ throw new IllegalStateException("Cannot set content on deleted Message"); }
+        String vn = VerifiedUtils.verifyContent(content);
+        if(!vn.equals(this.content)){
+            this.content = vn;
+            reUpdatedAt();
+        }
+    }
+
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public UUID getChannelId() {
+        return channelId;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public boolean delete() {
+        if(!isDeleted){
+            isDeleted = true;
+            reUpdatedAt();
+            return true;
+        }
+        return false;
+    }
+
+    public String getDisplayText() {
+        if(isDeleted){
+            return "Deleted Message";
+        } else {
+            return content;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "content='" + content + '\'' +
+                ", userName='" + userName + '\'' +
+                ", authorId=" + authorId +
+                ", channelId=" + channelId +
+                ", isDeleted=" + isDeleted +
+                '}';
     }
 }
