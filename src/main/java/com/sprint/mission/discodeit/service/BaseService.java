@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
  */
 public interface BaseService<T, ID> {
 
+
     /**
      * 주어진 엔티티를 저장(Create 또는 Update)합니다.
      *

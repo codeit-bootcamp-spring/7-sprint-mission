@@ -101,7 +101,12 @@ public abstract class BaseEntity implements Identifiable<UUID>, Deletable {
      * 엔티티의 내용이 변경되었을 때, 최종 수정 시각을 현재 시간으로 갱신하는 메서드입니다.
      * 자식 클래스의 수정 관련 메서드 내부에서 호출됩니다.
      */
-    protected void updateTimestamp() {
+    protected void updateTimestamp()  {
+//        try {
+//            Thread.sleep(30);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }  수정사항이 바로 반영 되면 이전 반영 시간과 같아져 테스트를 위해 넣었던 코드입니다.
         this.updatedAt = System.currentTimeMillis();
     }
 }
