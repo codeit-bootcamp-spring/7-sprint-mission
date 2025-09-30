@@ -34,9 +34,15 @@ public final class VerifiedUtils {
         return s;
     }
 
-    public static <T> T verifyNull(T value, String filedName)
+    public static <T> T verifyNull(T value)
     {
-        if(value == null) throw new IllegalArgumentException(filedName + "value cannot be null");
+        if(value == null) throw new IllegalArgumentException("value cannot be null");
         return value;
     }
+
+//    public static <T> T verifyNull(T value, String filedName)
+//    {
+//        if(value == null) throw new IllegalArgumentException(filedName + "value cannot be null");
+//        return value;
+//    }
 }
