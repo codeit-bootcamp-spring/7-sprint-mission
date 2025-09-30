@@ -36,16 +36,13 @@ public class JCFDb implements DbService {
         userDb.remove(user);
         deletedUserDb.put(user.getId(), user.getName());
 
-        channelDb.stream()
-                        .filter(x-> x.getUserDb().contains(user))
-                                .forEach(x->
-                                        new JCFChannel(this).deleteUserFromChannel(user,x)
-                                        );
-        messageDb.stream()
-                        .filter(x->x.getSender()==user)
-                                .forEach(x->
-                                        new JCFMessage(this).changeToDeletedUser(x)
-                                        );
+        channelDb.forEach(x->x.removeUserFromChannel(user));
+//        channelDb.stream()
+//                        .filter(x-> x.getUserDb().contains(user))
+//                                .forEach(x->
+//                                        new JCFChannel(this).deleteUserFromChannel(user,x)
+//                                        );
+        messageDb.forEach(x->x.setSender(JCFUser.DELETED_USER));
 
         System.out.println("유저가 삭제되었습니다 : " + user.getName());
         return;

@@ -25,29 +25,29 @@ this.deletedChannel = jcfDb.getDeletedChannelDb();
     }
 
 
-    public void addUserToChannel(User user, Channel channel){
-        if(channelDb.stream().noneMatch(u->u.getId()==user.getId())){
-            System.out.println("채널에 등록할 유저가 존재하지 않습니다.");
-            return;
-        }
-        if(channelDb.stream().noneMatch(c->c.getId()==channel.getId())){
-            System.out.println("채널이 존재하지 않습니다.");
-            return;
-        }
-        channel.addUserToChannel(user);
-    }
-
-    public void deleteUserFromChannel(User user, Channel channel){
-        if(channelDb.stream().noneMatch(u->u.getId()==user.getId())){
-            System.out.println("채널에 유저가 존재하지 않습니다.");
-            return;
-        }
-        if(channelDb.stream().noneMatch(c->c.getId()==channel.getId())){
-            System.out.println("채널이 존재하지 않습니다.");
-            return;
-        }
-        channel.removeUserFromChannel(user);
-    }
+//    public void addUserToChannel(User user, Channel channel){
+//        if(channelDb.stream().noneMatch(u->u.getId()==user.getId())){
+//            System.out.println("채널에 등록할 유저가 존재하지 않습니다.");
+//            return;
+//        }
+//        if(channelDb.stream().noneMatch(c->c.getId()==channel.getId())){
+//            System.out.println("채널이 존재하지 않습니다.");
+//            return;
+//        }
+//        channel.addUserToChannel(user);
+//    }
+//
+//    public void deleteUserFromChannel(User user, Channel channel){
+//        if(channelDb.stream().noneMatch(u->u.getId()==user.getId())){
+//            System.out.println("채널에 유저가 존재하지 않습니다.");
+//            return;
+//        }
+//        if(channelDb.stream().noneMatch(c->c.getId()==channel.getId())){
+//            System.out.println("채널이 존재하지 않습니다.");
+//            return;
+//        }
+//        channel.removeUserFromChannel(user);
+//    }
 
 
 

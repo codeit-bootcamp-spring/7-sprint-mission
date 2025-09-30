@@ -153,12 +153,12 @@ public class JCFMessage implements MessageService {
 
     }
 
-    public void changeToDeletedUser(Message msg){
-        if(jcfDb.getDeletedUserDb().containsKey(msg.getSender().getId()))
-        {
-            msg.setSender(JCFUser.DELETED_USER);
-            return;
-        }
-        System.out.println("아직 유저가 죽지 않앗습니다.");
-    }
+//    public void changeToDeletedUser(Message msg){
+//        if(jcfDb.getDeletedUserDb().containsKey(msg.getSender().getId()))
+//        {
+//            msg.setSender(JCFUser.DELETED_USER);
+//            return;
+//        }
+//        System.out.println("아직 유저가 죽지 않앗습니다.");
+//    }
 }
