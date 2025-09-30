@@ -21,27 +21,24 @@ public class JCFChannelService implements ChannelService {
     public Channel create(Channel.ChannelType type, String channelName, String channelDescription) {
         System.out.println("채널 생성");
         Channel channel = new Channel(type, channelName, channelDescription);
-        channelRepo.put(channel.getCommon().getId(),channel);
+        channelRepo.put(channel.getCommon().getId(), channel);
         return channel;
     }
 
     @Override
     public Channel read(UUID channelId) {
         System.out.println("채널 단건 검색");
-        if(channelRepo.containsKey(channelId)) {
-            Channel channel = channelRepo.get(channelId);
-            System.out.println(channel.toString());
-            return channel;
+        if (channelRepo.containsKey(channelId)) {
+            return channelRepo.get(channelId);
         }
-        System.out.println("찾을 수 없음.");
-        return null;
+        throw new NoSuchElementException("채널을 찾을 수 없습니다." + channelId);
     }
 
     @Override
     public List<Channel> readAll() {
         System.out.println("채널 전체 검색");
         List<Channel> channels = new ArrayList<>();
-        for(UUID key : channelRepo.keySet()){
+        for (UUID key : channelRepo.keySet()) {
             Channel channel = channelRepo.get(key);
             channels.add(channel);
         }
@@ -51,7 +48,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void update(UUID channelId, Channel.ChannelType type, String channelName, String channelDescription) {
         System.out.println("채널 업데이트");
-        if(channelRepo.containsKey(channelId)) {
+        if (channelRepo.containsKey(channelId)) {
             Channel channel = channelRepo.get(channelId);
             channel.setType(type);
             channel.setChannelName(channelName);
@@ -59,17 +56,17 @@ public class JCFChannelService implements ChannelService {
             channel.getCommon().touch();
             return;
         }
-        System.out.println("채널을 찾을 수 없음.");
+        throw new NoSuchElementException("채널을 찾을 수 없습니다." + channelId);
     }
+
     @Override
     public void delete(UUID channelId) {
         System.out.println("채널 삭제");
-        if(!channelRepo.containsKey(channelId)) {
-            System.out.println("채널을 찾을 수 없음.");
-            return;
+        if (!channelRepo.containsKey(channelId)) {
+            throw new NoSuchElementException("채널을 찾을 수 없습니다." + channelId);
         }
         // 채널 삭제를 하면, 해당 채널에 속해있던 각 유저 참여채널 리스트에서 해당 채널 삭제
-        for(UUID key : userRepo.keySet()) {
+        for (UUID key : userRepo.keySet()) {
             User user = userRepo.get(key);
             user.removeChannel(channelId);
         }

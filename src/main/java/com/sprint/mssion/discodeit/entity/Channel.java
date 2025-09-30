@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class Channel {
-    private Common common;
+    private final Common common;
     private ChannelType type;
     private String channelName;
     private String desc;
-    private List<UUID> joiner;
-    private List<UUID> messages;
+    private final List<UUID> joiner;
+    private final List<UUID> messages;
 
     public Channel(ChannelType type, String channelName, String desc) {
         this.type = type;

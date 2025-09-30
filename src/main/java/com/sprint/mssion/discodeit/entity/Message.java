@@ -3,10 +3,10 @@ package com.sprint.mssion.discodeit.entity;
 import java.util.UUID;
 
 public class Message {
-    private Common common;
+    private final Common common;
     private String message;
-    private UUID channelId;
-    private UUID userId;
+    private final UUID channelId;
+    private final UUID userId;
 
     public Message(String message, UUID channelId, UUID userId) {
         this.message = message;
@@ -33,10 +33,6 @@ public class Message {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
     }
 
     @Override

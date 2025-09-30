@@ -9,6 +9,6 @@ public interface MessageService {
     public Message create(String message, UUID channelId, UUID userId);
     public Message read(UUID messageId);
     public List<Message> readAll();
-    public Message update(UUID messageId, String message, UUID userId);
+    public Message update(UUID messageId, String message);
     public void delete(UUID messageId);
 }

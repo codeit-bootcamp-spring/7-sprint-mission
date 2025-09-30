@@ -10,7 +10,7 @@ public class User{
     private String email;
     private String phoneNumbers;
     private String pronoun; // 대명사 (디스코드에 있음)
-    private List<UUID> joinChannels = new ArrayList<>(); // 현재 참여중인 채널 리스트(UUID 리스트)
+    private final List<UUID> joinChannels = new ArrayList<>(); // 현재 참여중인 채널 리스트(UUID 리스트)
 
     public User (String username, String email, String phoneNumbers, String pronoun) {
         this.username = username;

@@ -50,7 +50,7 @@ public class JavaApplication {
                 "010-1234-5678", "ㅇㅇ_update");
         userService.read(user1.getCommon().getId());
         userService.delete(user4.getCommon().getId());
-        userService.read(user4.getCommon().getId());
+
 
         System.out.println("=============================================================");
         Channel channel1 = channelService.create(Channel.ChannelType.PUBLIC, "공지", "공지 채널입니다.");
@@ -68,8 +68,9 @@ public class JavaApplication {
         List<Message> messages = messageService.readAll();
         for(Message m : messages) System.out.println(m.toString());
 
-        Message errorMsg = messageService.create("에러 메세지", UUID.randomUUID(), user1.getCommon().getId()); // 없는 유저
-        Message errorMsg2 = messageService.create("에러 메세지2", channel1.getCommon().getId(), UUID.randomUUID()); // 없는 유저
+//        System.out.println("=============== 에러 테스트 ============================================");
+//        Message errorMsg = messageService.create("에러 메세지", UUID.randomUUID(), user1.getCommon().getId()); // 없는 유저
+//        Message errorMsg2 = messageService.create("에러 메세지2", channel1.getCommon().getId(), UUID.randomUUID()); // 없는 유저
 
         System.out.println("================== 채널에 참여한 유저 및 메시지 리스트 확인");
         channels = channelService.readAll();
@@ -96,8 +97,9 @@ public class JavaApplication {
         messages = messageService.readAll();
         for(Message m : messages) System.out.println(m.toString());
 
-        userService.update(user1.getCommon().getId(), "woody", "woody1234", "woody@codeit.com",
-                "010-1234-5678", "ㅇㅇ");
+//        유저 삭제로 인해 에러가 나야 하는 코드
+//        userService.update(user1.getCommon().getId(), "woody", "woody1234", "woody@codeit.com",
+//                "010-1234-5678", "ㅇㅇ");
 
         System.out.println("=========================채널 수정");
         channelService.update(channel3.getCommon().getId(),Channel.ChannelType.PRIVATE, "팀채널_수정", "팀 채널입니다." );
