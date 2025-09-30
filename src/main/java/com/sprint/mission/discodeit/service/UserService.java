@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.update.UserUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +14,9 @@ public interface UserService {
 
     List<User> readAll();                 // 전체 조회
 
-    User update(UUID id, User user);      // 수정
+    User update(UUID id, UserUpdate uu);      // 수정
+
+    User updateState(UUID id, User.State state);
 
     void delete(UUID id);              // 삭제
 

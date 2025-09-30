@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.service.UserService;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User extends BaseEntity {
 
@@ -35,8 +36,12 @@ public class User extends BaseEntity {
         this.state = State.ONLINE;      // 기본 상태
     }
 
-    // Getter
+    public User(String email, String password, String userName, String phoneNum) {
+        this(email, password, userName);
+        this.phoneNum = phoneNum;
+    }
 
+    // Getter
     public String getPassword() {
         return password;
     }
@@ -62,17 +67,14 @@ public class User extends BaseEntity {
         this.userName = userName;       // 특수문자금지
         updateTimestamp();
     }
-
     public void updatePassword(String password) {
         this.password = password;       // 변경 시 본인확인? 8자리
         updateTimestamp();
     }
-
     public void updatePhoneNum(String phoneNum) {
         this.phoneNum = phoneNum;       // 01012345678 11자리
         updateTimestamp();
     }
-
     public void updateState(State state) {
         this.state = state;
         updateTimestamp();
@@ -87,19 +89,4 @@ public class User extends BaseEntity {
                 ", 갱신일자: " + updatedAt +
                 " }";
     }
-
-    //    @Override
-//    public String toString() {
-//        return "User{" +
-//                "고유아이디: " + id +
-//                ", 초대코드: " + inviteCode +
-//                ", 생성일자:" + createdAt +
-//                ", 갱신일자:" + updatedAt +
-//                "이메일: '" + email + '\'' +
-//                ", 비밀번호: '" + password + '\'' +
-//                ", 이름: '" + userName + '\'' +
-//                ", 전화번호: '" + phoneNum + '\'' +
-//                ", 상태: '" + state.getDescState() + '\'' +
-//                '}';
-//    }
 }
