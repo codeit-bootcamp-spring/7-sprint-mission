@@ -1,47 +1,109 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.Identifiable;
+import com.sprint.mission.discodeit.Utils.Deletable;
+import com.sprint.mission.discodeit.Utils.Identifiable;
 
-import java.util.*;
-
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 /**
- * 모든 Repository의 공통 CRUD 기능을 제공하는 추상 클래스입니다.
- * 제네릭을 사용하여 어떤 타입의 엔티티든 처리할 수 있습니다.
- * @param <T> Identifiable 인터페이스를 구현한 엔티티 타입
+ * 모든 Repository가 공통적으로 가져야 할 기본 CRUD 기능을 정의하는 인터페이스입니다.
+ *
+ * @param <T>  리포지토리가 다룰 엔티티 타입 (Identifiable & Deletable을 구현해야 함)
  * @param <ID> 해당 엔티티의 ID 타입
  */
-public abstract class BaseRepository<T extends Identifiable<ID>, ID> {
-    // 각 하위 Repository 인스턴스가 자신만의 데이터 저장소를 갖도록 final 인스턴스 변수로 선언합니다.
-    protected final Map<ID, T> dataMap = new HashMap<>();
+public interface BaseRepository<T extends Identifiable<ID> & Deletable, ID> {
 
-    public void save(T entity) {
-        dataMap.put(entity.getId(), entity);
-    }
+    /**
+     * 주어진 엔티티를 저장하거나 수정합니다.
+     *
+     * @param entity 저장 또는 수정할 엔티티
+     */
+    void save(T entity);
 
-    public Optional<T> findById(ID id) {
-        return Optional.ofNullable(dataMap.get(id));
-    }
+    /**
+     * 주어진 여러 엔티티를 모두 저장하거나 수정합니다.
+     *
+     * @param entities 저장 또는 수정할 엔티티들의 컬렉션
+     */
+    void saveAll(Iterable<T> entities);
 
-    public List<T> findAll() {
-        // 내부 dataMap을 외부로 노출하지 않기 위해 방어적 복사(Defensive Copy)를 사용합니다.
-        return new ArrayList<>(dataMap.values());
-    }
+    /**
+     * 고유 ID로 특정 엔티티를 조회합니다.
+     *
+     * @param id 조회할 엔티티의 ID
+     * @return 엔티티가 존재하면 Optional<T>로 감싸서 반환하고, 없으면 Optional.empty()를 반환합니다.
+     */
+    Optional<T> findById(ID id);
 
-    public void deleteById(ID id) {
-        dataMap.remove(id);
-    }
+    /**
+     * 저장소의 모든 엔티티를 조회합니다. (논리적으로 삭제된 엔티티 포함)
+     *
+     * @return 모든 엔티티를 담은 List
+     */
+    List<T> findAll();
 
-    public void deleteAll() {
-        dataMap.clear();
-    }
+    /**
+     * 논리적으로 삭제되지 않은 모든 엔티티를 조회합니다.
+     *
+     * @return 삭제되지 않은 엔티티를 담은 List
+     */
+    List<T> findAllNonDel();
 
-    public long count() {
-        return dataMap.size();
-    }
+    /**
+     * 주어진 여러 ID에 해당하는 모든 엔티티를 조회합니다.
+     *
+     * @param ids 조회할 엔티티 ID들의 컬렉션
+     * @return 조회된 엔티티들의 List
+     */
+    List<T> findAllById(Iterable<ID> ids);
 
-    public boolean existsById(ID id) {
-        return dataMap.containsKey(id);
-    }
+    /**
+     * 주어진 여러 ID에 해당하는 엔티티 중, 논리적으로 삭제되지 않은 엔티티만 조회합니다.
+     *
+     * @param ids 조회할 엔티티 ID들의 컬렉션
+     * @return 조회된 엔티티들 중 삭제되지 않은 엔티티의 List
+     */
+    List<T> findAllByIdNonDel(Iterable<ID> ids);
+
+    /**
+     * 전체 엔티티의 개수를 반환합니다. (논리적으로 삭제된 엔티티 포함)
+     *
+     * @return long 타입의 전체 엔티티 수
+     */
+    long count();
+
+    /**
+     * 논리적으로 삭제되지 않은 전체 엔티티의 개수를 반환합니다.
+     *
+     * @return long 타입의 삭제되지 않은 엔티티 수
+     */
+    long countNonDel();
+
+    /**
+     * 주어진 ID를 가진 엔티티가 존재하는지 확인합니다.
+     *
+     * @param id 확인할 엔티티의 ID
+     * @return 존재하면 true, 아니면 false
+     */
+    boolean existsById(ID id);
+
+    /**
+     * 고유 ID로 특정 엔티티를 물리적으로 삭제합니다.
+     *
+     * @param id 삭제할 엔티티의 ID
+     */
+    void deleteById(ID id);
+
+    /**
+     * 모든 엔티티를 물리적으로 삭제합니다.
+     */
+    void deleteAll();
+
+    /**
+     * 주어진 여러 ID에 해당하는 모든 엔티티를 물리적으로 삭제합니다.
+     *
+     * @param ids 삭제할 엔티티 ID들의 컬렉션
+     */
+    void deleteAllById(Iterable<ID> ids);
 }
