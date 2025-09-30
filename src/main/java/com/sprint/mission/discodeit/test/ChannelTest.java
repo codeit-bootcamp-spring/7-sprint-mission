@@ -1,9 +1,8 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.test;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.jcf.JCFChannel;
 import com.sprint.mission.discodeit.service.jcf.JCFDb;
-import com.sprint.mission.discodeit.service.jcf.JCFMessage;
 
 public class ChannelTest {
 

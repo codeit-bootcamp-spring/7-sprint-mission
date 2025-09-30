@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.etc.StaticString;
+
 import javax.naming.Name;
 import javax.naming.NamingEnumeration;
+import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
 public class User extends Entity {
@@ -11,7 +14,23 @@ public class User extends Entity {
     private String nickname;
     private String email;
     private boolean isOnline;
+    private final ArrayList<Channel> channelDb = new ArrayList<>();
 
+    public ArrayList<Channel> getChannelDb() {
+        return channelDb;
+    }
+    public void addChannel(Channel channel){
+        if(channelDb.contains(channel)) {
+            throw new IllegalArgumentException(StaticString.CHANNEL_EXIST);
+
+        }
+        channelDb.add(channel);
+
+    }
+    public void removeChannel(Channel channel){
+        if(!channelDb.contains(channel)) throw new IllegalArgumentException(StaticString.CHANNEL_NOT_EXIST);
+        channelDb.remove(channel);
+    }
 
     public User(String name, String nickname, String email, boolean isOnline) {
         super();
@@ -76,6 +95,15 @@ public class User extends Entity {
                 ", nickname='" + nickname + '\'' +
                 ", email='" + email + '\'' +
                 ", isOnline=" + isOnline +
+                ", channelDb=" + showChannel(this) +
                 '}';
+    }
+
+    public String showChannel(User user){
+        StringBuilder out = new StringBuilder();
+        for(Channel channel : user.getChannelDb()){
+            out.append(channel.getName()).append("\n");
+        }
+        return out.toString();
     }
 }

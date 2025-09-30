@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.etc.StaticString;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -11,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+
+import static com.sprint.mission.discodeit.etc.StaticString.*;
 
 public class JCFMessage implements MessageService {
     private final ArrayList<Message> messageDB;
@@ -33,23 +36,23 @@ public class JCFMessage implements MessageService {
                         .noneMatch(x -> x.getId() == message.getSender().getId())
 
         ) {
-            System.out.println("유저는 존재하지 않습니다. : " + message.getSender().getName() );
+            System.out.println(USER_NOT_EXIST + message.getSender().getName() );
             return;
         }
         messageDB.add(message);
-        System.out.printf("메세지가 생성되었습니다 : %s\n", message.getSender().getName() + " : " + message.getContent());
+        System.out.printf(CREATE_MESSAGE+ message.getSender().getName() + " : " + message.getContent());
 
     }
 
     @Override
     public void readMessage(Message message) {
         if(deletedMessage.containsKey(message.getId())){
-            System.out.println(message.getContent() +" 삭제된 메시지입니다.");
+            System.out.println(message.getContent() +MESSAGE_ALREADY_DELETED);
             return;
         }
         if (messageDB.stream()
                 .noneMatch(m -> m.getId() == message.getId())) {
-            System.out.println("메세지는 존재하지 않습니다 : "+ message.getContent());
+            System.out.println(MESSAGE_NOT_EXIST+ message.getContent());
             return;
         }
 
@@ -63,12 +66,12 @@ public class JCFMessage implements MessageService {
 
         for (Message message : messages) {
             if(deletedMessage.containsKey(message.getId())){
-                System.out.println(message.getContent() +" 삭제된 메시지입니다.");
+                System.out.println(message.getContent() +MESSAGE_ALREADY_DELETED);
                 continue;
             }
             if (messageDB.stream()
                     .noneMatch(m -> m.getId() == message.getId())) {
-                System.out.println("메세지는 존재하지 않습니다: " + message.getContent( ));
+                System.out.println(MESSAGE_NOT_EXIST + message.getContent( ));
                 continue;
             }
 
@@ -90,13 +93,13 @@ public class JCFMessage implements MessageService {
         Message finalMessage = message;
         if (messageDB.stream()
                 .noneMatch(m->m.getId()== finalMessage.getId())) {
-            System.out.println(" 메세지는 존재하지 않습니다. : "+ message.getContent());
+            System.out.println(MESSAGE_NOT_EXIST+ message.getContent());
             return;
         }
 
         messageDB.remove(message);
         deletedMessage.put(message.getId(),message.getContent());
-        System.out.printf("메세지를 삭제합니다: %s\n", message.getContent());
+        System.out.printf(DELETE_MESSAGE+ message.getContent());
     }
 
     @Override
@@ -104,18 +107,21 @@ public class JCFMessage implements MessageService {
 
         if (messageDB.stream()
                 .noneMatch(m->m.getId()==message.getId())) {
-            System.out.println(" 메세지는 존재하지 않습니다. : "+ message.getContent());
+            System.out.println(MESSAGE_NOT_EXIST+ message.getContent());
             return;
         }
 
         BiConsumer<Message, Object> editFunction = messageElement.setter;
+        Object oldContent = getMessageElement(message,messageElement);
       try{
+          System.out.printf(DELETE_MESSAGE+ message.getContent());
+          System.out.println("변경한 필드: "+ messageElement.name()+ " 변경전: "+oldContent +" ==> 변경 후: "+updatedContent);
           editFunction.accept(message, updatedContent);
           message.updateEntity();
-          System.out.printf("메세지를 변경했습니다.: %s\n", message.getContent());
+
       }
       catch (ClassCastException e){
-          System.out.println("잘못된 타입을 입력했습니다. 올바른 입력값을 넣어주세요");
+          System.out.println(WRONG_TYPE);
       }
 
 
@@ -151,6 +157,17 @@ public class JCFMessage implements MessageService {
         System.out.println("==========");
 //        System.out.println("삭제된 메세지 : " + deletedMessage);
 
+    }
+
+    public <T>Object getMessageElement(Message message, Message.messageElement messageElement){
+        switch (messageElement){
+            case CONTENT:
+                return message.getContent();
+            case IS_MARKDOWN:
+                return message.isMarkDown();
+            default:
+                throw new IllegalArgumentException(WRONG_TYPE);
+        }
     }
 
 //    public void changeToDeletedUser(Message msg){

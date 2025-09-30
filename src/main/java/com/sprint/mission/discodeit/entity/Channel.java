@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.etc.StaticString;
+
 import javax.naming.Name;
 import javax.naming.NamingEnumeration;
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ public class Channel extends Entity {
             return;
         }
 
-            throw new IllegalArgumentException("채널에 존재하지 않는 유저입니다.");
+            throw new IllegalArgumentException(StaticString.CHANNEL_NOT_EXIST);
 
     }
 
@@ -79,11 +81,20 @@ public class Channel extends Entity {
                 ", description='" + description + '\'' +
                 ", isPublic=" + isPublic +
                 ", isTextChannel=" + isTextChannel +
+                ", userDb=" + showUser(this) +
                 '}';
     }
 
     public boolean isTextChannel() {
         return isTextChannel;
+    }
+
+    public String showUser(Channel channel){
+        StringBuilder out = new StringBuilder();
+        for(User user : channel.getUserDb()){
+            out.append(user.getName()).append("\n");
+        }
+        return out.toString();
     }
 
     public void setTextChannel(boolean textChannel) {
@@ -97,7 +108,6 @@ public class Channel extends Entity {
         IS_TEXT_CHANNEL((x,y)->x.setTextChannel( (boolean) y)),
         ;
        public BiConsumer<Channel, Object> setter;
-
 
 
 

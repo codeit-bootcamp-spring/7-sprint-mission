@@ -1,12 +1,10 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.test;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.jcf.JCFDb;
 import com.sprint.mission.discodeit.service.jcf.JCFMessage;
 import com.sprint.mission.discodeit.service.jcf.JCFUser;
-
-import java.util.ArrayList;
 
 public class MessageTest {
     public static void main(String[] args) {

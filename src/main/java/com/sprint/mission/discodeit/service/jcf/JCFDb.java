@@ -3,10 +3,13 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.etc.StaticString;
 import com.sprint.mission.discodeit.service.DbService;
 
 import java.awt.List;
 import java.util.*;
+
+import static com.sprint.mission.discodeit.etc.StaticString.*;
 
 public class JCFDb implements DbService {
 
@@ -29,8 +32,8 @@ public class JCFDb implements DbService {
 
     @Override
     public void deleteUser(User user) {
-        if (!isValidateUser(userDb, user)) {
-            System.out.println("존재하지 않는 유저입니다 : " + user.getName());
+        if (!isValidateUser(user)) {
+            System.out.println(USER_NOT_EXIST + user.getName());
             return;
         }
         userDb.remove(user);
@@ -44,80 +47,87 @@ public class JCFDb implements DbService {
 //                                        );
         messageDb.forEach(x->x.setSender(JCFUser.DELETED_USER));
 
-        System.out.println("유저가 삭제되었습니다 : " + user.getName());
+        System.out.println(DELETE_USER + user.getName());
         return;
     }
 
     @Override
     public void deleteMessage(Message message) {
-        if(!isValidateMessage(messageDb,message)){
-            System.out.println("존재하지 않는 메세지입니다 : " + message.getContent());
+        if(!isValidateMessage(message)){
+            System.out.println(MESSAGE_NOT_EXIST + message.getContent());
             return;
         }
         messageDb.remove(message);
         deletedMessageDb.put(message.getId(),message.getContent());
-        System.out.println("메세지가 삭제되었습니다 : " + message.getContent());
+        System.out.println(DELETE_MESSAGE + message.getContent());
        return;
     }
 
     @Override
     public void deleteChannel(Channel channel) {
-        if(!isValidateChannel(channelDb,channel)){
-            System.out.println("존재하지 않는 채널입니다 : " + channel.getName());
+        if(!isValidateChannel(channel)){
+            System.out.println(CHANNEL_NOT_EXIST + channel.getName());
             return;
         }
         channelDb.remove(channel);
         deletedChannelDb.put(channel.getId(),channel.getName());
-        System.out.println("채널이 삭제되었습니다 : " + channel.getName());
+        userDb.stream()
+                .filter(x->x.getChannelDb().contains(channel))
+                .forEach(x->x.removeChannel(channel));
+        System.out.println(DELETE_CHANNEL + channel.getName());
 
     }
 
     @Override
     public void createUser(User user) {
-        if(isValidateUser(userDb,user)){
-            System.out.println("이미 존재하는 유저입니다 : " + user.getName());
+        if(isValidateUser(user)){
+            System.out.println(USER_EXIST + user.getName());
             return;
         }
         userDb.add(user);
-        System.out.println("유저가 생성되었습니다 : " + user.getName());
+        System.out.println(CREATE_USER + user.getName());
         return;
 
     }
 
     @Override
     public void createMessage(Message message) {
-        if(isValidateMessage(messageDb,message)){
-            System.out.println("이미 존재하는 메세지입니다 : " + message.getContent());
+        if(isValidateMessage(message)){
+            System.out.println(MESSAGE_EXIST + message.getContent());
+            return;
+        }
+        if(!isValidateUser(message.getSender())){
+            System.out.println(USER_EXIST + message.getSender().getName());
             return;
         }
         messageDb.add(message);
-        System.out.println("메세지가 생성되었습니다 : " + message.getContent());
+        System.out.println(CREATE_MESSAGE + message.getContent());
         return;
     }
 
     @Override
     public void createChannel(Channel channel) {
-        if(isValidateChannel(channelDb,channel)){
-            System.out.println("이미 존재하는 채널입니다 : " + channel.getName());
+        if(isValidateChannel(channel)){
+            System.out.println(CHANNEL_EXIST + channel.getName());
             return;
         }
         channelDb.add(channel);
-        System.out.println("채널이 생성되었습니다 : " + channel.getName());
+        System.out.println(CREATE_CHANNEL + channel.getName());
         return;
 
     }
 
-    public boolean isValidateUser(ArrayList<User> dataBase, User user) {
-        return dataBase.stream().anyMatch(x -> x.getId() == user.getId());
+    public boolean isValidateUser( User user) {
+        return userDb.stream().anyMatch(x -> x.getId() == user.getId());
 
     }
 
-    public boolean isValidateMessage(ArrayList<Message> messageDb, Message message) {
+    public boolean isValidateMessage( Message message) {
         return messageDb.stream().anyMatch(x -> x.getId() == message.getId());
 
     }
 
-    public boolean isValidateChannel(ArrayList<Channel> channelDb, Channel channel) {
+    public boolean isValidateChannel( Channel channel) {
         return channelDb.stream().anyMatch(x -> x.getId() == channel.getId());
 
     }
