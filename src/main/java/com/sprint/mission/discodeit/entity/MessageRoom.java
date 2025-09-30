@@ -14,7 +14,7 @@ public class MessageRoom {
     private final List<User> participants= new ArrayList<>();
     private final List<Message> history = new ArrayList<>();
     private MessageRoomType messageRoomType;
-    private String MessageName;
+    private String MessageRoomName;
 
 
 
@@ -56,8 +56,8 @@ public class MessageRoom {
         return messageRoomType;
     }
 
-    public String getMessageName() {
-        return MessageName;
+    public String getMessageRoomName() {
+        return MessageRoomName;
     }
 
     public void setMessageRoomName(String messageRoomName) {
@@ -65,6 +65,6 @@ public class MessageRoom {
             System.out.println("서버 내의 채팅방에서만 이름을 설정할 수 있습니다.");
         }
         update();
-        MessageName = messageRoomName;
+        MessageRoomName = messageRoomName;
     }
 }

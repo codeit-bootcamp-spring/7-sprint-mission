@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 
 import com.sprint.mission.discodeit.entity.MessageRoom;
+import com.sprint.mission.discodeit.entity.MessageRoomDTO;
 
 
 import java.util.UUID;
@@ -15,8 +16,8 @@ public interface MessageRoomService {
     void removeMessageRoom(MessageRoom messageRoom);
 
     //메세지 가져오기
-    MessageRoom getMessageRoom(MessageRoom messageRoom);
+    MessageRoom getMessageRoom(UUID id);
 
     //메세지 수정
-    void updateMessageRoom(UUID messageId, String newName);
+    void updateMessageRoom(UUID messageId, MessageRoomDTO messageRoomDTO);
 }

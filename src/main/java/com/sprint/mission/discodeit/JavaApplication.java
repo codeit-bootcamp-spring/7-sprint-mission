@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessageRoomService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.etc.PrintUtil.*;
@@ -16,16 +15,17 @@ import static com.sprint.mission.discodeit.etc.PrintUtil.*;
 public class JavaApplication {
 
     public static void main(String[] args) {
+        //메서드 안에서는 접근자 세팅 불가능
+        //어차피 {}안에서만 유효하니까.
 
-
-        JCFUserService userService = new JCFUserService();
-        JCFChannelService channelService = new JCFChannelService();
-        JCFMessageRoomService messageRoomService = new JCFMessageRoomService();
+        AppConfig appConfig = new AppConfig();
+        JCFUserService userService = appConfig.userService();
+        JCFMessageRoomService messageRoomService= appConfig.messageRoomService();
+        JCFChannelService channelService = appConfig.channelService();
 
         //User생성 - 필수 필드 입력 안할 시 실패
         User user = new User();
         userService.addUser(user);
-
         printLine();
 
         //User 생성 -필수 필드 입력 시 성공!
@@ -33,9 +33,7 @@ public class JavaApplication {
         user.setEmail("@gmail.com");
         user.setUsername("ian");
         user.setPhoneNumber("01011111111");
-
         userService.addUser(user);
-        System.out.println("userService = " + userService.getUsers());
         printLine();
 
         //User 찾기
@@ -47,44 +45,38 @@ public class JavaApplication {
 
         //User 수정 - 실패
         UUID randomId = UUID.randomUUID();
-        user.setPhoneNumber("01022222222");
-        userService.updateUser(randomId, user);
+        UserDto userDto = new UserDto();
+        userService.updateUser(randomId, userDto);
         printLine();
 
 
         //User 수정 -성공
-        user.setPhoneNumber("01022222222");
-        userService.updateUser(id, user);
+        userDto.setPhoneNumber("01022222222");
+        userService.updateUser(id, userDto);
         System.out.println("user = " + user.getUsername());
         printLine();
 
 
         //User 삭제 - 유저가 저장되어 있을 경우
         userService.removeUser(user);
-        System.out.println("userService = " + userService.getUsers());
         printLine();
 
         //User삭제 - 유저가 없을 경우
         userService.removeUser(user);
-        System.out.println("userService = " + userService.getUsers());
         printLine();
 
 
         //Channel 생성 실패
         Channel channel = new Channel();
         channelService.addChannel(channel);
-        int channelSize = channelService.getChannels().size();
-        System.out.println("channelSize = " + channelSize);
         printLine();
 
 
         //Channel 생성 성공
-        channel.setManager(user);
+
         channel.setServerName("테스트 서버1");
         channel.setServerLevel(1L);
         channelService.addChannel(channel);
-        channelSize = channelService.getChannels().size();
-        System.out.println("channelSize = " + channelSize);
         printLine();
 
 
@@ -92,7 +84,7 @@ public class JavaApplication {
         //오류를 일으켰음
         try {
             Channel unsavedChannel = new Channel();
-            channelService.getChannel(unsavedChannel);
+            channelService.getChannel(unsavedChannel.getId());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -101,7 +93,7 @@ public class JavaApplication {
 
 
         //Channel 찾기 - 성공
-        Channel findChannel = channelService.getChannel(channel);
+        Channel findChannel = channelService.getChannel(channel.getId());
         System.out.println(findChannel==channel);
         printLine();
 
@@ -141,7 +133,7 @@ public class JavaApplication {
 
 
         //MessageRoom 찾기
-        messageRoomService.getMessageRoom(messageRoom);
+        messageRoomService.getMessageRoom(messageRoom.getId());
         printLine();
 
         //MessageRoom 삭제

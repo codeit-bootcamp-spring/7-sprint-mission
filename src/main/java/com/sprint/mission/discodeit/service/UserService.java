@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserDto;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +19,7 @@ public interface UserService {
 
     User getUser(UUID id);
 
-    void updateUser(UUID id, User user);
+    void updateUser(UUID id, UserDto userDto);
 
 
 

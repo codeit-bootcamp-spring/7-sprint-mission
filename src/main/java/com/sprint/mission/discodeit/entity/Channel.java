@@ -4,7 +4,6 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 //서버
@@ -14,7 +13,6 @@ public class Channel {
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;
-
 
     private User manager;
     private String serverName;
@@ -44,6 +42,13 @@ public class Channel {
         this.isPrivate=b;
     }
 
+    public User getManager() {
+        return manager;
+    }
+
+    public void setManager(User manager) {
+        this.manager = manager;
+    }
 
     public UUID getId() {
         return id;
@@ -53,9 +58,7 @@ public class Channel {
         return createdAt;
     }
 
-    public User getManager() {
-        return manager;
-    }
+
 
     public String getServerName() {
         return serverName;
@@ -81,9 +84,6 @@ public class Channel {
         isPrivate = aPrivate;
     }
 
-    public void setManager(User manager) {
-        this.manager = manager;
-    }
 
     public void setServerName(String serverName) {
         this.serverName = serverName;
@@ -99,7 +99,6 @@ public class Channel {
                 "id=" + id +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
-                ", manager=" + manager +
                 ", serverName='" + serverName + '\'' +
                 ", serverLevel=" + serverLevel + '\'' +
                 ", isPrivate=" + isPrivate +

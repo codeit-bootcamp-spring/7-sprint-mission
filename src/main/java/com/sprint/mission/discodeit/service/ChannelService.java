@@ -14,7 +14,7 @@ public interface ChannelService {
     void removeChannel(Channel channel);
 
     //채널 가져오기
-    Channel getChannel(Channel channel);
+    Channel getChannel(UUID id);
 
     //채널 수정
     void updateChannel(UUID channelId, UpdatedChannelDTO updatedChannelDTO);
