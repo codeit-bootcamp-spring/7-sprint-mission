@@ -12,8 +12,8 @@ public class Message extends BaseEntity {
     public Message(String content, String userName, UUID authorId, UUID channelId) {
         this.content = VerifiedUtils.verifyContent(content);
         this.userName = VerifiedUtils.verifyName(userName);
-        this.authorId = authorId;
-        this.channelId = channelId;
+        this.authorId = VerifiedUtils.verifyNull(authorId, "authorId");
+        this.channelId = VerifiedUtils.verifyNull(channelId, "channelId");
         this.isDeleted = false;
     }
 
@@ -75,10 +75,6 @@ public class Message extends BaseEntity {
     public String toString() {
         return "Message{" +
                 "content='" + content + '\'' +
-                ", userName='" + userName + '\'' +
-                ", authorId=" + authorId +
-                ", channelId=" + channelId +
-                ", isDeleted=" + isDeleted +
                 '}';
     }
 }

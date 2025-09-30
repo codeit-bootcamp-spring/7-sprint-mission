@@ -55,7 +55,7 @@ public class Channel extends BaseEntity {
 
     public void setSlowModeSeconds(int slowModeSeconds) {
         if(slowModeSeconds < 0) {
-            throw new IllegalArgumentException("slowModeSecond cannot be negative");
+            throw new IllegalArgumentException("slowModeSeconds cannot be negative");
         }
         if(this.slowModeSeconds != slowModeSeconds) {
             this.slowModeSeconds = slowModeSeconds;
