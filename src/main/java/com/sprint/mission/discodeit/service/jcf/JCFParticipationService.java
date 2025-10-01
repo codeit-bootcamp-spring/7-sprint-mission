@@ -9,9 +9,9 @@ import com.sprint.mission.discodeit.service.ParticipationService;
 import java.util.List;
 import java.util.UUID;
 
-public class ParticipationUserService extends JCFBaseService<Participation, UUID, ParticipationRepository> implements ParticipationService {
+public class JCFParticipationService extends JCFBaseService<Participation, UUID, ParticipationRepository> implements ParticipationService {
     private final ParticipationRepository repository;
-    protected ParticipationUserService(ParticipationRepository repository) {
+    protected JCFParticipationService(ParticipationRepository repository) {
         super(repository);
         this.repository = repository;
     }

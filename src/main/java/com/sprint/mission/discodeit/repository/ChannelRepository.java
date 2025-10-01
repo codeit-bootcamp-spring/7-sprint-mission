@@ -30,5 +30,16 @@ public interface ChannelRepository extends BaseRepository<Channel, UUID> {
      */
     boolean existsByChannelName(String name);
 
+    /**
+     * 여러 검색 조건(설정)에 맞는 채널 목록을 조회합니다.
+     * <p>
+     * 모든 파라미터는 선택적(optional)이며, null이 아닌 값만 검색 조건으로 사용됩니다.
+     * 모든 파라미터가 null일 경우, 모든 채널이 반환될 수 있습니다.
+     *
+     * @param channelName 검색할 채널 이름 (부분 또는 전체 일치, 선택 사항)
+     * @param channelType 검색할 채널 타입 (선택 사항)
+     * @param topic       검색할 채널 주제 (부분 또는 전체 일치, 선택 사항)
+     * @return 검색 조건에 맞는 채널의 List. 결과가 없으면 빈 리스트를 반환합니다.
+     */
     List<Channel> findAllChannelsBySettings(String channelName, ChannelType channelType, String topic);
 }
