@@ -230,7 +230,7 @@ public class JCFUser implements UserService {
             System.out.println(USER_NOT_EXIST + user.getName());
             return;
         }
-
+        System.out.println(user.getName() + "님이 " + channel.getName() + " 채널에서 나갔습니다.");
         channel.removeUserFromChannel(user);
         user.removeChannel(channel);
 
