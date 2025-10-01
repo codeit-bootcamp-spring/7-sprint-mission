@@ -54,8 +54,8 @@ public class Message extends Common{
     @Override
     public String toString() {
         return "Message{" +
-                "발신자 =" + sender +
-                ", 수신자 =" + receiver +
+                "발신자  =" + sender.getUserName() +
+                ", 수신자 =" + receiver.getUserName() +
                 ", 생성시간 =" + time +
                 ",  내용 ='" + content + '\'' +
                 '}';

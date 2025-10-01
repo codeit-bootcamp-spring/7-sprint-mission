@@ -9,9 +9,9 @@ public  class Common {
     //아니면 삭제해도 삭제기록같은걸 저장해서 고유번호는 정말 고유번호인걸까
     private final UUID id;
     //이건 생성시간이니 불변이겠고
-    private final long createdAt;
+    private final Long  createdAt;
     //이것도  업데이트 날짜를 뭐 바꾸겠냐
-    private long updatedAt;
+    private Long  updatedAt;
 
 
 

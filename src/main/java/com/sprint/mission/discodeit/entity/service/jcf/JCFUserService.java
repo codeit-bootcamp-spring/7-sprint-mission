@@ -104,4 +104,5 @@ public class JCFUserService implements UserService {
     public boolean delete(UUID userId) {
         return users.removeIf(u -> u.getId().equals(userId));
     }
+
 }

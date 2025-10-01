@@ -27,6 +27,7 @@ public class Channel extends Common {
 
     public void setBose(User bose) {
         this.bose = bose;
+
     }
 
     public List<User> getUsers() {
@@ -48,8 +49,11 @@ public class Channel extends Common {
     @Override
     public String toString() {
         return "Channel{" +
-                "주인=" + bose +
-                ", 유저들=" + users +
+                "주인=" + bose.getUserName() +
+                ", 유저들=" + users.stream()
+                .map(User::getUserName)
+                .toList()
+                +
                 '}';
     }
 }

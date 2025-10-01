@@ -6,6 +6,10 @@ import com.sprint.mission.discodeit.entity.service.UserService;
 import com.sprint.mission.discodeit.entity.service.jcf.*;
 
 import java.awt.print.Printable;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class JavaApplication {
@@ -68,20 +72,32 @@ public class JavaApplication {
         Channel channel2 = CHANNEL_SERVICE.create(u3, "채널2");
         Channel channel3 = CHANNEL_SERVICE.create(u4, "채널3");
         Channel channel4 = CHANNEL_SERVICE.create(u5, "채널4");
+
         // 조회
          CHANNEL_SERVICE.read(channel1.getId());
          CHANNEL_SERVICE.readAll();
-        // 수정
+        // 수정 유저 추가 추가유저 보스설정
         CHANNEL_SERVICE.update(channel1.getId(),d->{
-             d.setBose(u2);
-           //  channel1.getUsers().remove(u1);
-             channel1.getUsers().add(u2);
+
+            channel1.getUsers().add(0,u3);
+            d.setBose(u3);
         });
         // 조회
-        CHANNEL_SERVICE.read(channel1.getId());
+        CHANNEL_SERVICE.read(channel2.getId());
         CHANNEL_SERVICE.readAll();
         // 삭제
-        CHANNEL_SERVICE.delete(channel1.getId());
+        CHANNEL_SERVICE.delete(channel2.getId());
+        //조회
+        CHANNEL_SERVICE.read(channel2.getId());
+        CHANNEL_SERVICE.readAll();
+
+
+      String str ="테스트";
+      StringBuffer s = new StringBuffer("테스트");
+
+      Integer ad =1;
+      int ac =1;
+
 
 
     }
