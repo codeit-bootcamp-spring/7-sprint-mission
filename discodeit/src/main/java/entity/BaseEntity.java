@@ -10,4 +10,21 @@ public abstract class BaseEntity {
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
     }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    protected void touch() {
+        this.updatedAt = System.currentTimeMillis();
+    }
+
 }
