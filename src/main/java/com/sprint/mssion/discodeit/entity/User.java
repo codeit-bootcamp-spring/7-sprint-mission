@@ -8,14 +8,14 @@ public class User{
     private final Common common;
     private String username;
     private String email;
-    private String phoneNumbers;
+    private String phoneNumber;
     private String pronoun; // 대명사 (디스코드에 있음)
     private final List<UUID> joinChannels = new ArrayList<>(); // 현재 참여중인 채널 리스트(UUID 리스트)
 
-    public User (String username, String email, String phoneNumbers, String pronoun) {
+    public User (String username, String email, String phoneNumber, String pronoun) {
         this.username = username;
         this.email = email;
-        this.phoneNumbers = phoneNumbers;
+        this.phoneNumber = phoneNumber;
         this.pronoun = pronoun;
         this.common = new Common();
     }
@@ -27,8 +27,8 @@ public class User{
         return email;
     }
 
-    public String getPhoneNumbers() {
-        return phoneNumbers;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     public String getPronoun() {
@@ -51,8 +51,8 @@ public class User{
         this.email = email;
     }
 
-    public void setPhoneNumbers(String phoneNumbers) {
-        this.phoneNumbers = phoneNumbers;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public void setPronoun(String pronoun) {
@@ -74,7 +74,7 @@ public class User{
                 "common=" + common +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", phoneNumbers='" + phoneNumbers + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
                 ", pronoun='" + pronoun + '\'' +
                 ", joinChannels=" + joinChannels +
                 '}';

@@ -4,12 +4,12 @@ import java.util.UUID;
 
 public class Message {
     private final Common common;
-    private String message;
+    private String content;
     private final UUID channelId;
     private final UUID userId;
 
-    public Message(String message, UUID channelId, UUID userId) {
-        this.message = message;
+    public Message(String content, UUID channelId, UUID userId) {
+        this.content = content;
         this.channelId = channelId;
         this.userId = userId;
         this.common = new Common();
@@ -19,8 +19,8 @@ public class Message {
         return common;
     }
 
-    public String getMessage() {
-        return message;
+    public String getContent() {
+        return content;
     }
 
     public UUID getChannelId() {
@@ -31,15 +31,15 @@ public class Message {
         return userId;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     @Override
     public String toString() {
         return "Message{" +
                 "common=" + common +
-                ", message='" + message + '\'' +
+                ", content='" + content + '\'' +
                 ", channelId=" + channelId +
                 ", userId=" + userId +
                 '}';

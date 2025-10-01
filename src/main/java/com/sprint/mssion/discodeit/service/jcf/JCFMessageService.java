@@ -15,8 +15,8 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(String message, UUID channelId, UUID userId) {
-        Message newMessage = new Message(message, channelId, userId);
+    public Message createMessage(String content, UUID channelId, UUID userId) {
+        Message newMessage = new Message(content, channelId, userId);
         messageRepository.save(newMessage);
         return newMessage;
     }
@@ -35,7 +35,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void updateMessage(UUID messageId, String content) {
         Message message = this.getMessage(messageId);
-        message.setMessage(content);
+        message.setContent(content);
         messageRepository.save(message);
     }
 

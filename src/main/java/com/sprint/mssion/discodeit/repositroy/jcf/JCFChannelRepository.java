@@ -9,8 +9,8 @@ public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channelRepository = new HashMap<>();
 
     @Override
-    public void save(Channel user) {
-        channelRepository.put(user.getCommon().getId(), user);
+    public void save(Channel channel) {
+        channelRepository.put(channel.getCommon().getId(), channel);
     }
 
     @Override

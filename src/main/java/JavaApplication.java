@@ -12,7 +12,7 @@ import com.sprint.mssion.discodeit.service.MessageService;
 import com.sprint.mssion.discodeit.service.UserService;
 import com.sprint.mssion.discodeit.service.jcf.FacadeService;
 import com.sprint.mssion.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mssion.discodeit.service.jcf.JCFUserservice;
+import com.sprint.mssion.discodeit.service.jcf.JCFUserService;
 import com.sprint.mssion.discodeit.service.jcf.JCFMessageService;
 
 import java.util.List;
@@ -30,20 +30,20 @@ public class JavaApplication {
         MessageRepository messageRepository = new JCFMessageRepository();
 
         // Service init
-        UserService userService = new JCFUserservice(userRepository);
+        UserService userService = new JCFUserService(userRepository);
         ChannelService channelService = new JCFChannelService(channelRepository);
         MessageService messageService = new JCFMessageService(messageRepository);
         FacadeService facadeService = new FacadeService(userService, channelService, messageService);
 
         // 유저 생성
-        User user1 = userService.createUser("dog", "dog123", "dog@codeit.com", "1111", "111");
-        User user2 = userService.createUser("cat", "cat123", "cat@codeit.com", "2222", "222");
-        User user3 = userService.createUser("cow", "cow123", "cow@codeit.com","3333","333");
-        User user4 = userService.createUser("pig", "pig123", "pig@codeit.com", "4444", "444");
-        User user5 = userService.createUser("aaaa", "aaaa123", "aaa@codeit.com", "4444", "2442");
+        User user1 = userService.createUser("dog", "dog@codeit.com", "1111", "111");
+        User user2 = userService.createUser("cat", "cat@codeit.com", "2222", "222");
+        User user3 = userService.createUser("cow", "cow@codeit.com","3333","333");
+        User user4 = userService.createUser("pig", "pig@codeit.com", "4444", "444");
+        User user5 = userService.createUser("aaaa", "aaa@codeit.com", "4444", "2442");
 
         // 유저 업데이트
-        userService.updateUser(user2.getCommon().getId(), "cat", "cat123!@#", "cat@codeit.com", "2222", "222_Update");
+        userService.updateUser(user2.getCommon().getId(), "cat", "cat@codeit.com", "2222", "222_Update");
 
         // 채널 생성
         Channel notice = channelService.createChannel(Channel.ChannelType.PUBLIC, "공지", "공지 채널입니다.");

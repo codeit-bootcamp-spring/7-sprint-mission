@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User createUser(String username, String password, String email, String phoneNumbers, String pronoun);
+    User createUser(String username, String email, String phoneNumber, String pronoun);
     User getUserById(UUID uuid);
     List<User> getAllUsers();
-    void updateUser(UUID uuid, String username, String password, String email, String phoneNumbers, String pronoun);
+    void updateUser(UUID uuid, String username, String email, String phoneNumber, String pronoun);
     void deleteUser(UUID uuid);
     boolean isExistsUser(UUID userId);
 

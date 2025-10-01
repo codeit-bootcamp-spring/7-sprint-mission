@@ -1,7 +1,6 @@
 package com.sprint.mssion.discodeit.repositroy;
 
 import com.sprint.mssion.discodeit.entity.Channel;
-import com.sprint.mssion.discodeit.entity.User;
 
 import java.util.List;
 import java.util.Optional;

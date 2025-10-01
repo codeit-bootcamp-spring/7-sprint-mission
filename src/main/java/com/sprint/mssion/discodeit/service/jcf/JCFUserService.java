@@ -6,16 +6,16 @@ import com.sprint.mssion.discodeit.service.UserService;
 
 import java.util.*;
 
-public class JCFUserservice implements UserService {
+public class JCFUserService implements UserService {
     private final UserRepository userRepository;
 
-    public JCFUserservice(UserRepository userRepository) {
+    public JCFUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    public User createUser(String username, String password, String email, String phoneNumbers, String pronoun) {
-        User newUser = new User(username, email, phoneNumbers, pronoun);
+    public User createUser(String username, String email, String phoneNumber, String pronoun) {
+        User newUser = new User(username, email, phoneNumber, pronoun);
         userRepository.save(newUser);
         return newUser;
     }
@@ -32,11 +32,11 @@ public class JCFUserservice implements UserService {
     }
 
     @Override
-    public void updateUser(UUID userId, String username, String password, String email, String phoneNumbers, String pronoun) {
+    public void updateUser(UUID userId, String username, String email, String phoneNumber, String pronoun) {
         User user = this.getUserById(userId);
         user.setUsername(username);
         user.setEmail(email);
-        user.setPhoneNumbers(phoneNumbers);
+        user.setPhoneNumber(phoneNumber);
         user.setPronoun(pronoun);
         user.getCommon().touch();
         userRepository.save(user);

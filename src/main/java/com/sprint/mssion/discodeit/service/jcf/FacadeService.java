@@ -25,11 +25,11 @@ public class FacadeService {
         this.messageService = messageService;
     }
 
-    public void createMessageWithRelation(UUID userId, UUID channelId, String message) {
+    public void createMessageWithRelation(UUID userId, UUID channelId, String content) {
         if(!userService.isExistsUser(userId)) throw new NoSuchElementException("찾을 수 없는 유저입니다.");
         if(!channelService.isExistsChannel(channelId)) throw new NoSuchElementException("찾을 수 없는 채널입니다.");
         userService.addChannelToUser(userId, channelId); // 유저가 채널에 속해있지 않다면, 채널에 속하도록 한다.
-        messageService.createMessage(message, channelId, userId);
+        messageService.createMessage(content, channelId, userId);
 
     }
 
