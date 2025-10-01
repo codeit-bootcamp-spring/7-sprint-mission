@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserInfo;
+import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
@@ -16,39 +18,48 @@ public class JCFUserService implements UserService {
     // 생성
     @Override
     public User createUser(String email, String password, String userName) {
+        validateEmailIsUnique(email);
         User newUser = new User(email, password, userName);
         data.put(newUser.getId(), newUser);
         return newUser;
     }
+    // 이메일 중복 확인
+    private void validateEmailIsUnique(String email) {
+        boolean isDuplicate = data.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
 
+        if (isDuplicate) {
+            throw new DuplicateEmailException("이미 존재하는 이메일");
+        }
+    }
     // 조회
+
     @Override
-    public Optional<User> findUserById(UUID userId) {
-        return Optional.ofNullable(data.get(userId));
+    public Optional<UserInfo> findUserById(UUID userId) {
+
+        return Optional.ofNullable(data.get(userId)).map(UserInfo::new);
     }
 
     @Override
-    public List<User> findAllUsers() {
-        return new ArrayList<>(data.values());
+    public List<UserInfo> findAllUsers() {
+
+        return data.values().stream()
+                .map(UserInfo::new).toList();
     }
 
     // 수정
     @Override
     public Optional<User> updateProfile(UUID userId, String newUserName, String newPhoneNum) {
-        Optional<User> userOptional = findUserById(userId);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
+        return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updateUserName(newUserName);
             user.updatePhoneNum(newPhoneNum);
-            return Optional.of(user);
-        }
-        System.out.println("사용자를 찾을 수 없음");
-        return Optional.empty();
+            return user;
+        });
     }
 
     @Override
     public Optional<User> changePassword(UUID userId, String newPassword) {
-        return findUserById(userId).map(user -> {
+        return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updatePassword(newPassword);
             return user;
         });
@@ -56,7 +67,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public Optional<User> updateState(UUID userId, User.State newState) {
-        return findUserById(userId).map(user -> {
+        return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updateState(newState);
             return user;
         });
@@ -65,6 +76,13 @@ public class JCFUserService implements UserService {
     // 삭제
     @Override
     public boolean deleteUser(UUID userId) {
-        return false;
+        if (data.remove(userId) != null) {
+            System.out.println("삭제 성공");
+            return true;
+        }
+        else {
+            System.out.println("삭제 실패");
+            return false;
+        }
     }
 }

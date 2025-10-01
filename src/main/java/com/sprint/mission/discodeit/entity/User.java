@@ -2,8 +2,6 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class User extends BaseEntity {
@@ -16,10 +14,10 @@ public class User extends BaseEntity {
 
     // regular expression
     private static final Pattern REGEX_EMAIL_PATTERN
-            = Pattern.compile("^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]$");
+            = Pattern.compile("^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$");
     private static final Pattern REGEX_PHONE_PATTERN
             = Pattern.compile("^\\d{3}-\\d{4}-\\d{4}$");
-    private static final Pattern REGEX_PASWORD_PATTERN
+    private static final Pattern REGEX_PASSWORD_PATTERN
             = Pattern.compile("^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$");
 
 
@@ -44,6 +42,7 @@ public class User extends BaseEntity {
         super();
         validateEmail(email);
         validatePassword(password);
+        validateUserName(userName);
         this.email = email;             // 받을때 @ 있는지 확인
         this.password = password;       // 8자리 이상
         this.userName = userName;       // 특수문자 불가
@@ -94,16 +93,20 @@ public class User extends BaseEntity {
         this.state = state;
         updateTimestamp();
     }
+
     @Override
     public String toString() {
         return "User{" +
-                " 이름: '" + userName + '\'' +
-                ", 상태: " + state.getDescState() +
-                ", 생성일자: " + createdAt +
-                ", 갱신일자: " + updatedAt +
-                " }";
+                "email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", userName='" + userName + '\'' +
+                ", phoneNum='" + phoneNum + '\'' +
+                ", state=" + state +
+                ", id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
-
 
     // 유효성 검사
     private void validateEmail(String email) {
@@ -113,10 +116,17 @@ public class User extends BaseEntity {
     }
 
     private void validatePassword(String password) {
-        if (password == null || !REGEX_PASWORD_PATTERN.matcher(password).matches()) {
+        if (password == null || !REGEX_PASSWORD_PATTERN.matcher(password).matches()) {
             throw new InvalidInputException("비밀번호 형식이 올바르지 않음");
         }
     }
+
+    private void validateUserName(String userName) {
+        if (userName == null) {
+            throw new InvalidInputException("닉네임 형식이 올바르지 않음");
+        }
+    }
+
 
     private void validatePhoneNum(String phoneNum) {
         if (phoneNum == null || !REGEX_PHONE_PATTERN.matcher(phoneNum).matches()) {

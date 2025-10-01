@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserInfo;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,8 +16,8 @@ public interface UserService {
     User createUser(String email, String password, String userName);
 
     // 조회
-    Optional<User> findUserById(UUID userId);
-    List<User> findAllUsers();
+    Optional<UserInfo> findUserById(UUID userId);
+    List<UserInfo> findAllUsers();
 
     // 수정
     Optional<User> updateProfile(UUID userId, String newUserName, String newPhoneNum);

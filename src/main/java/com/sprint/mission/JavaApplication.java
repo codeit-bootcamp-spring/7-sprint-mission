@@ -1,13 +1,11 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.update.*;
-import com.sprint.mission.discodeit.service.*;
-import com.sprint.mission.discodeit.service.jcf.*;
-
-import static com.sprint.mission.discodeit.entity.Channel.ChannelType.TEXT;
-import static com.sprint.mission.discodeit.entity.Channel.ChannelType.VOICE;
-
+import com.sprint.mission.discodeit.exception.InvalidInputException;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import java.util.List;
+import java.util.UUID;
 
 public class JavaApplication {
 
