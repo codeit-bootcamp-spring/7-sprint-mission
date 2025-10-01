@@ -18,7 +18,7 @@ public class Channel {
     private String serverName;
     private Long serverLevel;
     private boolean isPrivate;
-    private List<Channel> Members = new ArrayList<>();
+    private List<ChannelUser> Members = new ArrayList<>();
 
 
     public Channel() {
@@ -68,7 +68,7 @@ public class Channel {
         return serverLevel;
     }
 
-    public List<User> getMembers() {
+    public List<ChannelUser> getMembers() {
         return Members;
     }
 

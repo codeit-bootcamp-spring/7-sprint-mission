@@ -1,13 +1,7 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.repository.MemoryChannelRepository;
-import com.sprint.mission.discodeit.repository.MemoryFriendRequestRepository;
-import com.sprint.mission.discodeit.repository.MemoryMessageRoomRepository;
-import com.sprint.mission.discodeit.repository.MemoryUserRepository;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFFriendRequestService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageRoomService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.service.jcf.*;
 
 //의존성 주입
 public class AppConfig {
@@ -16,10 +10,12 @@ public class AppConfig {
     private final MemoryMessageRoomRepository messageRoomRepository=new MemoryMessageRoomRepository();
     private final MemoryChannelRepository channelRepository = new MemoryChannelRepository();
     private final MemoryFriendRequestRepository friendRequestRepository = new MemoryFriendRequestRepository();
+    private final MemoryChannelInviteRepository channelInviteRepository = new MemoryChannelInviteRepository();
 
     private final JCFUserService userService = new JCFUserService(userRepository);
     private final JCFMessageRoomService messageRoomService= new JCFMessageRoomService(messageRoomRepository);
     private final JCFChannelService channelService = new JCFChannelService(channelRepository);
+    private final ChannelInviteRequestService channelInviteRequestService = new ChannelInviteRequestService(channelInviteRepository,channelService);
     private final JCFFriendRequestService friendRequestService =new JCFFriendRequestService(friendRequestRepository,userService);
 
     //getter
@@ -36,5 +32,9 @@ public class AppConfig {
 
     public JCFFriendRequestService getFriendRequestService() {
         return friendRequestService;
+    }
+
+    public ChannelInviteRequestService getChannelInviteRequestService() {
+        return channelInviteRequestService;
     }
 }

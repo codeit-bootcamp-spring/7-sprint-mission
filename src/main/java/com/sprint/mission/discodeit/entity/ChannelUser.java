@@ -14,5 +14,19 @@ public class ChannelUser {
         this.role = Role.MEMBER;
     }
 
+    public String getNickname() {
+        return nickname;
+    }
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }

@@ -15,7 +15,6 @@ public class User {
     private String email;
     private String nickname;
     private String phoneNumber;
-//    private List<FriendRequest> receivedFriendRequests=new ArrayList<>();
     private List<MessageRoom> MyMessageRooms = new ArrayList<>();
     private List<Channel> MyChannels = new ArrayList<>();
     private List<FriendUser> friends = new ArrayList<>();

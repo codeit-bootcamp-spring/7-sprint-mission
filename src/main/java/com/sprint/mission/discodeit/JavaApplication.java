@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.*;
 
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFFriendRequestService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageRoomService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.jcf.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +21,7 @@ public class JavaApplication {
         JCFMessageRoomService messageRoomService= appConfig.messageRoomService();
         JCFChannelService channelService = appConfig.channelService();
         JCFFriendRequestService friendRequestService = appConfig.getFriendRequestService();
+        ChannelInviteRequestService channelInviteRequestService=appConfig.getChannelInviteRequestService();
 
         //User생성 - 필수 필드 입력 안할 시 실패
         User user = new User();
@@ -35,6 +33,7 @@ public class JavaApplication {
         user.setEmail("@gmail.com");
         user.setUsername("ian");
         user.setPhoneNumber("01011111111");
+        user.setNickname("ianNickname");
         userService.addUser(user);
         printLine();
 
@@ -147,6 +146,7 @@ public class JavaApplication {
         user2.setEmail("teddy@email.com");
         user2.setPhoneNumber("1");
         user2.setPassword("111111111");
+        user2.setNickname("TeddyNickname");
         userService.addUser(user2);
         System.out.println("[유저 목록]");
         userService.getAllUser().forEach(user1-> System.out.println(user1.toString()));
@@ -166,18 +166,28 @@ public class JavaApplication {
 
         //user가 서버를 열고 user2 초대
         Channel madeByUserServer = channelService.openChannel(user, "user가 만든 서버", 1L, true);
-        channelService.inviteMember(user, madeByUserServer, user2);
+        //1.초대
+        channelInviteRequestService.sendChannelInviteRequest(user, madeByUserServer, user2);
+        //2.초대 확인
+        List<ChannelInviteRequest> user2Invitations = channelInviteRequestService.getChannelInviteRequest(user2.getId());
+        ChannelInviteRequest inviteRequest = user2Invitations.stream().filter(i -> i.getChannelId() == madeByUserServer.getId())
+                .findFirst().orElseGet(null);
+        //3.초대 수락
+        channelInviteRequestService.acceptChannelInviteRequest(user2, inviteRequest);
         System.out.println("<서버의 멤버 확인>");
-        madeByUserServer.getMembers().forEach(u-> System.out.println(u.getUsername()));
+        madeByUserServer.getMembers().forEach(u-> System.out.println(u.getNickname()));
         printLine();
 
         //친구 추가
+        // 1. 친추 보내기
         friendRequestService.sendFriendRequest(user,  user2.getId());
+        //2. 요청 목록 확인
         List<FriendRequest> receivedFriendRequests = friendRequestService.getReceivedFriendRequests(user2);
         FriendRequest friendRequest = receivedFriendRequests.stream()
                 .filter(r -> userService.getUser(r.getSenderId()) == user)
                 .findFirst()
                 .orElseGet(null);
+        //3.요청 수락
         friendRequestService.acceptFriendRequest(friendRequest);
         List<String> friendNameList = user.getFriends().stream().map(friendUser -> friendUser.getUsername()).toList();
         List<String> friendNameList2 = user2.getFriends().stream().map(friendUser -> friendUser.getUsername()).toList();

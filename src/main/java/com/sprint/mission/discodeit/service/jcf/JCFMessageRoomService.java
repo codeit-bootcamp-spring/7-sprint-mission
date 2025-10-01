@@ -62,7 +62,7 @@ public class JCFMessageRoomService implements MessageRoomService {
         MessageRoom messageRoom = new MessageRoom();
         messageRoom.setMessageRoomType(MessageRoomType.SERVER_MESSAGE_ROOM);
         messageRoom.setMessageRoomName(name);
-        List<User> members = channel.getMembers();
+        List<ChannelUser> members = channel.getMembers();
         addMessageRoom(messageRoom);
 
         return messageRoom;

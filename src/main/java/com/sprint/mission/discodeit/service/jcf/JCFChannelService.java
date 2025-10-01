@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.UpdatedChannelDTO;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.MemoryChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
+import java.util.List;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
@@ -13,6 +12,7 @@ public class JCFChannelService implements ChannelService {
 
 
     private final MemoryChannelRepository channelRepository;
+
 
     public JCFChannelService(MemoryChannelRepository channelRepository){
         this.channelRepository=channelRepository;
@@ -45,27 +45,13 @@ public class JCFChannelService implements ChannelService {
         channel.setServerName(serverName);
         channel.setServerLevel(serverLevel);
         channel.setPrivate(isPrivate);
-        channel.getMembers().add(user);
+        ChannelUser channelUser = new ChannelUser(user);
+        channelUser.setRole(Role.ADMIN);
+        channel.getMembers().add(channelUser);
         user.getMyChannels().add(channel);
 
         channelRepository.save(channel);
         return channel;
 
     }
-
-    public void inviteMember(User fromUser ,Channel channel, User toUser) {
-        if (!fromUser.getMyChannels().contains(channel)) {
-            System.out.println("서버에 있지 않습니다.");
-            return;
-        }
-        if (!(channel.getManager() == fromUser)) {
-            System.out.println("초대 권한이 없습니다.");
-            return;
-        }
-        channel.getMembers().add(toUser);
-
-    }
-
-
-
 }
