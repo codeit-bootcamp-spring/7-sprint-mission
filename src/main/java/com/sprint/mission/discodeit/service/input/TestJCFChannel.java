@@ -5,13 +5,13 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannel;
 
 import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
 
-public class InputJCFChannel {
+public class TestJCFChannel {
 
-    private final InputUtil testUtil;
+    private final TestUtil testUtil;
     private final JCFChannel jcfChannel ;
 
 
-    public InputJCFChannel(InputUtil testUtil, JCFChannel jcfChannel) {
+    public TestJCFChannel(TestUtil testUtil, JCFChannel jcfChannel) {
         this.testUtil = testUtil;
         this.jcfChannel = jcfChannel;
     }

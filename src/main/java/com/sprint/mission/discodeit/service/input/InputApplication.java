@@ -12,10 +12,10 @@ public class InputApplication {
 
     private final JCFDb jcfDb;
 
-    private final InputJCFChannel testJCFChannel;
-    private final InputJCFMessage testJCFMessage;
-    private final InputJCFUser testJCFUser;
-    private final InputUtil testUtil;
+    private final TestJCFChannel testJCFChannel;
+    private final TestJCFMessage testJCFMessage;
+    private final TestJCFUser testJCFUser;
+    private final TestUtil testUtil;
     private final HelpOperator helpOperator ;
     private boolean isRunning = true;
 
@@ -23,12 +23,12 @@ public class InputApplication {
         this.inputHandler = new InputHandler();
         this.jcfDb = new JCFDb();
 
-        this.testUtil = new InputUtil(jcfDb);
+        this.testUtil = new TestUtil(jcfDb);
 
 
-        this.testJCFChannel = new InputJCFChannel(testUtil, new JCFChannel(jcfDb));
-        this.testJCFMessage = new InputJCFMessage(testUtil, new JCFMessage(jcfDb));
-        this.testJCFUser = new InputJCFUser(testUtil, new JCFUser(jcfDb));
+        this.testJCFChannel = new TestJCFChannel(testUtil, new JCFChannel(jcfDb));
+        this.testJCFMessage = new TestJCFMessage(testUtil, new JCFMessage(jcfDb));
+        this.testJCFUser = new TestJCFUser(testUtil, new JCFUser(jcfDb));
         this.helpOperator = new HelpOperator();
     }
 

@@ -22,16 +22,19 @@ public class JCFValidateOperator implements ValidateService {
     }
 
     public boolean isValidateUser(User user) {
+        if (user == null) return false;
         return userDb.stream().anyMatch(x -> x.getId() == user.getId());
 
     }
 
     public boolean isValidateMessage( Message message) {
+        if (message == null) return false;
         return messageDb.stream().anyMatch(x -> x.getId() == message.getId());
 
     }
 
     public boolean isValidateChannel( Channel channel) {
+        if (channel == null) return false;
         return channelDb.stream().anyMatch(x -> x.getId() == channel.getId());
 
     }

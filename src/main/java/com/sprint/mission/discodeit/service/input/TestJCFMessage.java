@@ -5,14 +5,14 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessage;
 
 import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
 
-public class InputJCFMessage {
+public class TestJCFMessage {
 
-    private final InputUtil testUtil;
+    private final TestUtil testUtil;
 
     private final JCFMessage jcfMessage;
 
 
-    public InputJCFMessage(InputUtil testUtil, JCFMessage jcfMessage) {
+    public TestJCFMessage(TestUtil testUtil, JCFMessage jcfMessage) {
         this.testUtil = testUtil;
         this.jcfMessage = jcfMessage;
     }
