@@ -7,11 +7,11 @@ import com.sprint.mission.discodeit.service.jcf.JCFUser;
 import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
 import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
 
-public class TestJCFUser {
-    private final TestUtil testUtil;
+public class InputJCFUser {
+    private final InputUtil testUtil;
     private final JCFUser jcfUser;
 
-    public TestJCFUser(TestUtil testUtil, JCFUser jcfUser) {
+    public InputJCFUser(InputUtil testUtil, JCFUser jcfUser) {
         this.testUtil = testUtil;
         this.jcfUser = jcfUser;
     }

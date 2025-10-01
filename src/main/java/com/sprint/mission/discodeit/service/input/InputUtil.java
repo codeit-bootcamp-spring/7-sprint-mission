@@ -5,10 +5,10 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.jcf.JCFDb;
 
-public class TestUtil {
+public class InputUtil {
     private final JCFDb jcfDb;
 
-    public TestUtil(JCFDb jcfDb) {
+    public InputUtil(JCFDb jcfDb) {
         this.jcfDb = jcfDb;
     }
     public boolean checkValidateBoolean(String input) {

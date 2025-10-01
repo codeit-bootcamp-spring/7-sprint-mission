@@ -1,20 +1,18 @@
 package com.sprint.mission.discodeit.service.input;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.jcf.JCFDb;
 import com.sprint.mission.discodeit.service.jcf.JCFMessage;
-import com.sprint.mission.discodeit.service.jcf.JCFUser;
 
 import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
 
-public class TestJCFMessage {
+public class InputJCFMessage {
 
-    private final TestUtil testUtil;
+    private final InputUtil testUtil;
 
     private final JCFMessage jcfMessage;
 
 
-    public TestJCFMessage(TestUtil testUtil, JCFMessage jcfMessage) {
+    public InputJCFMessage(InputUtil testUtil, JCFMessage jcfMessage) {
         this.testUtil = testUtil;
         this.jcfMessage = jcfMessage;
     }

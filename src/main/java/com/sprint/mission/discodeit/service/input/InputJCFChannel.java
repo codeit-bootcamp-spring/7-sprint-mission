@@ -1,20 +1,17 @@
 package com.sprint.mission.discodeit.service.input;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.jcf.JCFChannel;
-import com.sprint.mission.discodeit.service.jcf.JCFDb;
-import com.sprint.mission.discodeit.service.jcf.JCFUser;
 
 import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
 
-public class TestJCFChannel {
+public class InputJCFChannel {
 
-    private final TestUtil testUtil;
+    private final InputUtil testUtil;
     private final JCFChannel jcfChannel ;
 
 
-    public TestJCFChannel(TestUtil testUtil, JCFChannel jcfChannel) {
+    public InputJCFChannel(InputUtil testUtil, JCFChannel jcfChannel) {
         this.testUtil = testUtil;
         this.jcfChannel = jcfChannel;
     }
