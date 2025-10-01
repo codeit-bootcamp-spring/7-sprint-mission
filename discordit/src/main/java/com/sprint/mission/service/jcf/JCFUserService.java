@@ -58,8 +58,6 @@ public class JCFUserService implements UserService {
     @Override
     public User login(String id, String passwd) {
         User user = data.get(id);
-        if(user == null)
-            throw new UserNotFoundException("존재하지 않는 아이디입니다.");
         if(!user.login(id, passwd))
             throw new IllegalArgumentException("아이디와 비밀번호가 일치하지 않습니다.");
 
@@ -100,5 +98,10 @@ public class JCFUserService implements UserService {
     @Override
     public boolean isOnline(String id) {
         return getUserById(id).getOnlineStatus() == User.Status.ONLINE;
+    }
+
+    @Override
+    public String getBio(String id) {
+        return getUserById(id).getBio();
     }
 }
