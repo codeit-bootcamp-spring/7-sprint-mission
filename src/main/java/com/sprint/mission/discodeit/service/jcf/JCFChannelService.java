@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.update.ChannelUpdate;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.*;
 
@@ -31,13 +30,7 @@ public class JCFChannelService implements ChannelService {
 
 
     @Override
-    public Channel update(UUID id, ChannelUpdate chu) {
-        if (chu.getChannelName() != null && !chu.getChannelName().isEmpty()) {
-            channels.get(id).updateChannelName(chu.getChannelName());
-        }
-        if (chu.getMemberName() != null) {
-            channels.get(id).updateMembers(chu.getMemberName());
-        }
+    public Channel update(UUID id, Channel channel) {
         return channels.get(id);
     }
 
