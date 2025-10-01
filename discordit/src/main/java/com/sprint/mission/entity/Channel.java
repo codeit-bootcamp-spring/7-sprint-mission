@@ -17,6 +17,7 @@ public class Channel extends BaseEntity implements Receivable {
         this.moderators = moderators;
     }
 
+
     public void setChannelName(String channelName) {
         this.channelName = channelName;
         this.updatedAt = getUnixTimestamp();
