@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class User extends BaseEntity implements Receivable {
 
-    private String userId;
-    private String Passwd;
+    private final String userId;
+    private String passwd;
 
     private String displayName;
     private String bio;
@@ -13,7 +13,7 @@ public class User extends BaseEntity implements Receivable {
 
     public User(String userId, String passwd, String displayName) {
         this.userId = userId;
-        this.Passwd = passwd;
+        this.passwd = passwd;
         this.displayName = displayName;
         this.onlineStatus = Status.OFFLINE;
     }
@@ -23,23 +23,16 @@ public class User extends BaseEntity implements Receivable {
     }
 
     public String getPasswd() {
-        return Passwd;
+        return passwd;
     }
 
     public void setPasswd(String passwd) {
         this.updatedAt = getUnixTimestamp();
-        Passwd = passwd;
+        this.passwd = passwd;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "userId='" + userId + '\'' +
-                ", Passwd='" + Passwd + '\'' +
-                ", displayName='" + displayName + '\'' +
-                ", bio='" + bio + '\'' +
-                ", onlineStatus=" + onlineStatus +
-                '}';
+    public boolean login(String id, String passwd){
+        return this.userId.equals(id) && this.passwd.equals(passwd);
     }
 
     @Override
@@ -70,6 +63,21 @@ public class User extends BaseEntity implements Receivable {
         this.onlineStatus = onlineStatus;
     }
 
+    public static boolean validateId(String id){
+        if (id.length() < 4 || id.length() > 10){
+            throw new IllegalArgumentException("아이디는 4에서 10자 사이로 입력해주세요.");
+        }
+        return true;
+    }
+
+    public static boolean validatePasswd(String passwd) {
+        // 지금은 아이디와 제약사항이 같지만 나중에 변경될 수 있어 분리함
+        if (passwd.length() < 4 || passwd.length() > 10){
+            throw new IllegalArgumentException("비밀번호는 4에서 10자 사이로 입력해주세요.");
+        }
+        return true;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -82,6 +90,17 @@ public class User extends BaseEntity implements Receivable {
         return Objects.hash(userId, displayName);
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId='" + userId + '\'' +
+                ", Passwd='" + passwd + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", bio='" + bio + '\'' +
+                ", onlineStatus=" + onlineStatus +
+                '}';
+    }
+
     public enum Status{
         ONLINE("온라인"),
         OFFLINE("오프라인"),
@@ -91,7 +110,7 @@ public class User extends BaseEntity implements Receivable {
         Status(String description){
         }
 
-    }
 
+    }
 
 }

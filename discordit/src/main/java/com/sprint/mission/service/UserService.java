@@ -5,18 +5,23 @@ import com.sprint.mission.entity.User;
 import java.util.List;
 
 public interface UserService {
-    public User getUserById(String id);
-    public List<User> getUsers(String... ids);
-    public List<User> getAllUsers();
+    User getUserById(String id);
+    List<User> getUsers(String... ids);
+    List<User> getAllUsers();
 
-    public void signIn(String userId, String passwd, String displayName);
+    boolean isCreatableId(String id);
+    boolean validatePasswd(String passwd);
+    User signIn(String userId, String passwd, String displayName);
+    User login(String id, String passwd);
 
-    public void deleteUser(String id);
+    void deleteUser(String id);
 
-    public void setPasswd(String id, String passwd);
-    public void setBio(String id, String bio);
-    public void setOnlineStatus(String id, User.Status status);
-    public User.Status getOnlineStatus(String id);
+    void setPasswd(String id, String passwd);
+    void setBio(String id, String bio);
+    void setOnlineStatus(String id, User.Status status);
 
-    public boolean isOnline(String id);
+    User.Status getOnlineStatus(String id);
+    String getDisplayName(String id);
+
+    boolean isOnline(String id);
 }

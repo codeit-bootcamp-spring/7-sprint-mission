@@ -33,10 +33,38 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void signIn(String userId, String passwd, String displayName) {
+    public boolean isCreatableId(String id) {
+        if(data.containsKey(id)){
+            throw new UserAlreadyExistsException(id);
+        }
+        return User.validateId(id);
+    }
+
+    @Override
+    public boolean validatePasswd(String passwd) {
+        return User.validatePasswd(passwd);
+    }
+
+
+
+    @Override
+    public User signIn(String userId, String passwd, String displayName) {
         if(data.containsKey(userId))
             throw new UserAlreadyExistsException(userId);
         data.put(userId, new User(userId, passwd, displayName));
+        return getUserById(userId);
+    }
+
+    @Override
+    public User login(String id, String passwd) {
+        User user = data.get(id);
+        if(user == null)
+            throw new UserNotFoundException("존재하지 않는 아이디입니다.");
+        if(!user.login(id, passwd))
+            throw new IllegalArgumentException("아이디와 비밀번호가 일치하지 않습니다.");
+
+        user.setOnlineStatus(User.Status.ONLINE);
+        return user;
     }
 
     @Override
@@ -62,6 +90,11 @@ public class JCFUserService implements UserService {
     @Override
     public User.Status getOnlineStatus(String id) {
         return getUserById(id).getOnlineStatus();
+    }
+
+    @Override
+    public String getDisplayName(String id) {
+        return getUserById(id).getDisplayName();
     }
 
     @Override
