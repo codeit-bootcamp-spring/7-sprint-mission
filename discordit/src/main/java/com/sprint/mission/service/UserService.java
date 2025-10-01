@@ -24,4 +24,6 @@ public interface UserService {
     String getDisplayName(String id);
 
     boolean isOnline(String id);
+
+    String getBio(String userId);
 }
