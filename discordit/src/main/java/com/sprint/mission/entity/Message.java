@@ -13,8 +13,7 @@ public class Message<T extends Receivable> extends BaseEntity {
 
     public void display() {
         System.out.printf("""
-                [%s] -> [%s] :
-                %s
+                [%s] -> [%s] : %s
                 """, sender.getDisplayName(), receiver.getDisplayName(), message);
     }
 
