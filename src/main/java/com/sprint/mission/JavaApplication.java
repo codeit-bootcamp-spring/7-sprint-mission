@@ -5,6 +5,9 @@ import com.sprint.mission.discodeit.entity.update.*;
 import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.service.jcf.*;
 
+import static com.sprint.mission.discodeit.entity.Channel.ChannelType.TEXT;
+import static com.sprint.mission.discodeit.entity.Channel.ChannelType.VOICE;
+
 
 public class JavaApplication {
 
@@ -39,6 +42,20 @@ public class JavaApplication {
         userService.delete(u2.getId());
         System.out.println("유저2 삭제");
         System.out.println("전체 유저: " + userService.readAll());
+
+        System.out.println("=========================");
+        ChannelService channelService = new JCFChannelService();
+
+        Channel ch1 = new Channel(u1, TEXT);
+        Channel ch2 = new Channel(u3, "MyChannel", VOICE);
+        channelService.create(ch1);
+        channelService.create(ch2);
+
+        System.out.println(channelService.readAll());
+
+        ChannelUpdate chu = new ChannelUpdate();
+        chu.updateChannelName("MyChannelUpdate");
+        channelService.update(ch1.getId(), chu);
 
 
     }
