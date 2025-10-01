@@ -1,23 +1,27 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.update.UserUpdate;
-
+import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * 사용자 관련 비즈니스 로직을 정의하는 서비스 인터페이스입니다.
+ */
 public interface UserService {
 
-    User create(User user);               // 생성
+    // 생성
+    User createUser(String email, String password, String userName);
 
-    User read(UUID id);                   // 단건 조회
+    // 조회
+    Optional<User> findUserById(UUID userId);
+    List<User> findAllUsers();
 
-    List<User> readAll();                 // 전체 조회
+    // 수정
+    Optional<User> updateProfile(UUID userId, String newUserName, String newPhoneNum);
+    Optional<User> changePassword(UUID userId, String newPassword);
+    Optional<User> updateState(UUID userId, User.State newState);
 
-    User update(UUID id, UserUpdate uu);      // 수정
-
-    User updateState(UUID id, User.State state);
-
-    void delete(UUID id);              // 삭제
-
+    // 삭제
+    boolean deleteUser(UUID userId); // 삭제 메서드 추가 (성공 여부 반환)
 }
