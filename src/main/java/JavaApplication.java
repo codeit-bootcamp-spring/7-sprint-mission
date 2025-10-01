@@ -1,112 +1,129 @@
 import com.sprint.mssion.discodeit.entity.Channel;
 import com.sprint.mssion.discodeit.entity.Message;
 import com.sprint.mssion.discodeit.entity.User;
+import com.sprint.mssion.discodeit.repositroy.ChannelRepository;
+import com.sprint.mssion.discodeit.repositroy.MessageRepository;
+import com.sprint.mssion.discodeit.repositroy.UserRepository;
+import com.sprint.mssion.discodeit.repositroy.jcf.JCFChannelRepository;
+import com.sprint.mssion.discodeit.repositroy.jcf.JCFUserRepository;
+import com.sprint.mssion.discodeit.repositroy.jcf.JCFMessageRepository;
 import com.sprint.mssion.discodeit.service.ChannelService;
 import com.sprint.mssion.discodeit.service.MessageService;
 import com.sprint.mssion.discodeit.service.UserService;
+import com.sprint.mssion.discodeit.service.jcf.FacadeService;
 import com.sprint.mssion.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mssion.discodeit.service.jcf.JCFUserservice;
-import com.sprint.mssion.discodeit.service.jcf.JCfMessageService;
+import com.sprint.mssion.discodeit.service.jcf.JCFMessageService;
 
 import java.util.List;
-import java.util.UUID;
+
 
 public class JavaApplication {
-    static User setupUser(UserService userService) {
-        return userService.create("woody", "woody1234", "woody@codeit.com",
-                "010-1234-5678", "ㅇㅇ");
-    }
-
-    static Channel setupChannel(ChannelService channelService) {
-        Channel channel = channelService.create(Channel.ChannelType.PUBLIC, "공지", "공지 채널입니다.");
-        return channel;
-    }
-
-    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-        Message message = messageService.create("안녕하세요.", channel.getCommon().getId(), author.getCommon().getId());
-        System.out.println("메시지 생성: " + message.getCommon().getId());
-    }
-
     public static void main(String[] args) {
-        // 서비스 초기화
-        // TODO Basic*Service 구현체를 초기화하세요.
-        UserService userService = new JCFUserservice();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCfMessageService();
 
-        // 셋업
-        User user1 = userService.create("woody", "woody1234", "woody@codeit.com",
-                "010-1234-5678", "ㅇㅇ");
-        User user2 = userService.create("buzz", "buzz9999", "buzz@codeit.com",
-                "010-1111-2222", "ㅇㅇ");
-        User user3 = userService.create("jessie", "jessie555", "jessie@codeit.com",
-                "010-3333-4444", "ㅇㅇ");
-        User user4 = userService.create("rex", "rex8888", "rex@codeit.com",
-                "010-5555-6666", "ㅇㅇ");
-        List<User> users = userService.readAll();
-        for(User u : users) System.out.println(u.toString());
+        //정훈이의 고민: https://github.com/woowacourse/retrospective/discussions/15
+        // -> 파사드 패턴?
 
-        userService.update(user1.getCommon().getId(),"woody_update", "woody1234", "woody@codeit.com",
-                "010-1234-5678", "ㅇㅇ_update");
-        userService.read(user1.getCommon().getId());
-        userService.delete(user4.getCommon().getId());
+        // Repository init
+        UserRepository userRepository = new JCFUserRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
 
+        // Service init
+        UserService userService = new JCFUserservice(userRepository);
+        ChannelService channelService = new JCFChannelService(channelRepository);
+        MessageService messageService = new JCFMessageService(messageRepository);
+        FacadeService facadeService = new FacadeService(userService, channelService, messageService);
 
-        System.out.println("=============================================================");
-        Channel channel1 = channelService.create(Channel.ChannelType.PUBLIC, "공지", "공지 채널입니다.");
-        Channel channel2 = channelService.create(Channel.ChannelType.PRIVATE, "일반", "일반 채널입니다.");
-        Channel channel3 = channelService.create(Channel.ChannelType.PRIVATE, "팀채널", "팀 채널입니다.");
-        List<Channel> channels = channelService.readAll();
-        for(Channel ch : channels) System.out.println(ch.toString());
+        // 유저 생성
+        User user1 = userService.createUser("dog", "dog123", "dog@codeit.com", "1111", "111");
+        User user2 = userService.createUser("cat", "cat123", "cat@codeit.com", "2222", "222");
+        User user3 = userService.createUser("cow", "cow123", "cow@codeit.com","3333","333");
+        User user4 = userService.createUser("pig", "pig123", "pig@codeit.com", "4444", "444");
+        User user5 = userService.createUser("aaaa", "aaaa123", "aaa@codeit.com", "4444", "2442");
 
-        System.out.println("=============================================================");
-        Message message1= messageService.create("안녕하세요. User1", channel1.getCommon().getId(), user1.getCommon().getId());
-        Message message2= messageService.create("안녕하세요.22 User2", channel1.getCommon().getId(), user2.getCommon().getId());
-        Message message3= messageService.create("오냐", channel1.getCommon().getId(), user1.getCommon().getId());
-        Message message4= messageService.create("안녕 채널 2", channel2.getCommon().getId(), user1.getCommon().getId());
+        // 유저 업데이트
+        userService.updateUser(user2.getCommon().getId(), "cat", "cat123!@#", "cat@codeit.com", "2222", "222_Update");
 
-        List<Message> messages = messageService.readAll();
-        for(Message m : messages) System.out.println(m.toString());
+        // 채널 생성
+        Channel notice = channelService.createChannel(Channel.ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        Channel general = channelService.createChannel(Channel.ChannelType.PUBLIC, "일반", "일반 채널입니다.");
+        Channel random = channelService.createChannel(Channel.ChannelType.PUBLIC, "랜덤", "랜덤 채널입니다.");
 
-//        System.out.println("=============== 에러 테스트 ============================================");
-//        Message errorMsg = messageService.create("에러 메세지", UUID.randomUUID(), user1.getCommon().getId()); // 없는 유저
-//        Message errorMsg2 = messageService.create("에러 메세지2", channel1.getCommon().getId(), UUID.randomUUID()); // 없는 유저
+        userService.addChannelToUser(user1.getCommon().getId(), notice.getCommon().getId());
+        userService.addChannelToUser(user2.getCommon().getId(), notice.getCommon().getId());
+        userService.addChannelToUser(user3.getCommon().getId(), notice.getCommon().getId());
+        userService.addChannelToUser(user4.getCommon().getId(), notice.getCommon().getId());
 
-        System.out.println("================== 채널에 참여한 유저 및 메시지 리스트 확인");
-        channels = channelService.readAll();
-        for(Channel ch : channels) System.out.println(ch.toString());
+        //메세지 생성
+        facadeService.createMessageWithRelation(user1.getCommon().getId(), general.getCommon().getId(), "안녕하세요");
+        facadeService.createMessageWithRelation(user2.getCommon().getId(), general.getCommon().getId(), "반갑다");
+        facadeService.createMessageWithRelation(user1.getCommon().getId(), general.getCommon().getId(), "이름 무너ㅑ");
+        facadeService.createMessageWithRelation(user2.getCommon().getId(), general.getCommon().getId(), "Dog");
+        facadeService.createMessageWithRelation(user3.getCommon().getId(), general.getCommon().getId(), "나도 안녕");
 
-        System.out.println("===== User1 참여 채널 리스트 확인===");
-        System.out.println(user1.getJoinChannels());
+        // 여기서는 따로 addChannelToUser를 호출하지 않았지만, 자체 함수에서 채널에 없으면, 해당 유저를 채널에 참여
+        facadeService.createMessageWithRelation(user1.getCommon().getId(), random.getCommon().getId(), "ㅎㅇ1");
+        facadeService.createMessageWithRelation(user5.getCommon().getId(), random.getCommon().getId(), "ㅎㅇ22222");
 
-        System.out.println("================== 삭제 후 채널에 참여한 유저 및 메시지 리스트 확인");
-        channelService.delete(channel1.getCommon().getId()); // channel1 삭제
-        channels = channelService.readAll();
-        for(Channel ch : channels) {
-            System.out.println(ch.toString());
+        System.out.println("========== 유저 리스트");
+        for(User user : userRepository.findAll()){
+            System.out.println(user);
         }
 
-        System.out.println("user1이 참여 중인 채널: " + user1.getJoinChannels());
-
-        System.out.println("==================== 유저 삭제 하였을 때 메세지 및 채널 리스트 확인");
-        userService.delete(user1.getCommon().getId());
-        channels = channelService.readAll();
-        for(Channel ch : channels) {
-            System.out.println(ch.toString());
+        System.out.println("========== 채널 리스트");
+        for(Channel channel  : channelRepository.findAll()){
+            System.out.println(channel);
         }
-        messages = messageService.readAll();
-        for(Message m : messages) System.out.println(m.toString());
 
-//        유저 삭제로 인해 에러가 나야 하는 코드
-//        userService.update(user1.getCommon().getId(), "woody", "woody1234", "woody@codeit.com",
-//                "010-1234-5678", "ㅇㅇ");
-
-        System.out.println("=========================채널 수정");
-        channelService.update(channel3.getCommon().getId(),Channel.ChannelType.PRIVATE, "팀채널_수정", "팀 채널입니다." );
-        channels = channelService.readAll();
-        for(Channel ch : channels) {
-            System.out.println(ch.toString());
+        System.out.println("========== 메세지 리스트");
+        for(Message message : messageRepository.findAll()){
+            System.out.println(message);
         }
+
+        // 채널 삭제
+        facadeService.deleteChannelWithRelation(random.getCommon().getId());
+        // 1. 기댓값은 해당 채널이 유저 채널리스트에서 없어야함.
+        System.out.println("============ 채널을 삭제 시 유저에 참여채널 확인 ==================");
+        for(User user : userRepository.findAll()){
+            System.out.println(user.getUsername() + "참여 채널: " + user.getJoinChannels());
+        }
+
+        // 2. 기댓값은 해당 채널에 속하던 메세지는 메세지 인스턴스를 삭제해야함.
+        System.out.println("============ 채널을 삭제 시 메세지 확인 ==================");
+        for(Message message : messageRepository.findAll()){
+            System.out.println(message);
+        }
+
+        // 유저 삭제
+        facadeService.deleteUserWithRelation(user1.getCommon().getId());
+        System.out.println("========== 유저 삭제 시 유저 리스트");
+        for(User user : userRepository.findAll()){
+            System.out.println(user);
+        }
+        System.out.println("============ 유저 삭제 시 메세지 확인 ==================");
+        for(Message message : messageRepository.findAll()){
+            System.out.println(message);
+        }
+
+
+        //유저 삭제(같은거 삭제 해서 에러 나는지 테스트)
+        try {
+            facadeService.deleteUserWithRelation(user1.getCommon().getId());
+        } catch (Exception e){
+            System.out.println("이미 삭제된 유저");
+        }
+
+        // 메세지 생성 및 삭제 테스트
+        List<Message> messages = messageService.getAllMessages();
+        Message testMessage = messages.get(0);
+        System.out.println("삭제 대상 메세지: " + testMessage);
+        messageService.deleteMessage(messages.get(0).getCommon().getId());
+        System.out.println("========== 메세지 리스트");
+        for(Message message : messageRepository.findAll()){
+            System.out.println(message);
+        }
+
 
 
     }

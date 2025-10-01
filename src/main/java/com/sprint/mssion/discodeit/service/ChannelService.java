@@ -4,11 +4,15 @@ import com.sprint.mssion.discodeit.entity.Channel;
 
 import java.util.List;
 import java.util.UUID;
+// 네이밍 컨벤션 해야함. createUser, creaChnael 등등,
+// 인터페이스에 너무 잡다한게 많은거같다.
 
 public interface ChannelService {
-    public Channel create(Channel.ChannelType type, String channelName, String channelDescription);
-    public Channel read(UUID channelId);
-    public List<Channel> readAll();
-    public void update(UUID channelId, Channel.ChannelType type, String channelName, String channelDescription);
-    public void delete(UUID channelId);
+    Channel createChannel(Channel.ChannelType type, String channelName, String channelDescription);
+    Channel getChannel(UUID channelId);
+    List<Channel> getAllChannels();
+    void updateChannel(UUID channelId, Channel.ChannelType type, String channelName, String channelDescription);
+    void deleteChannel(UUID channelId);
+    boolean isExistsChannel(UUID channelId);
+
 }

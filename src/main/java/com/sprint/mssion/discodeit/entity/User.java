@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class User{
-    private Common common;
+    private final Common common;
     private String username;
     private String email;
     private String phoneNumbers;
@@ -76,6 +76,7 @@ public class User{
                 ", email='" + email + '\'' +
                 ", phoneNumbers='" + phoneNumbers + '\'' +
                 ", pronoun='" + pronoun + '\'' +
+                ", joinChannels=" + joinChannels +
                 '}';
     }
 }
