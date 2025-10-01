@@ -3,18 +3,20 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.etc.StaticString;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 
-import static com.sprint.mission.discodeit.etc.StaticString.*;
+import static com.sprint.mission.discodeit.static_.StaticString.*;
 
 public class JCFChannel implements ChannelService {
 private final ArrayList<Channel> channelDb;
-private final  Map<UUID,String> deletedChannel ;
-    private final JCFDb jcfDb;
+private final  Map<UUID,String> deletedChannelDb ;
+private final JCFDb jcfDb;
+private final JCFValidateOperator validateOperator;
+private final ArrayList<User> userDb ;
+
 
 
 
@@ -23,7 +25,9 @@ private final  Map<UUID,String> deletedChannel ;
 
         this.jcfDb = jcfDb;
 this.channelDb = jcfDb.getChannelDb();
-this.deletedChannel = jcfDb.getDeletedChannelDb();
+this.deletedChannelDb = jcfDb.getDeletedChannelDb();
+this.validateOperator = new JCFValidateOperator(jcfDb);
+this.userDb = jcfDb.getUserDb();
 
     }
 
@@ -58,13 +62,26 @@ this.deletedChannel = jcfDb.getDeletedChannelDb();
 
     @Override
     public void createChannel(Channel channel) {
-        jcfDb.createChannel(channel);
+        if(channel == null) {
+            System.out.println(NULL_INPUT);
+            return;
+        }
+        if(validateOperator.isValidateChannel(channel)){
+            System.out.println(CHANNEL_EXIST + channel.getName());
+            return;
+        }
+        channelDb.add(channel);
+        System.out.println(CREATE_CHANNEL + channel.getName());
 //        System.out.printf("채널이 생성되었습니다 : %s\n", channel.getName());
 
     }
 
     @Override
     public void readChannel(Channel channel) {
+        if(channel == null) {
+            System.out.println(NULL_INPUT);
+            return;
+        }
         if(jcfDb.getDeletedChannelDb().containsKey(channel.getId())) {
             System.out.println(CHANNEL_ALREADY_DELETED+ channel.getName() );
             return;
@@ -84,7 +101,11 @@ this.deletedChannel = jcfDb.getDeletedChannelDb();
     public void readChannel(Channel... channels) {
 
         for (Channel channel : channels) {
-            if(deletedChannel.containsKey(channel.getId())){
+            if(channel == null) {
+                System.out.println(NULL_INPUT);
+                continue;
+            }
+            if(deletedChannelDb.containsKey(channel.getId())){
                 System.out.println(CHANNEL_ALREADY_DELETED +channel.getName());
                 continue;
             }
@@ -108,13 +129,30 @@ this.deletedChannel = jcfDb.getDeletedChannelDb();
 
     @Override
     public void deleteChannel(Channel channel) {
-        jcfDb.deleteChannel(channel);
+        if(channel == null) {
+            System.out.println(NULL_INPUT);
+            return;
+        }
+        if(!validateOperator.isValidateChannel(channel)){
+            System.out.println(CHANNEL_NOT_EXIST + channel.getName());
+            return;
+        }
+        channelDb.remove(channel);
+        deletedChannelDb.put(channel.getId(),channel.getName());
+        userDb.stream()
+                .filter(x->x.getChannelDb().contains(channel))
+                .forEach(x->x.removeChannel(channel));
+        System.out.println(DELETE_CHANNEL + channel.getName());
 
     }
 
     @Override
     public <T> void updateChannel(Channel channel, Channel.channelElement channelElement, T updatedContent) {
-        if(!jcfDb.isValidateChannel(channel)){
+        if(channel == null || updatedContent == null|| channelElement == null) {
+            System.out.println(NULL_INPUT);
+            return;
+        }
+        if(!validateOperator.isValidateChannel(channel)){
             System.out.println(CHANNEL_NOT_EXIST + channel.getName());
             return;
         }
@@ -159,13 +197,13 @@ this.deletedChannel = jcfDb.getDeletedChannelDb();
 
     @Override
     public void readDeletedChannel() {
-        if(deletedChannel.isEmpty()){
+        if(deletedChannelDb.isEmpty()){
             System.out.println( "삭제된 채널이 없습니다.");
             return;
         }
         System.out.println( "===삭제된 채널=== ");
-        for(UUID tmp :deletedChannel.keySet()){
-            String value = deletedChannel.get(tmp);
+        for(UUID tmp :deletedChannelDb.keySet()){
+            String value = deletedChannelDb.get(tmp);
             System.out.println(value);
         }
         System.out.println("==========");
@@ -189,11 +227,15 @@ this.deletedChannel = jcfDb.getDeletedChannelDb();
         }
     }
     public void inviteUserToChannel(User user, Channel channel){
-        if(!jcfDb.isValidateChannel(channel)){
+        if(user == null || channel == null) {
+            System.out.println(NULL_INPUT);
+            return;
+        }
+        if(!validateOperator.isValidateChannel(channel)){
             System.out.println(CHANNEL_NOT_EXIST + channel.getName());
             return;
         }
-        if(!jcfDb.isValidateUser(user)){
+        if(!validateOperator.isValidateUser(user)){
             System.out.println(USER_NOT_EXIST+ user.getName());
             return;
         }
@@ -203,11 +245,15 @@ this.deletedChannel = jcfDb.getDeletedChannelDb();
         System.out.println(user.getName()+"님이 "+channel.getName()+" 채널에 초대 됐습니다..");
     }
     public void deleteUserFromChannel(User user, Channel channel){
-        if(!jcfDb.isValidateChannel(channel)){
+        if(user == null || channel == null) {
+            System.out.println(NULL_INPUT);
+            return;
+        }
+        if(!validateOperator.isValidateChannel(channel)){
             System.out.println(CHANNEL_NOT_EXIST + channel.getName());
             return;
         }
-        if(!jcfDb.isValidateUser(user)){
+        if(!validateOperator.isValidateUser(user)){
             System.out.println(USER_NOT_EXIST + user.getName());
             return;
         }

@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.etc.StaticString;
+import com.sprint.mission.discodeit.static_.StaticString;
 
-import javax.naming.Name;
-import javax.naming.NamingEnumeration;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 

@@ -1,14 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.etc.StaticString;
+import com.sprint.mission.discodeit.static_.StaticString;
 
-import javax.naming.Name;
-import javax.naming.NamingEnumeration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class Channel extends Entity {
     private String name;

@@ -3,22 +3,20 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.etc.StaticString;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-import static com.sprint.mission.discodeit.etc.StaticString.*;
+import static com.sprint.mission.discodeit.static_.StaticString.*;
 
 public class JCFMessage implements MessageService {
-    private final ArrayList<Message> messageDB;
-    private final Map<UUID,String> deletedMessage = new HashMap<>();
+    private final ArrayList<Message> messageDb;
+    private final Map<UUID,String> deletedMessageDb ;
     private final ArrayList<User> userDb;
+    private final JCFValidateOperator validateOperator;
 
     private final JCFDb jcfDb;
 
@@ -26,31 +24,42 @@ public class JCFMessage implements MessageService {
 
     public JCFMessage(JCFDb jcfDb) {
         this.jcfDb = jcfDb;
-        this.messageDB = jcfDb.getMessageDb();
+        this.messageDb = jcfDb.getMessageDb();
         this.userDb = jcfDb.getUserDb();
+        this.validateOperator = new JCFValidateOperator(jcfDb);
+        this.deletedMessageDb = jcfDb.getDeletedMessageDb();
     }
 
     @Override
     public void createMessage(Message message) {
-        if (userDb.stream()
-                        .noneMatch(x -> x.getId() == message.getSender().getId())
-
-        ) {
-            System.out.println(USER_NOT_EXIST + message.getSender().getName() );
+        if (message == null) {
+            System.out.println(NULL_INPUT);
             return;
         }
-        messageDB.add(message);
-        System.out.printf(CREATE_MESSAGE+ message.getSender().getName() + " : " + message.getContent());
-
+        if(validateOperator.isValidateMessage(message)){
+            System.out.println(MESSAGE_EXIST + message.getContent());
+            return;
+        }
+        if(!validateOperator.isValidateUser(message.getSender())){
+            System.out.println(USER_NOT_EXIST + message.getSender().getName());
+            return;
+        }
+        messageDb.add(message);
+        System.out.println(CREATE_MESSAGE + message.getContent());
+        return;
     }
 
     @Override
     public void readMessage(Message message) {
-        if(deletedMessage.containsKey(message.getId())){
+        if (message == null) {
+            System.out.println(NULL_INPUT);
+            return;
+        }
+        if(deletedMessageDb.containsKey(message.getId())){
             System.out.println(message.getContent() +MESSAGE_ALREADY_DELETED);
             return;
         }
-        if (messageDB.stream()
+        if (messageDb.stream()
                 .noneMatch(m -> m.getId() == message.getId())) {
             System.out.println(MESSAGE_NOT_EXIST+ message.getContent());
             return;
@@ -65,11 +74,12 @@ public class JCFMessage implements MessageService {
     public void readMessage(Message... messages) {
 
         for (Message message : messages) {
-            if(deletedMessage.containsKey(message.getId())){
+
+            if(deletedMessageDb.containsKey(message.getId())){
                 System.out.println(message.getContent() +MESSAGE_ALREADY_DELETED);
                 continue;
             }
-            if (messageDB.stream()
+            if (messageDb.stream()
                     .noneMatch(m -> m.getId() == message.getId())) {
                 System.out.println(MESSAGE_NOT_EXIST + message.getContent( ));
                 continue;
@@ -82,7 +92,7 @@ public class JCFMessage implements MessageService {
 
     @Override
     public void readAllMessage() {
-        for (Message message : messageDB) {
+        for (Message message : messageDb) {
             readMessage(message);
         }
 
@@ -90,22 +100,28 @@ public class JCFMessage implements MessageService {
 
     @Override
     public void deleteMessage(Message message) {
-        Message finalMessage = message;
-        if (messageDB.stream()
-                .noneMatch(m->m.getId()== finalMessage.getId())) {
-            System.out.println(MESSAGE_NOT_EXIST+ message.getContent());
+        if (message == null) {
+            System.out.println(NULL_INPUT);
             return;
         }
-
-        messageDB.remove(message);
-        deletedMessage.put(message.getId(),message.getContent());
-        System.out.printf(DELETE_MESSAGE+ message.getContent());
+        if(!validateOperator.isValidateMessage(message)){
+            System.out.println(MESSAGE_NOT_EXIST + message.getContent());
+            return;
+        }
+        messageDb.remove(message);
+        deletedMessageDb.put(message.getId(),message.getContent());
+        System.out.println(DELETE_MESSAGE + message.getContent());
+        return;
     }
 
     @Override
     public <T> void updateMessage(Message message, Message.messageElement messageElement, T updatedContent) {
+        if (message == null || updatedContent == null || messageElement == null) {
+            System.out.println(NULL_INPUT);
+            return;
+        }
 
-        if (messageDB.stream()
+        if (messageDb.stream()
                 .noneMatch(m->m.getId()==message.getId())) {
             System.out.println(MESSAGE_NOT_EXIST+ message.getContent());
             return;
@@ -114,7 +130,7 @@ public class JCFMessage implements MessageService {
         BiConsumer<Message, Object> editFunction = messageElement.setter;
         Object oldContent = getMessageElement(message,messageElement);
       try{
-          System.out.printf(DELETE_MESSAGE+ message.getContent());
+          System.out.println(DELETE_MESSAGE+ message.getContent());
           System.out.println("변경한 필드: "+ messageElement.name()+ " 변경전: "+oldContent +" ==> 변경 후: "+updatedContent);
           editFunction.accept(message, updatedContent);
           message.updateEntity();
@@ -129,11 +145,11 @@ public class JCFMessage implements MessageService {
 
     @Override
     public void readUpdatedMessage() {
-        if (messageDB.stream().noneMatch(m -> m.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT)) {
+        if (messageDb.stream().noneMatch(m -> m.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT)) {
             System.out.println("업데이트 된 메시지가 없습니다.");
             return;
         }
-        for (Message message : messageDB) {
+        for (Message message : messageDb) {
 
             if (message.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT) {
                 readMessage(message);
@@ -145,13 +161,13 @@ public class JCFMessage implements MessageService {
 
     @Override
     public void readDeletedMessage() {
-        if (deletedMessage.isEmpty()) {
+        if (deletedMessageDb.isEmpty()) {
             System.out.println( "삭제된 메세지가 없습니다.");
             return;
         }
         System.out.println( "===삭제된 메세지=== ");
-        for( UUID tmp :deletedMessage.keySet()){
-            String value = deletedMessage.get(tmp);
+        for( UUID tmp :deletedMessageDb.keySet()){
+            String value = deletedMessageDb.get(tmp);
             System.out.println(value);
         }
         System.out.println("==========");

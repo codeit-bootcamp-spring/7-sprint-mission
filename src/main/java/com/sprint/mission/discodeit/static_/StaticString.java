@@ -1,6 +1,4 @@
-package com.sprint.mission.discodeit.etc;
-
-import javax.swing.plaf.PanelUI;
+package com.sprint.mission.discodeit.static_;
 
 public class StaticString {
     public static final String DELETE_USER ="유저가 삭제되었습니다 : ";
@@ -24,4 +22,7 @@ public class StaticString {
     public static final String CREATE_MESSAGE ="메시지가 생성되었습니다 : ";
 
     public static final String WRONG_TYPE ="잘못된 타입을 입력했습니다. 올바른 입력값을 넣어주세요";
+    public static final String WRONG_INPUT ="잘못된 입력값입니다. !help 명령어를 통해 도움말을 확인해주세요";
+    public static final String WRONG_COMMAND ="잘못된 명령입니다. !help 명령어를 통해 도움말을 확인해주세요";
+    public static final String NULL_INPUT ="입력값이 없습니다. 행동을 취소합니다";
 }
