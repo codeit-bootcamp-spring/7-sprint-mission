@@ -28,6 +28,16 @@ public class JCFChannelService implements ChannelService {
                 .toList();
     }
 
+    public UUID getNthChannel(int index){
+        return data.entrySet().stream()
+                .sorted(Comparator.comparing(e ->
+                        e.getValue().getDisplayName()))
+                .skip(index)
+                .findFirst()
+                .map(Map.Entry::getKey)
+                .orElseThrow(IndexOutOfBoundsException::new);
+    }
+
     @Override
     public List<UUID> getRegisteredChannels(User user) {
         List<UUID> registered = new ArrayList<>();
@@ -42,8 +52,15 @@ public class JCFChannelService implements ChannelService {
     @Override
     public List<UUID> getNotRegisteredChannels(User user) {
         List<UUID> registered = getRegisteredChannels(user);
-        // TODO 작성중
-        return new ArrayList<>();
+        List<UUID> allChannels = new ArrayList<>(data.keySet().stream().toList());
+        allChannels.removeAll(registered);
+
+        return data.entrySet().stream()
+                .filter(e -> allChannels.contains(e.getKey()))
+                .sorted(Comparator.comparing(e ->
+                    e.getValue().getDisplayName()))
+                .map(Map.Entry::getKey)
+                .toList();
     }
 
     @Override
