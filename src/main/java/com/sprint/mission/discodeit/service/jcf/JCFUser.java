@@ -112,6 +112,10 @@ public class JCFUser implements UserService {
 
     @Override
     public void readAllUser() {
+        if (userDb.isEmpty()) {
+            System.out.println(USER_EMPTY);
+            return;
+        }
         for (User user : userDb) {
             readUser(user);
         }

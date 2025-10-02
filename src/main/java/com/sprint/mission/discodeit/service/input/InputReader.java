@@ -2,14 +2,13 @@ package com.sprint.mission.discodeit.service.input;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class InputHandler {
+public class InputReader {
     private BufferedReader br;
 
 
-    public InputHandler() {
+    public InputReader() {
         this.br= new BufferedReader(new InputStreamReader(System.in));
     }
 

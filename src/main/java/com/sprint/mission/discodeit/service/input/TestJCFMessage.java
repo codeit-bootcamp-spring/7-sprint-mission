@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.input;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessage;
 
 import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
@@ -9,12 +10,13 @@ public class TestJCFMessage {
 
     private final TestUtil testUtil;
 
-    private final JCFMessage jcfMessage;
+//    private final JCFMessage jcfMessage;
+    private final MessageService messageService;
 
 
-    public TestJCFMessage(TestUtil testUtil, JCFMessage jcfMessage) {
+    public TestJCFMessage(TestUtil testUtil, MessageService messageService) {
         this.testUtil = testUtil;
-        this.jcfMessage = jcfMessage;
+        this.messageService = messageService;
     }
 
     void testCreateMessage(String[] cmdArray){
@@ -22,7 +24,7 @@ public class TestJCFMessage {
             System.out.println(WRONG_INPUT);
             return;
         }
-        jcfMessage.createMessage(new Message(cmdArray[1], testUtil.targetUser(cmdArray[2]), Boolean.parseBoolean(cmdArray[3])));
+        messageService.createMessage(new Message(cmdArray[1], testUtil.targetUser(cmdArray[2]), Boolean.parseBoolean(cmdArray[3])));
         return;
     }
     void testReadMessage(String[] cmdArray){
@@ -31,10 +33,10 @@ public class TestJCFMessage {
             System.out.println(WRONG_INPUT);
             return;
         }
-        jcfMessage.readMessage(testUtil.targetMessage(cmdArray[1]));
+        messageService.readMessage(testUtil.targetMessage(cmdArray[1]));
     }
     void testReadAllMessage(){
-        jcfMessage.readAllMessage();
+        messageService.readAllMessage();
     }
     void testUpdateMessage(String[] cmdArray){
         if (cmdArray.length != 4) {
@@ -50,10 +52,10 @@ public class TestJCFMessage {
            return;
         }
         if (messageElement == Message.messageElement.CONTENT) {
-            jcfMessage.updateMessage(targetMessage2, messageElement, cmdArray[3]);
+            messageService.updateMessage(targetMessage2, messageElement, cmdArray[3]);
         }
         if (messageElement == Message.messageElement.IS_MARKDOWN) {
-            jcfMessage.updateMessage(targetMessage2, messageElement, Boolean.parseBoolean(cmdArray[3]));
+            messageService.updateMessage(targetMessage2, messageElement, Boolean.parseBoolean(cmdArray[3]));
         }
         return;
     }
@@ -62,13 +64,13 @@ public class TestJCFMessage {
             System.out.println(WRONG_INPUT);
             return;
         }
-        jcfMessage.deleteMessage(testUtil.targetMessage(cmdArray[1]));
+        messageService.deleteMessage(testUtil.targetMessage(cmdArray[1]));
         return;
     }
     void testReadUpdatedMessage(){
-        jcfMessage.readUpdatedMessage();
+        messageService.readUpdatedMessage();
     }
     void testReadDeletedMessage(){
-        jcfMessage.readDeletedMessage();
+        messageService.readDeletedMessage();
     }
 }

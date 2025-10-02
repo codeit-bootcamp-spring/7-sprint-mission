@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 
 public interface UserService {
@@ -10,6 +11,8 @@ public interface UserService {
     <T>void updateUser(User user,User.userElement userElement, T updatedContent);
     void readUpdatedUser();
     void readDeletedUser();
+    void enterChannel(User user, Channel channel);
+    void exitChannel(User user,Channel channel);
 
 
 

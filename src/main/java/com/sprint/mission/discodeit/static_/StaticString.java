@@ -25,4 +25,8 @@ public class StaticString {
     public static final String WRONG_INPUT ="잘못된 입력값입니다. !help 명령어를 통해 도움말을 확인해주세요";
     public static final String WRONG_COMMAND ="잘못된 명령입니다. !help 명령어를 통해 도움말을 확인해주세요";
     public static final String NULL_INPUT ="입력값이 없습니다. 행동을 취소합니다";
+
+    public static final String CHANNEL_EMPTY ="채널이 비어있습니다. 채널을 생성해주세요";
+    public static final String USER_EMPTY ="유저가 비어있습니다. 유저를 생성해주세요";
+    public static final String MESSAGE_EMPTY ="메시지가 비어있습니다. 메시지를 작성해주세요";
 }

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.input;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFUser;
 
 import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
@@ -9,11 +10,12 @@ import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
 
 public class TestJCFUser {
     private final TestUtil testUtil;
-    private final JCFUser jcfUser;
+//
+    private final UserService userService;
 
-    public TestJCFUser(TestUtil testUtil, JCFUser jcfUser) {
+    public TestJCFUser(TestUtil testUtil, UserService userService) {
         this.testUtil = testUtil;
-        this.jcfUser = jcfUser;
+        this.userService = userService;
     }
 
     void testCreateUser(String [] cmdArray){
@@ -21,12 +23,12 @@ public class TestJCFUser {
             System.out.println(WRONG_INPUT);
             return;
         }
-        jcfUser.createUser(new User(cmdArray[1], cmdArray[2], cmdArray[3], Boolean.parseBoolean(cmdArray[4])));
+        userService.createUser(new User(cmdArray[1], cmdArray[2], cmdArray[3], Boolean.parseBoolean(cmdArray[4])));
         return;
 
     }
     void testReadAllUser(){
-        jcfUser.readAllUser();
+        userService.readAllUser();
     }
     void testDeleteUser(String[] cmdArray){
         if (cmdArray.length != 2) {
@@ -38,14 +40,14 @@ public class TestJCFUser {
             System.out.println(USER_NOT_EXIST + cmdArray[1]);
             return;
         }
-        jcfUser.deleteUser(user);
+        userService.deleteUser(user);
        return;
     }
     void testReadUpdatedUser(){
-        jcfUser.readUpdatedUser();
+        userService.readUpdatedUser();
     }
     void testReadDeletedUser(){
-        jcfUser.readDeletedUser();
+        userService.readDeletedUser();
     }
     void testEnterChannel(String[] cmdArray){
 
@@ -55,7 +57,7 @@ public class TestJCFUser {
         }
         User targetUser2 = testUtil.targetUser(cmdArray[1]);
         Channel targetChannel = testUtil.targetChannel(cmdArray[2]);
-        jcfUser.enterChannel(targetUser2, targetChannel);
+        userService.enterChannel(targetUser2, targetChannel);
         return;
     }
     void testExitChannel(String[] cmdArray){
@@ -66,7 +68,7 @@ public class TestJCFUser {
         }
         User targetUser3 = testUtil.targetUser(cmdArray[1]);
         Channel targetChannel2 = testUtil.targetChannel(cmdArray[2]);
-        jcfUser.exitChannel(targetUser3, targetChannel2);
+        userService.exitChannel(targetUser3, targetChannel2);
         return;
     }
     void testUpdateUser(String[] cmdArray){
@@ -90,10 +92,10 @@ public class TestJCFUser {
             return;
         }
         if (userElement == User.userElement.ONLINE) {
-            jcfUser.updateUser(targetUser, userElement, Boolean.parseBoolean(cmdArray[3]));
+            userService.updateUser(targetUser, userElement, Boolean.parseBoolean(cmdArray[3]));
             return;
         }
-        jcfUser.updateUser(targetUser, userElement, cmdArray[3]);
+        userService.updateUser(targetUser, userElement, cmdArray[3]);
         return;
     }
     void testReadUser(String[] cmdArray){
@@ -101,7 +103,7 @@ public class TestJCFUser {
             System.out.println(WRONG_INPUT);
             return;
         }
-        jcfUser.readUser(testUtil.targetUser(cmdArray[1]));
+        userService.readUser(testUtil.targetUser(cmdArray[1]));
 
     }
 }

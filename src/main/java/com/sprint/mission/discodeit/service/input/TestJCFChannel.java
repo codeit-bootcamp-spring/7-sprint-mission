@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.input;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannel;
 
 import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
@@ -8,12 +9,14 @@ import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
 public class TestJCFChannel {
 
     private final TestUtil testUtil;
-    private final JCFChannel jcfChannel ;
+//    private final JCFChannel jcfChannel ;
+    private final ChannelService channelService;
 
 
-    public TestJCFChannel(TestUtil testUtil, JCFChannel jcfChannel) {
+
+    public TestJCFChannel(TestUtil testUtil, ChannelService channelService) {
         this.testUtil = testUtil;
-        this.jcfChannel = jcfChannel;
+        this.channelService = channelService;
     }
 
     void testCreateChannel(String [] cmdArray) {
@@ -21,14 +24,14 @@ public class TestJCFChannel {
             System.out.println(WRONG_INPUT);
             return;
         }
-        jcfChannel.createChannel(new Channel(cmdArray[1], cmdArray[2], Boolean.parseBoolean(cmdArray[3]), Boolean.parseBoolean(cmdArray[4])));
+        channelService.createChannel(new Channel(cmdArray[1], cmdArray[2], Boolean.parseBoolean(cmdArray[3]), Boolean.parseBoolean(cmdArray[4])));
     }
     void testDeleteChannel(String[] cmdArray) {
         if (cmdArray.length != 2) {
             System.out.println(WRONG_INPUT);
             return;
         }
-        jcfChannel.deleteChannel(testUtil.targetChannel(cmdArray[1]));
+        channelService.deleteChannel(testUtil.targetChannel(cmdArray[1]));
     }
     void testUpdateChannel(String[] cmdArray) {
         if (cmdArray.length != 4) {
@@ -46,19 +49,19 @@ public class TestJCFChannel {
         }
 
         if (channelElement == Channel.channelElement.IS_PUBLIC) {
-            jcfChannel.updateChannel(targetChannel3, channelElement, Boolean.parseBoolean(cmdArray[3]));
+            channelService.updateChannel(targetChannel3, channelElement, Boolean.parseBoolean(cmdArray[3]));
 
         }
         if (channelElement == Channel.channelElement.IS_TEXT_CHANNEL) {
-            jcfChannel.updateChannel(targetChannel3, channelElement, Boolean.parseBoolean(cmdArray[3]));
+            channelService.updateChannel(targetChannel3, channelElement, Boolean.parseBoolean(cmdArray[3]));
 
         }
         if (channelElement == Channel.channelElement.NAME) {
-            jcfChannel.updateChannel(targetChannel3, channelElement, cmdArray[3]);
+            channelService.updateChannel(targetChannel3, channelElement, cmdArray[3]);
 
         }
         if (channelElement == Channel.channelElement.DESCRIPTION) {
-            jcfChannel.updateChannel(targetChannel3, channelElement, cmdArray[3]);
+            channelService.updateChannel(targetChannel3, channelElement, cmdArray[3]);
         }
         return;
     }
@@ -67,18 +70,18 @@ public class TestJCFChannel {
             System.out.println(WRONG_INPUT);
             return;
         }
-        jcfChannel.readChannel(testUtil.targetChannel(cmdArray[1]));
+        channelService.readChannel(testUtil.targetChannel(cmdArray[1]));
 
 
     }
     void testReadAllChannel()
-        {jcfChannel.readAllChannel();}
+        {channelService.readAllChannel();}
     void testInviteUserToChannel(String[] cmdArray) {
         if (cmdArray.length != 3) {
             System.out.println(WRONG_INPUT);
             return;
         }
-        jcfChannel.inviteUserToChannel(testUtil.targetUser(cmdArray[1]), testUtil.targetChannel(cmdArray[2]));
+        channelService.inviteUserToChannel(testUtil.targetUser(cmdArray[1]), testUtil.targetChannel(cmdArray[2]));
         return;
     }
     void testDeleteUserFromChannel(String[] cmdArray) {
@@ -86,16 +89,16 @@ public class TestJCFChannel {
             System.out.println(WRONG_INPUT);
             return;
         }
-        jcfChannel.deleteUserFromChannel(testUtil.targetUser(cmdArray[1]), testUtil.targetChannel(cmdArray[2]));
+        channelService.deleteUserFromChannel(testUtil.targetUser(cmdArray[1]), testUtil.targetChannel(cmdArray[2]));
         return;
 
     }
     void testReadUpdatedChannel() {
 
-        jcfChannel.readUpdatedChannel();
+        channelService.readUpdatedChannel();
     }
     void testReadDeletedChannel() {
-        jcfChannel.readDeletedChannel();
+        channelService.readDeletedChannel();
 
     }
 }

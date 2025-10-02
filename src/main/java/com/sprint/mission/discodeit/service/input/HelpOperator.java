@@ -11,6 +11,7 @@ public class HelpOperator {
         showMessageHelp();
         System.out.print("\n\n");
         showUserHelp();
+        System.out.println("\n !exit");
     }
 
     public void showChannelHelp() {

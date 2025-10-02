@@ -8,22 +8,21 @@ import com.sprint.mission.discodeit.service.jcf.JCFUser;
 import static com.sprint.mission.discodeit.static_.StaticString.*;
 
 public class InputApplication {
-    private final InputHandler inputHandler;
+    private final InputReader inputHandler;
 
     private final JCFDb jcfDb;
 
     private final TestJCFChannel testJCFChannel;
     private final TestJCFMessage testJCFMessage;
     private final TestJCFUser testJCFUser;
-    private final TestUtil testUtil;
     private final HelpOperator helpOperator ;
     private boolean isRunning = true;
 
     public InputApplication() {
-        this.inputHandler = new InputHandler();
+        this.inputHandler = new InputReader();
         this.jcfDb = new JCFDb();
 
-        this.testUtil = new TestUtil(jcfDb);
+        TestUtil testUtil = new TestUtil(jcfDb);
 
 
         this.testJCFChannel = new TestJCFChannel(testUtil, new JCFChannel(jcfDb));
@@ -131,6 +130,7 @@ public class InputApplication {
                break;
             case"!exit":
                 isRunning = false;
+                break;
             default:
                 System.out.println(WRONG_COMMAND);
 

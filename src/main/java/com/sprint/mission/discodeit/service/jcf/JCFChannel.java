@@ -122,6 +122,10 @@ this.userDb = jcfDb.getUserDb();
     }
     @Override
     public void readAllChannel() {
+        if(channelDb.isEmpty()){
+            System.out.println(CHANNEL_EMPTY);
+            return;
+        }
         for (Channel channel : channelDb) {
             readChannel(channel);
         }

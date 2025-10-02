@@ -92,6 +92,10 @@ public class JCFMessage implements MessageService {
 
     @Override
     public void readAllMessage() {
+        if(messageDb.isEmpty()){
+            System.out.println(MESSAGE_EMPTY);
+            return;
+        }
         for (Message message : messageDb) {
             readMessage(message);
         }
