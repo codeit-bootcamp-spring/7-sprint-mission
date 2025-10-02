@@ -55,7 +55,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<ChannelInfo> addMember(UUID channelId, UUID userId) {
+    public Optional<ChannelInfo> addMemberToChannel(UUID channelId, UUID userId) {
         Optional<Channel> channelOp = Optional.ofNullable(data.get(channelId));
         Optional<User> userOptional = userService.findEntityById(userId);
 
@@ -73,7 +73,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<ChannelInfo> removeMember(UUID channelId, UUID userId) {
+    public Optional<ChannelInfo> removeMemberFromChannel(UUID channelId, UUID userId) {
         Optional<Channel> channelOp = Optional.ofNullable(data.get(channelId));
         Optional<User> userOptional = userService.findEntityById(userId);
         if (channelOp.isPresent() && userOptional.isPresent()) {
@@ -98,5 +98,16 @@ public class JCFChannelService implements ChannelService {
             System.out.println("해당 채널이 존재하지 않음");
             return false;
         }
+    }
+
+    @Override
+    public int deleteUserFromAllChannel(User user) {
+        int count = 0;
+        for (Channel channel : data.values()) {
+            if(channel.removeMember(user)) {
+                count++;
+            }
+        }
+        return count;
     }
 }

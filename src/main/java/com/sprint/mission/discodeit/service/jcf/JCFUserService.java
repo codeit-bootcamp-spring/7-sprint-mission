@@ -3,14 +3,22 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.UserInfo;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFUserService implements UserService {
 
-    private final Map<UUID, User> data;
-    public JCFUserService() {this.data = new HashMap<>();}
+    private final Map<UUID, User> data = new HashMap<>();
+    private ChannelService channelService;
+
+    public JCFUserService() {
+    }
+
+    public void setChannelService(ChannelService channelService) {
+        this.channelService = channelService;
+    }
 
     // 생성
     @Override
@@ -20,6 +28,7 @@ public class JCFUserService implements UserService {
         data.put(newUser.getId(), newUser);
         return newUser;
     }
+
     // 이메일 중복 확인
     private void validateEmailIsUnique(String email) {
         boolean isDuplicate = data.values().stream()
@@ -35,6 +44,7 @@ public class JCFUserService implements UserService {
     public Optional<UserInfo> findUserById(UUID userId) {
         return Optional.ofNullable(data.get(userId)).map(UserInfo::new);
     }
+
     public Optional<User> findEntityById(UUID userId) {
         return Optional.ofNullable(data.get(userId));
     }
@@ -77,7 +87,15 @@ public class JCFUserService implements UserService {
     // 삭제
     @Override
     public boolean deleteUser(UUID userId) {
-        if (data.remove(userId) != null) {
+        Optional<User> userOptional = Optional.ofNullable(data.get(userId));
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if(channelService != null){
+                int removedChannelCount = channelService.deleteUserFromAllChannel(user);
+                if (removedChannelCount > 0) System.out.println("총 " + removedChannelCount + "개의 채널에서 삭제됌");
+            }
+            data.remove(userId);
             System.out.println("삭제 성공");
             return true;
         }

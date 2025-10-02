@@ -10,9 +10,8 @@ public class ChannelTest {
     public static void main(String[] args) {
 
         JCFUserService userService = new JCFUserService();
-        JCFChannelService channelService = new JCFChannelService(userService); // 의존성주입
-
-        System.out.println("🚀 채널 멤버 관리 기능 테스트 시작");
+        JCFChannelService channelService = new JCFChannelService(userService);
+        userService.setChannelService(channelService);
 
         // --- 유저 및 채널 생성 ---
         User User1 = userService.createUser("test@codeit.com", "QWERty1!", "admin");
@@ -20,7 +19,7 @@ public class ChannelTest {
         Channel channel1 = channelService.create(User1, Channel.ChannelType.TEXT);
 
         UUID user1Id = User1.getId();
-        UUID newUserId = User2.getId();
+        UUID user2Id = User2.getId();
         UUID channelId = channel1.getId();
 
         System.out.println("--- 채널 조회 ---");
@@ -40,28 +39,36 @@ public class ChannelTest {
         channelService.findAll().forEach(System.out::println);
 
         // --- 멤버 추가 ---
-        System.out.println("--- 멤버 추가 ---");
-        channelService.addMember(channelId, newUserId);
-        channelService.findById(channelId).ifPresent(System.out::println);
+        System.out.println("--- 멤버 각각 추가 ---");
+        channelService.addMemberToChannel(channelId, user2Id);
+        channelService.addMemberToChannel(channel2Id, user1Id);
+        channelService.findAll().forEach(System.out::println);
 
         // --- 중복 추가 ---
         System.out.println("--- 중복 추가 ---");
-        channelService.addMember(channelId, newUserId);
+        channelService.addMemberToChannel(channelId, user2Id);
+        channelService.addMemberToChannel(channel2Id, user1Id);
 
         // --- 멤버 삭제 ---
-        System.out.println("---멤버 삭제 ---");
-        channelService.removeMember(channelId, newUserId);
+        System.out.println("--- 채널1 멤버 삭제 ---");
+        channelService.removeMemberFromChannel(channelId, user2Id);
         channelService.findById(channelId).ifPresent(System.out::println);
 
         // --- 없는 멤버 삭제 ---
-        System.out.println("---없는 멤버 삭제 ---");
-        channelService.removeMember(channelId, newUserId);
+        System.out.println("--- 중복 삭제 ---");
+        channelService.removeMemberFromChannel(channelId, user2Id);
 
         // --- 채널 삭제 ---
         System.out.println("--- 채널 삭제 후 전체 조회 ---");
         channelService.deleteChannel(channelId);
         channelService.findAll().forEach(System.out::println);
 
+        // --- 유저1 삭제 후 채널 조회 ---
+        System.out.println("--- 유저1 삭제 후 채널 조회 ---");
+        userService.deleteUser(user1Id);
+        channelService.findAll().forEach(System.out::println);
+
+        System.out.println("========================");
         System.out.println("종료");
     }
 }

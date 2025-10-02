@@ -17,8 +17,10 @@ public interface ChannelService {
     List<ChannelInfo> findAll();
 
     Optional<ChannelInfo> updateChannelName(UUID channelId, String channelName);
-    Optional<ChannelInfo> addMember(UUID channelId, UUID userId);
-    Optional<ChannelInfo> removeMember(UUID channelId, UUID userId);
+    Optional<ChannelInfo> addMemberToChannel(UUID channelId, UUID userId);
+    Optional<ChannelInfo> removeMemberFromChannel(UUID channelId, UUID userId);
 
     boolean deleteChannel(UUID id);
+
+    int deleteUserFromAllChannel(User user);
 }

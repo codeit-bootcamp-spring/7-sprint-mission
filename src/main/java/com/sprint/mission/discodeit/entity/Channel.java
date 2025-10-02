@@ -69,15 +69,14 @@ public class Channel extends BaseEntity {
 
     @Override
     public String toString() {
-
-        String membersName = members.stream().map(User::getUserName)
-                .toList().toString();
-
-        return channelName + '{' +
-                " 관리자: " + channelAdmin.getUserName() +
-                ", 채널유형: " + type +
-                ", 생성일자: " + createdAt +
-                ", 맴버: " + membersName +
-                " }";
+        return "Channel{" +
+                "channelName='" + channelName + '\'' +
+                ", type=" + type +
+                ", channelAdmin=" + channelAdmin +
+                ", members=" + members +
+                ", id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }
