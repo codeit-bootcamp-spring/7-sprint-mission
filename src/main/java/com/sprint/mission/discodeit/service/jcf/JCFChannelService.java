@@ -1,41 +1,102 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.dto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.UserInfo;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
+
 import java.util.*;
 
 
 public class JCFChannelService implements ChannelService {
 
-    Map<UUID, Channel> channels = new HashMap<>();
+    private final Map<UUID, Channel> data;
+    private final UserService userService;
 
-    @Override
-    public Channel create(Channel channel) {
-        channels.put(channel.getId(), channel);
-        return channel;
+    public JCFChannelService(UserService userService) {
+        this.data = new HashMap<>();
+        this.userService = userService;
     }
 
     @Override
-    public Channel read(UUID id) {
-        return channels.get(id);
+    public Channel create(User user, Channel.ChannelType type) {
+        Channel newChannel = new Channel(user, type);
+        this.data.put(newChannel.getId(), newChannel);
+        return newChannel;
+    }
+
+    public Channel create(User user, String channelName, Channel.ChannelType type) {
+        Channel newChannel = new Channel(user, channelName, type);
+        this.data.put(newChannel.getId(), newChannel);
+        return newChannel;
+    }
+
+
+    @Override
+    public Optional<ChannelInfo> findById(UUID id) {
+        return Optional.ofNullable(data.get(id)).map(ChannelInfo::new);
     }
 
     @Override
-    public List<Channel> readAll() {
-        List<Channel> chnnalList = new ArrayList<>(channels.values());  // users 전체출력
-        chnnalList.sort(Comparator.comparing(Channel::getCreatedAt));    // 생성일자 오름차순 정렬
-        return chnnalList;
-    }
-
-
-
-    @Override
-    public Channel update(UUID id, Channel channel) {
-        return channels.get(id);
+    public List<ChannelInfo> findAll() {
+        return data.values().stream().map(ChannelInfo::new).toList();
     }
 
     @Override
-    public void delete(UUID id) {
-        channels.remove(id);
+    public Optional<ChannelInfo> updateChannelName(UUID id, String newChannelName) {
+        Optional<Channel> channelOp = Optional.ofNullable(data.get(id));
+
+        return channelOp.map(channel -> {
+            channel.changeChannelName(newChannelName);
+            return new ChannelInfo(channel);
+        });
+    }
+
+    @Override
+    public Optional<ChannelInfo> addMember(UUID channelId, UUID userId) {
+        Optional<Channel> channelOp = Optional.ofNullable(data.get(channelId));
+        Optional<User> userOptional = userService.findEntityById(userId);
+
+        if (channelOp.isPresent() && userOptional.isPresent()) {
+            Channel channel = channelOp.get();
+            User user = userOptional.get();
+            if (channel.addMember(user)) {
+                System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에 참가");
+            }
+            else System.out.println("이미 참여하고 있는 유저");
+            return Optional.of(new ChannelInfo(channel));
+        }
+        System.out.println("잘못된 입력");
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ChannelInfo> removeMember(UUID channelId, UUID userId) {
+        Optional<Channel> channelOp = Optional.ofNullable(data.get(channelId));
+        Optional<User> userOptional = userService.findEntityById(userId);
+        if (channelOp.isPresent() && userOptional.isPresent()) {
+            Channel channel = channelOp.get();
+            User user = userOptional.get();
+            if (channel.removeMember(user)) {
+                System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에서 삭제됨");
+            }
+            else System.out.println("채널에 없는 유저");
+            return Optional.of(new ChannelInfo(channel));
+        }
+        System.out.println("잘못된 입력");
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean deleteChannel(UUID id) {
+        if (data.remove(id) != null) {
+            System.out.println("채널 삭제 성공");
+            return true;
+        } else {
+            System.out.println("해당 채널이 존재하지 않음");
+            return false;
+        }
     }
 }

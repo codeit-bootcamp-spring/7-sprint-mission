@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Channel extends BaseEntity {
 
-    public String channelName;
+    private String channelName;
     private final ChannelType type;    // 채널타입
     private final User channelAdmin;
     private final List<User> members;
@@ -41,38 +40,31 @@ public class Channel extends BaseEntity {
     }
 
     // getter
-    public ChannelType getType() {
-        return type;
-    }
-
-    public User getChannelAdmin() {
-        return channelAdmin;
-    }
-
-    public List<User> getMembers() {
-        return members;
-    }
-
-    public String getChannelName() {
-        return channelName;
-    }
+    public ChannelType getType() {return type;}
+    public User getChannelAdmin() {return channelAdmin;}
+    public List<User> getMembers() {return members;}
+    public String getChannelName() {return channelName;}
 
     // update
-    public void updateChannelName(String channelName) {
+    public void changeChannelName(String channelName) {
         this.channelName = channelName;
         updateTimestamp();
     }
-
-    public void updateMembers(User user) {
-        if (user != channelAdmin) {
-            if (members.contains(user)) {
-                members.remove(user);  // 이미 있으면 제거
-            } else {
-                members.add(user);     // 없으면 추가
-            }
+    public boolean addMember(User user) {
+        if (!members.contains(user)) {
+            members.add(user);
             updateTimestamp();
+            return true;
         }
-        else System.out.println("맴버 삭제 불가");
+        return false;
+    }
+    public boolean removeMember(User user) {
+        if(members.contains(user)) {
+            members.remove(user);
+            updateTimestamp();
+            return true;
+        }
+        return false;
     }
 
     @Override
