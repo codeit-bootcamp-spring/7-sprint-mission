@@ -1,6 +1,8 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.DTO;
 
-public class UpdatedChannelDTO {
+import com.sprint.mission.discodeit.entity.User;
+
+public class ChannelDTO {
     private User manager;
     private String serverName;
     private Long serverLevel;

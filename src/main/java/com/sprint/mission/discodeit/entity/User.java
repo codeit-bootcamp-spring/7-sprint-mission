@@ -1,9 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.vo.Invitation;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
+@Setter
 public class User {
 
     private final UUID id;
@@ -15,10 +21,11 @@ public class User {
     private String email;
     private String nickname;
     private String phoneNumber;
-    private List<MessageRoom> MyMessageRooms = new ArrayList<>();
-    private List<Channel> MyChannels = new ArrayList<>();
-    private List<FriendUser> friends = new ArrayList<>();
-//    private Language language;
+    private final List<UUID> myMessageRooms = new ArrayList<>();
+    private final List<Invitation> myInvitations =new ArrayList<>();
+    private final List<UUID> myChannels = new ArrayList<>();
+    private final List<UUID> friends = new ArrayList<>();
+
 
 
 
@@ -45,64 +52,6 @@ public class User {
 
     }
 
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public List<MessageRoom> getMyMessageRooms() {
-        return MyMessageRooms;
-    }
-
-    public List<Channel> getMyChannels() {
-        return MyChannels;
-    }
-
-    public List<FriendUser> getFriends() {
-        return friends;
-    }
-
-
     public void updateUsername(String newUsername){
         this.updatedAt=System.currentTimeMillis();
         this.username=newUsername;
@@ -116,7 +65,7 @@ public class User {
         this.password=newPassword;
     }
     public void updateEmail(String newEmail){
-        if (email == null || email.indexOf('@') == -1 || email.indexOf('@') != email.lastIndexOf('@')) {
+        if ( email.indexOf('@') == -1 || email.indexOf('@') != email.lastIndexOf('@')) {
             System.out.println("올바른 이메일 형식으로 적어주세요");
         }
         this.updatedAt=System.currentTimeMillis();
@@ -131,17 +80,37 @@ public class User {
         this.phoneNumber=newPhoneNumber;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                '}';
+
+    public List<UUID> getMyMessageRooms() {
+        return List.copyOf(myMessageRooms);
     }
+
+    public List<UUID> getMyChannels() {
+        return List.copyOf(myChannels);
+    }
+
+    public void addMyChannel(UUID uuid){
+        myChannels.add(uuid);
+    }
+
+    public List<Invitation> getMyInvitations() {
+        return List.copyOf(myInvitations);
+    }
+
+    public void addMyInvitation(Invitation invitation){
+        myInvitations.add(invitation);
+    }
+
+    public void removeMyInvitation(Invitation invitation){
+        myInvitations.remove(invitation);
+    }
+
+    public List<UUID> getFriends() {
+        return List.copyOf(friends);
+    }
+
+    public void addFriend(UUID id){
+        friends.add(id);
+    }
+
 }

@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.DTO;
 
-public class UserDto {
+public class UserDTO {
     private String username;
     private String password;
     private String email;

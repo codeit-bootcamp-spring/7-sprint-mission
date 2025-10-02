@@ -2,8 +2,9 @@ package com.sprint.mission.discodeit.service.jcf;
 
 
 
+import com.sprint.mission.discodeit.DTO.MessageRoomDTO;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.repository.MemoryMessageRoomRepository;
+import com.sprint.mission.discodeit.repository.MessageRoomRepository;
 import com.sprint.mission.discodeit.service.MessageRoomService;
 
 
@@ -11,63 +12,52 @@ import java.util.*;
 
 public class JCFMessageRoomService implements MessageRoomService {
 
-    private final MemoryMessageRoomRepository messageRoomRepository;
+    private final MessageRoomRepository messageRoomRepository;
 
-    public JCFMessageRoomService(MemoryMessageRoomRepository messageRoomRepository) {
+    public JCFMessageRoomService(MessageRoomRepository messageRoomRepository) {
         this.messageRoomRepository=messageRoomRepository;
     }
 
     @Override
-    public void addMessageRoom(MessageRoom messageRoom) {
+    public void save(MessageRoom messageRoom) {
         messageRoomRepository.save(messageRoom);
+        System.out.println("채팅방 등록 성공");
     }
 
     @Override
-    public void removeMessageRoom(MessageRoom messageRoom) {
+    public void remove(MessageRoom messageRoom) {
         messageRoomRepository.remove(messageRoom);
+        System.out.println("채팅방 삭제 성공");
     }
 
     @Override
-    public MessageRoom getMessageRoom(UUID id) {
-        return messageRoomRepository.findById(id);
+    public MessageRoom findById(UUID uuid) {
+
+        return messageRoomRepository.findById(uuid).orElseThrow(()->new NoSuchElementException("채팅방을 찾을 수 없습니다."));
     }
 
     @Override
-    public void updateMessageRoom(UUID messageRoomId, MessageRoomDTO messageRoomDTO) {
-        messageRoomRepository.updateMessageRoom(messageRoomId, messageRoomDTO);
+    public List<MessageRoom> findAll() {
+        return messageRoomRepository.findAll();
     }
 
-    //기능추가
-
-    public MessageRoom findOrMakeDM(User user1, User user2){
-        List<MessageRoom> messageRooms = messageRoomRepository.findAll();
-        MessageRoom messageRoom = messageRooms.stream()
-                .filter(m->m.getMessageRoomType()==MessageRoomType.DM)
-                .filter(m -> m.getParticipants().contains(user1))
-                .filter(m -> m.getParticipants().contains(user2))
-                .findFirst()
-                .orElse(null);
-        if (messageRoom==null){
-            MessageRoom newDm = new MessageRoom();
-            newDm.setMessageRoomType(MessageRoomType.DM);
-            newDm.getParticipants().add(user1);
-            newDm.getParticipants().add(user2);
-            addMessageRoom(newDm);
-            return newDm;
+    @Override
+    public void update(UUID id, MessageRoomDTO messageRoomDTO) {
+        MessageRoom messageRoom = findById(id);
+        if(messageRoomDTO.getMessageRoomName()!=null){
+            messageRoom.setMessageRoomName(messageRoomDTO.getMessageRoomName());
+        }
+        save(messageRoom);
+    }
+    //서버 채팅방 만들기
+    public MessageRoom makeChannelMessageRoom(Channel channel){
+        MessageRoom messageRoom = new MessageRoom();
+        messageRoom.setMessageRoomType(MessageRoomType.SERVER_MESSAGE_ROOM);
+        List<UUID> members = channel.getMembers();
+        for (UUID member : members) {
+            messageRoom.addParticipants(member);
         }
         return messageRoom;
     }
-
-    public MessageRoom makeServerMessageRoom(Channel channel, String name){
-        MessageRoom messageRoom = new MessageRoom();
-        messageRoom.setMessageRoomType(MessageRoomType.SERVER_MESSAGE_ROOM);
-        messageRoom.setMessageRoomName(name);
-        List<ChannelUser> members = channel.getMembers();
-        addMessageRoom(messageRoom);
-
-        return messageRoom;
-
-    }
-
 
 }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.DTO;
 
 public class MessageRoomDTO {
     private String MessageRoomName;
