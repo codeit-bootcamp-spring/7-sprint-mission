@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.static_.StaticString;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Channel extends Entity {
     private String name;
@@ -98,19 +100,20 @@ public class Channel extends Entity {
     }
     public enum channelElement
     {
-        NAME((x,y) -> x.setName( (String) y)),
-        DESCRIPTION((x,y)->x.setDescription( (String) y)),
-        IS_PUBLIC((x,y)->x.setPublic( (boolean) y)),
-        IS_TEXT_CHANNEL((x,y)->x.setTextChannel( (boolean) y)),
+        NAME(Channel::getName,(x, y) -> x.setName( (String) y)),
+        DESCRIPTION(Channel::getDescription,(x,y)->x.setDescription( (String) y)),
+        IS_PUBLIC(Channel::isPublic,(x,y)->x.setPublic( (boolean) y)),
+        IS_TEXT_CHANNEL(Channel::isTextChannel,(x,y)->x.setTextChannel( (boolean) y)),
         ;
        public BiConsumer<Channel, Object> setter;
 
 
 
+       public Function<Channel,Object> getter;
 
 
-
-        channelElement(BiConsumer<Channel,Object> setter) {
+        channelElement(Function<Channel,Object> getter,BiConsumer<Channel,Object> setter) {
+            this.getter = getter;
             this.setter = setter;
         }
     }

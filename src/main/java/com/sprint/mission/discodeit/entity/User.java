@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.static_.StaticString;
 
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class User extends Entity {
 
@@ -72,15 +73,17 @@ public class User extends Entity {
 
     public enum userElement
     {
-        NAME((x,y) -> x.setName( (String) y)),
-        NICKNAME((x,y)->x.setNickname( (String) y)),
-        EMAIL((x,y)->x.setEmail( (String) y)),
-        ONLINE((x,y)->x.setOnline( (boolean) y));
+        NAME(User::getName,(x,y) -> x.setName( (String) y)),
+        NICKNAME(User::getNickname,(x,y)->x.setNickname( (String) y)),
+        EMAIL(User::getEmail,(x,y)->x.setEmail( (String) y)),
+        ONLINE(User::isOnline,(x,y)->x.setOnline( (boolean) y));
 
         public BiConsumer<User, Object> setter;
+        public Function<User,Object> getter;
 
-        userElement(BiConsumer<User, Object> setter)
+        userElement(Function<User,Object> getter, BiConsumer<User, Object> setter)
         {
+            this.getter = getter;
             this.setter = setter;
         }
 

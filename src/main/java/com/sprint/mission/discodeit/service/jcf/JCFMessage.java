@@ -4,11 +4,13 @@ import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.ValidateService;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import static com.sprint.mission.discodeit.static_.StaticString.*;
 
@@ -16,7 +18,7 @@ public class JCFMessage implements MessageService {
     private final ArrayList<Message> messageDb;
     private final Map<UUID,String> deletedMessageDb ;
     private final ArrayList<User> userDb;
-    private final JCFValidateOperator validateOperator;
+    private final ValidateService validateService;
 
     private final JCFDb jcfDb;
 
@@ -26,7 +28,7 @@ public class JCFMessage implements MessageService {
         this.jcfDb = jcfDb;
         this.messageDb = jcfDb.getMessageDb();
         this.userDb = jcfDb.getUserDb();
-        this.validateOperator = new JCFValidateOperator(jcfDb);
+        this.validateService = new JCFValidateOperator(jcfDb);
         this.deletedMessageDb = jcfDb.getDeletedMessageDb();
     }
 
@@ -36,11 +38,11 @@ public class JCFMessage implements MessageService {
             System.out.println(NULL_INPUT);
             return;
         }
-        if(validateOperator.isValidateMessage(message)){
+        if(validateService.isValidateMessage(message)){
             System.out.println(MESSAGE_EXIST + message.getContent());
             return;
         }
-        if(!validateOperator.isValidateUser(message.getSender())){
+        if(!validateService.isValidateUser(message.getSender())){
             System.out.println(USER_NOT_EXIST + message.getSender().getName());
             return;
         }
@@ -108,7 +110,7 @@ public class JCFMessage implements MessageService {
             System.out.println(NULL_INPUT);
             return;
         }
-        if(!validateOperator.isValidateMessage(message)){
+        if(!validateService.isValidateMessage(message)){
             System.out.println(MESSAGE_NOT_EXIST + message.getContent());
             return;
         }
@@ -131,13 +133,14 @@ public class JCFMessage implements MessageService {
             return;
         }
 
-        BiConsumer<Message, Object> editFunction = messageElement.setter;
-        Object oldContent = getMessageElement(message,messageElement);
+
       try{
-          System.out.println(DELETE_MESSAGE+ message.getContent());
-          System.out.println("변경한 필드: "+ messageElement.name()+ " 변경전: "+oldContent +" ==> 변경 후: "+updatedContent);
+          BiConsumer<Message, Object> editFunction = messageElement.setter;
+          Object oldContent = messageElement.getter.apply(message);
           editFunction.accept(message, updatedContent);
           message.updateEntity();
+          System.out.println(DELETE_MESSAGE+ message.getContent());
+          System.out.println("변경한 필드: "+ messageElement.name()+ " 변경전: "+oldContent +" ==> 변경 후: "+updatedContent);
 
       }
       catch (ClassCastException e){
@@ -179,16 +182,16 @@ public class JCFMessage implements MessageService {
 
     }
 
-    public <T>Object getMessageElement(Message message, Message.messageElement messageElement){
-        switch (messageElement){
-            case CONTENT:
-                return message.getContent();
-            case IS_MARKDOWN:
-                return message.isMarkDown();
-            default:
-                throw new IllegalArgumentException(WRONG_TYPE);
-        }
-    }
+//    public <T>Object getMessageElement(Message message, Message.messageElement messageElement){
+//        switch (messageElement){
+//            case CONTENT:
+//                return message.getContent();
+//            case IS_MARKDOWN:
+//                return message.isMarkDown();
+//            default:
+//                throw new IllegalArgumentException(WRONG_TYPE);
+//        }
+//    }
 
 //    public void changeToDeletedUser(Message msg){
 //        if(jcfDb.getDeletedUserDb().containsKey(msg.getSender().getId()))

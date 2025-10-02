@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.ValidateService;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class JCFUser implements UserService {
     private final ArrayList<User> userDb;
     private final Map<UUID, String> deletedUserDb;
     private final ArrayList<Channel> channelDb;
-    private final JCFValidateOperator validateOperator;
+    private final ValidateService validateService;
     private final ArrayList<Message> messageDb;
 
     private final JCFDb jcfDb;
@@ -31,29 +32,12 @@ public class JCFUser implements UserService {
         this.jcfDb = jcfDb;
         this.userDb = jcfDb.getUserDb();
         this.deletedUserDb = jcfDb.getDeletedUserDb();
-        this.validateOperator = new JCFValidateOperator(jcfDb);
+        this.validateService = new JCFValidateOperator(jcfDb);
         this.channelDb = jcfDb.getChannelDb();
         this.messageDb = jcfDb.getMessageDb();
 
     }
 
-    public <T> Object getUserContent(User user, User.userElement userElement) {
-        switch (userElement) {
-            case NAME:
-                return user.getName();
-            case NICKNAME:
-                return user.getNickname();
-            case ONLINE:
-                return user.isOnline();
-            case EMAIL:
-                return user.getEmail();
-            default:
-                return null;
-
-
-
-        }
-    }
 
     @Override
     public void createUser(User user) {
@@ -61,7 +45,7 @@ public class JCFUser implements UserService {
             System.out.println(NULL_INPUT);
             return;
         }
-        if(validateOperator.isValidateUser(user)){
+        if(validateService.isValidateUser(user)){
             System.out.println(USER_EXIST + user.getName());
             return;
         }
@@ -128,7 +112,7 @@ public class JCFUser implements UserService {
             System.out.println(NULL_INPUT);
             return;
         }
-        if (!validateOperator.isValidateUser(user)) {
+        if (!validateService.isValidateUser(user)) {
             System.out.println(USER_NOT_EXIST + user.getName());
             return;
         }
@@ -160,14 +144,16 @@ public class JCFUser implements UserService {
             return;
         }
 
-        BiConsumer<User, Object> editFunction = userElement.setter;
-        Object oldContent = getUserContent(user, userElement);
+
+
 
         try {
-            System.out.printf("유저 변경사항 : %s\n", user.getName());
-            System.out.println("변경한 필드: "+ userElement.name()+ " 변경전: "+oldContent +" ==> 변경 후: "+updatedContent);
+            BiConsumer<User, Object> editFunction = userElement.setter;
+            Object oldContent = userElement.getter.apply(user);
             editFunction.accept(user, updatedContent);
             user.updateEntity();
+            System.out.printf("유저 변경사항 : %s\n", user.getName());
+            System.out.println("변경한 필드: "+ userElement.name()+ " 변경전: "+oldContent.toString() +" ==> 변경 후: "+updatedContent);
 
         } catch (ClassCastException e) {
             System.out.println("잘못된 타입을 입력했습니다. 올바른 입력값을 넣어주세요");
@@ -212,11 +198,11 @@ public class JCFUser implements UserService {
             System.out.println(NULL_INPUT);
             return;
         }
-        if (!validateOperator.isValidateChannel(channel)) {
+        if (!validateService.isValidateChannel(channel)) {
             System.out.println(CHANNEL_NOT_EXIST + channel.getName());
             return;
         }
-        if (!validateOperator.isValidateUser(user)) {
+        if (!validateService.isValidateUser(user)) {
             System.out.println(USER_NOT_EXIST+ user.getName());
             return;
         }
@@ -226,11 +212,11 @@ public class JCFUser implements UserService {
     }
 
     public void exitChannel(User user, Channel channel) {
-        if (!validateOperator.isValidateChannel(channel)) {
+        if (!validateService.isValidateChannel(channel)) {
             System.out.println(CHANNEL_NOT_EXIST+ channel.getName());
             return;
         }
-        if (!validateOperator.isValidateUser(user)) {
+        if (!validateService.isValidateUser(user)) {
             System.out.println(USER_NOT_EXIST + user.getName());
             return;
         }

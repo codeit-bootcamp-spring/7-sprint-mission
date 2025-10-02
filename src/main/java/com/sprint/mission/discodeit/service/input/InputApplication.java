@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFUser;
 import static com.sprint.mission.discodeit.static_.StaticString.*;
 
 public class InputApplication {
-    private final InputReader inputHandler;
+    private final InputReader inputReader;
 
     private final JCFDb jcfDb;
 
@@ -19,7 +19,7 @@ public class InputApplication {
     private boolean isRunning = true;
 
     public InputApplication() {
-        this.inputHandler = new InputReader();
+        this.inputReader = new InputReader();
         this.jcfDb = new JCFDb();
 
         TestUtil testUtil = new TestUtil(jcfDb);
@@ -35,7 +35,7 @@ public class InputApplication {
 
         System.out.println("테스트를 시작합니다. 명령어를 입력하세요. !help을 통해 명령어를 확인할 수 있어요");
         while (isRunning) {
-            String input = inputHandler.readLine();
+            String input = inputReader.readLine();
             if (input.isEmpty()) continue;
             mappingCmd(input);
 
@@ -140,7 +140,7 @@ public class InputApplication {
 
     public void closeTest() {
 
-        inputHandler.close();
+        inputReader.close();
         System.out.println("테스트 종료");
     }
 

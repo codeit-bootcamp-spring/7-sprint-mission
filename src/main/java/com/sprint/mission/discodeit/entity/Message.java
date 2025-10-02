@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class Message extends Entity{
 
@@ -41,13 +42,14 @@ public class Message extends Entity{
 
     public enum messageElement
     {
-        CONTENT((x,y) -> x.setContent( (String) y)),
-        IS_MARKDOWN((x,y)->x.setMarkDown( (boolean) y));
+        CONTENT(Message::getContent,(x,y) -> x.setContent( (String) y)),
+        IS_MARKDOWN(Message::isMarkDown,(x,y)->x.setMarkDown( (boolean) y));
 
         public BiConsumer<Message, Object> setter;
+        public Function<Message,Object> getter;
 
-        messageElement(BiConsumer<Message, Object> setter)
-        {
+        messageElement(   Function<Message,Object>  getter,BiConsumer<Message, Object> setter)
+        {   this.getter = getter;
             this.setter = setter;
         }
     }

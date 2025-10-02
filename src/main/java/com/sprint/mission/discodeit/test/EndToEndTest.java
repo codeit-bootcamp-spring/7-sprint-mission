@@ -78,8 +78,8 @@ public class EndToEndTest {
         jcfUser.readDeletedUser();
         //채널 업데이트
         jcfChannel.updateChannel(channel2, Channel.channelElement.NAME,"Rust" );
-        jcfChannel.updateChannel(channel3, Channel.channelElement.IS_PUBLIC,false);
-        jcfChannel.updateChannel(channel3, Channel.channelElement.IS_PUBLIC,"hello");
+        jcfChannel.updateChannel(channel3, Channel.channelElement.DESCRIPTION,"you can join");
+        jcfChannel.updateChannel(channel3, Channel.channelElement.IS_PUBLIC,true);
 
         jcfChannel.readAllChannel();
 
@@ -87,9 +87,9 @@ public class EndToEndTest {
         jcfMessage.updateMessage(m2, Message.messageElement.CONTENT,"This is edited message ");
 
         jcfMessage.createMessage(m1);
-//        jcfChannel.readChannel(channel2);
-//        jcfChannel.readChannel(channel3);
-//        jcfChannel.readUpdatedChannel();
+        jcfChannel.readChannel(channel2);
+        jcfChannel.readChannel(channel3);
+        jcfChannel.readUpdatedChannel();
 
 
 

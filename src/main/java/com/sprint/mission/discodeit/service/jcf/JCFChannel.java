@@ -4,9 +4,12 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ValidateService;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.sprint.mission.discodeit.static_.StaticString.*;
 
@@ -14,7 +17,7 @@ public class JCFChannel implements ChannelService {
 private final ArrayList<Channel> channelDb;
 private final  Map<UUID,String> deletedChannelDb ;
 private final JCFDb jcfDb;
-private final JCFValidateOperator validateOperator;
+private final ValidateService validateService;
 private final ArrayList<User> userDb ;
 
 
@@ -26,7 +29,7 @@ private final ArrayList<User> userDb ;
         this.jcfDb = jcfDb;
 this.channelDb = jcfDb.getChannelDb();
 this.deletedChannelDb = jcfDb.getDeletedChannelDb();
-this.validateOperator = new JCFValidateOperator(jcfDb);
+this.validateService = new JCFValidateOperator(jcfDb);
 this.userDb = jcfDb.getUserDb();
 
     }
@@ -66,7 +69,7 @@ this.userDb = jcfDb.getUserDb();
             System.out.println(NULL_INPUT);
             return;
         }
-        if(validateOperator.isValidateChannel(channel)){
+        if(validateService.isValidateChannel(channel)){
             System.out.println(CHANNEL_EXIST + channel.getName());
             return;
         }
@@ -137,7 +140,7 @@ this.userDb = jcfDb.getUserDb();
             System.out.println(NULL_INPUT);
             return;
         }
-        if(!validateOperator.isValidateChannel(channel)){
+        if(!validateService.isValidateChannel(channel)){
             System.out.println(CHANNEL_NOT_EXIST + channel.getName());
             return;
         }
@@ -156,13 +159,14 @@ this.userDb = jcfDb.getUserDb();
             System.out.println(NULL_INPUT);
             return;
         }
-        if(!validateOperator.isValidateChannel(channel)){
+        if(!validateService.isValidateChannel(channel)){
             System.out.println(CHANNEL_NOT_EXIST + channel.getName());
             return;
         }
 
-        BiConsumer<Channel, Object> editFunction = channelElement.setter;
-        Object oldContent = getChannelContent(channel,channelElement);
+
+
+
 
 //        Class<? extends BiConsumer> aClass = editFunction.getClass();
 //        if(!aClass.isInstance(updatedContent)) {
@@ -171,10 +175,13 @@ this.userDb = jcfDb.getUserDb();
 //        }
         try
         {
-            System.out.printf("채널 내부 정보를 변경했습니다.: %s\n", channel.getName());
-            System.out.println("변경한 필드: "+ channelElement.name()+ " 변경전: "+oldContent +" ==> 변경 후: "+updatedContent);
+            BiConsumer<Channel, Object> editFunction = channelElement.setter;
+            Object oldContent = channelElement.getter.apply(channel);
+
             editFunction.accept(channel, updatedContent);
             channel.updateEntity();
+            System.out.printf("채널 내부 정보를 변경했습니다.: %s\n", channel.getName());
+            System.out.println("변경한 필드: "+ channelElement.name()+ " 변경전: "+ oldContent.toString() +" ==> 변경 후: "+updatedContent);
 
         } catch (ClassCastException e) {
 
@@ -235,11 +242,11 @@ this.userDb = jcfDb.getUserDb();
             System.out.println(NULL_INPUT);
             return;
         }
-        if(!validateOperator.isValidateChannel(channel)){
+        if(!validateService.isValidateChannel(channel)){
             System.out.println(CHANNEL_NOT_EXIST + channel.getName());
             return;
         }
-        if(!validateOperator.isValidateUser(user)){
+        if(!validateService.isValidateUser(user)){
             System.out.println(USER_NOT_EXIST+ user.getName());
             return;
         }
@@ -253,11 +260,11 @@ this.userDb = jcfDb.getUserDb();
             System.out.println(NULL_INPUT);
             return;
         }
-        if(!validateOperator.isValidateChannel(channel)){
+        if(!validateService.isValidateChannel(channel)){
             System.out.println(CHANNEL_NOT_EXIST + channel.getName());
             return;
         }
-        if(!validateOperator.isValidateUser(user)){
+        if(!validateService.isValidateUser(user)){
             System.out.println(USER_NOT_EXIST + user.getName());
             return;
         }
@@ -272,21 +279,21 @@ this.userDb = jcfDb.getUserDb();
 
     }
 
-    public <T> Object getChannelContent(Channel channel, Channel.channelElement channelElement){
-        switch(channelElement){
-            case NAME:
-                return channel.getName();
-
-            case DESCRIPTION:
-                return channel.getDescription();
-            case IS_PUBLIC:
-                return channel.isPublic();
-                case IS_TEXT_CHANNEL:
-                return channel.isTextChannel();
-            default:
-                return null;
-        }
-    }
+//    public <T> Object getChannelContent(Channel channel, Channel.channelElement channelElement){
+//        switch(channelElement){
+//            case NAME:
+//                return channel.getName();
+//
+//            case DESCRIPTION:
+//                return channel.getDescription();
+//            case IS_PUBLIC:
+//                return channel.isPublic();
+//                case IS_TEXT_CHANNEL:
+//                return channel.isTextChannel();
+//            default:
+//                return null;
+//        }
+//    }
 
 
 }
