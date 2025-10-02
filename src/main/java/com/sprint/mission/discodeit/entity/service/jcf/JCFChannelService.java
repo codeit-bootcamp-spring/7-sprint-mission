@@ -53,7 +53,15 @@ public class JCFChannelService implements ChannelService {
        return channel;
     }
 
+    @Override
+    public List<Channel> readAll() {
+        System.out.printf("%d개의 채널@@@\n",channels.size());
+        channels
+                .forEach(System.out::println);
+        return channels;
+    }
     //파라미터 어떻게 해야할것같다
+
     @Override
     public Channel update(UUID channelId, Consumer<Channel> updater) {
         System.out.println("수정");
@@ -67,14 +75,6 @@ public class JCFChannelService implements ChannelService {
                 .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + channelId));
     }
 
-
-    @Override
-    public List<Channel> readAll() {
-        System.out.printf("%d개의 채널@@@\n",channels.size());
-        channels
-                .forEach(System.out::println);
-        return channels;
-    }
 
     @Override
     public boolean delete(UUID channelId) {

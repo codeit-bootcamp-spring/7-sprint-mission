@@ -10,7 +10,7 @@ public  class Common {
     private final UUID id;
     //이건 생성시간이니 불변이겠고
     private final Long  createdAt;
-    //이것도  업데이트 날짜를 뭐 바꾸겠냐
+    //이것도
     private Long  updatedAt;
 
 

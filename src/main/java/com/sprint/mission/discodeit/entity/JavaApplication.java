@@ -92,11 +92,7 @@ public class JavaApplication {
         CHANNEL_SERVICE.readAll();
 
 
-      String str ="테스트";
-      StringBuffer s = new StringBuffer("테스트");
 
-      Integer ad =1;
-      int ac =1;
 
 
 
