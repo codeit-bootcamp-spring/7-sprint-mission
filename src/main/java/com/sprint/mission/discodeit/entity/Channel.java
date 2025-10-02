@@ -1,26 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
-/**
- * 디스코드 채널을 나타내는 엔티티
- */
-public class Channel extends BaseEntity {
-    private String name;        // 채널 이름
-    private String description; // 채널 설명
+public class Channel extends DefEntity{
+    private  String channelName;
+    private String channelTopic;
 
-    public Channel(String name, String description) {
-        super();
-        this.name = name;
-        this.description = description;
+
+    // getter
+    public String getChannelName() {
+        return channelName;
     }
 
-    // Getter
-    public String getName() { return name; }
-    public String getDescription() { return description; }
+    public String getChannelTopic() {
+        return channelTopic;
+    }
 
-    // 정보 수정
-    public void update(String name, String description) {
-        this.name = name;
-        this.description = description;
+    // 생성자: 필수 값인 채널 이름만 받음
+    public Channel(String channelName) {
+        super();    // DefEntity의 생성자 호출 (기본 필드 초기화)
+        this.channelName = channelName;
+        this.channelTopic = null; // 토픽은 선택 사항이므로 null로 초기화
+    }
+
+    public void updateChannelName(String newName) {
+        this.channelName = newName;
         touch();
     }
+
+    public void updateChannelTopic(String newTopic) {
+        this.channelTopic = newTopic;
+        touch();
+    }
+
+
 }

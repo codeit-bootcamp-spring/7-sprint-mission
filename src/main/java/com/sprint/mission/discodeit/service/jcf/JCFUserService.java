@@ -3,59 +3,73 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.*; // Map, HashMap, List, ArrayList, UUID ((java.util.;에 대한 모든 것 사용 가능))
 
-/**
- * UserService의 JCF(Java Collections Framework) 기반 구현체
- * 내부적으로 HashMap을 사용하여 User 데이터를 메모리에 저장한다.
- */
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> data; // User 데이터를 저장하는 Map
 
     public JCFUserService() {
-        this.data = new HashMap<>();
+        this.data = new LinkedHashMap<>();
     }
 
-    /**
-     * User 생성 (등록)
-     */
+    private final Map<UUID, User> data;
+
     @Override
-    public User create(User user) {
-        data.put(user.getId(), user);
-        return user;
+    public User create(String username, String email) {
+        User user = new User(username, email);  // 새로운 유저 등록을 위해 User 객체 생성
+        data.put(user.getId(), user);   // 생성된 유저를 맵에 저장 (key: UUID, value: User 객체)
+        return user;    // 생성된 유저 객체 반환
     }
 
-    /**
-     * User 단건 조회
-     */
+
+    // 특정 User 조회
     @Override
+
     public User read(UUID id) {
         return data.get(id);
     }
 
-    /**
-     * 전체 User 조회
-     */
+
+    // read all : 모든 User 조회
     @Override
     public List<User> readAll() {
         return new ArrayList<>(data.values());
     }
 
-    /**
-     * User 수정 (기존 id에 해당하는 데이터 교체)
-     */
+
+    // update : 유저 네임 변경
     @Override
-    public User update(UUID id, User user) {
-        if (data.containsKey(id)) {
-            data.put(id, user);
-            return user;
+    public User updateUsername(UUID id, String newUsername) {
+        User u = data.get(id);
+        if (u != null) {
+            u.updateUsername(newUsername);
         }
-        return null; // 수정 실패 (id 없음)
+        return u;
     }
 
-    /**
-     * User 삭제
-     */
+
+    // update : 이메일 변경
+    @Override
+    public User updateEmail(UUID id, String newEmail) {
+       User u = data.get(id);
+       if (u != null) {
+              u.updateEmail(newEmail);
+       }
+        return u;
+    }
+
+
+    // 유저 비활성화
+    @Override
+    public User deactivate(UUID id) {
+        User u = data.get(id);
+        if (u != null) {
+            u.deactivate();
+        }
+        return u;
+    }
+
+
+    // 유저 삭제
     @Override
     public boolean delete(UUID id) {
         return data.remove(id) != null;
