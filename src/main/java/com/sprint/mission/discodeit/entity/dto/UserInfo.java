@@ -1,4 +1,6 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.dto;
+
+import com.sprint.mission.discodeit.entity.User;
 
 public class UserInfo {
 

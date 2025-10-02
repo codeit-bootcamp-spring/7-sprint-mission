@@ -37,7 +37,6 @@ public class User extends BaseEntity {
     }
 
 
-
     public User(String email, String password, String userName) {
         super();
         validateEmail(email);
@@ -47,6 +46,7 @@ public class User extends BaseEntity {
         this.password = password;       // 8자리 이상
         this.userName = userName;       // 특수문자 불가
         this.state = State.ONLINE;      // 기본 상태
+        this.phoneNum = "비어있음";
     }
 
     public User(String email, String password, String userName, String phoneNum) {
@@ -55,10 +55,10 @@ public class User extends BaseEntity {
     }
 
     // Getter
-
     public String getPassword() {
         return password;
     }
+
     public String getUserName() {
         return userName;
     }
@@ -76,19 +76,25 @@ public class User extends BaseEntity {
     }
 
     // Update
-
     public void updateUserName(String userName) {
+        validateUserName(userName);
         this.userName = userName;
         updateTimestamp();
     }
+
     public void updatePassword(String password) {
+        validatePassword(password);
         this.password = password;
         updateTimestamp();
     }
+
     public void updatePhoneNum(String phoneNum) {
-        this.phoneNum = phoneNum;
+        validatePhoneNum(phoneNum);
+        if (phoneNum.isBlank()) this.phoneNum = "비어있음";
+        else this.phoneNum = phoneNum;
         updateTimestamp();
     }
+
     public void updateState(State state) {
         this.state = state;
         updateTimestamp();
@@ -122,18 +128,18 @@ public class User extends BaseEntity {
     }
 
     private void validateUserName(String userName) {
-        if (userName == null) {
+        if (userName == null || userName.isBlank()) {
             throw new InvalidInputException("닉네임 형식이 올바르지 않음");
         }
     }
 
-
     private void validatePhoneNum(String phoneNum) {
-        if (phoneNum == null || !REGEX_PHONE_PATTERN.matcher(phoneNum).matches()) {
-            throw new InvalidInputException("전화번호 형식이 올바르지 않음");
+        if (!phoneNum.isBlank()) {
+            if (!REGEX_PHONE_PATTERN.matcher(phoneNum).matches()) {
+                throw new InvalidInputException("전화번호 형식이 올바르지 않음");
+            }
         }
     }
-
 }
 
 //https://adjh54.tistory.com/104

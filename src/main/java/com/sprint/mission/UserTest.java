@@ -1,22 +1,27 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.dto.UserInfo;
+import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class UserTest {
 
     public static void read(UUID id) {
-        System.out.println(userService.findUserById(id));
+        Optional<UserInfo> user = userService.findUserById(id);
+        if (user.isPresent()) System.out.println(user);
+        else  System.out.println("유저를 찾을 수 없음");
     }
     public static void readAll() {
         List<UserInfo> users = userService.findAllUsers();
         if (users.isEmpty()) {
-            System.out.println("유저 없음");
+            System.out.println("유저를 찾을 수 없음");
         }
         else users.forEach(System.out::println);
     }
@@ -33,7 +38,7 @@ public class UserTest {
             user1 = userService.createUser
                     ("test@codeit.com", "QWERty1!", "admin");
             System.out.println("생성 성공");
-        } catch (InvalidInputException e) {
+        } catch (InvalidInputException | DuplicateEmailException e) {
             System.out.println("생성 실패: " + e.getMessage());
             return;
         }
@@ -46,7 +51,11 @@ public class UserTest {
         // --- 정보 수정 후 조회 ---
         System.out.println("--- 수정 후 다시 조회 ---");
 
-        userService.updateProfile(userId, "adminUpdate", "010-1234-5678");
+        try{
+            userService.updateProfile(userId, "adminUpdate", "010-1234-5678");
+        } catch (InvalidInputException e) {
+            System.out.println("업데이트 실패: " + e.getMessage());
+        }
         read(userId);
 
         // --- 삭제 ---
@@ -56,9 +65,9 @@ public class UserTest {
         // --- 전체 조회 ---
         System.out.println("--- 사용자 목록 ---");
         readAll();
-        System.out.println("종료");
+        System.out.println("시스템 종료");
+
+        read(userId);
         System.out.println(user1);
     }
 }
-
-// 고쳐야할것 -> update시에 전화번호, 닉네임, 비밀번호의 유효성검사
