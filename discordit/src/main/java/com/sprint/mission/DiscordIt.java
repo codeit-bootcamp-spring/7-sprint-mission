@@ -13,10 +13,10 @@ import java.util.UUID;
 
 public class DiscordIt {
 
-    public static final JCFMessageService<Channel> channelMessageService = new JCFMessageService<>();
-    public static final JCFMessageService<User> userMessageService = new JCFMessageService<>();
-    public static final JCFUserService userService = new JCFUserService();
-    public static final JCFChannelService channelService = new JCFChannelService();
+    public static final JCFMessageService<Channel> CHANNEL_MESSAGE_SERVICE = new JCFMessageService<>();
+    public static final JCFMessageService<User> USER_MESSAGE_SERVICE = new JCFMessageService<>();
+    public static final JCFUserService USER_SERVICE = new JCFUserService();
+    public static final JCFChannelService CHANNEL_SERVICE = new JCFChannelService();
 
     private Scanner scanner = new Scanner(System.in);
     private int userCommand = 0;
@@ -40,7 +40,6 @@ public class DiscordIt {
         }
     }
 
-
     private void menu() {
         printLine();
         System.out.println("[메뉴]");
@@ -53,26 +52,30 @@ public class DiscordIt {
         }
     }
 
-
     private void user() {
         printLine();
         System.out.println("[회원]");
-        System.out.println("1. 내 정보 조회/수정 2. 온라인 회원 조회 3. 메세지 보내기 4. 전체 회원 조회");
-        getInput(3);
-        switch (userCommand) {
-            case 1 -> manageMyProfile();
-            case 2 -> printOnlineUsers();
-            case 3 -> sendDirectMessage();
-            case 4 -> printAllUsers();
+        while(true) {
+            System.out.println("1. 내 정보 조회/수정 2. 온라인 회원 조회 3. 메세지 보내기 4. 전체 회원 조회 0. 종료");
+            getInput(3);
+            switch (userCommand) {
+                case 1 -> manageMyProfile();
+                case 2 -> printOnlineUsers();
+                case 3 -> sendDirectMessage();
+                case 4 -> printAllUsers();
+                case 0 -> {
+                    return;
+                }
+            }
         }
     }
 
     private void printAllUsers() {
-        printUserDetails(userService.getAllUsers());
+        printUserDetails(USER_SERVICE.getAllUsers());
     }
 
     private void printOnlineUsers() {
-        List<String> onlineUsers = userService.getOnlineUsers();
+        List<String> onlineUsers = USER_SERVICE.getOnlineUsers();
         System.out.println("현재 접속 중인 유저들 : ");
         printUserDetails(onlineUsers);
     }
@@ -80,23 +83,22 @@ public class DiscordIt {
     private void printUserDetails(List<String> userIds) {
         for (int i = 0; i < userIds.size(); i++) {
             String nowId = userIds.get(i);
-            System.out.printf("-%d.\t\t[%s]%s(%s) %s\n",
+            System.out.printf("-\t%d.[%s]\t%s(%s) \"%s\"\n",
                     i + 1,
                     nowId,
-                    userService.getDisplayName(nowId),
-                    userService.getOnlineStatus(nowId),
-                    userService.getBio(nowId));
+                    USER_SERVICE.getDisplayName(nowId),
+                    USER_SERVICE.getOnlineStatus(nowId),
+                    USER_SERVICE.getBio(nowId) == null? "" : USER_SERVICE.getBio(nowId));
         }
     }
 
     private void sendDirectMessage() {
-        List<String> onlineUsers = userService.getOnlineUsers();
+        List<String> onlineUsers = USER_SERVICE.getOnlineUsers();
         System.out.println("현재 접속 중인 유저들 : ");
         printUserDetails(onlineUsers);
         System.out.print("몇 번 유저에게 메세지를 보내시겠습니까? >> ");
 
         getInput(onlineUsers.size());
-
 
         String message;
         while(true){
@@ -106,14 +108,12 @@ public class DiscordIt {
             if(message.equals("0"))
                 return;
 
-            userMessageService.sendMessage(
-                    userService.getUserById(userId),
-                    userService.getUserById(onlineUsers.get(userCommand - 1)),
+            USER_MESSAGE_SERVICE.sendMessage(
+                    USER_SERVICE.getUserById(userId),
+                    USER_SERVICE.getUserById(onlineUsers.get(userCommand - 1)),
                     message
                     );
         }
-
-
     }
 
     private void manageMyProfile() {
@@ -124,9 +124,9 @@ public class DiscordIt {
                 "한마디 : %s\n" +
                 "현재 상태 : %s\n",
                 userId,
-                userService.getDisplayName(userId),
-                userService.getBio(userId),
-                userService.getOnlineStatus(userId));
+                USER_SERVICE.getDisplayName(userId),
+                USER_SERVICE.getBio(userId),
+                USER_SERVICE.getOnlineStatus(userId));
         System.out.println();
 
         System.out.printf("1. 프로필 수정하기 0. 돌아가기 >> ");
@@ -137,15 +137,13 @@ public class DiscordIt {
         System.out.print("1. 비밀번호 2. 닉네임 3. 한마디 4. 현재상태 >>");
         getInput(5);
 
-
-
         switch (userCommand) {
             case 1 -> {
                 System.out.print("현재 비밀번호를 입력해주세요 >> ");
                 String passWd = scanner.next();
 
                 int tried = 1;
-                while (userService.validatePasswd(passWd)) {
+                while (USER_SERVICE.validatePasswd(passWd)) {
                     System.out.println("비밀번호가 올바르지 않습니다.");
                     tried++;
 
@@ -159,15 +157,15 @@ public class DiscordIt {
                 }
                 System.out.print("새 비밀번호를 입력해주세요 >> ");
                 passWd = scanner.next();
-                userService.setPasswd(userId, passWd);
+                USER_SERVICE.setPasswd(userId, passWd);
             }
             case 2 -> {
                 System.out.print("변경 닉네임 >>");
-                userService.setDisplayName(userId, scanner.next());
+                USER_SERVICE.setDisplayName(userId, scanner.next());
             }
             case 3 -> {
                 System.out.print("변경 한마디 >>");
-                userService.setBio(userId, scanner.next());
+                USER_SERVICE.setBio(userId, scanner.next());
             }
             case 4 -> {
                 System.out.print("변경할 상태를 선택해주세요. ");
@@ -176,7 +174,7 @@ public class DiscordIt {
                     System.out.printf("\t%d. \t\t%s ", i + 1, statuses[i]);
                 }
                 getInput(statuses.length + 1);
-                userService.setOnlineStatus(userId, statuses[userCommand - 1]);
+                USER_SERVICE.setOnlineStatus(userId, statuses[userCommand - 1]);
             }
         }
         System.out.println("정상적으로 변경되었습니다.");
@@ -184,7 +182,7 @@ public class DiscordIt {
 
     private void logout() {
         System.out.println("로그아웃 합니다...");
-        userService.setOnlineStatus(userId, User.Status.OFFLINE);
+        USER_SERVICE.setOnlineStatus(userId, User.Status.OFFLINE);
         userId = null;
     }
 
@@ -192,25 +190,33 @@ public class DiscordIt {
         do {
             printLine();
             System.out.println("채널 조회");
-            System.out.print("1. 가입 채널 목록 2. 전체 채널 목록 3. 채널 접속하기 4. 채널 등록하기 5. 채널 만들기 0. 돌아가기 \n>>");
+            System.out.print("1. 가입 채널 목록 2. 전체 채널 목록 3. 채널 접속하기 \n4. 채널 등록하기 5. 채널 나오기 \n6. 채널 만들기 0. 돌아가기 \n>>");
             getInput(0, 5);
             switch (userCommand) {
                 case 1 -> printRegisteredChannel();
                 case 2 -> printAllChannel();
                 case 3 -> enterChannel();
                 case 4 -> registerChannel();
-                case 5 -> createChannel();
+                case 5 -> leaveChannel();
+                case 6 -> createChannel();
             }
         } while (userCommand != 0);
     }
 
+    private void leaveChannel() {
+        printRegisteredChannel();
+
+    }
+
     private void enterChannel() {
         printLine();
-        List<UUID> channels = channelService.getRegisteredChannels(userService.getUserById(userId));
+        List<UUID> channels = CHANNEL_SERVICE.getRegisteredChannels(USER_SERVICE.getUserById(userId));
         if (channels.isEmpty()) {
             System.out.println("가입된 채널이 없습니다.");
             return;
         }
+
+        printChannel(channels);
 
         System.out.print("접속할 채널을 선택해주세요. (0 : 취소) >>");
         getInput(0, channels.size());
@@ -219,8 +225,8 @@ public class DiscordIt {
     }
 
     private void channelMessageSend(UUID uuid) {
-        User sender = userService.getUserById(userId);
-        Channel receiver = channelService.getChannelById(uuid);
+        User sender = USER_SERVICE.getUserById(userId);
+        Channel receiver = CHANNEL_SERVICE.getChannelById(uuid);
         String message;
 
         while (true) {
@@ -229,13 +235,13 @@ public class DiscordIt {
 
             if (message.equals("0"))
                 return;
-            channelMessageService.sendMessage(sender, receiver, message);
+            CHANNEL_MESSAGE_SERVICE.sendMessage(sender, receiver, message);
         }
     }
 
     private void printRegisteredChannel() {
         printLine();
-        List<UUID> channels = channelService.getRegisteredChannels(userService.getUserById(userId));
+        List<UUID> channels = CHANNEL_SERVICE.getRegisteredChannels(USER_SERVICE.getUserById(userId));
 
         if (channels.isEmpty()) {
             System.out.println("가입된 채널이 없습니다.");
@@ -247,7 +253,7 @@ public class DiscordIt {
     }
 
     private void registerChannel() {
-        List<UUID> channels = channelService.getNotRegisteredChannels(userService.getUserById(userId));
+        List<UUID> channels = CHANNEL_SERVICE.getNotRegisteredChannels(USER_SERVICE.getUserById(userId));
 
         if (channels.isEmpty()) {
             System.out.println("이미 모든 채널에 가입되어있습니다.");
@@ -261,10 +267,10 @@ public class DiscordIt {
         getInput(0, channels.size());
         if (userCommand == 0)
             return;
-
         UUID registered = channels.get(userCommand - 1);
-        channelService.addMember(registered, userService.getUserById(userId));
-        System.out.printf("채널 [%s]에 가입되었습니다!\n", channelService.getChannelById(registered).getDisplayName());
+
+        CHANNEL_SERVICE.addMember(registered, USER_SERVICE.getUserById(userId));
+        System.out.printf("채널 [%s]에 가입되었습니다!\n", CHANNEL_SERVICE.getChannelById(registered).getDisplayName());
     }
 
     private void userLogin() {
@@ -280,7 +286,7 @@ public class DiscordIt {
         }
 
         printLine();
-        System.out.printf("%s님, 환영합니다! \n", userService.getDisplayName(userId));
+        System.out.printf("%s님, 환영합니다! \n", USER_SERVICE.getDisplayName(userId));
     }
 
     private void createChannel() {
@@ -289,13 +295,13 @@ public class DiscordIt {
 
     private void printAllChannel() {
         printLine();
-        List<UUID> allChannel = channelService.getAllChannels();
+        List<UUID> allChannel = CHANNEL_SERVICE.getAllChannels();
         if (allChannel.isEmpty()) {
             System.out.println("현재 개설된 채널이 없습니다.");
         }
         System.out.println("전체 채널 목록 : ");
         for (UUID uuid : allChannel) {
-            Channel channel = channelService.getChannelById(uuid);
+            Channel channel = CHANNEL_SERVICE.getChannelById(uuid);
             System.out.printf("\t- %s \t\t---\t%s\n", channel.getDisplayName(), channel.getType());
         }
     }
@@ -306,18 +312,15 @@ public class DiscordIt {
      * @param uuids 채널 고유 uuid
      */
     private void printChannel(List<UUID> uuids) {
-        printLine();
-
         for (int i = 0; i < uuids.size(); i++) {
-            Channel channel = channelService.getChannelById(uuids.get(i));
+            Channel channel = CHANNEL_SERVICE.getChannelById(uuids.get(i));
             System.out.printf("\t%d. \t\t%s \t(%s)\n", i + 1, channel.getDisplayName(), channel.getType());
         }
     }
 
-
     private void enterChannel(UUID uuid) {
         printLine();
-        Channel channel = channelService.getChannelById(uuid);
+        Channel channel = CHANNEL_SERVICE.getChannelById(uuid);
         while (true) {
             System.out.printf("채널 [%s]에 접속하였습니다.\n" +
                             "1. 전체 사용자 보기 2. 메세지 보내기 3. 뒤로 돌아가기 >>",
@@ -332,23 +335,22 @@ public class DiscordIt {
                 }
             }
         }
-
     }
 
     private void sendChannelMessage(UUID uuid) {
-        User user = userService.getUserById(userId);
-        Channel channel = channelService.getChannelById(uuid);
+        User user = USER_SERVICE.getUserById(userId);
+        Channel channel = CHANNEL_SERVICE.getChannelById(uuid);
         System.out.print("메세지 입력(종료하려면 -를 입력) : ");
         while (true) {
             String message = scanner.next();
             if (message.equals("-"))
                 return;
-            channelMessageService.sendMessage(user, channel, message);
+            CHANNEL_MESSAGE_SERVICE.sendMessage(user, channel, message);
         }
     }
 
     private void printAllRegisteredUser(UUID uuid) {
-        Set<User> users = channelService.getAllMembers(uuid);
+        Set<User> users = CHANNEL_SERVICE.getAllMembers(uuid);
         for (User user : users) {
             System.out.printf("\t- %s(%s)\n", user.getDisplayName(), user.getOnlineStatus());
         }
@@ -364,7 +366,7 @@ public class DiscordIt {
             id = scanner.next();
             System.out.print("비밀번호를 입력해주세요 >> ");
             passwd = scanner.next();
-            userService.login(id, passwd);
+            USER_SERVICE.login(id, passwd);
             userId = id;
             return;
         } catch (Exception e) {
@@ -380,13 +382,12 @@ public class DiscordIt {
         String id;
         String passwd;
         String displayName;
-        String bio;
 
         while (true) {
             System.out.print("아이디를 입력해주세요 >> ");
             id = scanner.next();
             try {
-                userService.isCreatableId(id);
+                USER_SERVICE.isCreatableId(id);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 continue;
@@ -398,7 +399,7 @@ public class DiscordIt {
             System.out.print("비밀번호를 입력해주세요 >> ");
             passwd = scanner.next();
             try {
-                userService.validatePasswd(passwd);
+                USER_SERVICE.validatePasswd(passwd);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 continue;
@@ -416,7 +417,7 @@ public class DiscordIt {
             break;
         }
 
-        userService.signIn(id, passwd, displayName);
+        USER_SERVICE.signIn(id, passwd, displayName);
 
         printLine();
         System.out.println("정상적으로 가입되었습니다. ");
@@ -471,11 +472,11 @@ public class DiscordIt {
     }
 
     private void init() {
-        userService.signIn("happy", "pancake", "heeyeon");
-        userService.signIn("jung123", "greeny", "garden");
-        userService.signIn("npnp9671", "something", "drawing");
+        USER_SERVICE.signIn("happy", "pancake", "heeyeon");
+        USER_SERVICE.signIn("jung123", "greeny", "garden");
+        USER_SERVICE.signIn("npnp9671", "something", "drawing");
 
-        channelService.createChannel("게임해요", Channel.ChannelType.VOICE, userService.getUserById("happy"));
-        channelService.createChannel("사진 모으기", Channel.ChannelType.TEXT, userService.getUserById("jung123"));
+        CHANNEL_SERVICE.createChannel("게임해요", Channel.ChannelType.VOICE, USER_SERVICE.getUserById("happy"));
+        CHANNEL_SERVICE.createChannel("사진 모으기", Channel.ChannelType.TEXT, USER_SERVICE.getUserById("jung123"));
     }
 }
