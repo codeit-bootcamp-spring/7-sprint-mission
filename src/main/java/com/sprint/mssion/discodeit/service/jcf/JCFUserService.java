@@ -61,6 +61,7 @@ public class JCFUserService implements UserService {
         User user = getUserById(userId);
         if (!user.getJoinChannels().contains(channelId)) {
             user.addChannel(channelId);
+            user.getCommon().touch();
             userRepository.save(user);
         }
     }
@@ -69,6 +70,7 @@ public class JCFUserService implements UserService {
     public void removeChannelFromAllUsers(UUID channelId) {
         for (User user : this.getAllUsers()) {
             user.removeChannel(channelId);
+            user.getCommon().touch();
             userRepository.save(user);
         }
     }

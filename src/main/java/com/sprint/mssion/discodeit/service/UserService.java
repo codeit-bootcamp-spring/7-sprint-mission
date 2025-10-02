@@ -16,3 +16,7 @@ public interface UserService {
     void addChannelToUser(UUID userId, UUID channelId);
     void removeChannelFromAllUsers(UUID channelId);
 }
+
+/** 스프링부트 사람 -> 컨트롤러 ->() -> 서비스 -> 엔티티
+ * 계산기 -> > reposiory(데이터를 저장하는 곳)->?엔티티(int a1, int a2, getter, setter) -> 서비스(더하기, 빼기, 나누기, 곱하기)
+ */

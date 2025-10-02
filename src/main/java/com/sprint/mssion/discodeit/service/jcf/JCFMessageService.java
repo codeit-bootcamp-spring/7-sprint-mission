@@ -36,6 +36,7 @@ public class JCFMessageService implements MessageService {
     public void updateMessage(UUID messageId, String content) {
         Message message = this.getMessage(messageId);
         message.setContent(content);
+        message.getCommon().touch();
         messageRepository.save(message);
     }
 
