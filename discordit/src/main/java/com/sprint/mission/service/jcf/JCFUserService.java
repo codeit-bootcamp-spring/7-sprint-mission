@@ -19,12 +19,10 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public List<User> getUsers(String... ids) {
-        List<User> users = new ArrayList<>();
-        for(String id : ids){
-            users.add(getUserById(id));
-        }
-        return users;
+    public List<String> getAllUsers() {
+        return data.keySet().stream()
+                .sorted()
+                .toList();
     }
 
     @Override
