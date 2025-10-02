@@ -26,8 +26,11 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return data.values().stream().toList();
+    public List<String> getOnlineUsers() {
+        return data.values().stream()
+                .filter(u -> u.getOnlineStatus() != User.Status.OFFLINE)
+                .map(User::getUserId)
+                .toList();
     }
 
     @Override

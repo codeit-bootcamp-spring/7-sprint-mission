@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface UserService {
     User getUserById(String id);
-    List<User> getAllUsers();
     List<String> getAllUsers();
+    List<String> getOnlineUsers();
 
     boolean isCreatableId(String id);
     boolean validatePasswd(String passwd);
