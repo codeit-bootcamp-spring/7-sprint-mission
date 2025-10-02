@@ -6,6 +6,7 @@ import com.sprint.mission.exceptions.UserNotFoundException;
 import com.sprint.mission.service.UserService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
     private static final Map<String, User> data = new HashMap<>();// 유저 id, User객체 (id검색을 빠르게 하기 위함)
@@ -17,6 +18,7 @@ public class JCFUserService implements UserService {
             throw new UserNotFoundException(id);
         return user;
     }
+
 
     @Override
     public List<String> getAllUsers() {
@@ -104,5 +106,13 @@ public class JCFUserService implements UserService {
     @Override
     public String getBio(String id) {
         return getUserById(id).getBio();
+    }
+
+    @Override
+    public void setDisplayName(String userId, String change) {
+        if (change.length() > 10){
+            throw new IllegalArgumentException("닉네임은 10자 이하로 입력되어야 합니다. 입력 글자 수 :" + change.length());
+        }
+        data.get(userId).setDisplayName(change);
     }
 }

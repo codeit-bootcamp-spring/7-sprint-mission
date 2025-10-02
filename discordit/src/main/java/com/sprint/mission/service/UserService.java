@@ -26,4 +26,6 @@ public interface UserService {
     boolean isOnline(String id);
 
     String getBio(String userId);
+
+    void setDisplayName(String userId, String change);
 }
