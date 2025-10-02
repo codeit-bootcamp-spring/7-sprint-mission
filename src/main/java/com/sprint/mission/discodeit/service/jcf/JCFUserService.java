@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserInfo;
+import com.sprint.mission.discodeit.entity.dto.UserInfo;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -10,10 +10,7 @@ import java.util.*;
 public class JCFUserService implements UserService {
 
     private final Map<UUID, User> data;
-
-    public JCFUserService() {
-        this.data = new HashMap<>();
-    }
+    public JCFUserService() {this.data = new HashMap<>();}
 
     // 생성
     @Override
@@ -36,8 +33,10 @@ public class JCFUserService implements UserService {
 
     @Override
     public Optional<UserInfo> findUserById(UUID userId) {
-
         return Optional.ofNullable(data.get(userId)).map(UserInfo::new);
+    }
+    public Optional<User> findEntityById(UUID userId) {
+        return Optional.ofNullable(data.get(userId));
     }
 
     @Override
@@ -49,27 +48,29 @@ public class JCFUserService implements UserService {
 
     // 수정
     @Override
-    public Optional<User> updateProfile(UUID userId, String newUserName, String newPhoneNum) {
-        return Optional.ofNullable(data.get(userId)).map(user -> {
+    public Optional<UserInfo> updateProfile(UUID userId, String newUserName, String newPhoneNum) {
+        Optional<User> userOptional = Optional.ofNullable(data.get(userId));
+
+        return userOptional.map(user -> {
             user.updateUserName(newUserName);
             user.updatePhoneNum(newPhoneNum);
-            return user;
+            return new UserInfo(user);
         });
     }
 
     @Override
-    public Optional<User> changePassword(UUID userId, String newPassword) {
+    public Optional<UserInfo> changePassword(UUID userId, String newPassword) {
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updatePassword(newPassword);
-            return user;
+            return new UserInfo(user);
         });
     }
 
     @Override
-    public Optional<User> updateState(UUID userId, User.State newState) {
+    public Optional<UserInfo> updateState(UUID userId, User.State newState) {
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updateState(newState);
-            return user;
+            return new UserInfo(user);
         });
     }
 
