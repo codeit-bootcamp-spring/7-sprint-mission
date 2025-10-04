@@ -2,37 +2,49 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.dto.MessageInfo;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
-    Map<UUID, Message> Log = new HashMap<>();
+    private final Map<UUID, Message> data;
+    public JCFMessageService() {this.data = new HashMap<>();}
 
     @Override
-    public Message create(Message message) {
-        Log.put(message.getId(), message);
-        return message;
-    }
-
-    @Override
-    public Message read(UUID id) {      // 한 사람의 채팅로그
-        return Log.get(id);
-    }
-
-    @Override
-    public List<Message> readAll() {    // 두 사람의 대화로그 혹은 채널의 전체로그
+    public Message createDirectMessage(UUID authorId, UUID receiverId, String content) {
         return null;
     }
 
     @Override
-    public Message update(UUID id, Message message) { // 한 사람의 대화 로그 중 수정
+    public Message createChannelMessage(UUID authorId, UUID channelId, String content) {
         return null;
     }
 
     @Override
-    public void delete(UUID id) {   // 대화 로그 하나 삭제
+    public Optional<MessageInfo> findMessageById(UUID userId) {
+        return Optional.empty();
+    }
 
+    @Override
+    public List<MessageInfo> findDMBetweenUsers(UUID userId1, UUID userId2) {
+        return List.of();
+    }
+
+    @Override
+    public List<Message> findCMByChannel(UUID userId, UUID channelId) {
+        return List.of();
+    }
+
+    @Override
+    public Optional<MessageInfo> update(UUID id, String newContent) {
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean deleteMessage(UUID id) {
+        return false;
     }
 }
