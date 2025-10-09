@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -23,14 +24,29 @@ public class JCFUserService extends JCFBaseService<User, UUID, UserRepository> i
 
     @Override
     public User createUser(String username, String password, String email, String nickname, String phoneNum) {
-        // 서비스 계층의 핵심 책임: 비즈니스 규칙(예: 사용자 이름 중복 불가)을 검증합니다.
-        if (userRepository.existsByUsername(username)) {
-            throw new IllegalStateException("이미 존재하는 사용자 이름입니다: " + username);
+        // 1. '삭제된 기록을 포함하여' 같은 이름의 사용자가 있는지 Repository에서 직접 조회합니다.
+        Optional<User> existingUser = userRepository.findByUsername(username); // (이 메서드는 새로 추가해야 합니다)
+
+        if (existingUser.isPresent()) {
+            // 2a. 기존 사용자가 있는 경우
+            User user = existingUser.get();
+            if (user.isDeleted()) {
+                // 탈퇴한 사용자라면, 정보를 복원하고 업데이트합니다.
+                user.restore();
+                user.changePassword(password); // 비밀번호는 새로 설정
+                user.updateProfile(nickname, email, phoneNum); // 프로필 정보 업데이트
+                userRepository.save(user);
+                return user;
+            } else {
+                // 이미 활성 상태인 사용자라면, 예외를 발생시킵니다.
+                throw new IllegalStateException("이미 존재하는 사용자 이름입니다: " + username);
+            }
+        } else {
+            // 2b. 기존 사용자가 전혀 없는 경우 (신규 가입)
+            User newUser = User.create(username, password, email, nickname, phoneNum);
+            userRepository.save(newUser);
+            return newUser;
         }
-        // 실제 객체 생성 책임은 User 엔티티의 정적 팩토리 메서드에 위임합니다.
-        User newUser = User.create(username, password, email, nickname, phoneNum);
-        userRepository.save(newUser);
-        return newUser;
     }
 
     @Override
@@ -113,6 +129,16 @@ public class JCFUserService extends JCFBaseService<User, UUID, UserRepository> i
     @Override
     public boolean isDoNotDisturb(UUID userId) {
         return findByIdNonDel(userId).isDoNotDisturb();
+    }
+
+    @Override
+    public User findByUsernameNonDel(String username) {
+        return repository.findByUsernameNonDel(username).orElseThrow(() -> new NoSuchElementException("해당 사용자를 찾을 수 없습니다: " + username));
+    }
+
+    @Override
+    public boolean existsByUsernameNonDel(String username) {
+        return repository.existsByUsernameNonDel(username);
     }
 
 }

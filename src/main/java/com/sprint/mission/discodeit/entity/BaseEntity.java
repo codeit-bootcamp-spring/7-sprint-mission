@@ -67,6 +67,14 @@ public abstract class BaseEntity<T> implements Identifiable<T>, Deletable {
     }
 
     /**
+     * 논리적으로 삭제된 엔티티를 다시 활성 상태로 복원합니다.
+     */
+    public void restore() {
+        this.isDeleted = false;
+        updateTimestamp();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

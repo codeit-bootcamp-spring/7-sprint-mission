@@ -4,13 +4,22 @@ import com.sprint.mission.discodeit.utils.ParticipationDualKey;
 
 import java.util.UUID;
 
-public class Participation extends BaseEntity{
-    private ParticipationDualKey participationDualKey;
+public class Participation extends BaseEntity<ParticipationDualKey>{
     private String nickname;
     private Role role;
 
-    protected Participation() {
-        super();
+    /**
+     * '어떤 유저'가 '어떤 채널'에 참여했는지에 대한 관계를 고유하게 식별하는 복합 키(Composite Key)입니다.
+     * 이 키는 Participation 엔티티의 기본 키(Primary Key)로 사용됩니다.
+     * <p>
+     * Java Record를 사용하여 불변(immutable) 객체로 선언되었으며,
+     * equals(), hashCode(), toString() 메서드가 자동으로 구현됩니다.
+     *
+     * @param channelId 참여 관계가 속한 채널의 고유 ID. {@link com.sprint.mission.discodeit.entity.Channel}의 ID를 참조합니다.
+     * @param userId    참여 관계의 주체인 사용자의 고유 ID. {@link com.sprint.mission.discodeit.entity.User}의 ID를 참조합니다.
+     */
+    protected Participation(UUID channelId, UUID userId) {
+        super(new ParticipationDualKey(channelId, userId));
     }
     public static Participation create(UUID channelId, UUID userId, String nickname, Role role) {
         if(channelId == null){
@@ -22,8 +31,7 @@ public class Participation extends BaseEntity{
         if(role == null){
             role = Role.USER;
         }
-        Participation participation = new Participation();
-        participation.participationDualKey = new ParticipationDualKey(channelId, userId);
+        Participation participation = new Participation(channelId, userId);
         participation.nickname = nickname;
         participation.role = role;
         return participation;
@@ -31,18 +39,16 @@ public class Participation extends BaseEntity{
 
     public void changeNickname(String nickname) {
         this.nickname = nickname;
-        super.updateTimestamp();
     }
     public void changeRole(Role role) {
         this.role = role;
-        super.updateTimestamp();
     }
 
     public UUID getChannelId() {
-        return participationDualKey.channelId();
+        return getId().channelId();
     }
     public UUID getUserId() {
-        return participationDualKey.userId();
+        return getId().userId();
     }
     public String getNickname() {
         return nickname;
@@ -53,12 +59,9 @@ public class Participation extends BaseEntity{
 
     @Override
     public String toString() {
-        return "Participation{" +
-                "channelId=" + participationDualKey.channelId() +
-                ", userId=" + participationDualKey.userId() +
-                "DualKey=" + participationDualKey +
-                ", nickname='" + nickname + '\'' +
+        return "Participation{"+ super.toString()+
+                " nickname='" + nickname + '\'' +
                 ", role=" + role +
-                '}';
+                "} " ;
     }
 }

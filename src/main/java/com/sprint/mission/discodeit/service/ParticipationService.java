@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.entity.Participation;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.utils.ParticipationDualKey;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +11,7 @@ import java.util.UUID;
 /**
  * 채널과 사용자의 '참여 관계'에 대한 비즈니스 로직을 처리하는 서비스 인터페이스입니다.
  */
-public interface ParticipationService extends BaseService<Participation, UUID> {
+public interface ParticipationService extends BaseService<Participation, ParticipationDualKey> {
 
     /**
      * 특정 사용자를 채널에 참여시킵니다.
@@ -27,8 +28,10 @@ public interface ParticipationService extends BaseService<Participation, UUID> {
      *
      * @param channelId 나갈 채널의 ID
      * @param userId    나가는 사용자의 ID
+     * @return 채널의 마지막 사용자가 나갔으면 true아니면 False
+     * ** 추후App에서 Channel에게 삭제 명령을 내리게 하기 위해 boolean을 리턴함**
      */
-    void leaveChannel(UUID channelId, UUID userId);
+    boolean leaveChannel(UUID channelId, UUID userId);
 
     /**
      * (추천) 관리자/소유자가 다른 사용자를 채널에서 강제로 내보냅니다.
@@ -80,13 +83,14 @@ public interface ParticipationService extends BaseService<Participation, UUID> {
     boolean isUserInChannel(UUID channelId, UUID userId);
 
     /**
-     * 채널 내 사용자의 역할을 변경합니다. (예: MEMBER -> ADMIN)
+     * 채널 내 특정 사용자의 역할을 변경합니다. (관리자 권한 필요)
      *
-     * @param channelId 역할을 변경할 채널의 ID
-     * @param userId    역할을 변경할 사용자의 ID
-     * @param newRole   새로운 역할
+     * @param channelId    역할을 변경할 채널의 ID
+     * @param targetUserId 역할을 변경할 대상 사용자의 ID
+     * @param actorId      역할 변경을 시도하는 사용자(행위자)의 ID
+     * @param newRole      새로운 역할
      */
-    void changeRole(UUID channelId, UUID userId, Role newRole);
+    void changeRole(UUID channelId, UUID targetUserId, UUID actorId, Role newRole);
 
     /**
      * 채널 내 사용자의 닉네임을 변경합니다.
@@ -97,6 +101,13 @@ public interface ParticipationService extends BaseService<Participation, UUID> {
      */
     void changeNickname(UUID channelId, UUID userId, String newNickname);
 
-    boolean isOwner(UUID uuid);
+    /**
+     * 특정 채널의 특정 사용자가 관리자인지 확인하고 boolean을 반환합니다
+     *
+     * @param channelId 사용자가 관리자인지 확인 할 채널 ID
+     * @param userId    관리자인지 확인 할 사용자 ID
+     * @return 관리자일 경우 true, 아닌 경우 false
+     */
+    boolean isOwner(UUID channelId, UUID userId);
 
 }

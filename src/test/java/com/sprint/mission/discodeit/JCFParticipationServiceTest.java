@@ -1,3 +1,5 @@
+package com.sprint.mission.discodeit;
+
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Participation;
 import com.sprint.mission.discodeit.entity.Role;
@@ -116,11 +118,15 @@ class JCFParticipationServiceTest {
         @DisplayName("실패: 채널의 마지막 관리자는 채널을 떠날 수 없다")
         void leaveChannel_fail_asLastAdmin() {
             // given
-            // adminUser를 채널에 참여시키고 ADMIN 역할을 부여
             participationService.joinChannel(publicChannel.getId(), adminUser.getId(), "관리자");
-            Participation adminParticipation = participationRepository.findById(new ParticipationDualKey(publicChannel.getId(), adminUser.getId())).get();
-            adminParticipation.changeRole(Role.ADMIN);
-            participationRepository.save(adminParticipation);
+            // 자기 자신을 ADMIN으로 만드는 것은 불가능하므로, 다른 관리자가 역할을 변경해줘야 함
+            // 테스트를 위해 임시 관리자를 만들어서 역할을 변경
+            User tempAdmin = User.create("tempAdmin", "p", "t@a.com", null, null);
+            userRepository.save(tempAdmin);
+
+
+            participationService.joinChannel(publicChannel.getId(), tempAdmin.getId(), "유저005");// 스스로 ADMIN이 됨
+            participationService.changeRole(publicChannel.getId(), adminUser.getId(), tempAdmin.getId(), Role.ADMIN);
 
             // when & then
             assertThatThrownBy(() -> participationService.leaveChannel(publicChannel.getId(), adminUser.getId()))
@@ -135,20 +141,17 @@ class JCFParticipationServiceTest {
             Participation firstParticipation = participationService.joinChannel(publicChannel.getId(), normalUser.getId(), "첫번째닉네임");
             long originalCreatedAt = firstParticipation.getCreatedAt();
 
-            // 2. 채널 나가기 (논리적 삭제)
-            participationService.leaveChannel(publicChannel.getId(), normalUser.getId());
-            assertThat(participationService.isUserInChannel(publicChannel.getId(), normalUser.getId())).isFalse();
-
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            // 2. 채널 나가기 (논리적 삭제)
+            participationService.leaveChannel(publicChannel.getId(), normalUser.getId());
+            assertThat(participationService.isUserInChannel(publicChannel.getId(), normalUser.getId())).isFalse();
 
             // when: 3. 다른 닉네임으로 다시 참여
             Participation rejoinParticipation = participationService.joinChannel(publicChannel.getId(), normalUser.getId(), "두번째닉네임");
-
-
 
             // then
             assertThat(rejoinParticipation.getId()).isEqualTo(firstParticipation.getId());
@@ -193,6 +196,7 @@ class JCFParticipationServiceTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("자기 자신을 강퇴할 수 없습니다.");
         }
+
 
         @Test
         @DisplayName("성공: findOwner는 채널의 관리자(ADMIN)를 정확히 찾아낸다")

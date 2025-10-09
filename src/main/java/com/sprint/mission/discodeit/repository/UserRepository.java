@@ -41,4 +41,5 @@ public interface UserRepository extends BaseRepository<User, UUID> {
      * @return 사용자 이름이 존재하며 삭제되지 않았으면 true, 아니면 false
      */
     boolean existsByUsernameNonDel(String username);
+
 }

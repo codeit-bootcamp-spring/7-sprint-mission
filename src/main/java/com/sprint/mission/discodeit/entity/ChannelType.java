@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.entity;
 public enum ChannelType {
     CHAT("대화"),
     VIDEO("영상"),
-    DIRECT("개인"),
     TEST("테스트");
 
     // 3. 필드 선언 (private final로 캡슐화)
