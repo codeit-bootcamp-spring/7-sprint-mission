@@ -3,13 +3,14 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.DTO.ChannelDTO;
 import com.sprint.mission.discodeit.DTO.UserDTO;
+import com.sprint.mission.discodeit.controller.Controller;
 import com.sprint.mission.discodeit.entity.*;
 
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageRoomService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.*;
-import com.sprint.mission.discodeit.vo.Invitation;
-import com.sprint.mission.discodeit.vo.InvitationType;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -23,9 +24,12 @@ public class JavaApplication {
         //어차피 {}안에서만 유효하니까.
 
         AppConfig appConfig = new AppConfig();
-        JCFUserService userService = appConfig.getUserService();
-        JCFMessageRoomService messageRoomService= appConfig.getMessageRoomService();
-        JCFChannelService channelService = appConfig.getChannelService();
+
+        UserService userService = appConfig.getUserService();
+        MessageRoomService messageRoomService= appConfig.getMessageRoomService();
+        ChannelService channelService = appConfig.getChannelService();
+
+        Controller controller = appConfig.getController();
 
 
         //User생성 - 필수 필드 입력 안할 시 실패
@@ -38,8 +42,8 @@ public class JavaApplication {
         printLine();
 
         //User 생성 -필수 필드 입력 시 성공!
-        user.setPassword("11111111");
-        user.setEmail("@gmail.com");
+        user.setPassword("1111");
+        user.setEmail("@");
         user.setUsername("ian");
         user.setPhoneNumber("01011111111");
         user.setNickname("ianNickname");
@@ -152,9 +156,9 @@ public class JavaApplication {
         userService.save(user);
         User user2 = new User();
         user2.setUsername("Teddy");
-        user2.setEmail("teddy@email.com");
+        user2.setEmail("@2");
         user2.setPhoneNumber("1");
-        user2.setPassword("111111111");
+        user2.setPassword("1111");
         user2.setNickname("TeddyNickname");
         userService.save(user2);
         System.out.println("[유저 목록]");
@@ -172,64 +176,49 @@ public class JavaApplication {
         channelService.findAll().forEach(c-> System.out.println(c.getServerName()));
         printLine();
 
+        channel.addMember(user.getId());
+        user.addMyChannel(channel.getId());
+        user2.addMyChannel(channel.getId());
+        channel.addMember(user2.getId());
+
+
+
         //MessageRoom 모두 조회
         messageRoomService.save(messageRoom);
         MessageRoom messageRoom2 = new MessageRoom();
-        messageRoom2.setMessageRoomName("user와 user2의 DM");
-        messageRoom2.setMessageRoomType(MessageRoomType.DM);
+        messageRoom2.setMessageRoomName("테스트 서버A의 채팅방");
+        messageRoom2.setMessageRoomType(MessageRoomType.SERVER_MESSAGE_ROOM);
         messageRoomService.save(messageRoom2);
         System.out.println("[채팅방 목록]");
         messageRoomService.findAll().forEach(m-> System.out.println(m.getMessageRoomName()));
         printLine();
 
+        channel.addMessageRoom(messageRoom2.getId());
 
         //지금까지는 간단한 CRUD를 구현했음
         //---------------------------------------------------------------------------------
-        //여기서부터는 도메인끼리 연결되는 함수
-
-        //친구 추가
-        Invitation invitation = userService.sendFriendRequest(user, user2.getId());
-        List<Invitation> user2Invitations = user2.getMyInvitations();
-        for (Invitation user2Invitation : user2Invitations) {
-            if(user2Invitation.getType()== InvitationType.FRIEND_INVITATION){
-                System.out.println("친구 요청을 보낸 사람: "+userService.findById(user2Invitation.getSenderId()).getUsername());
-            }
-        }
-        userService.acceptFriendRequest(invitation);
-        List<UUID> friends1 = user.getFriends();
-        System.out.println("["+user.getUsername()+"의 친구목록]");
-        for (UUID friend : friends1) {
-            System.out.println("> "+userService.findById(friend).getUsername());
-        }
-        List<UUID> friends2 = user2.getFriends();
-        System.out.println("["+user2.getUsername()+"의 친구목록]");
-        for (UUID friend : friends2) {
-            System.out.println("> "+userService.findById(friend).getUsername());
-        }
-        printLine();
+        //여기서부터는 콘솔 기반 어플리케이션
+        userService.findAll().forEach(user1 -> System.out.println(user1.getEmail()));
+        System.out.println();
+        System.out.println();
 
 
-
-        //user가 서버를 열고 user2 초대
-        //1.서버 오픈
-        Channel madeByUserServer = channelService.openChannel(user, "user가 만든 서버", 1L, true);
-        //2. 초대장 보내고 받기
-        Invitation invitation1 = channelService.sendInvitation(madeByUserServer, user2);
-        channelService.acceptChannelRequest(user2, invitation1);
-
-        System.out.println("<서버의 멤버 확인>");
-        List<UUID> members = madeByUserServer.getMembers();
-        for (UUID member : members) {
-            User u = userService.findById(member);
-            System.out.println(u.getNickname());
-        }
-        printLine();
-
-        //서버 채팅방 만들고 채팅 보내기
-        MessageRoom messageRoomInChannel = messageRoomService.makeChannelMessageRoom(madeByUserServer);
-        userService.sendMessage(user, messageRoomInChannel, "이건 첫 채팅이야");
-        userService.sendMessage(user2, messageRoomInChannel, "이건 답장이야");
-        System.out.println("채팅 기록 확인");
-        messageRoomInChannel.getHistory().forEach(m-> System.out.println("> "+m.getContent()));
+        /*
+        * email: @
+        * 비밀번호: 1111
+        * 로그인 해서 여러가지 기능을 콘솔로 할 수 있게 구현
+        *
+        * 다른 유저
+        * 이메일: @2
+        * 비밀번호: 1111
+        *
+        * 콘솔을 통해
+        * 회원가입, 로그인, 서버 확인, 친구 확인, 서버 내 채팅방 확인
+        * 서버 만들기, 채팅창 만들기, 채팅방에 채팅 보내기
+        * 친구 추가, 친구 추가 요청 확인, 친구 신청 받기
+        * 을 구현했습니다.
+        *
+         * */
+        controller.start();
     }
 }

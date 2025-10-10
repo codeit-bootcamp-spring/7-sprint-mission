@@ -29,4 +29,5 @@ public class MemoryMessageRoomRepository implements MessageRoomRepository {
     public List<MessageRoom> findAll() {
         return List.copyOf(store.values().stream().toList());
     }
+
 }

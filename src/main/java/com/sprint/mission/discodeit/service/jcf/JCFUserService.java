@@ -5,9 +5,8 @@ import com.sprint.mission.discodeit.entity.*;
 
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.vo.Invitation;
-import com.sprint.mission.discodeit.vo.InvitationType;
-import com.sprint.mission.discodeit.vo.Message;
+
+
 
 
 import java.util.*;
@@ -23,7 +22,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public void save(User user) {
-        if(user.getUsername()==null || user.getPassword()==null || user.getEmail()==null||user.getPhoneNumber()==null) {
+        if(user.getUsername()==null || user.getPassword().length()<4 || user.getEmail()==null||user.getPhoneNumber()==null) {
             throw new IllegalArgumentException("데이터를 모두 입력해 주세요.");
         }
         userRepository.save(user);
@@ -74,32 +73,37 @@ public class JCFUserService implements UserService {
         }
     }
 
-
-    public Invitation sendFriendRequest(User fromUser, UUID toUserId) {
-        Invitation invitation = new Invitation(fromUser.getId(),toUserId, InvitationType.FRIEND_INVITATION);
-        User toUser = findById(toUserId);
-        fromUser.addMyInvitation(invitation);
-        toUser.addMyInvitation(invitation);
-        return invitation;
+    //이메일로 유저 정보 가져오기
+    public User findByEmail(String email){
+        return userRepository.findByEmail(email).orElse(null);
     }
 
 
-
-    public void acceptFriendRequest(Invitation invitation) {
-        UUID receiverId = invitation.getReceiverId();
-        User user = findById(receiverId);
-        user.removeMyInvitation(invitation);
-        User sender = findById(invitation.getSenderId());
-        user.addFriend(invitation.getSenderId());
-        sender.addFriend(receiverId);
-
-    }
-
-
-
-        public void sendMessage(User sender, MessageRoom room, String content){
-        Message message1 = new Message(sender.getId(), content);
-        room.addHistory(message1);
-    }
+//    public Invitation sendFriendRequest(User fromUser, UUID toUserId) {
+//        Invitation invitation = new Invitation(fromUser.getId(),toUserId, InvitationType.FRIEND_INVITATION);
+//        User toUser = findById(toUserId);
+//        fromUser.addMyInvitation(invitation);
+//        toUser.addMyInvitation(invitation);
+//        return invitation;
+//    }
+//
+//
+//
+//    public void acceptFriendRequest(Invitation invitation) {
+//        UUID receiverId = invitation.getReceiverId();
+//        User user = findById(receiverId);
+//        user.removeMyInvitation(invitation);
+//        User sender = findById(invitation.getSenderId());
+//        user.addFriend(invitation.getSenderId());
+//        sender.addFriend(receiverId);
+//
+//    }
+//
+//
+//
+//        public void sendMessage(User sender, MessageRoom room, String content){
+//        Message message1 = new Message(sender.getId(), content);
+//        room.addHistory(message1);
+//    }
 
 }

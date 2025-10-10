@@ -21,7 +21,8 @@ public class Channel {
     private String serverName;
     private Long serverLevel;
     private boolean isPrivate;
-    private final List<UUID> Members = new ArrayList<>();
+    private final List<UUID> members = new ArrayList<>();
+    private final List<UUID> messageRooms = new ArrayList<>();
 
 
     public Channel() {
@@ -46,19 +47,24 @@ public class Channel {
     }
 
     public List<UUID> getMembers() {
-        return List.copyOf(Members);
+        return List.copyOf(members);
     }
 
-    /*
-    * 멤버 추가 메서드
-    *@param: User객체
-    **/
-    public void addMember(User user){
-        Members.add(user.getId());
+    public void addMember(UUID id){
+        members.add(id);
         updatedAt=System.currentTimeMillis();
     }
-    public void removeMember(User user){
-        Members.remove(user.getId());
+    public void removeMember(UUID id){
+        members.remove(id);
+        updatedAt=System.currentTimeMillis();
+    }
+
+    public List<UUID> getMessageRooms() {
+        return List.copyOf(messageRooms);
+    }
+
+    public void addMessageRoom(UUID id){
+        messageRooms.add(id);
         updatedAt=System.currentTimeMillis();
     }
 

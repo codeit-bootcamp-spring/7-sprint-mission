@@ -25,7 +25,6 @@ public class MemoryChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAll() {
-
         return List.copyOf(store.values().stream().toList());
     }
 

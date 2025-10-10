@@ -49,15 +49,15 @@ public class JCFMessageRoomService implements MessageRoomService {
         }
         save(messageRoom);
     }
-    //서버 채팅방 만들기
-    public MessageRoom makeChannelMessageRoom(Channel channel){
-        MessageRoom messageRoom = new MessageRoom();
-        messageRoom.setMessageRoomType(MessageRoomType.SERVER_MESSAGE_ROOM);
-        List<UUID> members = channel.getMembers();
-        for (UUID member : members) {
-            messageRoom.addParticipants(member);
-        }
-        return messageRoom;
-    }
+//    //서버 채팅방 만들기
+//    public MessageRoom makeChannelMessageRoom(Channel channel){
+//        MessageRoom messageRoom = new MessageRoom();
+//        messageRoom.setMessageRoomType(MessageRoomType.SERVER_MESSAGE_ROOM);
+//        List<UUID> members = channel.getMembers();
+//        for (UUID member : members) {
+//            messageRoom.addParticipants(member);
+//        }
+//        return messageRoom;
+//    }
 
 }

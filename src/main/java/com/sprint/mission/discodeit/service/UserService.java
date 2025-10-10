@@ -9,5 +9,6 @@ import java.util.UUID;
 public interface UserService extends BaseService<User> {
     void update(UUID id, UserDTO userDTO);
 
+    public User findByEmail(String email);
 
 }

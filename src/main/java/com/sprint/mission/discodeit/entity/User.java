@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.vo.Invitation;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,9 +21,10 @@ public class User {
     private String nickname;
     private String phoneNumber;
     private final List<UUID> myMessageRooms = new ArrayList<>();
-    private final List<Invitation> myInvitations =new ArrayList<>();
     private final List<UUID> myChannels = new ArrayList<>();
     private final List<UUID> friends = new ArrayList<>();
+    private final List<UUID> myFriendRequest = new ArrayList<>();
+
 
 
 
@@ -34,10 +34,18 @@ public class User {
         this.createdAt = System.currentTimeMillis();
     }
 
+    public User(String username, String password, String email, String phoneNumber) {
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
 
     public void setPassword(String password) {
-        if (password == null || password.length() < 8) {
-            System.out.println("비밀번호를 8글자 이상 적어주세요.");
+        if (password == null || password.length() < 4) {
+            System.out.println("비밀번호를 4글자 이상 적어주세요.");
         } else {
             this.password = password;
         }
@@ -57,8 +65,8 @@ public class User {
         this.username=newUsername;
     }
     public void updatePassword(String newPassword){
-        if (newPassword == null || newPassword.length() < 8) {
-            System.out.println("비밀번호를 8글자 이상 적어주세요.");
+        if (newPassword == null || newPassword.length() < 4) {
+            System.out.println("비밀번호를 4글자 이상 적어주세요.");
             return;
         }
         this.updatedAt=System.currentTimeMillis();
@@ -93,17 +101,6 @@ public class User {
         myChannels.add(uuid);
     }
 
-    public List<Invitation> getMyInvitations() {
-        return List.copyOf(myInvitations);
-    }
-
-    public void addMyInvitation(Invitation invitation){
-        myInvitations.add(invitation);
-    }
-
-    public void removeMyInvitation(Invitation invitation){
-        myInvitations.remove(invitation);
-    }
 
     public List<UUID> getFriends() {
         return List.copyOf(friends);
@@ -113,4 +110,10 @@ public class User {
         friends.add(id);
     }
 
+    public List<UUID> getMyFriendRequest() {
+        return List.copyOf(myFriendRequest);
+    }
+    public void addFriendRequest(UUID id){
+        myFriendRequest.add(id);
+    }
 }

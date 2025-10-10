@@ -1,42 +1,18 @@
 package com.sprint.mission.discodeit.DTO;
 
 import com.sprint.mission.discodeit.entity.User;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Getter
+@Setter
 public class ChannelDTO {
-    private User manager;
     private String serverName;
     private Long serverLevel;
     private boolean isPrivate;
 
-    public User getManager() {
-        return manager;
-    }
-
-    public void setManager(User manager) {
-        this.manager = manager;
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
-
-    public Long getServerLevel() {
-        return serverLevel;
-    }
-
-    public void setServerLevel(Long serverLevel) {
-        this.serverLevel = serverLevel;
-    }
-
-    public boolean isPrivate() {
-        return isPrivate;
-    }
-
-    public void setPrivate(boolean aPrivate) {
-        isPrivate = aPrivate;
-    }
 }
