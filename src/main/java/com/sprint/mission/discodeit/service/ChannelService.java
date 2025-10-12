@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    void createChannel(Channel.ChannelType channelType, String channelName, User admin);
+    Channel createChannel(Channel.ChannelType channelType, String channelName, User admin);
     void addMember(UUID id, User member);
 
     Channel getChannel(UUID id);

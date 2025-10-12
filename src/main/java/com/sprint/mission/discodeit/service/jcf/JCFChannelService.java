@@ -16,10 +16,11 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void createChannel(Channel.ChannelType channelType, String channelName, User admin) {
+    public Channel createChannel(Channel.ChannelType channelType, String channelName, User admin) {
         Channel newChannel = new Channel(channelType, channelName, admin);
         channelStore.put(newChannel.getId(), newChannel);
         admin.addChannelId(newChannel.getId()); // 유저 객체에 속한 채널 UUID 리스트 저장
+        return newChannel;
     }
 
     @Override
