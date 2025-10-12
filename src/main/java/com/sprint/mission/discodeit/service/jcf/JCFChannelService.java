@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.ChannelInfo;
-import com.sprint.mission.discodeit.entity.dto.UserInfo;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -35,8 +34,12 @@ public class JCFChannelService implements ChannelService {
 
 
     @Override
-    public Optional<ChannelInfo> findById(UUID id) {
+    public Optional<ChannelInfo> findChannelInfoById(UUID id) {
         return Optional.ofNullable(data.get(id)).map(ChannelInfo::new);
+    }
+
+    public Optional<Channel> findChannelEntityById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
@@ -57,7 +60,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Optional<ChannelInfo> addMemberToChannel(UUID channelId, UUID userId) {
         Optional<Channel> channelOp = Optional.ofNullable(data.get(channelId));
-        Optional<User> userOptional = userService.findEntityById(userId);
+        Optional<User> userOptional = userService.findUserEntityById(userId);
 
         if (channelOp.isPresent() && userOptional.isPresent()) {
             Channel channel = channelOp.get();
@@ -75,7 +78,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Optional<ChannelInfo> removeMemberFromChannel(UUID channelId, UUID userId) {
         Optional<Channel> channelOp = Optional.ofNullable(data.get(channelId));
-        Optional<User> userOptional = userService.findEntityById(userId);
+        Optional<User> userOptional = userService.findUserEntityById(userId);
         if (channelOp.isPresent() && userOptional.isPresent()) {
             Channel channel = channelOp.get();
             User user = userOptional.get();

@@ -13,7 +13,8 @@ public interface ChannelService {
     Channel create(User user, Channel.ChannelType type);
     Channel create(User user, String channelName, Channel.ChannelType type);
 
-    Optional<ChannelInfo> findById(UUID id);
+    Optional<ChannelInfo> findChannelInfoById(UUID id);
+    Optional<Channel> findChannelEntityById(UUID id);
     List<ChannelInfo> findAll();
 
     Optional<ChannelInfo> updateChannelName(UUID channelId, String channelName);

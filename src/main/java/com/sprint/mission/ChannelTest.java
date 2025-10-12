@@ -23,12 +23,12 @@ public class ChannelTest {
         UUID channelId = channel1.getId();
 
         System.out.println("--- 채널 조회 ---");
-        channelService.findById(channelId).ifPresent(System.out::println);
+        channelService.findChannelInfoById(channelId).ifPresent(System.out::println);
 
         // --- 채널 수정 ---
         System.out.println("--- 채널 이름 수정 ---");
         channelService.updateChannelName(channelId, "UpdatedChannel");
-        channelService.findById(channelId).ifPresent(System.out::println);
+        channelService.findChannelInfoById(channelId).ifPresent(System.out::println);
 
         // --- 채널2 생성 ---
         Channel channel2 = channelService.create(User2, "뉴비의채널", Channel.ChannelType.VOICE);
@@ -52,7 +52,7 @@ public class ChannelTest {
         // --- 멤버 삭제 ---
         System.out.println("--- 채널1 멤버 삭제 ---");
         channelService.removeMemberFromChannel(channelId, user2Id);
-        channelService.findById(channelId).ifPresent(System.out::println);
+        channelService.findChannelInfoById(channelId).ifPresent(System.out::println);
 
         // --- 없는 멤버 삭제 ---
         System.out.println("--- 중복 삭제 ---");
