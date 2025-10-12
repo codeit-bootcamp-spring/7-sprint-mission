@@ -51,8 +51,28 @@ public class JCFUserService implements UserService{
     }
 
     @Override
-    public Collection<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userStore;
+    }
+
+    @Override
+    public User login(String userId, String password) {
+        User user = userStore.stream()
+                .filter(u -> u.getUserId().equals(userId) && u.getPassword().equals(password))
+                .findFirst()
+                .orElse(null);
+
+        return user;
+    }
+
+    @Override
+    public String getUserNickName(UUID id) {
+        String nickName = userStore.stream()
+                .filter(u -> u.getId() == id)
+                .findFirst()
+                .get().getNickName();
+
+        return nickName;
     }
 
     @Override
