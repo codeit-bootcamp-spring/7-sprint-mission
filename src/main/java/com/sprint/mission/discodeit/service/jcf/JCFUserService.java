@@ -41,11 +41,11 @@ public class JCFUserService implements UserService {
     // 조회
 
     @Override
-    public Optional<UserInfo> findUserById(UUID userId) {
+    public Optional<UserInfo> findUserInfoById(UUID userId) {
         return Optional.ofNullable(data.get(userId)).map(UserInfo::new);
     }
 
-    public Optional<User> findEntityById(UUID userId) {
+    public Optional<User> findUserEntityById(UUID userId) {
         return Optional.ofNullable(data.get(userId));
     }
 
@@ -96,11 +96,11 @@ public class JCFUserService implements UserService {
                 if (removedChannelCount > 0) System.out.println("총 " + removedChannelCount + "개의 채널에서 삭제됌");
             }
             data.remove(userId);
-            System.out.println("삭제 성공");
+            System.out.println("유저 삭제 성공");
             return true;
         }
         else {
-            System.out.println("삭제 실패");
+            System.out.println("해당 유저가 존재하지 않음");
             return false;
         }
     }

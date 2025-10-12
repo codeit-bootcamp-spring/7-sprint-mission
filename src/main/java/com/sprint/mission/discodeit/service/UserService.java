@@ -13,8 +13,8 @@ public interface UserService {
     User createUser(String email, String password, String userName);
 
     // 조회
-    Optional<UserInfo> findUserById(UUID userId);
-    Optional<User> findEntityById(UUID userID);
+    Optional<UserInfo> findUserInfoById(UUID userId);
+    Optional<User> findUserEntityById(UUID userID);
     List<UserInfo> findAllUsers();
 
     // 수정

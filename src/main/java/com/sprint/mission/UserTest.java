@@ -14,7 +14,7 @@ import java.util.UUID;
 public class UserTest {
 
     public static void read(UUID id) {
-        Optional<UserInfo> user = userService.findUserById(id);
+        Optional<UserInfo> user = userService.findUserInfoById(id);
         if (user.isPresent()) System.out.println(user);
         else  System.out.println("유저를 찾을 수 없음");
     }
@@ -46,7 +46,7 @@ public class UserTest {
         // --- 사용자 조회 ---
         UUID userId = user1.getId();
         System.out.println("--- 사용자 조회 ---");
-        System.out.println(userService.findUserById(userId));
+        System.out.println(userService.findUserInfoById(userId));
 
         // --- 정보 수정 후 조회 ---
         System.out.println("--- 수정 후 다시 조회 ---");
