@@ -46,7 +46,7 @@ public class HelpOperator {
 
     public void showMessageHelp() {
         System.out.println("=========Message 명령어 입니다==========");
-        System.out.println("createmessage <user_name> <content> <is_markdown>");
+        System.out.println("createmessage <content> <user_name> <is_markdown>");
         System.out.println("readmessage <message_content>");
         System.out.println("readallmessage");
         System.out.println("deletemessage <message_content>");

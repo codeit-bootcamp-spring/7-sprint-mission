@@ -38,4 +38,6 @@ public class JCFValidateOperator implements ValidateService {
         return channelDb.stream().anyMatch(x -> x.getId() == channel.getId());
 
     }
+
+
 }

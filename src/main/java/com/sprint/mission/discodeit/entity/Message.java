@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -11,6 +12,13 @@ public class Message extends Entity{
 
     public Message(String content, User sender, boolean isMarkDown) {
         super();
+        this.content = content;
+        this.sender = sender;
+        this.isMarkDown = isMarkDown;
+    }
+
+    public Message(UUID id, String content, User sender, boolean isMarkDown) {
+        super(id);
         this.content = content;
         this.sender = sender;
         this.isMarkDown = isMarkDown;

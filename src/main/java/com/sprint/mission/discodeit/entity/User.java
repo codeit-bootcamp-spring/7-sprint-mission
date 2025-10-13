@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.static_.StaticString;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -33,6 +34,14 @@ public class User extends Entity {
 
     public User(String name, String nickname, String email, boolean isOnline) {
         super();
+        this.name = name;
+        this.nickname = nickname;
+        this.email = email;
+        this.isOnline = isOnline;
+    }
+
+    public User(UUID id, String name, String nickname, String email, boolean isOnline) {
+        super(id);
         this.name = name;
         this.nickname = nickname;
         this.email = email;

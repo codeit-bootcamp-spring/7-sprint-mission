@@ -25,6 +25,12 @@ public class Entity {
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = DEFAULT_UPDATED_AT;
     }
+    public Entity(UUID id) {
+        this.id = id;
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = DEFAULT_UPDATED_AT;
+    }
+
 
     public void updateEntity(){
         this.updatedAt = System.currentTimeMillis();

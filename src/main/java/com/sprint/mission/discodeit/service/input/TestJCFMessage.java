@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service.input;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessage;
 
+import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
 import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
 
 public class TestJCFMessage {
@@ -22,6 +24,11 @@ public class TestJCFMessage {
     void testCreateMessage(String[] cmdArray){
         if (cmdArray.length != 4 || !testUtil.checkValidateBoolean(cmdArray[3])) {
             System.out.println(WRONG_INPUT);
+            return;
+        }
+        User targetUser = testUtil.targetUser(cmdArray[2]);
+        if (targetUser == null) {
+            System.out.println(USER_NOT_EXIST + cmdArray[2] );
             return;
         }
         messageService.createMessage(new Message(cmdArray[1], testUtil.targetUser(cmdArray[2]), Boolean.parseBoolean(cmdArray[3])));

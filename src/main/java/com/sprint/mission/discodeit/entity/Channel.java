@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.static_.StaticString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -43,6 +44,13 @@ public class Channel extends Entity {
         this.isTextChannel = isTextChannel;
     }
 
+    public Channel(UUID id, String name, String description, boolean isPublic, boolean isTextChannel) {
+        super(id);
+        this.name = name;
+        this.description = description;
+        this.isPublic = isPublic;
+        this.isTextChannel = isTextChannel;
+    }
 
     public String getName() {
         return name;
