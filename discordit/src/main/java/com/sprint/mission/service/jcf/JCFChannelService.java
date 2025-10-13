@@ -10,7 +10,13 @@ import java.util.function.Predicate;
 
 public class JCFChannelService implements ChannelService {
     private static final Map<UUID, Channel> data = new HashMap<>();
+    private static final JCFChannelService instance = new JCFChannelService();
 
+    private JCFChannelService() {}
+
+    public static JCFChannelService getInstance(){
+        return instance;
+    }
 
     @Override
     public UUID createChannel(String name, Channel.ChannelType type, User... moderators) {
