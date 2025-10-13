@@ -1,22 +1,24 @@
 package com.sprint.mission;
 
 import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.Channel.ChannelType;
+import com.sprint.mission.entity.Message;
+import com.sprint.mission.entity.Receivable;
 import com.sprint.mission.entity.User;
 import com.sprint.mission.service.jcf.JCFChannelService;
 import com.sprint.mission.service.jcf.JCFMessageService;
 import com.sprint.mission.service.jcf.JCFUserService;
 
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 public class DiscordIt {
 
-    public static final JCFMessageService<Channel> CHANNEL_MESSAGE_SERVICE = new JCFMessageService<>();
-    public static final JCFMessageService<User> USER_MESSAGE_SERVICE = new JCFMessageService<>();
-    public static final JCFUserService USER_SERVICE = new JCFUserService();
-    public static final JCFChannelService CHANNEL_SERVICE = new JCFChannelService();
+    public static final JCFMessageService messageService = JCFMessageService.getInstance();
+    public static final JCFUserService userService = JCFUserService.getInstance();
+    public static final JCFChannelService channelService = JCFChannelService.getInstance();
 
     private Scanner scanner = new Scanner(System.in);
     private int userCommand = 0;
@@ -43,21 +45,66 @@ public class DiscordIt {
     private void menu() {
         printLine();
         System.out.println("[메뉴]");
-        System.out.println("1. 채널 2. 회원 3. 로그아웃");
-        getInput(3);
+        System.out.println("1. 채널 2. 회원 3. 로그아웃 (4. 관리자 모드)");
+        getInput(4);
         switch (userCommand) {
             case 1 -> channel();
             case 2 -> user();
             case 3 -> logout();
+            case 4 -> admin();
+        }
+    }
+
+    private void admin() {
+        printLine();
+        System.out.println("[관리자 모드]");
+        System.out.println("1. 메세지");
+        messageSearch();
+    }
+
+    private void messageSearch() {
+        printLine();
+        List<Message<Receivable>> messageList = new ArrayList<>();
+        System.out.println("[메세지 조회]");
+        System.out.println("1. 발신자로 메세지 조회");
+        System.out.println("2. 발신자와 수신자로 메세지 조회");
+        System.out.println("3. 채널 메세지 조회");
+        getInput(3);
+        switch (userCommand) {
+            case 1 -> {
+                System.out.print("아이디를 입력하세요 : ");
+                String userId = scanner.next();
+                messageList = messageService.getBySender(userService.getUserById(userId));
+            }
+            case 2 ->{
+                System.out.print("발신자 아이디를 입력하세요 : ");
+                String senderId = scanner.next();
+                System.out.print("수신자 아이디를 입력하세요 : ");
+                String receiverId = scanner.next();
+                messageList = messageService.getBySenderAndReceiver(
+                        userService.getUserById(senderId),
+                        userService.getUserById(receiverId)
+                );
+            }
+            case 3 -> {
+                System.out.println("채널을 선택해주세요.");
+                printChannel(channelService.getAllChannels());
+                getInput(1, channelService.getAllChannels().size() + 1);
+                UUID receiverId = channelService.getNthChannel(userCommand - 1);
+                messageList = messageService.getByReceiver(channelService.getChannelById(receiverId));
+            }
+        }
+        for (Message<Receivable> message : messageList) {
+            message.display();
         }
     }
 
     private void user() {
         printLine();
         System.out.println("[회원]");
-        while(true) {
+        while (true) {
             System.out.println("1. 내 정보 조회/수정 2. 온라인 회원 조회 3. 메세지 보내기 4. 전체 회원 조회 0. 종료");
-            getInput(3);
+            getInput(0, 4);
             switch (userCommand) {
                 case 1 -> manageMyProfile();
                 case 2 -> printOnlineUsers();
@@ -71,11 +118,11 @@ public class DiscordIt {
     }
 
     private void printAllUsers() {
-        printUserDetails(USER_SERVICE.getAllUsers());
+        printUserDetails(userService.getAllUsers());
     }
 
     private void printOnlineUsers() {
-        List<String> onlineUsers = USER_SERVICE.getOnlineUsers();
+        List<String> onlineUsers = userService.getOnlineUsers();
         System.out.println("현재 접속 중인 유저들 : ");
         printUserDetails(onlineUsers);
     }
@@ -86,14 +133,14 @@ public class DiscordIt {
             System.out.printf("-\t%d.[%s]\t%s(%s) \"%s\"\n",
                     i + 1,
                     nowId,
-                    USER_SERVICE.getDisplayName(nowId),
-                    USER_SERVICE.getOnlineStatus(nowId),
-                    USER_SERVICE.getBio(nowId) == null? "" : USER_SERVICE.getBio(nowId));
+                    userService.getDisplayName(nowId),
+                    userService.getOnlineStatus(nowId),
+                    userService.getBio(nowId) == null ? "" : userService.getBio(nowId));
         }
     }
 
     private void sendDirectMessage() {
-        List<String> onlineUsers = USER_SERVICE.getOnlineUsers();
+        List<String> onlineUsers = userService.getOnlineUsers();
         System.out.println("현재 접속 중인 유저들 : ");
         printUserDetails(onlineUsers);
         System.out.print("몇 번 유저에게 메세지를 보내시겠습니까? >> ");
@@ -101,18 +148,18 @@ public class DiscordIt {
         getInput(onlineUsers.size());
 
         String message;
-        while(true){
+        while (true) {
             System.out.print("메세지 (종료는 0) : ");
             message = scanner.next();
 
-            if(message.equals("0"))
+            if (message.equals("0"))
                 return;
 
-            USER_MESSAGE_SERVICE.sendMessage(
-                    USER_SERVICE.getUserById(userId),
-                    USER_SERVICE.getUserById(onlineUsers.get(userCommand - 1)),
+            messageService.sendMessage(
+                    userService.getUserById(userId),
+                    userService.getUserById(onlineUsers.get(userCommand - 1)),
                     message
-                    );
+            );
         }
     }
 
@@ -120,13 +167,13 @@ public class DiscordIt {
         printLine();
         System.out.println("[내 정보]");
         System.out.printf("아이디 : %s\n" +
-                "닉네임 : %s\n" +
-                "한마디 : %s\n" +
-                "현재 상태 : %s\n",
+                        "닉네임 : %s\n" +
+                        "한마디 : %s\n" +
+                        "현재 상태 : %s\n",
                 userId,
-                USER_SERVICE.getDisplayName(userId),
-                USER_SERVICE.getBio(userId),
-                USER_SERVICE.getOnlineStatus(userId));
+                userService.getDisplayName(userId),
+                userService.getBio(userId),
+                userService.getOnlineStatus(userId));
         System.out.println();
 
         System.out.printf("1. 프로필 수정하기 0. 돌아가기 >> ");
@@ -143,11 +190,11 @@ public class DiscordIt {
                 String passWd = scanner.next();
 
                 int tried = 1;
-                while (USER_SERVICE.validatePasswd(passWd)) {
+                while (userService.validatePasswd(passWd)) {
                     System.out.println("비밀번호가 올바르지 않습니다.");
                     tried++;
 
-                    if(tried >= 3) {
+                    if (tried >= 3) {
                         System.out.println("3번 연속으로 실패하였으므로 이전으로 돌아갑니다.");
                         return;
                     }
@@ -157,15 +204,15 @@ public class DiscordIt {
                 }
                 System.out.print("새 비밀번호를 입력해주세요 >> ");
                 passWd = scanner.next();
-                USER_SERVICE.setPasswd(userId, passWd);
+                userService.setPasswd(userId, passWd);
             }
             case 2 -> {
                 System.out.print("변경 닉네임 >>");
-                USER_SERVICE.setDisplayName(userId, scanner.next());
+                userService.setDisplayName(userId, scanner.next());
             }
             case 3 -> {
                 System.out.print("변경 한마디 >>");
-                USER_SERVICE.setBio(userId, scanner.next());
+                userService.setBio(userId, scanner.next());
             }
             case 4 -> {
                 System.out.print("변경할 상태를 선택해주세요. ");
@@ -174,7 +221,7 @@ public class DiscordIt {
                     System.out.printf("\t%d. \t\t%s ", i + 1, statuses[i]);
                 }
                 getInput(statuses.length + 1);
-                USER_SERVICE.setOnlineStatus(userId, statuses[userCommand - 1]);
+                userService.setOnlineStatus(userId, statuses[userCommand - 1]);
             }
         }
         System.out.println("정상적으로 변경되었습니다.");
@@ -182,7 +229,7 @@ public class DiscordIt {
 
     private void logout() {
         System.out.println("로그아웃 합니다...");
-        USER_SERVICE.setOnlineStatus(userId, User.Status.OFFLINE);
+        userService.setOnlineStatus(userId, User.Status.OFFLINE);
         userId = null;
     }
 
@@ -191,7 +238,7 @@ public class DiscordIt {
             printLine();
             System.out.println("채널 조회");
             System.out.print("1. 가입 채널 목록 2. 전체 채널 목록 3. 채널 접속하기 \n4. 채널 등록하기 5. 채널 나오기 \n6. 채널 만들기 0. 돌아가기 \n>>");
-            getInput(0, 5);
+            getInput(0, 6);
             switch (userCommand) {
                 case 1 -> printRegisteredChannel();
                 case 2 -> printAllChannel();
@@ -204,13 +251,20 @@ public class DiscordIt {
     }
 
     private void leaveChannel() {
-        printRegisteredChannel();
 
+        printLine();
+        List<UUID> registeredChannels = channelService.getRegisteredChannels(userService.getUserById(userId));
+        System.out.print("나갈 채널을 선택해주세요. >>");
+        printChannel(registeredChannels);
+        getInput(registeredChannels.size());
+
+        channelService.deleteMember(registeredChannels.get(userCommand - 1), userService.getUserById(userId));
+        System.out.println("채널에서 나왔습니다.");
     }
 
     private void enterChannel() {
         printLine();
-        List<UUID> channels = CHANNEL_SERVICE.getRegisteredChannels(USER_SERVICE.getUserById(userId));
+        List<UUID> channels = channelService.getRegisteredChannels(userService.getUserById(userId));
         if (channels.isEmpty()) {
             System.out.println("가입된 채널이 없습니다.");
             return;
@@ -225,8 +279,8 @@ public class DiscordIt {
     }
 
     private void channelMessageSend(UUID uuid) {
-        User sender = USER_SERVICE.getUserById(userId);
-        Channel receiver = CHANNEL_SERVICE.getChannelById(uuid);
+        User sender = userService.getUserById(userId);
+        Channel receiver = channelService.getChannelById(uuid);
         String message;
 
         while (true) {
@@ -235,13 +289,13 @@ public class DiscordIt {
 
             if (message.equals("0"))
                 return;
-            CHANNEL_MESSAGE_SERVICE.sendMessage(sender, receiver, message);
+            messageService.sendMessage(sender, receiver, message);
         }
     }
 
     private void printRegisteredChannel() {
         printLine();
-        List<UUID> channels = CHANNEL_SERVICE.getRegisteredChannels(USER_SERVICE.getUserById(userId));
+        List<UUID> channels = channelService.getRegisteredChannels(userService.getUserById(userId));
 
         if (channels.isEmpty()) {
             System.out.println("가입된 채널이 없습니다.");
@@ -253,7 +307,7 @@ public class DiscordIt {
     }
 
     private void registerChannel() {
-        List<UUID> channels = CHANNEL_SERVICE.getNotRegisteredChannels(USER_SERVICE.getUserById(userId));
+        List<UUID> channels = channelService.getNotRegisteredChannels(userService.getUserById(userId));
 
         if (channels.isEmpty()) {
             System.out.println("이미 모든 채널에 가입되어있습니다.");
@@ -269,8 +323,8 @@ public class DiscordIt {
             return;
         UUID registered = channels.get(userCommand - 1);
 
-        CHANNEL_SERVICE.addMember(registered, USER_SERVICE.getUserById(userId));
-        System.out.printf("채널 [%s]에 가입되었습니다!\n", CHANNEL_SERVICE.getChannelById(registered).getDisplayName());
+        channelService.addMember(registered, userService.getUserById(userId));
+        System.out.printf("채널 [%s]에 가입되었습니다!\n", channelService.getChannelById(registered).getDisplayName());
     }
 
     private void userLogin() {
@@ -286,22 +340,40 @@ public class DiscordIt {
         }
 
         printLine();
-        System.out.printf("%s님, 환영합니다! \n", USER_SERVICE.getDisplayName(userId));
+        System.out.printf("%s님, 환영합니다! \n", userService.getDisplayName(userId));
     }
 
     private void createChannel() {
-        System.out.println("아직안만듦");
+        printLine();
+
+        System.out.print("생성할 채널의 이름을 입력해주세요. >> ");
+        String channelName = scanner.next();
+        System.out.println("채널의 타입을 입력해주세요.");
+        ChannelType[] types = ChannelType.values();
+        for (int i = 0; i < types.length; i++) {
+            System.out.printf("%d. %s", i + 1, types[i]);
+        }
+        System.out.println();
+        System.out.print(">> ");
+        getInput(types.length);
+        channelService.createChannel(
+                channelName,
+                types[userCommand - 1],
+                userService.getUserById(userId),
+                userService.getUserById(userId)
+        );
+        System.out.println("채널이 생성되었습니다.");
     }
 
     private void printAllChannel() {
         printLine();
-        List<UUID> allChannel = CHANNEL_SERVICE.getAllChannels();
+        List<UUID> allChannel = channelService.getAllChannels();
         if (allChannel.isEmpty()) {
             System.out.println("현재 개설된 채널이 없습니다.");
         }
         System.out.println("전체 채널 목록 : ");
         for (UUID uuid : allChannel) {
-            Channel channel = CHANNEL_SERVICE.getChannelById(uuid);
+            Channel channel = channelService.getChannelById(uuid);
             System.out.printf("\t- %s \t\t---\t%s\n", channel.getDisplayName(), channel.getType());
         }
     }
@@ -309,18 +381,19 @@ public class DiscordIt {
     /**
      * 주어진 채널 uuid 목록으로 각 채널에 대한 정보를 간단하게 출력함
      * 예시 : 1. 모각코     --- VOICE
+     *
      * @param uuids 채널 고유 uuid
      */
     private void printChannel(List<UUID> uuids) {
         for (int i = 0; i < uuids.size(); i++) {
-            Channel channel = CHANNEL_SERVICE.getChannelById(uuids.get(i));
+            Channel channel = channelService.getChannelById(uuids.get(i));
             System.out.printf("\t%d. \t\t%s \t(%s)\n", i + 1, channel.getDisplayName(), channel.getType());
         }
     }
 
     private void enterChannel(UUID uuid) {
         printLine();
-        Channel channel = CHANNEL_SERVICE.getChannelById(uuid);
+        Channel channel = channelService.getChannelById(uuid);
         while (true) {
             System.out.printf("채널 [%s]에 접속하였습니다.\n" +
                             "1. 전체 사용자 보기 2. 메세지 보내기 3. 뒤로 돌아가기 >>",
@@ -338,19 +411,19 @@ public class DiscordIt {
     }
 
     private void sendChannelMessage(UUID uuid) {
-        User user = USER_SERVICE.getUserById(userId);
-        Channel channel = CHANNEL_SERVICE.getChannelById(uuid);
+        User user = userService.getUserById(userId);
+        Channel channel = channelService.getChannelById(uuid);
         System.out.print("메세지 입력(종료하려면 -를 입력) : ");
         while (true) {
             String message = scanner.next();
             if (message.equals("-"))
                 return;
-            CHANNEL_MESSAGE_SERVICE.sendMessage(user, channel, message);
+            messageService.sendMessage(user, channel, message);
         }
     }
 
     private void printAllRegisteredUser(UUID uuid) {
-        Set<User> users = CHANNEL_SERVICE.getAllMembers(uuid);
+        Set<User> users = channelService.getAllMembers(uuid);
         for (User user : users) {
             System.out.printf("\t- %s(%s)\n", user.getDisplayName(), user.getOnlineStatus());
         }
@@ -366,7 +439,7 @@ public class DiscordIt {
             id = scanner.next();
             System.out.print("비밀번호를 입력해주세요 >> ");
             passwd = scanner.next();
-            USER_SERVICE.login(id, passwd);
+            userService.login(id, passwd);
             userId = id;
             return;
         } catch (Exception e) {
@@ -387,7 +460,7 @@ public class DiscordIt {
             System.out.print("아이디를 입력해주세요 >> ");
             id = scanner.next();
             try {
-                USER_SERVICE.isCreatableId(id);
+                userService.isCreatableId(id);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 continue;
@@ -399,7 +472,7 @@ public class DiscordIt {
             System.out.print("비밀번호를 입력해주세요 >> ");
             passwd = scanner.next();
             try {
-                USER_SERVICE.validatePasswd(passwd);
+                userService.validatePasswd(passwd);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 continue;
@@ -417,7 +490,7 @@ public class DiscordIt {
             break;
         }
 
-        USER_SERVICE.signIn(id, passwd, displayName);
+        userService.signIn(id, passwd, displayName);
 
         printLine();
         System.out.println("정상적으로 가입되었습니다. ");
@@ -436,6 +509,7 @@ public class DiscordIt {
 
     /**
      * 유저 입력을 안전하게 받기 위한 메소드
+     *
      * @param start
      * @param end
      */
@@ -472,11 +546,304 @@ public class DiscordIt {
     }
 
     private void init() {
-        USER_SERVICE.signIn("happy", "pancake", "heeyeon");
-        USER_SERVICE.signIn("jung123", "greeny", "garden");
-        USER_SERVICE.signIn("npnp9671", "something", "drawing");
+        // 1. 사용자 생성
+        userService.signIn("happy", "pancake", "heeyeon");
+        userService.signIn("jung123", "greeny", "garden");
+        userService.signIn("npnp9671", "something", "drawing");
+        userService.signIn("alice", "pass1234", "Alice");
+        userService.signIn("bob1234", "pass1234", "Bob");
+        userService.signIn("charlie", "pass1234", "Charlie");
+        userService.signIn("david12", "pass1234", "David");
+        userService.signIn("emma123", "pass1234", "Emma");
 
-        CHANNEL_SERVICE.createChannel("게임해요", Channel.ChannelType.VOICE, USER_SERVICE.getUserById("happy"));
-        CHANNEL_SERVICE.createChannel("사진 모으기", Channel.ChannelType.TEXT, USER_SERVICE.getUserById("jung123"));
+        // 사용자 프로필 설정 (Bio 및 온라인 상태)
+        userService.setBio("happy", "게임 좋아하는 사람");
+        userService.setBio("jung123", "사진 찍는 걸 좋아해요");
+        userService.setBio("npnp9671", "그림 그리는 중");
+        userService.setBio("alice", "코딩하는 앨리스");
+        userService.setBio("bob1234", "음악 듣는 걸 좋아합니다");
+        userService.setBio("charlie", "운동 매니아");
+
+        // 일부 사용자를 온라인 상태로 변경
+        userService.setOnlineStatus("happy", User.Status.ONLINE);
+        userService.setOnlineStatus("alice", User.Status.ONLINE);
+        userService.setOnlineStatus("bob1234", User.Status.AWAY);
+        userService.setOnlineStatus("charlie", User.Status.DO_NOT_DISTURB);
+
+        // 2. 채널 생성
+        UUID gameChannel = channelService.createChannel("게임해요", ChannelType.VOICE, userService.getUserById("happy"));
+        UUID photoChannel = channelService.createChannel("사진 모으기", ChannelType.TEXT, userService.getUserById("jung123"));
+        UUID studyChannel = channelService.createChannel("스터디", ChannelType.TEXT, userService.getUserById("alice"));
+        UUID musicChannel = channelService.createChannel("음악 공유", ChannelType.VOICE, userService.getUserById("bob1234"));
+        UUID generalChannel = channelService.createChannel("일반 채팅", ChannelType.TEXT,
+                userService.getUserById("happy"), userService.getUserById("alice"));
+
+        // 3. 사용자를 채널에 등록
+        // 게임해요 채널
+        channelService.addMember(gameChannel, userService.getUserById("happy"));
+        channelService.addMember(gameChannel, userService.getUserById("alice"));
+        channelService.addMember(gameChannel, userService.getUserById("bob1234"));
+        channelService.addMember(gameChannel, userService.getUserById("charlie"));
+
+        // 사진 모으기 채널
+        channelService.addMember(photoChannel, userService.getUserById("jung123"));
+        channelService.addMember(photoChannel, userService.getUserById("npnp9671"));
+        channelService.addMember(photoChannel, userService.getUserById("emma123"));
+        channelService.addMember(photoChannel, userService.getUserById("alice"));
+
+        // 스터디 채널
+        channelService.addMember(studyChannel, userService.getUserById("alice"));
+        channelService.addMember(studyChannel, userService.getUserById("bob1234"));
+        channelService.addMember(studyChannel, userService.getUserById("charlie"));
+        channelService.addMember(studyChannel, userService.getUserById("david12"));
+
+        // 음악 공유 채널
+        channelService.addMember(musicChannel, userService.getUserById("bob1234"));
+        channelService.addMember(musicChannel, userService.getUserById("alice"));
+        channelService.addMember(musicChannel, userService.getUserById("happy"));
+
+        // 일반 채팅 채널 (모든 사용자)
+        channelService.addMember(generalChannel, userService.getUserById("happy"));
+        channelService.addMember(generalChannel, userService.getUserById("alice"));
+        channelService.addMember(generalChannel, userService.getUserById("jung123"));
+        channelService.addMember(generalChannel, userService.getUserById("npnp9671"));
+        channelService.addMember(generalChannel, userService.getUserById("bob1234"));
+        channelService.addMember(generalChannel, userService.getUserById("charlie"));
+        channelService.addMember(generalChannel, userService.getUserById("david12"));
+        channelService.addMember(generalChannel, userService.getUserById("emma123"));
+
+        // 4. 사용자 간 다이렉트 메시지 생성 (다양한 시간대)
+        // 3일 전 오전 9시
+        messageService.sendMessage(
+                userService.getUserById("alice"),
+                userService.getUserById("bob1234"),
+                "안녕하세요 Bob! 오늘 스터디 참여하시나요?"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(3).withHour(9).withMinute(0)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 3일 전 오전 9시 15분
+        messageService.sendMessage(
+                userService.getUserById("bob1234"),
+                userService.getUserById("alice"),
+                "네! 3시에 뵙겠습니다."
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(3).withHour(9).withMinute(15)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 2일 전 저녁 6시
+        messageService.sendMessage(
+                userService.getUserById("happy"),
+                userService.getUserById("charlie"),
+                "오늘 저녁에 게임 한판 할래요?"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(2).withHour(18).withMinute(30)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 2일 전 저녁 6시 45분
+        messageService.sendMessage(
+                userService.getUserById("charlie"),
+                userService.getUserById("happy"),
+                "좋아요! 8시에 들어갈게요."
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(2).withHour(18).withMinute(45)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 1일 전 오후 2시
+        messageService.sendMessage(
+                userService.getUserById("jung123"),
+                userService.getUserById("npnp9671"),
+                "어제 찍은 사진 정말 예뻤어요!"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(1).withHour(14).withMinute(20)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 오늘 오전 10시
+        messageService.sendMessage(
+                userService.getUserById("alice"),
+                userService.getUserById("david12"),
+                "이번 주 과제 진행 상황 어떠세요?"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().withHour(10).withMinute(30)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 오늘 오전 11시
+        messageService.sendMessage(
+                userService.getUserById("david12"),
+                userService.getUserById("alice"),
+                "거의 다 끝났어요. 내일 리뷰 부탁드려요."
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().withHour(11).withMinute(15)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 5. 채널 메시지 생성 (다양한 시간대)
+        // 게임해요 채널 - 어제 저녁
+        messageService.sendMessage(
+                userService.getUserById("happy"),
+                channelService.getChannelById(gameChannel),
+                "안녕하세요! 이번 주말에 같이 게임 할 분 계신가요?"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(1).withHour(20).withMinute(0)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        messageService.sendMessage(
+                userService.getUserById("alice"),
+                channelService.getChannelById(gameChannel),
+                "저 참여하고 싶어요!"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(1).withHour(20).withMinute(5)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        messageService.sendMessage(
+                userService.getUserById("charlie"),
+                channelService.getChannelById(gameChannel),
+                "저도요! 몇 시에 시작하나요?"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(1).withHour(20).withMinute(12)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 사진 모으기 채널 - 3일 전 오후
+        messageService.sendMessage(
+                userService.getUserById("jung123"),
+                channelService.getChannelById(photoChannel),
+                "오늘 찍은 풍경 사진 공유합니다~"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(3).withHour(15).withMinute(30)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        messageService.sendMessage(
+                userService.getUserById("npnp9671"),
+                channelService.getChannelById(photoChannel),
+                "와 너무 예뻐요! 어디서 찍으셨나요?"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(3).withHour(15).withMinute(45)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        messageService.sendMessage(
+                userService.getUserById("emma123"),
+                channelService.getChannelById(photoChannel),
+                "저도 내일 사진 찍으러 가려고요!"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(3).withHour(16).withMinute(10)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 스터디 채널 - 어제 오후
+        messageService.sendMessage(
+                userService.getUserById("alice"),
+                channelService.getChannelById(studyChannel),
+                "이번 주 스터디 주제는 제네릭입니다."
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(1).withHour(14).withMinute(0)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        messageService.sendMessage(
+                userService.getUserById("bob1234"),
+                channelService.getChannelById(studyChannel),
+                "자료 준비해서 공유하겠습니다."
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(1).withHour(14).withMinute(20)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        messageService.sendMessage(
+                userService.getUserById("david12"),
+                channelService.getChannelById(studyChannel),
+                "질문 있으면 언제든지 물어보세요!"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(1).withHour(14).withMinute(35)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 음악 공유 채널 - 2일 전 아침
+        messageService.sendMessage(
+                userService.getUserById("bob1234"),
+                channelService.getChannelById(musicChannel),
+                "요즘 듣는 노래 추천해드릴게요!"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(2).withHour(8).withMinute(30)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        messageService.sendMessage(
+                userService.getUserById("happy"),
+                channelService.getChannelById(musicChannel),
+                "감사합니다! 들어볼게요~"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().minusDays(2).withHour(9).withMinute(15)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        // 일반 채팅 채널 - 오늘 다양한 시간
+        messageService.sendMessage(
+                userService.getUserById("happy"),
+                channelService.getChannelById(generalChannel),
+                "모두들 안녕하세요! 반갑습니다."
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().withHour(8).withMinute(0)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        messageService.sendMessage(
+                userService.getUserById("alice"),
+                channelService.getChannelById(generalChannel),
+                "환영합니다! 즐거운 시간 되세요~"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().withHour(9).withMinute(30)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        messageService.sendMessage(
+                userService.getUserById("charlie"),
+                channelService.getChannelById(generalChannel),
+                "오늘 날씨 정말 좋네요!"
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().withHour(12).withMinute(45)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
+
+        messageService.sendMessage(
+                userService.getUserById("emma123"),
+                channelService.getChannelById(generalChannel),
+                "네! 산책하기 좋은 날씨에요."
+        );
+        messageService.getLastMessage().setCreatedAt(
+                LocalDateTime.now().withHour(13).withMinute(10)
+                        .atZone(ZoneId.systemDefault()).toEpochSecond()
+        );
     }
 }
