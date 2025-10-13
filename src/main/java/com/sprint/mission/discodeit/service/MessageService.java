@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.dto.MessageInfo;
 
 import java.util.List;
@@ -14,10 +13,10 @@ public interface MessageService {
 
     Optional<MessageInfo> findMessageById(UUID messageId);
 
-    List<MessageInfo> findDMBetweenUsers(UUID userId1, UUID userId2);     // 유저 둘의 메시지 전체 조회
-    List<MessageInfo> findCMByChannel(UUID channelId);     // 한 채널의 메시지 전체 조회
+    List<MessageInfo> findMessageBetweenUsers(UUID userId1, UUID userId2);     // 유저 둘의 메시지 전체 조회
+    List<MessageInfo> findChannelMessage(UUID channelId);     // 한 채널의 메시지 전체 조회
 
-    Optional<MessageInfo> update(UUID id, String newContent);      // 수정
+    Optional<MessageInfo> updateMessage(UUID id, String newContent);      // 수정
 
     boolean deleteMessage(UUID id);              // 삭제
 }

@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.UserInfo;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.*;
 
 import java.util.*;
 
@@ -91,7 +90,8 @@ public class JCFUserService implements UserService {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if(channelService != null){
+
+            if (channelService != null){
                 int removedChannelCount = channelService.deleteUserFromAllChannel(user);
                 if (removedChannelCount > 0) System.out.println("총 " + removedChannelCount + "개의 채널에서 삭제됌");
             }

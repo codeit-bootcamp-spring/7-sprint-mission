@@ -1,12 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.MessageInfo;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.dto.*;
+import com.sprint.mission.discodeit.service.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,8 +55,9 @@ public class JCFMessageService implements MessageService {
         return Optional.ofNullable(data.get(messageId)).map(MessageInfo::new);
     }
 
+    // update를 해도 순서는 바뀌지않음 생성일자로 정렬
     @Override
-    public List<MessageInfo> findDMBetweenUsers(UUID userId1, UUID userId2) {
+    public List<MessageInfo> findMessageBetweenUsers(UUID userId1, UUID userId2) {
         return data.values().stream()
                 .filter(m -> m.getType() == Message.MessageType.DIRECT)
                 .filter(m ->
@@ -71,9 +68,10 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageInfo> findCMByChannel(UUID channelId) {
+    public List<MessageInfo> findChannelMessage(UUID channelId) {
         return data.values().stream()
                 .filter(m -> m.getType() == Message.MessageType.CHANNEL)
+                .filter(m -> m.getChannel().getId().equals(channelId))
                 .sorted(Comparator.comparing(Message::getCreatedAt))
                 .map(MessageInfo::new).collect(Collectors.toList());
 
@@ -81,7 +79,11 @@ public class JCFMessageService implements MessageService {
 
     // Message Update
     @Override
-    public Optional<MessageInfo> update(UUID id, String newContent) {
+    public Optional<MessageInfo> updateMessage(UUID id, String newContent) {
+        if (newContent.isEmpty()) {
+            deleteMessage(id);
+            return Optional.empty();
+        }
         Optional<Message> messageOp = Optional.ofNullable(data.get(id));
 
         return messageOp.map(message -> {
@@ -93,13 +95,7 @@ public class JCFMessageService implements MessageService {
     // Message Delete
     @Override
     public boolean deleteMessage(UUID id) {
-        if (data.remove(id) != null) {
-            System.out.println("메시지 삭제 성공");
-            return true;
-        } else {
-            System.out.println("해당 메시지가 존재하지 않음");
-            return false;
-        }
+        return data.remove(id) != null;
     }
 }
 

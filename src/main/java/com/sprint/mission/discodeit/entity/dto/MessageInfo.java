@@ -16,10 +16,12 @@ public class MessageInfo {
     public MessageInfo(Message message) {
         this.id = message.getId();
         this.author = message.getAuthor().getUserName();
-        this.receiver = message.getReceiver().getUserName();
         this.content = message.getContent();
         this.createdAt = message.getCreatedAt();
         this.updatedAt = message.getUpdatedAt();
+        this.receiver = message.getType() == Message.MessageType.DIRECT ?
+                message.getReceiver().getUserName() :
+                message.getChannel().getChannelName();
     }
 
     public UUID getId() { return id; }
@@ -42,8 +44,7 @@ public class MessageInfo {
     @Override
     public String toString() {
 
-        String editSign = createdAt == updatedAt ? " (수정됨)" : "";
-
+        String editSign = createdAt == updatedAt ? "" : " (수정됨)";
         return author + "   " + createdAt + "\n" + content  + editSign;
     }
 }

@@ -45,7 +45,7 @@ public class Channel extends BaseEntity {
     public List<User> getMembers() {return members;}
     public String getChannelName() {return channelName;}
 
-    // update
+    // updateMessage
     public void changeChannelName(String channelName) {
         this.channelName = channelName;
         updateTimestamp();
