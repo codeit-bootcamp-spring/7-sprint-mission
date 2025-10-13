@@ -9,7 +9,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
+
+    private static JCFUserService instance = new JCFUserService();
     private static final Map<String, User> data = new HashMap<>();// 유저 id, User객체 (id검색을 빠르게 하기 위함)
+
+    private JCFUserService() {
+    }
+
+    public static JCFUserService getInstance(){
+        return instance;
+    }
 
     @Override
     public User getUserById(String id) {
