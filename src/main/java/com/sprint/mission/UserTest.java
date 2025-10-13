@@ -30,7 +30,7 @@ public class UserTest {
 
     public static void main(String[] args) {
 
-        User user1 = null;
+        UserInfo user1 = null;
 
         // --- 사용자 생성 ---
         System.out.println("--- 사용자 생성 ---");

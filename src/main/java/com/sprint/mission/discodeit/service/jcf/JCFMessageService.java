@@ -25,31 +25,31 @@ public class JCFMessageService implements MessageService {
     // Find User, Channel
     private User FindUser(UUID userId) {
         return userService.findUserEntityById(userId)
-                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없음"));
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
     }
     private Channel FindChannel(UUID channelId) {
         return channelService.findChannelEntityById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없음"));
+                .orElseThrow(() -> new RuntimeException("채널을 찾을 수 없음"));
     }
 
 
     // Message Create
     @Override
-    public Message createDirectMessage(UUID authorId, UUID receiverId, String content) {
+    public MessageInfo createDirectMessage(UUID authorId, UUID receiverId, String content) {
         User author = FindUser(authorId);
         User receiver = FindUser(receiverId);
         Message message = new Message(author, receiver, content);
         data.put(message.getId(), message);
-        return message;
+        return new MessageInfo(message);
     }
 
     @Override
-    public Message createChannelMessage(UUID authorId, UUID channelId, String content) {
+    public MessageInfo createChannelMessage(UUID authorId, UUID channelId, String content) {
         User author = FindUser(authorId);
         Channel channel = FindChannel(channelId);
         Message message = new Message(author, channel, content);
         data.put(message.getId(), message);
-        return message;
+        return new MessageInfo(message);
     }
 
 

@@ -20,16 +20,22 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(User user, Channel.ChannelType type) {
+    public ChannelInfo create(UUID userId, Channel.ChannelType type) {
+        User user = userService.findUserEntityById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         Channel newChannel = new Channel(user, type);
         this.data.put(newChannel.getId(), newChannel);
-        return newChannel;
+        return new ChannelInfo(newChannel);
     }
 
-    public Channel create(User user, String channelName, Channel.ChannelType type) {
+    public ChannelInfo create(UUID userId, String channelName, Channel.ChannelType type) {
+        User user = userService.findUserEntityById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         Channel newChannel = new Channel(user, channelName, type);
         this.data.put(newChannel.getId(), newChannel);
-        return newChannel;
+        return new ChannelInfo(newChannel);
     }
 
 

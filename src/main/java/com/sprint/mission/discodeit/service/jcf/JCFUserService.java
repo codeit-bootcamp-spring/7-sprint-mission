@@ -22,11 +22,11 @@ public class JCFUserService implements UserService {
 
     // 생성
     @Override
-    public User createUser(String email, String password, String userName) {
+    public UserInfo createUser(String email, String password, String userName) {
         validateEmailIsUnique(email);
         User newUser = new User(email, password, userName);
         data.put(newUser.getId(), newUser);
-        return newUser;
+        return new UserInfo(newUser);
     }
 
     // 이메일 중복 확인

@@ -9,8 +9,8 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    Message createDirectMessage(UUID authorId, UUID receiverId, String content); // 생성
-    Message createChannelMessage(UUID authorId, UUID channelId, String content);
+    MessageInfo createDirectMessage(UUID authorId, UUID receiverId, String content); // 생성
+    MessageInfo createChannelMessage(UUID authorId, UUID channelId, String content);
 
     Optional<MessageInfo> findMessageById(UUID messageId);
 

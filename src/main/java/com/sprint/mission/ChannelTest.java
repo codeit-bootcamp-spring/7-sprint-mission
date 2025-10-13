@@ -1,6 +1,7 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.dto.*;
 import com.sprint.mission.discodeit.service.jcf.*;
 
 import java.util.UUID;
@@ -14,12 +15,12 @@ public class ChannelTest {
         userService.setChannelService(channelService);
 
         // --- 유저 및 채널 생성 ---
-        User User1 = userService.createUser("test@codeit.com", "QWERty1!", "admin");
-        User User2 = userService.createUser("newbie@codeit.com", "NewbiePass1!", "newbie");
-        Channel channel1 = channelService.create(User1, Channel.ChannelType.TEXT);
-
+        UserInfo User1 = userService.createUser("test@codeit.com", "QWERty1!", "admin");
+        UserInfo User2 = userService.createUser("newbie@codeit.com", "NewbiePass1!", "newbie");
         UUID user1Id = User1.getId();
         UUID user2Id = User2.getId();
+
+        ChannelInfo channel1 = channelService.create(user1Id, Channel.ChannelType.TEXT);
         UUID channelId = channel1.getId();
 
         System.out.println("--- 채널 조회 ---");
@@ -31,7 +32,7 @@ public class ChannelTest {
         channelService.findChannelInfoById(channelId).ifPresent(System.out::println);
 
         // --- 채널2 생성 ---
-        Channel channel2 = channelService.create(User2, "뉴비의채널", Channel.ChannelType.VOICE);
+        ChannelInfo channel2 = channelService.create(user2Id, "뉴비의채널", Channel.ChannelType.VOICE);
         UUID channel2Id = channel2.getId();
 
         // --- 채널 전체 조회 ---

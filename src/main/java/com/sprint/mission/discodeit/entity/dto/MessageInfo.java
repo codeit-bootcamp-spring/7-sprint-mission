@@ -2,8 +2,11 @@ package com.sprint.mission.discodeit.entity.dto;
 
 import com.sprint.mission.discodeit.entity.Message;
 
+import java.util.UUID;
+
 public class MessageInfo {
 
+    private UUID id;
     private String author;
     private String receiver;
     private String content;
@@ -11,6 +14,7 @@ public class MessageInfo {
     private double updatedAt;
 
     public MessageInfo(Message message) {
+        this.id = message.getId();
         this.author = message.getAuthor().getUserName();
         this.receiver = message.getReceiver().getUserName();
         this.content = message.getContent();
@@ -18,6 +22,7 @@ public class MessageInfo {
         this.updatedAt = message.getUpdatedAt();
     }
 
+    public UUID getId() { return id; }
     public String getAuthor() {
         return author;
     }

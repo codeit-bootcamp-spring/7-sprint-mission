@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface UserService {
 
     // 생성
-    User createUser(String email, String password, String userName);
+    UserInfo createUser(String email, String password, String userName);
 
     // 조회
     Optional<UserInfo> findUserInfoById(UUID userId);

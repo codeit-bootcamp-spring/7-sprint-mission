@@ -4,10 +4,12 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class ChannelInfo {
 
+    private final UUID id;
     private final String channelAdmin;
     private final String channelName;
     private final String channelType;
@@ -15,12 +17,32 @@ public class ChannelInfo {
     private final List<String> members;
 
     public ChannelInfo(Channel channel) {
+        this.id = channel.getId();
         this.channelAdmin = channel.getChannelAdmin().getUserName();
         this.channelName = channel.getChannelName();
         this.channelType = channel.getType().getDescType();
         this.createdAt = channel.getCreatedAt();
         this.members = channel.getMembers().stream().map(User::getUserName)
                 .collect(Collectors.toList());
+    }
+
+    public UUID getId() {
+        return id;
+    }
+    public String getChannelAdmin() {
+        return channelAdmin;
+    }
+    public String getChannelName() {
+        return channelName;
+    }
+    public String getChannelType() {
+        return channelType;
+    }
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+    public List<String> getMembers() {
+        return members;
     }
 
     public String toString() {

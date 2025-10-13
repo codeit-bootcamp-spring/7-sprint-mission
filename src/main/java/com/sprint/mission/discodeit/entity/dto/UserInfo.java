@@ -2,8 +2,11 @@ package com.sprint.mission.discodeit.entity.dto;
 
 import com.sprint.mission.discodeit.entity.User;
 
+import java.util.UUID;
+
 public class UserInfo {
 
+    private UUID id;
     private String email;
     private String userName;
     private String state;
@@ -11,6 +14,7 @@ public class UserInfo {
     private String phoneNum;
 
     public UserInfo(User user) {
+        this.id = user.getId();
         this.email = user.getEmail();
         this.userName = user.getUserName();
         this.state = user.getState().getDescState();
@@ -18,6 +22,7 @@ public class UserInfo {
         this.phoneNum = user.getPhoneNum();
     }
 
+    public UUID getId() { return id; }
     public String getEmail() { return email; }
     public String getUserName() { return userName; }
     public String getState() { return state; }
