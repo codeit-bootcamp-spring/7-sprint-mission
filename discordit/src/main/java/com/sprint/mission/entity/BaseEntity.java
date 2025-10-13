@@ -21,16 +21,51 @@ public class BaseEntity {
         return uuid;
     }
 
-    public String getCreatedAt() {
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
+     * 테스트용 메서드: createdAt 값을 직접 설정합니다.
+     *
+     * @param createdAt Unix timestamp (초 단위)
+     */
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getFormattedCreatedAt() {
         return timeFormatter(createdAt);
     }
 
-    public String getUpdatedAt() {
-        return timeFormatter(createdAt);
+    public String getCreatedTime() {
+        LocalDateTime dateTime = LocalDateTime.ofInstant(
+                Instant.ofEpochSecond(createdAt),
+                ZoneId.systemDefault()
+        );
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return dateTime.format(formatter);
+    }
+
+    public String getSimpleCreatedDate() {
+        LocalDateTime dateTime = LocalDateTime.ofInstant(
+                Instant.ofEpochSecond(createdAt),
+                ZoneId.systemDefault()
+        );
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd");
+        return dateTime.format(formatter);
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getFormattedUpdatedAt() {
+        return timeFormatter(updatedAt);
     }
 
     public void update() {
-        createdAt = Instant.now().getEpochSecond();
+        updatedAt = Instant.now().getEpochSecond();
     }
 
     protected static long getUnixTimestamp() {
@@ -49,5 +84,4 @@ public class BaseEntity {
         // 출력: 2024년 03월 15일 14:30:45
         return dateTime.format(formatter);
     }
-
 }
