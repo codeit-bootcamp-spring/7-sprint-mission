@@ -54,6 +54,18 @@ public class JavaApplication {
         System.out.println("\n유저 조회(다건)=================");
         userService.getAllUsers().forEach(System.out::println);
 
+        System.out.println("\n유저 로그인=================");
+        User loginUser1 = userService.login("abc1234", "qwer1234");
+        if(loginUser1!=null){
+            System.out.printf("안녕하세요 %s님\n", loginUser1.getNickName());
+        } else {
+            System.out.println("아이디 또는 비밀번호가 틀렸습니다.");
+        }
+
+        System.out.println("\n유저 닉네임 조회=================");
+        String nickName1 = userService.getUserNickName(loginUser1.getId());
+        System.out.printf("유저의 닉네임은 %s입니다.\n", nickName1);
+
         // 3. 유저 업데이트
         System.out.println("\n3. 유저 업데이트");
         read1 = userService.getUserByEmail("smjoe0302@naver.com"); // 유저 검색
@@ -102,7 +114,14 @@ public class JavaApplication {
         Channel newChannel4 = channelService.createChannel(Channel.ChannelType.VOICE, "미니 게임 메시지 채널", user3);
 
         // 1.2 채널에 멤버 추가
+        System.out.println("\n채널에 멤버 추가=================");
         channelService.addMember(newChannel3.getId(), user2); // 특정 UUID 채널에 멤버 추가
+        List<Channel> user2Channel = channelService.getChannelByUser(user2);
+
+        System.out.println("user2가 속한 채널 : ");
+        for(Channel channel : user2Channel){
+            System.out.printf("%s \n", channel);
+        }
 
         // 2. 조회
         System.out.println("2. 채널 조회");
@@ -314,6 +333,9 @@ public class JavaApplication {
 
         // channel2 (관리자: discordItUser2)
         channelService.addMember(channel2.getId(), discordItUser1);
+        channelService.addMember(channel2.getId(), discordItUser4);
+        channelService.addMember(channel2.getId(), discordItUser6);
+        channelService.addMember(channel2.getId(), discordItUser8);
 
         // channel3 (관리자: discordItUser3)
         channelService.addMember(channel3.getId(), discordItUser2);
@@ -322,6 +344,9 @@ public class JavaApplication {
 
         // channel4 (관리자: discordItUser4)
         channelService.addMember(channel4.getId(), discordItUser1);
+        channelService.addMember(channel4.getId(), discordItUser2);
+        channelService.addMember(channel4.getId(), discordItUser6);
+        channelService.addMember(channel4.getId(), discordItUser7);
         channelService.addMember(channel4.getId(), discordItUser8);
 
         // channel5 (관리자: discordItUser5)
@@ -329,6 +354,7 @@ public class JavaApplication {
 
         // channel6 (관리자: discordItUser6)
         channelService.addMember(channel6.getId(), discordItUser2);
+        channelService.addMember(channel6.getId(), discordItUser3);
         channelService.addMember(channel6.getId(), discordItUser5);
         channelService.addMember(channel6.getId(), discordItUser7);
         channelService.addMember(channel6.getId(), discordItUser8);
@@ -339,7 +365,11 @@ public class JavaApplication {
 
         // channel8 (관리자: discordItUser8)
         channelService.addMember(channel8.getId(), discordItUser1);
+        channelService.addMember(channel8.getId(), discordItUser2);
+        channelService.addMember(channel8.getId(), discordItUser3);
         channelService.addMember(channel8.getId(), discordItUser4);
+        channelService.addMember(channel8.getId(), discordItUser5);
+        channelService.addMember(channel8.getId(), discordItUser6);
 
         // 채널 메시지 추가(메시지 채널에만 추가)
 
@@ -349,7 +379,7 @@ public class JavaApplication {
         channelMessageService.createMessage(discordItUser6, channel2, "UI는 제가 진행할게요.");
         channelMessageService.createMessage(discordItUser8, channel2, "테스트 케이스 작성은 제가 해보겠습니다.");
         channelMessageService.createMessage(discordItUser2, channel2, "좋아요. 그럼 목요일까지 중간 점검합시다.");
-        channelMessageService.createMessage(discordItUser4, channel2, "확인했습니다!");
+        channelMessageService.createMessage(discordItUser1, channel2, "확인했습니다!");
 
         // channel4 (discordItUser4 관리자) : "공지사항 메시지 채널"
         channelMessageService.createMessage(discordItUser4, channel4, "📢 이번 주 토요일 정기 점검이 있습니다.");
@@ -486,7 +516,11 @@ public class JavaApplication {
 
                                             System.out.println("입장을 원하시는 채널을 선택해주세요.");
                                             Channel c;
-                                            for (int i = 0; i < userChannels.size(); i++) {
+                                            for (int i = 0; i <= userChannels.size(); i++) {
+                                                if(i == userChannels.size()) {
+                                                    System.out.printf("%d. 이전 메뉴\n", i + 1);
+                                                    break;
+                                                }
                                                 c = userChannels.get(i);
                                                 System.out.printf("%d. %s(%s)\n", i + 1, c.getChannelName(), c.getChannelType());
                                             }
@@ -494,6 +528,9 @@ public class JavaApplication {
                                             System.out.print("입력: ");
                                             choice = sc.nextInt();
                                             sc.nextLine();
+
+                                            if(choice == (userChannels.size() + 1)) break;
+
                                             channelId = userChannels.get(choice - 1).getId();
                                             userChannel = channelService.getChannel(channelId); //선택된 채널 불러오기
 
@@ -693,7 +730,6 @@ public class JavaApplication {
                                 System.out.println("진짜로 계정을 삭제하시겠습니까?");
                                 System.out.println("삭제를 원하시면 아이디와 비밀번호를 정확히 입력해주세요");
 
-                                sc.nextLine();
                                 System.out.print("아이디: ");
                                 userId = sc.nextLine();
                                 System.out.print("비밀번호: ");
