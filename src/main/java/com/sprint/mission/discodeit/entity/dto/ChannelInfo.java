@@ -7,13 +7,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
+
 public class ChannelInfo {
 
     private final UUID id;
     private final String channelAdmin;
     private final String channelName;
     private final String channelType;
-    private final Long createdAt;
+    private final String createdAt;
+    private final String updatedAt;
     private final List<String> members;
 
     public ChannelInfo(Channel channel) {
@@ -21,7 +24,8 @@ public class ChannelInfo {
         this.channelAdmin = channel.getChannelAdmin().getUserName();
         this.channelName = channel.getChannelName();
         this.channelType = channel.getType().getDescType();
-        this.createdAt = channel.getCreatedAt();
+        this.createdAt = changeTime(channel.getCreatedAt());
+        this.updatedAt = changeTime(channel.getUpdatedAt());
         this.members = channel.getMembers().stream().map(User::getUserName)
                 .collect(Collectors.toList());
     }
@@ -38,7 +42,7 @@ public class ChannelInfo {
     public String getChannelType() {
         return channelType;
     }
-    public Long getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
     public List<String> getMembers() {
@@ -47,11 +51,11 @@ public class ChannelInfo {
 
     public String toString() {
 
-        return channelName + '{' +
-                " 관리자: " + channelAdmin +
+        return channelName + '[' +
+                "관리자: " + channelAdmin +
                 ", 채널유형: " + channelType +
                 ", 생성일자: " + createdAt +
                 ", 맴버: " + members +
-                " }";
+                "]";
     }
 }

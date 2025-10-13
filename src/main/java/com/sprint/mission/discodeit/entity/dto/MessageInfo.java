@@ -2,23 +2,28 @@ package com.sprint.mission.discodeit.entity.dto;
 
 import com.sprint.mission.discodeit.entity.Message;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
+
+import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
 
 public class MessageInfo {
 
-    private UUID id;
-    private String author;
-    private String receiver;
-    private String content;
-    private double createdAt;
-    private double updatedAt;
+    private final UUID id;
+    private final String author;
+    private final String receiver;
+    private final String content;
+    private final String createdAt;
+    private final String updatedAt;
 
     public MessageInfo(Message message) {
         this.id = message.getId();
         this.author = message.getAuthor().getUserName();
         this.content = message.getContent();
-        this.createdAt = message.getCreatedAt();
-        this.updatedAt = message.getUpdatedAt();
+        this.createdAt = changeTime(message.getCreatedAt());
+        this.updatedAt = changeTime(message.getUpdatedAt());
         this.receiver = message.getType() == Message.MessageType.DIRECT ?
                 message.getReceiver().getUserName() :
                 message.getChannel().getChannelName();
@@ -34,17 +39,17 @@ public class MessageInfo {
     public String getContent() {
         return content;
     }
-    public double getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
-    public double getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
     @Override
     public String toString() {
 
-        String editSign = createdAt == updatedAt ? "" : " (수정됨)";
+        String editSign = createdAt.equals(updatedAt) ? "" : " (수정됨)";
         return author + "   " + createdAt + "\n" + content  + editSign;
     }
 }
