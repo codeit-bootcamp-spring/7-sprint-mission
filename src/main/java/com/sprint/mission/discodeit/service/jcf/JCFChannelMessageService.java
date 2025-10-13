@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.ChannelMessage;
 import com.sprint.mission.discodeit.repository.ChannelMessageRepository;
 import com.sprint.mission.discodeit.repository.ParticipationRepository;
 import com.sprint.mission.discodeit.service.ChannelMessageService;
+import com.sprint.mission.discodeit.service.EventService;
 import com.sprint.mission.discodeit.utils.ParticipationDualKey;
 
 import java.util.List;
@@ -13,11 +14,13 @@ public class JCFChannelMessageService extends JCFBaseService<ChannelMessage, UUI
 
     private final ChannelMessageRepository channelMessageRepository;
     private final ParticipationRepository participationRepository; // 사용자 참여 여부 확인을 위해 추가
+    private final EventService eventService;
 
-    public JCFChannelMessageService(ChannelMessageRepository channelMessageRepository, ParticipationRepository participationRepository) {
+    public JCFChannelMessageService(ChannelMessageRepository channelMessageRepository, ParticipationRepository participationRepository, JCFEventService eventService) {
         super(channelMessageRepository);
         this.channelMessageRepository = channelMessageRepository;
         this.participationRepository = participationRepository;
+        this.eventService = eventService;
     }
 
     @Override

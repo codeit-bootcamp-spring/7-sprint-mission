@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.service.jcf.JCFEventService;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -145,4 +147,6 @@ public interface BaseService<T, ID> {
      * 주로 관리자 기능이나 데이터 정리(batch) 작업에 사용될 수 있습니다.
      */
     void deleteAllByIsDel();
+
+
 }

@@ -79,7 +79,7 @@ public class User extends BaseEntity<UUID> {
         user.email = email;
         user.nickname = nickname;
         user.phoneNum = phoneNum;
-        user.state = State.ONLINE; // 사용자는 생성 시 기본적으로 온라인 상태입니다.
+        user.state = State.OFFLINE; // 사용자는 생성 시 기본적으로 로그인 전까지 오프라인 상태입니다.
         user.lastOnlineAt = user.getCreatedAt(); // 최초 접속 시간은 생성 시간과 동일하게 설정합니다.
 
         return user;

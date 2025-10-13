@@ -28,6 +28,7 @@ public class AppConfig {
     private final JCFChannelMessageService channelMessageService;
     private final JCFDirectMessageService directMessageService;
     private final AuthService authService;
+    private final JCFEventService eventService;
 
 
     public AppConfig() {
@@ -43,19 +44,22 @@ public class AppConfig {
         this.participationRepository = new JCFParticipationRepository();
         this.channelMessageRepository = new JCFChannelMessageRepository();
         this.directMessageRepository = new JCFDirectMessageRepository();
+        this.eventService = new JCFEventService();
 
         // 3. 데이터 로드
         loadAllData();
 
         // 4. Service 생성 및 의존성 주입
-        this.userService = new JCFUserService(userRepository);
+        this.userService = new JCFUserService(userRepository, eventService);
         this.channelService = new JCFChannelService(channelRepository);
         this.participationService = new JCFParticipationService(participationRepository, userRepository, channelRepository);
-        this.channelMessageService = new JCFChannelMessageService(channelMessageRepository, participationRepository);
+        this.channelMessageService = new JCFChannelMessageService(channelMessageRepository, participationRepository,eventService);
         this.directMessageService = new JCFDirectMessageService(directMessageRepository, userRepository);
 
         // 5. AuthService 생성 및 의존성 주입 (userService 주입)
         this.authService = new AuthService(this.userService);
+
+
     }
 
     private void loadAllData() {
@@ -94,4 +98,5 @@ public class AppConfig {
     public AuthService getAuthService() {
         return authService;
     }
+    public JCFEventService getEventService() { return eventService; }
 }

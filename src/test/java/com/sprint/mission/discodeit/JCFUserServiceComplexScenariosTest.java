@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.service.jcf.JCFEventService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,11 +22,13 @@ class JCFUserServiceComplexScenariosTest {
 
     private JCFUserService userService;
     private JCFUserRepository userRepository;
+    private JCFEventService eventService;
 
     @BeforeEach
     void setUp() {
         userRepository = new JCFUserRepository();
-        userService = new JCFUserService(userRepository);
+        eventService = new JCFEventService();
+        userService = new JCFUserService(userRepository, eventService);
     }
 
     @Nested

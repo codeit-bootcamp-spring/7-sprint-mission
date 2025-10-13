@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.auth.AuthUser;
+import com.sprint.mission.discodeit.common.Event;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.EventService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.NoSuchElementException;
@@ -16,10 +19,12 @@ public class JCFUserService extends JCFBaseService<User, UUID, UserRepository> i
     // JCFBaseService의 repository 필드와 별도로 UserRepository 타입의 필드를 두어
     // findByUsername과 같은 고유 메서드에 쉽게 접근할 수 있도록 합니다.
     private final UserRepository userRepository;
+    private final EventService eventService;
 
-    public JCFUserService(UserRepository userRepository) {
+    public JCFUserService(UserRepository userRepository, JCFEventService eventService) {
         super(userRepository);
         this.userRepository = userRepository;
+        this.eventService = eventService;
     }
 
     @Override
@@ -64,6 +69,12 @@ public class JCFUserService extends JCFBaseService<User, UUID, UserRepository> i
         User user = findByIdNonDel(userId);
         user.goOnline();
         userRepository.save(user);
+        if (eventService != null) {
+            // User 엔티티 대신 필요한 정보만 담은 AuthUser를 이벤트 데이터로 사용
+            AuthUser authUser = AuthUser.from(user);
+            Event<AuthUser> event = new Event<>(Event.EventType.USER_STATUS_CHANGED, authUser);
+            eventService.publishEvent(event);
+        }
     }
 
     @Override
@@ -71,6 +82,12 @@ public class JCFUserService extends JCFBaseService<User, UUID, UserRepository> i
         User user = findByIdNonDel(userId);
         user.goOffline();
         userRepository.save(user);
+
+        if (eventService != null) {
+            AuthUser authUser = AuthUser.from(user);
+            Event<AuthUser> event = new Event<>(Event.EventType.USER_STATUS_CHANGED, authUser);
+            eventService.publishEvent(event);
+        }
     }
 
     @Override

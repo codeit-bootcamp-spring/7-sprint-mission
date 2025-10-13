@@ -15,8 +15,12 @@ public class JavaApplication {
         // 2. UI 애플리케이션 클래스에 AppConfig 인스턴스를 전달합니다.
         DiscodeitApplication.setAppConfig(appConfig);
 
+        Runtime.getRuntime().addShutdownHook(new Thread(appConfig::saveAllData));
+
         // 3. JavaFX 애플리케이션을 실행합니다.
-        Application.launch(DiscodeitApplication.class, args);
+//        Application.launch(DiscodeitApplication.class, args);
+
+        new Thread(()-> Application.launch(DiscodeitApplication.class, args)).start();
     }
 }
 //    public static void main(String[] args) {
