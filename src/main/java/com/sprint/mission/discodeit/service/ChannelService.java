@@ -13,5 +13,7 @@ public interface ChannelService {
     Channel update(Channel channel);
     boolean delete(UUID id);
     List<Channel> getAll();
-
+    boolean join(UUID channelId, UUID userId);
+    boolean leave(UUID channelId, UUID userId);
+    void setSlowModeSeconds(UUID channelId, int slowModeSeconds);
 }
