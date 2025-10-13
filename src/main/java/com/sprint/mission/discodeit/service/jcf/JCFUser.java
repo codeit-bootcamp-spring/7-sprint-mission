@@ -71,7 +71,7 @@ public class JCFUser implements UserService {
             return;
         }
 
-        System.out.println("유저 정보 :" + user.toString());
+        System.out.println("User Info :" + user.toString());
 
     }
 
@@ -90,7 +90,7 @@ public class JCFUser implements UserService {
                 continue;
             }
 
-            System.out.println("유저 정보: " + user.toString());
+            System.out.println("User Info: " + user.toString());
         }
     }
 
@@ -165,13 +165,13 @@ public class JCFUser implements UserService {
     @Override
     public void readUpdatedUser() {
         if (userDb.stream().noneMatch(u -> u.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT)) {
-            System.out.println("업데이트 된 유저가 없습니다.");
+            System.out.println("No Updated User");
             return;
         }
         for (User user : userDb) {
             if (user.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT) {
                 readUser(user);
-                System.out.println(user.getName() + " 변경 시간: " + " " + user.getUpdatedAt());
+                System.out.println(user.getName() + "Updated Time: " + " " + user.getUpdatedAt());
             }
         }
 
@@ -180,10 +180,10 @@ public class JCFUser implements UserService {
     @Override
     public void readDeletedUser() {
         if (deletedUserDb.isEmpty()) {
-            System.out.println("삭제된 유저가 없습니다.");
+            System.out.println("No Deleted User");
             return;
         }
-        System.out.println("===삭제된 유저=== ");
+        System.out.println("===Deleted User=== ");
         for (UUID tmp : deletedUserDb.keySet()) {
             String value = deletedUserDb.get(tmp);
             System.out.println(value);
@@ -206,7 +206,7 @@ public class JCFUser implements UserService {
             System.out.println(USER_NOT_EXIST+ user.getName());
             return;
         }
-        System.out.println(user.getName() + "님이 " + channel.getName() + " 채널에 입장하였습니다.");
+        System.out.println(user.getName() + " enters " + channel.getName() + " channel.");
         channel.addUserToChannel(user);
         user.addChannel(channel);
     }
@@ -220,7 +220,7 @@ public class JCFUser implements UserService {
             System.out.println(USER_NOT_EXIST + user.getName());
             return;
         }
-        System.out.println(user.getName() + "님이 " + channel.getName() + " 채널에서 나갔습니다.");
+        System.out.println(user.getName() + "exit " + channel.getName() + " channel.");
         channel.removeUserFromChannel(user);
         user.removeChannel(channel);
 

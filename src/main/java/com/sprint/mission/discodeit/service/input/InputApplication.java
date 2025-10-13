@@ -33,7 +33,7 @@ public class InputApplication {
 
     public void start() {
 
-        System.out.println("테스트를 시작합니다. 명령어를 입력하세요. !help을 통해 명령어를 확인할 수 있어요");
+        System.out.println("Test is started Type command or !help");
         while (isRunning) {
             String input = inputReader.readLine();
             if (input.isEmpty()) continue;

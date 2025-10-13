@@ -4,7 +4,7 @@ public class HelpOperator {
 
 
     public void showHelp() {
-        System.out.println("!help 명령어 : !help  또는 !help <channel/user/message>");
+        System.out.println("!help command : !help  or !help <channel/user/message>");
         System.out.println("\n ");
         showChannelHelp();
         System.out.print("\n\n");
@@ -15,7 +15,7 @@ public class HelpOperator {
     }
 
     public void showChannelHelp() {
-        System.out.println("=========Channel 명령어 입니다==========");
+        System.out.println("=========Channel Command==========");
         System.out.println("createchannel <channel_name> <description> <is_public> <is_text_channel>");
         System.out.println("readallchannel");
         System.out.println("deletechannel <channel_name>");
@@ -29,7 +29,7 @@ public class HelpOperator {
     }
 
     public void showUserHelp() {
-        System.out.println("=========User 명령어 입니다==========");
+        System.out.println("=========User Command==========");
         System.out.println("createuser <user_name> <nickname> <email> <is_online>");
         System.out.println("readalluser");
         System.out.println("deleteuser <user_name>");
@@ -45,7 +45,7 @@ public class HelpOperator {
     }
 
     public void showMessageHelp() {
-        System.out.println("=========Message 명령어 입니다==========");
+        System.out.println("=========Message Command==========");
         System.out.println("createmessage <content> <user_name> <is_markdown>");
         System.out.println("readmessage <message_content>");
         System.out.println("readallmessage");
@@ -73,7 +73,7 @@ public class HelpOperator {
                     showMessageHelp();
                     break;
                 default:
-                    System.out.println("!help 혹은 !help <channel/user/message>를 입력하세요");
+                    System.out.println("!help or !help <channel/user/message> ");
             }
         }
     }

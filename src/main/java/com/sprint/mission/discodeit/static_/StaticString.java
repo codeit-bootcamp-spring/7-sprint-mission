@@ -1,32 +1,32 @@
 package com.sprint.mission.discodeit.static_;
 
 public class StaticString {
-    public static final String DELETE_USER ="유저가 삭제되었습니다 : ";
-    public static final String DELETE_MESSAGE ="메시지가 삭제되었습니다 : ";
-    public static final String DELETE_CHANNEL ="채널이 삭제되었습니다 : ";
+    public static final String DELETE_USER ="user is deleted : ";
+    public static final String DELETE_MESSAGE ="message is deleted : ";
+    public static final String DELETE_CHANNEL ="channel is deleted : ";
 
-    public static final String CHANNEL_NOT_EXIST ="채널이 존재하지 않습니다. : ";
-    public static final String USER_NOT_EXIST ="존재하지 않는 유저입니다 : ";
-    public static final String MESSAGE_NOT_EXIST ="존재하지 않는 메시지입니다 : ";
+    public static final String CHANNEL_NOT_EXIST ="channel is not exist. : ";
+    public static final String USER_NOT_EXIST ="user is not exist : ";
+    public static final String MESSAGE_NOT_EXIST ="message is not exist : ";
 
-    public static final String CHANNEL_EXIST ="채널이 이미 존재합니다. : ";
-    public static final String USER_EXIST ="이미 존재하는 유저입니다 : ";
-    public static final String MESSAGE_EXIST ="이미 존재하는 메시지입니다 : ";
+    public static final String CHANNEL_EXIST ="channel is already exist. : ";
+    public static final String USER_EXIST ="user is already exist : ";
+    public static final String MESSAGE_EXIST ="message is already exist : ";
 
-    public static final String CHANNEL_ALREADY_DELETED ="채널이 이미 삭제되었습니다. : ";
-    public static final String USER_ALREADY_DELETED ="유저가 이미 삭제되었습니다. : ";
-    public static final String MESSAGE_ALREADY_DELETED ="메시지가 이미 삭제되었습니다. : ";
+    public static final String CHANNEL_ALREADY_DELETED ="channel is already deleted. : ";
+    public static final String USER_ALREADY_DELETED ="user is already deleted. : ";
+    public static final String MESSAGE_ALREADY_DELETED ="message is already deleted. : ";
 
-    public static final String CREATE_CHANNEL ="채널이 생성되었습니다 : ";
-    public static final String CREATE_USER ="유저가 생성되었습니다 : ";
-    public static final String CREATE_MESSAGE ="메시지가 생성되었습니다 : ";
+    public static final String CREATE_CHANNEL ="channel is created : ";
+    public static final String CREATE_USER ="user is created: ";
+    public static final String CREATE_MESSAGE ="message is created : ";
 
-    public static final String WRONG_TYPE ="잘못된 타입을 입력했습니다. 올바른 입력값을 넣어주세요";
-    public static final String WRONG_INPUT ="잘못된 입력값입니다. !help 명령어를 통해 도움말을 확인해주세요";
-    public static final String WRONG_COMMAND ="잘못된 명령입니다. !help 명령어를 통해 도움말을 확인해주세요";
-    public static final String NULL_INPUT ="입력값이 없습니다. 행동을 취소합니다";
+    public static final String WRONG_TYPE ="Wrong type Please check the walkthrough ";
+    public static final String WRONG_INPUT ="Wrong input Please use !help command";
+    public static final String WRONG_COMMAND ="Wrong command Please use !help command";
+    public static final String NULL_INPUT ="No input, cancel command";
 
-    public static final String CHANNEL_EMPTY ="채널이 비어있습니다. 채널을 생성해주세요";
-    public static final String USER_EMPTY ="유저가 비어있습니다. 유저를 생성해주세요";
-    public static final String MESSAGE_EMPTY ="메시지가 비어있습니다. 메시지를 작성해주세요";
+    public static final String CHANNEL_EMPTY ="channel is empty. create channel";
+    public static final String USER_EMPTY ="user is empty create user";
+    public static final String MESSAGE_EMPTY ="message is empty create message";
 }

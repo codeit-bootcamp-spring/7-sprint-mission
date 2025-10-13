@@ -97,7 +97,7 @@ this.userDb = jcfDb.getUserDb();
             return;
         }
 
-        System.out.println("채널 정보: "+ channel.toString() );
+        System.out.println("Channel info: "+ channel.toString() );
 
     }
 
@@ -120,7 +120,7 @@ this.userDb = jcfDb.getUserDb();
                 continue;
             }
 
-            System.out.println("채널 정보: "+ channel.toString() );
+            System.out.println("Channel info: "+ channel.toString() );
         }
     }
     @Override
@@ -180,8 +180,8 @@ this.userDb = jcfDb.getUserDb();
 
             editFunction.accept(channel, updatedContent);
             channel.updateEntity();
-            System.out.printf("채널 내부 정보를 변경했습니다.: %s\n", channel.getName());
-            System.out.println("변경한 필드: "+ channelElement.name()+ " 변경전: "+ oldContent.toString() +" ==> 변경 후: "+updatedContent);
+            System.out.printf("Update Channel field .: %s\n", channel.getName());
+            System.out.println("Updated field: "+ channelElement.name()+ " Before Updated: "+ oldContent.toString() +" ==> 변경 후: "+updatedContent);
 
         } catch (ClassCastException e) {
 
@@ -194,14 +194,14 @@ this.userDb = jcfDb.getUserDb();
     @Override
     public void readUpdatedChannel() {
         if (channelDb.stream().noneMatch(c -> c.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT)) {
-            System.out.println("업데이트 된 채널이 없습니다.");
+            System.out.println("No Updated Channel");
             return;
         }
         for(Channel channel : channelDb){
 
             if(channel.getUpdatedAt()!= Entity.DEFAULT_UPDATED_AT){
                 readChannel(channel);
-                System.out.println(channel.getName()+" 변경 시간: "+" "+channel.getUpdatedAt() );
+                System.out.println(channel.getName()+" Updated Time : "+" "+channel.getUpdatedAt() );
             }
         }
     }
@@ -209,10 +209,10 @@ this.userDb = jcfDb.getUserDb();
     @Override
     public void readDeletedChannel() {
         if(deletedChannelDb.isEmpty()){
-            System.out.println( "삭제된 채널이 없습니다.");
+            System.out.println( "No Deleted Channel.");
             return;
         }
-        System.out.println( "===삭제된 채널=== ");
+        System.out.println( "===Deleted Channel=== ");
         for(UUID tmp :deletedChannelDb.keySet()){
             String value = deletedChannelDb.get(tmp);
             System.out.println(value);
@@ -253,7 +253,7 @@ this.userDb = jcfDb.getUserDb();
 
         channel.addUserToChannel(user);
         user.addChannel(channel);
-        System.out.println(user.getName()+"님이 "+channel.getName()+" 채널에 초대 됐습니다..");
+        System.out.println(user.getName()+" is invited from "+channel.getName());
     }
     public void deleteUserFromChannel(User user, Channel channel){
         if(user == null || channel == null) {
@@ -270,10 +270,10 @@ this.userDb = jcfDb.getUserDb();
         }
 
         if(!channel.getUserDb().contains(user)){
-            System.out.println("채널에 등록된 유저가 아닙니다.");
+            System.out.println("Not in this channel");
             return;
         }
-        System.out.println(user.getName()+"님이 "+channel.getName()+" 채널에서 추방되었습니다.");
+        System.out.println(user.getName()+"is banished from  "+channel.getName()+" Channel");
         channel.removeUserFromChannel(user);
         user.removeChannel(channel);
 

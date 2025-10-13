@@ -140,7 +140,7 @@ public class JCFMessage implements MessageService {
           editFunction.accept(message, updatedContent);
           message.updateEntity();
           System.out.println(DELETE_MESSAGE+ message.getContent());
-          System.out.println("변경한 필드: "+ messageElement.name()+ " 변경전: "+oldContent +" ==> 변경 후: "+updatedContent);
+          System.out.println("Updated field: "+ messageElement.name()+ " Before Update: "+oldContent +" ==> After Update: "+updatedContent);
 
       }
       catch (ClassCastException e){
@@ -153,14 +153,14 @@ public class JCFMessage implements MessageService {
     @Override
     public void readUpdatedMessage() {
         if (messageDb.stream().noneMatch(m -> m.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT)) {
-            System.out.println("업데이트 된 메시지가 없습니다.");
+            System.out.println("No Updated Message");
             return;
         }
         for (Message message : messageDb) {
 
             if (message.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT) {
                 readMessage(message);
-                System.out.println(message.getContent() + " 변경 시간: " + " " + message.getUpdatedAt());
+                System.out.println(message.getContent() + " Updated Time: " + " " + message.getUpdatedAt());
             }
         }
 
@@ -169,10 +169,10 @@ public class JCFMessage implements MessageService {
     @Override
     public void readDeletedMessage() {
         if (deletedMessageDb.isEmpty()) {
-            System.out.println( "삭제된 메세지가 없습니다.");
+            System.out.println( "No Deleted Message");
             return;
         }
-        System.out.println( "===삭제된 메세지=== ");
+        System.out.println( "===Deleted Message=== ");
         for( UUID tmp :deletedMessageDb.keySet()){
             String value = deletedMessageDb.get(tmp);
             System.out.println(value);

@@ -14,6 +14,8 @@ import com.sprint.mission.discodeit.service.jcf.JCFDb;
 import com.sprint.mission.discodeit.service.jcf.JCFMessage;
 import com.sprint.mission.discodeit.service.jcf.JCFUser;
 
+import java.util.List;
+
 public class ControllerTest {
     public static void main(String[] args) {
         JCFDb jcfDb = new JCFDb();
@@ -52,6 +54,7 @@ public class ControllerTest {
         Message m2 = messageController.createMessageController(m2Dto);
         Message m3 = messageController.createMessageController(m3Dto);
 
+        channelController.inviteUserToChannelController(user1Dto,channel1Dto);
 
     }
 }
