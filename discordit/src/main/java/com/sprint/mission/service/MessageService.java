@@ -4,8 +4,11 @@ import com.sprint.mission.entity.Message;
 import com.sprint.mission.entity.Receivable;
 import com.sprint.mission.entity.User;
 
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.List;
 
-public interface MessageService<T extends Receivable> {
-    public void sendMessage(User sender, T receiver, String message);
+public interface MessageService {
+    void sendMessage(User sender, Receivable receiver, String message);
+
+    <T extends  Receivable> List<Message<T>> getBySenderAndReceiver(User sender, T receiver);
 }
