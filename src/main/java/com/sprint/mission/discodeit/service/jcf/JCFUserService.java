@@ -97,7 +97,7 @@ public class JCFUserService implements UserService{
         for(int i = 0; i < userStore.size(); i++){
             if(userStore.get(i).getId() == id){
                 userStore.remove(i);
-                messageService.delMessageByUser(userStore.get(i)); //삭제될 유저가 보낸 메시지도 삭제
+                messageService.deleteMessagesByUser(userStore.get(i)); //삭제될 유저가 보낸 메시지도 삭제
                 break;
             }
         }

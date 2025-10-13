@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFServiceFactory;
+import com.sprint.mission.discodeit.factory.JCFServiceFactory;
 import com.sprint.mission.discodeit.utils.Printer;
 
 import java.util.List;
@@ -250,7 +250,7 @@ public class JavaApplication {
         messages3.forEach(System.out::println);
 
         System.out.println("\n메시지 삭제 후: ");
-        messageService.delMessageByUser(user1);
+        messageService.deleteMessagesByUser(user1);
         messages3 = messageService.getAllMessagesByUser(user1);
         messages3.forEach(System.out::println); //user1이 받은 메시지만 출력이 된다
 
