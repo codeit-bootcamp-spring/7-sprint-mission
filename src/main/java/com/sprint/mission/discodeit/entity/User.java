@@ -80,7 +80,7 @@ public class User extends BaseEntity{
         this.channelIds.add(id);
     }
 
-    public void delChannelId(UUID id) {
+    public void deleteChannelId(UUID id) {
         this.channelIds.remove(id);
     }
 

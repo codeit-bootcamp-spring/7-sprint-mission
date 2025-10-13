@@ -1,17 +1,20 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFUserService implements UserService{
-    private final List<User> userStore = new ArrayList<>();
-    private final MessageService messageService;
 
-    public JCFUserService(MessageService messageService) {
-        this.messageService = messageService;
+    private final UserRepository userRepository;
+    private final MessageRepository messageRepository;
+
+    public JCFUserService(UserRepository userRepository, MessageRepository messageRepository) {
+        this.userRepository = userRepository;
+        this.messageRepository = messageRepository;
     }
 
     @Override
@@ -20,91 +23,67 @@ public class JCFUserService implements UserService{
         // 유저 아이디 중복 확인 코드 필요
 
         User newUser = new User(userName, nickName, email, phoneNum, userId, password);
-        userStore.add(newUser);
+        userRepository.save(newUser);
     }
 
     @Override
     public User getUserByEmail(String email) {
-        User target = userStore.stream()
-                .filter(u -> email.equals(u.getEmail()))
-                .findFirst()
-                .orElse(null);
-        return target;
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     @Override
     public User getUserByPhone(String phoneNum) {
-        User target = userStore.stream()
-                .filter(u -> phoneNum.equals(u.getPhoneNum()))
-                .findFirst()
-                .orElse(null);
-        return target;
+        return userRepository.findByPhone(phoneNum).orElse(null);
     }
 
     @Override
     public User getUserByUserId(String userId) {
-        User target = userStore.stream()
-                .filter(u -> userId.equals(u.getUserId()))
-                .findFirst()
-                .orElse(null);
-        return target;
+        return userRepository.findByUserId(userId).orElse(null);
     }
 
     @Override
     public List<User> getAllUsers() {
-        return userStore;
+        return userRepository.findAll();
     }
 
     @Override
     public User login(String userId, String password) {
-        User user = userStore.stream()
-                .filter(u -> u.getUserId().equals(userId) && u.getPassword().equals(password))
-                .findFirst()
+        return userRepository.findByUserId(userId)
+                .filter(u -> u.getPassword().equals(password))
                 .orElse(null);
-
-        return user;
     }
 
     @Override
     public String getUserNickName(UUID id) {
-        String nickName = userStore.stream()
-                .filter(u -> u.getId() == id)
-                .findFirst()
-                .get().getNickName();
-
-        return nickName;
+        return userRepository.findById(id)
+                .map(User::getNickName)
+                .orElse(null);
     }
 
     @Override
     public void updateUser(User user) {
-        for(int i = 0; i < userStore.size(); i++){
-            if(userStore.get(i).getId() == user.getId()){ //UUID 비교
-                //변경될 사용자 정보가 비어있는 경우 이전 정보 저장
-                if(user.getUserName() == null) user.setUserName(userStore.get(i).getUserName());
-                else if(user.getNickName() == null) user.setNickName(userStore.get(i).getNickName());
-                else if(user.getEmail() == null) user.setEmail(userStore.get(i).getEmail());
-                else if(user.getPhoneNum() == null) user.setPhoneNum(userStore.get(i).getPhoneNum());
-                else if(user.getPassword() == null) user.setPassword(userStore.get(i).getPassword());
+        userRepository.findById(user.getId()).ifPresent(existing -> {
+            if (user.getUserName() == null) user.setUserName(existing.getUserName());
+            if (user.getNickName() == null) user.setNickName(existing.getNickName());
+            if (user.getEmail() == null) user.setEmail(existing.getEmail());
+            if (user.getPhoneNum() == null) user.setPhoneNum(existing.getPhoneNum());
+            if (user.getPassword() == null) user.setPassword(existing.getPassword());
 
-                //변경된 사용자 정보로 업데이트
-                userStore.set(i, user);
-            }
-        }
+            userRepository.update(user);
+        });
     }
 
     @Override
     public void deleteUser(UUID id) {
-        for(int i = 0; i < userStore.size(); i++){
-            if(userStore.get(i).getId() == id){
-                userStore.remove(i);
-                messageService.deleteMessagesByUser(userStore.get(i)); //삭제될 유저가 보낸 메시지도 삭제
-                break;
-            }
-        }
+        userRepository.findById(id).ifPresent(user -> {
+            userRepository.deleteById(id);
+            messageRepository.deleteByUser(user);
+        });
     }
 
     @Override
-    public void removeChannelFromUser(UUID id, User user) {
-        user.delChannelId(id);
+    public void deleteChannelFromUser(UUID channelId, User user) {
+        user.deleteChannelId(channelId);
+        userRepository.update(user);
     }
 }

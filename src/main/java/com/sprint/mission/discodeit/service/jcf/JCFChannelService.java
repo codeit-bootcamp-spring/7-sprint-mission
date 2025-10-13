@@ -93,7 +93,7 @@ public class JCFChannelService implements ChannelService {
             return;
         }
 
-        userService.removeChannelFromUser(id, user); //유저에 저장된 채널 id 삭제
+        userService.deleteChannelFromUser(id, user); //유저에 저장된 채널 id 삭제
         channelStore.remove(id);
     }
 
@@ -120,7 +120,7 @@ public class JCFChannelService implements ChannelService {
             return;
         }
 
-        userService.removeChannelFromUser(id, target);
+        userService.deleteChannelFromUser(id, target);
         channel.delMember(target);
     }
 }
