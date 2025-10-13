@@ -11,6 +11,7 @@ public interface UserService {
 
     // 생성
     UserInfo createUser(String email, String password, String userName);
+    UserInfo createUser(String email, String password, String userName, String phoneNum);
 
     // 조회
     Optional<UserInfo> findUserInfoById(UUID userId);

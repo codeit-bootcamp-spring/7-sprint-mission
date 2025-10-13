@@ -37,7 +37,7 @@ public class User extends BaseEntity {
     }
 
 
-    public User(String email, String password, String userName) {
+    public User(String email, String password, String userName, String phoneNum) {
         super();
         validateEmail(email);
         validatePassword(password);
@@ -46,12 +46,11 @@ public class User extends BaseEntity {
         this.password = password;       // 8자리 이상
         this.userName = userName;       // 특수문자 불가
         this.state = State.ONLINE;      // 기본 상태
-        this.phoneNum = "비어있음";
+        this.phoneNum = phoneNum==null || phoneNum.isBlank() ? "비어있음" :  phoneNum;
     }
 
-    public User(String email, String password, String userName, String phoneNum) {
-        this(email, password, userName);
-        this.phoneNum = phoneNum;
+    public User(String email, String password, String userName) {
+        this(email, password, userName, null);
     }
 
     // Getter

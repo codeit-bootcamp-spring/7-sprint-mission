@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.InvalidInputException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,20 +25,23 @@ public class Channel extends BaseEntity {
         public String getDescType() {
             return descType;
         }
-    }
 
-    public Channel(User user, ChannelType type) {
+    }
+    public Channel(User user, String channelName, ChannelType type) {
         super();
         this.channelAdmin = user;
-        this.channelName = user.getUserName() + "의 채널";
+        if (channelName == null || channelName.isBlank()) {
+            this.channelName = user.getUserName() + "의 채널";
+        }
+        else this.channelName = channelName;
+
         this.type = type;
         this.members = new ArrayList<>();
         members.add(user);
     }
 
-    public Channel(User user, String channelName, ChannelType type) {
-        this(user, type);
-        this.channelName = channelName;
+    public Channel(User user, ChannelType type) {
+        this(user, null, type);
     }
 
     // getter
@@ -47,6 +52,9 @@ public class Channel extends BaseEntity {
 
     // updateMessage
     public void changeChannelName(String channelName) {
+        if (channelName == null || channelName.isEmpty()) {
+            throw new InvalidInputException("잘못된 입력");
+        }
         this.channelName = channelName;
         updateTimestamp();
     }
