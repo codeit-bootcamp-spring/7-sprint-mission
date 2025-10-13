@@ -28,8 +28,7 @@ public class Message extends BaseEntity{
     public String getContents() {
         return content;
     }
-    
-    //코드 추가 필요
+
     public void setContents(String content) {
         this.setUpdatedAt();
         this.content = content;

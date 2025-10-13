@@ -30,8 +30,7 @@ public class Channel extends BaseEntity{
     public String getChannelName() {
         return channelName;
     }
-    
-    //코드 추가 필요
+
     public void setChannelName(String channelName) {
         this.setUpdatedAt();
         this.channelName = channelName;
