@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.ChannelInfo;
+import com.sprint.mission.discodeit.exception.NotFound;
 import com.sprint.mission.discodeit.service.*;
 
 import java.util.*;
@@ -19,22 +20,17 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelInfo create(UUID userId, Channel.ChannelType type) {
-        User user = userService.findUserEntityById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Channel newChannel = new Channel(user, type);
-        this.data.put(newChannel.getId(), newChannel);
-        return new ChannelInfo(newChannel);
-    }
-
     public ChannelInfo create(UUID userId, String channelName, Channel.ChannelType type) {
         User user = userService.findUserEntityById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFound("채널을 찾을 수 없음"));
 
         Channel newChannel = new Channel(user, channelName, type);
         this.data.put(newChannel.getId(), newChannel);
         return new ChannelInfo(newChannel);
+    }
+    @Override
+    public ChannelInfo create(UUID userId, Channel.ChannelType type) {
+        return this.create(userId, null, type);
     }
 
 
@@ -43,6 +39,7 @@ public class JCFChannelService implements ChannelService {
         return Optional.ofNullable(data.get(id)).map(ChannelInfo::new);
     }
 
+    // message에 채널을 주기위해
     public Optional<Channel> findChannelEntityById(UUID id) {
         return Optional.ofNullable(data.get(id));
     }

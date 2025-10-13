@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.dto.*;
+import com.sprint.mission.discodeit.exception.NotFound;
 import com.sprint.mission.discodeit.service.*;
 
 import java.util.*;
@@ -18,22 +19,21 @@ public class JCFMessageService implements MessageService {
         this.channelService = channelService;
     }
 
-    // Find User, Channel
-    private User FindUser(UUID userId) {
+    // 유저 및 채널 찾기
+    private User findUser(UUID userId) {
         return userService.findUserEntityById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
+                .orElseThrow(() -> new NotFound("user not found"));
     }
-    private Channel FindChannel(UUID channelId) {
+    private Channel findChannel(UUID channelId) {
         return channelService.findChannelEntityById(channelId)
-                .orElseThrow(() -> new RuntimeException("채널을 찾을 수 없음"));
+                .orElseThrow(() -> new NotFound("channel not found"));
     }
-
 
     // Message Create
     @Override
     public MessageInfo createDirectMessage(UUID authorId, UUID receiverId, String content) {
-        User author = FindUser(authorId);
-        User receiver = FindUser(receiverId);
+        User author = findUser(authorId);
+        User receiver = findUser(receiverId);
         Message message = new Message(author, receiver, content);
         data.put(message.getId(), message);
         return new MessageInfo(message);
@@ -41,8 +41,8 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public MessageInfo createChannelMessage(UUID authorId, UUID channelId, String content) {
-        User author = FindUser(authorId);
-        Channel channel = FindChannel(channelId);
+        User author = findUser(authorId);
+        Channel channel = findChannel(channelId);
         Message message = new Message(author, channel, content);
         data.put(message.getId(), message);
         return new MessageInfo(message);

@@ -2,6 +2,7 @@ package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.dto.*;
+import com.sprint.mission.discodeit.exception.InvalidInputException;
 import com.sprint.mission.discodeit.service.jcf.*;
 
 import java.util.UUID;
@@ -28,7 +29,11 @@ public class ChannelTest {
 
         // --- 채널 수정 ---
         System.out.println("--- 채널 이름 수정 ---");
-        channelService.updateChannelName(channelId, "UpdatedChannel");
+        try {
+            channelService.updateChannelName(channelId, "UpdatedChannel");
+        } catch (InvalidInputException e) {
+            System.out.println("오류: "  + e.getMessage());
+        }
         channelService.findChannelInfoById(channelId).ifPresent(System.out::println);
 
         // --- 채널2 생성 ---
