@@ -10,7 +10,8 @@ public class User extends BaseEntity {
 
     public User(String username, String password, String email) {
         this.username = VerifiedUtils.verifyName(username);
-        this.password = VerifiedUtils.verifyPassword(password);;
+        this.password = VerifiedUtils.verifyPassword(password);
+        ;
         this.email = VerifiedUtils.verifyEmail(email);
         this.userState = UserState.ONLINE;
     }
@@ -20,9 +21,9 @@ public class User extends BaseEntity {
     }
 
     public void setUserState(UserState userState) {
-        if(userState == null) { throw new IllegalArgumentException("userState cannot be null"); }
-        if (this.userState != userState) {
-            this.userState = userState;
+        UserState state = VerifiedUtils.verifyNull(userState);
+        if (this.userState != state) {
+            this.userState = state;
             reUpdatedAt();
         }
     }
@@ -33,7 +34,7 @@ public class User extends BaseEntity {
 
     public void setUsername(String username) {
         String v = VerifiedUtils.verifyName(username);
-        if (!Objects.equals(this.username, v)){
+        if (!v.equals(this.username)) {
             this.username = v;
             reUpdatedAt();
         }
@@ -41,7 +42,7 @@ public class User extends BaseEntity {
 
     public void setPassword(String password) {
         String v = VerifiedUtils.verifyPassword(password);
-        if(!Objects.equals(this.password, v)){
+        if (!v.equals(this.password)) {
             this.password = v;
             reUpdatedAt();
         }
@@ -53,7 +54,7 @@ public class User extends BaseEntity {
 
     public void setEmail(String email) {
         String v = VerifiedUtils.verifyEmail(email);
-        if(!Objects.equals(this.email, v)){
+        if (!v.equals(this.email)) {
             this.email = v;
             reUpdatedAt();
         }
@@ -68,8 +69,12 @@ public class User extends BaseEntity {
     }
 
     public void update(String username, String password, String email) {
-        if(username != null) setUsername(username);
-        if(password != null) setPassword(password);
-        if(email != null) setEmail(email);
+        if (username != null) setUsername(username);
+        if (password != null) setPassword(password);
+        if (email != null) setEmail(email);
+    }
+
+    public boolean passwordMatch(String password) {
+        return this.password.equals(password);
     }
 }

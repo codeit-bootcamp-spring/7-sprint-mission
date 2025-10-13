@@ -12,8 +12,8 @@ public class Message extends BaseEntity {
     public Message(String content, String userName, UUID authorId, UUID channelId) {
         this.content = VerifiedUtils.verifyContent(content);
         this.userName = VerifiedUtils.verifyName(userName);
-        this.authorId = VerifiedUtils.verifyNull(authorId, "authorId");
-        this.channelId = VerifiedUtils.verifyNull(channelId, "channelId");
+        this.authorId = VerifiedUtils.verifyNull(authorId);
+        this.channelId = VerifiedUtils.verifyNull(channelId);
         this.isDeleted = false;
     }
 
