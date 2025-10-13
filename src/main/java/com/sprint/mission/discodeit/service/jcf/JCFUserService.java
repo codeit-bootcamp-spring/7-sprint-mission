@@ -19,9 +19,6 @@ public class JCFUserService implements UserService{
 
     @Override
     public void createUser(String userName, String nickName, String email, String phoneNum, String userId, String password) {
-        // 유저 닉네임 중복 확인 코드 필요
-        // 유저 아이디 중복 확인 코드 필요
-
         User newUser = new User(userName, nickName, email, phoneNum, userId, password);
         userRepository.save(newUser);
     }
@@ -79,11 +76,5 @@ public class JCFUserService implements UserService{
             userRepository.deleteById(id);
             messageRepository.deleteByUser(user);
         });
-    }
-
-    @Override
-    public void deleteChannelFromUser(UUID channelId, User user) {
-        user.deleteChannelId(channelId);
-        userRepository.update(user);
     }
 }

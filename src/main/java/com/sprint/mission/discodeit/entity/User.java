@@ -1,9 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 public class User extends BaseEntity{
     private String userName;
     private String nickName;
@@ -11,7 +7,6 @@ public class User extends BaseEntity{
     private String phoneNum;
     private final String userId;
     private String password;
-    private List<UUID> channelIds;
 
     public User(String userName, String nickName, String email, String phoneNum, String userId, String password) {
         this.userName = userName;
@@ -20,10 +15,8 @@ public class User extends BaseEntity{
         this.phoneNum = phoneNum;
         this.userId = userId;
         this.password = password;
-        this.channelIds = new ArrayList<>();
     }
 
-    //setter 처리 추가 필요
     public String getUserName() {
         return userName;
     }
@@ -72,18 +65,6 @@ public class User extends BaseEntity{
         this.password = password;
     }
 
-    public List<UUID> getChannelIds() {
-        return channelIds;
-    }
-
-    public void addChannelId(UUID id) {
-        this.channelIds.add(id);
-    }
-
-    public void deleteChannelId(UUID id) {
-        this.channelIds.remove(id);
-    }
-
     @Override
     public String toString() {
         String str = super.toString();
@@ -96,7 +77,6 @@ public class User extends BaseEntity{
                 ", userId='" + userId + '\'' +
                 ", password='" + password + '\'' +
                 str +
-                ", channelIds='" + channelIds + '\'' +
                 '}';
     }
 }

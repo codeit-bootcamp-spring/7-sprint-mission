@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.factory;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -15,8 +17,9 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 
 public class JCFServiceFactory {
-    private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
+    private final MessageRepository messageRepository;
 
     private final UserService userService;
     private final ChannelService channelService;
@@ -25,11 +28,12 @@ public class JCFServiceFactory {
 
 
     private JCFServiceFactory() {
-        messageRepository = new JCFMessageRepository();
         userRepository = new JCFUserRepository();
+        channelRepository = new JCFChannelRepository();
+        messageRepository = new JCFMessageRepository();
 
         userService = new JCFUserService(userRepository, messageRepository);
-        channelService = new JCFChannelService(userService);
+        channelService = new JCFChannelService(channelRepository);
         messageService = new JCFMessageService<>(messageRepository);
         channelMessageService = new JCFMessageService<>(messageRepository);
     }

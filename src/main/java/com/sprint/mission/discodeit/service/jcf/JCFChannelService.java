@@ -2,70 +2,59 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private final Map<UUID, Channel> channelStore = new HashMap<>();
-    private final UserService userService;
+    private final ChannelRepository channelRepository;
 
-    public JCFChannelService(UserService userService) {
-        this.userService = userService;
+    public JCFChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Override
     public Channel createChannel(Channel.ChannelType channelType, String channelName, User admin) {
         Channel newChannel = new Channel(channelType, channelName, admin);
-        channelStore.put(newChannel.getId(), newChannel);
-        admin.addChannelId(newChannel.getId()); // 유저 객체에 속한 채널 UUID 리스트 저장
+        channelRepository.save(newChannel);
+        channelRepository.addChannelIdForUser(newChannel.getId(), admin);
         return newChannel;
     }
 
     @Override
-    public void addMember(UUID id, User member){
-        channelStore.get(id).addMember(member);
-        member.addChannelId(id); // 유저 객체에 속한 채널 UUID 리스트 저장
+    public void addMember(UUID channelId, User member){
+        Channel channel = channelRepository.findById(channelId).orElse(null);
+        if (channel != null) {
+            channel.addMember(member);
+            channelRepository.save(channel);
+            channelRepository.addChannelIdForUser(channelId, member);
+        }
     }
 
     @Override
     public Channel getChannel(UUID id){
-        return channelStore.get(id);
+        return channelRepository.findById(id).orElse(null);
     }
 
     @Override
     public List<Channel> getChannelByUser(User user) {
-        List<Channel> joinedChannels = new ArrayList<>();
-
-        for(UUID id : user.getChannelIds()) {
-            joinedChannels.add(channelStore.get(id));
-        }
-
-        return joinedChannels;
+        return channelRepository.findByUser(user);
     }
 
     @Override
-    public List<Channel> getChannelByType(Channel.ChannelType channelType) {
-        List<Channel> channels = new ArrayList<>();
-
-        for(UUID id : channelStore.keySet()){
-            if(channelStore.get(id).getChannelType().equals(channelType)){
-                channels.add(channelStore.get(id));
-            }
-        }
-
-        return channels;
+    public List<Channel> getChannelByType(Channel.ChannelType type) {
+        return channelRepository.findByType(type);
     }
 
     @Override
     public List<Channel> getAllChannels() {
-        return new ArrayList<>(channelStore.values());
+        return channelRepository.findAll();
     }
 
     @Override
     public void updateAdmin(UUID id, User user) {
-        Channel channel = channelStore.get(id);
+        Channel channel = channelRepository.findById(id).orElse(null);
 
         if (!channel.getMembers().contains(user)) {
             System.out.println("그 유저는 이 채널에 속해 있지 않아 관리자로 변경할 수 없습니다.");
@@ -75,31 +64,34 @@ public class JCFChannelService implements ChannelService {
             return;
         }
 
-        channel.setAdmin(user);
+        channelRepository.updateAdmin(id, user);
     }
 
     @Override
     public void updateName(UUID id, String name) {
-        Channel channel = channelStore.get(id);
-        channel.setChannelName(name);
+        channelRepository.updateName(id, name);
     }
 
     @Override
-    public void delChannel(UUID id, User user) {
-        Channel channel = channelStore.get(id);
+    public void deleteChannel(UUID id, User user) {
+        Channel channel = channelRepository.findById(id).orElse(null);
 
         if(!channel.getAdmin().equals(user)) {
             System.out.println("관리자가 아니므로 채널을 삭제할 수 없습니다.");
             return;
         }
 
-        userService.deleteChannelFromUser(id, user); //유저에 저장된 채널 id 삭제
-        channelStore.remove(id);
+        channelRepository.deleteById(id);
+
+        // 삭제되는 채널 id를 유저들이 속해 있는 채널 리스트(joinedChannels)에서도 삭제
+        for(User member : channel.getMembers()){
+            channelRepository.deleteChannelIdForUser(id, member);
+        }
     }
 
     @Override
-    public void delChannelMember(UUID id, User requester, User target) {
-        Channel channel = channelStore.get(id);
+    public void deleteChannelMember(UUID id, User requester, User target) {
+        Channel channel = channelRepository.findById(id).orElse(null);
 
         if(channel == null){
             System.out.println("해당 채널이 존재하지 않습니다.");
@@ -120,7 +112,8 @@ public class JCFChannelService implements ChannelService {
             return;
         }
 
-        userService.deleteChannelFromUser(id, target);
+        channelRepository.deleteChannelIdForUser(id, target);
         channel.delMember(target);
+        channelRepository.save(channel);
     }
 }

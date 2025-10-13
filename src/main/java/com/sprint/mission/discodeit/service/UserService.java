@@ -8,7 +8,6 @@ import java.util.UUID;
 /**
  * UserService 인터페이스
  * - 사용자 생성, 조회, 업데이트, 삭제 기능 제공
- * - 내부적으로 MessageService와 연동 가능
  */
 public interface UserService {
 
@@ -66,10 +65,4 @@ public interface UserService {
      * @param id 삭제할 User UUID
      */
     void deleteUser(UUID id);
-
-    /**
-     * @param channelId 삭제할 채널 UUID
-     * @param user 대상 사용자
-     */
-    void deleteChannelFromUser(UUID channelId, User user);
 }

@@ -30,8 +30,6 @@ public class JavaApplication {
         System.out.println("User 구현체 테스트");
 
         // 1. 유저 생성
-        // 각 입력 요소 별 setter의 거름망 코드 추가 필요
-        // 새 유저 생성시 id로 중복 확인 필요
         System.out.println("1. 유저 생성");
         userService.createUser("조성만", "smjoe0302", "smjoe0302@naver.com", "010-7140-6533", "abc1234", "qwer1234");
         userService.createUser("조조", "jojo", "jojo@naver.com", "010-1234-5678", "abc12345", "qwer12345");
@@ -98,21 +96,20 @@ public class JavaApplication {
         System.out.println("1. 채널 생성");
 
         // 1.1 채널 생성
-        channelService.createChannel(Channel.ChannelType.VOICE, "코드잇 스프린트 스프링 백엔드 7기 음성 채널", user1);
-        channelService.createChannel(Channel.ChannelType.MESSAGE, "코드잇 스프린트 스프링 백엔드 7기 메시지 채널", user2);
-        channelService.createChannel(Channel.ChannelType.VOICE, "미니 게임 음성 채널", user3);
-        channelService.createChannel(Channel.ChannelType.VOICE, "미니 게임 메시지 채널", user3);
+        Channel newChannel1 = channelService.createChannel(Channel.ChannelType.VOICE, "코드잇 스프린트 스프링 백엔드 7기 음성 채널", user1);
+        Channel newChannel2 = channelService.createChannel(Channel.ChannelType.MESSAGE, "코드잇 스프린트 스프링 백엔드 7기 메시지 채널", user2);
+        Channel newChannel3 = channelService.createChannel(Channel.ChannelType.VOICE, "미니 게임 음성 채널", user3);
+        Channel newChannel4 = channelService.createChannel(Channel.ChannelType.VOICE, "미니 게임 메시지 채널", user3);
 
         // 1.2 채널에 멤버 추가
-        Channel channel = channelService.getChannel(user3.getChannelIds().get(0)); //하나의 채널만 가지고 있으므로 간단하게 채널 UUID 불러오기
-        channelService.addMember(channel.getId(), user2); // 특정 UUID 채널에 멤버 추가
+        channelService.addMember(newChannel3.getId(), user2); // 특정 UUID 채널에 멤버 추가
 
         // 2. 조회
         System.out.println("2. 채널 조회");
 
         // 2.1 id로 특정 채널 정보 조회(단건)
         System.out.println("\nid로 채널 조회=================");
-        channel = channelService.getChannel(user3.getChannelIds().get(1));
+        Channel channel = channelService.getChannel(newChannel2.getId());
         System.out.println(channel);
 
         // 2.2 유저가 속한 채널 정보 조회(다건)
@@ -139,7 +136,7 @@ public class JavaApplication {
 
         // 3.1 특정 채널 관리자 변경
         System.out.println("\n채널 관리자 수정=================");
-        Channel channelAdmin = channelService.getChannel(user3.getChannelIds().get(0));
+        Channel channelAdmin = channelService.getChannel(newChannel3.getId());
 
         // 3.1.1 관리자 변경 전
         System.out.println("\n관리자 변경 전: " + channelAdmin);
@@ -153,7 +150,7 @@ public class JavaApplication {
 
         // 3.2 특정 채널 이름 변경
         System.out.println("\n채널 이름 수정=================");
-        Channel channelName = channelService.getChannel(user2.getChannelIds().get(0));
+        Channel channelName = channelService.getChannel(newChannel2.getId());
 
         System.out.println("\n채널 이름 변경 전: " + channelName);
         channelService.updateName(channelName.getId(), "코드잇 스프린트 스프링 백엔드 6기 메시지 채널");
@@ -161,30 +158,30 @@ public class JavaApplication {
 
         // 4. 삭제
         // 4.1 채널 삭제
-        Channel channelDel = channelService.getChannel(user2.getChannelIds().get(0));
+        Channel channelDel = channelService.getChannel(newChannel2.getId());
 
         System.out.println("\n4. 채널 삭제");
         System.out.println("\n채널 삭제 전: ");
         channelService.getAllChannels().forEach(System.out::println);
 
-        channelService.delChannel(user2.getChannelIds().get(0), user1); //관리자가 아닌 경우 삭제 거부
+        channelService.deleteChannel(newChannel2.getId(), user1); //관리자가 아닌 경우 삭제 거부
 
         System.out.println("\n채널 삭제 후: ");
-        channelService.delChannel(user2.getChannelIds().get(0), user2);
+        channelService.deleteChannel(newChannel2.getId(), user2);
         channelService.getAllChannels().forEach(System.out::println);
 
         // 4.2 채널 내 멤버 삭제
         System.out.println("\n채널 내 멤버 삭제=================");
-        channelDel = channelService.getChannel(user2.getChannelIds().get(0));
+        channelDel = channelService.getChannel(newChannel3.getId());
 
         System.out.println("\n채널 내 멤버 삭제 전: ");
         System.out.println(channelDel);
 
         System.out.println("\n채널 내 멤버 삭제 후: ");
-        channelService.delChannelMember(user2.getChannelIds().get(0), user2, user1); // 채널에 속하지 않은 멤버는 삭제 할 수 없다
-        channelService.delChannelMember(user2.getChannelIds().get(0), user2, user2); // 채널의 관리자는 채널에서 나갈 수 없다
-        channelService.delChannelMember(user2.getChannelIds().get(0), user3, user2); // 채널의 유저는 채널 내 유저를 삭제할 수 없다
-        channelService.delChannelMember(user2.getChannelIds().get(0), user2, user3);
+        channelService.deleteChannelMember(newChannel3.getId(), user2, user1); // 채널에 속하지 않은 멤버는 삭제 할 수 없다
+        channelService.deleteChannelMember(newChannel3.getId(), user2, user2); // 채널의 관리자는 채널에서 나갈 수 없다
+        channelService.deleteChannelMember(newChannel3.getId(), user3, user2); // 채널의 유저는 채널 내 유저를 삭제할 수 없다
+        channelService.deleteChannelMember(newChannel3.getId(), user2, user3);
         System.out.println(channelDel);
 
         // message
@@ -257,7 +254,7 @@ public class JavaApplication {
         //요구사항을 이용한 간단한 프로그램 실행
         System.out.println("======================================================================================");
         System.out.println("디스코드잇 어플리케이션 입니다.");
-        // 필요한거
+
         // 계정 생성
         userService.createUser("김철수", "chulsoo", "chulsoo01@naver.com", "010-1111-2222", "idchulsoo", "pass1234");
         userService.createUser("이영희", "younghee", "younghee02@gmail.com", "010-3333-4444", "idyounghee", "pw5678");
@@ -577,10 +574,9 @@ public class JavaApplication {
                                                         choice = sc.nextInt();
 
                                                         if (choice == 1)
-                                                            channelService.delChannelMember(userChannel.getId(), user, user);
+                                                            channelService.deleteChannelMember(userChannel.getId(), user, user);
                                                         break outer2;
                                                     case 4:
-                                                        if (!isAdmin) break;
                                                         System.out.println("삭제할 멤버를 선택해주세요");
                                                         channelMember = userChannel.getMembers();
 
@@ -603,7 +599,7 @@ public class JavaApplication {
                                                         String userName = sc.nextLine();
 
                                                         if (userName.equals(target.getNickName())) {
-                                                            channelService.delChannelMember(userChannel.getId(), user, target);
+                                                            channelService.deleteChannelMember(userChannel.getId(), user, target);
                                                             System.out.println("선택된 멤버가 삭제되었습니다.");
                                                         } else {
                                                             System.out.println("닉네임이 정확하지 않습니다. 메뉴로 돌아갑니다.");
@@ -616,7 +612,7 @@ public class JavaApplication {
                                                         System.out.printf("채널 이름: %s\n", userChannel.getChannelName());
                                                         System.out.println("입력: ");
                                                         if (sc.nextLine().equals(userChannel.getChannelName())) {
-                                                            channelService.delChannel(userChannel.getId(), user);
+                                                            channelService.deleteChannel(userChannel.getId(), user);
                                                             System.out.println("채널이 삭제되었습니다. 이전 메뉴로 돌아갑니다.");
                                                             Printer.printLine();
                                                         } else {
@@ -719,7 +715,6 @@ public class JavaApplication {
                     }
                     break;
                 case 2:
-                    //검증 로직 추가 필요 -> 어디에?
                     String name, nickName, email, phoneNum, newUserId, newPassword;
                     System.out.println("계정을 생성합니다. 정보를 입력해주세요.");
                     System.out.print("이름: ");
