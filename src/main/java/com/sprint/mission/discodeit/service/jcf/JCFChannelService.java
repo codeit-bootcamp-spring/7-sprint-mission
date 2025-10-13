@@ -106,7 +106,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public int deleteUserFromAllChannel(User user) {
+    public int deleteUserFromAllChannel(User user) {        // 생각해보니 디코는 탈퇴했다고 나가지지 않음
         int count = 0;
         for (Channel channel : data.values()) {
             if(channel.removeMember(user)) {

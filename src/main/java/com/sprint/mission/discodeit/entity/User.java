@@ -57,22 +57,10 @@ public class User extends BaseEntity {
     public String getPassword() {
         return password;
     }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhoneNum() {
-        return phoneNum;
-    }
-
-    public State getState() {
-        return state;
-    }
+    public String getUserName() { return userName; }
+    public String getEmail() { return email; }
+    public String getPhoneNum() { return phoneNum; }
+    public State getState() { return state; }
 
     // Update
     public void updateUserName(String userName) {

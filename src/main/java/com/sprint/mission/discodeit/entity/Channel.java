@@ -27,13 +27,13 @@ public class Channel extends BaseEntity {
         }
 
     }
+
     public Channel(User user, String channelName, ChannelType type) {
         super();
         this.channelAdmin = user;
         if (channelName == null || channelName.isBlank()) {
             this.channelName = user.getUserName() + "의 채널";
-        }
-        else this.channelName = channelName;
+        } else this.channelName = channelName;
 
         this.type = type;
         this.members = new ArrayList<>();
@@ -45,10 +45,10 @@ public class Channel extends BaseEntity {
     }
 
     // getter
-    public ChannelType getType() {return type;}
-    public User getChannelAdmin() {return channelAdmin;}
-    public List<User> getMembers() {return members;}
-    public String getChannelName() {return channelName;}
+    public ChannelType getType() { return type; }
+    public User getChannelAdmin() { return channelAdmin; }
+    public List<User> getMembers() { return members; }
+    public String getChannelName() { return channelName; }
 
     // updateMessage
     public void changeChannelName(String channelName) {
@@ -58,6 +58,7 @@ public class Channel extends BaseEntity {
         this.channelName = channelName;
         updateTimestamp();
     }
+
     public boolean addMember(User user) {
         if (!members.contains(user)) {
             members.add(user);
@@ -66,14 +67,20 @@ public class Channel extends BaseEntity {
         }
         return false;
     }
+
     public boolean removeMember(User user) {
-        if(members.contains(user)) {
+        if (members.contains(user)) {
             members.remove(user);
             updateTimestamp();
             return true;
         }
         return false;
     }
+
+// 현재 코드가 '누가' '어떤 채널'의 정보를 바꾼다는 것이 아니라 미구현
+//    public boolean isAdmin(User user) {
+//        return this.channelAdmin.getId().equals(user.getId());
+//    }
 
     @Override
     public String toString() {
