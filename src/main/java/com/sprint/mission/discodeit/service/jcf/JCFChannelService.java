@@ -10,8 +10,13 @@ public class JCFChannelService implements ChannelService {
 
     private final Map<UUID, Channel> data;
 
-    public JCFChannelService() {
+    private JCFChannelService() {
         this.data = new HashMap<>();
+    }
+
+    private static final JCFChannelService jcfChannelService = new JCFChannelService();
+    public static JCFChannelService getInstance() {
+        return jcfChannelService;
     }
 
     @Override
@@ -19,7 +24,7 @@ public class JCFChannelService implements ChannelService {
         Channel c = VerifiedUtils.verifyNull(channel);
         UUID n =  VerifiedUtils.verifyNull(c.getId());
         if(data.containsKey(n)) {
-            throw new IllegalArgumentException("Channel with id " + n + " already exists");
+            throw new IllegalStateException("Channel with id " + n + " already exists");
         }
         data.put(n, c);
         return c;
@@ -40,7 +45,7 @@ public class JCFChannelService implements ChannelService {
         Channel c = VerifiedUtils.verifyNull(channel);
         UUID n = VerifiedUtils.verifyNull(c.getId());
         if(!data.containsKey(n)) {
-            throw new NoSuchElementException("Channel already exists");
+            throw new NoSuchElementException("Channel with id " + n + " not found");
         }
         data.put(n,c);
         return c;
@@ -55,5 +60,24 @@ public class JCFChannelService implements ChannelService {
     @Override
     public List<Channel> getAll() {
         return  new ArrayList<>(data.values());
+    }
+
+    // join
+    @Override
+    public boolean join(UUID channelId, UUID userId) {
+        Channel c = get(channelId);
+        return c.join(userId);
+    }
+    // leave
+    @Override
+    public boolean leave(UUID channelId, UUID userId) {
+        Channel c = get(channelId);
+        return c.leave(userId);
+    }
+    // slowMode
+    @Override
+    public void setSlowModeSeconds(UUID channelId, int slowModeSeconds) {
+        Channel c = get(channelId);
+        c.setSlowModeSeconds(slowModeSeconds);
     }
 }
