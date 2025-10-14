@@ -3,7 +3,9 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.VerifiedUtils;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 /*
@@ -11,15 +13,19 @@ import java.util.*;
  */
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data;
+    private final ChannelService channelService;
+    private final UserService userService;
 
-    private JCFMessageService() {
+    public JCFMessageService(ChannelService channelService, UserService userService) {
+        this.channelService = VerifiedUtils.verifyNull(channelService);
+        this.userService = VerifiedUtils.verifyNull(userService);
         this.data = new HashMap<>();
     }
 
-    private static final JCFMessageService jcfMessageService = new JCFMessageService();
-    public static JCFMessageService getInstance() {
-        return jcfMessageService;
-    }
+//    private static final JCFMessageService jcfMessageService = new JCFMessageService();
+//    public static JCFMessageService getInstance() {
+//        return jcfMessageService;
+//    }
 
     @Override
     public Message create(Message message) {
@@ -28,10 +34,10 @@ public class JCFMessageService implements MessageService {
         if(data.containsKey(id)) {
             throw new IllegalStateException("Message already exists: " + id);
         }
-        Channel ch =  JCFChannelService.getInstance().get(msg.getChannelId());
+        Channel ch =  channelService.get(msg.getChannelId());
         int slow = ch.getSlowModeSeconds();
         if ( slow < 0 ) {
-            throw new IllegalStateException("SlowModeSeconds must be greater than 0");
+            throw new IllegalStateException("SlowModeSeconds must be >= 0");
         }
 
         if ( slow > 0 ) {
@@ -48,7 +54,7 @@ public class JCFMessageService implements MessageService {
 
             if (last.isPresent() && (timeNow - last.getAsLong()) < windowTime) {
                 long leftTime = windowTime - (timeNow - last.getAsLong());
-                long seconds = leftTime / 1000;
+                long seconds = (leftTime + 999) / 1000;
                 throw new IllegalStateException("SlowModeSeconds wait : " + seconds + "s");
             }
         }

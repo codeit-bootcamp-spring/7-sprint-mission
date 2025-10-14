@@ -16,8 +16,9 @@ public class JavaApplication {
 
     public static void main(String[] args) {
         ChannelService channelService = JCFChannelService.getInstance();
-        MessageService messageService = JCFMessageService.getInstance();
+//        MessageService messageService = JCFMessageService.getInstance();
         UserService userService = JCFUserService.getInstance();
+        MessageService messageService = new JCFMessageService(channelService, userService);
 
         System.out.println("1. User Service 체크");
         titlePrint("등록");
