@@ -41,7 +41,7 @@ public class Printer {
         }
     }
 
-    public static void printChatLatest(MessageService messageService, User user1, User user2){
+    public static void printChatLatest(MessageService<User> messageService, User user1, User user2){
         Message message = messageService.getLastestMessage(user1, user2);
         long unixTime;
         String KST, time;
