@@ -128,5 +128,3 @@ public class User extends BaseEntity {
         }
     }
 }
-
-//https://adjh54.tistory.com/104

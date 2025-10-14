@@ -19,6 +19,16 @@ public class JCFUserService implements UserService {
         this.channelService = channelService;
     }
 
+    private void validateEmailIsUnique(String email) {
+        // 이메일 중복 확인
+        boolean isDuplicate = data.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+
+        if (isDuplicate) {
+            throw new DuplicateEmailException("이미 존재하는 이메일");
+        }
+    }
+
     // 생성
     @Override
     public UserInfo createUser(String email, String password, String userName, String phoneNum) {
@@ -28,23 +38,12 @@ public class JCFUserService implements UserService {
         return new UserInfo(newUser);
 
     }
-
     @Override
     public UserInfo createUser(String email, String password, String userName) {
         return createUser(email, password, userName, null);
     }
 
-    // 이메일 중복 확인
-    private void validateEmailIsUnique(String email) {
-        boolean isDuplicate = data.values().stream()
-                .anyMatch(user -> user.getEmail().equals(email));
-
-        if (isDuplicate) {
-            throw new DuplicateEmailException("이미 존재하는 이메일");
-        }
-    }
     // 조회
-
     @Override
     public Optional<UserInfo> findUserInfoById(UUID userId) {
         return Optional.ofNullable(data.get(userId)).map(UserInfo::new);
@@ -64,9 +63,8 @@ public class JCFUserService implements UserService {
     // 수정
     @Override
     public Optional<UserInfo> updateProfile(UUID userId, String newUserName, String newPhoneNum) {
-        Optional<User> userOptional = Optional.ofNullable(data.get(userId));
 
-        return userOptional.map(user -> {
+        return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updateUserName(newUserName);
             user.updatePhoneNum(newPhoneNum);
             return new UserInfo(user);
@@ -75,6 +73,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public Optional<UserInfo> changePassword(UUID userId, String newPassword) {
+
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updatePassword(newPassword);
             return new UserInfo(user);
@@ -83,6 +82,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public Optional<UserInfo> updateState(UUID userId, User.State newState) {
+
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updateState(newState);
             return new UserInfo(user);

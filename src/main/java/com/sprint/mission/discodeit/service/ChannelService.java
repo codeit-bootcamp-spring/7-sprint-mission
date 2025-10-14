@@ -10,8 +10,8 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-    ChannelInfo create(UUID userId, Channel.ChannelType type);
-    ChannelInfo create(UUID userId, String channelName, Channel.ChannelType type);
+    ChannelInfo createChannel(UUID userId, Channel.ChannelType type);
+    ChannelInfo createChannel(UUID userId, String channelName, Channel.ChannelType type);
 
     Optional<ChannelInfo> findChannelInfoById(UUID id);
     Optional<Channel> findChannelEntityById(UUID id);

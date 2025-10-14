@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.ChannelInfo;
-import com.sprint.mission.discodeit.exception.NotFound;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.entity.dto.ChannelInfo;
 
 import java.util.*;
 
@@ -20,17 +18,19 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelInfo create(UUID userId, String channelName, Channel.ChannelType type) {
+    public ChannelInfo createChannel(UUID userId, String channelName, Channel.ChannelType type) {
         User user = userService.findUserEntityById(userId)
-                .orElseThrow(() -> new NotFound("채널을 찾을 수 없음"));
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없음"));
+        if (channelName == null || channelName.isBlank())
+            channelName = user.getUserName() + "의 채널";
 
         Channel newChannel = new Channel(user, channelName, type);
         this.data.put(newChannel.getId(), newChannel);
         return new ChannelInfo(newChannel);
     }
     @Override
-    public ChannelInfo create(UUID userId, Channel.ChannelType type) {
-        return this.create(userId, null, type);
+    public ChannelInfo createChannel(UUID userId, Channel.ChannelType type) {
+        return this.createChannel(userId, null, type);
     }
 
 
@@ -51,9 +51,8 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Optional<ChannelInfo> updateChannelName(UUID id, String newChannelName) {
-        Optional<Channel> channelOp = Optional.ofNullable(data.get(id));
 
-        return channelOp.map(channel -> {
+        return Optional.ofNullable(data.get(id)).map(channel -> {
             channel.changeChannelName(newChannelName);
             return new ChannelInfo(channel);
         });
@@ -106,7 +105,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public int deleteUserFromAllChannel(User user) {        // 생각해보니 디코는 탈퇴했다고 나가지지 않음
+    public int deleteUserFromAllChannel(User user) {        // 디코는 탈퇴한다고 채널에서 나가지지않음
         int count = 0;
         for (Channel channel : data.values()) {
             if(channel.removeMember(user)) {

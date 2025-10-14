@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.dto.*;
-import com.sprint.mission.discodeit.exception.NotFound;
+import com.sprint.mission.discodeit.exception.InvalidInputException;
 import com.sprint.mission.discodeit.service.*;
 
 import java.util.*;
@@ -19,33 +19,35 @@ public class JCFMessageService implements MessageService {
         this.channelService = channelService;
     }
 
-    // 유저 및 채널 찾기
-    private User findUser(UUID userId) {
-        return userService.findUserEntityById(userId)
-                .orElseThrow(() -> new NotFound("user not found"));
-    }
-    private Channel findChannel(UUID channelId) {
-        return channelService.findChannelEntityById(channelId)
-                .orElseThrow(() -> new NotFound("channel not found"));
-    }
-
     // Message Create
     @Override
     public MessageInfo createDirectMessage(UUID authorId, UUID receiverId, String content) {
-        User author = findUser(authorId);
-        User receiver = findUser(receiverId);
+        if (content == null || content.isBlank()) {
+            throw new InvalidInputException("공백을 보낼 수 없음");
+        }
+        User author = userService.findUserEntityById(authorId)
+                .orElseThrow(() -> new NoSuchElementException("메시지를 보내는 사용자를 찾을 수 없음"));
+        User receiver = userService.findUserEntityById(receiverId)
+                .orElseThrow(() -> new NoSuchElementException("메시지를 받을 사용자를 찾을 수 없음"));
         Message message = new Message(author, receiver, content);
         data.put(message.getId(), message);
         return new MessageInfo(message);
+
     }
 
     @Override
     public MessageInfo createChannelMessage(UUID authorId, UUID channelId, String content) {
-        User author = findUser(authorId);
-        Channel channel = findChannel(channelId);
+        if (content == null || content.isBlank()) {
+            throw new InvalidInputException("공백을 보낼 수 없음");
+        }
+        User author = userService.findUserEntityById(authorId)
+                .orElseThrow(() -> new NoSuchElementException("메시지를 보내는 사용자를 찾을 수 없음"));
+        Channel channel = channelService.findChannelEntityById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("메시지를 받을 채널을 찾을 수 없음"));
         Message message = new Message(author, channel, content);
         data.put(message.getId(), message);
         return new MessageInfo(message);
+
     }
 
 
@@ -62,7 +64,7 @@ public class JCFMessageService implements MessageService {
                 .filter(m -> m.getType() == Message.MessageType.DIRECT)
                 .filter(m ->
                         (m.getAuthor().getId().equals(userId1) && m.getReceiver().getId().equals(userId2)) ||
-                        (m.getAuthor().getId().equals(userId2) && m.getReceiver().getId().equals(userId1)))
+                                (m.getAuthor().getId().equals(userId2) && m.getReceiver().getId().equals(userId1)))
                 .sorted(Comparator.comparing(Message::getCreatedAt))
                 .map(MessageInfo::new).collect(Collectors.toList());
     }
@@ -80,7 +82,7 @@ public class JCFMessageService implements MessageService {
     // Message Update
     @Override
     public Optional<MessageInfo> updateMessage(UUID id, String newContent) {
-        if (newContent.isEmpty()) {
+        if (newContent == null || newContent.isBlank()) {
             deleteMessage(id);
             return Optional.empty();
         }
@@ -98,6 +100,3 @@ public class JCFMessageService implements MessageService {
         return data.remove(id) != null;
     }
 }
-
-
-// https://velog.io/@wonizizi99/Optional%EC%9D%98-orElseorElseThrow-%EC%82%AC%EC%9A%A9%EB%B2%95

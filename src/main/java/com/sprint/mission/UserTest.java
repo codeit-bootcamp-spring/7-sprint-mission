@@ -12,10 +12,12 @@ import java.util.UUID;
 
 public class UserTest {
 
+    // 유저 조회
     public static void read(UUID id) {
         userService.findUserInfoById(id)
                 .ifPresentOrElse(System.out::println, () -> System.out.println("유저를 찾을 수 없음"));
     }
+    // 유저 모두 조회
     public static void readAll() {
         List<UserInfo> users = userService.findAllUsers();
         if (users.isEmpty()) {
@@ -26,6 +28,9 @@ public class UserTest {
 
     static UserService userService = new JCFUserService();
 
+
+
+    // 메인
     public static void main(String[] args) {
 
         UserInfo user1 = null;
