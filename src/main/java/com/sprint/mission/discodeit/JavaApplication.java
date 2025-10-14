@@ -697,7 +697,7 @@ public class JavaApplication {
                                 break;
                             case 4:
                                 System.out.println("내 정보 수정");
-                                System.out.println("1. 이름 2. 닉네임 3. 이메일 4. 전화번호 5. 나가기");
+                                System.out.println("1. 이름 2. 닉네임 3. 이메일 4. 전화번호 5. 비밀번호 6. 나가기");
                                 choice = sc.nextInt();
                                 sc.nextLine();
                                 switch (choice){
@@ -722,6 +722,27 @@ public class JavaApplication {
                                         user.setPhoneNum(sc.nextLine());
                                         break;
                                     case 5:
+                                        String nowPassword, newPassword, newPassword2;
+
+                                        System.out.print("현재 비밀번호 입력: ");
+                                        nowPassword = sc.nextLine();
+                                        if(user.getPassword().equals(nowPassword)){
+
+                                            System.out.print("새로운 비밀번호 입력: ");
+                                            newPassword = sc.nextLine();
+
+                                            System.out.print("새로운 비밀번호 한번 더 입력: ");
+                                            newPassword2 = sc.nextLine();
+
+                                            if(newPassword.equals(newPassword2)){
+                                                user.setPassword(newPassword);
+                                                login = false;
+                                            }
+                                        } else{
+                                            System.out.println("비밀번호를 틀렸습니다. 다시 입력하세요.");
+                                        }
+                                        break;
+                                    case 6:
                                         continue;
                                 }
                                 userService.updateUser(user);
