@@ -53,7 +53,6 @@ public class JavaApplication {
 
         jcf_channel.getAll_Messages(channel_I);
 
-
         Channel channel_II = jcf_channel.createChannel(user3, "세일러문");
         UUID messgeID_1 = jcf_channel.sendMessage(channel_II, user3, "세일러문 방장은 나다~~!!");
         User user5 = jcf_User.creatUser("생크림케익");
