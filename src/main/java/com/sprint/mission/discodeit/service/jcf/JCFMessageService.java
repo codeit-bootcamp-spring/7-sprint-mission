@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.VerifiedUtils;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -27,6 +28,31 @@ public class JCFMessageService implements MessageService {
         if(data.containsKey(id)) {
             throw new IllegalStateException("Message already exists: " + id);
         }
+        Channel ch =  JCFChannelService.getInstance().get(msg.getChannelId());
+        int slow = ch.getSlowModeSeconds();
+        if ( slow < 0 ) {
+            throw new IllegalStateException("SlowModeSeconds must be greater than 0");
+        }
+
+        if ( slow > 0 ) {
+            long timeNow = System.currentTimeMillis();
+            long windowTime = slow * 1000L;
+
+            OptionalLong last = data.values()
+                    .stream()
+                    .filter(m -> m.getChannelId().equals(msg.getChannelId()))
+                    .filter(m -> m.getAuthorId().equals(msg.getAuthorId()))
+                    .filter(m -> !m.isDeleted())
+                    .mapToLong(m -> m.getCreatedAt())
+                    .max();
+
+            if (last.isPresent() && (timeNow - last.getAsLong()) < windowTime) {
+                long leftTime = windowTime - (timeNow - last.getAsLong());
+                long seconds = leftTime / 1000;
+                throw new IllegalStateException("SlowModeSeconds wait : " + seconds + "s");
+            }
+        }
+
         data.put(id, msg);
         return msg;
     }
