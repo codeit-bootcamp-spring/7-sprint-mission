@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.service.input;
+package com.sprint.mission.discodeit.test;
 
-import com.sprint.mission.discodeit.service.jcf.JCFDb;
+import com.sprint.mission.discodeit.service.input.InputApplication;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -9,7 +9,7 @@ import java.awt.event.KeyEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class FrontGui {
+public class InputGuiTest {
     public static void main(String[] args) throws IOException {
         JFrame frame = new JFrame("FrontGui");
         frame.setSize(600,300);
