@@ -11,7 +11,6 @@ public class User extends BaseEntity {
     public User(String username, String password, String email) {
         this.username = VerifiedUtils.verifyName(username);
         this.password = VerifiedUtils.verifyPassword(password);
-        ;
         this.email = VerifiedUtils.verifyEmail(email);
         this.userState = UserState.ONLINE;
     }
