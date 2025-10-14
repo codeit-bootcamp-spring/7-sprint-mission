@@ -24,7 +24,7 @@ public class JavaApplication {
         User user1 = userService
                 .create(new User("이형일","dlguddlf","eldh1000@naver.com"));
         User user2 = userService
-                .create(new User("김태언", "rlaxodjs1", "xodjs@gmail.com"));
+                .create(new User("김태언", "rlaxodjs", "xodjs@gmail.com"));
         User user3 = userService
                 .create(new User("최지혜", "chlwlgP", "wlgP@daum.net"));
         System.out.println("Users count: " + userService.getAll().size());
@@ -96,6 +96,7 @@ public class JavaApplication {
         System.out.println("현재 총 인원: " + userService.getAll().size());
         System.out.println("남은 인원: " + userService.getAll());
 
+        // 재사용을 위해 다시 등등
         user1 = userService
                 .create(new User("이형일","dlguddlf","eldh1000@naver.com"));
 
@@ -190,7 +191,16 @@ public class JavaApplication {
                 .getMembers().size());
 
         titlePrint("SlowMode");
-        System.out.println("추가 예정..");
+        channelService.setSlowModeSeconds(channel1.getId(), 10);
+
+        messageService.create(new Message("테스트1", user2.getUsername(), user2.getId(), channel1.getId()));
+        try {
+            messageService.create(new Message("테스트2", user2.getUsername(), user2.getId(), channel1.getId()));
+            System.out.println("슬로우모드에서 딜레이 없이 전송 됨!");
+        } catch (IllegalStateException e) {
+            System.out.println("남은 시간초 : " + e.getMessage());
+        }
+
         titlePrint("수정");
         channel1.setChannelName("Sprint1!!!!!");
         channelService.update(channel1);
@@ -212,6 +222,8 @@ public class JavaApplication {
             System.out.println("채널 삭제!");
         }
         System.out.println("남은 채널 수: " + channelService.getAll());
+
+        // 이후 사용하기 위해 재등록
         channel1 = channelService
                 .create(new Channel(ChType.VOICE, "Sprint1"));
 
@@ -234,17 +246,36 @@ public class JavaApplication {
         System.out.println(messageService.getMessagesByChannelAndAuthor(channel1.getId(), user1.getId()));
 
         titlePrint("조회 다건");
+        System.out.println("메세지의 총 개수: " + messageService.getAllMessages().size());
         System.out.println(messageService.getAllMessages());
-        System.out.println(messageService.getAll());
 
         titlePrint("수정");
-        message1.setContent("백엔드 빡세네잉!");
-        System.out.println(messageService.get(message1.getId()).getContent());
+        System.out.println("수정전 " + message1.getUserName() + " 님의 메세지 : " + message1.getContent());
+        message1.setContent("백엔드 sprint 미션 중입니당");
+        System.out.println("메세지가 수정 되었습니다.");
 
         titlePrint("수정된 데이터 조회");
+        System.out.println("수정된 " + message1.getUserName() + " 님의 메세지 : " + message1.getContent());
+        System.out.println(messageService.getAllMessages());
+
         titlePrint("삭제");
-        messageService.delete(message1.getId());
-        System.out.println(messageService.getAll());
+        boolean msg = messageService.delete(message1.getId());
+        System.out.println("삭제 결과: " + msg);
+
         titlePrint("삭제된 데이터 조회");
+        try {
+            messageService.get(message1.getId());
+            System.out.println("메세지가 삭제되지 않고 여전히 존재합니다.");
+        } catch (NoSuchElementException e) {
+            System.out.println("메세지가 삭제 되었습니다.");
+        }
+            System.out.println("남은 메세지: " + messageService.getAllMessages());
+
+        titlePrint("키워드 검색");
+        String keyword = "하이";
+        System.out.println("키워드 " + keyword + " 검색: " + messageService.searchByKeyword(keyword).size());
+        messageService.searchByKeyword(keyword)
+                .forEach(m -> System.out.println("- " + m.getContent()));
+
     }
 }
