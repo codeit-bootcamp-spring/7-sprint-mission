@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
-
 public final class VerifiedUtils {
     public static String verifyName(String name) {
         String n = verifyNullOrBlank(name);
@@ -13,7 +11,7 @@ public final class VerifiedUtils {
 
     public static String verifyPassword(String password) {
         String n = verifyNullOrBlank(password);
-        if(password.length() < 7 || password.length() > 50) {
+        if(n.length() < 7 || n.length() > 50) {
             throw new IllegalArgumentException("password length must be between 7 and 50 characters");
         }
         return password;
