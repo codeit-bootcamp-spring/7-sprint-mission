@@ -46,5 +46,23 @@ public class RepositoryOperator {
        channelService.createChannel(channel1Dto);
        channelService.createChannel(channel2Dto);
        channelService.createChannel(channel3Dto);
+
+       userService.createUser(user1Dto);
+        userService.createUser(user2Dto);
+        userService.createUser(notInUserDBUserDto);
+
+        messageService.createMessage(m1Dto);
+        messageService.createMessage(m2Dto);
+        messageService.createMessage(m3Dto);
+
+        messageService.deleteMessage(m1Dto);
+        messageService.deleteMessage(m3Dto);
+
+//        messageService.readUpdatedMessage();
+        messageService.readAllMessage();
+
+
+
+
    }
 }

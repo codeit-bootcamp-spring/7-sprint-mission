@@ -51,7 +51,7 @@ public class JCFMessageService implements MessageService {
     public void readAllMessage(){
 
         for(MessageDto messageDto : messageRepository.getAllMessage()){
-            readMessage(messageDto);
+            System.out.println(messageDto.toString());
         }
     }
     public void deleteMessage(MessageDto messageDto){

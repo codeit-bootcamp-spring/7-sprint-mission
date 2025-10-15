@@ -28,10 +28,10 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void createChannel(ChannelDto channelDto) {
-//        if(validateService.isValidateChannel(channelDto)){
-//            System.out.println(VALIDATE_FAIL);
-//            return;
-//        }
+        if(validateService.isValidateChannel(channelDto)){
+            System.out.println(VALIDATE_FAIL);
+            return;
+        }
         channelRepository.saveChannel(channelDto);
         System.out.println(CREATE_CHANNEL + channelDto.getName());
 

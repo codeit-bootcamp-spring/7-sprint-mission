@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.util.AppendableObjectOutputStream;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -73,8 +74,8 @@ public class FileUserService implements UserRepository {
 
     }
     private final String DATA_ROOT = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\data\\";
-    private final String USER_DATA_ROOT = DATA_ROOT + "userRepository.cer";
-    private final String DELETED_USER_DATA_ROOT = DATA_ROOT + "deletedUserRepository.cer";
+    private final String USER_DATA_ROOT = DATA_ROOT + "userRepository.ser";
+    private final String DELETED_USER_DATA_ROOT = DATA_ROOT + "deletedUserRepository.ser";
     private File userRepositoryFile = new File(USER_DATA_ROOT);
     private File deletedUserRepositoryFile = new File(DELETED_USER_DATA_ROOT);
 
@@ -88,9 +89,9 @@ public class FileUserService implements UserRepository {
         List<User> userDb = (List<User>) ois.readObject();
         boolean isExist = userDb.stream().anyMatch(x -> x.getId().equals(userId));
         if(!isExist) return null;
-        User result = userDb.stream().filter(x->x.getId().equals(userId)).findFirst().get();
+       ;
         ois.close();
-        return userToUserDto(result);
+        return  userDb.stream().filter(x->x.getId().equals(userId)).findFirst().map(this::userToUserDto).orElse(null);
 
     }
 
@@ -116,8 +117,8 @@ public class FileUserService implements UserRepository {
             List<User> userDb = (List<User>) ois.readObject();
             boolean isExist = userDb.stream().anyMatch(x -> x.getName().equals(userName));
             if(!isExist) return null;
-            User result = userDb.stream().filter(x->x.getName().equals(userName)).findFirst().get();
-            return userToUserDto(result);
+            return  userDb.stream().filter(x->x.getName().equals(userName)).findFirst()
+                    .map(this::userToUserDto).orElse(null);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -142,30 +143,29 @@ public class FileUserService implements UserRepository {
 
     @Override
     public void saveUser(UserDto userDto) {
-        try(
-                ObjectOutputStream oos = new AppendableObjectOutputStream(new FileOutputStream(USER_DATA_ROOT,true))
-                )
-        {
-         oos.writeObject(userDtoToUser(userDto));
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+      List<User> userDb = loadAllUser();
+       userDb.add(userDtoToUser(userDto));
+       saveAllUser(userDb);
+       return;
 
     }
 
     @Override
     public void deleteUser(UserDto userDto) {
+
         try(
-                ObjectOutputStream oosDeleted = new AppendableObjectOutputStream(new FileOutputStream(DELETED_USER_DATA_ROOT,true));
-                ObjectOutputStream oosUser = new ObjectOutputStream(new FileOutputStream(USER_DATA_ROOT));
+                ObjectOutputStream oosDeleted = new AppendableObjectOutputStream(new FileOutputStream(DELETED_USER_DATA_ROOT,true))
+               ;
                 ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));
                 )
         {
          List<User> tempUserLis = (List<User>) ois.readObject();
+
+            ObjectOutputStream oosUser = new ObjectOutputStream(new FileOutputStream(USER_DATA_ROOT));
          tempUserLis.remove(userDtoToUser(userDto));
          oosUser.writeObject(tempUserLis);
          oosDeleted.writeObject(userDtoToDeletedUser(userDto));
+         oosUser.close();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -176,7 +176,7 @@ public class FileUserService implements UserRepository {
     @Override
     public <T> void updateUser(UserDto userDto, User.userElement userElement, T updatedContent) {
         try(
-                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_DATA_ROOT));
+
                 ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));
                 ){
             User updatedUser = userDtoToUser(userDto);
@@ -184,9 +184,12 @@ public class FileUserService implements UserRepository {
             editFunction.accept(updatedUser, updatedContent);
             updatedUser.updateEntity();
             List<User> userDb = (List<User>) ois.readObject();
+
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_DATA_ROOT));
             userDb.remove(userDtoToUser(userDto));
             userDb.add(updatedUser);
             oos.writeObject(userDb);
+            oos.close();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -269,4 +272,27 @@ public class FileUserService implements UserRepository {
     private DeletedUser userDtoToDeletedUser(UserDto userDto){
         return new DeletedUser(userDto.getName());
     }
+
+    private void saveAllUser(List<User>userList){
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_DATA_ROOT));){
+            oos.writeObject(userList);
+            oos.flush();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    private List<User> loadAllUser(){
+        if(!userRepositoryFile.exists() || userRepositoryFile.length() == 0) {
+            return new ArrayList<>();
+        }
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));){
+            return (List<User>) ois.readObject();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
 }

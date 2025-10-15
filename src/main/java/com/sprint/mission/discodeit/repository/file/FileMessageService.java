@@ -11,14 +11,15 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.util.AppendableObjectOutputStream;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class FileMessageService implements MessageRepository {
 
-    private final String MESSAGE_DATA_PATH = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\data\\";
-    private final String DELETED_MESSAGE_DATA_PATH = "C:/Users/황준영/Java-codeit/7-sprint-mission/src/main/resources/data/deletedMessageRepository.cer";
+    private final String MESSAGE_DATA_PATH = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\data\\messageRepository.ser";
+    private final String DELETED_MESSAGE_DATA_PATH = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\data\\deletedMessageRepository.ser";
     private File messageRepositoryFile = new File(MESSAGE_DATA_PATH);
     private File deletedMessageRepositoryFile = new File(DELETED_MESSAGE_DATA_PATH);
     private final User DEFAULT_SENDER = new User(UUID.randomUUID(), "DeletedUser", "DeletedUser", "codeit.org", true);
@@ -34,8 +35,9 @@ public class FileMessageService implements MessageRepository {
                 )
         ) {
             List<Message> messageDb = (List<Message>) ois.readObject();
-            Message result = messageDb.stream().filter(x -> x.getId().equals(messageId)).findFirst().get();
-            return messageToMessageDto(result);
+
+
+            return  messageDb.stream().filter(x -> x.getId().equals(messageId)).findFirst().map(this::messageToMessageDto).orElse(null);
 
 
         } catch (Exception e) {
@@ -52,8 +54,8 @@ public class FileMessageService implements MessageRepository {
                 )
         ) {
             List<Message> messageDb = (List<Message>) ois.readObject();
-            Message result = messageDb.stream().filter(x -> x.getContent().equals(messageName)).findFirst().get();
-            return messageToMessageDto(result);
+            return  messageDb.stream().filter(x -> x.getContent().equals(messageName)).findFirst().
+                    map(this::messageToMessageDto).orElse(null);
 
 
         } catch (Exception e) {
@@ -70,42 +72,25 @@ public class FileMessageService implements MessageRepository {
 
     @Override
     public void saveMessage(MessageDto messageDto) {
-        try(
-                ObjectOutputStream oos = new AppendableObjectOutputStream(new FileOutputStream(MESSAGE_DATA_PATH,true))
-                )
-        {
-            oos.writeObject(messageDtoToMessage(messageDto));
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+        List<Message> messageDb = loadAllMessage();
+        messageDb.add(messageDtoToMessage(messageDto));
+        saveAllMessage(messageDb);
         return;
 
     }
 
     @Override
     public void deleteMessage(MessageDto messageDto) {
-        try(
-                ObjectOutputStream oos = new AppendableObjectOutputStream(new FileOutputStream(DELETED_MESSAGE_DATA_PATH,true));
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(MESSAGE_DATA_PATH));
-                ObjectOutputStream oosMessage = new ObjectOutputStream(new FileOutputStream(MESSAGE_DATA_PATH));
-                )
-        {
-            List<Message> messageDb = (List<Message>) ois.readObject();
-            messageDb.remove(messageDtoToMessage(messageDto));
-            oosMessage.writeObject(messageDb);
-            oos.writeObject(messageDtoToMessage(messageDto));
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+        List<Message> messageDb = loadAllMessage();
+        messageDb.remove(messageDtoToMessage(messageDto));
+        saveAllMessage(messageDb);
 
     }
 
     @Override
     public <T> void updateMessage(MessageDto messageDto, Message.messageElement messageElement, T updatedContent) {
         try(
-                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(MESSAGE_DATA_PATH));
+
                 ObjectInputStream ois = new ObjectInputStream(new FileInputStream(MESSAGE_DATA_PATH));
                 )
         {
@@ -114,9 +99,12 @@ public class FileMessageService implements MessageRepository {
             editFunction.accept(updatedMessage, updatedContent);
             updatedMessage.updateEntity();
             List<Message> messageDb = (List<Message>) ois.readObject();
+
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(MESSAGE_DATA_PATH));
             messageDb.remove(messageDtoToMessage(messageDto));
             messageDb.add(updatedMessage);
             oos.writeObject(messageDb);
+            oos.close();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -174,13 +162,17 @@ public class FileMessageService implements MessageRepository {
 
     @Override
     public void setDefaultSender(MessageDto messageDto) {
-        try( ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(MESSAGE_DATA_PATH));
+        try(
              ObjectInputStream ois = new ObjectInputStream(new FileInputStream(MESSAGE_DATA_PATH));
         ){
            List<Message> messageDb = (List<Message>) ois.readObject();
+
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(MESSAGE_DATA_PATH));
            Message targetMessage = messageDb.stream().filter(x->x.getId().equals(messageDto.getId())).findFirst().get();
            targetMessage.setSender(DEFAULT_SENDER);
            oos.writeObject(messageDb);
+           oos.close();
+
         }
 
         catch (Exception e){
@@ -225,4 +217,29 @@ public class FileMessageService implements MessageRepository {
     private DeletedMessageDto deletedMessageToDeletedMessageDto(DeletedMessage deletedMessage){
         return new DeletedMessageDto(deletedMessage.getSenderName(),deletedMessage.getContent());
     }
+
+    private void saveAllMessage(List<Message>messageList){
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(messageRepositoryFile,false));){
+            oos.writeObject(messageList);
+//            oos.flush();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private List<Message> loadAllMessage(){
+        if (!messageRepositoryFile.exists() || messageRepositoryFile.length() == 0) {
+            return new ArrayList<>(); // 빈 파일이면 빈 리스트 반환
+        }
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(messageRepositoryFile));){
+            return (List<Message>) ois.readObject();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+
 }

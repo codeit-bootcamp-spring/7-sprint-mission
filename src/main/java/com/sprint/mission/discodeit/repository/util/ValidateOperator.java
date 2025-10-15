@@ -34,20 +34,20 @@ public class ValidateOperator implements ValidateService {
     public boolean isValidateChannel(ChannelDto channelDto) {
         if(channelDto==null) return false;
 
-        return channelRepository.getChannel(channelDto)==null;
+        return channelRepository.getChannel(channelDto)!=null;
     }
 
     @Override
     public boolean isValidateUser(UserDto userDto) {
         if(userDto==null) return false;
 
-        return userRepository.getUser(userDto)==null;
+        return userRepository.getUser(userDto)!=null;
     }
 
     @Override
     public boolean isValidateMessage(MessageDto messageDto) {
         if(messageDto==null) return false;
 
-        return messageRepository.getMessage(messageDto)==null;
+        return messageRepository.getMessage(messageDto)!=null;
     }
 }

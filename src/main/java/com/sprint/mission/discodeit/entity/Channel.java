@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class Channel extends Entity {
+public class Channel extends Entity implements Serializable{
     private String name;
     private String description;
     private boolean isPublic;
