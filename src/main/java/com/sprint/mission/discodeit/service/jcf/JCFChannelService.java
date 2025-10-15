@@ -1,13 +1,11 @@
-package com.sprint.mission.discodeit.entity.service.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.service.ChannelService;
+import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.function.Consumer;
 

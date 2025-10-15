@@ -1,9 +1,10 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Channel extends Common {
+public class Channel extends Common implements Serializable {
     // 필드(변수)
      private String channelName;
      private User bose;

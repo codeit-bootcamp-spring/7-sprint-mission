@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.entity.service.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.service.MessageService;
+import com.sprint.mission.entity.Message;
+import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
 

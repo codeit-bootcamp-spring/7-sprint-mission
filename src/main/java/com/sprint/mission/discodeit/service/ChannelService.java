@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.entity.service;
+package com.sprint.mission.discodeit.service;
 
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.User;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,5 +14,6 @@ public interface ChannelService {
     List<Channel> readAll();
     Channel update(UUID channelId, Consumer<Channel> updater);
     boolean delete(UUID channelId);
+
 
 }

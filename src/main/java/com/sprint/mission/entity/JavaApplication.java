@@ -1,16 +1,12 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.entity;
 
-import com.sprint.mission.discodeit.entity.service.ChannelService;
-import com.sprint.mission.discodeit.entity.service.MessageService;
-import com.sprint.mission.discodeit.entity.service.UserService;
 import com.sprint.mission.discodeit.entity.service.jcf.*;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
-import java.awt.print.Printable;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class JavaApplication {
 
@@ -91,9 +87,13 @@ public class JavaApplication {
         CHANNEL_SERVICE.read(channel2.getId());
         CHANNEL_SERVICE.readAll();
 
+        System.out.println("@@@@@@@@@@@@@@@@@");
+        Function<String, Stream<String>> f = s -> Stream.of(s, s.toUpperCase());
 
-
-
+        Stream<Stream<String>> streamStream = Stream.of("a", "bb")
+                .map(f);// ["a","bb"] → [Stream("a","A"), Stream("bb","BB")]
+        Stream<String> stringStream = Stream.of("a", "bb")
+                .flatMap(f);// ["a","bb"] → "a","A","bb","BB"
 
 
     }

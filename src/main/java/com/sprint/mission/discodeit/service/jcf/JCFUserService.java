@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.entity.service.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.service.UserService;
+import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 import java.util.List;
@@ -15,15 +15,14 @@ public class JCFUserService implements UserService {
     //마지막에 컴퓨터 좋아지면서 리스트를 많이쓴다 해서 리스트했다
     private final List<User> users;
 
-    //싱글톤 클래스내부에서 마지막에 불변 해서 올려놓고
-    private static final JCFUserService INSTANCE = new JCFUserService();
-
-
-
     //생성자 초기화 외부에서 못쓰게
     private JCFUserService() {
         this.users = new LinkedList<>();
     }
+
+    //싱글톤 클래스내부에서 마지막에 불변 해서 올려놓고
+    private static final JCFUserService INSTANCE = new JCFUserService();
+
 
     //메인에 호출할 유일 인스턴스 메인에서 쓰려고
     public static JCFUserService getInstance() {
@@ -31,8 +30,7 @@ public class JCFUserService implements UserService {
     }
 
 
-
-        @Override
+    @Override
     public User create(String userId,String password,String userName,String userNickname) {
          User user = new User(userId,password,userName,userNickname);
          users.add(user);
@@ -94,7 +92,8 @@ public class JCFUserService implements UserService {
                 .filter(u -> u.getId().equals(uuid))
                 .findFirst()
                 .map(u -> {
-                    updater.accept(u); // 여러개 가능하게
+                    updater.accept(u);
+                    // 여러개 가능하게
                     return u;
                 })
                 .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + uuid));

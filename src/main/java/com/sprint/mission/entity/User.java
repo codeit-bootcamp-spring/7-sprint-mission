@@ -1,6 +1,8 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.entity;
 
-public class User extends Common {
+import java.io.Serializable;
+
+public class User extends Common implements Serializable {
 
     private String userId;
     private String password;
@@ -17,9 +19,6 @@ public class User extends Common {
            this.userName = userName;
            this.password = password;
            this.userNickname = userNickname;
-
-
-
     }
 
 

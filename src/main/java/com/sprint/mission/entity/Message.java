@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.entity;
 
-import java.time.LocalDateTime;
+import java.io.Serializable;
 
-public class Message extends Common{
+public class Message extends Common implements Serializable {
     private User sender;
     private User receiver;
     private long time;
