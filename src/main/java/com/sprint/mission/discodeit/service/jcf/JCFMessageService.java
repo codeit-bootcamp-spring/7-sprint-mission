@@ -8,9 +8,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
-/*
-    의존성 주입 해야해!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- */
+
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data;
     private final ChannelService channelService;
