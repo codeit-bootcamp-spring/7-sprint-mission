@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.Memory;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.repository.UserRepository;
+import com.sprint.mission.discodeit.domain.User;
+import com.sprint.mission.discodeit.application.repository.UserRepository;
 
 import java.util.*;
 

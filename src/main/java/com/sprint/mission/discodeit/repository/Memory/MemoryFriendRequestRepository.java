@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.Memory;
 
-import com.sprint.mission.discodeit.entity.FriendRequest;
-import com.sprint.mission.discodeit.service.repository.FriendRequestRepository;
+import com.sprint.mission.discodeit.domain.FriendRequest;
+import com.sprint.mission.discodeit.application.repository.FriendRequestRepository;
 
 import java.util.*;
 

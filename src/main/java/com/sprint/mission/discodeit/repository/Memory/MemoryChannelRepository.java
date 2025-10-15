@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.Memory;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.service.repository.ChannelRepository;
+import com.sprint.mission.discodeit.domain.Channel;
+import com.sprint.mission.discodeit.application.repository.ChannelRepository;
 
 import java.util.*;
 
