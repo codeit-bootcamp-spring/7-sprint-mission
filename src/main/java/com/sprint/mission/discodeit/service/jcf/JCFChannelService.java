@@ -103,15 +103,4 @@ public class JCFChannelService implements ChannelService {
             return false;
         }
     }
-
-    @Override
-    public int deleteUserFromAllChannel(User user) {        // 디코는 탈퇴한다고 채널에서 나가지지않음
-        int count = 0;
-        for (Channel channel : data.values()) {
-            if(channel.removeMember(user)) {
-                count++;
-            }
-        }
-        return count;
-    }
 }

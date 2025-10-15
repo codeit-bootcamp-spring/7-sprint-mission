@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public class User extends BaseEntity {
 
-    private final String email;     // 이메일 -> 아이디로 사용
+    private String email;     // 이메일 -> 아이디로 사용
     private String password;        // 비밀번호
     private String userName;        // 닉네임
     private String phoneNum;        // 전화번호
@@ -85,6 +85,16 @@ public class User extends BaseEntity {
     public void updateState(State state) {
         this.state = state;
         updateTimestamp();
+    }
+
+    // 논리 삭제
+    public void softDelete() {
+        this.userName = "Deleted User";
+        this.email = this.id.toString() + "@deleted.user";
+        this.password = this.id.toString();
+        this.phoneNum = null;
+        this.state = State.OFFLINE;
+        updateTimestamp();  // 탈퇴일자
     }
 
     @Override

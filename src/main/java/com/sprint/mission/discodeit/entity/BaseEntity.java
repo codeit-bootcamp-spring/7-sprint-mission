@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 // abstract 키워드를 사용해 이 클래스 자체로는 객체를 만들 수 없도록 합니다.
-public class BaseEntity {
+public class BaseEntity implements Serializable {
 
     // 자식 클래스에서도 접근할 수 있도록 protected로 선언합니다.
     protected final UUID id;        // 고유아이디

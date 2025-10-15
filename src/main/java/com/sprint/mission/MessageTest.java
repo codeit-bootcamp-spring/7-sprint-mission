@@ -14,7 +14,6 @@ public class MessageTest {
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService(userService);
         JCFMessageService messageService = new JCFMessageService(userService, channelService);
-        userService.setChannelService(channelService);
 
         // --- 유저 및 채널 생성 ---
         UserInfo user1 = userService.createUser("test@codeit.com", "QWERty1!", "admin");

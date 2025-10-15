@@ -23,5 +23,4 @@ public interface ChannelService {
 
     boolean deleteChannel(UUID id);
 
-    int deleteUserFromAllChannel(User user);
 }

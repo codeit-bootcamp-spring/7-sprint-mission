@@ -13,7 +13,6 @@ public class ChannelTest {
 
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService(userService);
-        userService.setChannelService(channelService);
 
         // --- 유저 및 채널 생성 ---
         UserInfo User1 = userService.createUser("test@codeit.com", "QWERty1!", "admin");
