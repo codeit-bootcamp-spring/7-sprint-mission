@@ -125,7 +125,7 @@ public class JCFChannelRepository extends JCFBaseRepository<Channel, UUID> imple
     @Override
     public List<Channel> findAllChannelsBySettingsNonDel(String channelName, ChannelType channelType, String topic) {
         // 1. 저장소의 모든 채널 데이터를 스트림으로 변환합니다.
-        Stream<Channel> channelStream = findAll().stream();
+        Stream<Channel> channelStream = findAllNonDel().stream();
 
         // 2. [조건부 필터링] channelName 파라미터가 유효한 경우, 이름에 해당 문자열이 포함된 채널만 필터링합니다.
         if (channelName != null && !channelName.isBlank()) {
@@ -149,10 +149,7 @@ public class JCFChannelRepository extends JCFBaseRepository<Channel, UUID> imple
             );
         }
 
-        // 5. 위 조건부 필터링을 거친 최종 데이터에서 논리적 삭제가 되지않은 데이터만 추려냅니다.
-        channelStream =  channelStream.filter(channel -> !channel.isDeleted());
-
-        // 6. 모든 필터링을 거친 최종 결과를 List 형태로 수집하여 반환합니다.
+        // 5. 모든 필터링을 거친 최종 결과를 List 형태로 수집하여 반환합니다.
         return channelStream.collect(Collectors.toList());
     }
 }

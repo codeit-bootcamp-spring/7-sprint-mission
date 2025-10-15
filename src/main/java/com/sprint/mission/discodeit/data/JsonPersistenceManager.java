@@ -1,7 +1,8 @@
-package com.sprint.mission.discodeit.utils;
+package com.sprint.mission.discodeit.data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sprint.mission.discodeit.utils.ConfigurationLoader;
 
 import java.io.File;
 import java.io.FileReader;

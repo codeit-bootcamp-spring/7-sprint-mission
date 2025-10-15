@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'application' // application 플러그인 추가
-    id 'org.openjfx.javafxplugin' version '0.0.13' // JavaFX 플러그인 추가
 }
 
 group = 'com.sprint.mission'
@@ -13,12 +12,6 @@ repositories {
     mavenCentral()
 }
 
-// JavaFX 설정
-javafx {
-    version = "17.0.6" // Java 17과 호환되는 버전 사용
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
-}
-
 dependencies {
     // 기존 의존성
     implementation 'com.google.code.gson:gson:2.10.1'
@@ -27,11 +20,6 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.assertj:assertj-core:3.27.3'
-}
-
-application {
-    // 기본 실행 클래스 지정
-    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
 }
 
 test {
