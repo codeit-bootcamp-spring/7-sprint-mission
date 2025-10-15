@@ -1,6 +1,12 @@
 package com.sprint.mission.entity;
 
-public class Message<T extends Receivable> extends BaseEntity {
+import java.io.Serializable;
+
+public class Message<T extends Receivable> extends BaseEntity implements Serializable {
+
+    // 직렬화 및 역직렬화를 수행할 때 이 클래스의 버전을 의미
+    public static final long serialVersionID = 1L;
+
     private User sender;
     private Receivable receiver;
     private String message;

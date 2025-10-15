@@ -1,8 +1,12 @@
 package com.sprint.mission.entity;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class User extends BaseEntity implements Receivable {
+public class User extends BaseEntity implements Receivable, Serializable {
+
+    // 직렬화 및 역직렬화를 수행할 때 이 클래스의 버전을 의미
+    public static final long serialVersionID = 1L;
 
     private final String userId;
     private String passwd;
