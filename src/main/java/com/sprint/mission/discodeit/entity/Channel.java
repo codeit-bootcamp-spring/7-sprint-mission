@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.static_.StaticString;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +15,7 @@ public class Channel extends Entity {
     private String description;
     private boolean isPublic;
     private boolean isTextChannel;
-    private final List<User> userDb = new ArrayList<>();
+    private final List<User> userDb;
 
     public void addUserToChannel(User user){
         userDb.add(user);
@@ -42,6 +43,7 @@ public class Channel extends Entity {
         this.description = description;
         this.isPublic = isPublic;
         this.isTextChannel = isTextChannel;
+        this.userDb = new ArrayList<>();
     }
 
     public Channel(UUID id, String name, String description, boolean isPublic, boolean isTextChannel) {
@@ -50,6 +52,15 @@ public class Channel extends Entity {
         this.description = description;
         this.isPublic = isPublic;
         this.isTextChannel = isTextChannel;
+        this.userDb = new ArrayList<>();
+    }
+    public Channel(UUID id, String name, String description, boolean isPublic, boolean isTextChannel, List<User> userDb) {
+        super(id);
+        this.name = name;
+        this.description = description;
+        this.isPublic = isPublic;
+        this.isTextChannel = isTextChannel;
+        this.userDb = userDb;
     }
 
     public String getName() {
@@ -113,7 +124,7 @@ public class Channel extends Entity {
         IS_PUBLIC(Channel::isPublic,(x,y)->x.setPublic( (boolean) y)),
         IS_TEXT_CHANNEL(Channel::isTextChannel,(x,y)->x.setTextChannel( (boolean) y)),
         ;
-       public BiConsumer<Channel, Object> setter;
+        public BiConsumer<Channel, Object> setter;
 
 
 

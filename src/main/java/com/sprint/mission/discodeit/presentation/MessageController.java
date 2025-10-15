@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.presentation;
 
 import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 
 public class MessageController {
@@ -39,11 +41,8 @@ public class MessageController {
     }
 
     private Message messageInverter(MessageDto messageDto){
-        return new Message(
-                messageDto.getId(),
-                messageDto.getContent(),
-                messageDto.getSender(),
-                messageDto.isMarkDown()
-        );
+
+        User sender = new User(messageDto.getSender().getId(), messageDto.getSender().getName(), messageDto.getSender().getNickname(), messageDto.getSender().getEmail(), messageDto.getSender().isOnline());
+        return new Message(messageDto.getId(), messageDto.getContent(), sender, messageDto.isMarkDown());
     }
 }

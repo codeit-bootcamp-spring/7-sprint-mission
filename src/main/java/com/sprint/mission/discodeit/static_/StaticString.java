@@ -29,4 +29,5 @@ public class StaticString {
     public static final String CHANNEL_EMPTY ="channel is empty. create channel";
     public static final String USER_EMPTY ="user is empty create user";
     public static final String MESSAGE_EMPTY ="message is empty create message";
+    public static final String VALIDATE_FAIL ="validate test fail";
 }

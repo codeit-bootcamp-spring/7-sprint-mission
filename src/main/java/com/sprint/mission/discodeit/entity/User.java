@@ -2,12 +2,13 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.static_.StaticString;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class User extends Entity {
+public class User extends Entity implements Serializable {
 
 
     private String name;

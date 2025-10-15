@@ -45,10 +45,10 @@ public class ControllerTest {
         User user2 = userController.createUserController(user2Dto);
         User notInUserDBUser = userController.createUserController(notInUserDBUserDto);
         // 메세지 객체
-
-        MessageDto m1Dto = new MessageDto("Hello", user1, false);
-        MessageDto m2Dto = new MessageDto("Hi I am Faker", user2, false);
-        MessageDto m3Dto = new MessageDto("JAVA 를 정상화하네", notInUserDBUser, false);
+//
+        MessageDto m1Dto = new MessageDto("Hello", user1Dto, false);
+        MessageDto m2Dto = new MessageDto("Hi I am Faker", user2Dto, false);
+        MessageDto m3Dto = new MessageDto("JAVA 를 정상화하네", notInUserDBUserDto, false);
 
         Message m1 = messageController.createMessageController(m1Dto);
         Message m2 = messageController.createMessageController(m2Dto);

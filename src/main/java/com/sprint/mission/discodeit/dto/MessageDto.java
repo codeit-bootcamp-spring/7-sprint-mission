@@ -5,22 +5,33 @@ import com.sprint.mission.discodeit.entity.User;
 
 public class MessageDto extends Entity {
     private final String content;
-    private final User sender;
+    private final UserDto sender;
     private final boolean isMarkDown;
 
 
-    public MessageDto(String content, User sender, boolean isMarkDown) {
+    public MessageDto(String content, UserDto sender, boolean isMarkDown) {
         this.content = content;
         this.sender = sender;
         this.isMarkDown = isMarkDown;
     }
 
+
+
     public String getContent() {
         return content;
     }
 
-    public User getSender() {
+    public UserDto getSender() {
         return sender;
+    }
+
+    @Override
+    public String toString() {
+        return "MessageDto{" +
+                "content='" + content + '\'' +
+                ", sender=" + sender.getName() +
+                ", isMarkDown=" + isMarkDown +
+                '}';
     }
 
     public boolean isMarkDown() {
