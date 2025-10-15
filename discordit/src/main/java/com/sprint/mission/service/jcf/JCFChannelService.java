@@ -2,14 +2,15 @@ package com.sprint.mission.service.jcf;
 
 import com.sprint.mission.entity.Channel;
 import com.sprint.mission.entity.User;
-import com.sprint.mission.exceptions.ChannelIdNotFoundException;
+import com.sprint.mission.exceptions.ChannelNotFoundException;
+import com.sprint.mission.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.service.ChannelService;
 
 import java.util.*;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
-    private static final Map<UUID, Channel> data = new HashMap<>();
+    private static final JCFChannelRepository repository = JCFChannelRepository.getInstance();
     private static final JCFChannelService instance = new JCFChannelService();
 
     private JCFChannelService() {}
@@ -22,97 +23,82 @@ public class JCFChannelService implements ChannelService {
     public UUID createChannel(String name, Channel.ChannelType type, User... moderators) {
         HashSet<User> moderatorSet = new HashSet<>(Arrays.asList(moderators));
         Channel channel = new Channel(name, type, moderatorSet);
-        data.put(channel.getUuid(), channel);
+        repository.save(channel);
         return channel.getUuid();
     }
 
     @Override
-    public List<UUID> getAllChannels() {
-        return data.values().stream()
-                .sorted(Comparator.comparing(Channel::getDisplayName))
+    public List<UUID> getAllChannelIds() {
+        return repository.findAll().stream()
                 .map(Channel::getUuid)
                 .toList();
     }
 
     public UUID getNthChannel(int index){
-        return data.entrySet().stream()
-                .sorted(Comparator.comparing(e ->
-                        e.getValue().getDisplayName()))
-                .skip(index)
-                .findFirst()
-                .map(Map.Entry::getKey)
-                .orElseThrow(IndexOutOfBoundsException::new);
+        return repository.findAll().get(index).getUuid();
     }
 
     @Override
     public List<UUID> getRegisteredChannels(User user) {
         List<UUID> registered = new ArrayList<>();
-        for (Channel c : data.values()) {
+        for (Channel c : repository.findAll()) {
             if (c.getMembers().contains(user))
                 registered.add(c.getUuid());
         }
-        Collections.sort(registered);
         return registered;
     }
 
     @Override
     public List<UUID> getNotRegisteredChannels(User user) {
         List<UUID> registered = getRegisteredChannels(user);
-        List<UUID> allChannels = new ArrayList<>(data.keySet().stream().toList());
+        List<UUID> allChannels = repository.findAll().stream()
+                .map(Channel::getUuid)
+                .collect(Collectors.toCollection(ArrayList::new));
         allChannels.removeAll(registered);
-
-        return data.entrySet().stream()
-                .filter(e -> allChannels.contains(e.getKey()))
-                .sorted(Comparator.comparing(e ->
-                    e.getValue().getDisplayName()))
-                .map(Map.Entry::getKey)
-                .toList();
+        return allChannels;
     }
 
     @Override
     public void setChannelName(UUID uuid, String name) {
-        getChannelByUuid(uuid).setChannelName(name);
+        Channel channel = repository.findById(uuid);
+        channel.setChannelName(name);
+        repository.update(channel);
     }
 
     @Override
     public Channel getChannelById(UUID uuid) {
-        return data.get(uuid);
+        return repository.findById(uuid);
     }
 
     @Override
     public Set<User> getAllMembers(UUID uuid) {
-        return getChannelByUuid(uuid).getMembers();
+        return repository.findById(uuid).getMembers();
     }
 
     @Override
     public Set<User> getAllModerators(UUID uuid) {
-        return getChannelByUuid(uuid).getModerators();
+        return repository.findById(uuid).getModerators();
     }
 
     @Override
     public void addMember(UUID uuid, User user) {
-        getChannelByUuid(uuid).addMember(user);
+        Channel channel = repository.findById(uuid);
+        channel.addMember(user);
     }
 
     @Override
     public void addModerator(UUID uuid, User user) {
-        getChannelByUuid(uuid).addModerator(user);
+        repository.findById(uuid).addModerator(user);
     }
 
     @Override
     public void deleteMember(UUID uuid, User user) {
-        getChannelByUuid(uuid).deleteMember(user);
+        repository.findById(uuid).deleteMember(user);
     }
 
     @Override
     public void deleteModerator(UUID uuid, User user) {
-        getChannelByUuid(uuid).deleteModerator(user);
+        repository.findById(uuid).deleteModerator(user);
     }
 
-    private Channel getChannelByUuid(UUID uuid) {
-        Channel channel = data.get(uuid);
-        if (channel == null)
-            throw new ChannelIdNotFoundException(uuid);
-        return channel;
-    }
 }

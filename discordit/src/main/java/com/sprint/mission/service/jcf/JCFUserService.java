@@ -1,17 +1,15 @@
 package com.sprint.mission.service.jcf;
 
 import com.sprint.mission.entity.User;
-import com.sprint.mission.exceptions.UserAlreadyExistsException;
-import com.sprint.mission.exceptions.UserNotFoundException;
+import com.sprint.mission.repository.jcf.JCFUserRepository;
 import com.sprint.mission.service.UserService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
 
-    private static JCFUserService instance = new JCFUserService();
-    private static final Map<String, User> data = new HashMap<>();// 유저 id, User객체 (id검색을 빠르게 하기 위함)
+    private static final JCFUserService instance = new JCFUserService();
+    private static final JCFUserRepository repository = JCFUserRepository.getInstance();
 
     private JCFUserService() {
     }
@@ -21,107 +19,88 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User getUserById(String id) {
-        User user = data.get(id);
-        if(user == null)
-            throw new UserNotFoundException(id);
-        return user;
+    public User getById(String id) {
+        return repository.findById(id);
     }
 
 
     @Override
     public List<String> getAllUsers() {
-        return data.keySet().stream()
-                .sorted()
-                .toList();
-    }
-
-    @Override
-    public List<String> getOnlineUsers() {
-        return data.values().stream()
-                .filter(u -> u.getOnlineStatus() != User.Status.OFFLINE)
+        return repository.findAll().stream()
                 .map(User::getUserId)
                 .toList();
     }
 
     @Override
-    public boolean isCreatableId(String id) {
-        if(data.containsKey(id)){
-            throw new UserAlreadyExistsException(id);
-        }
-        return User.validateId(id);
-    }
-
-    @Override
-    public boolean validatePasswd(String passwd) {
-        return User.validatePasswd(passwd);
+    public List<String> getOnlineUsers() {
+        return repository.findAll().stream()
+                .filter(u -> u.getOnlineStatus() != User.Status.OFFLINE)
+                .map(User::getUserId)
+                .toList();
     }
 
 
 
     @Override
-    public User signIn(String userId, String passwd, String displayName) {
-        if(data.containsKey(userId))
-            throw new UserAlreadyExistsException(userId);
-        data.put(userId, new User(userId, passwd, displayName));
-        return getUserById(userId);
+    public void signIn(String userId, String passwd, String displayName) {
+        repository.save(new User(userId, passwd, displayName));
     }
 
     @Override
-    public User login(String id, String passwd) {
-        User user = data.get(id);
-        if(!user.login(id, passwd))
+    public boolean login(String id, String passwd) {
+        User user = repository.findById(id);
+        if(!user.getPasswd().equals(passwd))
             throw new IllegalArgumentException("아이디와 비밀번호가 일치하지 않습니다.");
 
         user.setOnlineStatus(User.Status.ONLINE);
-        return user;
+        repository.update(user);
+        return true;
     }
 
     @Override
-    public void deleteUser(String id) {
-        data.remove(id);
+    public void deleteById(String id) {
+        repository.deleteById(id);
     }
 
     @Override
     public void setPasswd(String id, String passwd) {
-        getUserById(id).setPasswd(passwd);
+        getById(id).setPasswd(passwd);
     }
 
     @Override
     public void setBio(String id, String bio) {
-        getUserById(id).setBio(bio);
+        getById(id).setBio(bio);
     }
 
     @Override
     public void setOnlineStatus(String id, User.Status status) {
-        getUserById(id).setOnlineStatus(status);
+        getById(id).setOnlineStatus(status);
     }
 
     @Override
     public User.Status getOnlineStatus(String id) {
-        return getUserById(id).getOnlineStatus();
+        return getById(id).getOnlineStatus();
     }
 
     @Override
     public String getDisplayName(String id) {
-        return getUserById(id).getDisplayName();
+        return getById(id).getDisplayName();
     }
 
     @Override
     public boolean isOnline(String id) {
-        return getUserById(id).getOnlineStatus() == User.Status.ONLINE;
+        return getById(id).getOnlineStatus() == User.Status.ONLINE;
     }
 
     @Override
     public String getBio(String id) {
-        return getUserById(id).getBio();
+        return getById(id).getBio();
     }
 
     @Override
-    public void setDisplayName(String userId, String change) {
-        if (change.length() > 10){
-            throw new IllegalArgumentException("닉네임은 10자 이하로 입력되어야 합니다. 입력 글자 수 :" + change.length());
-        }
-        data.get(userId).setDisplayName(change);
+    public void setDisplayName(String userId, String displayName) {
+        User user = repository.findById(userId);
+        user.setDisplayName(displayName);
+        repository.update(user);
     }
 }

@@ -6,7 +6,7 @@ import java.util.Objects;
 public class User extends BaseEntity implements Receivable, Serializable {
 
     // 직렬화 및 역직렬화를 수행할 때 이 클래스의 버전을 의미
-    public static final long serialVersionID = 1L;
+    private static final long serialVersionID = 1L;
 
     private final String userId;
     private String passwd;
@@ -16,6 +16,10 @@ public class User extends BaseEntity implements Receivable, Serializable {
     private Status onlineStatus;
 
     public User(String userId, String passwd, String displayName) {
+        validateId(userId);
+        validateId(passwd);
+        validateDisplayName(displayName);
+
         this.userId = userId;
         this.passwd = passwd;
         this.displayName = displayName;
@@ -31,12 +35,9 @@ public class User extends BaseEntity implements Receivable, Serializable {
     }
 
     public void setPasswd(String passwd) {
+        validatePasswd(passwd);
         this.updatedAt = getUnixTimestamp();
         this.passwd = passwd;
-    }
-
-    public boolean login(String id, String passwd){
-        return this.userId.equals(id) && this.passwd.equals(passwd);
     }
 
     @Override
@@ -45,6 +46,7 @@ public class User extends BaseEntity implements Receivable, Serializable {
     }
 
     public void setDisplayName(String displayName) {
+        validateDisplayName(displayName);
         this.updatedAt = getUnixTimestamp();
         this.displayName = displayName;
     }
@@ -67,19 +69,23 @@ public class User extends BaseEntity implements Receivable, Serializable {
         this.onlineStatus = onlineStatus;
     }
 
-    public static boolean validateId(String id){
+    public static void validateId(String id){
         if (id.length() < 4 || id.length() > 10){
             throw new IllegalArgumentException("아이디는 4에서 10자 사이로 입력해주세요.");
         }
-        return true;
     }
 
-    public static boolean validatePasswd(String passwd) {
+    public static void validatePasswd(String passwd) {
         // 지금은 아이디와 제약사항이 같지만 나중에 변경될 수 있어 분리함
         if (passwd.length() < 4 || passwd.length() > 10){
             throw new IllegalArgumentException("비밀번호는 4에서 10자 사이로 입력해주세요.");
         }
-        return true;
+    }
+
+    public static void validateDisplayName(String displayName) {
+        if (displayName.length() > 10){
+            throw new IllegalArgumentException("닉네임은 10자 이하로 입력되어야 합니다. 입력 글자 수 :" + displayName.length());
+        }
     }
 
     @Override

@@ -5,16 +5,15 @@ import com.sprint.mission.entity.User;
 import java.util.List;
 
 public interface UserService {
-    User getUserById(String id);
+    User getById(String id);
     List<String> getAllUsers();
     List<String> getOnlineUsers();
 
-    boolean isCreatableId(String id);
-    boolean validatePasswd(String passwd);
-    User signIn(String userId, String passwd, String displayName);
-    User login(String id, String passwd);
 
-    void deleteUser(String id);
+    void signIn(String userId, String passwd, String displayName);
+    boolean login(String id, String passwd);
+
+    void deleteById(String id);
 
     void setPasswd(String id, String passwd);
     void setBio(String id, String bio);

@@ -41,3 +41,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/docs/
+/.github/copilot-instructions.md
+/.github/
+/.agents/

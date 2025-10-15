@@ -22,7 +22,7 @@ public interface ChannelService {
 
     void deleteModerator(UUID uuid, User user);
 
-    List<UUID> getAllChannels();
+    List<UUID> getAllChannelIds();
     UUID getNthChannel(int index);
 
     List<UUID> getRegisteredChannels(User user);
