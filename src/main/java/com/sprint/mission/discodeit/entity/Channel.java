@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 public class Channel extends DefEntity{
+    private static final long serialVersionUID = 1L;
     private  String channelName;
     private String channelTopic;
 

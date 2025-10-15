@@ -1,39 +1,34 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-/*
-    CRUD 순서대로 이렇게 생긴 것이다.
-
-    C: create
-
-    R: read, readAll
-
-    U: updateUsername, updateEmail, deactivate
-
-    D: delete
-* */
-
-
+/**
+ * ✅ UserService 인터페이스
+ * - User 도메인에 대한 CRUD 규칙을 정의한다.
+ * - 구현체(JCFUserService)에서 이 규칙을 구체적으로 실현한다.
+ */
 public interface UserService {
 
-    // User 등록 단계
-    User create(String username, String email); // 유저 생성 ( 유저네임, 이메일 )
+    // C: 사용자 생성 (이름, 이메일 필수)
+    User create(String username, String email);
 
-    // 조회
-    User read(UUID id); // 유저 조회 ( UUID id ) = 특정 유저 하나만 조회
-    List<User> readAll();   // 모든 유저 조회
+    // R: 단건 조회
+    User read(UUID id);
 
-    // 수정
-    User updateUsername(UUID id,  String newUsername); // 유저네임 수정
-    User updateEmail(UUID id, String newEmail); // 이메일 수정
-    User deactivate(UUID id); // 유저 비활성화
+    // R: 전체 조회
+    List<User> readAll();
 
-    // 유저 삭제
-    boolean delete(UUID id); // 유저 삭제 ( id )
+    // U: 이름 수정
+    User updateUsername(UUID id, String newName);
 
+    // U: 이메일 수정
+    User updateEmail(UUID id, String newEmail);
 
+    // D: 삭제
+    boolean delete(UUID id);
 
+    // 추가: 활성/비활성 전환
+    User activate(UUID id);
+    User deactivate(UUID id);
 }
