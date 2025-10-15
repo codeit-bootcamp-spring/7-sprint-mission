@@ -11,8 +11,8 @@ public interface MessageRepository {
     Optional<Message> findById(UUID uuid);
     List<Message> findAll();
     boolean deleteById(UUID uuid);
-    List<Message> findByMessagesByChannel(UUID channelId);
-    List<Message> findByMessagesByAuthor(UUID authorId);
-    List<Message> findByMessagesByChannelAndAuthor(UUID channelId, UUID authorId);
+    List<Message> findByChannel(UUID channelId);
+    List<Message> findByAuthor(UUID authorId);
+    List<Message> findByChannelIdAndAuthorId(UUID channelId, UUID authorId);
     List<Message> searchByKeyword(String keyword);
 }
