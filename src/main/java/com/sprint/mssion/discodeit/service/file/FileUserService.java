@@ -1,15 +1,17 @@
-package com.sprint.mssion.discodeit.service.jcf;
+package com.sprint.mssion.discodeit.service.file;
 
 import com.sprint.mssion.discodeit.entity.User;
 import com.sprint.mssion.discodeit.repository.UserRepository;
 import com.sprint.mssion.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-public class JCFUserService implements UserService {
+public class FileUserService implements UserService {
     private final UserRepository userRepository;
 
-    public JCFUserService(UserRepository userRepository) {
+    public FileUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -73,6 +75,4 @@ public class JCFUserService implements UserService {
             userRepository.save(user);
         }
     }
-
-
 }

@@ -1,16 +1,18 @@
-package com.sprint.mssion.discodeit.service.jcf;
+package com.sprint.mssion.discodeit.service.file;
 
 import com.sprint.mssion.discodeit.entity.Message;
 import com.sprint.mssion.discodeit.repository.MessageRepository;
 import com.sprint.mssion.discodeit.service.MessageService;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-public class JCFMessageService implements MessageService {
+public class FileMessageService implements MessageService {
     private final MessageRepository messageRepository;
 
 
-    public JCFMessageService(MessageRepository messageRepository) {
+    public FileMessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
 

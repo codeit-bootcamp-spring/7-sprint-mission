@@ -1,4 +1,4 @@
-package com.sprint.mssion.discodeit.service.jcf;
+package com.sprint.mssion.discodeit.service.file;
 
 // 1. 파사드 패턴
 // - 서비스 순환 참조 발생 -> 서비스 간에 의존 의문 -> 컨트롤러로 대체?
@@ -14,12 +14,12 @@ import com.sprint.mssion.discodeit.service.UserService;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class FacadeService {
+public class FileFacadeService {
     private final UserService userService;
     private final ChannelService channelService;
     private final MessageService messageService;
 
-    public FacadeService(UserService userService, ChannelService channelService, MessageService messageService) {
+    public FileFacadeService(UserService userService, ChannelService channelService, MessageService messageService) {
         this.userService = userService;
         this.channelService = channelService;
         this.messageService = messageService;

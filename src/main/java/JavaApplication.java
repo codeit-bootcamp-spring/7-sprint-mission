@@ -1,16 +1,17 @@
 import com.sprint.mssion.discodeit.entity.Channel;
 import com.sprint.mssion.discodeit.entity.Message;
 import com.sprint.mssion.discodeit.entity.User;
-import com.sprint.mssion.discodeit.repositroy.ChannelRepository;
-import com.sprint.mssion.discodeit.repositroy.MessageRepository;
-import com.sprint.mssion.discodeit.repositroy.UserRepository;
-import com.sprint.mssion.discodeit.repositroy.jcf.JCFChannelRepository;
-import com.sprint.mssion.discodeit.repositroy.jcf.JCFUserRepository;
-import com.sprint.mssion.discodeit.repositroy.jcf.JCFMessageRepository;
+import com.sprint.mssion.discodeit.repository.ChannelRepository;
+import com.sprint.mssion.discodeit.repository.MessageRepository;
+import com.sprint.mssion.discodeit.repository.UserRepository;
+import com.sprint.mssion.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mssion.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mssion.discodeit.repository.file.FileUserRepository;
 import com.sprint.mssion.discodeit.service.ChannelService;
 import com.sprint.mssion.discodeit.service.MessageService;
 import com.sprint.mssion.discodeit.service.UserService;
-import com.sprint.mssion.discodeit.service.jcf.FacadeService;
+import com.sprint.mssion.discodeit.service.file.FileFacadeService;
+import com.sprint.mssion.discodeit.service.jcf.JCFFacadeService;
 import com.sprint.mssion.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mssion.discodeit.service.jcf.JCFUserService;
 import com.sprint.mssion.discodeit.service.jcf.JCFMessageService;
@@ -25,15 +26,16 @@ public class JavaApplication {
         // -> 파사드 패턴?
 
         // Repository init
-        UserRepository userRepository = new JCFUserRepository();
-        ChannelRepository channelRepository = new JCFChannelRepository();
-        MessageRepository messageRepository = new JCFMessageRepository();
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
 
         // Service init
         UserService userService = new JCFUserService(userRepository);
         ChannelService channelService = new JCFChannelService(channelRepository);
         MessageService messageService = new JCFMessageService(messageRepository);
-        FacadeService facadeService = new FacadeService(userService, channelService, messageService);
+        JCFFacadeService facadeService = new JCFFacadeService(userService, channelService, messageService);
+//        FileFacadeService facadeService = new FileFacadeService(userService, channelService, messageService);
 
         // 유저 생성
         User user1 = userService.createUser("dog", "dog@codeit.com", "1111", "111");
@@ -59,7 +61,7 @@ public class JavaApplication {
         facadeService.createMessageWithRelation(user1.getCommon().getId(), general.getCommon().getId(), "안녕하세요");
         facadeService.createMessageWithRelation(user2.getCommon().getId(), general.getCommon().getId(), "반갑다");
         facadeService.createMessageWithRelation(user1.getCommon().getId(), general.getCommon().getId(), "이름 무너ㅑ");
-        facadeService.createMessageWithRelation(user2.getCommon().getId(), general.getCommon().getId(), "Dog");
+        facadeService.createMessageWithRelation(user2.getCommon().getId(), general.getCommon().getId(), "gdgdgdd");
         facadeService.createMessageWithRelation(user3.getCommon().getId(), general.getCommon().getId(), "나도 안녕");
 
         // 여기서는 따로 addChannelToUser를 호출하지 않았지만, 자체 함수에서 채널에 없으면, 해당 유저를 채널에 참여

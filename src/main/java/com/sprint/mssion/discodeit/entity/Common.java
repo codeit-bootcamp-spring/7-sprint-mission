@@ -1,8 +1,13 @@
 package com.sprint.mssion.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Common {
+public class Common implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     public UUID id;
     public Long createAt;
     public Long updateAt;

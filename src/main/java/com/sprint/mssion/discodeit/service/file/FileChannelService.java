@@ -1,16 +1,18 @@
-package com.sprint.mssion.discodeit.service.jcf;
+package com.sprint.mssion.discodeit.service.file;
 
 import com.sprint.mssion.discodeit.entity.Channel;
 import com.sprint.mssion.discodeit.repository.ChannelRepository;
 import com.sprint.mssion.discodeit.service.ChannelService;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-public class JCFChannelService implements ChannelService {
+public class FileChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
 
-    public JCFChannelService(ChannelRepository channelRepository) {
+    public FileChannelService(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
     }
 

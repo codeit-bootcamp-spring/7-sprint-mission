@@ -1,6 +1,11 @@
 package com.sprint.mssion.discodeit.entity;
 
-public class Channel {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Channel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final Common common;
     private ChannelType type;
     private String channelName;

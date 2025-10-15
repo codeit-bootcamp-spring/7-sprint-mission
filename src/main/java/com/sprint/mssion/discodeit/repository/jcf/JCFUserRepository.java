@@ -1,7 +1,7 @@
-package com.sprint.mssion.discodeit.repositroy.jcf;
+package com.sprint.mssion.discodeit.repository.jcf;
 
 import com.sprint.mssion.discodeit.entity.User;
-import com.sprint.mssion.discodeit.repositroy.UserRepository;
+import com.sprint.mssion.discodeit.repository.UserRepository;
 
 import java.util.*;
 

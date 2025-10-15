@@ -1,4 +1,4 @@
-package com.sprint.mssion.discodeit.repositroy;
+package com.sprint.mssion.discodeit.repository;
 
 import com.sprint.mssion.discodeit.entity.Message;
 
