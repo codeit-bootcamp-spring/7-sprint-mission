@@ -1,18 +1,18 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.FriendShip;
-import com.sprint.mission.discodeit.service.repository.FriendShipRepository;
 import com.sprint.mission.discodeit.service.FriendShipService;
+import com.sprint.mission.discodeit.service.repository.FriendShipRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class JCFFriendShipService implements FriendShipService {
+public class FileFriendShipService implements FriendShipService {
 
     private final FriendShipRepository friendShipRepository;
 
-    public JCFFriendShipService(FriendShipRepository friendShipRepository) {
+    public FileFriendShipService(FriendShipRepository friendShipRepository) {
         this.friendShipRepository = friendShipRepository;
     }
 

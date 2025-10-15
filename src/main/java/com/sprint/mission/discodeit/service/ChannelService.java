@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService extends BaseService<Channel>{
+
     void update(UUID id, ChannelDTO channelDTO);
 
     void addMember(Channel channel, UUID uuid);

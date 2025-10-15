@@ -1,22 +1,20 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.DTO.UserDTO;
-import com.sprint.mission.discodeit.entity.*;
-
-import com.sprint.mission.discodeit.service.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.repository.UserRepository;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-
-
-import java.util.*;
-
-public class JCFUserService implements UserService {
+public class FileUserService implements UserService {
 
 
     private final UserRepository userRepository;
 
-    public JCFUserService(UserRepository userRepository) {
+    public FileUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

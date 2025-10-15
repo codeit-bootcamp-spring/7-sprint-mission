@@ -4,13 +4,15 @@ import com.sprint.mission.discodeit.vo.Message;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class MessageRoom {
+public class MessageRoom implements Serializable {
+    private static final long serialVersionUID = 3L;
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;

@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.repository;
+package com.sprint.mission.discodeit.service.repository;
 
 import com.sprint.mission.discodeit.entity.FriendRequest;
-import com.sprint.mission.discodeit.service.BaseService;
 
 public interface FriendRequestRepository extends BaseRepository<FriendRequest> {
 

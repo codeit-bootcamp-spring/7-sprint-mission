@@ -1,9 +1,7 @@
-package com.sprint.mission.discodeit.repository.jcf;
+package com.sprint.mission.discodeit.repository.Memory;
 
 import com.sprint.mission.discodeit.entity.MessageRoom;
-import com.sprint.mission.discodeit.DTO.MessageRoomDTO;
-import com.sprint.mission.discodeit.entity.MessageRoomType;
-import com.sprint.mission.discodeit.repository.MessageRoomRepository;
+import com.sprint.mission.discodeit.service.repository.MessageRoomRepository;
 
 import java.util.*;
 

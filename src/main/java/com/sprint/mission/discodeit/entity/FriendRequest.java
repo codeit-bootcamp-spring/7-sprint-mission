@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 
+import java.io.Serializable;
 import java.util.UUID;
 
 
 @Getter
-public class FriendRequest {
+public class FriendRequest implements Serializable {
+    private static final long serialVersionUID = 4L;
 
     private final UUID id;
     private final UUID senderId;

@@ -3,16 +3,14 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.DTO.ChannelDTO;
 import com.sprint.mission.discodeit.DTO.UserDTO;
-import com.sprint.mission.discodeit.controller.Controller;
+import com.sprint.mission.discodeit.application.ConsoleApplication;
 import com.sprint.mission.discodeit.entity.*;
 
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageRoomService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.*;
 
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.etc.PrintUtil.*;
@@ -29,7 +27,7 @@ public class JavaApplication {
         MessageRoomService messageRoomService= appConfig.getMessageRoomService();
         ChannelService channelService = appConfig.getChannelService();
 
-        Controller controller = appConfig.getController();
+        ConsoleApplication consoleApplication = appConfig.getConsoleApplication();
 
 
         //User생성 - 필수 필드 입력 안할 시 실패
@@ -51,7 +49,7 @@ public class JavaApplication {
 
         //User 찾기
         User findUser = userService.findById(user.getId());
-        System.out.println("같은 객체인가?"+ (findUser==user));
+        System.out.println("같은 객체인가?"+ (findUser.equals(user)));
         printLine();
 
 
@@ -106,7 +104,7 @@ public class JavaApplication {
 
         //Channel 찾기 - 성공
         Channel findChannel = channelService.findById(channel.getId());
-        System.out.println("같은 객체인가요? "+(findChannel==channel));
+        System.out.println("같은 객체인가요? "+(findChannel.equals(channel)));
         printLine();
 
 
@@ -145,7 +143,7 @@ public class JavaApplication {
 
         //MessageRoom 찾기 -성공
         MessageRoom findMessageRoom = messageRoomService.findById(messageRoom.getId());
-        System.out.println("같은 객체인가요? "+(findMessageRoom==messageRoom));
+        System.out.println("같은 객체인가요? "+(findMessageRoom.equals(messageRoom)));
         printLine();
 
         //MessageRoom 삭제
@@ -184,16 +182,16 @@ public class JavaApplication {
 
 
         //MessageRoom 모두 조회
-        messageRoomService.save(messageRoom);
-        MessageRoom messageRoom2 = new MessageRoom();
-        messageRoom2.setMessageRoomName("테스트 서버A의 채팅방");
-        messageRoom2.setMessageRoomType(MessageRoomType.SERVER_MESSAGE_ROOM);
-        messageRoomService.save(messageRoom2);
-        System.out.println("[채팅방 목록]");
-        messageRoomService.findAll().forEach(m-> System.out.println(m.getMessageRoomName()));
-        printLine();
+//        messageRoomService.save(messageRoom);
+//        MessageRoom messageRoom2 = new MessageRoom();
+//        messageRoom2.setMessageRoomName("테스트 서버A의 채팅방");
+//        messageRoom2.setMessageRoomType(MessageRoomType.SERVER_MESSAGE_ROOM);
+//        messageRoomService.save(messageRoom2);
+//        System.out.println("[채팅방 목록]");
+//        messageRoomService.findAll().forEach(m-> System.out.println(m.getMessageRoomName()));
+//        printLine();
 
-        channel.addMessageRoom(messageRoom2.getId());
+//        channel.addMessageRoom(messageRoom2.getId());
 
         //지금까지는 간단한 CRUD를 구현했음
         //---------------------------------------------------------------------------------
@@ -219,6 +217,6 @@ public class JavaApplication {
         * 을 구현했습니다.
         *
          * */
-        controller.start();
+        consoleApplication.start();
     }
 }

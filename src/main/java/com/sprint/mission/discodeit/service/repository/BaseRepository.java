@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository;
+package com.sprint.mission.discodeit.service.repository;
 
 import java.util.List;
 import java.util.Optional;

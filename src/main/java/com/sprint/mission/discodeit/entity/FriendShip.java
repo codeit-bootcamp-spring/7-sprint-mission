@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Getter
-public class FriendShip {
+public class FriendShip implements Serializable {
+    private static final long serialVersionUID = 5L;
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;

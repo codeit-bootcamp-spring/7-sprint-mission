@@ -3,13 +3,17 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class User {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final UUID id;
     private final Long createdAt;
@@ -115,5 +119,16 @@ public class User {
     }
     public void addFriendRequest(UUID id){
         myFriendRequest.add(id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(id, user.id) && Objects.equals(createdAt, user.createdAt) && Objects.equals(updatedAt, user.updatedAt) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(nickname, user.nickname) && Objects.equals(phoneNumber, user.phoneNumber) && Objects.equals(myMessageRooms, user.myMessageRooms) && Objects.equals(myChannels, user.myChannels) && Objects.equals(friends, user.friends) && Objects.equals(myFriendRequest, user.myFriendRequest);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, createdAt, updatedAt, username, password, email, nickname, phoneNumber, myMessageRooms, myChannels, friends, myFriendRequest);
     }
 }

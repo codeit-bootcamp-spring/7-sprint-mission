@@ -1,18 +1,18 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.FriendRequest;
-import com.sprint.mission.discodeit.service.repository.FriendRequestRepository;
 import com.sprint.mission.discodeit.service.FriendRequestService;
+import com.sprint.mission.discodeit.service.repository.FriendRequestRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class JCFFriendRequestService implements FriendRequestService {
+public class FileFriendRequestService implements FriendRequestService {
 
     private final FriendRequestRepository friendRequestRepository;
 
-    public JCFFriendRequestService(FriendRequestRepository friendRequestRepository) {
+    public FileFriendRequestService(FriendRequestRepository friendRequestRepository) {
         this.friendRequestRepository = friendRequestRepository;
     }
 

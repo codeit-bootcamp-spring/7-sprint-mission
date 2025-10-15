@@ -1,8 +1,7 @@
-package com.sprint.mission.discodeit.repository.jcf;
+package com.sprint.mission.discodeit.repository.Memory;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.DTO.UserDTO;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.repository.UserRepository;
 
 import java.util.*;
 

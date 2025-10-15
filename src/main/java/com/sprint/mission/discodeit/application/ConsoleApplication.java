@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.application;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.*;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class Controller {
+public class ConsoleApplication {
     private final ChannelService channelService;
     private final UserService userService;
     private final MessageRoomService messageRoomService;
@@ -16,11 +16,11 @@ public class Controller {
     private final FriendShipService friendShipService;
 
 
-    public Controller(ChannelService channelService,
-                      UserService userService,
-                      MessageRoomService messageRoomService,
-                      FriendRequestService friendRequestService,
-                      FriendShipService friendShipService) {
+    public ConsoleApplication(ChannelService channelService,
+                              UserService userService,
+                              MessageRoomService messageRoomService,
+                              FriendRequestService friendRequestService,
+                              FriendShipService friendShipService) {
         this.channelService = channelService;
         this.userService = userService;
         this.messageRoomService = messageRoomService;
@@ -341,6 +341,8 @@ public class Controller {
         channel.addMember(currentUser.getId());
         channelService.save(channel);
 
+        currentUser.addMyChannel(channel.getId());
+        userService.save(currentUser);
         System.out.println("'" + channelName + "'서버가 성공적으로 생성되었습니다!\n");
     }
 

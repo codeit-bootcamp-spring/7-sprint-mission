@@ -1,20 +1,20 @@
-package com.sprint.mission.discodeit.service.jcf;
-
+package com.sprint.mission.discodeit.service.file;
 
 
 import com.sprint.mission.discodeit.DTO.MessageRoomDTO;
-import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.service.repository.MessageRoomRepository;
+import com.sprint.mission.discodeit.entity.MessageRoom;
 import com.sprint.mission.discodeit.service.MessageRoomService;
+import com.sprint.mission.discodeit.service.repository.MessageRoomRepository;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-import java.util.*;
-
-public class JCFMessageRoomService implements MessageRoomService {
+public class FileMessageRoomService implements MessageRoomService {
 
     private final MessageRoomRepository messageRoomRepository;
 
-    public JCFMessageRoomService(MessageRoomRepository messageRoomRepository) {
+    public FileMessageRoomService(MessageRoomRepository messageRoomRepository) {
         this.messageRoomRepository=messageRoomRepository;
     }
 
