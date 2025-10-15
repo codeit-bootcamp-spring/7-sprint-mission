@@ -2,10 +2,8 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserState;
-import com.sprint.mission.discodeit.entity.VerifiedUtils;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 // 생성 , 읽기 , 모두읽기, 수정, 삭제

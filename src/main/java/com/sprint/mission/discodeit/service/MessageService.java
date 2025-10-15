@@ -13,8 +13,8 @@ public interface MessageService {
     Message update(Message message);
     boolean delete(UUID uuid);
     List<Message> getMessagesByChannel(UUID channelId);
-    List<Message> getMessagesByAuthor(UUID AuthorId);
-    List<Message> getMessagesByChannelAndAuthor(UUID channelId, UUID AuthorId);
+    List<Message> getMessagesByAuthor(UUID authorId);
+    List<Message> getMessagesByChannelAndAuthor(UUID channelId, UUID authorId);
     List<Message> getAllMessages();
     List<Message> searchByKeyword(String keyword);
 }
