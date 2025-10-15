@@ -8,10 +8,9 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class FileUserRepository implements UserRepository {
-    private final Path filePath = Paths.get("src", "main", "resources", "Users.ser");
     private final FileManager<User> fileManager;
-    public FileUserRepository() {
-        fileManager = new FileManager<>(filePath);
+    public FileUserRepository(FileManager<User> fileManager) {
+        this.fileManager = fileManager;
     }
 
     @Override

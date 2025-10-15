@@ -5,17 +5,22 @@ import com.sprint.mssion.discodeit.repository.ChannelRepository;
 import com.sprint.mssion.discodeit.repository.MessageRepository;
 import com.sprint.mssion.discodeit.repository.UserRepository;
 import com.sprint.mssion.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mssion.discodeit.repository.file.FileManager;
 import com.sprint.mssion.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mssion.discodeit.repository.file.FileUserRepository;
 import com.sprint.mssion.discodeit.service.ChannelService;
 import com.sprint.mssion.discodeit.service.MessageService;
 import com.sprint.mssion.discodeit.service.UserService;
+import com.sprint.mssion.discodeit.service.file.FileChannelService;
 import com.sprint.mssion.discodeit.service.file.FileFacadeService;
+import com.sprint.mssion.discodeit.service.file.FileMessageService;
+import com.sprint.mssion.discodeit.service.file.FileUserService;
 import com.sprint.mssion.discodeit.service.jcf.JCFFacadeService;
 import com.sprint.mssion.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mssion.discodeit.service.jcf.JCFUserService;
 import com.sprint.mssion.discodeit.service.jcf.JCFMessageService;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 
@@ -26,15 +31,15 @@ public class JavaApplication {
         // -> 파사드 패턴?
 
         // Repository init
-        UserRepository userRepository = new FileUserRepository();
-        ChannelRepository channelRepository = new FileChannelRepository();
-        MessageRepository messageRepository = new FileMessageRepository();
+        UserRepository userRepository = new FileUserRepository(new FileManager<>(Paths.get("src", "main", "resources", "Users.ser")));
+        ChannelRepository channelRepository = new FileChannelRepository(new FileManager<>(Paths.get("src", "main", "resources", "Channels.ser")));
+        MessageRepository messageRepository = new FileMessageRepository(new FileManager<>(Paths.get("src", "main", "resources", "Messages.ser")));
 
         // Service init
-        UserService userService = new JCFUserService(userRepository);
-        ChannelService channelService = new JCFChannelService(channelRepository);
-        MessageService messageService = new JCFMessageService(messageRepository);
-        JCFFacadeService facadeService = new JCFFacadeService(userService, channelService, messageService);
+        UserService userService = new FileUserService(userRepository);
+        ChannelService channelService = new FileChannelService(channelRepository);
+        MessageService messageService = new FileMessageService(messageRepository);
+        FileFacadeService facadeService = new FileFacadeService(userService, channelService, messageService);
 //        FileFacadeService facadeService = new FileFacadeService(userService, channelService, messageService);
 
         // 유저 생성

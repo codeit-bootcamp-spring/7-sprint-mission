@@ -1,6 +1,4 @@
 package com.sprint.mssion.discodeit.repository.file;
-
-import com.sprint.mssion.discodeit.entity.Channel;
 import com.sprint.mssion.discodeit.entity.Message;
 import com.sprint.mssion.discodeit.repository.MessageRepository;
 
@@ -9,10 +7,9 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class FileMessageRepository implements MessageRepository {
-    private final Path filePath = Paths.get("src", "main", "resources", "Messages.ser");
     private final FileManager<Message> fileManager;
-    public FileMessageRepository() {
-        fileManager = new FileManager<>(filePath);
+    public FileMessageRepository(FileManager<Message> fileManager) {
+        this.fileManager = fileManager;
     }
 
     @Override

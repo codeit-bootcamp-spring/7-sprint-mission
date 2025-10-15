@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class FileChannelService implements ChannelService {
+    public class FileChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
 

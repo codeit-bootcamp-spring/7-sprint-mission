@@ -1,7 +1,6 @@
 package com.sprint.mssion.discodeit.repository.file;
 
 import com.sprint.mssion.discodeit.entity.Channel;
-import com.sprint.mssion.discodeit.entity.User;
 import com.sprint.mssion.discodeit.repository.ChannelRepository;
 
 import java.nio.file.Path;
@@ -9,10 +8,9 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class FileChannelRepository implements ChannelRepository {
-    private final Path filePath = Paths.get("src", "main", "resources", "Channels.ser");
     private final FileManager<Channel> fileManager;
-    public FileChannelRepository() {
-        fileManager = new FileManager<>(filePath);
+    public FileChannelRepository(FileManager<Channel> fileManager) {
+        this.fileManager = fileManager;
     }
 
     @Override
