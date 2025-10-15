@@ -22,8 +22,7 @@ public class JavaApplication {
 
         UserService userService = serviceFactory.getUserService();
         ChannelService channelService = serviceFactory.getChannelService();
-        MessageService<User> messageService = serviceFactory.getMessageService();
-        MessageService<Channel> channelMessageService = serviceFactory.getChannelMessageService();
+        MessageService messageService = serviceFactory.getMessageService();
 
         //======================================================================================
         // user
@@ -374,36 +373,36 @@ public class JavaApplication {
         // 채널 메시지 추가(메시지 채널에만 추가)
 
         // channel2 (discordItUser2 관리자) : "프로젝트 토론 메시지 채널"
-        channelMessageService.createMessage(discordItUser2, channel2, "이번 주까지 로그인 기능 마무리해야 할 것 같아요.");
-        channelMessageService.createMessage(discordItUser4, channel2, "DB 쪽은 제가 맡을게요.");
-        channelMessageService.createMessage(discordItUser6, channel2, "UI는 제가 진행할게요.");
-        channelMessageService.createMessage(discordItUser8, channel2, "테스트 케이스 작성은 제가 해보겠습니다.");
-        channelMessageService.createMessage(discordItUser2, channel2, "좋아요. 그럼 목요일까지 중간 점검합시다.");
-        channelMessageService.createMessage(discordItUser1, channel2, "확인했습니다!");
+        messageService.createMessage(discordItUser2, channel2, "이번 주까지 로그인 기능 마무리해야 할 것 같아요.");
+        messageService.createMessage(discordItUser4, channel2, "DB 쪽은 제가 맡을게요.");
+        messageService.createMessage(discordItUser6, channel2, "UI는 제가 진행할게요.");
+        messageService.createMessage(discordItUser8, channel2, "테스트 케이스 작성은 제가 해보겠습니다.");
+        messageService.createMessage(discordItUser2, channel2, "좋아요. 그럼 목요일까지 중간 점검합시다.");
+        messageService.createMessage(discordItUser1, channel2, "확인했습니다!");
 
         // channel4 (discordItUser4 관리자) : "공지사항 메시지 채널"
-        channelMessageService.createMessage(discordItUser4, channel4, "📢 이번 주 토요일 정기 점검이 있습니다.");
-        channelMessageService.createMessage(discordItUser1, channel4, "확인했습니다!");
-        channelMessageService.createMessage(discordItUser2, channel4, "네 알겠습니다.");
-        channelMessageService.createMessage(discordItUser6, channel4, "그날은 접속 못하겠네요 ㅎㅎ");
-        channelMessageService.createMessage(discordItUser4, channel4, "불편 드려 죄송합니다. 더 나은 환경을 위해 점검하는 거예요.");
-        channelMessageService.createMessage(discordItUser7, channel4, "넵 고생 많으십니다!");
+        messageService.createMessage(discordItUser4, channel4, "📢 이번 주 토요일 정기 점검이 있습니다.");
+        messageService.createMessage(discordItUser1, channel4, "확인했습니다!");
+        messageService.createMessage(discordItUser2, channel4, "네 알겠습니다.");
+        messageService.createMessage(discordItUser6, channel4, "그날은 접속 못하겠네요 ㅎㅎ");
+        messageService.createMessage(discordItUser4, channel4, "불편 드려 죄송합니다. 더 나은 환경을 위해 점검하는 거예요.");
+        messageService.createMessage(discordItUser7, channel4, "넵 고생 많으십니다!");
 
         // channel6 (discordItUser6 관리자) : "자유 대화 메시지 채널"
-        channelMessageService.createMessage(discordItUser6, channel6, "오늘 점심 뭐 먹었어요?");
-        channelMessageService.createMessage(discordItUser2, channel6, "저는 김치찌개 먹었어요 ㅎㅎ");
-        channelMessageService.createMessage(discordItUser8, channel6, "저는 편의점 샌드위치로 때웠어요.");
-        channelMessageService.createMessage(discordItUser7, channel6, "저는 돈가스 먹었습니다!");
-        channelMessageService.createMessage(discordItUser3, channel6, "다들 맛있게 드셨네요. 전 샐러드만 먹었어요.");
-        channelMessageService.createMessage(discordItUser6, channel6, "역시 점심 메뉴 얘기가 제일 재밌어요 ㅋㅋ");
+        messageService.createMessage(discordItUser6, channel6, "오늘 점심 뭐 먹었어요?");
+        messageService.createMessage(discordItUser2, channel6, "저는 김치찌개 먹었어요 ㅎㅎ");
+        messageService.createMessage(discordItUser8, channel6, "저는 편의점 샌드위치로 때웠어요.");
+        messageService.createMessage(discordItUser7, channel6, "저는 돈가스 먹었습니다!");
+        messageService.createMessage(discordItUser3, channel6, "다들 맛있게 드셨네요. 전 샐러드만 먹었어요.");
+        messageService.createMessage(discordItUser6, channel6, "역시 점심 메뉴 얘기가 제일 재밌어요 ㅋㅋ");
 
         // channel8 (discordItUser8 관리자) : "Q&A 메시지 채널"
-        channelMessageService.createMessage(discordItUser8, channel8, "스프링에서 DI가 뭔지 설명해줄 수 있나요?");
-        channelMessageService.createMessage(discordItUser5, channel8, "의존성 주입이에요. 객체 간 결합도를 낮추는 개념이죠.");
-        channelMessageService.createMessage(discordItUser3, channel8, "맞아요. 보통 @Autowired 같은 걸로 구현합니다.");
-        channelMessageService.createMessage(discordItUser2, channel8, "또는 생성자 주입 방식도 많이 씁니다.");
-        channelMessageService.createMessage(discordItUser6, channel8, "그게 테스트할 때 더 유리하다고 들었어요.");
-        channelMessageService.createMessage(discordItUser8, channel8, "아~ 이제 확실히 이해됐습니다. 감사합니다!");
+        messageService.createMessage(discordItUser8, channel8, "스프링에서 DI가 뭔지 설명해줄 수 있나요?");
+        messageService.createMessage(discordItUser5, channel8, "의존성 주입이에요. 객체 간 결합도를 낮추는 개념이죠.");
+        messageService.createMessage(discordItUser3, channel8, "맞아요. 보통 @Autowired 같은 걸로 구현합니다.");
+        messageService.createMessage(discordItUser2, channel8, "또는 생성자 주입 방식도 많이 씁니다.");
+        messageService.createMessage(discordItUser6, channel8, "그게 테스트할 때 더 유리하다고 들었어요.");
+        messageService.createMessage(discordItUser8, channel8, "아~ 이제 확실히 이해됐습니다. 감사합니다!");
 
         // 어플리케이션에 필요한 변수 간단히 생성
         Scanner sc = new Scanner(System.in);
@@ -568,7 +567,7 @@ public class JavaApplication {
                                                             System.out.println("채널 채팅 입장");
                                                             Printer.printLine();
 
-                                                            List<Message> channelMessages = channelMessageService.getAllByChannel(userChannel);
+                                                            List<Message> channelMessages = messageService.getAllByChannel(userChannel);
                                                             Printer.printChatHistory(userService, user, channelMessages);
                                                             while (true) {
                                                                 Printer.printHalfLine();
@@ -577,11 +576,11 @@ public class JavaApplication {
                                                                 input = sc.nextLine();
 
                                                                 if (input.equals("1")) {
-                                                                    channelMessages = channelMessageService.getAllByChannel(userChannel);
+                                                                    channelMessages = messageService.getAllByChannel(userChannel);
                                                                     Printer.printChatHistory(userService, user, channelMessages);
                                                                 } else if (input.equals("-1")) break;
                                                                 else {
-                                                                    channelMessageService.createMessage(user, userChannel, input);
+                                                                    messageService.createMessage(user, userChannel, input);
                                                                 }
                                                             }
 

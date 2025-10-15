@@ -12,16 +12,14 @@ import java.util.UUID;
  * MessageService
  * -----------------
  * 메시지 전송/조회/수정/삭제 등의 비즈니스 로직을 정의한 인터페이스입니다.
- *
- * @param <T> 수신자 타입 (User 또는 Channel)
  */
-public interface MessageService<T> {
+public interface MessageService {
 
     /** 새로운 메시지를 생성 */
-    void createMessage(User user, T receiver, String content);
+    <T> void createMessage(User user, T receiver, String content);
 
     /** 두 유저 또는 채널 간의 최신 메시지(가장 마지막 메시지)를 가져옴 */
-    Message getLastestMessage(User user, T receiver);
+    <T> Message getLastestMessage(User user, T receiver);
 
     /** 두 유저 간의 전체 메시지 목록을 조회 */
     List<Message> getMessagesBetween(User user1, User user2);

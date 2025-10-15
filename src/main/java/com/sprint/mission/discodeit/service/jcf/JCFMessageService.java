@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  * - 비즈니스 로직: 메시지 생성, 필터링, 최신 메시지 조회 등
  * - 데이터 저장/조회: MessageRepository에 위임
  */
-public class JCFMessageService<T> implements MessageService<T> {
+public class JCFMessageService implements MessageService {
     private final MessageRepository messageRepository;
 
     /**
@@ -34,7 +34,7 @@ public class JCFMessageService<T> implements MessageService<T> {
      * 새로운 메시지를 생성하여 Repository에 저장
      */
     @Override
-    public void createMessage(User user, T receiver, String content) {
+    public <T> void createMessage(User user, T receiver, String content) {
         Message newMessage = null;
 
         // 수신자가 User인 경우
@@ -52,7 +52,7 @@ public class JCFMessageService<T> implements MessageService<T> {
      * 특정 유저/채널과의 최신 메시지를 조회
      */
     @Override
-    public Message getLastestMessage(User user, T receiver) {
+    public <T> Message getLastestMessage(User user, T receiver) {
         List<Message> allMessages = messageRepository.findAll();
 
         // 최신순(역순)으로 순회

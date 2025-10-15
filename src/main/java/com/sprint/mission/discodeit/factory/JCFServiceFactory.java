@@ -23,8 +23,7 @@ public class JCFServiceFactory {
 
     private final UserService userService;
     private final ChannelService channelService;
-    private final MessageService<User> messageService;
-    private final MessageService<Channel> channelMessageService;
+    private final MessageService messageService;
 
 
     private JCFServiceFactory() {
@@ -34,8 +33,7 @@ public class JCFServiceFactory {
 
         userService = new JCFUserService(userRepository, messageRepository);
         channelService = new JCFChannelService(channelRepository);
-        messageService = new JCFMessageService<>(messageRepository);
-        channelMessageService = new JCFMessageService<>(messageRepository);
+        messageService = new JCFMessageService(messageRepository);
     }
 
     // 팩토리 클래스는 한 번만 부르면 되므로 싱글톤 패턴으로 구현
@@ -53,12 +51,7 @@ public class JCFServiceFactory {
         return channelService;
     }
 
-    public MessageService<User> getMessageService() {
+    public MessageService getMessageService() {
         return messageService;
     }
-
-    public MessageService<Channel> getChannelMessageService() {
-        return channelMessageService;
-    }
-
 }
