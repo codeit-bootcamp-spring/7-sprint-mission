@@ -14,16 +14,28 @@ import java.util.*;
 public class FileChannelRepository implements ChannelRepository {
     private static final String FILE_PATH = DataPath.FILE_DIR + "/channel.sav";
     private static final FileChannelRepository instance = new FileChannelRepository();
-    private static final Map<UUID, Channel> data = new HashMap<>();
+    private static Map<UUID, Channel> data;
 
     private FileChannelRepository(){
+        data = new HashMap<>();
+        File file = new File(FILE_PATH);
+
+        // 파일이 없으면 디렉토리 생성 및 빈 데이터로 시작
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            return;
+        }
+
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))){
             List<Channel> objects = (List<Channel>) ois.readObject();
             for (Channel object : objects) {
                 data.put(object.getUuid(), object);
             }
-        } catch (ClassNotFoundException | IOException e) {
-            throw new RuntimeException(e);
+        } catch (FileNotFoundException e) {
+            // 파일이 없으면 빈 맵으로 시작
+            System.out.println("채널 파일이 없어 새로 생성합니다.");
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("채널 파일 로드 중 오류 발생", e);
         }
     }
 
@@ -83,7 +95,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     private void write(){
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(data);
+            oos.writeObject(List.copyOf(data.values()));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {

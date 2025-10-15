@@ -19,14 +19,14 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void save(User user) {
-        if(existsById(user.getUserId()))
+        if(isExsistId(user.getUserId()))
             throw new UserAlreadyExistsException(user.getUserId());
         data.put(user.getUserId(), user);
     }
 
     @Override
     public void update(User user) {
-        if(!existsById(user.getUserId()))
+        if(!isExsistId(user.getUserId()))
             throw new UserNotFoundException(user.getUserId());
         data.put(user.getUserId(), user);
     }
@@ -34,27 +34,27 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User findById(String id) {
-        if(existsById(id))
+        if(isExsistId(id))
             throw new UserNotFoundException(id);
         return data.get(id);
     }
 
     @Override
     public void deleteById(String id) {
-        if(!existsById(id))
+        if(!isExsistId(id))
             throw new UserNotFoundException(id);
         data.remove(id);
     }
 
     @Override
-    public boolean existsById(String id) {
+    public boolean isExsistId(String id) {
         return data.containsKey(id);
     }
 
     @Override
     public List<User> findByIds(String... ids) {
         return Arrays.stream(ids)
-                .filter(this::existsById)
+                .filter(this::isExsistId)
                 .map(data::get)
                 .sorted(Comparator.comparing(User::getUserId))
                 .toList();

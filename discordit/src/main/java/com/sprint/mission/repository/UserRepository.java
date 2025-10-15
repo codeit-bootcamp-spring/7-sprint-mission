@@ -10,7 +10,7 @@ public interface UserRepository {
 
     User findById(String id);
     void deleteById(String id);
-    boolean existsById(String id);
+    boolean isExsistId(String id);
     List<User> findByIds(String... ids);
     List<User> findAll();
 

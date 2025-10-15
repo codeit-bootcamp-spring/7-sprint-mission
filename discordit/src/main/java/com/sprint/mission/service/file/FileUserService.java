@@ -65,17 +65,23 @@ public class FileUserService implements UserService {
 
     @Override
     public void setPasswd(String id, String passwd) {
-        getById(id).setPasswd(passwd);
+        User user = getById(id);
+        user.setPasswd(passwd);
+        repository.update(user);
     }
 
     @Override
     public void setBio(String id, String bio) {
-        getById(id).setBio(bio);
+        User user = getById(id);
+        user.setBio(bio);
+        repository.update(user);
     }
 
     @Override
     public void setOnlineStatus(String id, User.Status status) {
-        getById(id).setOnlineStatus(status);
+        User user = getById(id);
+        user.setOnlineStatus(status);
+        repository.update(user);
     }
 
     @Override

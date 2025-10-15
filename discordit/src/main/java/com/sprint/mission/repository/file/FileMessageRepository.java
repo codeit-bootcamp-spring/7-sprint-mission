@@ -15,17 +15,27 @@ import java.util.UUID;
 public class FileMessageRepository implements MessageRepository {
 
     private static final String FILE_PATH = DataPath.FILE_DIR + "/message.sav";
-    private static final List<Message<? extends Receivable>> data = new ArrayList<>();
+    private static List<Message<? extends Receivable>> data;
     private static final FileMessageRepository instance = new FileMessageRepository();
 
     private FileMessageRepository() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))){
+        data = new ArrayList<>();
+        File file = new File(FILE_PATH);
+
+        // 파일이 없으면 디렉토리 생성 및 빈 데이터로 시작
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            return;
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
             List<Message<Receivable>> objects = (List<Message<Receivable>>) ois.readObject();
-            for (Message<Receivable> object : objects) {
-                data.add(object);
-            }
-        } catch (ClassNotFoundException | IOException e) {
-            throw new RuntimeException(e);
+            data.addAll(objects);
+        } catch (FileNotFoundException e) {
+            // 파일이 없으면 빈 리스트로 시작
+            System.out.println("메시지 파일이 없어 새로 생성합니다.");
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("메시지 파일 로드 중 오류 발생", e);
         }
     }
 
@@ -99,8 +109,8 @@ public class FileMessageRepository implements MessageRepository {
         return (Message<Receivable>) data.get(data.size() - 1);
     }
 
-    private void write(){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+    private void write() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(data);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
