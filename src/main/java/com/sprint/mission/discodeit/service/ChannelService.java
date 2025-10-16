@@ -16,6 +16,7 @@ public interface ChannelService {
     Optional<ChannelInfo> findChannelInfoById(UUID id);
     Optional<Channel> findChannelEntityById(UUID id);
     List<ChannelInfo> findAll();
+    Optional<ChannelInfo> findChannelInfoByChannelName(String channelName);
 
     Optional<ChannelInfo> updateChannelName(UUID channelId, String channelName);
     Optional<ChannelInfo> addMemberToChannel(UUID channelId, UUID userId);

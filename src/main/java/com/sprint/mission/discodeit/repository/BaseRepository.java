@@ -16,5 +16,4 @@ public interface BaseRepository<T> {
 
     // 물리 삭제
     void deleteById(UUID id);
-
 }

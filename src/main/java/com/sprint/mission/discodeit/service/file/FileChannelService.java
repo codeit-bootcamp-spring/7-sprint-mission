@@ -82,6 +82,13 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
+    public Optional<ChannelInfo> findChannelInfoByChannelName(String channelName) {
+        Channel ch = data.values().stream().filter(channel ->
+                        channel.getChannelName().equals(channelName)).findFirst().orElse(null);
+        return Optional.ofNullable(ch).map(ChannelInfo::new);
+    }
+
+    @Override
     public Optional<ChannelInfo> updateChannelName(UUID id, String newChannelName) {
 
         return findChannelEntityById(id).map(channel -> {
@@ -141,5 +148,4 @@ public class FileChannelService implements ChannelService {
             return false;
         }
     }
-
 }

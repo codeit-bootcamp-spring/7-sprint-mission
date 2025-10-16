@@ -28,6 +28,7 @@ public class JCFChannelService implements ChannelService {
         this.data.put(newChannel.getId(), newChannel);
         return new ChannelInfo(newChannel);
     }
+
     @Override
     public ChannelInfo createChannel(UUID userId, Channel.ChannelType type) {
         return this.createChannel(userId, null, type);
@@ -50,6 +51,14 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
+    public Optional<ChannelInfo> findChannelInfoByChannelName(String channelName) {
+        Channel ch = data.values().stream().filter(channel ->
+                channel.getChannelName().equals(channelName)).findFirst().orElse(null);
+        return Optional.ofNullable(ch).map(ChannelInfo::new);
+    }
+
+
+    @Override
     public Optional<ChannelInfo> updateChannelName(UUID id, String newChannelName) {
 
         return Optional.ofNullable(data.get(id)).map(channel -> {
@@ -68,8 +77,7 @@ public class JCFChannelService implements ChannelService {
             User user = userOptional.get();
             if (channel.addMember(user)) {
                 System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에 참가");
-            }
-            else System.out.println("이미 참여하고 있는 유저");
+            } else System.out.println("이미 참여하고 있는 유저");
             return Optional.of(new ChannelInfo(channel));
         }
         System.out.println("잘못된 입력");
@@ -85,8 +93,7 @@ public class JCFChannelService implements ChannelService {
             User user = userOptional.get();
             if (channel.removeMember(user)) {
                 System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에서 삭제됨");
-            }
-            else System.out.println("채널에 없는 유저");
+            } else System.out.println("채널에 없는 유저");
             return Optional.of(new ChannelInfo(channel));
         }
         System.out.println("잘못된 입력");

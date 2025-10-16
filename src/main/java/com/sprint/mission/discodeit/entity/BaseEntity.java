@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 // abstract 키워드를 사용해 이 클래스 자체로는 객체를 만들 수 없도록 합니다.
@@ -31,6 +32,17 @@ public class BaseEntity implements Serializable {
 
     public Long getUpdatedAt() {
         return updatedAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof BaseEntity that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     // 수정시간 업데이트

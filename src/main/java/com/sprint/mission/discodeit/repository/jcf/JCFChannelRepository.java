@@ -32,6 +32,11 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
+    public Optional<Channel> findByChannelName(String channelName) {
+        return data.values().stream().filter(c -> c.getChannelName().equals(channelName)).findFirst();
+    }
+
+    @Override
     public void deleteById(UUID id) {
         data.remove(id);
     }

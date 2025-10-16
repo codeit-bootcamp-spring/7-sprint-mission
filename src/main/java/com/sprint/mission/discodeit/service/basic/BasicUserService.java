@@ -51,6 +51,11 @@ public class BasicUserService implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Optional<UserInfo> findUserInfoByEmail(String email) {
+        return userRepository.findByEmail(email).map(UserInfo::new);
+    }
+
     // 수정
     @Override
     public Optional<UserInfo> updateProfile(UUID userId, String newUserName, String newPhoneNum) {

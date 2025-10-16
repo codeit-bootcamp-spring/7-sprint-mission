@@ -94,6 +94,12 @@ public class FileUserService implements UserService {
                 .map(UserInfo::new).collect(Collectors.toList());
     }
 
+    @Override
+    public Optional<UserInfo> findUserInfoByEmail(String email) {
+        User user = data.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
+        return Optional.ofNullable(user).map(UserInfo::new);
+    }
+
     // 수정
     @Override
     public Optional<UserInfo> updateProfile(UUID userId, String newUserName, String newPhoneNum) {

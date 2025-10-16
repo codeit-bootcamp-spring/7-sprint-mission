@@ -2,8 +2,6 @@ package com.sprint.mission.discodeit.entity.dto;
 
 import com.sprint.mission.discodeit.entity.User;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
@@ -41,7 +39,6 @@ public class UserInfo {
     public String toString() {
         return "유저 정보\n" +
                 "이름: " + userName + '\n' +
-                "이메일: " + email + '\n' +
                 "상태: " + state + '\n' +
                 "가입 시기: " + createAt + '\n' +
                 "전화번호: " + phoneNum + '\n';

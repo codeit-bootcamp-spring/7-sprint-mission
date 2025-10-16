@@ -18,6 +18,8 @@ public interface UserService {
     Optional<User> findUserEntityById(UUID userID);
     List<UserInfo> findAllUsers();
 
+    Optional<UserInfo> findUserInfoByEmail(String email);
+
     // 수정
     Optional<UserInfo> updateProfile(UUID userId, String newUserName, String newPhoneNum);
     Optional<UserInfo> changePassword(UUID userId, String newPassword);

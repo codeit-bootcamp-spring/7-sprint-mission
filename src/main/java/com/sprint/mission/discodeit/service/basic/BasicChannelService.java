@@ -53,6 +53,15 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    public Optional<ChannelInfo> findChannelInfoByChannelName(String channelName) {
+        return channelRepository.findByChannelName(channelName).map(ChannelInfo::new);
+    }
+
+    public Optional<ChannelInfo> findChannelByName(String channelName) {
+        return channelRepository.findByChannelName(channelName).map(ChannelInfo::new);
+    }
+
+    @Override
     public Optional<ChannelInfo> updateChannelName(UUID id, String newChannelName) {
 
         return channelRepository.findById(id).map(channel -> {
