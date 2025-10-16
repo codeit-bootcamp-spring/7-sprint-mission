@@ -49,7 +49,7 @@ public class AppConfig {
         loadAllData();
 
         // 4. Service 생성 및 의존성 주입
-        this.userService = new JCFUserService(userRepository);
+        this.userService = new JCFUserService(userRepository, participationRepository, channelMessageRepository, directMessageRepository);
         this.channelService = new JCFChannelService(channelRepository);
         this.participationService = new JCFParticipationService(participationRepository, userRepository, channelRepository);
         this.channelMessageService = new JCFChannelMessageService(channelMessageRepository, participationRepository);

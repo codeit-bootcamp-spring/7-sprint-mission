@@ -23,11 +23,13 @@ public class UserView {
             System.out.println("\n--- 유저 관리 ---");
             System.out.println("1. 유저 추가");
             System.out.println("2. 유저 프로필 수정");
-            System.out.println("3. 유저 논리적 삭제 (Soft Delete)");
-            System.out.println("4. 유저 물리적 삭제 (Hard Delete)");
-            System.out.println("5. 모든 유저 조회 (삭제 포함)");
-            System.out.println("6. 활성 유저 조회");
-            System.out.println("7. 유저 이름으로 조회");
+            System.out.println("3. 유저 상태 변경");
+            System.out.println("4. 비밀번호 변경");
+            System.out.println("5. 유저 논리적 삭제");
+            System.out.println("6. 유저 물리적 삭제");
+            System.out.println("7. 모든 유저 조회");
+            System.out.println("8. 활성 유저 조회");
+            System.out.println("9. 유저 이름으로 조회");
             System.out.println("0. 이전 메뉴로");
             System.out.print(">> 유저 관리 메뉴: ");
 
@@ -43,18 +45,24 @@ public class UserView {
                         updateUserProfile();
                         break;
                     case 3:
-                        softDeleteUser();
+                        changeUserState();
                         break;
                     case 4:
-                        deleteUser();
+                        changePassword();
                         break;
                     case 5:
-                        userService.findAll().forEach(System.out::println);
+                        softDeleteUser();
                         break;
                     case 6:
-                        userService.findAllNonDel().forEach(System.out::println);
+                        deleteUser();
                         break;
                     case 7:
+                        userService.findAll().forEach(System.out::println);
+                        break;
+                    case 8:
+                        userService.findAllNonDel().forEach(System.out::println);
+                        break;
+                    case 9:
                         findUserByUsername();
                         break;
                     case 0:
@@ -90,6 +98,42 @@ public class UserView {
         String newEmail = sc.nextLine();
         User updatedUser = userService.updateProfile(user.getId(), newNickname, newEmail, null);
         System.out.println("프로필 수정 완료: " + updatedUser);
+    }
+
+    private void changeUserState() {
+        System.out.println("--- 상태를 변경할 사용자 선택 ---");
+        User user = sharedView.selectUserFromList(true);
+        if (user == null) return;
+
+        System.out.println("--- 변경할 상태 선택 ---");
+        System.out.println("1. 온라인");
+        System.out.println("2. 오프라인");
+        System.out.println("3. 자리비움");
+        System.out.println("4. 다른 용무 중");
+        System.out.print(">> 상태 번호: ");
+        int choice = sc.nextInt();
+        sc.nextLine();
+
+        switch (choice) {
+            case 1: userService.goOnline(user.getId()); break;
+            case 2: userService.goOffline(user.getId()); break;
+            case 3: userService.setAway(user.getId()); break;
+            case 4: userService.setDoNotDisturb(user.getId()); break;
+            default: System.out.println("잘못된 선택입니다."); return;
+        }
+        System.out.println("사용자 상태 변경 완료: " + userService.findById(user.getId()).getState().getDescription());
+    }
+
+    private void changePassword() {
+        System.out.println("--- 비밀번호를 변경할 사용자 선택 ---");
+        User user = sharedView.selectUserFromList(true);
+        if (user == null) return;
+
+        System.out.print("새 비밀번호 (8자 이상): ");
+        String newPassword = sc.nextLine();
+
+        userService.changePassword(user.getId(), newPassword);
+        System.out.println("비밀번호 변경이 완료되었습니다.");
     }
 
     private void softDeleteUser() {

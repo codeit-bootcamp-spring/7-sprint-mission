@@ -56,8 +56,14 @@ public class JCFParticipationService extends JCFBaseService<Participation, Parti
             }
         } else {
             // 3b. 기존 참여 정보가 전혀 없는 경우 (최초 참여)
+            Participation newParticipation;
             // 새로운 참여 정보를 생성하고 저장합니다.
-            Participation newParticipation = Participation.create(channelId, userId, nickname, Role.USER);
+            if(userRepository.findById(userId).get().getUsername().equals("admin")){
+                newParticipation = Participation.create(channelId, userId, nickname, Role.ADMIN);
+            }else{
+                newParticipation = Participation.create(channelId, userId, nickname, Role.USER);
+            }
+
             participationRepository.save(newParticipation);
             return newParticipation;
         }

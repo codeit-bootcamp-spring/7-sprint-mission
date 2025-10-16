@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.view;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Participation;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFParticipationService;
@@ -29,37 +30,30 @@ public class ParticipationView {
         while (true) {
             System.out.println("\n--- 참여 관리 ---");
             System.out.println("1. 채널 참여하기");
-            System.out.println("2. 채널 나가기 (논리적 삭제)");
-            System.out.println("3. 참여 정보 물리적 삭제");
-            System.out.println("4. 특정 채널의 참여자 목록 조회");
-            System.out.println("5. 특정 유저의 참여 채널 목록 조회");
+            System.out.println("2. 채널 나가기");
+            System.out.println("3. 참여자 강퇴하기 (관리자)"); // 기능 추가
+            System.out.println("4. 참여자 역할 변경 (관리자)"); // 기능 추가
+            System.out.println("5. 채널 닉네임 변경"); // 기능 추가
+            System.out.println("6. 특정 채널의 참여자 목록 조회");
+            System.out.println("7. 특정 유저의 참여 채널 목록 조회");
             System.out.println("0. 이전 메뉴로");
             System.out.print(">> 참여 관리 메뉴: ");
+
 
             int choice = sc.nextInt();
             sc.nextLine();
 
             try {
                 switch (choice) {
-                    case 1:
-                        joinChannel();
-                        break;
-                    case 2:
-                        leaveChannel();
-                        break;
-                    case 3:
-                        deleteParticipation();
-                        break;
-                    case 4:
-                        findParticipantsByChannel();
-                        break;
-                    case 5:
-                        findChannelsByUser();
-                        break;
-                    case 0:
-                        return;
-                    default:
-                        System.out.println("잘못된 입력입니다.");
+                    case 1: joinChannel(); break;
+                    case 2: leaveChannel(); break;
+                    case 3: kickUserFromChannel(); break; // 기능 연결
+                    case 4: changeRole(); break; // 기능 연결
+                    case 5: changeNickname(); break; // 기능 연결
+                    case 6: findParticipantsByChannel(); break;
+                    case 7: findChannelsByUser(); break;
+                    case 0: return;
+                    default: System.out.println("잘못된 입력입니다.");
                 }
             } catch (Exception e) {
                 System.out.println("작업 중 오류 발생: " + e.getMessage());
@@ -80,6 +74,62 @@ public class ParticipationView {
         String nickname = sc.nextLine();
         participationService.joinChannel(channel.getId(), user.getId(), nickname);
         System.out.println("'" + user.getUsername() + "'님이 '" + channel.getChannelName() + "' 채널에 참여 완료.");
+    }
+
+    private void kickUserFromChannel() {
+        System.out.println("--- 작업 대상 채널 선택 ---");
+        Channel channel = sharedView.selectChannelFromList(true);
+        if (channel == null) return;
+
+        System.out.println("--- 강퇴시킬 사용자 선택 ---");
+        User targetUser = sharedView.selectUserFromList(true);
+        if (targetUser == null) return;
+
+        System.out.println("--- 작업을 수행할 관리자 선택 ---");
+        User admin = sharedView.selectUserFromList(true);
+        if (admin == null) return;
+
+        participationService.kickUserFromChannel(channel.getId(), targetUser.getId(), admin.getId());
+        System.out.println("사용자를 채널에서 강퇴했습니다.");
+    }
+
+    private void changeRole() {
+        System.out.println("--- 작업 대상 채널 선택 ---");
+        Channel channel = sharedView.selectChannelFromList(true);
+        if (channel == null) return;
+
+        System.out.println("--- 역할을 변경할 사용자 선택 ---");
+        User targetUser = sharedView.selectUserFromList(true);
+        if (targetUser == null) return;
+
+        System.out.println("--- 작업을 수행할 관리자 선택 ---");
+        User admin = sharedView.selectUserFromList(true);
+        if (admin == null) return;
+
+        System.out.print("새 역할 (ADMIN, USER, GUEST): ");
+        String roleStr = sc.nextLine();
+        Role newRole;
+        try {
+            newRole = Role.valueOf(roleStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            System.out.println("존재하지 않는 역할입니다.");
+            return;
+        }
+    }
+    private void changeNickname() {
+        System.out.println("--- 닉네임을 변경할 사용자 선택 ---");
+        User user = sharedView.selectUserFromList(true);
+        if (user == null) return;
+
+        System.out.println("--- 닉네임을 변경할 채널 선택 ---");
+        Participation participation = sharedView.selectParticipationFromUser(user);
+        if (participation == null) return;
+
+        System.out.print("새 닉네임: ");
+        String newNickname = sc.nextLine();
+
+        participationService.changeNickname(participation.getChannelId(), user.getId(), newNickname);
+        System.out.println("채널 닉네임 변경 완료.");
     }
 
     private void leaveChannel() {

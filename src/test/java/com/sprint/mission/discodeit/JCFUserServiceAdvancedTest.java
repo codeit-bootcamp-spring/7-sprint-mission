@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFDirectMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFParticipationRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +25,7 @@ class JCFUserServiceAdvancedTest {
     @BeforeEach
     void setUp() {
         userRepository = new JCFUserRepository();
-        userService = new JCFUserService(userRepository);
+        userService = new JCFUserService(userRepository, new JCFParticipationRepository(), new JCFChannelMessageRepository(), new JCFDirectMessageRepository());
     }
 
     @Nested

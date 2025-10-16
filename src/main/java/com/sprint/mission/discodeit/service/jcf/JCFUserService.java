@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelMessageRepository;
+import com.sprint.mission.discodeit.repository.DirectMessageRepository;
+import com.sprint.mission.discodeit.repository.ParticipationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -16,10 +19,19 @@ public class JCFUserService extends JCFBaseService<User, UUID, UserRepository> i
     // JCFBaseService의 repository 필드와 별도로 UserRepository 타입의 필드를 두어
     // findByUsername과 같은 고유 메서드에 쉽게 접근할 수 있도록 합니다.
     private final UserRepository userRepository;
+    private final ParticipationRepository participationRepository;
+    private final ChannelMessageRepository channelMessageRepository;
+    private final DirectMessageRepository directMessageRepository;
 
-    public JCFUserService(UserRepository userRepository) {
+    public JCFUserService(UserRepository userRepository,
+                          ParticipationRepository participationRepository,
+                          ChannelMessageRepository channelMessageRepository,
+                          DirectMessageRepository directMessageRepository) {
         super(userRepository);
         this.userRepository = userRepository;
+        this.participationRepository = participationRepository;
+        this.channelMessageRepository = channelMessageRepository;
+        this.directMessageRepository = directMessageRepository;
     }
 
     @Override
