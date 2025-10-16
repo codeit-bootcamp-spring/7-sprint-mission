@@ -2,8 +2,9 @@ package com.sprint.mission.entity;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
-public class User extends BaseEntity implements Receivable, Serializable {
+public class User extends BaseEntity implements Receivable {
 
     // 직렬화 및 역직렬화를 수행할 때 이 클래스의 버전을 의미
     private static final long serialVersionID = 1L;
@@ -40,7 +41,6 @@ public class User extends BaseEntity implements Receivable, Serializable {
         this.passwd = passwd;
     }
 
-    @Override
     public String getDisplayName() {
         return displayName;
     }
@@ -88,6 +88,19 @@ public class User extends BaseEntity implements Receivable, Serializable {
         }
     }
 
+    // 파일 IO시 필드 복원을 위한 메서드
+    public static User rehydrate(UUID uuid, Long createdAt, Long updatedAt,
+                                 String userId, String passwd, String displayName,
+                                 String bio, Status status){
+        User user = new User(userId, passwd, displayName);
+        user.uuid = uuid;
+        user.createdAt = createdAt;
+        user.updatedAt = updatedAt;
+        user.bio = bio;
+        user.onlineStatus = status;
+        return user;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -119,8 +132,6 @@ public class User extends BaseEntity implements Receivable, Serializable {
 
         Status(String description){
         }
-
-
     }
 
 }

@@ -4,9 +4,7 @@ import com.sprint.mission.entity.Message;
 import com.sprint.mission.entity.Receivable;
 import com.sprint.mission.entity.User;
 import com.sprint.mission.repository.file.FileMessageRepository;
-import com.sprint.mission.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.service.MessageService;
-import com.sprint.mission.service.jcf.JCFMessageService;
 
 import java.util.List;
 
@@ -47,6 +45,6 @@ public class FileMessageService implements MessageService {
 
     @Override
     public Message<Receivable> getLastMessage() {
-        return repository.getLastMessage();
+        return repository.getLast();
     }
 }

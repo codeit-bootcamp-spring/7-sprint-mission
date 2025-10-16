@@ -26,11 +26,7 @@ public class BaseEntity {
         return createdAt;
     }
 
-    /**
-     * 테스트용 메서드: createdAt 값을 직접 설정합니다.
-     *
-     * @param createdAt Unix timestamp (초 단위)
-     */
+    // 더미 데이터 초기 생성용
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
     }
@@ -69,6 +65,10 @@ public class BaseEntity {
         updatedAt = Instant.now().getEpochSecond();
     }
 
+    public void setUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     protected static long getUnixTimestamp() {
         return Instant.now().getEpochSecond();
     }
@@ -97,4 +97,6 @@ public class BaseEntity {
     public int hashCode() {
         return Objects.hashCode(uuid);
     }
+
+
 }

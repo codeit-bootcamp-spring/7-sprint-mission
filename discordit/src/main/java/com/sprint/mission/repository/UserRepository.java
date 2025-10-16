@@ -5,6 +5,7 @@ import com.sprint.mission.entity.User;
 import java.util.List;
 
 public interface UserRepository {
+    void init();
     void save(User user);
     void update(User user);
 

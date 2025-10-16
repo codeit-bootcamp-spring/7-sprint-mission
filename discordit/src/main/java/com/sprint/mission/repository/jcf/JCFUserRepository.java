@@ -18,6 +18,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public void init() {
+
+    }
+
+    @Override
     public void save(User user) {
         if(isExsistId(user.getUserId()))
             throw new UserAlreadyExistsException(user.getUserId());

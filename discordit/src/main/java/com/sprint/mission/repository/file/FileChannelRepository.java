@@ -2,11 +2,12 @@ package com.sprint.mission.repository.file;
 
 import com.sprint.mission.config.DataPath;
 import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.entity.dto.ChannelDTO;
+import com.sprint.mission.entity.dto.mapper.Mapper;
 import com.sprint.mission.exceptions.ChannelAlreadyExistsException;
 import com.sprint.mission.exceptions.ChannelNotFoundException;
 import com.sprint.mission.repository.ChannelRepository;
-import com.sprint.mission.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.repository.UserRepository;
 
 import java.io.*;
 import java.util.*;
@@ -14,9 +15,9 @@ import java.util.*;
 public class FileChannelRepository implements ChannelRepository {
     private static final String FILE_PATH = DataPath.FILE_DIR + "/channel.sav";
     private static final FileChannelRepository instance = new FileChannelRepository();
-    private static Map<UUID, Channel> data;
+    private static Map<UUID, Channel> data = new HashMap<>();
 
-    private FileChannelRepository(){
+    private FileChannelRepository() {
         data = new HashMap<>();
         File file = new File(FILE_PATH);
 
@@ -25,9 +26,16 @@ public class FileChannelRepository implements ChannelRepository {
             file.getParentFile().mkdirs();
             return;
         }
+    }
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))){
-            List<Channel> objects = (List<Channel>) ois.readObject();
+    public void init(UserRepository userRepository) {
+        if (!data.isEmpty()) {
+            return;
+        }
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
+            List<Channel> objects = ((List<ChannelDTO>) ois.readObject()).stream()
+                    .map(c -> Mapper.toChannel(c, userRepository))
+                    .toList();
             for (Channel object : objects) {
                 data.put(object.getUuid(), object);
             }
@@ -45,7 +53,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void save(Channel channel) {
-        if(existsById(channel.getUuid()))
+        if (existsById(channel.getUuid()))
             throw new ChannelAlreadyExistsException("채널 업데이트는 update를 사용해주세요.");
         data.put(channel.getUuid(), channel);
         write();
@@ -93,11 +101,11 @@ public class FileChannelRepository implements ChannelRepository {
                 .anyMatch(c -> c.getDisplayName().equals(name));
     }
 
-    private void write(){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(List.copyOf(data.values()));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+    private void write() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+            oos.writeObject(data.values().stream()
+                    .map(Mapper::toChannelDTO)
+                    .toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

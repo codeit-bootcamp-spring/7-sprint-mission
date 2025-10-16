@@ -3,10 +3,7 @@ package com.sprint.mission.entity;
 import java.io.Serializable;
 import java.util.*;
 
-public class Channel extends BaseEntity implements Receivable, Serializable {
-
-    // 직렬화 및 역직렬화를 수행할 때 이 클래스의 버전을 의미
-    private static final long serialVersionID = 1L;
+public class Channel extends BaseEntity implements Receivable {
 
     private String channelName;
     private ChannelType type;
@@ -21,6 +18,10 @@ public class Channel extends BaseEntity implements Receivable, Serializable {
         this.moderators = moderators;
     }
 
+
+    public String getChannelName() {
+        return channelName;
+    }
 
     public void setChannelName(String channelName) {
         this.channelName = channelName;
@@ -75,7 +76,6 @@ public class Channel extends BaseEntity implements Receivable, Serializable {
         this.updatedAt = getUnixTimestamp();
     }
 
-    @Override
     public String getDisplayName() {
         return channelName;
     }
@@ -86,6 +86,17 @@ public class Channel extends BaseEntity implements Receivable, Serializable {
 
         ChannelType(String description) {
         }
+    }
+
+    public static Channel rehydrate(UUID uuid, Long createdAt, Long updatedAt,
+                                    String channelName, ChannelType type,
+                                    Set<User> moderators, Set<User> members) {
+        Channel channel = new Channel(channelName, type, moderators);
+        channel.uuid = uuid;
+        channel.createdAt = createdAt;
+        channel.updatedAt = updatedAt;
+        channel.members = members;
+        return channel;
     }
 
 }

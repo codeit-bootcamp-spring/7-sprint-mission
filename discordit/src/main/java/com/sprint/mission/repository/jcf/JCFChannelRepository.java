@@ -4,6 +4,7 @@ import com.sprint.mission.entity.Channel;
 import com.sprint.mission.exceptions.ChannelAlreadyExistsException;
 import com.sprint.mission.exceptions.ChannelNotFoundException;
 import com.sprint.mission.repository.ChannelRepository;
+import com.sprint.mission.repository.UserRepository;
 
 import java.util.*;
 
@@ -15,6 +16,11 @@ public class JCFChannelRepository implements ChannelRepository {
 
     public static JCFChannelRepository getInstance() {
         return instance;
+    }
+
+    @Override
+    public void init(UserRepository userRepository) {
+        // 필요없음
     }
 
     @Override

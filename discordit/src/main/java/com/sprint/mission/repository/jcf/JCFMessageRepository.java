@@ -3,7 +3,9 @@ package com.sprint.mission.repository.jcf;
 import com.sprint.mission.entity.Message;
 import com.sprint.mission.entity.Receivable;
 import com.sprint.mission.entity.User;
+import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.MessageRepository;
+import com.sprint.mission.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,11 @@ public class JCFMessageRepository implements MessageRepository {
 
     public static JCFMessageRepository getInstance() {
         return instance;
+    }
+
+    @Override
+    public void init(UserRepository userRepository, ChannelRepository channelRepository) {
+
     }
 
     @Override
