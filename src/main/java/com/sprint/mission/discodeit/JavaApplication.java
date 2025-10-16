@@ -3,6 +3,9 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -13,9 +16,15 @@ public class JavaApplication {
 
     public static void main(String[] args) {
 
-        JCFUserService userService = JCFUserService.getInstance();
-        JCFChannelService channelService = JCFChannelService.getInstance();
-        JCFMessageService messageService = JCFMessageService.getInstance();
+//       //JCF 테스트
+//       JCFUserService userService = JCFUserService.getInstance();
+//       JCFChannelService channelService = JCFChannelService.getInstance();
+//       JCFMessageService messageService = JCFMessageService.getInstance();
+
+        // File 테스트
+        FileUserService userService = new FileUserService();
+        FileChannelService channelService = new FileChannelService();
+        FileMessageService messageService = new FileMessageService();
 
         System.out.println("==== User 테스트 ====");
 
@@ -45,7 +54,6 @@ public class JavaApplication {
         System.out.println("== 유저 업데이트==");
         User update = userService.updateUser("진우", user1.getId(), "자바");
         System.out.println("업데이트: " + update);
-
 
         // 유저 삭제
         System.out.println("== 유저 삭제==");
@@ -111,15 +119,14 @@ public class JavaApplication {
         Message msg2 = messageService.createMessage(user2.getId(), user1.getId(), "반가워요");
         Message msg3 = messageService.createMessage(user1.getId(), user2.getId(), "잘지냇ㅂ(오타)");
 
-        System.out.println("생성 완료: " + msg1.getContent());
-        System.out.println("생성 완료: " + msg2.getContent());
-        System.out.println("생성 완료: " + msg3.getContent());
+        System.out.println("생성 완료: " + msg1.getContent() + " 보낸 유저 : " + user1.getUsername());
+        System.out.println("생성 완료: " + msg2.getContent()+ " 보낸 유저 : " + user2.getUsername());
+        System.out.println("생성 완료: " + msg3.getContent() + " 보낸 유저 : " + user1.getUsername());
 
         //메시지 조회
         System.out.println("== 메시지 조회==");
         Message foundMsg = messageService.findMessage(msg1.getId());
         System.out.println("조회 : " + foundMsg.getContent());
-
 
         //메시지 전체 조회
         System.out.println("== 메시지 전체 조회==");
@@ -140,5 +147,7 @@ public class JavaApplication {
         System.out.println("삭제 완료");
         allMessages = messageService.findAllMessages();
         System.out.println("삭제 후 메시지 갯수: " + allMessages.size() + "개");
+
+
     }
 }
