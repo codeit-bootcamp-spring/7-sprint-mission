@@ -3,6 +3,7 @@ package com.sprint.mission.entity;
 import java.io.Serializable;
 
 public class User extends Common implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String userId;
     private String password;
@@ -62,6 +63,7 @@ public class User extends Common implements Serializable {
                 ", 비번 = '" + password + '\'' +
                 ", 이름 = '" + userName + '\'' +
                 ", 닉네임 = '" + userNickname + '\'' +
+                ", 닉네임 = '" + this.getId() + '\'' +
                 '}';
     }
 }

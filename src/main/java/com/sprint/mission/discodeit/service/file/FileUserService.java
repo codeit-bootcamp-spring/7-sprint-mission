@@ -1,23 +1,24 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class FileUserService implements UserService {
+public class FileUserService implements UserRepository {
     private static final String filename = "users";
-    private static final long serialVersionUID = 1L;
+
 
 
     private List<User> users;
 
 
     private FileUserService() {
-        this.users = new LinkedList<>();
+        this.users = new ArrayList<>();
 
     }
 
@@ -101,18 +102,20 @@ public class FileUserService implements UserService {
     // 이건 내가 원하는거
     @Override
     public User update(UUID uuid, Consumer<User> updater) {
-        users = ReadService.read(filename,User.class);
+       users = ReadService.read(filename,User.class);
         System.out.println("수정");
-        return users.stream()
+        User user = users.stream()
                 .filter(u -> u.getId().equals(uuid))
                 .findFirst()
                 .map(u -> {
                     updater.accept(u);
                     // 여러개 가능하게
-                    LoadService.load(filename,users);
+
                     return u;
                 })
                 .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + uuid));
+        LoadService.load(filename,users);
+        return user;
     }
 
     @Override

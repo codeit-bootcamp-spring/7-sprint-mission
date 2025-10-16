@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.entity.Common;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -12,13 +13,16 @@ public class LoadService {
 
  public static <T extends Common & Serializable> void load (String type,List<T> list)
     {
-      /*  File file = new File(Path.RooT_PATH.getPath()+"/"+type+"List.sav");
+        String path = Path.RooT_PATH.getPath()+"/"+type+"List.sav";
+
+       File file = new File(path);
         File parent = file.getParentFile();
-        if (parent != null && !parent.exists()) parent.mkdirs(); */
+        if (parent != null && !parent.exists()) parent.mkdirs();
+
 
         try (
                 ObjectOutputStream oos =
-                        new ObjectOutputStream(new FileOutputStream(Path.RooT_PATH.getPath()+"/"+type+"List.sav"))
+                        new ObjectOutputStream(new FileOutputStream(path))
 
 
         ) {

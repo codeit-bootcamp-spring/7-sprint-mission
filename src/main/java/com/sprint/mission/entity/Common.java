@@ -1,8 +1,9 @@
 package com.sprint.mission.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public  class Common {
+public  class Common implements Serializable {
 
     //고유값이긴한데
     //삭제하면 파이널이 필요할까?

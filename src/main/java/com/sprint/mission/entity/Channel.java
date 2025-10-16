@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Channel extends Common implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     // 필드(변수)
      private String channelName;
      private User bose;

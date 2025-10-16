@@ -3,6 +3,8 @@ package com.sprint.mission.entity;
 import java.io.Serializable;
 
 public class Message extends Common implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private User sender;
     private User receiver;
     private long time;

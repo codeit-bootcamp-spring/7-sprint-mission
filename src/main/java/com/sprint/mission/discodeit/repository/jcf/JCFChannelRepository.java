@@ -1,28 +1,27 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.entity.Channel;
 import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class FileChannelService implements ChannelService {
+public class JCFChannelRepository implements ChannelService {
 
-    private static final String filename = "channels";
 
     private  final  List<Channel>  channels;
 
-    private static final FileChannelService INSTANCE = new FileChannelService();
+    private static final JCFChannelRepository INSTANCE = new JCFChannelRepository();
 
-    private FileChannelService(){
+    private JCFChannelRepository(){
         channels = new LinkedList<>();
     }
 
     //이것도 다 똑같다
-    public static FileChannelService getInstance(){
+    public static JCFChannelRepository getInstance(){
         return INSTANCE;
     }
 
