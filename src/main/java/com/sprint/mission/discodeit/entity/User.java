@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.sql.SQLOutput;
 
 public class User extends BaseEntity{
     private String userName;
