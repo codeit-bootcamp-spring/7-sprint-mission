@@ -3,23 +3,17 @@ package com.sprint.mission.service.jcf;
 import com.sprint.mission.entity.Message;
 import com.sprint.mission.entity.Receivable;
 import com.sprint.mission.entity.User;
+import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.service.MessageService;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class JCFMessageService implements MessageService {
-    private static final JCFMessageService instance = new JCFMessageService();
-    private static final JCFMessageRepository repository = JCFMessageRepository.getInstance();
+    private final MessageRepository repository;
 
-    private JCFMessageService() {
-    }
-
-    public static JCFMessageService getInstance() {
-        return instance;
+    public JCFMessageService(MessageRepository repository) {
+        this.repository = repository;
     }
 
     @Override

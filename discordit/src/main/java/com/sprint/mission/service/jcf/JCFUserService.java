@@ -1,6 +1,7 @@
 package com.sprint.mission.service.jcf;
 
 import com.sprint.mission.entity.User;
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.repository.jcf.JCFUserRepository;
 import com.sprint.mission.service.UserService;
 
@@ -8,14 +9,10 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
 
-    private static final JCFUserService instance = new JCFUserService();
-    private static final JCFUserRepository repository = JCFUserRepository.getInstance();
+    private final UserRepository repository;
 
-    private JCFUserService() {
-    }
-
-    public static JCFUserService getInstance(){
-        return instance;
+    public JCFUserService(UserRepository userRepository) {
+        this.repository = userRepository;
     }
 
     @Override

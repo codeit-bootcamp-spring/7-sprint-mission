@@ -14,32 +14,10 @@ import com.sprint.mission.service.MessageService;
 import java.util.List;
 
 public class BasicMessageService implements MessageService {
-    private static final UserRepository userRepository;
-    private static final ChannelRepository channelRepository;
-    private static final MessageRepository messageRepository;
-    private static final BasicMessageService instance;
+    private final MessageRepository messageRepository;
 
-    static {
-        // 1. Repository 인스턴스 생성
-        userRepository = FileUserRepository.getInstance();
-        channelRepository = FileChannelRepository.getInstance();
-        messageRepository = FileMessageRepository.getInstance();
-
-        // 2. 순서대로 초기화
-        userRepository.init();
-        channelRepository.init(userRepository);
-        messageRepository.init(userRepository, channelRepository);
-
-        // 3. Service 인스턴스 생성
-        instance = new BasicMessageService();
-    }
-
-    private BasicMessageService() {
-        // static 블록에서 이미 초기화 완료
-    }
-
-    public static BasicMessageService getInstance() {
-        return instance;
+    private BasicMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
     }
 
     @Override

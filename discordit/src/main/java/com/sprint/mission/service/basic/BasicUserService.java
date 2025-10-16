@@ -10,26 +10,10 @@ import java.util.*;
 
 public class BasicUserService implements UserService {
 
-    private static final UserRepository userRepository;
-    private static final BasicUserService instance;
+    private final UserRepository userRepository;
 
-    static {
-        // 1. Repository 인스턴스 생성
-        userRepository = FileUserRepository.getInstance();
-
-        // 2. 초기화
-        userRepository.init();
-
-        // 3. Service 인스턴스 생성
-        instance = new BasicUserService();
-    }
-
-    private BasicUserService() {
-        // static 블록에서 이미 초기화 완료
-    }
-
-    public static BasicUserService getInstance() {
-        return instance;
+    private BasicUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override

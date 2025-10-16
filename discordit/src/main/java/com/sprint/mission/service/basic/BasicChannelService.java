@@ -12,29 +12,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BasicChannelService implements ChannelService {
-    private static final UserRepository userRepository;
-    private static final ChannelRepository channelRepository;
-    private static final BasicChannelService instance;
+    private final ChannelRepository channelRepository;
 
-    static {
-        // 1. Repository 인스턴스 생성
-        userRepository = FileUserRepository.getInstance();
-        channelRepository = FileChannelRepository.getInstance();
-
-        // 2. 순서대로 초기화
-        userRepository.init();
-        channelRepository.init(userRepository);
-
-        // 3. Service 인스턴스 생성
-        instance = new BasicChannelService();
-    }
-
-    private BasicChannelService() {
-        // static 블록에서 이미 초기화 완료
-    }
-
-    public static BasicChannelService getInstance(){
-        return instance;
+    public BasicChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Override
