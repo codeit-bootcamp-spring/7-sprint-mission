@@ -3,61 +3,51 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserState;
 import com.sprint.mission.discodeit.entity.VerifiedUtils;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> data;
+    private final UserRepository userRepository;
 
-    private JCFUserService() {
-        this.data = new HashMap<>();
-    }
-
-    private static final JCFUserService jcfUserService = new JCFUserService();
-    public static JCFUserService getInstance() {
-        return jcfUserService;
+    public JCFUserService(UserRepository userRepository) {
+        this.userRepository = VerifiedUtils.verifyNull(userRepository);
     }
 
     @Override
     public User create(User user) {
         User u = VerifiedUtils.verifyNull(user);
         UUID id = VerifiedUtils.verifyNull(u.getId());
-        if(data.containsKey(id)) {
+        if(userRepository.findById(id).isPresent()) {
             throw new IllegalStateException("User already exists: " + id);
         }
-        data.put(id, u);
-        return u;
+        return userRepository.save(u);
     }
 
     @Override
     public User get(UUID uuid) {
         UUID id = VerifiedUtils.verifyNull(uuid);
-        User user = data.get(id);
-        if(user == null) {
-            throw new NoSuchElementException("User not found: " + id);
-        }
-        return user;
+        return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found: " + id));
     }
 
     @Override
-    public List<User> getAll() { return new ArrayList<>(data.values()); }
+    public List<User> getAll() {
+        return userRepository.findAll();
+    }
 
     @Override
     public User update(User user) {
         User u = VerifiedUtils.verifyNull(user);
         UUID id = VerifiedUtils.verifyNull(u.getId());
-        if(!data.containsKey(id)) {
-            throw new NoSuchElementException("User not found: " + id);
-        }
-        data.put(id, u);
-        return u;
+        userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found: " + id));
+        return userRepository.save(u);
     }
 
     @Override
     public boolean delete(UUID uuid) {
         UUID id = VerifiedUtils.verifyNull(uuid);
-        return data.remove(id) != null;
+        return userRepository.deleteById(id);
     }
 
     // Online/Offline 전환
@@ -66,6 +56,7 @@ public class JCFUserService implements UserService {
         User user = get(uuid);
         if(user.getUserState() != userState) {
             user.setUserState(userState);
+            userRepository.save(user);
         }
         return user;
     }
@@ -73,30 +64,21 @@ public class JCFUserService implements UserService {
     @Override
     public List<User> getUsersByName(String username) {
         String user = VerifiedUtils.verifyName(username);
-        return data.values()
-                .stream()
-                .filter(u -> u.getUsername().equals(user))
-                .toList();
+        return userRepository.findByName(user);
     }
 
     // 이메일로 조회
     @Override
-    public List<User> getUsersByEmail(String email) {
+    public Optional<User> getUsersByEmail(String email) {
         String e = VerifiedUtils.verifyEmail(email);
-        return data.values()
-                .stream()
-                .filter(u -> u.getEmail().equals(e))
-                .toList();
+        return userRepository.findByEmail(e);
     }
 
     // 특정 상태만 조회
     @Override
     public List<User> getUsersByState(UserState userState) {
         UserState state = VerifiedUtils.verifyNull(userState);
-        return data.values()
-                .stream()
-                .filter( u -> u.getUserState() == state)
-                .toList();
+        return userRepository.findByState(state);
     }
 
     // 로그인
@@ -105,14 +87,13 @@ public class JCFUserService implements UserService {
         String e = VerifiedUtils.verifyEmail(email);
         String p = VerifiedUtils.verifyPassword(password);
         User user = getUsersByEmail(e)
-                .stream()
-                .findFirst()
                 .orElseThrow( () -> new NoSuchElementException("User not found: " + email));
         if(!user.passwordMatch(p)) {
             throw new IllegalArgumentException("Passwords do not match");
         }
         if(user.getUserState() != UserState.ONLINE) {
             user.setUserState(UserState.ONLINE);
+            userRepository.save(user);
         }
         return user;
     }
@@ -121,13 +102,12 @@ public class JCFUserService implements UserService {
     public User logout(String email) {
         String e = VerifiedUtils.verifyEmail(email);
         User user = getUsersByEmail(e)
-                .stream()
-                .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("User not found: " + email));
         if(user.getUserState() == UserState.OFFLINE) {
             return user;
         }
         user.setUserState(UserState.OFFLINE);
+        userRepository.save(user);
         return user;
     }
 }

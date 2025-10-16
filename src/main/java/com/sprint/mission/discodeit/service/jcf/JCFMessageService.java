@@ -3,36 +3,37 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.VerifiedUtils;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> data;
-    private final ChannelService channelService;
-    private final UserService userService;
+    private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
 
-    public JCFMessageService(ChannelService channelService, UserService userService) {
-        this.channelService = VerifiedUtils.verifyNull(channelService);
-        this.userService = VerifiedUtils.verifyNull(userService);
-        this.data = new HashMap<>();
+    public JCFMessageService(MessageRepository messageRepository,  ChannelRepository channelRepository,  UserRepository userRepository) {
+        this.messageRepository = VerifiedUtils.verifyNull(messageRepository);
+        this.channelRepository = VerifiedUtils.verifyNull(channelRepository);
+        this.userRepository = VerifiedUtils.verifyNull(userRepository);
     }
-
-//    private static final JCFMessageService jcfMessageService = new JCFMessageService();
-//    public static JCFMessageService getInstance() {
-//        return jcfMessageService;
-//    }
 
     @Override
     public Message create(Message message) {
         Message msg = VerifiedUtils.verifyNull(message);
         UUID id = VerifiedUtils.verifyNull(msg.getId());
-        if(data.containsKey(id)) {
+
+        if(messageRepository.findById(id).isPresent()) {
             throw new IllegalStateException("Message already exists: " + id);
         }
-        Channel ch =  channelService.get(msg.getChannelId());
+        userRepository.findById(msg.getAuthorId()).orElseThrow(() -> new NoSuchElementException("User not found" + msg.getAuthorId()));
+        Channel ch =  channelRepository.findById(msg.getChannelId()).orElseThrow(()-> new NoSuchElementException("Channel not found" + msg.getChannelId()));
+        if(!ch.getMembers().containsKey(msg.getAuthorId())) {
+            throw new NoSuchElementException("Member not found" +  msg.getAuthorId());
+        }
         int slow = ch.getSlowModeSeconds();
         if ( slow < 0 ) {
             throw new IllegalStateException("SlowModeSeconds must be >= 0");
@@ -42,10 +43,8 @@ public class JCFMessageService implements MessageService {
             long timeNow = System.currentTimeMillis();
             long windowTime = slow * 1000L;
 
-            OptionalLong last = data.values()
+            OptionalLong last = messageRepository.findByChannelIdAndAuthorId(msg.getChannelId(),msg.getAuthorId())
                     .stream()
-                    .filter(m -> m.getChannelId().equals(msg.getChannelId()))
-                    .filter(m -> m.getAuthorId().equals(msg.getAuthorId()))
                     .filter(m -> !m.isDeleted())
                     .mapToLong(m -> m.getCreatedAt())
                     .max();
@@ -56,93 +55,64 @@ public class JCFMessageService implements MessageService {
                 throw new IllegalStateException("SlowModeSeconds wait : " + seconds + "s");
             }
         }
-
-        data.put(id, msg);
-        return msg;
+        return messageRepository.save(msg);
     }
 
     @Override
     public Message get(UUID uuid) {
         UUID id = VerifiedUtils.verifyNull(uuid);
-        Message msg = data.get(id);
-        if(msg == null) {
-            throw new NoSuchElementException("Message not found: " + id);
-        }
-        return msg;
+        return messageRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Message not found: " + id));
     }
 
     @Override
     public List<Message> getAll() {
-        return new ArrayList<>(data.values());
+        return messageRepository.findAll();
     }
 
     @Override
     public Message update(Message message) {
         Message msg = VerifiedUtils.verifyNull(message);
         UUID id = VerifiedUtils.verifyNull(msg.getId());
-        if(!data.containsKey(id)) {
-            throw new NoSuchElementException("Message not found: " + id);
-        }
-        data.put(id,msg);
-        return msg;
+        messageRepository.findById(id).orElseThrow(()-> new NoSuchElementException("Message not found: " + id));
+        return messageRepository.save(msg);
     }
 
     @Override
     public boolean delete(UUID uuid) {
         UUID id = VerifiedUtils.verifyNull(uuid);
-        return data.remove(id) != null;
+        return messageRepository.deleteById(id);
     }
 
     // 특정 채널별 메세지 조회
     @Override
     public List<Message> getMessagesByChannel(UUID channelId) {
         UUID id = VerifiedUtils.verifyNull(channelId);
-        return data.values()
-                .stream()
-                .filter(m -> m.getChannelId().equals(id))
-                .filter(m -> !m.isDeleted())
-                .toList();
+        return messageRepository.findByChannel(id);
     }
     // 특정 작성자별 메세지 조회
     @Override
     public List<Message> getMessagesByAuthor(UUID authorId) {
         UUID id = VerifiedUtils.verifyNull(authorId);
-        return data.values()
-                .stream()
-                .filter(m -> m.getAuthorId().equals(id))
-                .filter(m -> !m.isDeleted())
-                .toList();
+        return messageRepository.findByAuthor(id);
     }
     // 특정 채널의 특정 작성자 메세지 조회
     @Override
     public List<Message> getMessagesByChannelAndAuthor(UUID channelId, UUID authorId) {
         UUID cid = VerifiedUtils.verifyNull(channelId);
         UUID aid = VerifiedUtils.verifyNull(authorId);
-        return data.values()
-                .stream()
-                .filter(m -> m.getChannelId().equals(cid))
-                .filter(m -> m.getAuthorId().equals(aid))
-                .filter(m -> !m.isDeleted())
-                .toList();
+        return messageRepository.findByChannelIdAndAuthorId(cid,aid);
     }
 
     // 모든 채널의 메세지 조회
     @Override
     public List<Message> getAllMessages() {
-        return data.values()
-                .stream()
-                .filter(m -> !m.isDeleted())
-                .toList();
+        return messageRepository.findAll();
     }
 
     // 특정 키워드 검색
     @Override
     public List<Message> searchByKeyword(String keyword) {
-        String s = VerifiedUtils.verifyNullOrBlank(keyword).toLowerCase();
-        return data.values()
-                .stream()
-                .filter(m -> !m.isDeleted())
-                .filter(m -> m.getContent().toLowerCase().contains(s))
-                .toList();
+        String s = VerifiedUtils.verifyNullOrBlank(keyword);
+        return messageRepository.searchByKeyword(s);
     }
 }
