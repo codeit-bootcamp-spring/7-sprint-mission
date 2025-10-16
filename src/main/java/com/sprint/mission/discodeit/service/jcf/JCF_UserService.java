@@ -17,6 +17,10 @@ public class JCF_UserService implements UserService {
         return service;
     }
 
+    //===============================
+    //========== @Override ==========
+    //===============================
+
     @Override
     public User creatUser(String name) {
         User user = new User(name);
@@ -32,9 +36,9 @@ public class JCF_UserService implements UserService {
                 .stream()
                 .filter(user -> user.getUserName().equals(name))
                 .findFirst()
-                .ifPresent(user -> System.out.println( "\uD83C\uDF3C readUser = " + user));
+                .ifPresent(user -> System.out.println( "\uD83C\uDF3C \uD83E\uDE77\uD83E\uDE77\uD83E\uDE77 readUser = " + user));
 
-        this.data.forEach((UUID key, User value) -> System.out.println());
+//        this.data.forEach((UUID key, User value) -> System.out.println()); //???
     }
 
     @Override

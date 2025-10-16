@@ -24,9 +24,15 @@ public class JCF_ChannelService implements ChannelService, MessageService {
         dataChannel = new HashMap<>();
     }
 
+
+    //===============================
+    //========== @Override ==========
+    //===============================
+
     @Override
     public Channel createChannel(User ownerUser, String channelName){
         System.out.printf("\n\uD83C\uDF7F\uD83C\uDF7F [%s]가 [%s] 채널 생성 \uD83C\uDF7F\uD83C\uDF7F\n", ownerUser.getUserName(), channelName); // 🍵🍿
+
         Channel channel1 = new Channel(ownerUser, channelName);
         dataChannel.put(channel1.getId(), channel1);
         return channel1;
@@ -61,6 +67,7 @@ public class JCF_ChannelService implements ChannelService, MessageService {
         else {
             Channel channel1 = dataChannel.get(channel.getId());
             channel1.setChannelType(channelType);
+            System.out.printf("\uD83D\uDEAB [%s] 채널은 [%s] 타입 채널방으로 변경됨\n", channel.getChannelName(), channelType); // 🚫
         }
     }
 
@@ -121,6 +128,10 @@ public class JCF_ChannelService implements ChannelService, MessageService {
             channel1.delete_Message(messageID);
         }
     }
+
+    //===============================
+    //========== @Func ==========
+    //===============================
 
     public UUID sendMessage(Channel channel, User user, String strMessage) {
         Channel channel1 = dataChannel.get(channel.getId());
