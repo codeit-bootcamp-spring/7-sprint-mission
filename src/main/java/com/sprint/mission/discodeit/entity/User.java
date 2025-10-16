@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.static_.StaticString;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -31,6 +32,17 @@ public class User extends Entity implements Serializable {
     public void removeChannel(Channel channel){
         if(!channelDb.contains(channel)) throw new IllegalArgumentException(StaticString.CHANNEL_NOT_EXIST);
         channelDb.remove(channel);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User user)) return false;
+        return isOnline == user.isOnline && Objects.equals(name, user.name) && Objects.equals(nickname, user.nickname) && Objects.equals(email, user.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, nickname, email, isOnline);
     }
 
     public User(String name, String nickname, String email, boolean isOnline) {

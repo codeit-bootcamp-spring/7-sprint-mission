@@ -13,6 +13,14 @@ public class DeletedChannelDto {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return "DeletedChannelDto{" +
+                "name='" + name + '\'' +
+                ", DeletedTime=" + DeletedTime +
+                '}';
+    }
+
     public Long getDeletedTime() {
         return DeletedTime;
     }

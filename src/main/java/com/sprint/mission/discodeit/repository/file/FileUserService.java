@@ -15,35 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 public class FileUserService implements UserRepository {
     @Override
     public void addChannelToUser(UserDto userDto, ChannelDto channelDto) {
-        if(userDto==null || channelDto==null){
-            return;
-        }
-        try(
-                ObjectInputStream ois = new ObjectInputStream
-                        (new FileInputStream
-                                (USER_DATA_ROOT));
-                ObjectOutputStream oos = new ObjectOutputStream
-                        (new FileOutputStream
-                                (USER_DATA_ROOT));
-        ){
-
-            List<User> userDb = (List<User>) ois.readObject();
-            User tempUser = userDb.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().get();
-
-
-            tempUser.addChannel(channelDtoToChannel(channelDto));
-
-            userDb.remove(userDtoToUser(userDto));
-            userDb.add(tempUser);
-            oos.writeObject(userDb);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+        List<User> userDb = loadAllUser();
+        User targetUser = userDb.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().get();
+        targetUser.addChannel(channelDtoToChannel(channelDto));
+        saveAllUser(userDb);
     }
 
     @Override
@@ -51,28 +31,19 @@ public class FileUserService implements UserRepository {
         if(userDto==null || channelDto==null){
             return;
         }
-        try(
-                ObjectInputStream ois = new ObjectInputStream
-                        (new FileInputStream
-                                (USER_DATA_ROOT));
-                ObjectOutputStream oos = new ObjectOutputStream
-                        (new FileOutputStream
-                                (USER_DATA_ROOT));
-        )
-        {
+       List<User> userDb = loadAllUser();
+        User targetUser = userDb.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().orElse(null);
+        targetUser.removeChannel(channelDtoToChannel(channelDto));
+        saveAllUser(userDb);
+    }
 
-            List<User> userDb = (List<User>) ois.readObject();
-            User tempUser = userDb.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().get();
-            tempUser.removeChannel(channelDtoToChannel(channelDto));
-            userDb.remove(userDtoToUser(userDto));
-            userDb.add(tempUser);
-            oos.writeObject(userDb);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+    @Override
+    public void resetUserRepository() {
+        saveAllUser(new ArrayList<>());
+        saveAllDeletedUser(new ArrayList<>());
 
     }
+
     private final String DATA_ROOT = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\data\\";
     private final String USER_DATA_ROOT = DATA_ROOT + "userRepository.ser";
     private final String DELETED_USER_DATA_ROOT = DATA_ROOT + "deletedUserRepository.ser";
@@ -81,64 +52,29 @@ public class FileUserService implements UserRepository {
 
     public FileUserService() {
         repositoryFileCheck();
+        resetUserRepository();
     }
 
     @Override
-    public UserDto getUserById(UUID userId) throws IOException, ClassNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));
-        List<User> userDb = (List<User>) ois.readObject();
-        boolean isExist = userDb.stream().anyMatch(x -> x.getId().equals(userId));
-        if(!isExist) return null;
-       ;
-        ois.close();
-        return  userDb.stream().filter(x->x.getId().equals(userId)).findFirst().map(this::userToUserDto).orElse(null);
+    public UserDto getUserById(UUID userId) {
+       return loadAllUser().stream().filter(x->x.getId().equals(userId)).map(this::userToUserDto).findFirst().orElse(null);
 
     }
 
     @Override
     public UserDto getUser(UserDto userDto) {
 
-        try
-        {
-            return getUserById(userDto.getId());
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
+       return getUserById(userDto.getId());
     }
 
     @Override
     public UserDto getUserByName(String userName) {
-        try(
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));
-                )
-        {
-            List<User> userDb = (List<User>) ois.readObject();
-            boolean isExist = userDb.stream().anyMatch(x -> x.getName().equals(userName));
-            if(!isExist) return null;
-            return  userDb.stream().filter(x->x.getName().equals(userName)).findFirst()
-                    .map(this::userToUserDto).orElse(null);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
+       return loadAllUser().stream().filter(x->x.getName().equals(userName)).map(this::userToUserDto).findFirst().orElse(null);
     }
 
     @Override
     public UserDto[] getAllUser() {
-        try(
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));
-                )
-        {
-            List<User> userDb = (List<User>) ois.readObject();
-            return userDb.stream().map(this::userToUserDto).toArray(UserDto[]::new);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
+     return loadAllUser().stream().map(this::userToUserDto).toArray(UserDto[]::new);
     }
 
     @Override
@@ -153,79 +89,35 @@ public class FileUserService implements UserRepository {
     @Override
     public void deleteUser(UserDto userDto) {
 
-        try(
-                ObjectOutputStream oosDeleted = new AppendableObjectOutputStream(new FileOutputStream(DELETED_USER_DATA_ROOT,true))
-               ;
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));
-                )
-        {
-         List<User> tempUserLis = (List<User>) ois.readObject();
+        List<User> userDb = loadAllUser();
+        userDb.remove(userDtoToUser(userDto));
 
-            ObjectOutputStream oosUser = new ObjectOutputStream(new FileOutputStream(USER_DATA_ROOT));
-         tempUserLis.remove(userDtoToUser(userDto));
-         oosUser.writeObject(tempUserLis);
-         oosDeleted.writeObject(userDtoToDeletedUser(userDto));
-         oosUser.close();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-
+        List<DeletedUser> deletedUserDb = loadAllDeletedUser();
+        deletedUserDb.add(userDtoToDeletedUser(userDto));
+        saveAllDeletedUser(deletedUserDb);
+        saveAllUser(userDb);
+        return;
     }
 
     @Override
     public <T> void updateUser(UserDto userDto, User.userElement userElement, T updatedContent) {
-        try(
-
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));
-                ){
-            User updatedUser = userDtoToUser(userDto);
-            BiConsumer<User, Object> editFunction = userElement.setter;
-            editFunction.accept(updatedUser, updatedContent);
-            updatedUser.updateEntity();
-            List<User> userDb = (List<User>) ois.readObject();
-
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_DATA_ROOT));
-            userDb.remove(userDtoToUser(userDto));
-            userDb.add(updatedUser);
-            oos.writeObject(userDb);
-            oos.close();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-
+       List<User> users = loadAllUser();
+       User targetUser = users.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().orElse(null);
+       BiConsumer<User, Object> editFunction = userElement.setter;
+       editFunction.accept(targetUser, updatedContent);
+       targetUser.updateEntity();
+       saveAllUser(users);
 
     }
 
     @Override
     public UserDto[] getUpdatedUser() {
-        try
-            (
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));
-                )
-        {
-            List<User> userDb = (List<User>) ois.readObject();
-            return userDb.stream().filter(x->x.getUpdatedAt()!= Entity.DEFAULT_UPDATED_AT).map(this::userToUserDto).toArray(UserDto[]::new);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
+       return loadAllUser().stream().filter(x->x.getUpdatedAt()!=Entity.DEFAULT_UPDATED_AT).map(this::userToUserDto).toArray(UserDto[]::new);
     }
 
     @Override
-    public UserDto[] getDeletedUser() {
-        try(
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DELETED_USER_DATA_ROOT));
-                ){
-            List<DeletedUser> deletedUserDb = (List<DeletedUser>) ois.readObject();
-            return deletedUserDb.stream().map(this::deletedUserToDeletedUserDto).toArray(UserDto[]::new);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
+    public DeletedUserDto[] getDeletedUser() {
+        return loadAllDeletedUser().stream().map(this::deletedUserToDeletedUserDto).toArray(DeletedUserDto[]::new);
     }
 
     private void repositoryFileCheck(){
@@ -250,12 +142,12 @@ public class FileUserService implements UserRepository {
     private Channel channelDtoToChannel(ChannelDto channelDto){
         List<User> userDb = channelDto.getUserDtoList().stream().map(
                 x->new User(x.getId(),x.getName(),x.getNickname(),x.getEmail(),x.isOnline())
-        ).toList();
+        ).collect(Collectors.toList());
         return new Channel(channelDto.getId(),channelDto.getName(),channelDto.getDescription(),channelDto.isPublic(),channelDto.isTextChannel(),userDb);
     }
     private UserDto userToUserDto(User user){
         List<ChannelDto> channelDtoList = user.getChannelDb().stream()
-                .map(x->new ChannelDto(x.getId(),x.getName(),x.getDescription(),x.isPublic(),x.isTextChannel())).toList();
+                .map(x->new ChannelDto(x.getId(),x.getName(),x.getDescription(),x.isPublic(),x.isTextChannel())).collect(Collectors.toList());
         return new UserDto(user.getId(),user.getName(),user.getNickname(),user.getEmail(),user.isOnline(),channelDtoList);
     }
     private User userDtoToUser(UserDto userDto){
@@ -293,6 +185,27 @@ public class FileUserService implements UserRepository {
             e.printStackTrace();
         }
         return new ArrayList<>();
+    }
+
+    private List<DeletedUser> loadAllDeletedUser(){
+        if(!deletedUserRepositoryFile.exists() || deletedUserRepositoryFile.length() == 0) {
+            return new ArrayList<>();
+        }
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DELETED_USER_DATA_ROOT));){
+            return (List<DeletedUser>) ois.readObject();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    private void saveAllDeletedUser(List<DeletedUser>deletedUserList){
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DELETED_USER_DATA_ROOT));){
+            oos.writeObject(deletedUserList);
+            oos.flush();
+        }
+        catch (Exception e){}
     }
 
 }

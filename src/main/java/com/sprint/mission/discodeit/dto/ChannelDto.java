@@ -41,7 +41,7 @@ public class ChannelDto extends Entity{
         this.userDtoList = new ArrayList<>();
     }
 
-    public ChannelDto(UUID uuid, String name, String description, boolean isPublic, boolean isTextChannel, List<UserDto> userDtoList,UserDto userDto) {
+    public ChannelDto(UUID uuid, String name, String description, boolean isPublic, boolean isTextChannel, List<UserDto> userDtoList) {
         super(uuid);
         this.name = name;
         this.description = description;
@@ -57,6 +57,7 @@ public class ChannelDto extends Entity{
                 ", description='" + description + '\'' +
                 ", isPublic=" + isPublic +
                 ", isTextChannel=" + isTextChannel +
+                ", userDtoList=" + userDtoList.stream().map(UserDto::getName).reduce("", (a, b) -> a + "\n" + b)+
                 '}';
     }
 

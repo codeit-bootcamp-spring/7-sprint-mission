@@ -16,6 +16,14 @@ public class DeletedChannel implements Serializable {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return "DeletedChannel{" +
+                "name='" + name + '\'' +
+                ", DeletedTime=" + DeletedTime +
+                '}';
+    }
+
     public Long getDeletedTime() {
         return DeletedTime;
     }

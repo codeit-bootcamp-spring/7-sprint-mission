@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.file.FileChannelService;
 import com.sprint.mission.discodeit.repository.file.FileMessageService;
 import com.sprint.mission.discodeit.repository.file.FileUserService;
@@ -60,9 +61,27 @@ public class RepositoryOperator {
 
 //        messageService.readUpdatedMessage();
         messageService.readAllMessage();
+        userService.readAllUser();
+        channelService.readAllChannel();
+
+        userService.enterChannel(user1Dto, channel1Dto);
+        userService.readUser(user1Dto);
+        channelService.readChannel(channel1Dto);
+        userService.exitChannel(user1Dto, channel1Dto);
+        userService.readUser(user1Dto);
+        channelService.readChannel(channel1Dto);
+        userService.deleteUser(user1Dto);
+        userService.readDeletedUser();
+        channelService.updateChannel(channel1Dto, Channel.channelElement.NAME, "JAVAUpdated");
+        channelService.readUpdatedChannel();
+        channelService.deleteChannel(channel1Dto);
+        channelService.readDeletedChannel();
 
 
 
 
    }
+
+
+
 }

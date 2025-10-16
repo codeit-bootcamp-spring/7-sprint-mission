@@ -45,6 +45,17 @@ public class UserDto extends Entity {
         return channelDtoList;
     }
 
+    @Override
+    public String toString() {
+        return "UserDto{" +
+                "name='" + name + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", email='" + email + '\'' +
+                ", isOnline=" + isOnline +
+                ", channelDtoList=" + channelDtoList.stream().map(ChannelDto::getName).reduce("", (a, b) -> a + "\n" + b)+"}";
+
+    }
+
     public String getName() {
         return name;
     }

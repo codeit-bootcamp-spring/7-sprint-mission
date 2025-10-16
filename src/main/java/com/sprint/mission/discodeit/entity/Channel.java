@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.static_.StaticString;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -35,6 +36,17 @@ public class Channel extends Entity implements Serializable{
 
             throw new IllegalArgumentException(StaticString.CHANNEL_NOT_EXIST);
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Channel channel)) return false;
+        return isPublic == channel.isPublic && isTextChannel == channel.isTextChannel && Objects.equals(name, channel.name) && Objects.equals(description, channel.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, isPublic, isTextChannel);
     }
 
     public Channel(String name, String description, boolean isPublic, boolean isTextChannel) {

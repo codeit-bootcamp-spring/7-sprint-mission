@@ -29,7 +29,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void createChannel(ChannelDto channelDto) {
         if(validateService.isValidateChannel(channelDto)){
-            System.out.println(VALIDATE_FAIL);
+            System.out.println(CHANNEL_EXIST);
             return;
         }
         channelRepository.saveChannel(channelDto);
@@ -40,7 +40,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void readChannel(ChannelDto channelDto) {
-        if(validateService.isValidateChannel(channelDto)){
+        if(!validateService.isValidateChannel(channelDto)){
             System.out.println(VALIDATE_FAIL);
             return;
         }
@@ -64,7 +64,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println(NULL_INPUT);
             return;
         }
-        if(validateService.isValidateChannel(channelDto)){
+        if(!validateService.isValidateChannel(channelDto)){
             System.out.println(VALIDATE_FAIL);
             return;
         }
@@ -81,8 +81,9 @@ public class JCFChannelService implements ChannelService {
             System.out.println(NULL_INPUT);
             return;
         }
-        if(validateService.isValidateChannel(channelDto)){
+        if(!validateService.isValidateChannel(channelDto)){
             System.out.println(VALIDATE_FAIL);
+            return;
         }
 
         try
@@ -90,7 +91,7 @@ public class JCFChannelService implements ChannelService {
 
 
             channelRepository.updateChannel(channelDto, channelElement, updatedContent);
-            System.out.printf("Update Channel field .: %s\n", channelDto.getName());
+            System.out.printf("Update Channel Name : %s\n", channelDto.getName());
             System.out.println("Updated field: "+ channelElement.name() +"updatedContent : "+updatedContent);
 
         } catch (ClassCastException e) {
@@ -133,8 +134,10 @@ public class JCFChannelService implements ChannelService {
         System.out.println(NULL_INPUT);
         return;
     }
-    if(validateService.isValidateUser(userDto) || validateService.isValidateChannel(channelDto)){
+    if(!validateService.isValidateUser(userDto) || !validateService.isValidateChannel(channelDto)) {
         System.out.println(VALIDATE_FAIL);
+        return;
+    }
         UserDto tempUser = userRepository.getUser(userDto);
         ChannelDto tempChannel = channelRepository.getChannel(channelDto);
 
@@ -145,7 +148,7 @@ public class JCFChannelService implements ChannelService {
     }
 
 
-    }
+
 
     @Override
     public void deleteUserFromChannel(UserDto userDto, ChannelDto channelDto) {

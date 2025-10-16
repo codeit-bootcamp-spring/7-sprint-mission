@@ -22,4 +22,6 @@ public interface ChannelRepository {
     public DeletedChannelDto[] getDeletedChannel();
     public void addUserToChannel(UserDto userDto, ChannelDto channelDto);
     public void deleteUserFromChannel(UserDto userDto, ChannelDto channelDto);
+
+    public void resetChannelRepository();
 }

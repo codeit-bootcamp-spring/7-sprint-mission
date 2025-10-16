@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
-public class DeletedMessage {
+import java.io.Serializable;
+
+public class DeletedMessage implements Serializable {
 
 
     private final String senderName;

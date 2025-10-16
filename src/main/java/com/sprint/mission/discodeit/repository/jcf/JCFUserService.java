@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.DeletedUserDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
@@ -149,7 +150,7 @@ public class JCFUserService implements UserService {
             return;
         }
         System.out.println("===Deleted User=== ");
-        for (UserDto userDto : userRepository.getDeletedUser()) {
+        for (DeletedUserDto userDto : userRepository.getDeletedUser()) {
             System.out.println(userDto.toString());
         }
         System.out.println("================");
@@ -168,6 +169,7 @@ public class JCFUserService implements UserService {
         }
         if(!validateService.isValidateChannel(channelDto)){
             System.out.println(CHANNEL_NOT_EXIST + channelDto.getName());
+            return;
         }
         UserDto tempUserDto = userRepository.getUser(userDto);
         ChannelDto tempChannelDto = channelRepository.getChannel(channelDto);
@@ -192,10 +194,11 @@ public class JCFUserService implements UserService {
         }
         if(!validateService.isValidateChannel(channelDto)){
             System.out.println(CHANNEL_NOT_EXIST + channelDto.getName());
+            return;
         }
         UserDto tempUserDto = userRepository.getUser(userDto);
         ChannelDto tempChannelDto = channelRepository.getChannel(channelDto);
-        if(!tempChannelDto.getUserDtoList().stream().anyMatch(x->x.getId().equals(tempUserDto.getId()))){
+        if(tempChannelDto.getUserDtoList().stream().noneMatch(x->x.getId().equals(tempUserDto.getId()))){
             System.out.println("Not in this channel");
             return;
         }

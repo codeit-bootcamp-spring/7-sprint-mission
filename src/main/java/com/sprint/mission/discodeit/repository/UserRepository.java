@@ -22,9 +22,10 @@ public interface UserRepository {
     public void deleteUser(UserDto userDto);
     public <T> void updateUser(UserDto userDto, User.userElement userElement, T updatedContent);
     public UserDto[] getUpdatedUser();
-    public UserDto[] getDeletedUser();
+    public DeletedUserDto[] getDeletedUser();
     public void addChannelToUser(UserDto userDto, ChannelDto channelDto);
     public void deleteChannelFromUser(UserDto userDto, ChannelDto channelDto);
+    public void resetUserRepository();
 
 
 }

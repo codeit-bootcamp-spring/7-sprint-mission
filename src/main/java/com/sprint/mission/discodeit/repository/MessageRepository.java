@@ -20,5 +20,6 @@ public interface MessageRepository {
     public DeletedMessageDto[] getDeletedMessage();
     public MessageDto[] getAllMessage();
     public void setDefaultSender(MessageDto messageDto);
+    public void resetMessageRepository();
 
 }

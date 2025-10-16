@@ -13,6 +13,14 @@ public class DeletedUserDto {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return "DeletedUserDto{" +
+                "name='" + name + '\'' +
+                ", DeletedTime=" + DeletedTime +
+                '}';
+    }
+
     public Long getDeletedTime() {
         return DeletedTime;
     }
