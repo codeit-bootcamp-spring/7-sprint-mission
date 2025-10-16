@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserState;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 // 생성 , 읽기 , 모두읽기, 수정, 삭제
@@ -15,7 +16,7 @@ public interface UserService {
     boolean delete(UUID uuid);
     User setUserState(UUID uuid, UserState userState);
     List<User> getUsersByName(String username);
-    List<User> getUsersByEmail(String email);
+    Optional<User> getUsersByEmail(String email);
     List<User> getUsersByState(UserState userState);
     User login(String email, String password);
     User logout(String email);
