@@ -31,6 +31,11 @@ public class Entity implements Serializable {
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = DEFAULT_UPDATED_AT;
     }
+    public Entity(UUID id, long updatedAt) {
+        this.id = id;
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = updatedAt;
+    }
 
 
     public void updateEntity(){

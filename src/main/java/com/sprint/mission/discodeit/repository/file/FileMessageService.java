@@ -57,7 +57,7 @@ public class FileMessageService implements MessageRepository {
     public void deleteMessage(MessageDto messageDto) {
         List<Message> messageDb = loadAllMessage();
         List<DeletedMessage> deletedMessageDb = loadAllDeletedMessage();
-        messageDb.remove(messageDtoToMessage(messageDto));
+        messageDb.removeIf(x->x.getId().equals(messageDto.getId()));
         deletedMessageDb.add(messageDtoToDeletedMessage(messageDto));
         saveAllDeletedMessage(deletedMessageDb);
         saveAllMessage(messageDb);
@@ -170,7 +170,7 @@ public class FileMessageService implements MessageRepository {
 
     private MessageDto messageToMessageDto(Message message) {
         UserDto tempSender = new UserDto(message.getSender().getId(), message.getSender().getName(), message.getSender().getNickname(), message.getSender().getEmail(), message.getSender().isOnline());
-        return new MessageDto(message.getContent(), tempSender, message.isMarkDown());
+        return new MessageDto(message.getId(),message.getContent(), tempSender, message.isMarkDown());
     }
 
     private DeletedMessage messageDtoToDeletedMessage(MessageDto messageDto){
@@ -186,7 +186,7 @@ public class FileMessageService implements MessageRepository {
     private void saveAllMessage(List<Message>messageList){
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(messageRepositoryFile,false));){
             oos.writeObject(messageList);
-//            oos.flush();
+            oos.flush();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -222,6 +222,7 @@ public class FileMessageService implements MessageRepository {
     private void saveAllDeletedMessage(List<DeletedMessage>deletedMessageList){
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DELETED_MESSAGE_DATA_PATH,false));){
             oos.writeObject(deletedMessageList);
+            oos.flush();
         }
         catch (Exception e){
             e.printStackTrace();

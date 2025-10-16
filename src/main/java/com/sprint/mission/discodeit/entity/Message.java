@@ -66,7 +66,7 @@ public class Message extends Entity{
     public String toString() {
         return "Message{" +
                 "content='" + content + '\'' +
-                ", sender=" + sender.getNickname() +
+                ", sender=" + sender.getName() +
                 ", isMarkDown=" + isMarkDown +
                 '}';
     }

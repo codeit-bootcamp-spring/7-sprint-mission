@@ -90,7 +90,7 @@ public class FileUserService implements UserRepository {
     public void deleteUser(UserDto userDto) {
 
         List<User> userDb = loadAllUser();
-        userDb.remove(userDtoToUser(userDto));
+        userDb.removeIf(x->x.getId().equals(userDto.getId()));
 
         List<DeletedUser> deletedUserDb = loadAllDeletedUser();
         deletedUserDb.add(userDtoToDeletedUser(userDto));

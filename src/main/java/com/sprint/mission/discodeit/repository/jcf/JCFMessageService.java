@@ -45,8 +45,8 @@ public class JCFMessageService implements MessageService {
             System.out.println(MESSAGE_NOT_EXIST+messageDto.getContent());
             return;
         }
-        messageRepository.getMessage(messageDto);
-        System.out.println(messageDto.getContent());
+        MessageDto result =messageRepository.getMessage(messageDto);
+        System.out.println(result.toString());
     }
     public void readAllMessage(){
 
@@ -65,7 +65,9 @@ public class JCFMessageService implements MessageService {
             System.out.println(MESSAGE_NOT_EXIST+messageDto.getContent());
             return;
         }
+
         messageRepository.deleteMessage(messageDto);
+
         System.out.println(DELETE_MESSAGE+messageDto.getContent());
     }
     public void updateMessage(MessageDto messageDto, Message.messageElement messageElement, Object updatedContent){

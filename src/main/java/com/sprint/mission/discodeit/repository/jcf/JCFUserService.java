@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.repository.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.sprint.mission.discodeit.static_.StaticString.*;
 
@@ -79,19 +81,20 @@ public class JCFUserService implements UserService {
             System.out.println(USER_NOT_EXIST + userDto.getName());
             return;
         }
-        UserDto[] userList = userRepository.getAllUser();
+        ChannelDto [] channelList = channelRepository.getAllChannel();
+        List<ChannelDto> channelDtoStream = Arrays.stream(channelList).filter(x -> x.getUserDtoList().stream().anyMatch(y -> y.getId().equals(userDto.getId()))).toList();
+        for(ChannelDto channelDto : channelDtoStream) channelRepository.deleteUserFromChannel(userDto,channelDto);
 
-        for(UserDto tmp : userList){
-            if(tmp.getChannelDtoList().size() > 0){
-                for(ChannelDto channelDto : tmp.getChannelDtoList()){
-                    channelRepository.deleteUserFromChannel(tmp,channelDto);
-                }
-            }
-        }
+
         MessageDto [] messageList = messageRepository.getAllMessage();
-        List<MessageDto> messageDtoList = Arrays.stream(messageList).filter(x-> x.getSender().getId()==userDto.getId()).toList();
-        messageDtoList.forEach(x->messageRepository.setDefaultSender(x));
+        List<MessageDto> messageDtoList = Arrays.stream(messageList).filter(x-> x.getSender().getId().equals(userDto.getId())).collect(Collectors.toList());
 
+
+        for(MessageDto temp : messageDtoList)
+        {
+            messageRepository.setDefaultSender(temp);
+
+        }
 
 
 

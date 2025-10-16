@@ -63,7 +63,7 @@ public class FileChannelService implements ChannelRepository {
     public void deleteChannel(ChannelDto channelDto) {
       List<Channel> channels = loadAllChannel();
       List<DeletedChannel> deletedChannels = loadAllDeletedChannel();
-      channels.remove(channelDtoToChannel(channelDto));
+      channels.removeIf(x->x.getId().equals(channelDto.getId()));
       deletedChannels.add(channelDtoToDeletedChannel(channelDto));
       saveAllChannel(channels);
       saveAllDeletedChannel(deletedChannels);
@@ -203,6 +203,7 @@ public class FileChannelService implements ChannelRepository {
     @Override
     public void resetChannelRepository() {
         saveAllChannel(new ArrayList<>());
+        saveAllDeletedChannel(new ArrayList<>());
     }
 
     private ChannelDto channelToChannelDto(Channel channel){

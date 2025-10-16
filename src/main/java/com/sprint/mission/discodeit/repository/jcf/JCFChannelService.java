@@ -92,7 +92,7 @@ public class JCFChannelService implements ChannelService {
 
             channelRepository.updateChannel(channelDto, channelElement, updatedContent);
             System.out.printf("Update Channel Name : %s\n", channelDto.getName());
-            System.out.println("Updated field: "+ channelElement.name() +"updatedContent : "+updatedContent);
+            System.out.println("Updated field: "+ channelElement.name() +" updatedContent : "+updatedContent);
 
         } catch (ClassCastException e) {
 

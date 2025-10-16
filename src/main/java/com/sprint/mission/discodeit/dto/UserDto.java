@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class UserDto extends Entity {
@@ -54,6 +55,17 @@ public class UserDto extends Entity {
                 ", isOnline=" + isOnline +
                 ", channelDtoList=" + channelDtoList.stream().map(ChannelDto::getName).reduce("", (a, b) -> a + "\n" + b)+"}";
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof UserDto userDto)) return false;
+        return isOnline == userDto.isOnline && Objects.equals(name, userDto.name) && Objects.equals(nickname, userDto.nickname) && Objects.equals(email, userDto.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, nickname, email, isOnline);
     }
 
     public String getName() {

@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.dto;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.User;
 
+import java.util.UUID;
+
 public class MessageDto extends Entity {
     private final String content;
     private final UserDto sender;
@@ -15,7 +17,12 @@ public class MessageDto extends Entity {
         this.isMarkDown = isMarkDown;
     }
 
-
+    public MessageDto(UUID id, String content, UserDto sender, boolean isMarkDown) {
+        super(id);
+        this.content = content;
+        this.sender = sender;
+        this.isMarkDown = isMarkDown;
+    }
 
     public String getContent() {
         return content;
