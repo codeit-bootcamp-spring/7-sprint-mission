@@ -12,6 +12,7 @@ public class JCFMessageService implements MessageService {
 
     // 싱글톤 패턴
     private static JCFMessageService instance;
+    private JCFMessageService() {}
     public static JCFMessageService getInstance(){
         if (instance == null){
             instance = new JCFMessageService();
@@ -21,6 +22,12 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message createMessage(UUID senderId, UUID receiverId, String content) {
+        if(senderId == null || receiverId == null){
+            throw new IllegalArgumentException("ID값이 잘 못 되었습니다.");
+        }
+        if(content == null || content.trim().isEmpty()){
+            throw new IllegalArgumentException("메시지 내용이 비어 있을 수 없습니다.");
+        }
         Message message = new Message(senderId, receiverId, content);
         messages.put(message.getId(), message);
         return message;

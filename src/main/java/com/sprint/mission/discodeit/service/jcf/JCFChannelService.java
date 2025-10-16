@@ -12,6 +12,9 @@ public class JCFChannelService implements ChannelService {
 
     // 싱글톤 패턴
     private static JCFChannelService instance;
+
+    private JCFChannelService() {}
+
     public static JCFChannelService getInstance(){
         if (instance == null){
             instance = new JCFChannelService();
@@ -44,7 +47,9 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel updateChannel(UUID id, String channelName) {
         Channel channel = channels.get(id);
-        channel.setChannelName(channelName);
+        if(channel != null){
+            channel.setChannelName(channelName);
+        }
         return channel;
     }
 
