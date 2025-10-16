@@ -136,23 +136,23 @@ public class File_ChannelService implements ChannelService, MessageService {
 
     @Override
     public void getAll_Messages(Channel channel) {
-        File_Common.errMessage("❌❌❌ getAll_Messages 이런걸 언제 구현?! PASS! ❌❌❌");
+        File_Common.errMessage("❌❌❌ getAll_Messages  PASS! ❌❌❌");
     }
 
     @Override
     public Message get_Message(Channel channel, UUID messageID) {
-        File_Common.errMessage("❌❌❌ get_Message 이런걸 언제 구현?! PASS! ❌❌❌");
+        File_Common.errMessage("❌❌❌ get_Message PASS! ❌❌❌");
         return null;
     }
 
     @Override
     public void update_Message(Channel channel, UUID messageID, String message) {
-        File_Common.errMessage("❌❌❌ update_Message 이런걸 언제 구현?! PASS! ❌❌❌");
+        File_Common.errMessage("❌❌❌ update_Message  PASS! ❌❌❌");
     }
 
     @Override
     public void delete_Message(Channel channel, UUID messageID) {
-        File_Common.errMessage("❌❌❌ delete_Message 이런걸 언제 구현?! PASS! ❌❌❌");
+        File_Common.errMessage("❌❌❌ delete_Message PASS! ❌❌❌");
     }
 
     //===============================
