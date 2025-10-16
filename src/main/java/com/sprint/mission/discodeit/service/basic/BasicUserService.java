@@ -1,11 +1,15 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.DeletedUserDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ValidateService;
+import com.sprint.mission.discodeit.service.MessageRepository;
+import com.sprint.mission.discodeit.service.UserRepository;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,14 +23,13 @@ import static com.sprint.mission.discodeit.static_.StaticString.USER_EMPTY;
 import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
 import static com.sprint.mission.discodeit.static_.StaticString.WRONG_TYPE;
 
-public class JCFUser implements UserService {
-
+public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final ValidateService validateService;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
 
-    public JCFUser(UserRepository userRepository, ValidateService validateService, ChannelRepository channelRepository, MessageRepository messageRepository) {
+    public BasicUserService(UserRepository userRepository, ValidateService validateService, ChannelRepository channelRepository, MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.validateService = validateService;
         this.channelRepository = channelRepository;

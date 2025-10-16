@@ -14,9 +14,9 @@ import com.sprint.mission.discodeit.repository.jcf.JCFUserService;
 import com.sprint.mission.discodeit.repository.util.ValidateOperator;
 
 public class RepositoryOperator {
-    private final ChannelService channelService;
-    private final UserService userService;
-    private final MessageService messageService;
+        private final ChannelService channelService;
+        private final UserService userService;
+        private final MessageService messageService;
 
 
     private final ChannelRepository channelRepository = new FileChannelService();

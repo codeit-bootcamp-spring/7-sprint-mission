@@ -1,26 +1,30 @@
-package com.sprint.mission.discodeit.repository.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.DeletedChannelDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.ChannelService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.ValidateService;
-
-
-import java.util.function.BiConsumer;
+import com.sprint.mission.discodeit.service.ChannelService;
 
 import static com.sprint.mission.discodeit.static_.StaticString.*;
+import static com.sprint.mission.discodeit.static_.StaticString.CHANNEL_EMPTY;
+import static com.sprint.mission.discodeit.static_.StaticString.CHANNEL_NOT_EXIST;
+import static com.sprint.mission.discodeit.static_.StaticString.DELETE_CHANNEL;
+import static com.sprint.mission.discodeit.static_.StaticString.NULL_INPUT;
+import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
+import static com.sprint.mission.discodeit.static_.StaticString.VALIDATE_FAIL;
+import static com.sprint.mission.discodeit.static_.StaticString.WRONG_TYPE;
 
-public class JCFChannelService implements ChannelService {
+public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final ValidateService validateService;
     private final UserRepository userRepository;
 
-    public JCFChannelService(ChannelRepository channelRepository, ValidateService validateService, UserRepository userRepository) {
+    public BasicChannelService(ChannelRepository channelRepository, ValidateService validateService, UserRepository userRepository) {
         this.channelRepository = channelRepository;
         this.validateService = validateService;
         this.userRepository = userRepository;
@@ -130,14 +134,14 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void inviteUserToChannel(UserDto userDto, ChannelDto channelDto) {
-    if(userDto==null || channelDto==null){
-        System.out.println(NULL_INPUT);
-        return;
-    }
-    if(!validateService.isValidateUser(userDto) || !validateService.isValidateChannel(channelDto)) {
-        System.out.println(VALIDATE_FAIL);
-        return;
-    }
+        if(userDto==null || channelDto==null){
+            System.out.println(NULL_INPUT);
+            return;
+        }
+        if(!validateService.isValidateUser(userDto) || !validateService.isValidateChannel(channelDto)) {
+            System.out.println(VALIDATE_FAIL);
+            return;
+        }
         UserDto tempUser = userRepository.getUser(userDto);
         ChannelDto tempChannel = channelRepository.getChannel(channelDto);
 

@@ -1,19 +1,20 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 
-import java.util.function.Consumer;
-
 public interface ChannelService {
 
-    void createChannel(Channel channel);
-    void readChannel(Channel channel);
+
+    void createChannel(ChannelDto channelDto);
+    void readChannel(ChannelDto channelDto);
     void readAllChannel();
-    void deleteChannel(Channel channel);
-    <T> void updateChannel(Channel channel, Channel.channelElement channelElement, T updatedContent);
+    void deleteChannel(ChannelDto channelDto);
+    <T> void updateChannel(ChannelDto channel, Channel.channelElement channelElement, T updatedContent);
     void readUpdatedChannel();
     void readDeletedChannel();
-    void inviteUserToChannel(User user, Channel channel);
-    void deleteUserFromChannel(User user, Channel channel);
+    void inviteUserToChannel(UserDto user, ChannelDto channel);
+    void deleteUserFromChannel(UserDto user, ChannelDto channel);
 }

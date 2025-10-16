@@ -1,148 +1,147 @@
 package com.sprint.mission.discodeit.service.input;
 
 import com.sprint.mission.discodeit.service.jcf.JCFChannel;
-import com.sprint.mission.discodeit.service.jcf.JCFDb;
 import com.sprint.mission.discodeit.service.jcf.JCFMessage;
 import com.sprint.mission.discodeit.service.jcf.JCFUser;
 
 import static com.sprint.mission.discodeit.static_.StaticString.*;
 
 public class InputApplication {
-    private final InputReader inputReader;
-
-    private final JCFDb jcfDb;
-
-    private final TestJCFChannel testJCFChannel;
-    private final TestJCFMessage testJCFMessage;
-    private final TestJCFUser testJCFUser;
-    private final HelpOperator helpOperator ;
-    private boolean isRunning = true;
-
-    public InputApplication() {
-        this.inputReader = new InputReader();
-        this.jcfDb = new JCFDb();
-
-        TestUtil testUtil = new TestUtil(jcfDb);
-
-
-        this.testJCFChannel = new TestJCFChannel(testUtil, new JCFChannel(jcfDb));
-        this.testJCFMessage = new TestJCFMessage(testUtil, new JCFMessage(jcfDb));
-        this.testJCFUser = new TestJCFUser(testUtil, new JCFUser(jcfDb));
-        this.helpOperator = new HelpOperator();
-    }
-
-    public void start() {
-
-        System.out.println("Test is started Type command or !help");
-        while (isRunning) {
-            String input = inputReader.readLine();
-            if (input.isEmpty()) continue;
-            mappingCmd(input);
-
-
-        }
-        closeTest();
-    }
-
-    public void mappingCmd(String cmd) {
-        String[] cmdArray = cmd.split(" ");
-
-
-        String noUpperCase = cmdArray[0].toLowerCase();
-        switch (noUpperCase) {
-            case "createuser":
-             testJCFUser.testCreateUser(cmdArray);
-                break;
-            case "readalluser":
-                testJCFUser.testReadAllUser();
-                break;
-            case "deleteuser":
-              testJCFUser.testDeleteUser(cmdArray);
-                break;
-            case "updateuser":
-            testJCFUser.testUpdateUser(cmdArray);
-                break;
-            case "readupdateduser":
-              testJCFUser.testReadUpdatedUser();
-                break;
-            case "readdeleteduser":
-             testJCFUser.testReadDeletedUser();
-                break;
-            case "readuser":
-              testJCFUser.testReadUser(cmdArray);
-                break;
-            case "enterchannel":
-              testJCFUser.testEnterChannel(cmdArray);
-                break;
-            case "exitchannel":
-              testJCFUser.testExitChannel(cmdArray);
-                break;
-            case "createchannel":
-             testJCFChannel.testCreateChannel(cmdArray);
-                break;
-            case "readallchannel":
-               testJCFChannel.testReadAllChannel();
-                break;
-            case "deletechannel":
-            testJCFChannel.testDeleteChannel(cmdArray);
-                break;
-            case "readchannel":
-              testJCFChannel.testReadChannel(cmdArray);
-                break;
-            case "updatechannel":
-               testJCFChannel.testUpdateChannel(cmdArray);
-                break;
-            case "readupdatedchannel":
-               testJCFChannel.testReadUpdatedChannel();
-                break;
-            case "readdeletedchannel":
-               testJCFChannel.testReadDeletedChannel();
-                break;
-            case "inviteusertochannel":
-              testJCFChannel.testInviteUserToChannel(cmdArray);
-                break;
-            case "deleteuserfromchannel":
-             testJCFChannel.testDeleteUserFromChannel(cmdArray);
-             break;
-            case "createmessage":
-             testJCFMessage.testCreateMessage(cmdArray);
-                break;
-            case "readmessage":
-              testJCFMessage.testReadMessage(cmdArray);
-                break;
-            case "readallmessage":
-               testJCFMessage.testReadAllMessage();
-                break;
-            case "deletemessage":
-             testJCFMessage.testDeleteMessage(cmdArray);
-                break;
-            case "updatemessage":
-               testJCFMessage.testUpdateMessage(cmdArray);
-                break;
-            case "readupdatedmessage":
-                testJCFMessage.testReadUpdatedMessage();
-                break;
-            case "readdeletedmessage":
-                testJCFMessage.testReadDeletedMessage();
-                break;
-            case "!help":
-               helpOperator.helpFinal(cmdArray);
-               break;
-            case"!exit":
-                isRunning = false;
-                break;
-            default:
-                System.out.println(WRONG_COMMAND);
-
-
-        }
-    }
-
-    public void closeTest() {
-
-        inputReader.close();
-        System.out.println("테스트 종료");
-    }
+//    private final InputReader inputReader;
+//
+//    private final JCFDb jcfDb;
+//
+//    private final TestJCFChannel testJCFChannel;
+//    private final TestJCFMessage testJCFMessage;
+//    private final TestJCFUser testJCFUser;
+//    private final HelpOperator helpOperator ;
+//    private boolean isRunning = true;
+//
+//    public InputApplication() {
+//        this.inputReader = new InputReader();
+//        this.jcfDb = new JCFDb();
+//
+//        TestUtil testUtil = new TestUtil(jcfDb);
+//
+//
+//        this.testJCFChannel = new TestJCFChannel(testUtil, new JCFChannel(jcfDb));
+//        this.testJCFMessage = new TestJCFMessage(testUtil, new JCFMessage(jcfDb));
+//        this.testJCFUser = new TestJCFUser(testUtil, new JCFUser(jcfDb));
+//        this.helpOperator = new HelpOperator();
+//    }
+//
+//    public void start() {
+//
+//        System.out.println("Test is started Type command or !help");
+//        while (isRunning) {
+//            String input = inputReader.readLine();
+//            if (input.isEmpty()) continue;
+//            mappingCmd(input);
+//
+//
+//        }
+//        closeTest();
+//    }
+//
+//    public void mappingCmd(String cmd) {
+//        String[] cmdArray = cmd.split(" ");
+//
+//
+//        String noUpperCase = cmdArray[0].toLowerCase();
+//        switch (noUpperCase) {
+//            case "createuser":
+//             testJCFUser.testCreateUser(cmdArray);
+//                break;
+//            case "readalluser":
+//                testJCFUser.testReadAllUser();
+//                break;
+//            case "deleteuser":
+//              testJCFUser.testDeleteUser(cmdArray);
+//                break;
+//            case "updateuser":
+//            testJCFUser.testUpdateUser(cmdArray);
+//                break;
+//            case "readupdateduser":
+//              testJCFUser.testReadUpdatedUser();
+//                break;
+//            case "readdeleteduser":
+//             testJCFUser.testReadDeletedUser();
+//                break;
+//            case "readuser":
+//              testJCFUser.testReadUser(cmdArray);
+//                break;
+//            case "enterchannel":
+//              testJCFUser.testEnterChannel(cmdArray);
+//                break;
+//            case "exitchannel":
+//              testJCFUser.testExitChannel(cmdArray);
+//                break;
+//            case "createchannel":
+//             testJCFChannel.testCreateChannel(cmdArray);
+//                break;
+//            case "readallchannel":
+//               testJCFChannel.testReadAllChannel();
+//                break;
+//            case "deletechannel":
+//            testJCFChannel.testDeleteChannel(cmdArray);
+//                break;
+//            case "readchannel":
+//              testJCFChannel.testReadChannel(cmdArray);
+//                break;
+//            case "updatechannel":
+//               testJCFChannel.testUpdateChannel(cmdArray);
+//                break;
+//            case "readupdatedchannel":
+//               testJCFChannel.testReadUpdatedChannel();
+//                break;
+//            case "readdeletedchannel":
+//               testJCFChannel.testReadDeletedChannel();
+//                break;
+//            case "inviteusertochannel":
+//              testJCFChannel.testInviteUserToChannel(cmdArray);
+//                break;
+//            case "deleteuserfromchannel":
+//             testJCFChannel.testDeleteUserFromChannel(cmdArray);
+//             break;
+//            case "createmessage":
+//             testJCFMessage.testCreateMessage(cmdArray);
+//                break;
+//            case "readmessage":
+//              testJCFMessage.testReadMessage(cmdArray);
+//                break;
+//            case "readallmessage":
+//               testJCFMessage.testReadAllMessage();
+//                break;
+//            case "deletemessage":
+//             testJCFMessage.testDeleteMessage(cmdArray);
+//                break;
+//            case "updatemessage":
+//               testJCFMessage.testUpdateMessage(cmdArray);
+//                break;
+//            case "readupdatedmessage":
+//                testJCFMessage.testReadUpdatedMessage();
+//                break;
+//            case "readdeletedmessage":
+//                testJCFMessage.testReadDeletedMessage();
+//                break;
+//            case "!help":
+//               helpOperator.helpFinal(cmdArray);
+//               break;
+//            case"!exit":
+//                isRunning = false;
+//                break;
+//            default:
+//                System.out.println(WRONG_COMMAND);
+//
+//
+//        }
+//    }
+//
+//    public void closeTest() {
+//
+//        inputReader.close();
+//        System.out.println("테스트 종료");
+//    }
 
 //    public boolean checkValidateBoolean(String input) {
 //

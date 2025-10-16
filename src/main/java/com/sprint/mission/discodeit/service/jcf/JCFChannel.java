@@ -1,187 +1,103 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.DeletedChannelDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Entity;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ChannelRepository;
+import com.sprint.mission.discodeit.service.UserRepository;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.ValidateService;
 
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import static com.sprint.mission.discodeit.static_.StaticString.*;
+import static com.sprint.mission.discodeit.static_.StaticString.CHANNEL_EMPTY;
+import static com.sprint.mission.discodeit.static_.StaticString.CHANNEL_NOT_EXIST;
+import static com.sprint.mission.discodeit.static_.StaticString.DELETE_CHANNEL;
+import static com.sprint.mission.discodeit.static_.StaticString.NULL_INPUT;
+import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
+import static com.sprint.mission.discodeit.static_.StaticString.VALIDATE_FAIL;
+import static com.sprint.mission.discodeit.static_.StaticString.WRONG_TYPE;
 
 public class JCFChannel implements ChannelService {
-private final ArrayList<Channel> channelDb;
-private final  Map<UUID,String> deletedChannelDb ;
-private final JCFDb jcfDb;
-private final ValidateService validateService;
-private final ArrayList<User> userDb ;
 
+    private final ChannelRepository channelRepository;
+    private final ValidateService validateService;
+    private final UserRepository userRepository;
 
+    public JCFChannel(ChannelRepository channelRepository, ValidateService validateService, UserRepository userRepository) {
+        this.channelRepository = channelRepository;
+        this.validateService = validateService;
+        this.userRepository = userRepository;
+    }
 
+    @Override
+    public void createChannel(ChannelDto channelDto) {
+        if(validateService.isValidateChannel(channelDto)){
+            System.out.println(CHANNEL_EXIST);
+            return;
+        }
+        channelRepository.saveChannel(channelDto);
+        System.out.println(CREATE_CHANNEL + channelDto.getName());
 
-
-    public JCFChannel(JCFDb jcfDb) {
-
-        this.jcfDb = jcfDb;
-this.channelDb = jcfDb.getChannelDb();
-this.deletedChannelDb = jcfDb.getDeletedChannelDb();
-this.validateService = new JCFValidateOperator(jcfDb);
-this.userDb = jcfDb.getUserDb();
 
     }
 
-
-//    public void addUserToChannel(User user, Channel channel){
-//        if(channelDb.stream().noneMatch(u->u.getId()==user.getId())){
-//            System.out.println("채널에 등록할 유저가 존재하지 않습니다.");
-//            return;
-//        }
-//        if(channelDb.stream().noneMatch(c->c.getId()==channel.getId())){
-//            System.out.println("채널이 존재하지 않습니다.");
-//            return;
-//        }
-//        channel.addUserToChannel(user);
-//    }
-//
-//    public void deleteUserFromChannel(User user, Channel channel){
-//        if(channelDb.stream().noneMatch(u->u.getId()==user.getId())){
-//            System.out.println("채널에 유저가 존재하지 않습니다.");
-//            return;
-//        }
-//        if(channelDb.stream().noneMatch(c->c.getId()==channel.getId())){
-//            System.out.println("채널이 존재하지 않습니다.");
-//            return;
-//        }
-//        channel.removeUserFromChannel(user);
-//    }
+    @Override
+    public void readChannel(ChannelDto channelDto) {
+        if(!validateService.isValidateChannel(channelDto)){
+            System.out.println(VALIDATE_FAIL);
+            return;
+        }
+        ChannelDto tempChannel = channelRepository.getChannel(channelDto);
+        System.out.println(tempChannel.toString());
 
 
-
-
+    }
 
     @Override
-    public void createChannel(Channel channel) {
-        if(channel == null) {
+    public void readAllChannel() {
+        for(ChannelDto channelDto : channelRepository.getAllChannel()){
+            System.out.println(channelDto.toString());
+        }
+
+    }
+
+    @Override
+    public void deleteChannel(ChannelDto channelDto) {
+        if(channelDto == null){
             System.out.println(NULL_INPUT);
             return;
         }
-        if(validateService.isValidateChannel(channel)){
-            System.out.println(CHANNEL_EXIST + channel.getName());
+        if(!validateService.isValidateChannel(channelDto)){
+            System.out.println(VALIDATE_FAIL);
             return;
         }
-        channelDb.add(channel);
-        System.out.println(CREATE_CHANNEL + channel.getName());
-//        System.out.printf("채널이 생성되었습니다 : %s\n", channel.getName());
+        channelRepository.deleteChannel(channelDto);
+        System.out.println(DELETE_CHANNEL + channelDto.getName());
+        return;
+
 
     }
 
     @Override
-    public void readChannel(Channel channel) {
-        if(channel == null) {
+    public <T> void updateChannel(ChannelDto channelDto, Channel.channelElement channelElement, T updatedContent) {
+        if(channelDto == null || updatedContent == null || channelElement == null){
             System.out.println(NULL_INPUT);
             return;
         }
-        if(jcfDb.getDeletedChannelDb().containsKey(channel.getId())) {
-            System.out.println(CHANNEL_ALREADY_DELETED+ channel.getName() );
-            return;
-        }
-        if(jcfDb.getChannelDb().stream()
-                .noneMatch(c->c.getName().equals(channel.getName()))
-
-        ){
-            System.out.println(CHANNEL_NOT_EXIST+ channel.getName());
+        if(!validateService.isValidateChannel(channelDto)){
+            System.out.println(VALIDATE_FAIL);
             return;
         }
 
-        System.out.println("Channel info: "+ channel.toString() );
-
-    }
-
-    public void readChannel(Channel... channels) {
-
-        for (Channel channel : channels) {
-            if(channel == null) {
-                System.out.println(NULL_INPUT);
-                continue;
-            }
-            if(deletedChannelDb.containsKey(channel.getId())){
-                System.out.println(CHANNEL_ALREADY_DELETED +channel.getName());
-                continue;
-            }
-            if(channelDb.stream()
-                    .noneMatch(c->c.getId()==channel.getId())
-
-            ){
-                System.out.println(CHANNEL_NOT_EXIST+ channel.getName());
-                continue;
-            }
-
-            System.out.println("Channel info: "+ channel.toString() );
-        }
-    }
-    @Override
-    public void readAllChannel() {
-        if(channelDb.isEmpty()){
-            System.out.println(CHANNEL_EMPTY);
-            return;
-        }
-        for (Channel channel : channelDb) {
-            readChannel(channel);
-        }
-    }
-
-    @Override
-    public void deleteChannel(Channel channel) {
-        if(channel == null) {
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(!validateService.isValidateChannel(channel)){
-            System.out.println(CHANNEL_NOT_EXIST + channel.getName());
-            return;
-        }
-        channelDb.remove(channel);
-        deletedChannelDb.put(channel.getId(),channel.getName());
-        userDb.stream()
-                .filter(x->x.getChannelDb().contains(channel))
-                .forEach(x->x.removeChannel(channel));
-        System.out.println(DELETE_CHANNEL + channel.getName());
-
-    }
-
-    @Override
-    public <T> void updateChannel(Channel channel, Channel.channelElement channelElement, T updatedContent) {
-        if(channel == null || updatedContent == null|| channelElement == null) {
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(!validateService.isValidateChannel(channel)){
-            System.out.println(CHANNEL_NOT_EXIST + channel.getName());
-            return;
-        }
-
-
-
-
-
-//        Class<? extends BiConsumer> aClass = editFunction.getClass();
-//        if(!aClass.isInstance(updatedContent)) {
-//            System.out.println("잘못된 타입을 입력했습니다");
-//            return;
-//        }
         try
         {
-            BiConsumer<Channel, Object> editFunction = channelElement.setter;
-            Object oldContent = channelElement.getter.apply(channel);
 
-            editFunction.accept(channel, updatedContent);
-            channel.updateEntity();
-            System.out.printf("Update Channel field .: %s\n", channel.getName());
-            System.out.println("Updated field: "+ channelElement.name()+ " Before Updated: "+ oldContent.toString() +" ==> 변경 후: "+updatedContent);
+
+            channelRepository.updateChannel(channelDto, channelElement, updatedContent);
+            System.out.printf("Update Channel Name : %s\n", channelDto.getName());
+            System.out.println("Updated field: "+ channelElement.name() +" updatedContent : "+updatedContent);
 
         } catch (ClassCastException e) {
 
@@ -193,107 +109,79 @@ this.userDb = jcfDb.getUserDb();
 
     @Override
     public void readUpdatedChannel() {
-        if (channelDb.stream().noneMatch(c -> c.getUpdatedAt() != Entity.DEFAULT_UPDATED_AT)) {
-            System.out.println("No Updated Channel");
+        if(channelRepository.getUpdatedChannel().length == 0){
+            System.out.println(CHANNEL_EMPTY);
             return;
         }
-        for(Channel channel : channelDb){
-
-            if(channel.getUpdatedAt()!= Entity.DEFAULT_UPDATED_AT){
-                readChannel(channel);
-                System.out.println(channel.getName()+" Updated Time : "+" "+channel.getUpdatedAt() );
-            }
+        for(ChannelDto channelDto : channelRepository.getUpdatedChannel()){
+            System.out.println(channelDto.toString());
         }
+
     }
 
     @Override
     public void readDeletedChannel() {
-        if(deletedChannelDb.isEmpty()){
-            System.out.println( "No Deleted Channel.");
+        if(channelRepository.getDeletedChannel().length == 0){
+            System.out.println("No deleted channel");
             return;
         }
-        System.out.println( "===Deleted Channel=== ");
-        for(UUID tmp :deletedChannelDb.keySet()){
-            String value = deletedChannelDb.get(tmp);
-            System.out.println(value);
+        System.out.println("===Deleted Channel=== ");
+        for(DeletedChannelDto deletedChannelDto : channelRepository.getDeletedChannel()){
+            System.out.println(deletedChannelDto.toString());
         }
-        System.out.println("==========");
+        System.out.println("=============");
 
     }
-//    public boolean checkIfChannelExist(Channel channel){
-//        if(channelDb.stream()
-//                .noneMatch(c->c.getId()==channel.getId())
-//
-//        ){
-//            System.out.println("채널은 존재하지 않습니다. : "+ channel.getName());
-//
-//            return false;
-//        }
-//        return true;
-//
-//    }
-    public void showUserInChannel(Channel channel){
-        for(User user : channel.getUsers()){
-            System.out.println(user.getName());
-        }
-    }
-    public void inviteUserToChannel(User user, Channel channel){
-        if(user == null || channel == null) {
+
+    @Override
+    public void inviteUserToChannel(UserDto userDto, ChannelDto channelDto) {
+        if(userDto==null || channelDto==null){
             System.out.println(NULL_INPUT);
             return;
         }
-        if(!validateService.isValidateChannel(channel)){
-            System.out.println(CHANNEL_NOT_EXIST + channel.getName());
+        if(!validateService.isValidateUser(userDto) || !validateService.isValidateChannel(channelDto)) {
+            System.out.println(VALIDATE_FAIL);
             return;
         }
-        if(!validateService.isValidateUser(user)){
-            System.out.println(USER_NOT_EXIST+ user.getName());
-            return;
-        }
+        UserDto tempUser = userRepository.getUser(userDto);
+        ChannelDto tempChannel = channelRepository.getChannel(channelDto);
 
-        channel.addUserToChannel(user);
-        user.addChannel(channel);
-        System.out.println(user.getName()+" is invited from "+channel.getName());
+        channelRepository.addUserToChannel(tempUser,tempChannel);
+        userRepository.addChannelToUser(tempUser,tempChannel);
+        System.out.println(tempUser.getName()+" is invited from "+tempChannel.getName());
+        return;
     }
-    public void deleteUserFromChannel(User user, Channel channel){
-        if(user == null || channel == null) {
+
+
+
+
+    @Override
+    public void deleteUserFromChannel(UserDto userDto, ChannelDto channelDto) {
+        if(userDto==null || channelDto==null){
             System.out.println(NULL_INPUT);
             return;
         }
-        if(!validateService.isValidateChannel(channel)){
-            System.out.println(CHANNEL_NOT_EXIST + channel.getName());
+        if(!validateService.isValidateChannel(channelDto)){
+            System.out.println(CHANNEL_NOT_EXIST + channelDto.getName());
             return;
         }
-        if(!validateService.isValidateUser(user)){
-            System.out.println(USER_NOT_EXIST + user.getName());
+        if(!validateService.isValidateUser(userDto)){
+            System.out.println(USER_NOT_EXIST + userDto.getName());
             return;
         }
+        UserDto tempUser = userRepository.getUser(userDto);
+        ChannelDto tempChannel = channelRepository.getChannel(channelDto);
 
-        if(!channel.getUserDb().contains(user)){
+        if(tempChannel.getUserDtoList().stream().noneMatch(x->x.getId().equals(tempUser.getId()))){
             System.out.println("Not in this channel");
             return;
         }
-        System.out.println(user.getName()+"is banished from  "+channel.getName()+" Channel");
-        channel.removeUserFromChannel(user);
-        user.removeChannel(channel);
+        channelRepository.deleteUserFromChannel(tempUser,tempChannel );
+        userRepository.deleteChannelFromUser(tempUser,tempChannel );
+        System.out.println(userDto.getName()+" is banished from "+channelDto.getName());
+
+
+
 
     }
-
-//    public <T> Object getChannelContent(Channel channel, Channel.channelElement channelElement){
-//        switch(channelElement){
-//            case NAME:
-//                return channel.getName();
-//
-//            case DESCRIPTION:
-//                return channel.getDescription();
-//            case IS_PUBLIC:
-//                return channel.isPublic();
-//                case IS_TEXT_CHANNEL:
-//                return channel.isTextChannel();
-//            default:
-//                return null;
-//        }
-//    }
-
-
 }
