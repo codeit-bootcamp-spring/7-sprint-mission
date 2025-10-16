@@ -20,12 +20,9 @@ public class FileManager<T> {
         if (Files.notExists(filePath)) {
             try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
                 oos.writeObject(new HashMap<UUID, T>());
-//                System.out.printf("*** %s 생성하였습니다.***", data.getClass().getName());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        } else{
-            System.out.println("생성할 필요가 없음");
         }
     }
 
@@ -35,9 +32,8 @@ public class FileManager<T> {
             Object data = ois.readObject();
             return  (Map<UUID, T>) data;
         } catch (IOException |ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return new HashMap<>();
     }
 
     @SuppressWarnings(value = "unchecked")
@@ -45,7 +41,7 @@ public class FileManager<T> {
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
             oos.writeObject(map);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
