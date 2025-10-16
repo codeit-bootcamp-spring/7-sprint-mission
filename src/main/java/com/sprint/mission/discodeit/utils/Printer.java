@@ -33,7 +33,7 @@ public class Printer {
                 System.out.printf("====================%s====================\n", date);
             }
 
-            if(msg.senderId == user.getId()){
+            if(msg.senderId.equals(user.getId())){
                 System.out.printf("%s 나: %s\n", time, msg.getContents());
             } else {
                 System.out.printf("%s %s: %s\n", time, userService.getUserNickName(msg.getSenderId()), msg.getContents());
