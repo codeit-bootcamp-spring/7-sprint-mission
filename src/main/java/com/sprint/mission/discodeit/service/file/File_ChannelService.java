@@ -128,46 +128,10 @@ public class File_ChannelService implements ChannelService, MessageService {
 
     @Override
     public void deleteChannel(UUID uuid) { // 🖤🖤🖤🖤🖤🖤🖤🖤 아이디로 객체 찾기!!
-        Optional<Channel> channel1 = channelList.stream().filter(channel -> channel.getId().equals(uuid)).findFirst();
-        List<Channel> channels = channelList.stream().filter(channel -> !channel.getId().equals(uuid)).collect(Collectors.toList());
-
-        String message = "[" + channel1.get().getChannelName() + "] 채널 삭제";
-        File_Common.fileWrite(channels, FILE_PATH, message);
-
-//        this.channelList = new ArrayList<>();
-//        this.channelList.addAll(channels);
-
-//        String message = "[" + channel1.get().getChannelName() + "] 채널 삭제";
-//        System.out.println("//////");
-//
-//        Optional<Channel> channel1 = channelList.stream().filter(channel -> channel.getId().equals(uuid)).findFirst(); //
-//
-//        String message = "[" + channel1.get().getChannelName() + "] 채널 삭제";
-//        System.out.println("//////" + message);
-//        channelList.remove(channel1.get());
-////        System.out.println("///////////" + message);
-//
-
-//        channel1.ifPresent(channel -> channelList.remove(channel));// .ifPresent();
-
-//        if (channel1.isPresent()) {
-//            String message = "[" + channel1.get().getChannelName() + "] 채널 삭제";
-//            Channel bingoChannel = channel1.get();
-//            int index_I = channelList.indexOf(bingoChannel);
-//            System.out.println("===== " + String.valueOf(index_I) + "===" + channel1.get().getChannelName());
-////            channelList.remove(index_I);
-////            File_Common.errMessage("!!!! removed" + String.valueOf(removed));
-////            File_Common.errMessage("!!!!removed removed removed" + String.valueOf(index));
-////            if () {
-////                File_Common.fileWrite(channelList, FILE_PATH, message);
-////            }
-////            else {
-////                File_Common.errMessage(message);
-////            }
-//        }
-//        else {
-//            File_Common.errMessage("uuid = " + uuid.toString() + "채널 삭제 오류");
-//        }
+        Channel findChannel = channelList.stream().filter(channel -> channel.getId().equals(uuid)).findFirst().get();
+        String message = "[" + findChannel.getChannelName() + "] 채널 삭제";
+        channelList.remove(findChannel);
+        File_Common.fileWrite(channelList, FILE_PATH, message);
     }
 
     @Override
@@ -196,21 +160,19 @@ public class File_ChannelService implements ChannelService, MessageService {
     //===============================
 
     public UUID sendMessage(Channel in_Channel, User user, String strMessage) {
-        int index = channelList.indexOf(in_Channel);
-        Channel channel = channelList.get(index);
+       if (channelList.contains(in_Channel)) {
+           JCF_MessageService jcf_message = JCF_MessageService.getInstance();
+           Message message = jcf_message.createMessage(strMessage);
+           message.setUserID( user.getId());
 
-        if (channel == null) {
-            File_Common.errMessage(in_Channel.getChannelName() + "는 삭제된 채널임! - [" + strMessage  + "] 메세지 전송 불가! \n");
-            return null;
-        }
-        else {
-            JCF_MessageService jcf_message = JCF_MessageService.getInstance();
-            Message message = jcf_message.createMessage(strMessage);
-            message.setUserID( user.getId());
-            channel.sendMessage(user, message);
+           channelList.get(channelList.indexOf(in_Channel)).sendMessage(user, message);
 
-            return message.getId();
-        }
+           return message.getId();
+       }
+       else {
+           File_Common.errMessage("삭제된 채널임! - [" + strMessage  + "] 메세지 전송 불가!");
+           return null;
+       }
     }
 
     public void setUser(Channel in_Channel, User user) {

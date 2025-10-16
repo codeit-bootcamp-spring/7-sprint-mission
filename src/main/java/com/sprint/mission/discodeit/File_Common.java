@@ -21,6 +21,7 @@ public class File_Common {
         if (!file.exists()) {
             String[] arrPath = file.getAbsolutePath().split("/"); //.split("/");
             String message = "파일 생성 : [" + arrPath[arrPath.length - 1]  + "]";
+
             try {
                 file.createNewFile();
                 File_Common.okMessage(message);

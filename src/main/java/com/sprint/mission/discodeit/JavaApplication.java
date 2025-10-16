@@ -173,8 +173,8 @@ public class JavaApplication {
         file_channel.getAllChannels();
         file_channel.sendMessage(channel_IV, file_user7, "없는 방이 맞제??");
 
-        User file_user8 = file_User.creatUser("user_test");
-        file_channel.setUser(channel_IV, file_user8);
+//        User file_user8 = file_User.creatUser("user_test");
+//        file_channel.setUser(channel_IV, file_user8);
 
         // Message> Message> Message> Message> Message> Message> Message> Message> Message> Message> Message>
         // 1. 등록                  : sendMessage
