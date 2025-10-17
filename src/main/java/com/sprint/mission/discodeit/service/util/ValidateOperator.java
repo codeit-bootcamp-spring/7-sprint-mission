@@ -3,13 +3,12 @@ package com.sprint.mission.discodeit.service.util;
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.service.ChannelRepository;
-import com.sprint.mission.discodeit.service.MessageRepository;
-import com.sprint.mission.discodeit.service.UserRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ValidateService;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class ValidateOperator implements ValidateService {
 

@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.deletedCash.DeletedChannel;
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.DeletedChannelDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.DeletedChannel;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.util.AppendableObjectOutputStream;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,16 +16,15 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-public class FileChannelService implements ChannelRepository {
+public class FileChannelRepository implements ChannelRepository {
 
-
-    private final String DataRootPath = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\data\\";
+    private final String DataRootPath = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\data\\";
     private final String channelRepositoryDataPath = DataRootPath+"channelRepository.ser";
     private final String deletedChannelRepositoryDataPath = DataRootPath+"deletedChannelRepository.ser";
     private File channelRepositoryFile = new File(channelRepositoryDataPath);
     private File deletedChannelRepositoryFile = new File(deletedChannelRepositoryDataPath);
 
-    public FileChannelService() {
+    public FileChannelRepository() {
         repositoryCheck();
         resetChannelRepository();
     }
@@ -61,23 +59,23 @@ public class FileChannelService implements ChannelRepository {
 
     @Override
     public void deleteChannel(ChannelDto channelDto) {
-      List<Channel> channels = loadAllChannel();
-      List<DeletedChannel> deletedChannels = loadAllDeletedChannel();
-      channels.removeIf(x->x.getId().equals(channelDto.getId()));
-      deletedChannels.add(channelDtoToDeletedChannel(channelDto));
-      saveAllChannel(channels);
-      saveAllDeletedChannel(deletedChannels);
+        List<Channel> channels = loadAllChannel();
+        List<DeletedChannel> deletedChannels = loadAllDeletedChannel();
+        channels.removeIf(x->x.getId().equals(channelDto.getId()));
+        deletedChannels.add(channelDtoToDeletedChannel(channelDto));
+        saveAllChannel(channels);
+        saveAllDeletedChannel(deletedChannels);
 
     }
 
     @Override
     public <T>void updateChannel(ChannelDto channelDto, Channel.channelElement channelElement, T updatedContent) {
-         List<Channel> channels = loadAllChannel();
-         Channel targetChannel = channels.stream().filter(x->x.getId().equals(channelDto.getId())).findFirst().orElse(null);
-         BiConsumer<Channel, Object> editFunction = channelElement.setter;
-         editFunction.accept(targetChannel, updatedContent);
-         targetChannel.updateEntity();
-         saveAllChannel(channels);
+        List<Channel> channels = loadAllChannel();
+        Channel targetChannel = channels.stream().filter(x->x.getId().equals(channelDto.getId())).findFirst().orElse(null);
+        BiConsumer<Channel, Object> editFunction = channelElement.setter;
+        editFunction.accept(targetChannel, updatedContent);
+        targetChannel.updateEntity();
+        saveAllChannel(channels);
 //        try(
 //                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(channelRepositoryDataPath));
 //                       )
@@ -108,27 +106,27 @@ public class FileChannelService implements ChannelRepository {
 //            tempChannels.add(updatedChannel);
 //
 //            oos.writeObject(tempChannels);
-        }
+    }
 
 
 
 
     @Override
     public ChannelDto[] getAllChannel() {
-       return loadAllChannel().stream().map(this::channelToChannelDto).toArray(ChannelDto[]::new);
+        return loadAllChannel().stream().map(this::channelToChannelDto).toArray(ChannelDto[]::new);
 
     }
 
     @Override
     public ChannelDto[] getUpdatedChannel() {
         List<Channel> channels = loadAllChannel();
-        return channels.stream().filter(x->x.getUpdatedAt()!=Entity.DEFAULT_UPDATED_AT).map(this::channelToChannelDto).toArray(ChannelDto[]::new);
+        return channels.stream().filter(x->x.getUpdatedAt()!= Entity.DEFAULT_UPDATED_AT).map(this::channelToChannelDto).toArray(ChannelDto[]::new);
 
     }
 
     @Override
     public DeletedChannelDto[] getDeletedChannel() {
-       return loadAllDeletedChannel().stream().map(this::deletedChannelToDeletedChannelDto).toArray(DeletedChannelDto[]::new);
+        return loadAllDeletedChannel().stream().map(this::deletedChannelToDeletedChannelDto).toArray(DeletedChannelDto[]::new);
     }
 
     private void repositoryCheck(){
@@ -269,14 +267,14 @@ public class FileChannelService implements ChannelRepository {
 
     private void saveAllDeletedChannel(List<DeletedChannel>deletedChannelList){
         try (
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(deletedChannelRepositoryFile))){
+                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(deletedChannelRepositoryFile))){
             oos.writeObject(deletedChannelList);
             oos.flush();
 
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
     @Override
@@ -287,7 +285,6 @@ public class FileChannelService implements ChannelRepository {
         saveAllChannel(channels);
         return;
     }
-
 
 
 }

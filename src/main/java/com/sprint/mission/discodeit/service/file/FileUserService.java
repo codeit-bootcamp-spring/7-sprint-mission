@@ -1,35 +1,38 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.DeletedUserDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.ValidateService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.sprint.mission.discodeit.static_.StaticString.*;
-import static com.sprint.mission.discodeit.static_.StaticString.CHANNEL_NOT_EXIST;
-import static com.sprint.mission.discodeit.static_.StaticString.DELETE_USER;
-import static com.sprint.mission.discodeit.static_.StaticString.NULL_INPUT;
-import static com.sprint.mission.discodeit.static_.StaticString.USER_EMPTY;
-import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
-import static com.sprint.mission.discodeit.static_.StaticString.WRONG_TYPE;
+import static com.sprint.mission.discodeit.service.util.StaticString.*;
+import static com.sprint.mission.discodeit.service.util.StaticString.CHANNEL_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.DELETE_USER;
+import static com.sprint.mission.discodeit.service.util.StaticString.NULL_INPUT;
+import static com.sprint.mission.discodeit.service.util.StaticString.USER_EMPTY;
+import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.WRONG_TYPE;
 
-public class JCFUser implements UserService {
-
+public class FileUserService implements UserService {
     private final UserRepository userRepository;
-    private final ValidateService validateService;
     private final ChannelRepository channelRepository;
+    private final ValidateService validateService;
     private final MessageRepository messageRepository;
 
-    public JCFUser(UserRepository userRepository, ValidateService validateService, ChannelRepository channelRepository, MessageRepository messageRepository) {
+    public FileUserService(UserRepository userRepository, ChannelRepository channelRepository, ValidateService validateService, MessageRepository messageRepository) {
         this.userRepository = userRepository;
-        this.validateService = validateService;
         this.channelRepository = channelRepository;
+        this.validateService = validateService;
         this.messageRepository = messageRepository;
     }
 

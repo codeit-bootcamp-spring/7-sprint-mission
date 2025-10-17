@@ -1,24 +1,24 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.dto.DeletedMessageDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.DeletedMessage;
+import com.sprint.mission.discodeit.deletedCash.DeletedMessage;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.MessageRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-public class FileMessageRepository implements MessageRepository {
+public class JCFMessageRepository implements MessageRepository {
     private final ArrayList<Message> messageRepo ;
     private final ArrayList<DeletedMessage> deletedMessageRepo ;
     private final User DEFAULT_SENDER = new User(UUID.randomUUID(), "DeletedUser", "DeletedUser", "codeit.org", true);
 
-    public FileMessageRepository() {
+    public JCFMessageRepository() {
         this.messageRepo = new ArrayList<>();
         this.deletedMessageRepo = new ArrayList<>();
         resetMessageRepository();

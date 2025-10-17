@@ -6,17 +6,17 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.ValidateService;
+import com.sprint.mission.discodeit.service.ValidateService;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import static com.sprint.mission.discodeit.static_.StaticString.*;
-import static com.sprint.mission.discodeit.static_.StaticString.CHANNEL_EMPTY;
-import static com.sprint.mission.discodeit.static_.StaticString.CHANNEL_NOT_EXIST;
-import static com.sprint.mission.discodeit.static_.StaticString.DELETE_CHANNEL;
-import static com.sprint.mission.discodeit.static_.StaticString.NULL_INPUT;
-import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
-import static com.sprint.mission.discodeit.static_.StaticString.VALIDATE_FAIL;
-import static com.sprint.mission.discodeit.static_.StaticString.WRONG_TYPE;
+import static com.sprint.mission.discodeit.service.util.StaticString.*;
+import static com.sprint.mission.discodeit.service.util.StaticString.CHANNEL_EMPTY;
+import static com.sprint.mission.discodeit.service.util.StaticString.CHANNEL_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.DELETE_CHANNEL;
+import static com.sprint.mission.discodeit.service.util.StaticString.NULL_INPUT;
+import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.VALIDATE_FAIL;
+import static com.sprint.mission.discodeit.service.util.StaticString.WRONG_TYPE;
 
 public class BasicChannelService implements ChannelService {
 

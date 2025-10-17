@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.deletedCash.DeletedMessage;
 import com.sprint.mission.discodeit.dto.DeletedMessageDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.DeletedMessage;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.util.AppendableObjectOutputStream;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -16,26 +15,26 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-public class FileMessageService implements MessageRepository {
+public class FileMessageRepository implements MessageRepository {
 
-    private final String MESSAGE_DATA_PATH = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\data\\messageRepository.ser";
-    private final String DELETED_MESSAGE_DATA_PATH = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\data\\deletedMessageRepository.ser";
+    private final String MESSAGE_DATA_PATH = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\data\\messageRepository.ser";
+    private final String DELETED_MESSAGE_DATA_PATH = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\data\\deletedMessageRepository.ser";
     private File messageRepositoryFile = new File(MESSAGE_DATA_PATH);
     private File deletedMessageRepositoryFile = new File(DELETED_MESSAGE_DATA_PATH);
     private final User DEFAULT_SENDER = new User(UUID.randomUUID(), "DeletedUser", "DeletedUser", "codeit.org", true);
-    public FileMessageService() {
+    public FileMessageRepository() {
         repositoryCheck();
         resetMessageRepository();
     }
 
     @Override
     public MessageDto getMessageById(UUID messageId) {
-       return loadAllMessage().stream().filter(x->x.getId().equals(messageId)).map(this::messageToMessageDto).findFirst().orElse(null);
+        return loadAllMessage().stream().filter(x->x.getId().equals(messageId)).map(this::messageToMessageDto).findFirst().orElse(null);
     }
 
     @Override
     public MessageDto getMessageByName(String messageName) {
-       return loadAllMessage().stream().filter(x->x.getContent().equals(messageName)).map(this::messageToMessageDto).findFirst().orElse(null);
+        return loadAllMessage().stream().filter(x->x.getContent().equals(messageName)).map(this::messageToMessageDto).findFirst().orElse(null);
     }
 
     @Override
@@ -98,18 +97,18 @@ public class FileMessageService implements MessageRepository {
 
     @Override
     public MessageDto[] getUpdatedMessage() {
-       return loadAllMessage().stream().filter(x->x.getUpdatedAt()!=Entity.DEFAULT_UPDATED_AT).map(this::messageToMessageDto).toArray(MessageDto[]::new);
+        return loadAllMessage().stream().filter(x->x.getUpdatedAt()!= Entity.DEFAULT_UPDATED_AT).map(this::messageToMessageDto).toArray(MessageDto[]::new);
 
     }
 
     @Override
     public DeletedMessageDto[] getDeletedMessage() {
-       return loadAllDeletedMessage().stream().map(this::deletedMessageToDeletedMessageDto).toArray(DeletedMessageDto[]::new);
+        return loadAllDeletedMessage().stream().map(this::deletedMessageToDeletedMessageDto).toArray(DeletedMessageDto[]::new);
     }
 
     @Override
     public MessageDto[] getAllMessage() {
-      return loadAllMessage().stream().map(this::messageToMessageDto).toArray(MessageDto[]::new);
+        return loadAllMessage().stream().map(this::messageToMessageDto).toArray(MessageDto[]::new);
     }
 
     @Override
@@ -176,7 +175,7 @@ public class FileMessageService implements MessageRepository {
     private DeletedMessage messageDtoToDeletedMessage(MessageDto messageDto){
         return new DeletedMessage(messageDto.getSender().getName(),messageDto.getContent());
     }
-//    private DeletedMessage deletedMessageDtoToDeletedMessage(DeletedMessageDto deletedMessageDto){
+    //    private DeletedMessage deletedMessageDtoToDeletedMessage(DeletedMessageDto deletedMessageDto){
 //        return new DeletedMessage(deletedMessageDto.getName(),deletedMessageDto.getContent());
 //    }
     private DeletedMessageDto deletedMessageToDeletedMessageDto(DeletedMessage deletedMessage){
@@ -207,7 +206,7 @@ public class FileMessageService implements MessageRepository {
     }
 
     private List<DeletedMessage> loadAllDeletedMessage(){
-    if(!deletedMessageRepositoryFile.exists() || deletedMessageRepositoryFile.length() == 0) {
+        if(!deletedMessageRepositoryFile.exists() || deletedMessageRepositoryFile.length() == 0) {
             return new ArrayList<>();
         }
         try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(deletedMessageRepositoryFile));){
@@ -228,6 +227,4 @@ public class FileMessageService implements MessageRepository {
             e.printStackTrace();
         }
     }
-
-
 }

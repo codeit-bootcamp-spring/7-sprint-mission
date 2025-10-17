@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.dto.DeletedMessageDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
-import com.sprint.mission.discodeit.entity.DeletedMessage;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.UUID;

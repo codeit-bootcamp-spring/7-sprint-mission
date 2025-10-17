@@ -3,23 +3,23 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.dto.DeletedMessageDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.MessageRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ValidateService;
 
-import static com.sprint.mission.discodeit.static_.StaticString.*;
-import static com.sprint.mission.discodeit.static_.StaticString.CREATE_MESSAGE;
-import static com.sprint.mission.discodeit.static_.StaticString.DELETE_MESSAGE;
-import static com.sprint.mission.discodeit.static_.StaticString.MESSAGE_NOT_EXIST;
-import static com.sprint.mission.discodeit.static_.StaticString.NULL_INPUT;
-import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.*;
+import static com.sprint.mission.discodeit.service.util.StaticString.CREATE_MESSAGE;
+import static com.sprint.mission.discodeit.service.util.StaticString.DELETE_MESSAGE;
+import static com.sprint.mission.discodeit.service.util.StaticString.MESSAGE_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.NULL_INPUT;
+import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EXIST;
 
-public class JCFMessage implements MessageService {
+public class JCFMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
     private final ValidateService validateService;
 
-    public JCFMessage(MessageRepository messageRepository, ValidateService validateService) {
+    public JCFMessageService(MessageRepository messageRepository, ValidateService validateService) {
         this.messageRepository = messageRepository;
         this.validateService = validateService;
     }

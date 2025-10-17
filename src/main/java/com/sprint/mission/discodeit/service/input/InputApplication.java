@@ -1,11 +1,5 @@
 package com.sprint.mission.discodeit.service.input;
 
-import com.sprint.mission.discodeit.service.jcf.JCFChannel;
-import com.sprint.mission.discodeit.service.jcf.JCFMessage;
-import com.sprint.mission.discodeit.service.jcf.JCFUser;
-
-import static com.sprint.mission.discodeit.static_.StaticString.*;
-
 public class InputApplication {
 //    private final InputReader inputReader;
 //

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.static_.StaticString;
+import com.sprint.mission.discodeit.service.util.StaticString;
 
 import java.io.Serializable;
 import java.util.ArrayList;

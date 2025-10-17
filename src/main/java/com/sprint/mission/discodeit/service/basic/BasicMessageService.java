@@ -4,17 +4,15 @@ import com.sprint.mission.discodeit.dto.DeletedMessageDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.ValidateService;
-import com.sprint.mission.discodeit.service.ChannelRepository;
+import com.sprint.mission.discodeit.service.ValidateService;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import static com.sprint.mission.discodeit.static_.StaticString.*;
-import static com.sprint.mission.discodeit.static_.StaticString.CREATE_MESSAGE;
-import static com.sprint.mission.discodeit.static_.StaticString.DELETE_MESSAGE;
-import static com.sprint.mission.discodeit.static_.StaticString.MESSAGE_NOT_EXIST;
-import static com.sprint.mission.discodeit.static_.StaticString.NULL_INPUT;
-import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.*;
+import static com.sprint.mission.discodeit.service.util.StaticString.CREATE_MESSAGE;
+import static com.sprint.mission.discodeit.service.util.StaticString.DELETE_MESSAGE;
+import static com.sprint.mission.discodeit.service.util.StaticString.MESSAGE_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.NULL_INPUT;
+import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EXIST;
 
 public class BasicMessageService implements MessageService {
 

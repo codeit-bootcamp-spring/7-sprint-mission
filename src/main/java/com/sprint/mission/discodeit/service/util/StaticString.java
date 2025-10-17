@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.static_;
+package com.sprint.mission.discodeit.service.util;
 
 public class StaticString {
     public static final String DELETE_USER ="user is deleted : ";

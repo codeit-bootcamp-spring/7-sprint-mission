@@ -1,29 +1,38 @@
-package com.sprint.mission.discodeit.repository.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.DeletedUserDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static com.sprint.mission.discodeit.static_.StaticString.*;
+import static com.sprint.mission.discodeit.service.util.StaticString.*;
+import static com.sprint.mission.discodeit.service.util.StaticString.CHANNEL_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.DELETE_USER;
+import static com.sprint.mission.discodeit.service.util.StaticString.NULL_INPUT;
+import static com.sprint.mission.discodeit.service.util.StaticString.USER_EMPTY;
+import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.WRONG_TYPE;
 
 public class JCFUserService implements UserService {
+
     private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
     private final ValidateService validateService;
+    private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
 
-    public JCFUserService(UserRepository userRepository, ChannelRepository channelRepository, ValidateService validateService, MessageRepository messageRepository) {
+    public JCFUserService(UserRepository userRepository, ValidateService validateService, ChannelRepository channelRepository, MessageRepository messageRepository) {
         this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
         this.validateService = validateService;
+        this.channelRepository = channelRepository;
         this.messageRepository = messageRepository;
     }
 
@@ -38,8 +47,8 @@ public class JCFUserService implements UserService {
             return;
         }
 
-            userRepository.saveUser(userDto);
-            System.out.println(CREATE_USER + userDto.getName());
+        userRepository.saveUser(userDto);
+        System.out.println(CREATE_USER + userDto.getName());
 
 
     }
@@ -86,7 +95,7 @@ public class JCFUserService implements UserService {
         for(ChannelDto channelDto : channelDtoStream) channelRepository.deleteUserFromChannel(userDto,channelDto);
 
 
-        MessageDto [] messageList = messageRepository.getAllMessage();
+        MessageDto[] messageList = messageRepository.getAllMessage();
         List<MessageDto> messageDtoList = Arrays.stream(messageList).filter(x-> x.getSender().getId().equals(userDto.getId())).collect(Collectors.toList());
 
 

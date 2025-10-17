@@ -1,11 +1,5 @@
 package com.sprint.mission.discodeit.service.input;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannel;
-
-import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
-
 public class TestJCFChannel {
 
 //    private final TestUtil testUtil;

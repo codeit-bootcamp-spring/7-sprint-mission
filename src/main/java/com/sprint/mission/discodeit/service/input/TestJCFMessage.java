@@ -1,12 +1,5 @@
 package com.sprint.mission.discodeit.service.input;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.JCFMessage;
-
-import static com.sprint.mission.discodeit.static_.StaticString.USER_NOT_EXIST;
-import static com.sprint.mission.discodeit.static_.StaticString.WRONG_INPUT;
-
 public class TestJCFMessage {
 
 //    private final TestUtil testUtil;

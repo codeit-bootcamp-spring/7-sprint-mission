@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.deletedCash.DeletedUser;
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.DeletedUserDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.DeletedUser;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.util.AppendableObjectOutputStream;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,7 +16,8 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-public class FileUserService implements UserRepository {
+public class FileUserRepository implements UserRepository {
+
     @Override
     public void addChannelToUser(UserDto userDto, ChannelDto channelDto) {
         List<User> userDb = loadAllUser();
@@ -31,7 +31,7 @@ public class FileUserService implements UserRepository {
         if(userDto==null || channelDto==null){
             return;
         }
-       List<User> userDb = loadAllUser();
+        List<User> userDb = loadAllUser();
         User targetUser = userDb.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().orElse(null);
         targetUser.removeChannel(channelDtoToChannel(channelDto));
         saveAllUser(userDb);
@@ -44,45 +44,45 @@ public class FileUserService implements UserRepository {
 
     }
 
-    private final String DATA_ROOT = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\data\\";
+    private final String DATA_ROOT = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\data\\";
     private final String USER_DATA_ROOT = DATA_ROOT + "userRepository.ser";
     private final String DELETED_USER_DATA_ROOT = DATA_ROOT + "deletedUserRepository.ser";
     private File userRepositoryFile = new File(USER_DATA_ROOT);
     private File deletedUserRepositoryFile = new File(DELETED_USER_DATA_ROOT);
 
-    public FileUserService() {
+    public FileUserRepository() {
         repositoryFileCheck();
         resetUserRepository();
     }
 
     @Override
     public UserDto getUserById(UUID userId) {
-       return loadAllUser().stream().filter(x->x.getId().equals(userId)).map(this::userToUserDto).findFirst().orElse(null);
+        return loadAllUser().stream().filter(x->x.getId().equals(userId)).map(this::userToUserDto).findFirst().orElse(null);
 
     }
 
     @Override
     public UserDto getUser(UserDto userDto) {
 
-       return getUserById(userDto.getId());
+        return getUserById(userDto.getId());
     }
 
     @Override
     public UserDto getUserByName(String userName) {
-       return loadAllUser().stream().filter(x->x.getName().equals(userName)).map(this::userToUserDto).findFirst().orElse(null);
+        return loadAllUser().stream().filter(x->x.getName().equals(userName)).map(this::userToUserDto).findFirst().orElse(null);
     }
 
     @Override
     public UserDto[] getAllUser() {
-     return loadAllUser().stream().map(this::userToUserDto).toArray(UserDto[]::new);
+        return loadAllUser().stream().map(this::userToUserDto).toArray(UserDto[]::new);
     }
 
     @Override
     public void saveUser(UserDto userDto) {
-      List<User> userDb = loadAllUser();
-       userDb.add(userDtoToUser(userDto));
-       saveAllUser(userDb);
-       return;
+        List<User> userDb = loadAllUser();
+        userDb.add(userDtoToUser(userDto));
+        saveAllUser(userDb);
+        return;
 
     }
 
@@ -101,18 +101,18 @@ public class FileUserService implements UserRepository {
 
     @Override
     public <T> void updateUser(UserDto userDto, User.userElement userElement, T updatedContent) {
-       List<User> users = loadAllUser();
-       User targetUser = users.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().orElse(null);
-       BiConsumer<User, Object> editFunction = userElement.setter;
-       editFunction.accept(targetUser, updatedContent);
-       targetUser.updateEntity();
-       saveAllUser(users);
+        List<User> users = loadAllUser();
+        User targetUser = users.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().orElse(null);
+        BiConsumer<User, Object> editFunction = userElement.setter;
+        editFunction.accept(targetUser, updatedContent);
+        targetUser.updateEntity();
+        saveAllUser(users);
 
     }
 
     @Override
     public UserDto[] getUpdatedUser() {
-       return loadAllUser().stream().filter(x->x.getUpdatedAt()!=Entity.DEFAULT_UPDATED_AT).map(this::userToUserDto).toArray(UserDto[]::new);
+        return loadAllUser().stream().filter(x->x.getUpdatedAt()!= Entity.DEFAULT_UPDATED_AT).map(this::userToUserDto).toArray(UserDto[]::new);
     }
 
     @Override
@@ -207,5 +207,4 @@ public class FileUserService implements UserRepository {
         }
         catch (Exception e){}
     }
-
 }

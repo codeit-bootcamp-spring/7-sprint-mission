@@ -1,20 +1,24 @@
-package com.sprint.mission.discodeit.repository.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.dto.DeletedMessageDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.MessageService;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.ValidateService;
+import com.sprint.mission.discodeit.service.ValidateService;
+import com.sprint.mission.discodeit.service.MessageService;
 
-import static com.sprint.mission.discodeit.static_.StaticString.*;
+import static com.sprint.mission.discodeit.service.util.StaticString.*;
+import static com.sprint.mission.discodeit.service.util.StaticString.CREATE_MESSAGE;
+import static com.sprint.mission.discodeit.service.util.StaticString.DELETE_MESSAGE;
+import static com.sprint.mission.discodeit.service.util.StaticString.MESSAGE_NOT_EXIST;
+import static com.sprint.mission.discodeit.service.util.StaticString.NULL_INPUT;
+import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EXIST;
 
-public class JCFMessageService implements MessageService {
+public class FileMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ValidateService validateService;
 
-    public JCFMessageService(MessageRepository messageRepository, ValidateService validateService) {
+    public FileMessageService(MessageRepository messageRepository, ValidateService validateService) {
         this.messageRepository = messageRepository;
         this.validateService = validateService;
     }

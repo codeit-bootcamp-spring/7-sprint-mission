@@ -1,13 +1,13 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.DeletedChannelDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.DeletedChannel;
+import com.sprint.mission.discodeit.deletedCash.DeletedChannel;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +15,12 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-public class FileChannelRepository implements ChannelRepository {
+public class JCFChannelRepository implements ChannelRepository {
 
     private final ArrayList<Channel> channelRepo ;
     private final ArrayList<DeletedChannel> deletedChannelRepo ;
 
-    public FileChannelRepository() {
+    public JCFChannelRepository() {
         this.channelRepo = new ArrayList<>();
         this.deletedChannelRepo = new ArrayList<>();
         resetChannelRepository();

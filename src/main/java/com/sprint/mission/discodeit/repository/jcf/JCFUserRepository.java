@@ -1,26 +1,25 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.DeletedUserDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.DeletedUser;
+import com.sprint.mission.discodeit.deletedCash.DeletedUser;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-public class FileUserRepository implements UserRepository {
+public class JCFUserRepository implements UserRepository {
     private final ArrayList<User> userRepo ;
     private final ArrayList<DeletedUser> deletedUserRepo ;
 
-    public FileUserRepository() {
+    public JCFUserRepository() {
         this.userRepo = new ArrayList<>();
         this.deletedUserRepo = new ArrayList<>();
         resetUserRepository();
