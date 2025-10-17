@@ -4,6 +4,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class User implements Serializable {
@@ -82,5 +83,17 @@ public class User implements Serializable {
                 ", pronoun='" + pronoun + '\'' +
                 ", joinChannels=" + joinChannels +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(common, user.common) && Objects.equals(username, user.username) && Objects.equals(email, user.email) && Objects.equals(phoneNumber, user.phoneNumber) && Objects.equals(pronoun, user.pronoun) && Objects.equals(joinChannels, user.joinChannels);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(common, username, email, phoneNumber, pronoun, joinChannels);
     }
 }
