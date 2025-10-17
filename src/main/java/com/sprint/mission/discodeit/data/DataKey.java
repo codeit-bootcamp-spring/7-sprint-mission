@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.utils;
+package com.sprint.mission.discodeit.data;
 
 public enum DataKey {
     USER("users.txt", "USER"),
