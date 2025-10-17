@@ -7,25 +7,36 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.util.ValidateOperator;
 
+import java.io.File;
+
 public class JavaApplication {
     public static void main(String[] args) {
 
-        ChannelRepository channelRepository = new JCFChannelRepository();
-        MessageRepository messageRepository = new JCFMessageRepository();
-        UserRepository userRepository = new JCFUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
+        UserRepository userRepository = new FileUserRepository();
         ValidateService validateService = new ValidateOperator(channelRepository, userRepository, messageRepository);
 
-        ChannelService channelService  = new JCFChannelService(channelRepository,validateService,userRepository);
-        MessageService messageService = new JCFMessageService(messageRepository,validateService);
-        UserService userService = new JCFUserService(userRepository,validateService,channelRepository,messageRepository);
+        ChannelService channelService  = new BasicChannelService(channelRepository,validateService,userRepository);
+        MessageService messageService = new BasicMessageService(messageRepository,validateService);
+        UserService userService = new BasicUserService(userRepository,validateService,channelRepository,messageRepository);
 
 
         ChannelDto channel1Dto = new ChannelDto("JAVA","JAVA 안전자산 놀이터",true,true);
@@ -60,7 +71,10 @@ public class JavaApplication {
         channelService.inviteUserToChannel(user2Dto,channel2Dto);
         channelService.readChannel(channel2Dto);
         userService.deleteUser(user2Dto);
+        userService.readDeletedUser();
         messageService.readMessage(m2Dto);
+        messageService.readAllMessage();
+
 
     }
 }

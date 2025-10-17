@@ -29,7 +29,7 @@ public class FileUserService implements UserService {
     private final ValidateService validateService;
     private final MessageRepository messageRepository;
 
-    public FileUserService(UserRepository userRepository, ChannelRepository channelRepository, ValidateService validateService, MessageRepository messageRepository) {
+    public FileUserService(UserRepository userRepository,ValidateService validateService ,ChannelRepository channelRepository , MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.channelRepository = channelRepository;
         this.validateService = validateService;
