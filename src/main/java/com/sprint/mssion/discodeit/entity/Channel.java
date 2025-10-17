@@ -2,6 +2,7 @@ package com.sprint.mssion.discodeit.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Channel implements Serializable {
     @Serial
@@ -58,5 +59,17 @@ public class Channel implements Serializable {
                 ", type=" + type +
                 ", common=" + common +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Channel channel = (Channel) o;
+        return Objects.equals(common, channel.common) && type == channel.type && Objects.equals(channelName, channel.channelName) && Objects.equals(desc, channel.desc);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(common, type, channelName, desc);
     }
 }

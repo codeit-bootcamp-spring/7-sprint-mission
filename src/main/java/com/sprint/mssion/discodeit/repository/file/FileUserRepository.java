@@ -2,9 +2,6 @@ package com.sprint.mssion.discodeit.repository.file;
 
 import com.sprint.mssion.discodeit.entity.User;
 import com.sprint.mssion.discodeit.repository.UserRepository;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class FileUserRepository implements UserRepository {
