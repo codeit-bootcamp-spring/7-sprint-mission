@@ -164,12 +164,10 @@ public class JavaApplication {
         file_channel.setUser(channel_IV, file_user7);
         file_channel.updateChannelType(channel_IV, ONE_VS_ONE);
         file_channel.updateChannelName(channel_IV, "달의 요정 세일러문");
-
+        file_channel.getAll_Messages(channel_IV);
         channel_IV.removeUser(file_User3);
 
         file_channel.getChannel(channel_IV);
-        file_channel.getAllChannels();
-        file_channel.deleteChannel(channel_IV.getId());
         file_channel.getAllChannels();
         file_channel.sendMessage(channel_IV, file_user7, "없는 방이 맞제??");
 
@@ -184,14 +182,14 @@ public class JavaApplication {
         // 5. 삭제                  : delete_Message
         // 6. 조회를 통해 삭제되었는지 확인
 
+        file_channel.delete_Message(channel_III, messgeID_6);
+        file_channel.update_Message(channel_III, uuidMessage5, "4.4.4. 이정현의 바꿔 바꿔 바꿔~~!!");
+        file_channel.getAll_Messages(channel_III);
+        file_channel.deleteChannel(channel_III.getId());
+
         file_channel.getAll_Messages(channel_IV);
         file_channel.delete_Message(channel_IV, messgeID_11);
         file_channel.get_Message(channel_IV, messgeID_11);
-        file_channel.getAll_Messages(channel_IV);
-        file_channel.getAll_Messages(channel_IV);
-        file_channel.delete_Message(channel_IV, messgeID_6);
-        file_channel.getAll_Messages(channel_IV);
-        file_channel.update_Message(channel_IV, uuidMessage5, "이정현의 바꿔 바꿔 바꿔~~!!");
         file_channel.getAll_Messages(channel_IV);
     }
     public static void jcf_Repository_Test() {
@@ -200,7 +198,6 @@ public class JavaApplication {
     }
 
     public static void main(String[] args) {
-
         JavaApplication javaApplication = new JavaApplication();
 
 //        jcf_Test();

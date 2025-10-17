@@ -7,6 +7,9 @@ import java.io.ObjectOutputStream;
 public class File_Common {
     public static final String ROOT_PATH = "/Users/my05030/Desktop/장미연/7-sprint-mission/src/main/java/com/sprint/mission/discodeit/FileEx";
 
+    public static void fileLoading() {
+
+    }
     public static void fileCreate(File file, String filePath) {
         // 1. 경로내 폴더 확인
         File rootFolder = new File(filePath);

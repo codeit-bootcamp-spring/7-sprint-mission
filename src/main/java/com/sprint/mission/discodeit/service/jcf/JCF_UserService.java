@@ -37,7 +37,6 @@ public class JCF_UserService implements UserService {
                 .filter(user -> user.getUserName().equals(name))
                 .findFirst()
                 .ifPresent(user -> System.out.println( "\uD83C\uDF3C \uD83E\uDE77\uD83E\uDE77\uD83E\uDE77 readUser = " + user));
-
 //        this.data.forEach((UUID key, User value) -> System.out.println()); //???
     }
 

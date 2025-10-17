@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class JCF_MessageService { //implements MessageService {
+public class JCF_MessageService {
     private static JCF_MessageService messageService = new JCF_MessageService();
     public static JCF_MessageService getInstance() {
         return messageService;
@@ -19,7 +19,7 @@ public class JCF_MessageService { //implements MessageService {
     }
 
 //    @Override
-    public Message createMessage(String msg) {
+    public Message neoMessage(String msg) {
         Message message = new Message(msg);
         data.put(message.getId(), message);
 

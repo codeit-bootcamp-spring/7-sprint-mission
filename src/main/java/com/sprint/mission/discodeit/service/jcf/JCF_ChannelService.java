@@ -39,18 +39,17 @@ public class JCF_ChannelService implements ChannelService, MessageService {
     }
 
     @Override
-    public Channel getChannel(Channel channel) {
+    public void getChannel(Channel channel) {
         Channel channel1 = dataChannel.get(channel.getId());
         System.out.println("\uD83D\uDC8C getChannel data : " + channel1); // 💌
-        return channel1;
+//        return channel1;
     }
 
     @Override
-    public Channel[] getAllChannels() {
+    public void getAllChannels() {
         for (Map.Entry<UUID, Channel> entry : dataChannel.entrySet()) {
             System.out.println("\uD83D\uDC8C getAllChannels data : " + entry.getValue()); // 💌
         }
-        return dataChannel.values().toArray(new Channel[0]);
     }
 
     @Override
@@ -84,6 +83,11 @@ public class JCF_ChannelService implements ChannelService, MessageService {
         }
     }
 
+//    @Override
+//    public Message createMessage(String msg) {
+//        return null; // 안써!
+//    }
+
     @Override
     public void getAll_Messages(Channel channel) {
         Channel channel1 = dataChannel.get(channel.getId());
@@ -96,14 +100,13 @@ public class JCF_ChannelService implements ChannelService, MessageService {
     }
 
     @Override
-    public Message get_Message(Channel channel, UUID messageID) {
+    public void get_Message(Channel channel, UUID messageID) {
         Channel channel1 = dataChannel.get(channel.getId());
         if (channel1 == null) {
             System.out.printf("\uD83D\uDEA8\uD83D\uDEA8 [%s]는 삭제된 채널임! - getMessage() 호출 불가 \n", channel.getChannelName()); // 🚨
-            return null;
         }
         else {
-            return channel1.get_Message(messageID);
+            channel1.get_Message(messageID);
         }
     }
 
@@ -142,7 +145,7 @@ public class JCF_ChannelService implements ChannelService, MessageService {
         }
         else {
             JCF_MessageService jcf_message = JCF_MessageService.getInstance();
-            Message message = jcf_message.createMessage(strMessage);
+            Message message = jcf_message.neoMessage(strMessage);
             message.setUserID( user.getId());
             channel1.sendMessage(user, message);
 

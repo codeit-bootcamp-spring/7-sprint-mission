@@ -21,7 +21,7 @@ public class Channel extends CommonModel {
         ownerUser.setOwnChannelID(this.getId()); // 채널을 만든경우 소유한 채널 ID를 갖는다.
         setUser(ownerUser);
         getChannelType();
-        System.out.println("\uD83D\uDCCC 1:1 채널로 변경 가능합니다!  \n"); // 📌
+        System.out.println("\uD83D\uDCCC 1:1 채널로 변경 가능합니다!"); // 📌
     }
 
     //===========================
@@ -41,7 +41,7 @@ public class Channel extends CommonModel {
 
     public void setChannelName(String channelName, String channelName_Neo) {
         this.channelName = channelName_Neo;
-        System.out.printf("\uD83D\uDC8C [%s] 에서 [%s] 으로 채널 이름 변경 \n", channelName, channelName_Neo); // 💌
+//        System.out.printf("\uD83D\uDC8C [%s] 에서 [%s] 으로 채널 이름 변경 \n", channelName, channelName_Neo); // 💌
     }
 
     public void sendMessage(User user, Message message) {
@@ -70,7 +70,7 @@ public class Channel extends CommonModel {
         System.out.printf("\uD83D\uDC8C [%s] 채널의 모든 메세지 출력 =============== The End =================|| \n", channelName); // 💌
     }
 
-    public Message get_Message(UUID messageID) {
+    public void get_Message(UUID messageID) {
         Message msg = messages.get(messageID);;
         if (msg == null) {
             System.out.println("\uD83D\uDEA8 없는 메세지"); // 🚨
@@ -78,7 +78,6 @@ public class Channel extends CommonModel {
         else {
             System.out.println("\uD83D\uDC8C 찾는 메세지는 [%s]" + msg.getMsg()); // 💌
         }
-        return msg;
     }
 
     public void update_Message(UUID messageID, String message) {

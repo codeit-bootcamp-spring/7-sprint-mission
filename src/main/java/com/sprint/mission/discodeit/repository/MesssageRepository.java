@@ -3,12 +3,9 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface MesssageRepository {
-    //    Message createMessage(String msg);                    // 생성// 읽기
-//    void getAll_Messages(Channel channel);
-//    Message get_Message(Channel channel, UUID messageID);   // 모두 읽기
-    void update_Message(Channel channel, UUID messageID, String message);  // 수정
-    void delete_Message(Channel channel, UUID messageID);   // 삭제
+    void messageWrite(List<Message> messageList, String msg);
 }

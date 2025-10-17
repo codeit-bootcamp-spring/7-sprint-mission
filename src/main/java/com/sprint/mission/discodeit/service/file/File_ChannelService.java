@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.file.File_ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.File_Common;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -14,59 +15,58 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.sprint.mission.discodeit.entity.ChannelType.ONE_VS_ONE;
 
 public class File_ChannelService implements ChannelService, MessageService {
-    private static final String FILE_PATH = File_Common.ROOT_PATH + "/File_ChannelService.txt";
-    private static File file_ChannelService = new File(FILE_PATH);
-    private static List<Channel> channelList = new ArrayList<>();
-
-    private static File_ChannelService service = new File_ChannelService();
+    public static final String FILE_PATH = File_Common.ROOT_PATH + "/File_ChannelService.ser";
+    public File file_ChannelService = new File(FILE_PATH);
     private File_ChannelService() {
         File_Common.fileCreate(file_ChannelService, File_Common.ROOT_PATH);
     }
+
+    private static File_ChannelService service = new File_ChannelService();
     static public File_ChannelService getInstance() { return service; }
 
+    private List<Channel> channelList = new ArrayList<>();
+    private File_ChannelRepository channelRepository = new File_ChannelRepository();
 
     //===============================
     //========== @Override ==========
     //===============================
     @Override
-    public Channel createChannel(User ownerUser, String channelName) {
-        String message = "\n\uD83C\uDF7F\uD83C\uDF7F [" + ownerUser.getUserName() + "]가 [" + channelName + "] 채널 생성 \uD83C\uDF7F\uD83C\uDF7F\n";
+    public Channel createChannel(User user, String channelName) {
+        String message = "\uD83C\uDF7F\uD83C\uDF7F [" + user.getUserName() + "]가 [" + channelName + "] 채널 생성 \uD83C\uDF7F\uD83C\uDF7F";
         File_Common.okMessage(message);
 
-        Channel channel = new Channel(ownerUser, channelName);
+        Channel channel = new Channel(user, channelName);
         channelList.add(channel);
-        File_Common.fileWrite(channelList, FILE_PATH, "");
+        // File_Common.fileWrite(channel, FILE_PATH, "");
+        channelRepository.channelWrite(channelList, "");
 
         return channel;
     }
 
     @Override
-    public Channel getChannel(Channel in_Channel) {
+    public void getChannel(Channel in_Channel) {
         String message = "getChannel: [" + in_Channel.getChannelName() + "]";
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH));) {
 
-            Boolean isExist = false;
+//            Boolean isExist = false;
             List<Channel> channels = (List<Channel>)ois.readObject();
 
             for (Channel channel : channels) {
                 if (channel.getChannelName().equals(in_Channel.getChannelName())) {
-
+//                    isExist = true;
                     File_Common.okMessage(message);
-                    return channel;
+                    return;
                 }
             }
 
             File_Common.errMessage(message);
-            return null;
+            return;
         } catch (Exception e) {
             File_Common.errMessage(message);
             throw new RuntimeException(e);
@@ -74,41 +74,49 @@ public class File_ChannelService implements ChannelService, MessageService {
     }
 
     @Override
-    public Channel[] getAllChannels() {
-        String message = "getAllChannels_";
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH));) {
-
-            Boolean isExist = false;
-            List<Channel> channels = (List<Channel>)ois.readObject();
-
-            for (Channel channel : channels) {
-                File_Common.okMessage(message + "[" + channel.getChannelName() + "]");
-            }
-
-            return null; // 안써!
-        } catch (Exception e) {
-            File_Common.errMessage(message);
-            throw new RuntimeException(e);
+    public void getAllChannels() {
+        for (Channel channel : channelList) {
+            String message = "getAllChannels: " + channel.getChannelName();
+            File_Common.okMessage(message);
         }
     }
 
+//    @Override
+//    public void updateChannelName(Channel in_Channel, String reName) {
+//        String message = "updateChannelName: [" + in_Channel.getChannelName() + "]에서 -> [" + reName + "]으로 변경";
+//
+//        for (Channel channel : channelList) {
+//            if (channel.getChannelName().equals(reName)) {
+//                int index = channelList.indexOf(channel);
+//                channel.setChannelName(channel.getChannelName(), reName);
+//                channelList.set(index, channel);
+//
+////                File_Common.fileWrite(channelList, FILE_PATH, message);
+//                channelRepository.channelWrite(channelList, message);
+//                return;
+//            }
+//        }
+//
+//        System.out.println("\uD83D\uDC9A\uD83D\uDC9A\uD83D\uDC9A");
+//        File_Common.errMessage(message);
+//    }
     @Override
     public void updateChannelName(Channel in_Channel, String reName) {
         String message = "updateChannelName: [" + in_Channel.getChannelName() + "]에서 -> [" + reName + "]으로 변경";
 
         for (Channel channel : channelList) {
-            if (channel.getChannelName().equals(reName)) {
+            if (channel.getChannelName().equals(in_Channel.getChannelName())) {
                 int index = channelList.indexOf(channel);
                 channel.setChannelName(channel.getChannelName(), reName);
                 channelList.set(index, channel);
 
-                File_Common.fileWrite(channelList, FILE_PATH, message);
-
+    //                File_Common.fileWrite(channelList, FILE_PATH, message);
+                channelRepository.channelWrite(channelList, message);
                 return;
             }
         }
 
+//        System.out.println("\uD83D\uDC9A\uD83D\uDC9A\uD83D\uDC9A");
         File_Common.errMessage(message);
     }
 
@@ -122,37 +130,75 @@ public class File_ChannelService implements ChannelService, MessageService {
             channelList.get(channelList.indexOf(channel)).setChannelType(channelType);
 
             String message = "\uD83D\uDEAB [" + channel.getChannelName() + "] 채널은 ["+ channelType + "] 타입 채널방으로 변경됨\n";
-            File_Common.fileWrite(channelList, FILE_PATH, message);
+//            File_Common.fileWrite(channelList, FILE_PATH, message);
+            channelRepository.channelWrite(channelList, message);
         }
     }
+
+//    @Override
+//    public Message createMessage(String msg) {
+//        return null; // 안써!
+//    }
 
     @Override
     public void deleteChannel(UUID uuid) { // 🖤🖤🖤🖤🖤🖤🖤🖤 아이디로 객체 찾기!!
         Channel findChannel = channelList.stream().filter(channel -> channel.getId().equals(uuid)).findFirst().get();
         String message = "[" + findChannel.getChannelName() + "] 채널 삭제";
         channelList.remove(findChannel);
-        File_Common.fileWrite(channelList, FILE_PATH, message);
+//        File_Common.fileWrite(channelList, FILE_PATH, message);
+        channelRepository.channelWrite(channelList, message);
     }
 
     @Override
-    public void getAll_Messages(Channel channel) {
-        File_Common.errMessage("❌❌❌ getAll_Messages  PASS! ❌❌❌");
+    public void getAll_Messages(Channel in_Channel) {
+        int index = channelList.indexOf(in_Channel);
+        if (index == -1) {
+            String message = "\uD83D\uDEA8\uD83D\uDEA8 [" + in_Channel.getChannelName() + "]는 삭제된 채널임! - getAllMessages() 호출 불가";
+            File_Common.errMessage(message);
+        }
+        else {
+            Channel channel = channelList.get(index);
+            channel.getAllMessages();
+        }
     }
 
     @Override
-    public Message get_Message(Channel channel, UUID messageID) {
-        File_Common.errMessage("❌❌❌ get_Message PASS! ❌❌❌");
-        return null;
+    public void get_Message(Channel in_Channel, UUID messageID) {
+        int index = channelList.indexOf(in_Channel);
+        if (index == -1) {
+            String message = "\uD83D\uDEA8\uD83D\uDEA8 [" + in_Channel.getChannelName() + "]는 삭제된 채널임! - get_Message() 호출 불가";
+            File_Common.errMessage(message);
+        }
+        else {
+            Channel channel = channelList.get(index);
+            channel.get_Message(messageID);
+        }
     }
 
     @Override
-    public void update_Message(Channel channel, UUID messageID, String message) {
-        File_Common.errMessage("❌❌❌ update_Message  PASS! ❌❌❌");
+    public void update_Message(Channel in_Channel, UUID messageID, String message) {
+        int index = channelList.indexOf(in_Channel);
+        if (index == -1) {
+            String errMessage = "\uD83D\uDEA8\uD83D\uDEA8 [" + in_Channel.getChannelName() + "]는 삭제된 채널임! - update_Message() 호출 불가";
+            File_Common.errMessage(errMessage);
+        }
+        else {
+            Channel channel = channelList.get(index);
+            channel.update_Message(messageID, message);
+        }
     }
 
     @Override
-    public void delete_Message(Channel channel, UUID messageID) {
-        File_Common.errMessage("❌❌❌ delete_Message PASS! ❌❌❌");
+    public void delete_Message(Channel in_Channel, UUID messageID) {
+        int index = channelList.indexOf(in_Channel);
+        if (index == -1) {
+            String message = "\uD83D\uDEA8\uD83D\uDEA8 [" + in_Channel.getChannelName() + "]는 삭제된 채널임! - delete_Message() 호출 불가";
+            File_Common.errMessage(message);
+        }
+        else {
+            Channel channel = channelList.get(index);
+            channel.delete_Message(messageID);
+        }
     }
 
     //===============================
@@ -160,19 +206,21 @@ public class File_ChannelService implements ChannelService, MessageService {
     //===============================
 
     public UUID sendMessage(Channel in_Channel, User user, String strMessage) {
-       if (channelList.contains(in_Channel)) {
-           JCF_MessageService jcf_message = JCF_MessageService.getInstance();
-           Message message = jcf_message.createMessage(strMessage);
-           message.setUserID( user.getId());
+        int index = channelList.indexOf(in_Channel);
+        if (index == -1) {
+            String message = "\uD83D\uDEA8\uD83D\uDEA8 [" + in_Channel.getChannelName() + "]는 삭제된 채널임! - sendMessage() 호출 불가";
+            File_Common.errMessage(message);
 
-           channelList.get(channelList.indexOf(in_Channel)).sendMessage(user, message);
+            return null;
+        }
+        else {
+            JCF_MessageService jcf_message = JCF_MessageService.getInstance();
+            Message message = jcf_message.neoMessage(strMessage);
+            message.setUserID(user.getId());
+            channelList.get(index).sendMessage(user, message);
 
-           return message.getId();
-       }
-       else {
-           File_Common.errMessage("삭제된 채널임! - [" + strMessage  + "] 메세지 전송 불가!");
-           return null;
-       }
+            return message.getId();
+        }
     }
 
     public void setUser(Channel in_Channel, User user) {
