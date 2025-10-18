@@ -32,7 +32,7 @@ public class User extends BaseEntity{
     }
 
     public void setNickName(String nickName) {
-        String regex = "^[가-힣a-zA-Z0-9]$";
+        String regex = "^[가-힣a-zA-Z0-9]+$";
 
         if(nickName.length() < 2 || nickName.length() > 12){
             System.out.println("닉네임을 2자 이상 12자 이하로 입력해주세요.");
