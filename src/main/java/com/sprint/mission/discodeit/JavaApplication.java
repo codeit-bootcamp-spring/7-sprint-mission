@@ -612,18 +612,19 @@ public class JavaApplication {
                                                         System.out.print("1. 통화방 입장 ");
                                                     }
 
-                                                    System.out.print("2. 채널 멤버 조회 3. 채널 나가기 ");
+                                                    System.out.print("2. 채널 멤버 조회 ");
 
                                                     if (isAdmin) { // 관리자 전용 메뉴 출력
-                                                        System.out.println("4. 채널 내 멤버 삭제 5. 채널 삭제 6. 이전 메뉴");
+                                                        System.out.println("3. 채널 이름 변경 4. 채널 관리자 변경 5. 채널 내 멤버 삭제 6. 채널 삭제 7. 이전 메뉴");
                                                     } else {
-                                                        System.out.println("4. 이전 메뉴");
+                                                        System.out.println("3. 채널 나가기 4. 이전 메뉴");
                                                     }
                                                     System.out.print("입력: ");
                                                     choice = sc.nextInt();
                                                     sc.nextLine();
 
-                                                    if (!isAdmin && choice == 4) choice = 6; //관리자 아닌 유저가 나가기 선택시 번호 변경
+                                                    if (!isAdmin && choice == 3) choice = 8; //관리자가 아닌 유저가 채널 나가기 선택시 번호 변경
+                                                    if (!isAdmin && choice == 4) choice = 7; //관리자 아닌 유저가 이전 메뉴 선택시 번호 변경
 
                                                     switch (choice) {
                                                         case 1:
@@ -667,18 +668,38 @@ public class JavaApplication {
                                                             Printer.printHalfLine();
                                                             break;
                                                         case 3:
-                                                            if (isAdmin) {
-                                                                System.out.println("채널 관리자는 채널을 나갈 수 없습니다. 채널 삭제를 진행해주세요.");
-                                                                break;
+                                                            System.out.println("채널 이름 변경을 선택하였습니다. 변경 이름 작성해주세요. 이전 메뉴로 가시려면 -1을 입력하세요");
+                                                            System.out.print("변경할 채널 이름: ");
+                                                            String newChannelName = sc.nextLine();
+                                                            if(!newChannelName.equals("-1")) {
+                                                                channelService.updateName(userChannel.getId(), newChannelName);
                                                             }
-                                                            System.out.printf("정말로 %s을 나가시길 원하시면 1을 눌러주세요.\n", userChannel.getChannelName());
+                                                            break;
+                                                        case 4:
+                                                            System.out.println("채널 관리자 변경을 선택하였습니다. 변경을 원하는 멤버를 선택해주세요.");
+                                                            List<User> members = userChannel.getMembers();
+                                                            members.remove(user);
+
+                                                            for(int i = 0; i <= members.size(); i++) {
+                                                                if (i == members.size()) {
+                                                                    System.out.printf("%d. 이전 메뉴\n", i);
+                                                                    break;
+                                                                }
+                                                                System.out.printf("%d. %s\n", i+1, members.get(i).getNickName());
+                                                            }
+
                                                             System.out.print("입력: ");
                                                             choice = sc.nextInt();
+                                                            sc.nextLine();
 
-                                                            if (choice == 1)
-                                                                channelService.deleteChannelMember(userChannel.getId(), user, user);
-                                                            break outer2;
-                                                        case 4:
+                                                            if(choice < members.size()){
+                                                                User newAdmin = members.get(choice-1);
+                                                                channelService.updateAdmin(userChannel.getId(), newAdmin);
+                                                            } else if(choice > members.size()){
+                                                                System.out.println("올바르지 않은 입력입니다. 다시시도해주세요. 이전 메뉴로 돌아갑니다.");
+                                                            }
+                                                            break;
+                                                        case 5:
                                                             System.out.println("삭제할 멤버를 선택해주세요");
                                                             channelMember = userChannel.getMembers();
 
@@ -708,12 +729,12 @@ public class JavaApplication {
                                                                 System.out.println("닉네임이 정확하지 않습니다. 메뉴로 돌아갑니다.");
                                                             }
                                                             break;
-                                                        case 5:
+                                                        case 6:
                                                             //채널 삭제시 연동되는 것들까지 삭제하기
                                                             System.out.println("정말로 채널을 삭제하시겠습니까?");
                                                             System.out.println("삭제를 원하시면 채널 이름을 정확히 입력해주세요");
                                                             System.out.printf("채널 이름: %s\n", userChannel.getChannelName());
-                                                            System.out.println("입력: ");
+                                                            System.out.print("입력: ");
                                                             if (sc.nextLine().equals(userChannel.getChannelName())) {
                                                                 channelService.deleteChannel(userChannel.getId(), user);
                                                                 System.out.println("채널이 삭제되었습니다. 이전 메뉴로 돌아갑니다.");
@@ -723,10 +744,17 @@ public class JavaApplication {
                                                                 break;
                                                             }
                                                             break outer2;
-                                                        case 6:
+                                                        case 7:
                                                             System.out.println("이전 메뉴로 돌아갑니다.");
                                                             break outer2;
+                                                        case 8:
+                                                            System.out.printf("정말로 %s을 나가시길 원하시면 1을 눌러주세요.\n", userChannel.getChannelName());
+                                                            System.out.print("입력: ");
+                                                            choice = sc.nextInt();
 
+                                                            if (choice == 1)
+                                                                channelService.deleteChannelMember(userChannel.getId(), user, user);
+                                                            break outer2;
                                                     }
                                                 }
                                                 break;
