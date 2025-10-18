@@ -50,7 +50,7 @@ public class Channel extends BaseEntity{
     }
 
     public List<User> getMembers() {
-        return members;
+        return new ArrayList<>(members);
     }
 
     public void addMember(User user) {
