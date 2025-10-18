@@ -17,8 +17,17 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel createChannel(Channel.ChannelType channelType, String channelName, User admin) {
         Channel newChannel = new Channel(channelType, channelName, admin);
-        channelRepository.save(newChannel);
+
+        // 이름 중복 저장 불가
+        for(Channel c : channelRepository.findAll()){
+            if(c.getChannelName().equals(channelName)){
+                System.out.println("동일한 이름의 채널이 이미 존재합니다.");
+                return null;
+            }
+        }
+
         channelRepository.addChannelIdForUser(newChannel.getId(), admin);
+        channelRepository.save(newChannel);
         return newChannel;
     }
 
@@ -26,9 +35,13 @@ public class JCFChannelService implements ChannelService {
     public void addMember(UUID channelId, User member){
         Channel channel = channelRepository.findById(channelId).orElse(null);
         if (channel != null) {
+            if(channel.getMembers().contains(member)){
+                System.out.println("이미 멤버가 채널에 속해있습니다.");
+                return;
+            }
             channel.addMember(member);
+            channelRepository.addChannelIdForUser(channel.getId(), member); // 유저 객체에 속한 채널 UUID 리스트 저장
             channelRepository.save(channel);
-            channelRepository.addChannelIdForUser(channelId, member);
         }
     }
 
@@ -81,12 +94,7 @@ public class JCFChannelService implements ChannelService {
             return;
         }
 
-        channelRepository.deleteById(id);
-
-        // 삭제되는 채널 id를 유저들이 속해 있는 채널 리스트(joinedChannels)에서도 삭제
-        for(User member : channel.getMembers()){
-            channelRepository.deleteChannelIdForUser(id, member);
-        }
+        channelRepository.deleteById(id); // 채널 삭제
     }
 
     @Override
@@ -112,8 +120,6 @@ public class JCFChannelService implements ChannelService {
             return;
         }
 
-        channelRepository.deleteChannelIdForUser(id, target);
-        channel.delMember(target);
-        channelRepository.save(channel);
+        channelRepository.deleteMember(channel, target);
     }
 }

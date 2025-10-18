@@ -64,4 +64,9 @@ public interface ChannelRepository {
      * 사용자가 속한 채널 UUID 삭제
      */
     void deleteChannelIdForUser(UUID channelId, User user);
+
+    /**
+     * 채널에서 멤버 삭제
+     */
+    void deleteMember(Channel channel, User target);
 }

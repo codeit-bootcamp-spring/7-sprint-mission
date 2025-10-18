@@ -68,12 +68,26 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteById(UUID id) {
+        Channel channel = findById(id).orElse(null);
+
+        // 삭제되는 채널 id를 유저들이 속해 있는 채널 리스트(joinedChannels)에서도 삭제
+        for(User member : channel.getMembers()){
+            deleteChannelIdForUser(id, member);
+        }
+
         channelStore.remove(id);
     }
 
     @Override
     public void addChannelIdForUser(UUID channelId, User user) {
-        Set<UUID> channelIds = joinedChannels.computeIfAbsent(user.getId(), k -> new HashSet<>());
+        Set<UUID> channelIds;
+
+        if (joinedChannels.containsKey(user.getId())) {
+            channelIds = joinedChannels.get(user.getId());
+        } else {
+            channelIds = new HashSet<>();
+        }
+
         channelIds.add(channelId);
         joinedChannels.put(user.getId(), channelIds); // 채널 추가 후 저장
     }
@@ -87,4 +101,10 @@ public class JCFChannelRepository implements ChannelRepository {
         joinedChannels.put(user.getId(), channelIds); // 채널 삭제 후 저장
     }
 
+    @Override
+    public void deleteMember(Channel channel, User target){
+        deleteChannelIdForUser(channel.getId(), target); // 강퇴된 유저가 가진 채널 목록에서 채널 UUID 삭제
+        channel.delMember(target); // 채널에서 강퇴된 유저 삭제
+        save(channel); // 변경된 채널 정보 저장
+    }
 }
