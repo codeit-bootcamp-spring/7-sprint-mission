@@ -73,8 +73,8 @@ public class JCFUserService implements UserService{
     @Override
     public void deleteUser(UUID id) {
         userRepository.findById(id).ifPresent(user -> {
-            userRepository.deleteById(id);
             messageRepository.deleteByUser(user);
+            userRepository.deleteById(id);
         });
     }
 }
