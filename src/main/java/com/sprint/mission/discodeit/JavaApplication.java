@@ -1,13 +1,28 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.jcf.*;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class JavaApplication {
+    enum SelectRepo { JCF, FILE }
+    private static SelectRepo selectRepo = SelectRepo.JCF;
+
     private static void titlePrint(String title) {
         System.out.println(" ");
         System.out.println("==================== " + title + " ====================");
@@ -15,10 +30,23 @@ public class JavaApplication {
     }
 
     public static void main(String[] args) {
-        ChannelService channelService = JCFChannelService.getInstance();
-//        MessageService messageService = JCFMessageService.getInstance();
-        UserService userService = JCFUserService.getInstance();
-        MessageService messageService = new JCFMessageService(channelService, userService);
+        ChannelRepository chRepo;
+        UserRepository userRepo;
+        MessageRepository msgRepo;
+
+        if(selectRepo == SelectRepo.FILE) {
+            chRepo = new JCFChannelRepository();
+            userRepo = new JCFUserRepository();
+            msgRepo = new JCFMessageRepository();
+        } else {
+            chRepo = new FileChannelRepository();
+            userRepo = new FileUserRepository();
+            msgRepo = new FileMessageRepository();
+        }
+
+        ChannelService channelService = new BasicChannelService(chRepo);
+        UserService userService = new BasicUserService(userRepo);
+        MessageService messageService = new BasicMessageService(msgRepo, chRepo, userRepo);
 
         System.out.println("1. User Service 체크");
         titlePrint("등록");
@@ -32,7 +60,7 @@ public class JavaApplication {
 
         System.out.print(user1.getUsername() + "님이 가입하셨습니다.");
         System.out.println("환영합니다!");
-        System.out.println("Email: " + userService.getUsersByEmail(user1.getEmail()).get(0).getEmail());
+        System.out.println("Email: " + userService.getUsersByEmail(user1.getEmail()).get().getEmail());
         System.out.println("Name: " + userService.getUsersByName(user1.getUsername()).get(0).getUsername());
 
         titlePrint("로그인");
@@ -44,7 +72,6 @@ public class JavaApplication {
         System.out.println("Logged out!," + logined.getUserState());
 
         titlePrint("조회 단건");
-        userService.getUsersByName(user1.getUsername());
         System.out.println(userService
                 .getUsersByName(user1.getUsername()).get(0).getUsername() + "님이 확인되었습니다.");
 
@@ -70,7 +97,7 @@ public class JavaApplication {
         System.out.println("이름: " + userService
                 .getUsersByName(user1.getUsername()).get(0).getUsername());
         System.out.println("이메일: " + userService
-                .getUsersByEmail(user1.getEmail()).get(0).getEmail());
+                .getUsersByEmail(user1.getEmail()).get().getEmail());
         System.out.println(userService
                 .getUsersByName(user1.getUsername()).get(0).getUsername() + "님이 확인되었습니다.");
 
@@ -194,6 +221,8 @@ public class JavaApplication {
         titlePrint("SlowMode");
         channelService.setSlowModeSeconds(channel1.getId(), 10);
 
+        channelService.join(channel1.getId(), user2.getId());
+
         messageService.create(new Message("테스트1", user2.getUsername(), user2.getId(), channel1.getId()));
         try {
             messageService.create(new Message("테스트2", user2.getUsername(), user2.getId(), channel1.getId()));
@@ -222,11 +251,17 @@ public class JavaApplication {
         } catch (NoSuchElementException e) {
             System.out.println("채널 삭제!");
         }
-        System.out.println("남은 채널 수: " + channelService.getAll());
+        System.out.println("남은 채널 수: " + channelService.getAll().size());
 
         // 이후 사용하기 위해 재등록
         channel1 = channelService
                 .create(new Channel(ChType.VOICE, "Sprint1"));
+        // 3. Message Service 체크 시작 직전
+        channelService.join(channel1.getId(), user1.getId()); // message1: user1 -> channel1
+        channelService.join(channel2.getId(), user2.getId()); // message2: user2 -> channel2
+        channelService.join(channel3.getId(), user3.getId()); // message3: user3 -> channel3
+        channelService.join(channel2.getId(), user1.getId()); // message4: user1 -> channel2
+
 
         System.out.println(" ");
         System.out.println("3. Message Service 체크");
@@ -253,6 +288,7 @@ public class JavaApplication {
         titlePrint("수정");
         System.out.println("수정전 " + message1.getUserName() + " 님의 메세지 : " + message1.getContent());
         message1.setContent("백엔드 sprint 미션 중입니당");
+        messageService.update(message1);
         System.out.println("메세지가 수정 되었습니다.");
 
         titlePrint("수정된 데이터 조회");
