@@ -35,7 +35,7 @@ public class JCFMessageService implements MessageService {
      */
     @Override
     public <T> void createMessage(User user, T receiver, String content) {
-        Message newMessage = null;
+        Message newMessage;
 
         // 수신자가 User인 경우
         if(receiver instanceof User user2){
@@ -63,13 +63,13 @@ public class JCFMessageService implements MessageService {
         if (receiver instanceof User user2) {
             // 유저 간의 대화 중 가장 마지막 메시지
             return reversed.filter(m ->
-                            (m.getSenderId() == user.getId() && m.getReceiverId() == user2.getId()) ||
-                                    (m.getSenderId() == user2.getId() && m.getReceiverId() == user.getId()))
+                            (m.getSenderId().equals(user.getId()) && m.getReceiverId().equals(user2.getId())) ||
+                                    (m.getSenderId().equals(user2.getId()) && m.getReceiverId().equals(user.getId())))
                     .findFirst().orElse(null);
         } else if (receiver instanceof Channel channel) {
             // 특정 채널에 보낸 마지막 메시지
             return reversed.filter(m ->
-                            m.getSenderId() == user.getId() && m.getReceiverId() == channel.getId())
+                            m.getSenderId().equals(user.getId()) && m.getReceiverId().equals(channel.getId()))
                     .findFirst().orElse(null);
         }
 
@@ -82,8 +82,8 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getMessagesBetween(User user1, User user2) {
         return messageRepository.findAll().stream()
-                .filter(m -> (m.getSenderId() == user1.getId() && m.getReceiverId() == user2.getId()) ||
-                        (m.getSenderId() == user2.getId() && m.getReceiverId() == user1.getId()))
+                .filter(m -> (m.getSenderId().equals(user1.getId()) && m.getReceiverId().equals(user2.getId())) ||
+                        (m.getSenderId().equals(user2.getId()) && m.getReceiverId().equals(user1.getId())))
                 .toList();
     }
 
@@ -93,7 +93,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getAllMessagesByUser(User user) {
         return messageRepository.findAll().stream()
-                .filter(m -> m.getSenderId() == user.getId() || m.getReceiverId() == user.getId())
+                .filter(m -> m.getSenderId().equals(user.getId()) || m.getReceiverId().equals(user.getId()))
                 .toList();
     }
 
@@ -103,7 +103,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getAllByChannel(Channel channel) {
         return messageRepository.findAll().stream()
-                .filter(m -> m.getReceiverId() == channel.getId())
+                .filter(m -> m.getReceiverId().equals(channel.getId()))
                 .toList();
     }
 

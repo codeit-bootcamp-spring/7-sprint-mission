@@ -55,6 +55,6 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void deleteByUser(User user) {
         // 특정 유저가 보낸 메시지 전부 삭제
-        messageStore.removeIf(m -> m.getSenderId() == user.getId());
+        messageStore.removeIf(m -> m.getSenderId().equals(user.getId()));
     }
 }
