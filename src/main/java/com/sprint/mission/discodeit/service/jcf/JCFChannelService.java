@@ -1,79 +1,25 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.VerifiedUtils;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private final ChannelRepository channelRepository;
+    private final BasicChannelService basicChannelService;
 
     public JCFChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = VerifiedUtils.verifyNull(channelRepository);
+        this.basicChannelService = new BasicChannelService(channelRepository);
     }
 
-    @Override
-    public Channel create(Channel channel) {
-        Channel c = VerifiedUtils.verifyNull(channel);
-        UUID n =  VerifiedUtils.verifyNull(c.getId());
-        if(channelRepository.findById(n).isPresent()) {
-            throw new IllegalStateException("Channel with id " + n + " already exists");
-        }
-        return channelRepository.save(channel);
-    }
-
-    @Override
-    public Channel get(UUID id) {
-        UUID n = VerifiedUtils.verifyNull(id);
-        return channelRepository.findById(n).orElseThrow(() -> new NoSuchElementException("Channel with id " + n + " not found"));
-    }
-
-    @Override
-    public Channel update(Channel channel) {
-        Channel c = VerifiedUtils.verifyNull(channel);
-        UUID n = VerifiedUtils.verifyNull(c.getId());
-        channelRepository.findById(n).orElseThrow(() -> new NoSuchElementException("Channel with id " + n + " not found"));
-        return channelRepository.save(channel);
-    }
-
-    @Override
-    public boolean delete(UUID id) {
-        UUID n = VerifiedUtils.verifyNull(id);
-        return channelRepository.deleteById(n);
-    }
-
-    @Override
-    public List<Channel> getAll() {
-        return channelRepository.findAll();
-    }
-
-    // join
-    @Override
-    public boolean join(UUID channelId, UUID userId) {
-        Channel c = get(VerifiedUtils.verifyNull(channelId));
-        boolean changed = c.join(VerifiedUtils.verifyNull(userId));
-        if(changed) {
-            channelRepository.save(c);
-        }
-        return changed;
-    }
-    // leave
-    @Override
-    public boolean leave(UUID channelId, UUID userId) {
-        Channel c = get(VerifiedUtils.verifyNull(channelId));
-        boolean changed = c.leave(VerifiedUtils.verifyNull(userId));
-        if(changed) {
-            channelRepository.save(c);
-        }
-        return changed;
-    }
-    // slowMode
-    @Override
-    public void setSlowModeSeconds(UUID channelId, int slowModeSeconds) {
-        Channel c = get(channelId);
-        c.setSlowModeSeconds(slowModeSeconds);
-        channelRepository.save(c);
-    }
+    @Override public Channel create(Channel channel) {return basicChannelService.create(channel);}
+    @Override public Channel get(UUID id) {return basicChannelService.get(id);}
+    @Override public Channel update(Channel channel) {return basicChannelService.update(channel);}
+    @Override public boolean delete(UUID id) {return basicChannelService.delete(id);}
+    @Override public List<Channel> getAll() {return basicChannelService.getAll();}
+    @Override public boolean join(UUID channelId, UUID userId) {return basicChannelService.join(channelId, userId);}
+    @Override public boolean leave(UUID channelId, UUID userId) {return basicChannelService.leave(channelId, userId);}
+    @Override public void setSlowModeSeconds(UUID channelId, int slowModeSeconds) {basicChannelService.setSlowModeSeconds(channelId, slowModeSeconds);}
 }

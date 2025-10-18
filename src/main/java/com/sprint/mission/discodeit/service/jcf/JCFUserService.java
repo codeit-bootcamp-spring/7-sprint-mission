@@ -5,109 +5,33 @@ import com.sprint.mission.discodeit.entity.UserState;
 import com.sprint.mission.discodeit.entity.VerifiedUtils;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final UserRepository userRepository;
+    private final BasicUserService basicUserService;
 
     public JCFUserService(UserRepository userRepository) {
-        this.userRepository = VerifiedUtils.verifyNull(userRepository);
+        this.basicUserService = new BasicUserService(userRepository);
     }
 
-    @Override
-    public User create(User user) {
-        User u = VerifiedUtils.verifyNull(user);
-        UUID id = VerifiedUtils.verifyNull(u.getId());
-        if(userRepository.findById(id).isPresent()) {
-            throw new IllegalStateException("User already exists: " + id);
-        }
-        return userRepository.save(u);
-    }
-
-    @Override
-    public User get(UUID uuid) {
-        UUID id = VerifiedUtils.verifyNull(uuid);
-        return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found: " + id));
-    }
-
-    @Override
-    public List<User> getAll() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public User update(User user) {
-        User u = VerifiedUtils.verifyNull(user);
-        UUID id = VerifiedUtils.verifyNull(u.getId());
-        userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found: " + id));
-        return userRepository.save(u);
-    }
-
-    @Override
-    public boolean delete(UUID uuid) {
-        UUID id = VerifiedUtils.verifyNull(uuid);
-        return userRepository.deleteById(id);
-    }
-
+    @Override public User create(User user) {return basicUserService.create(user);}
+    @Override public User get(UUID uuid) {return basicUserService.get(uuid);}
+    @Override public List<User> getAll() {return basicUserService.getAll();}
+    @Override public User update(User user) {return basicUserService.update(user);}
+    @Override public boolean delete(UUID uuid) {return basicUserService.delete(uuid);}
     // Online/Offline 전환
-    @Override
-    public User setUserState(UUID uuid, UserState userState) {
-        User user = get(uuid);
-        if(user.getUserState() != userState) {
-            user.setUserState(userState);
-            userRepository.save(user);
-        }
-        return user;
-    }
+    @Override public User setUserState(UUID uuid, UserState userState) {return basicUserService.setUserState(uuid, userState);}
     // 이름으로 조회
-    @Override
-    public List<User> getUsersByName(String username) {
-        String user = VerifiedUtils.verifyName(username);
-        return userRepository.findByName(user);
-    }
-
+    @Override public List<User> getUsersByName(String username) {return basicUserService.getUsersByName(username);}
     // 이메일로 조회
-    @Override
-    public Optional<User> getUsersByEmail(String email) {
-        String e = VerifiedUtils.verifyEmail(email);
-        return userRepository.findByEmail(e);
-    }
-
+    @Override public Optional<User> getUsersByEmail(String email) {return basicUserService.getUsersByEmail(email);}
     // 특정 상태만 조회
     @Override
-    public List<User> getUsersByState(UserState userState) {
-        UserState state = VerifiedUtils.verifyNull(userState);
-        return userRepository.findByState(state);
-    }
-
+    public List<User> getUsersByState(UserState userState) {return basicUserService.getUsersByState(userState);}
     // 로그인
-    @Override
-    public User login(String email, String password) {
-        String e = VerifiedUtils.verifyEmail(email);
-        String p = VerifiedUtils.verifyPassword(password);
-        User user = getUsersByEmail(e)
-                .orElseThrow( () -> new NoSuchElementException("User not found: " + email));
-        if(!user.passwordMatch(p)) {
-            throw new IllegalArgumentException("Passwords do not match");
-        }
-        if(user.getUserState() != UserState.ONLINE) {
-            user.setUserState(UserState.ONLINE);
-            userRepository.save(user);
-        }
-        return user;
-    }
+    @Override public User login(String email, String password) {return basicUserService.login(email, password);}
     // 로그아웃
-    @Override
-    public User logout(String email) {
-        String e = VerifiedUtils.verifyEmail(email);
-        User user = getUsersByEmail(e)
-                .orElseThrow(() -> new NoSuchElementException("User not found: " + email));
-        if(user.getUserState() == UserState.OFFLINE) {
-            return user;
-        }
-        user.setUserState(UserState.OFFLINE);
-        userRepository.save(user);
-        return user;
-    }
+    @Override public User logout(String email) {return basicUserService.logout(email);}
 }
