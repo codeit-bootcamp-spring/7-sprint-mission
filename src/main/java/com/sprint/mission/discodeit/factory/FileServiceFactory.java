@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.factory;
 
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -19,6 +21,7 @@ public class FileServiceFactory implements ServiceFactory{
     private String MESSAGE_FILE = FILE_PATH + "\\messages.sav";
 
     private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
 
     private final UserService userService;
@@ -29,11 +32,12 @@ public class FileServiceFactory implements ServiceFactory{
     // 기본 경로의 파일에 데이터 저장
     public FileServiceFactory() {
         userRepository = new FileUserRepository(USER_FILE);
+        channelRepository = new FileChannelRepository(CHANNEL_FILE, JOINED_FILE);
         messageRepository = new FileMessageRepository(MESSAGE_FILE);
 
-        channelService = new FileChannelService(CHANNEL_FILE, JOINED_FILE);
-        messageService = new FileMessageService(messageRepository);
         userService = new FileUserService(userRepository, messageRepository);
+        channelService = new FileChannelService(channelRepository);
+        messageService = new FileMessageService(messageRepository);
     }
 
     // 선택된 경로의 파일에 데이터 저장
@@ -44,11 +48,12 @@ public class FileServiceFactory implements ServiceFactory{
         this.MESSAGE_FILE = MESSAGE_FILE;
 
         userRepository = new FileUserRepository(USER_FILE);
+        channelRepository = new FileChannelRepository(CHANNEL_FILE, JOINED_FILE);
         messageRepository = new FileMessageRepository(MESSAGE_FILE);
 
-        channelService = new FileChannelService(CHANNEL_FILE, JOINED_FILE);
-        messageService = new FileMessageService(messageRepository);
         userService = new FileUserService(userRepository, messageRepository);
+        channelService = new FileChannelService(channelRepository);
+        messageService = new FileMessageService(messageRepository);
     }
 
     public UserService getUserService() {
