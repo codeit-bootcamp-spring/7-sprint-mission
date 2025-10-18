@@ -74,7 +74,9 @@ public class JCFMessageRepository implements MessageRepository {
     public List<Message> searchByKeyword(String keyword) {
         String k = Objects.requireNonNull(keyword, "keyword must not be null")
                 .trim().toLowerCase();
-        if(k.isEmpty()) { return new ArrayList<>(); }
+        if(k.isEmpty()) {
+            return new ArrayList<>();
+        }
         return data.values()
                 .stream()
                 .filter(m -> !m.isDeleted())
