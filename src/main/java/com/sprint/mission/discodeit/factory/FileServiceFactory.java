@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.factory;
 
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -14,14 +16,18 @@ public class FileServiceFactory implements ServiceFactory{
     private String JOINED_FILE = FILE_PATH + "\\joinedChannels.sav";
     private String MESSAGE_FILE = FILE_PATH + "\\messages.sav";
 
+    private final MessageRepository messageRepository;
+
     private final UserService userService;
     private final ChannelService channelService;
     private final MessageService messageService;
 
 
     public FileServiceFactory() {
+        messageRepository = new FileMessageRepository(MESSAGE_FILE);
+
         channelService = new FileChannelService(CHANNEL_FILE, JOINED_FILE);
-        messageService = new FileMessageService(MESSAGE_FILE);
+        messageService = new FileMessageService(messageRepository);
         userService = new FileUserService(messageService, USER_FILE);
     }
 
@@ -29,10 +35,13 @@ public class FileServiceFactory implements ServiceFactory{
     public FileServiceFactory(String USER_FILE, String CHANNEL_FILE, String JOINED_FILE, String MESSAGE_FILE) {
         this.USER_FILE = USER_FILE;
         this.CHANNEL_FILE = CHANNEL_FILE;
+        this.JOINED_FILE = JOINED_FILE;
         this.MESSAGE_FILE = MESSAGE_FILE;
 
+        messageRepository = new FileMessageRepository(MESSAGE_FILE);
+
         channelService = new FileChannelService(CHANNEL_FILE, JOINED_FILE);
-        messageService = new FileMessageService(MESSAGE_FILE);
+        messageService = new FileMessageService(messageRepository);
         userService = new FileUserService(messageService, USER_FILE);
     }
 

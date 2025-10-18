@@ -3,49 +3,30 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+/**
+ * FileMessageService
+ * -----------------
+ * MessageService 인터페이스의 파일 기반 구현체로,
+ * FileMessageRepository를 주입받아 메시지 처리 로직을 수행합니다.
+ *
+ * - 기능은 JCFMessageService와 동일하나,
+ *   데이터 저장 및 조회가 파일(.sav) 단위로 이루어집니다.
+ */
 public class FileMessageService implements MessageService {
-    private final List<Message> messageStore = new ArrayList<>();
-    private final String MESSAGE_FILE;
+    private final MessageRepository messageRepository;
 
-    public FileMessageService(String MESSAGE_FILE) {
-        this.MESSAGE_FILE = MESSAGE_FILE;
-        loadMessagesFromFile(); // 서비스 시작 시 파일 로드
+    public FileMessageService(MessageRepository fileMessageRepository) {
+        this.messageRepository = fileMessageRepository;
     }
-
-    // --- 파일 저장 (직렬화) ---
-    private void saveMessagesToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(MESSAGE_FILE))) {
-            oos.writeObject(messageStore);
-            System.out.println("[저장 완료] 메시지 데이터 파일 저장됨");
-        } catch (IOException e) {
-            System.err.println("[오류] 메시지 저장 실패: " + e.getMessage());
-        }
-    }
-
-    // --- 파일 불러오기 (역직렬화) ---
-    private void loadMessagesFromFile() {
-        File file = new File(MESSAGE_FILE);
-        if (!file.exists()) return;
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(MESSAGE_FILE))) {
-            List<Message> loaded = (List<Message>) ois.readObject();
-            messageStore.clear();
-            messageStore.addAll(loaded);
-            System.out.println("[로드 완료] 메시지 데이터 로드됨");
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("[오류] 메시지 로드 실패: " + e.getMessage());
-        }
-    }
-
 
     @Override
     public <T> void createMessage(User user, T receiver, String content) {
@@ -57,16 +38,17 @@ public class FileMessageService implements MessageService {
             newMessage = new Message(user.getId(), channel.getId(), Message.ReceiveType.CHANNEL, content);
         } else return;
 
-        messageStore.add(newMessage);
-        saveMessagesToFile();
+        messageRepository.save(newMessage);
     }
 
     @Override
     public <T> Message getLastestMessage(User user, T receiver) {
+        List<Message> allMessages = messageRepository.findAll();
+
         // 최신순(역순)으로 순회
-        Stream<Message> reversed = IntStream.iterate(messageStore.size() - 1, i -> i - 1)
-                .limit(messageStore.size())
-                .mapToObj(index -> messageStore.get(index));
+        Stream<Message> reversed = IntStream.iterate(allMessages.size() - 1, i -> i - 1)
+                .limit(allMessages.size())
+                .mapToObj(index -> allMessages.get(index));
 
         if(receiver instanceof User user2){
             return reversed.filter(m ->
@@ -84,7 +66,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public List<Message> getMessagesBetween(User user1, User user2) {
-        return messageStore.stream()
+        return messageRepository.findAll().stream()
                 .filter(m -> (m.getSenderId().equals(user1.getId()) && m.getReceiverId().equals(user2.getId())) ||
                         (m.getSenderId().equals(user2.getId()) && m.getReceiverId().equals(user1.getId())))
                 .toList();
@@ -92,40 +74,33 @@ public class FileMessageService implements MessageService {
 
     @Override
     public List<Message> getAllMessagesByUser(User user) {
-        return messageStore.stream()
+        return messageRepository.findAll().stream()
                 .filter(m -> m.getSenderId().equals(user.getId()) || m.getReceiverId().equals(user.getId()))
                 .toList();
     }
 
     @Override
     public List<Message> getAllByChannel(Channel channel) {
-        return messageStore.stream()
+        return messageRepository.findAll().stream()
                 .filter(m -> m.getReceiverId().equals(channel.getId()))
                 .toList();
     }
 
     @Override
     public void updateMessage(UUID id, String content) {
-        for(int i = 0; i < messageStore.size(); i++){
-            if(messageStore.get(i).getId().equals(id)){
-                Message message = messageStore.get(i);
-                message.setContents(content);
-                messageStore.set(i, message);
-                saveMessagesToFile();
-                break;
-            }
-        }
+        messageRepository.findById(id).ifPresent(message -> {
+            message.setContents(content);
+            messageRepository.update(message);
+        });
     }
 
     @Override
     public void deleteMessage(UUID id) {
-        messageStore.removeIf(m -> m.getId().equals(id));
-        saveMessagesToFile();
+        messageRepository.deleteById(id);
     }
 
     @Override
     public void deleteMessagesByUser(User user) {
-        messageStore.removeIf(m -> m.getSenderId().equals(user.getId()));
-        saveMessagesToFile();
+        messageRepository.deleteByUser(user);
     }
 }
