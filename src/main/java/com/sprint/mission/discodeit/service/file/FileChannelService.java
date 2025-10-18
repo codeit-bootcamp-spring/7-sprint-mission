@@ -184,12 +184,12 @@ public class FileChannelService implements ChannelService {
             return;
         }
 
-        channelStore.remove(id);
-
         // 삭제되는 채널 id를 유저들이 속해 있는 채널 리스트(joinedChannels)에서도 삭제
         for(User member : channel.getMembers()){
             deleteChannelIdForUser(id, member);
         }
+
+        channelStore.remove(id);
 
         // 삭제된 후 목록 저장
         saveChannels();
