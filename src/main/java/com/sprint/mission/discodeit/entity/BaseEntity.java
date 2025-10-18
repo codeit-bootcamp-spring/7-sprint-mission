@@ -1,4 +1,5 @@
 package com.sprint.mission.discodeit.entity;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 /*
@@ -7,10 +8,11 @@ import java.util.UUID;
 나타내기 위한 필드로 long 타입으로 선언한다.
  */
 
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Serializable {
     private final UUID id;
     private final long createdAt;
     private long updatedAt;
+    private static final long serialVersionUID = 1L;
 
     protected BaseEntity() {
         id = UUID.randomUUID();
