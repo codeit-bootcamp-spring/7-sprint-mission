@@ -24,7 +24,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public synchronized User create(String userId, String password, String userName, String userNickname) {
+    public User create(String userId, String password, String userName, String userNickname) {
         User user = new User(userId, password, userName, userNickname);
         List<User> users = loadAll();
         users.add(user);
@@ -33,7 +33,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public synchronized User read(UUID userId) {
+    public User read(UUID userId) {
         return loadAll().stream()
                 .filter(u -> u.getId().equals(userId))
                 .findFirst()
@@ -41,12 +41,12 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public synchronized List<User> readAll() {
+    public List<User> readAll() {
         return loadAll();
     }
 
     @Override
-    public synchronized boolean delete(UUID userId) {
+    public boolean delete(UUID userId) {
         List<User> users = loadAll();
         boolean removed = users.removeIf(u -> u.getId().equals(userId));
         if (removed) saveAll(users);
@@ -54,7 +54,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public synchronized User updateName(UUID uuid, String userName) {
+    public User updateName(UUID uuid, String userName) {
         List<User> users = loadAll();
         User u = users.stream()
                 .filter(x -> x.getId().equals(uuid))
@@ -66,7 +66,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public synchronized User updateNickName(UUID uuid, String userNickname) {
+    public User updateNickName(UUID uuid, String userNickname) {
         List<User> users = loadAll();
         User u = users.stream()
                 .filter(x -> x.getId().equals(uuid))
@@ -78,7 +78,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public synchronized User update(UUID uuid, Consumer<User> updater) {
+    public User update(UUID uuid, Consumer<User> updater) {
         List<User> users = loadAll();
         User u = users.stream()
                 .filter(x -> x.getId().equals(uuid))
