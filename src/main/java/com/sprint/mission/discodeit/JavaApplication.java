@@ -18,16 +18,16 @@ import java.util.UUID;
 public class JavaApplication {
     public static void main(String[] args) {
         final String FILE_PATH = "C:\\Users\\user\\Workspace\\codeit-sprint-bootcamp\\7-sprint-mission\\data";
-        String USER_FILE = FILE_PATH + "\\test_users.sav";
-        String CHANNEL_FILE = FILE_PATH + "\\test_channels.sav";
-        String JOINED_FILE = FILE_PATH + "\\test_joined_files.sav";
-        String MESSAGE_FILE = FILE_PATH + "\\test_messages.sav";
+        String userFilePath = FILE_PATH + "\\test_users.sav";
+        String channelFilePath = FILE_PATH + "\\test_channels.sav";
+        String joinedFilePath = FILE_PATH + "\\test_joined_files.sav";
+        String messageFilePath = FILE_PATH + "\\test_messages.sav";
 
         //도메인 별 서비스 구현체를 테스트
 
         //팩토리 패턴으로 서비스 객체 주입
         JCFServiceFactory serviceFactory = JCFServiceFactory.getInstance();
-        FileServiceFactory fileServiceFactory = new FileServiceFactory(USER_FILE, CHANNEL_FILE, JOINED_FILE, MESSAGE_FILE);
+        FileServiceFactory fileServiceFactory = new FileServiceFactory(userFilePath, channelFilePath, joinedFilePath, messageFilePath);
 
         //JCFService
 //        UserService userService = serviceFactory.getUserService();
@@ -46,7 +46,7 @@ public class JavaApplication {
         // 1. 유저 생성
         try {
             System.out.println("1. 유저 생성");
-            if (!new File(USER_FILE).exists()) {
+            if (!new File(userFilePath).exists()) {
                 System.out.println("새로운 유저를 생성합니다.");
                 userService.createUser("조성만", "smjoe0302", "smjoe0302@naver.com", "010-7140-6533", "abc1234", "qwer1234");
                 userService.createUser("조조", "jojo", "jojo@naver.com", "010-1234-5678", "abc12345", "qwer12345");
@@ -134,7 +134,7 @@ public class JavaApplication {
             Channel newChannel1, newChannel2, newChannel3 = null, newChannel4;
 
             //채널 파일이 저장 되어있으면 생성하지 않는다.
-            if (!new File(CHANNEL_FILE).exists()) {
+            if (!new File(channelFilePath).exists()) {
                 newChannel1 = channelService.createChannel(Channel.ChannelType.VOICE, "코드잇 스프린트 스프링 백엔드 7기 음성 채널", user1);
                 newChannel2 = channelService.createChannel(Channel.ChannelType.MESSAGE, "코드잇 스프린트 스프링 백엔드 7기 메시지 채널", user2);
                 newChannel3 = channelService.createChannel(Channel.ChannelType.VOICE, "미니 게임 음성 채널", user3);
@@ -325,19 +325,19 @@ public class JavaApplication {
             System.out.println("디스코드잇 어플리케이션 입니다.");
 
             //두번째 테스트를 위해 저장되는 파일 경로 변경
-            USER_FILE = FILE_PATH + "\\users.sav";
-            CHANNEL_FILE = FILE_PATH + "\\channels.sav";
-            JOINED_FILE = FILE_PATH + "\\joined_files.sav";
-            MESSAGE_FILE = FILE_PATH + "\\messages.sav";
+            userFilePath = FILE_PATH + "\\users.sav";
+            channelFilePath = FILE_PATH + "\\channels.sav";
+            joinedFilePath = FILE_PATH + "\\joined_files.sav";
+            messageFilePath = FILE_PATH + "\\messages.sav";
 
-            FileServiceFactory fileServiceFactory2 = new FileServiceFactory();
+            FileServiceFactory fileServiceFactory2 = new FileServiceFactory(userFilePath, channelFilePath, joinedFilePath, messageFilePath);
             userService = fileServiceFactory2.getUserService();
             channelService = fileServiceFactory2.getChannelService();
             messageService = fileServiceFactory2.getMessageService();
 
             //이미 생성했다면 생성하지 않는다.
-            if(!new File(USER_FILE).exists()) {
-                // 계정 불러오기 -> 메시지 생성 위함
+            if(!new File(userFilePath).exists()) {
+                // 계정 생성하기 -> 메시지 생성 위함
                 userService.createUser("테스트", "test", "test@naver.com", "010-1234-5678", "test1234", "test1234");
                 userService.createUser("박지훈", "jihun", "jihun01@gmail.com", "010-1234-5678", "idjihun", "securePass1!");
                 userService.createUser("이수빈", "subin", "subin09@naver.com", "010-8765-4321", "idsubin", "myPassword2@");
@@ -831,6 +831,7 @@ public class JavaApplication {
                                                 if (newPassword.equals(newPassword2)) {
                                                     user.setPassword(newPassword);
                                                     login = false;
+                                                    System.out.println("비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
                                                 }
                                             } else {
                                                 System.out.println("비밀번호를 틀렸습니다. 다시 입력하세요.");

@@ -14,12 +14,6 @@ import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
 
 public class FileServiceFactory implements ServiceFactory{
-    private final String FILE_PATH = "C:\\Users\\user\\Workspace\\codeit-sprint-bootcamp\\7-sprint-mission\\data";
-    private String USER_FILE = FILE_PATH + "\\users.sav";
-    private String CHANNEL_FILE = FILE_PATH + "\\channels.sav";
-    private String JOINED_FILE = FILE_PATH + "\\joinedChannels.sav";
-    private String MESSAGE_FILE = FILE_PATH + "\\messages.sav";
-
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
@@ -28,29 +22,11 @@ public class FileServiceFactory implements ServiceFactory{
     private final ChannelService channelService;
     private final MessageService messageService;
 
-
-    // 기본 경로의 파일에 데이터 저장
-    public FileServiceFactory() {
-        userRepository = new FileUserRepository(USER_FILE);
-        channelRepository = new FileChannelRepository(CHANNEL_FILE, JOINED_FILE);
-        messageRepository = new FileMessageRepository(MESSAGE_FILE);
-
-        userService = new FileUserService(userRepository, messageRepository);
-        channelService = new FileChannelService(channelRepository);
-        messageService = new FileMessageService(messageRepository);
-    }
-
     // 선택된 경로의 파일에 데이터 저장
-    public FileServiceFactory(String USER_FILE, String CHANNEL_FILE, String JOINED_FILE, String MESSAGE_FILE) {
-        this.USER_FILE = USER_FILE;
-        this.CHANNEL_FILE = CHANNEL_FILE;
-        this.JOINED_FILE = JOINED_FILE;
-        this.MESSAGE_FILE = MESSAGE_FILE;
-
-        userRepository = new FileUserRepository(USER_FILE);
-        channelRepository = new FileChannelRepository(CHANNEL_FILE, JOINED_FILE);
-        messageRepository = new FileMessageRepository(MESSAGE_FILE);
-
+    public FileServiceFactory(String userFilePath, String channelFilePath, String joinedFilePath, String messageFilePath) {
+        userRepository = new FileUserRepository(userFilePath);
+        channelRepository = new FileChannelRepository(channelFilePath, joinedFilePath);
+        messageRepository = new FileMessageRepository(messageFilePath);
         userService = new FileUserService(userRepository, messageRepository);
         channelService = new FileChannelService(channelRepository);
         messageService = new FileMessageService(messageRepository);
