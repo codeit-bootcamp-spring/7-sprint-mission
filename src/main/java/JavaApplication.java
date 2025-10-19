@@ -22,6 +22,7 @@ import com.sprint.mssion.discodeit.service.jcf.JCFMessageService;
 
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Random;
 
 
 public class JavaApplication {
@@ -57,10 +58,16 @@ public class JavaApplication {
         Channel general = channelService.createChannel(Channel.ChannelType.PUBLIC, "일반", "일반 채널입니다.");
         Channel random = channelService.createChannel(Channel.ChannelType.PUBLIC, "랜덤", "랜덤 채널입니다.");
 
-        userService.addChannelToUser(user1.getCommon().getId(), notice.getCommon().getId());
-        userService.addChannelToUser(user2.getCommon().getId(), notice.getCommon().getId());
-        userService.addChannelToUser(user3.getCommon().getId(), notice.getCommon().getId());
-        userService.addChannelToUser(user4.getCommon().getId(), notice.getCommon().getId());
+        facadeService.addChannelToUserWithRelation(user1.getCommon().getId(), notice.getCommon().getId());
+        facadeService.addChannelToUserWithRelation(user2.getCommon().getId(), notice.getCommon().getId());
+        facadeService.addChannelToUserWithRelation(user3.getCommon().getId(), general.getCommon().getId());
+        facadeService.addChannelToUserWithRelation(user4.getCommon().getId(), random.getCommon().getId());
+
+        // 유저 리스트 확인(채널 추가 확인)
+        System.out.println("========== 유저 리스트");
+        for(User user : userRepository.findAll()){
+            System.out.println(user);
+        }
 
         //메세지 생성
         facadeService.createMessageWithRelation(user1.getCommon().getId(), general.getCommon().getId(), "안녕하세요");
@@ -130,8 +137,5 @@ public class JavaApplication {
         for(Message message : messageRepository.findAll()){
             System.out.println(message);
         }
-
-
-
     }
 }
