@@ -1,6 +1,5 @@
 package com.sprint.mission.entity;
 
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.file.FileUserService;
 
 import java.util.UUID;

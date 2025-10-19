@@ -1,37 +1,25 @@
 package com.sprint.mission.discodeit.repository.jcf;
-
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.entity.Channel;
 import com.sprint.mission.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class JCFChannelRepository implements ChannelService {
+public class JCFChannelRepository implements ChannelRepository {
 
-
-    private  final  List<Channel>  channels;
+    private final List<Channel> channels = new LinkedList<>();
 
     private static final JCFChannelRepository INSTANCE = new JCFChannelRepository();
-
-    private JCFChannelRepository(){
-        channels = new LinkedList<>();
-    }
-
-    //이것도 다 똑같다
-    public static JCFChannelRepository getInstance(){
-        return INSTANCE;
-    }
-
+    public static JCFChannelRepository getInstance() { return INSTANCE; }
+    private JCFChannelRepository() {}
 
     @Override
-    public Channel create(User user,String channelName) {
-        Channel ch = new Channel(user,channelName);
+    public  Channel create(User user, String channelName) {
+        Channel ch = new Channel(user, channelName);
         channels.add(ch);
-        ch.setChannelName(channelName);
-        System.out.printf("%s가 채널을 만들엇습니다\n",user.getUserName());
+        System.out.printf("%s가 채널을 만들었습니다\n", user.getUserName());
         return ch;
     }
 
@@ -41,6 +29,7 @@ public class JCFChannelRepository implements ChannelService {
                 .filter(ch -> ch.getId().equals(channelId))
                 .findFirst()
                 .orElse(null);
+
         if (channel == null) {
             System.out.println("해당 채널 없습니다: " + channelId);
         } else {
@@ -50,31 +39,27 @@ public class JCFChannelRepository implements ChannelService {
     }
 
     @Override
-    public List<Channel> readAll() {
-        System.out.printf("%d개의 채널@@@\n",channels.size());
-        channels
-                .forEach(System.out::println);
-        return channels;
+    public  List<Channel> readAll() {
+        System.out.printf("%d개의 채널@@@\n", channels.size());
+        channels.forEach(System.out::println);
+        return new LinkedList<>(channels);
     }
-    //파라미터 어떻게 해야할것같다
 
     @Override
-    public Channel update(UUID channelId, Consumer<Channel> updater) {
+    public  Channel update(UUID channelId, Consumer<Channel> updater) {
         System.out.println("수정");
         return channels.stream()
-                .filter(u -> u.getId().equals(channelId))
+                .filter(ch -> ch.getId().equals(channelId))
                 .findFirst()
-                .map(u -> {
-                    updater.accept(u); // 여러개 가능하게
-                    return u;
+                .map(ch -> {
+                    updater.accept(ch);
+                    return ch;
                 })
                 .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + channelId));
     }
 
-
     @Override
-    public boolean delete(UUID channelId) {
-        return channels.removeIf(u -> u.getId().equals(channelId));
-
+    public synchronized boolean delete(UUID channelId) {
+        return channels.removeIf(ch -> ch.getId().equals(channelId));
     }
 }
