@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.FileServiceFactory;
+import com.sprint.mission.discodeit.factory.ServiceFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -18,28 +19,51 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
+
+        //파일 저장을 원하는 경로 설정
         final String FILE_PATH = "C:\\Users\\user\\Workspace\\codeit-sprint-bootcamp\\7-sprint-mission\\data";
+
+        // 첫번째 테스트를 위한 파일 이름 설정
         String userFilePath = FILE_PATH + "\\test_users.sav";
         String channelFilePath = FILE_PATH + "\\test_channels.sav";
         String joinedFilePath = FILE_PATH + "\\test_joined_files.sav";
         String messageFilePath = FILE_PATH + "\\test_messages.sav";
 
-        //도메인 별 서비스 구현체를 테스트
+        ServiceFactory serviceFactory;
+        UserService userService;
+        ChannelService channelService;
+        MessageService messageService;
+
+        int factoryChoice;
+        Scanner sc = new Scanner(System.in);
+
+        // 테스트할 서비스 선택
+        System.out.println("테스트에 사용할 서비스 구현체의 번호를 선택해주세요.");
+        System.out.println("1. JCFService 2. FileService");
+        System.out.print("입력: ");
+        factoryChoice = sc.nextInt();
+        sc.nextLine();
+        
+        // 1번 선택 또는 잘못된 숫자 입력시 JCF를 기본으로 테스트 진행
+        if(factoryChoice != 2){
+            System.out.println("JCF 서비스로 테스트를 진행합니다.");
+        } else {
+            System.out.println("File I/O 서비스로 테스트를 진행합니다.");
+        }
 
         //팩토리 패턴으로 서비스 객체 주입
-        JCFServiceFactory serviceFactory = JCFServiceFactory.getInstance();
-        FileServiceFactory fileServiceFactory = new FileServiceFactory(userFilePath, channelFilePath, joinedFilePath, messageFilePath);
+        if (factoryChoice != 2) { //JCFService
+            serviceFactory = JCFServiceFactory.getInstance();
+        } else { //FileService
+            // 경로를 받기 위해 FileServiceFactory는 싱글톤 패턴 삭제
+            serviceFactory = new FileServiceFactory(userFilePath, channelFilePath, joinedFilePath, messageFilePath);
+        }
 
-        //JCFService
-//        UserService userService = serviceFactory.getUserService();
-//        ChannelService channelService = serviceFactory.getChannelService();
-//        MessageService messageService = serviceFactory.getMessageService();
+        userService = serviceFactory.getUserService();
+        channelService = serviceFactory.getChannelService();
+        messageService = serviceFactory.getMessageService();
 
-        //FileService
-        UserService userService = fileServiceFactory.getUserService();
-        ChannelService channelService = fileServiceFactory.getChannelService();
-        MessageService messageService = fileServiceFactory.getMessageService();
-
+        //도메인 별 서비스 구현체를 테스트
         //======================================================================================
         // user
         System.out.println("User 구현체 테스트");
@@ -47,7 +71,8 @@ public class JavaApplication {
         // 1. 유저 생성
         try {
             System.out.println("1. 유저 생성");
-            if (!new File(userFilePath).exists()) {
+            //fileServiceFactory를 사용하고 파일이 생성되어 있지 않다면 유저 생성
+            if (serviceFactory instanceof JCFServiceFactory || !new File(userFilePath).exists()) {
                 System.out.println("새로운 유저를 생성합니다.");
                 userService.createUser("조성만", "smjoe0302", "smjoe0302@naver.com", "010-7140-6533", "abc1234", "qwer1234");
                 userService.createUser("조조", "jojo", "jojo@naver.com", "010-1234-5678", "abc12345", "qwer12345");
@@ -135,7 +160,7 @@ public class JavaApplication {
             Channel newChannel1, newChannel2, newChannel3 = null, newChannel4;
 
             //채널 파일이 저장 되어있으면 생성하지 않는다.
-            if (!new File(channelFilePath).exists()) {
+            if (serviceFactory instanceof JCFServiceFactory || !new File(channelFilePath).exists()) {
                 newChannel1 = channelService.createChannel(Channel.ChannelType.VOICE, "코드잇 스프린트 스프링 백엔드 7기 음성 채널", user1);
                 newChannel2 = channelService.createChannel(Channel.ChannelType.MESSAGE, "코드잇 스프린트 스프링 백엔드 7기 메시지 채널", user2);
                 newChannel3 = channelService.createChannel(Channel.ChannelType.VOICE, "미니 게임 음성 채널", user3);
@@ -325,26 +350,26 @@ public class JavaApplication {
             System.out.println("======================================================================================");
             System.out.println("디스코드잇 어플리케이션 입니다.");
 
-            //두번째 테스트를 위해 저장되는 파일 경로 변경
-            userFilePath = FILE_PATH + "\\users.sav";
-            channelFilePath = FILE_PATH + "\\channels.sav";
-            joinedFilePath = FILE_PATH + "\\joined_files.sav";
-            messageFilePath = FILE_PATH + "\\messages.sav";
+            //file I/O 서비스 구현체 사용 시 두번째 테스트를 위해 저장되는 파일 경로 변경
+            if(serviceFactory instanceof FileServiceFactory){
+                userFilePath = FILE_PATH + "\\users.sav";
+                channelFilePath = FILE_PATH + "\\channels.sav";
+                joinedFilePath = FILE_PATH + "\\joined_files.sav";
+                messageFilePath = FILE_PATH + "\\messages.sav";
 
-            FileServiceFactory fileServiceFactory2 = new FileServiceFactory(userFilePath, channelFilePath, joinedFilePath, messageFilePath);
-            userService = fileServiceFactory2.getUserService();
-            channelService = fileServiceFactory2.getChannelService();
-            messageService = fileServiceFactory2.getMessageService();
+                FileServiceFactory fileServiceFactory2 = new FileServiceFactory(userFilePath, channelFilePath, joinedFilePath, messageFilePath);
+                userService = fileServiceFactory2.getUserService();
+                channelService = fileServiceFactory2.getChannelService();
+                messageService = fileServiceFactory2.getMessageService();
+            }
 
-            //이미 생성했다면 생성하지 않는다.
-            if(!new File(userFilePath).exists()) {
+            //File I/O 서비스 사용시 파일이 없다면 생성
+            if(serviceFactory instanceof JCFServiceFactory || !new File(userFilePath).exists()) {
                 //테스트를 위한 유저, 채널, 메시지 데이터 생성
                 TestDataInitializer.initialize(userService, channelService, messageService);
             }
 
             // 어플리케이션에 필요한 변수 간단히 생성
-            Scanner sc = new Scanner(System.in);
-
             String userId;
             String password;
 
