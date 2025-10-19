@@ -71,3 +71,11 @@ public class UserTest {
         System.out.println("시스템 종료");
     }
 }
+
+/*
+--- 참고자료 ---
+https://mangkyu.tistory.com/203 Optional
+https://adjh54.tistory.com/104 정규식
+https://velog.io/@wonizizi99/Optional%EC%9D%98-orElseorElseThrow-%EC%82%AC%EC%9A%A9%EB%B2%95 orElseThrow
+https://goballe.tistory.com/entry/%EB%AC%BC%EB%A6%AC-%EC%82%AD%EC%A0%9C-vs-%EB%85%BC%EB%A6%AC-%EC%82%AD%EC%A0%9C 논리, 물리삭제
+ */
