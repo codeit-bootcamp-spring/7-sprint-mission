@@ -67,10 +67,12 @@ public class User implements Serializable {
     public void addChannel(UUID channelID){
         if(!joinChannels.contains(channelID)){
             joinChannels.add(channelID);
+            common.touch();
         }
     }
     public void removeChannel(UUID channelID){
         joinChannels.remove(channelID);
+        common.touch();
     }
 
     @Override
