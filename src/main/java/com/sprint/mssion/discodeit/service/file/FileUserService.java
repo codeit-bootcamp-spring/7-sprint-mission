@@ -23,7 +23,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User getUserById(UUID userId) { // 단건 검색
+    public User getUser(UUID userId) { // 단건 검색
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + userId));
     }
@@ -35,7 +35,7 @@ public class FileUserService implements UserService {
 
     @Override
     public void updateUser(UUID userId, String username, String email, String phoneNumber, String pronoun) {
-        User user = this.getUserById(userId);
+        User user = this.getUser(userId);
         user.setUsername(username);
         user.setEmail(email);
         user.setPhoneNumber(phoneNumber);
@@ -59,7 +59,7 @@ public class FileUserService implements UserService {
 
     @Override
     public void addChannelToUser(UUID userId, UUID channelId) {
-        User user = getUserById(userId);
+        User user = getUser(userId);
         if (!user.getJoinChannels().contains(channelId)) {
             user.addChannel(channelId);
             user.getCommon().touch();
