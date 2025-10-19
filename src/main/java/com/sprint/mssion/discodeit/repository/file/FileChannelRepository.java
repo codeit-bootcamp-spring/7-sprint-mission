@@ -3,8 +3,6 @@ package com.sprint.mssion.discodeit.repository.file;
 import com.sprint.mssion.discodeit.entity.Channel;
 import com.sprint.mssion.discodeit.repository.ChannelRepository;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class FileChannelRepository implements ChannelRepository {

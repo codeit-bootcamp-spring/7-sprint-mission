@@ -26,29 +26,40 @@ public class JCFFacadeService {
     }
 
     public void createMessageWithRelation(UUID userId, UUID channelId, String content) {
-        if(!userService.isExistsUser(userId)) throw new NoSuchElementException("찾을 수 없는 유저입니다.");
-        if(!channelService.isExistsChannel(channelId)) throw new NoSuchElementException("찾을 수 없는 채널입니다.");
+        if (!userService.isExistsUser(userId)) throw new NoSuchElementException("찾을 수 없는 유저입니다.");
+        if (!channelService.isExistsChannel(channelId)) throw new NoSuchElementException("찾을 수 없는 채널입니다.");
         userService.addChannelToUser(userId, channelId); // 유저가 채널에 속해있지 않다면, 채널에 속하도록 한다.
         messageService.createMessage(content, channelId, userId);
 
     }
 
-    public void deleteMessageWithRelation(UUID messageId){
+    public void deleteMessageWithRelation(UUID messageId) {
         Message message = messageService.getMessage(messageId);
         UUID userId = message.getUserId();
         UUID channelId = message.getChannelId();
-        if(!userService.isExistsUser(userId)) throw new NoSuchElementException("찾을 수 없는 유저입니다.");
-        if(!channelService.isExistsChannel(channelId)) throw new NoSuchElementException("찾을 수 없는 채널입니다.");
+        if (!userService.isExistsUser(userId)) throw new NoSuchElementException("찾을 수 없는 유저입니다.");
+        if (!channelService.isExistsChannel(channelId)) throw new NoSuchElementException("찾을 수 없는 채널입니다.");
         messageService.deleteMessage(messageId);
     }
 
-    public void deleteChannelWithRelation(UUID channelId){
+    public void addChannelToUserWithRelation(UUID userId, UUID channelId) {
+        if (!userService.isExistsUser(userId)) {
+            throw new NoSuchElementException("찾을 수 없는 유저: " + userId);
+        }
+        if (!channelService.isExistsChannel(channelId)) {
+            throw new NoSuchElementException("찾을 수 없는 채널: " + channelId);
+        }
+        userService.addChannelToUser(userId, channelId);
+    }
+
+
+    public void deleteChannelWithRelation(UUID channelId) {
         channelService.deleteChannel(channelId);
         userService.removeChannelFromAllUsers(channelId);
         messageService.deleteMessagesByChannel(channelId);
     }
 
-    public void deleteUserWithRelation(UUID userId){
+    public void deleteUserWithRelation(UUID userId) {
         userService.deleteUser(userId);
         messageService.deleteMessagesByUser(userId);
     }
