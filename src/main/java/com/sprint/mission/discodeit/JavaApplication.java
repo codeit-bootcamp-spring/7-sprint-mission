@@ -350,6 +350,23 @@ public class JavaApplication {
             System.out.println("======================================================================================");
             System.out.println("디스코드잇 어플리케이션 입니다.");
 
+            // ===========================================
+            // 테스트용 기본 유저 데이터 (테스트/샘플용)
+            // ===========================================
+            // 이름      | 아이디      | 비밀번호
+            // -------------------------------------------
+            // 테스트    | test1234   | test1234
+            // 박지훈    | idjihun    | securePass1!
+            // 이수빈    | idsubin    | myPassword2@
+            // 최하늘    | idhaneul   | skyPass123!
+            // 이영희    | idyounghee | pw5678
+            // 박민수    | idminsu    | securepw1
+            // 최지현    | idjihyun   | mypassword2
+            // 오세훈    | idsehun    | hello4321
+            // ===========================================
+            // 실제 데이터 생성은 TestDataInitializer 클래스에서 수행
+            // 기존 File I/O 서비스 사용으로 파일 내 유저 데이터 삭제시 유저 일부가 삭제되었을 수 있다
+
             //file I/O 서비스 구현체 사용 시 두번째 테스트를 위해 저장되는 파일 경로 변경
             if(serviceFactory instanceof FileServiceFactory){
                 userFilePath = FILE_PATH + "\\users.sav";
