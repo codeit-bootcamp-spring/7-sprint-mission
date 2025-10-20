@@ -1,0 +1,78 @@
+package com.sprint.mission.discodeit.entity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Channel extends BaseEntity{
+    private String channelName;
+    private final ChannelType channelType;
+    private User admin;
+    private List<User> members;
+
+    public enum ChannelType{
+        MESSAGE("메시지 채널"), VOICE("음성 채널");
+
+        private final String desc;
+
+        ChannelType(String desc){
+            this.desc = desc;
+        }
+    }
+
+    public Channel(ChannelType channelType, String channelName, User admin) {
+        this.channelType = channelType;
+        this.channelName = channelName;
+        this.admin = admin;
+        this.members = new ArrayList<>();
+        this.members.add(admin);
+    }
+
+    public String getChannelName() {
+        return channelName;
+    }
+
+    public void setChannelName(String channelName) {
+        this.setUpdatedAt();
+        this.channelName = channelName;
+    }
+
+    public ChannelType getChannelType() {
+        return channelType;
+    }
+
+    public User getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(User admin) {
+        this.setUpdatedAt();
+        this.admin = admin;
+    }
+
+    public List<User> getMembers() {
+        return new ArrayList<>(members);
+    }
+
+    public void addMember(User user) {
+        this.setUpdatedAt();
+        this.members.add(user);
+    }
+
+    public void delMember(User user){
+        this.setUpdatedAt();
+        this.members.remove(user);
+    }
+
+    @Override
+    public String toString() {
+        String str = super.toString();
+
+        return "Channel{" +
+                "channelName='" + channelName + '\'' +
+                ", channelType=" + channelType +
+                ", admin=" + admin.getUserName() +
+                ", members=" + members.stream().map(m -> m.getUserName()).toList() +
+                str +
+                '}';
+    }
+}

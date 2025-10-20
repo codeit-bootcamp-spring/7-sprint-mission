@@ -1,0 +1,166 @@
+package com.sprint.mission.discodeit.repository.file;
+
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class FileChannelRepository implements ChannelRepository {
+    private final Map<UUID, Channel> channelStore = new HashMap<>();
+    private final Map<UUID, Set<UUID>> joinedChannels = new HashMap<>();
+    private final String CHANNEL_FILE;
+    private final String JOINED_FILE;
+
+    public FileChannelRepository(String channelFile, String joinedFile) {
+        this.CHANNEL_FILE = channelFile;
+        this.JOINED_FILE = joinedFile;
+        loadChannels();
+        loadJoinedChannels();
+    }
+
+    // --- 채널 정보 저장 ---
+    private void saveChannels() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(CHANNEL_FILE))) {
+            oos.writeObject(channelStore);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // --- 유저-채널 관계 저장 ---
+    private void saveJoinedChannels() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(JOINED_FILE))) {
+            oos.writeObject(joinedChannels);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadChannels() {
+        File file = new File(CHANNEL_FILE);
+        if (!file.exists()) return;
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(CHANNEL_FILE))) {
+            Map<UUID, Channel> loaded = (Map<UUID, Channel>) ois.readObject();
+            channelStore.clear();
+            channelStore.putAll(loaded);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadJoinedChannels() {
+        File file = new File(JOINED_FILE);
+        if (!file.exists()) return;
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(JOINED_FILE))) {
+            Map<UUID, Set<UUID>> loaded = (Map<UUID, Set<UUID>>) ois.readObject();
+            joinedChannels.clear();
+            joinedChannels.putAll(loaded);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 유저가 속한 채널 id 목록을 joinedChannels Map에 저장
+    // key : user uuid
+    // value : 유저가 속한 channel uuid 목록
+    public void addChannelIdForUser(UUID channelId, User user) {
+        Set<UUID> channelIds;
+
+        if (joinedChannels.containsKey(user.getId())) {
+            channelIds = joinedChannels.get(user.getId());
+        } else {
+            channelIds = new HashSet<>();
+        }
+
+        channelIds.add(channelId);
+        joinedChannels.put(user.getId(), channelIds); // 채널 추가 후 저장
+    }
+
+    // 채널에서 유저가 나가거나 채널이 삭제되면 joinedChannels 목록에서 삭제
+    public void deleteChannelIdForUser(UUID channelId, User user) {
+        Set<UUID> channelIds = joinedChannels.get(user.getId());
+        if (channelIds != null) {
+            channelIds.remove(channelId);
+        }
+        joinedChannels.put(user.getId(), channelIds); // 채널 삭제 후 저장
+    }
+
+    @Override
+    public void save(Channel channel) {
+        channelStore.put(channel.getId(), channel);
+        saveChannels();
+        saveJoinedChannels();
+    }
+
+    @Override
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(channelStore.get(id));
+    }
+
+    @Override
+    public List<Channel> findByUser(User user) {
+        return joinedChannels.get(user.getId()).stream()
+                .map(key -> channelStore.get(key))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Channel> findByType(Channel.ChannelType type) {
+        return channelStore.values().stream()
+                .filter(c -> c.getChannelType() == type)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Channel> findAll() {
+        return new ArrayList<>(channelStore.values());
+    }
+
+    @Override
+    public void updateName(UUID id, String name) {
+        Channel channel = channelStore.get(id);
+        if (channel != null) {
+            channel.setChannelName(name);
+            channelStore.put(id, channel);
+            saveChannels();
+        }
+    }
+
+    @Override
+    public void updateAdmin(UUID id, User admin) {
+        Channel channel = channelStore.get(id);
+        if (channel != null) {
+            channel.setAdmin(admin);
+            channelStore.put(id, channel);
+            saveChannels();
+        }
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Channel channel = findById(id).orElse(null);
+
+        // 삭제되는 채널 id를 유저들이 속해 있는 채널 리스트(joinedChannels)에서도 삭제
+        for(User member : channel.getMembers()){
+            deleteChannelIdForUser(id, member);
+        }
+
+        channelStore.remove(id);
+
+        // 삭제된 후 목록 저장
+        saveChannels();
+        saveJoinedChannels();
+    }
+
+    @Override
+    public void deleteMember(Channel channel, User target){
+        deleteChannelIdForUser(channel.getId(), target); // 강퇴된 유저가 가진 채널 목록에서 채널 UUID 삭제
+        channel.delMember(target); // 채널에서 강퇴된 유저 삭제
+        save(channel); // 변경된 채널 정보 저장
+    }
+}
