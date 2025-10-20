@@ -1,4 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-public class JCFChannelRepository {
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+
+public class JCFChannelRepository implements ChannelRepository {
+
 }

@@ -1,4 +1,4 @@
 package com.sprint.mission.discodeit.repository;
 
-public class ChannelRepository {
+public interface ChannelRepository {
 }

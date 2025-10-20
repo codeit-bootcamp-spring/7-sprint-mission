@@ -1,4 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-public class JCFMessageRepository {
+import com.sprint.mission.discodeit.repository.MessageRepository;
+
+public class JCFMessageRepository implements MessageRepository {
 }

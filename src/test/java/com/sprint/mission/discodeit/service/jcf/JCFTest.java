@@ -3,9 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class JCFUserServiceTest {
+class JCFTest {
     JCFUserService userService = JCFUserService.getInstance();
 
     @Test
@@ -17,5 +15,7 @@ class JCFUserServiceTest {
         userService.delete(tester1.getId());
 
         System.out.println(userService.findAll());
+
+
     }
 }

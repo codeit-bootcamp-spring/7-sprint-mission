@@ -1,46 +1,40 @@
-package com.sprint.mission.discodeit.service.repository.file;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class FileUserService implements UserService {
-    private final List<User> data = new ArrayList<>();
+    private List<User> data;
     private static final FileUserService singleton = new FileUserService();
+    private final String filename = "users";
 
     //로그인을 구현하지 않았으므로 임의로 생성해둔 것이다.
     public static final User loginUser = new User("로그저", "LoUser@naver.com", "ejbd2");
-
-    private FileUserService() {}
 
     public static FileUserService getInstance() {
         return singleton;
     }
 
-
-    
-    //회원 등록
-    @Override
-    public User insert(User user) throws FileNotFoundException {
-        FileOutputStream fos = new FileOutputStream("./test.txt");
-        data.add(user);
-        return user;
-    }
-
     //다건 조회
     @Override
     public List<User> findAll() {
-        return List.copyOf(data);
+        try(ObjectInputStream is = FileInOutUtil.getInputStream(filename);){
+            data = (ArrayList)is.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return data;
     }
     
     //단건 조회
     @Override
     public User findById(UUID id) {
+        data = findAll();
         return data.stream().filter(
                 u -> u.getId().equals(id)).findFirst().orElseThrow(
                         () -> new RuntimeException("해당 ID를 가진 User를 찾을 수 없습니다: " + id)
@@ -50,11 +44,26 @@ public class FileUserService implements UserService {
     //이메일로 조회
     @Override
     public User findByEmail(String email) {
+        data = findAll();
         return data.stream()
                 .filter(u -> u.getNickname().equals(email))
                 .findFirst().orElseThrow(
                         () -> new RuntimeException("해당 이메일의 User가 없음: "+ email)
         );
+    }
+
+    //회원 등록
+    @Override
+    public User insert(User user) throws FileNotFoundException {
+        try(ObjectOutputStream os = FileInOutUtil.getOutputStream(filename);){
+            data = findAll();
+            data.add(user);
+            os.writeObject(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return user;
     }
 
     //업데이트
@@ -67,6 +76,13 @@ public class FileUserService implements UserService {
         user.setPassword(password);
         user.setUpdatedAt(System.currentTimeMillis());
 
+        try(ObjectOutputStream os = FileInOutUtil.getOutputStream(filename);){
+            data = findAll();
+            os.writeObject(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return user;
     }
 
@@ -75,6 +91,14 @@ public class FileUserService implements UserService {
     public User delete(UUID id) {
         User user = findById(id);
         data.remove(user);
+
+        try(ObjectOutputStream os = FileInOutUtil.getOutputStream(filename);){
+            data = findAll();
+            os.writeObject(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return user;
     }
 }
