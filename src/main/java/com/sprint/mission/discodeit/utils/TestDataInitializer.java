@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.utils;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -53,14 +54,14 @@ public class TestDataInitializer {
         messageService.createMessage(discordItUser8, discordItUser7, "좋지! 오늘 밤에 접속하자.");
 
         // 채널 생성
-        Channel channel1 = channelService.createChannel(Channel.ChannelType.VOICE, "스터디 음성 채널", discordItUser1);
-        Channel channel2 = channelService.createChannel(Channel.ChannelType.MESSAGE, "프로젝트 토론 메시지 채널", discordItUser2);
-        Channel channel3 = channelService.createChannel(Channel.ChannelType.VOICE, "게임 파티 음성 채널", discordItUser3);
-        Channel channel4 = channelService.createChannel(Channel.ChannelType.MESSAGE, "공지사항 메시지 채널", discordItUser4);
-        Channel channel5 = channelService.createChannel(Channel.ChannelType.VOICE, "음악 감상 음성 채널", discordItUser5);
-        Channel channel6 = channelService.createChannel(Channel.ChannelType.MESSAGE, "자유 대화 메시지 채널", discordItUser6);
-        Channel channel7 = channelService.createChannel(Channel.ChannelType.VOICE, "코딩 면접 준비 음성 채널", discordItUser7);
-        Channel channel8 = channelService.createChannel(Channel.ChannelType.MESSAGE, "Q&A 메시지 채널", discordItUser8);
+        Channel channel1 = channelService.createChannel(ChannelType.VOICE, "스터디 음성 채널", discordItUser1);
+        Channel channel2 = channelService.createChannel(ChannelType.MESSAGE, "프로젝트 토론 메시지 채널", discordItUser2);
+        Channel channel3 = channelService.createChannel(ChannelType.VOICE, "게임 파티 음성 채널", discordItUser3);
+        Channel channel4 = channelService.createChannel(ChannelType.MESSAGE, "공지사항 메시지 채널", discordItUser4);
+        Channel channel5 = channelService.createChannel(ChannelType.VOICE, "음악 감상 음성 채널", discordItUser5);
+        Channel channel6 = channelService.createChannel(ChannelType.MESSAGE, "자유 대화 메시지 채널", discordItUser6);
+        Channel channel7 = channelService.createChannel(ChannelType.VOICE, "코딩 면접 준비 음성 채널", discordItUser7);
+        Channel channel8 = channelService.createChannel(ChannelType.MESSAGE, "Q&A 메시지 채널", discordItUser8);
 
         // 채널에 멤버 추가
         // channel1 (관리자: discordItUser1)

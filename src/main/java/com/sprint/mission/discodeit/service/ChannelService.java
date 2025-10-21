@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface ChannelService {
     /**
      * 새로운 채널 생성
      */
-    Channel createChannel(Channel.ChannelType channelType, String channelName, User admin);
+    Channel createChannel(ChannelType channelType, String channelName, User admin);
 
     /**
      * 채널에 멤버 추가
@@ -35,7 +36,7 @@ public interface ChannelService {
     /**
      * 채널 타입으로 조회
      */
-    List<Channel> getChannelByType(Channel.ChannelType channelType);
+    List<Channel> getChannelByType(ChannelType channelType);
 
     /**
      * 전체 채널 조회

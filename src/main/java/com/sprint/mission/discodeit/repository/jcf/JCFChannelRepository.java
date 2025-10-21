@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
@@ -45,7 +46,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findByType(Channel.ChannelType type) {
+    public List<Channel> findByType(ChannelType type) {
         return channelStore.values().stream()
                 .filter(c -> c.getChannelType() == type)
                 .collect(Collectors.toList());

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -17,7 +18,7 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(Channel.ChannelType channelType, String channelName, User admin) {
+    public Channel createChannel(ChannelType channelType, String channelName, User admin) {
         Channel newChannel = new Channel(channelType, channelName, admin);
 
         // 이름 중복 저장 불가
@@ -58,7 +59,7 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> getChannelByType(Channel.ChannelType type) {
+    public List<Channel> getChannelByType(ChannelType type) {
         return channelRepository.findByType(type);
     }
 

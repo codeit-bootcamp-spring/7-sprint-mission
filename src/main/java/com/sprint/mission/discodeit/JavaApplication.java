@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -142,10 +143,10 @@ public class JavaApplication {
             // 1.1 채널 생성
             Channel newChannel1, newChannel2, newChannel3 = null, newChannel4;
 
-            newChannel1 = channelService.createChannel(Channel.ChannelType.VOICE, "코드잇 스프린트 스프링 백엔드 7기 음성 채널", user1);
-            newChannel2 = channelService.createChannel(Channel.ChannelType.MESSAGE, "코드잇 스프린트 스프링 백엔드 7기 메시지 채널", user2);
-            newChannel3 = channelService.createChannel(Channel.ChannelType.VOICE, "미니 게임 음성 채널", user3);
-            newChannel4 = channelService.createChannel(Channel.ChannelType.VOICE, "미니 게임 메시지 채널", user3);
+            newChannel1 = channelService.createChannel(ChannelType.VOICE, "코드잇 스프린트 스프링 백엔드 7기 음성 채널", user1);
+            newChannel2 = channelService.createChannel(ChannelType.MESSAGE, "코드잇 스프린트 스프링 백엔드 7기 메시지 채널", user2);
+            newChannel3 = channelService.createChannel(ChannelType.VOICE, "미니 게임 음성 채널", user3);
+            newChannel4 = channelService.createChannel(ChannelType.VOICE, "미니 게임 메시지 채널", user3);
 
 
             // 1.2 채널에 멤버 추가
@@ -173,11 +174,11 @@ public class JavaApplication {
 
             // 2.3 특정 타입의 채널 정보 조회(다건)
             System.out.println("\n음성 채널들 조회=================");
-            List<Channel> voiceChannels = channelService.getChannelByType(Channel.ChannelType.VOICE);
+            List<Channel> voiceChannels = channelService.getChannelByType(ChannelType.VOICE);
             voiceChannels.forEach(System.out::println);
 
             System.out.println("\n메시지 채널들 조회=================");
-            List<Channel> msgChannels = channelService.getChannelByType(Channel.ChannelType.MESSAGE);
+            List<Channel> msgChannels = channelService.getChannelByType(ChannelType.MESSAGE);
             msgChannels.forEach(System.out::println);
 
             // 2.4 모든 채널 조회(다건)
@@ -359,7 +360,7 @@ public class JavaApplication {
             }
 
             //File I/O 서비스 사용시 파일이 없다면 생성
-            if(userService instanceof JCFUserService || !new File(AppConfig.DATA_PATH + "users.sav").exists()) {
+            if(userService instanceof JCFUserService || !new File(AppConfig.DATA_PATH + "\\users.sav").exists()) {
                 //테스트를 위한 유저, 채널, 메시지 데이터 생성
                 TestDataInitializer.initialize(userService, channelService, messageService);
             }
@@ -498,9 +499,9 @@ public class JavaApplication {
                                                     boolean isAdmin = userChannel.getAdmin().equals(user); // 로그인 유저가 채널 관리자인지 확인
 
                                                     // 채널 타입에 따라 출력
-                                                    if (userChannel.getChannelType() == Channel.ChannelType.MESSAGE) {
+                                                    if (userChannel.getChannelType() == ChannelType.MESSAGE) {
                                                         System.out.print("1. 채널 채팅 입장 ");
-                                                    } else if (userChannel.getChannelType() == Channel.ChannelType.VOICE) {
+                                                    } else if (userChannel.getChannelType() == ChannelType.VOICE) {
                                                         System.out.print("1. 통화방 입장 ");
                                                     }
 
@@ -521,7 +522,7 @@ public class JavaApplication {
                                                     switch (choice) {
                                                         case 1:
                                                             //채팅방과 통화방 나누기
-                                                            if (userChannel.getChannelType() == Channel.ChannelType.MESSAGE) {
+                                                            if (userChannel.getChannelType() == ChannelType.MESSAGE) {
                                                                 Printer.printLine();
                                                                 System.out.println("채널 채팅 입장");
                                                                 Printer.printLine();
@@ -543,7 +544,7 @@ public class JavaApplication {
                                                                     }
                                                                 }
 
-                                                            } else if (userChannel.getChannelType() == Channel.ChannelType.VOICE) {
+                                                            } else if (userChannel.getChannelType() == ChannelType.VOICE) {
                                                                 Printer.printLine();
                                                                 System.out.println("전화를 진행합니다. 끊으시려면 -1을 입력하세요");
                                                                 choice = sc.nextInt();
@@ -660,10 +661,10 @@ public class JavaApplication {
                                                 String newChannelName = sc.nextLine();
                                                 switch (choice) {
                                                     case 1:
-                                                        channelService.createChannel(Channel.ChannelType.MESSAGE, newChannelName, user);
+                                                        channelService.createChannel(ChannelType.MESSAGE, newChannelName, user);
                                                         break;
                                                     case 2:
-                                                        channelService.createChannel(Channel.ChannelType.VOICE, newChannelName, user);
+                                                        channelService.createChannel(ChannelType.VOICE, newChannelName, user);
                                                         break;
                                                     default:
                                                         System.out.println("채널 타입을 정확이 골라주세요 이전 메뉴로 돌아갑니다.");

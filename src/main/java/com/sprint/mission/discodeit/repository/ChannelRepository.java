@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public interface ChannelRepository {
     /**
      * 채널 타입으로 조회
      */
-    List<Channel> findByType(Channel.ChannelType type);
+    List<Channel> findByType(ChannelType type);
 
     /**
      * 전체 채널 조회

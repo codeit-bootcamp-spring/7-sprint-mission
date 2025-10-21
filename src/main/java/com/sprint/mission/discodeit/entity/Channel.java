@@ -9,16 +9,6 @@ public class Channel extends BaseEntity{
     private User admin;
     private List<User> members;
 
-    public enum ChannelType{
-        MESSAGE("메시지 채널"), VOICE("음성 채널");
-
-        private final String desc;
-
-        ChannelType(String desc){
-            this.desc = desc;
-        }
-    }
-
     public Channel(ChannelType channelType, String channelName, User admin) {
         this.channelType = channelType;
         this.channelName = channelName;
