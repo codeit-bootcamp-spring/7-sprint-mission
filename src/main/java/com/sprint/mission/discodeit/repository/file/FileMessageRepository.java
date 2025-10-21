@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -29,16 +30,21 @@ import java.util.UUID;
  */
 public class FileMessageRepository implements MessageRepository {
     private final List<Message> messageStore = new ArrayList<>();
-    private final String MESSAGE_FILE;
+    private final String filePath = AppConfig.DATA_PATH + "messages.sav";
 
-    public FileMessageRepository(String MESSAGE_FILE) {
-        this.MESSAGE_FILE = MESSAGE_FILE;
+    private FileMessageRepository() {
         loadMessagesFromFile();
+    }
+
+    private static FileMessageRepository instance = new FileMessageRepository();
+
+    public static FileMessageRepository getInstance() {
+        return new FileMessageRepository();
     }
 
     // --- 파일 저장 (직렬화) ---
     private void saveMessagesToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(MESSAGE_FILE))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(messageStore);
             System.out.println("[저장 완료] 메시지 데이터 파일 저장됨");
         } catch (IOException e) {
@@ -48,10 +54,10 @@ public class FileMessageRepository implements MessageRepository {
 
     // --- 파일 불러오기 (역직렬화) ---
     private void loadMessagesFromFile() {
-        File file = new File(MESSAGE_FILE);
+        File file = new File(filePath);
         if (!file.exists()) return;
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(MESSAGE_FILE))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
             List<Message> loaded = (List<Message>) ois.readObject();
             messageStore.clear();
             messageStore.addAll(loaded);

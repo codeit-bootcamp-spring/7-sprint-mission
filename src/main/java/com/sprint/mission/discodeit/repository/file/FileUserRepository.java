@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
@@ -28,18 +29,23 @@ import java.util.UUID;
  */
 public class FileUserRepository implements UserRepository {
     private final List<User> userStore = new ArrayList<>();
-    private final String USER_FILE;
+    private final String filePath = AppConfig.DATA_PATH + "users.sav";
 
-    public FileUserRepository(String USER_FILE) {
-        this.USER_FILE = USER_FILE;
+    private FileUserRepository() {
         loadUsersFromFile();
+    }
+
+    private static FileUserRepository instance = new FileUserRepository();
+
+    public static FileUserRepository getInstance() {
+        return instance;
     }
 
     // 저장하기
     private void saveUsersToFile() {
         // FileOutputStream은 기본적으로 덮어쓰기를 진행한다.
         // append 파라미터를 true로 변경해야 이어쓰기가 가능하다.
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_FILE))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(userStore);
             System.out.println("✅ 사용자 정보가 파일에 저장되었습니다.");
         } catch (IOException e) {
@@ -49,13 +55,13 @@ public class FileUserRepository implements UserRepository {
 
     // 불러오기
     private void loadUsersFromFile() {
-        File file = new File(USER_FILE);
+        File file = new File(filePath);
         if (!file.exists()) {
             System.out.println("ℹ️ 저장된 사용자 파일이 없어 새로 생성합니다.");
             return;
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_FILE))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
             List<User> loaded = (List<User>) ois.readObject();
             userStore.clear();
             userStore.addAll(loaded);

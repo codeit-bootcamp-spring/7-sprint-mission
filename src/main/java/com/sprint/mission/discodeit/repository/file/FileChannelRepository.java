@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -11,19 +12,23 @@ import java.util.stream.Collectors;
 public class FileChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channelStore = new HashMap<>();
     private final Map<UUID, Set<UUID>> joinedChannels = new HashMap<>();
-    private final String CHANNEL_FILE;
-    private final String JOINED_FILE;
+    private final String channelPath = AppConfig.DATA_PATH + "channels.sav";
+    private final String joinedPath = AppConfig.DATA_PATH + "joined.sav";
 
-    public FileChannelRepository(String channelFile, String joinedFile) {
-        this.CHANNEL_FILE = channelFile;
-        this.JOINED_FILE = joinedFile;
+    private FileChannelRepository() {
         loadChannels();
         loadJoinedChannels();
     }
 
+    private static FileChannelRepository instance = new FileChannelRepository();
+
+    public static FileChannelRepository getInstance() {
+        return instance;
+    }
+
     // --- 채널 정보 저장 ---
     private void saveChannels() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(CHANNEL_FILE))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(channelPath))) {
             oos.writeObject(channelStore);
         } catch (IOException e) {
             e.printStackTrace();
@@ -32,7 +37,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     // --- 유저-채널 관계 저장 ---
     private void saveJoinedChannels() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(JOINED_FILE))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(joinedPath))) {
             oos.writeObject(joinedChannels);
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,10 +45,10 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     private void loadChannels() {
-        File file = new File(CHANNEL_FILE);
+        File file = new File(channelPath);
         if (!file.exists()) return;
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(CHANNEL_FILE))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(channelPath))) {
             Map<UUID, Channel> loaded = (Map<UUID, Channel>) ois.readObject();
             channelStore.clear();
             channelStore.putAll(loaded);
@@ -53,10 +58,10 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     private void loadJoinedChannels() {
-        File file = new File(JOINED_FILE);
+        File file = new File(joinedPath);
         if (!file.exists()) return;
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(JOINED_FILE))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(joinedPath))) {
             Map<UUID, Set<UUID>> loaded = (Map<UUID, Set<UUID>>) ois.readObject();
             joinedChannels.clear();
             joinedChannels.putAll(loaded);

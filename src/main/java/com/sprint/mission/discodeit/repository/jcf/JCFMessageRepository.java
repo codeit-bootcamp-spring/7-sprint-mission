@@ -19,6 +19,15 @@ import java.util.UUID;
 public class JCFMessageRepository implements MessageRepository {
     private final List<Message> messageStore = new ArrayList<>();
 
+    private JCFMessageRepository() {}
+
+    private static JCFMessageRepository instance = new JCFMessageRepository();
+
+    public static JCFMessageRepository getInstance() {
+        return instance;
+    }
+
+
     @Override
     public void save(Message message) {
         messageStore.add(message);

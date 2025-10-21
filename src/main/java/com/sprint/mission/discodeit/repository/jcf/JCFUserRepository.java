@@ -18,6 +18,14 @@ import java.util.UUID;
 public class JCFUserRepository implements UserRepository {
     private final List<User> userStore = new ArrayList<>();
 
+    private JCFUserRepository() {}
+
+    private static JCFUserRepository instance = new JCFUserRepository();
+
+    public static JCFUserRepository getInstance() {
+        return instance;
+    }
+
     @Override
     public void save(User user) {
         userStore.add(user);
