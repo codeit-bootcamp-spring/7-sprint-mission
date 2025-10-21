@@ -12,3 +12,4 @@ public interface MessageService {
     void update_Message(Channel channel, UUID messageID, String message);  // 수정
     void delete_Message(Channel channel, UUID messageID);   // 삭제
 }
+
