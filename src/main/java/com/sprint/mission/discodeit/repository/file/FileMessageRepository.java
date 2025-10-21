@@ -30,7 +30,7 @@ import java.util.UUID;
  */
 public class FileMessageRepository implements MessageRepository {
     private final List<Message> messageStore = new ArrayList<>();
-    private final String filePath = AppConfig.DATA_PATH + "messages.sav";
+    private final String filePath = AppConfig.DATA_PATH + "\\messages.sav";
 
     private FileMessageRepository() {
         loadMessagesFromFile();

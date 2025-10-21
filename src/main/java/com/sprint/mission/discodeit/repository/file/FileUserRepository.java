@@ -29,7 +29,7 @@ import java.util.UUID;
  */
 public class FileUserRepository implements UserRepository {
     private final List<User> userStore = new ArrayList<>();
-    private final String filePath = AppConfig.DATA_PATH + "users.sav";
+    private final String filePath = AppConfig.DATA_PATH + "\\users.sav";
 
     private FileUserRepository() {
         loadUsersFromFile();
