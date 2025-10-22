@@ -1,0 +1,58 @@
+package com.sprint.mssion.discodeit.service.jcf;
+
+import com.sprint.mssion.discodeit.entity.Channel;
+import com.sprint.mssion.discodeit.repository.ChannelRepository;
+import com.sprint.mssion.discodeit.service.ChannelService;
+
+import java.util.*;
+
+public class JCFChannelService implements ChannelService {
+
+    private final ChannelRepository channelRepository;
+
+    public JCFChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
+    }
+
+    @Override
+    public Channel createChannel(Channel.ChannelType type, String channelName, String channelDescription) {
+        Channel newChannel = new Channel(type, channelName, channelDescription);
+        channelRepository.save(newChannel);
+        return newChannel;
+    }
+
+    @Override
+    public Channel getChannel(UUID channelId) {
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다." + channelId));
+    }
+
+    @Override
+    public List<Channel> getAllChannels() {
+        return channelRepository.findAll();
+    }
+
+    @Override
+    public void updateChannel(UUID channelId, Channel.ChannelType type, String channelName, String channelDescription) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다." + channelId));
+        channel.setType(type);
+        channel.setChannelName(channelName);
+        channel.setDesc(channelDescription);
+        channel.getCommon().touch();
+    }
+
+    @Override
+    public boolean isExistsChannel(UUID channelId) {
+        return channelRepository.existsById(channelId);
+    }
+
+    @Override
+    public void deleteChannel(UUID channelId) {
+        if (!isExistsChannel(channelId)) {
+            throw new NoSuchElementException("채널을 찾을 수 없습니다." + channelId);
+        }
+        channelRepository.deleteById(channelId);
+    }
+}
+
