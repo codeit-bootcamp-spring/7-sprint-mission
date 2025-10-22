@@ -15,13 +15,13 @@ public class FileFriendShipRepository implements FriendShipRepository {
 
     private Map<UUID, FriendShip> load() {
         Path filePath = Path.of(FILE_PATH);
-        try {
-            if (Files.notExists(filePath)) {
+
+        if (Files.notExists(filePath)) {
                 return new HashMap<>();
-            }
-            try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
+        }
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
                 return (Map<UUID, FriendShip>) ois.readObject();
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return new HashMap<>();
@@ -30,10 +30,10 @@ public class FileFriendShipRepository implements FriendShipRepository {
 
     private void saveToFile(Map<UUID, FriendShip> data) {
         Path filePath = Path.of(FILE_PATH);
-        try {
-            try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
                 oos.writeObject(data);
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

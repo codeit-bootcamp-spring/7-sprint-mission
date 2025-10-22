@@ -18,17 +18,17 @@ public class FileUserRepository implements UserRepository {
 
 
         Path filePath = Path.of(FILE_PATH);
-        try {
-            // 파일 없으면 빈 맵 반환
-            if (Files.notExists(filePath)) {
+
+        // 파일 없으면 빈 맵 반환
+        if (Files.notExists(filePath)) {
                 return new HashMap<>();
-            }
+        }
 
 
-            // try-with-resources로 안전하게 파일 읽기
-            try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
+        // try-with-resources로 안전하게 파일 읽기
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
                 return (Map<UUID, User>) ois.readObject();
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return new HashMap<>();

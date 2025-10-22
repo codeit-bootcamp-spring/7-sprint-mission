@@ -78,11 +78,6 @@ public class User implements Serializable {
         this.updatedAt = System.currentTimeMillis();
     }
 
-    public void UpdatedEmail(String email) {
-        validateEmail(email);
-        this.email = email;
-        this.updatedAt = System.currentTimeMillis();
-    }
 
     public void updateUsername(String username) {
         validateUsername(username);

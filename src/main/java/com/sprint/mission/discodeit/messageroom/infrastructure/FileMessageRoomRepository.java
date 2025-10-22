@@ -17,13 +17,12 @@ public class FileMessageRoomRepository implements MessageRoomRepository {
 
     private Map<UUID, MessageRoom> load() {
         Path filePath = Path.of(FILE_PATH);
-        try {
-            if (Files.notExists(filePath)) {
+
+        if (Files.notExists(filePath)) {
                 return new HashMap<>();
-            }
-            try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
+        }
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
                 return (Map<UUID, MessageRoom>) ois.readObject();
-            }
         } catch (Exception e) {
             e.printStackTrace();
             return new HashMap<>();
@@ -33,10 +32,9 @@ public class FileMessageRoomRepository implements MessageRoomRepository {
 
     private void saveToFile(Map<UUID, MessageRoom> data) {
         Path filePath = Path.of(FILE_PATH);
-        try {
-            try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
                 oos.writeObject(data);
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

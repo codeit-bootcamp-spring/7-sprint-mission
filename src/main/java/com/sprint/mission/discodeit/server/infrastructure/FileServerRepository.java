@@ -19,13 +19,12 @@ public class FileServerRepository implements ServerRepository {
         Path filePath = Path.of(FILE_PATH);
 
 
-        try {
-            if (Files.notExists(filePath)) {
-                return new HashMap<>();
-            }
-            try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
-                return (Map<UUID, Server>) ois.readObject();
-            }
+        if (Files.notExists(filePath)) {
+            return new HashMap<>();
+        }
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
+            return (Map<UUID, Server>) ois.readObject();
+
         } catch (Exception e) {
             e.printStackTrace();
             return new HashMap<>();
@@ -34,29 +33,30 @@ public class FileServerRepository implements ServerRepository {
 
     private void saveToFile(Map<UUID, Server> data) {
         Path filePath = Path.of(FILE_PATH);
-        try {
-            try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-                oos.writeObject(data);
-            }
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
+            oos.writeObject(data);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void save(Server server){
+    public void save(Server server) {
         Map<UUID, Server> store = load();
         UUID key = server.getId();
         store.put(key, server);
         saveToFile(store);
     }
-    public void remove(Server server){
+
+    public void remove(Server server) {
         Map<UUID, Server> store = load();
         UUID findChannelId = server.getId();
         store.remove(findChannelId);
         saveToFile(store);
     }
 
-    public Optional<Server> findById(UUID id){
+    public Optional<Server> findById(UUID id) {
         Map<UUID, Server> store = load();
         return Optional.ofNullable(store.get(id));
     }
