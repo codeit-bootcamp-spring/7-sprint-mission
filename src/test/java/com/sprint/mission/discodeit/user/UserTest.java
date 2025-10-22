@@ -1,4 +1,4 @@
-package user;
+package com.sprint.mission.discodeit.user;
 
 
 import com.sprint.mission.discodeit.user.domain.User;

@@ -1,31 +1,31 @@
 package com.sprint.mission.discodeit;
 
-
 import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
+import com.sprint.mission.discodeit.messageroom.application.MessageRoomService;
 import com.sprint.mission.discodeit.messageroom.domain.MessageRoom;
 import com.sprint.mission.discodeit.messageroom.domain.MessageRoomType;
 import com.sprint.mission.discodeit.server.application.ServerService;
-import com.sprint.mission.discodeit.messageroom.application.MessageRoomService;
 import com.sprint.mission.discodeit.server.domain.Server;
 import com.sprint.mission.discodeit.user.application.UserService;
 import com.sprint.mission.discodeit.user.domain.User;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.List;
 
-
-public class JavaApplication {
+@SpringBootApplication
+public class DiscodeitApplication {
 
     public static void main(String[] args) {
+        SpringApplication.run(DiscodeitApplication.class, args);
         //메서드 안에서는 접근자 세팅 불가능
         //어차피 {}안에서만 유효하니까.
 
-        ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+        WebConfig webConfig = new WebConfig();
 
-        UserService userService = context.getBean(UserService.class);
-        MessageRoomService messageRoomService= context.getBean(MessageRoomService.class);
-        ServerService serverService = context.getBean(ServerService.class);
+        UserService userService = webConfig.getUserService();
+        MessageRoomService messageRoomService= webConfig.getMessageRoomService();
+        ServerService serverService = webConfig.getServerService();
 
 
 
@@ -48,6 +48,8 @@ public class JavaApplication {
         User findUser = userService.findById(user.getId());
         System.out.println("같은 객체인가?"+ (findUser.equals(user)));
         printLine();
+
+
 
 
         //User 삭제 - 유저가 저장되어 있을 경우
@@ -190,7 +192,6 @@ public class JavaApplication {
         userService.acceptFriendRequest(user2, request);
 
     }
-
 
     private static void printLine(){
         System.out.println("======================================");

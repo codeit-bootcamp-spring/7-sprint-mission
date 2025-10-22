@@ -3,20 +3,15 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.friendrequest.infrastructure.MemoryFriendRequestRepository;
 import com.sprint.mission.discodeit.friendship.infrastructure.MemoryFriendShipRepository;
 import com.sprint.mission.discodeit.messageroom.infrastructure.MemoryMessageRoomRepository;
-import com.sprint.mission.discodeit.server.infrastructure.FileServerRepository;
-import com.sprint.mission.discodeit.friendrequest.infrastructure.FileFriendRequestRepository;
 import com.sprint.mission.discodeit.friendrequest.infrastructure.FriendRequestRepository;
 import com.sprint.mission.discodeit.server.application.ServerRepository;
 import com.sprint.mission.discodeit.server.application.ServerService;
 import com.sprint.mission.discodeit.server.application.FileServerService;
-import com.sprint.mission.discodeit.friendship.infrastructure.FileFriendShipRepository;
 import com.sprint.mission.discodeit.friendship.infrastructure.FriendShipRepository;
-import com.sprint.mission.discodeit.messageroom.infrastructure.FileMessageRoomRepository;
 import com.sprint.mission.discodeit.messageroom.application.FileMessageRoomService;
 import com.sprint.mission.discodeit.messageroom.application.MessageRoomRepository;
 import com.sprint.mission.discodeit.messageroom.application.MessageRoomService;
 import com.sprint.mission.discodeit.server.infrastructure.MemoryServerRepository;
-import com.sprint.mission.discodeit.user.infrastructure.FileUserRepository;
 import com.sprint.mission.discodeit.user.application.FileUserService;
 import com.sprint.mission.discodeit.user.application.UserRepository;
 import com.sprint.mission.discodeit.user.application.UserService;
@@ -25,7 +20,7 @@ import lombok.Getter;
 
 //의존성 주입
 @Getter
-public class AppConfig {
+public class WebConfig {
 
     private final UserRepository userRepository = new MemoryUserRepository();
     private final MessageRoomRepository messageRoomRepository = new MemoryMessageRoomRepository();
