@@ -1,43 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Channel extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // 필드(변수)
      private String channelName;
-     private User bose;
-     private List<User> users;
+     private UUID bose;
+     private List<UUID> users;
     //카테고리다 channel
  //   private List<Category> category;
  //   private String imageUrl;
  //   private Message channelMessage;
 
 
-    public Channel(User user,String channelName) {
+    public Channel(UUID user, String channelName) {
         this.channelName = channelName;
         this.users = new ArrayList<>();
         this.bose = user;
         this.users.add(user);
     }
 
-    public User getBose() {
+    public UUID getBose() {
         return bose;
     }
 
-    public void setBose(User bose) {
+    public void setBose(UUID bose) {
         this.bose = bose;
 
     }
 
-    public List<User> getUsers() {
+    public List<UUID> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(List<UUID> users) {
         this.users = users;
     }
 
@@ -52,11 +54,33 @@ public class Channel extends Common implements Serializable {
     @Override
     public String toString() {
         return "Channel{" +
-                "주인=" + bose.getUserName() +
-                ", 유저들=" + users.stream()
-                .map(User::getUserName)
+                "주인= UUID" + bose +
+                ", 유저들 UUID=" + users.stream()
                 .toList()
                 +
                 '}';
+    }
+
+    public void update(String newChannelName, UUID newBose, List<UUID> newUsers) {
+        boolean anyValueUpdated = false;
+
+        if (newChannelName != null && !newChannelName.equals(this.channelName)) {
+            this.channelName = newChannelName;
+            anyValueUpdated = true;
+        }
+
+        if (newBose != null && !newBose.equals(this.bose)) {
+            this.bose = newBose;
+            anyValueUpdated = true;
+        }
+
+        if (newUsers != null && !newUsers.equals(this.users)) {
+            this.users = newUsers;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.setUpdatedAt(Instant.now().getEpochSecond());
+        }
     }
 }

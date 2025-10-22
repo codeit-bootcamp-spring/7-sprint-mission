@@ -2,64 +2,40 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.function.Consumer;
 
 public class JCFChannelRepository implements ChannelRepository {
+    private final Map<UUID, Channel> data;
 
-    private final List<Channel> channels = new LinkedList<>();
-
-    private static final JCFChannelRepository INSTANCE = new JCFChannelRepository();
-    public static JCFChannelRepository getInstance() { return INSTANCE; }
-    private JCFChannelRepository() {}
-
-    @Override
-    public  Channel create(User user, String channelName) {
-        Channel ch = new Channel(user, channelName);
-        channels.add(ch);
-        System.out.printf("%s가 채널을 만들었습니다\n", user.getUserName());
-        return ch;
+    public JCFChannelRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public  Channel read(UUID channelId) {
-        Channel channel = channels.stream()
-                .filter(ch -> ch.getId().equals(channelId))
-                .findFirst()
-                .orElse(null);
-
-        if (channel == null) {
-            System.out.println("해당 채널 없습니다: " + channelId);
-        } else {
-            System.out.println(channel);
-        }
+    public Channel save(Channel channel) {
+        this.data.put(channel.getId(), channel);
         return channel;
     }
 
     @Override
-    public  List<Channel> readAll() {
-        System.out.printf("%d개의 채널@@@\n", channels.size());
-        channels.forEach(System.out::println);
-        return new LinkedList<>(channels);
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public  Channel update(UUID channelId, Consumer<Channel> updater) {
-        System.out.println("수정");
-        return channels.stream()
-                .filter(ch -> ch.getId().equals(channelId))
-                .findFirst()
-                .map(ch -> {
-                    updater.accept(ch);
-                    return ch;
-                })
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + channelId));
+    public List<Channel> findAll() {
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public boolean delete(UUID channelId) {
-        return channels.removeIf(ch -> ch.getId().equals(channelId));
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }

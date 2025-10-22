@@ -1,39 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
 public class Message extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private User sender;
-    private User receiver;
-    private long time;
+    private UUID sender;
+    private UUID receiver;
+    private Long time;
     private String content;
 
     public Message() {
     }
 
 
-    public  Message(User send,User receiver,String content ){
+    public  Message(UUID send,UUID receiver,String content ){
         this.sender = send;
         this.receiver = receiver;
         this.time = System.currentTimeMillis();
         this.content = content;
     }
 
-    public User getSender() {
+    public UUID getSender() {
         return sender;
     }
 
-    public void setSender(User sender) {
+    public void setSender(UUID sender) {
         this.sender = sender;
     }
 
-    public User getReceiver() {
+    public UUID getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(User receiver) {
+    public void setReceiver(UUID receiver) {
         this.receiver = receiver;
     }
 
@@ -56,10 +58,22 @@ public class Message extends Common implements Serializable {
     @Override
     public String toString() {
         return "Message{" +
-                "발신자  =" + sender.getUserName() +
-                ", 수신자 =" + receiver.getUserName() +
+                "발신자 UUID  =" + sender+
+                ", 수신자 UUID =" + receiver+
                 ", 생성시간 =" + time +
                 ",  내용 ='" + content + '\'' +
                 '}';
+    }
+
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.setUpdatedAt(Instant.now().getEpochSecond());
+        }
     }
 }

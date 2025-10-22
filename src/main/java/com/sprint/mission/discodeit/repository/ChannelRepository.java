@@ -4,14 +4,15 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 public interface ChannelRepository {
 
-    Channel create(User user, String channelName);
-    Channel read(UUID channelId);
-    List<Channel> readAll();
-    Channel update(UUID channelId, Consumer<Channel> updater);
-    boolean delete(UUID channelId);
+    Channel save(Channel channel);
+    Optional<Channel> findById(UUID id);
+    List<Channel> findAll();
+    boolean existsById(UUID id);
+    void deleteById(UUID id);
 }
