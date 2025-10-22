@@ -12,21 +12,7 @@ public class Channel extends BaseEntity {
     private final User channelAdmin;
     private final List<User> members;
 
-    public enum ChannelType {
-        TEXT("텍스트"), VOICE("음성"),
-        FORUM("포럼");
 
-        private final String descType;
-
-        ChannelType(String descType) {
-            this.descType = descType;
-        }
-
-        public String getDescType() {
-            return descType;
-        }
-
-    }
 
     public Channel(User user, String channelName, ChannelType type) {
         super();

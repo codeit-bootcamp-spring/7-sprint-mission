@@ -61,7 +61,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<MessageInfo> findMessageBetweenUsers(UUID userId1, UUID userId2) {
         return data.values().stream()
-                .filter(m -> m.getType() == Message.MessageType.DIRECT)
+                .filter(m -> m.getType() == MessageType.DIRECT)
                 .filter(m ->
                         (m.getAuthor().getId().equals(userId1) && m.getReceiver().getId().equals(userId2)) ||
                                 (m.getAuthor().getId().equals(userId2) && m.getReceiver().getId().equals(userId1)))
@@ -72,7 +72,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<MessageInfo> findChannelMessage(UUID channelId) {
         return data.values().stream()
-                .filter(m -> m.getType() == Message.MessageType.CHANNEL)
+                .filter(m -> m.getType() == MessageType.CHANNEL)
                 .filter(m -> m.getChannel().getId().equals(channelId))
                 .sorted(Comparator.comparing(Message::getCreatedAt))
                 .map(MessageInfo::new).collect(Collectors.toList());

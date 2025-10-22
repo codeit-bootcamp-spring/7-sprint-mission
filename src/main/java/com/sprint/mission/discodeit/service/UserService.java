@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserState;
 import com.sprint.mission.discodeit.entity.dto.UserInfo;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public interface UserService {
     // 수정
     Optional<UserInfo> updateProfile(UUID userId, String newUserName, String newPhoneNum);
     Optional<UserInfo> changePassword(UUID userId, String newPassword);
-    Optional<UserInfo> updateState(UUID userId, User.State newState);
+    Optional<UserInfo> updateState(UUID userId, UserState newState);
 
     // 삭제
     boolean deleteUser(UUID userId); // 삭제 메서드 추가 (성공 여부 반환)

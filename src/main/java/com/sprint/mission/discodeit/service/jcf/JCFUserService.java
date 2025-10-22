@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserState;
 import com.sprint.mission.discodeit.entity.dto.UserInfo;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.service.*;
@@ -82,7 +83,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public Optional<UserInfo> updateState(UUID userId, User.State newState) {
+    public Optional<UserInfo> updateState(UUID userId, UserState newState) {
 
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updateState(newState);

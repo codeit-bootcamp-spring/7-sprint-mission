@@ -23,7 +23,7 @@ public class MessageTest {
         UUID user2Id = user2.getId();
         UUID user3Id = user3.getId();
 
-        ChannelInfo channel = channelService.createChannel(user1Id, Channel.ChannelType.TEXT);
+        ChannelInfo channel = channelService.createChannel(user1Id, ChannelType.TEXT);
         UUID channelId = channel.getId();
 
         // --- 채널에 유저 추가 ---

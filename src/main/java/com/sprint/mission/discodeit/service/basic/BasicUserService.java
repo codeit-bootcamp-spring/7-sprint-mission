@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserState;
 import com.sprint.mission.discodeit.entity.dto.UserInfo;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -85,7 +86,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public Optional<UserInfo> updateState(UUID userId, User.State newState) {
+    public Optional<UserInfo> updateState(UUID userId, UserState newState) {
 
         return userRepository.findById(userId).map(user -> {
             user.updateState(newState);

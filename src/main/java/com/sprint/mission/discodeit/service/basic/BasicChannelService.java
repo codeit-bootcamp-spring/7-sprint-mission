@@ -20,7 +20,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelInfo createChannel(UUID userId, String channelName, Channel.ChannelType type) {
+    public ChannelInfo createChannel(UUID userId, String channelName, ChannelType type) {
         User user = userService.findUserEntityById(userId)
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없음"));
         if (channelName == null || channelName.isBlank())
@@ -32,7 +32,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelInfo createChannel(UUID userId, Channel.ChannelType type) {
+    public ChannelInfo createChannel(UUID userId, ChannelType type) {
         return this.createChannel(userId, null, type);
     }
 

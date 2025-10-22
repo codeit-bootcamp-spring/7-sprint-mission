@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.ChannelInfo;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -48,7 +49,7 @@ public class FileChannelService implements ChannelService {
     //============================================생성=====
 
     @Override
-    public ChannelInfo createChannel(UUID userId, String channelName, Channel.ChannelType type) {
+    public ChannelInfo createChannel(UUID userId, String channelName, ChannelType type) {
         User user = userService.findUserEntityById(userId)
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없음"));
         if (channelName == null || channelName.isBlank())
@@ -61,7 +62,7 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelInfo createChannel(UUID userId, Channel.ChannelType type) {
+    public ChannelInfo createChannel(UUID userId, ChannelType type) {
         return this.createChannel(userId, null, type);
     }
 

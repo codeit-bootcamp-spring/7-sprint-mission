@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity.dto;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.MessageType;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,7 +25,7 @@ public class MessageInfo {
         this.content = message.getContent();
         this.createdAt = changeTime(message.getCreatedAt());
         this.updatedAt = changeTime(message.getUpdatedAt());
-        this.receiver = message.getType() == Message.MessageType.DIRECT ?
+        this.receiver = message.getType() == MessageType.DIRECT ?
                 message.getReceiver().getUserName() :
                 message.getChannel().getChannelName();
     }

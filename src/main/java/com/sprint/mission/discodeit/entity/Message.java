@@ -9,17 +9,6 @@ public class Message extends BaseEntity {
 
     private final MessageType type;
 
-    public enum MessageType {
-        CHANNEL("채널메시지"), DIRECT("개인메시지");
-        private final String desc;
-        MessageType(String description) {
-            this.desc = description;
-        }
-        public String getDesc() {
-            return desc;
-        }
-    }   // CHANNEL, DIRECT
-
     public Message(User author, User receiver, String content) {
         super();
         this.author = author;

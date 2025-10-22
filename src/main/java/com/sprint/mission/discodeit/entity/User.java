@@ -10,7 +10,8 @@ public class User extends BaseEntity {
     private String password;        // 비밀번호
     private String userName;        // 닉네임
     private String phoneNum;        // 전화번호
-    private State state;            // 상태
+    private UserState userState; // 상태
+
 
     // regular expression
     private static final Pattern REGEX_EMAIL_PATTERN
@@ -45,7 +46,7 @@ public class User extends BaseEntity {
         this.email = email;             // 받을때 @ 있는지 확인
         this.password = password;       // 8자리 이상
         this.userName = userName;       // 특수문자 불가
-        this.state = State.ONLINE;      // 기본 상태
+        this.userState = UserState.ONLINE;      // 기본 상태
         this.phoneNum = phoneNum==null || phoneNum.isBlank() ? "비어있음" :  phoneNum;
     }
 
@@ -60,7 +61,7 @@ public class User extends BaseEntity {
     public String getUserName() { return userName; }
     public String getEmail() { return email; }
     public String getPhoneNum() { return phoneNum; }
-    public State getState() { return state; }
+    public UserState getState() { return userState; }
 
     // Update
     public void updateUserName(String userName) {
@@ -82,8 +83,8 @@ public class User extends BaseEntity {
         updateTimestamp();
     }
 
-    public void updateState(State state) {
-        this.state = state;
+    public void updateState(UserState userState) {
+        this.userState = userState;
         updateTimestamp();
     }
 
@@ -93,7 +94,7 @@ public class User extends BaseEntity {
         this.email = this.id.toString() + "@deleted.user";
         this.password = this.id.toString();
         this.phoneNum = null;
-        this.state = State.OFFLINE;
+        this.userState = UserState.OFFLINE;
         updateTimestamp();  // 탈퇴일자
     }
 
@@ -104,7 +105,7 @@ public class User extends BaseEntity {
                 ", password='" + password + '\'' +
                 ", userName='" + userName + '\'' +
                 ", phoneNum='" + phoneNum + '\'' +
-                ", state=" + state +
+                ", state=" + userState +
                 ", id=" + id +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

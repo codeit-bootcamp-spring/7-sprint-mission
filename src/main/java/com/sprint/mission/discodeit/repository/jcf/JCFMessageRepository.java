@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.MessageType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
@@ -34,7 +35,7 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         return data.values().stream()
-                .filter(m -> m.getType() == Message.MessageType.CHANNEL &&
+                .filter(m -> m.getType() == MessageType.CHANNEL &&
                         m.getChannel().getId().equals(channelId)).collect(Collectors.toList());
     }
 

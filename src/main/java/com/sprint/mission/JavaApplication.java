@@ -30,7 +30,7 @@ public class JavaApplication {
     }
 
     private static ChannelInfo channelCreateOrLoad(ChannelService channelService
-            , UUID adminId, String channelName, Channel.ChannelType type) {
+            , UUID adminId, String channelName, ChannelType type) {
         return channelService.findChannelInfoByChannelName(channelName)
                 .orElseGet(() -> {
                     System.out.println("새로운 채널 개설: " + channelName);
@@ -60,7 +60,7 @@ public class JavaApplication {
         UUID adminId = admin.getId();
         UUID userId = user.getId();
 
-        ChannelInfo noticeChannel = channelCreateOrLoad(channelService, adminId, "공지사항", Channel.ChannelType.TEXT);
+        ChannelInfo noticeChannel = channelCreateOrLoad(channelService, adminId, "공지사항", ChannelType.TEXT);
         UUID noticeChannelId = noticeChannel.getId();
 
         System.out.println("--- 채널 멤버 추가 ---");     // 버그 발생...

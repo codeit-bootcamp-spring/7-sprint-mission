@@ -20,7 +20,7 @@ public class ChannelTest {
         UUID user1Id = User1.getId();
         UUID user2Id = User2.getId();
 
-        ChannelInfo channel1 = channelService.createChannel(user1Id, Channel.ChannelType.TEXT);
+        ChannelInfo channel1 = channelService.createChannel(user1Id, ChannelType.TEXT);
         UUID channelId = channel1.getId();
 
         System.out.println("--- 채널 조회 ---");
@@ -36,7 +36,7 @@ public class ChannelTest {
         channelService.findChannelInfoById(channelId).ifPresent(System.out::println);
 
         // --- 채널2 생성 ---
-        ChannelInfo channel2 = channelService.createChannel(user2Id, "채널2", Channel.ChannelType.VOICE);
+        ChannelInfo channel2 = channelService.createChannel(user2Id, "채널2", ChannelType.VOICE);
         UUID channel2Id = channel2.getId();
 
         // --- 채널 전체 조회 ---
