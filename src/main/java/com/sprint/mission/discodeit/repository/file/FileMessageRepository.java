@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.entity.Message;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;

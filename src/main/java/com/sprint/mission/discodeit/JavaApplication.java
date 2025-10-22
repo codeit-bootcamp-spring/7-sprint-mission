@@ -1,9 +1,11 @@
-package com.sprint.mission.entity;
+package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.service.jcf.*;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.jcf.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.jcf.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.jcf.basic.BasicUserService;
 
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -12,9 +14,9 @@ public class JavaApplication {
 
     public static void main(String[] args) {
         //싱글톤 길어서 변수에 담았다
-        JCFUserService USER_SERVICE = JCFUserService.getInstance(); //유저기능
-        JCFMessageService MESSAGE_SERVICE = JCFMessageService.getInstance(); //메시지 기능
-        JCFChannelService CHANNEL_SERVICE = JCFChannelService.getInstance(); //채널 기능
+        BasicUserService USER_SERVICE = BasicUserService.getInstance(); //유저기능
+        BasicMessageService MESSAGE_SERVICE = BasicMessageService.getInstance(); //메시지 기능
+        BasicChannelService CHANNEL_SERVICE = BasicChannelService.getInstance(); //채널 기능
         //등록 조회 수정 조회 삭제
       //유저
         System.out.println("==========================유저=============================");

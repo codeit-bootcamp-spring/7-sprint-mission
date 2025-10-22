@@ -1,25 +1,25 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.jcf.basic;
 
-import com.sprint.mission.entity.Message;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
 
-public class JCFMessageService implements MessageService {
+public class BasicMessageService implements MessageService {
 
     //파이널 필드
     private  final List<Message> messages;
 
     //유일 인스턴스  스태틱파이널로 불변생성
-    private static final JCFMessageService INSTANCE = new JCFMessageService();
+    private static final BasicMessageService INSTANCE = new BasicMessageService();
 
     //생성자로 필드 초기화
-    private JCFMessageService() {
+    private BasicMessageService() {
          messages  = new LinkedList<>();
     }
    //그 인스턴스 가지고오는 용도
-    public static JCFMessageService getInstance() {
+    public static BasicMessageService getInstance() {
         return INSTANCE;
     }
 

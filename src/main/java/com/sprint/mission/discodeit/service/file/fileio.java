@@ -7,12 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ReadService {
+public class fileio {
+
+    public static <T extends Common & Serializable> void save (String type, List<T> list)
+    {
+        String path = Path.RooT_PATH.getPath()+"/"+type+"List.sav";
+
+        File file = new File(path);
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists()) parent.mkdirs();
+
+
+        try (ObjectOutputStream oos =
+                        new ObjectOutputStream(new FileOutputStream(path))
+        ) {
+            oos.writeObject(list);
+            System.out.println( type + "리스트 객체 저장 성공");
+        } catch (Exception e) {
+            System.out.println("여기냐");
+            e.printStackTrace();
+        }
+    }
+
 
     public static <T extends Common & Serializable> List<T> read (String type, Class<T> clas)
     {
-       List<T> result = null;
-
+        List<T> result = null;
 
         String path = Path.RooT_PATH.getPath()+"/"+type+"List.sav";
         File file = new File(path);
@@ -21,9 +41,6 @@ public class ReadService {
             System.out.println("그래서했다");
             return new ArrayList<>();
         }
-
-
-
         try(ObjectInputStream ois
                     = new ObjectInputStream(
                 new FileInputStream(path )))
@@ -37,7 +54,7 @@ public class ReadService {
                     .map(clas::cast)
                     .collect(Collectors.toCollection(ArrayList::new));
 
-         }catch (EOFException er){
+        }catch (EOFException er){
             System.out.println("파일은 있는데 내용이 없다");
 
             return new ArrayList<>();
@@ -50,6 +67,8 @@ public class ReadService {
         }
         return result;
     }
+
+
 
 
 }

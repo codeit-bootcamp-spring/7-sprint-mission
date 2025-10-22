@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.jcf.basic;
 
-import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.LinkedList;
@@ -9,18 +9,18 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class JCFChannelService implements ChannelService {
+public class BasicChannelService implements ChannelService {
 
     private  final  List<Channel>  channels;
 
-    private static final JCFChannelService INSTANCE = new JCFChannelService();
+    private static final BasicChannelService INSTANCE = new BasicChannelService();
 
-    private  JCFChannelService(){
+    private BasicChannelService(){
         channels = new LinkedList<>();
     }
 
     //이것도 다 똑같다
-    public static JCFChannelService getInstance(){
+    public static BasicChannelService getInstance(){
         return INSTANCE;
     }
 

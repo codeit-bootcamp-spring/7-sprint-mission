@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.entity.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

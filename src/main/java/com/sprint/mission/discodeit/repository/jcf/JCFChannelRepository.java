@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -59,7 +59,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public synchronized boolean delete(UUID channelId) {
+    public boolean delete(UUID channelId) {
         return channels.removeIf(ch -> ch.getId().equals(channelId));
     }
 }

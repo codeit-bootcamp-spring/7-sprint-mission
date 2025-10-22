@@ -1,4 +1,4 @@
-package com.sprint.mission.entity;
+package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;

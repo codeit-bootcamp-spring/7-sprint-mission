@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.entity.Common;
+import com.sprint.mission.discodeit.entity.Common;
 
 import java.io.File;
 import java.io.FileOutputStream;

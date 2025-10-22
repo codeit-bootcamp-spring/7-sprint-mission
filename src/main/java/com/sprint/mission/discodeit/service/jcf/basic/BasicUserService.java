@@ -1,13 +1,13 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.jcf.basic;
 
-import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class JCFUserService implements UserService {
+public class BasicUserService implements UserService {
 
     //컬렉션 필드  final  메서드들은 이 데이터를 가지고 만들꺼다
     //왜 리스트였냐 수업중에 조회는,수정은 리스트
@@ -16,16 +16,16 @@ public class JCFUserService implements UserService {
     private final List<User> users;
 
     //생성자 초기화 외부에서 못쓰게
-    private JCFUserService() {
+    private BasicUserService() {
         this.users = new ArrayList<>();
     }
 
     //싱글톤 클래스내부에서 마지막에 불변 해서 올려놓고
-    private static final JCFUserService INSTANCE = new JCFUserService();
+    private static final BasicUserService INSTANCE = new BasicUserService();
 
 
     //메인에 호출할 유일 인스턴스 메인에서 쓰려고
-    public static JCFUserService getInstance() {
+    public static BasicUserService getInstance() {
         return INSTANCE;
     }
 
