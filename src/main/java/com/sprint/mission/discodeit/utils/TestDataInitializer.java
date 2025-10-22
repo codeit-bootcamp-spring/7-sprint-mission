@@ -14,7 +14,7 @@ public class TestDataInitializer {
         userService.createUser("박지훈", "jihun", "jihun01@gmail.com", "010-1234-5678", "idjihun", "securePass1!");
         userService.createUser("이수빈", "subin", "subin09@naver.com", "010-8765-4321", "idsubin", "myPassword2@");
         userService.createUser("최하늘", "haneul", "haneul77@kakao.com", "010-3344-5566", "idhaneul", "skyPass123!");
-        userService.createUser("이영희", "younghee", "younghee02@gmail.com", "010-3333-4444", "idyounghee", "pw5678");
+        userService.createUser("이영희", "younghee", "younghee02@gmail.com", "010-3333-4444", "idyounghee", "pw567890");
         userService.createUser("박민수", "minsu", "minsu03@daum.net", "010-5555-6666", "idminsu", "securepw1");
         userService.createUser("최지현", "jihyun", "jihyun04@naver.com", "010-7777-8888", "idjihyun", "mypassword2");
         userService.createUser("오세훈", "sehun", "sehun05@kakao.com", "010-9999-0000", "idsehun", "hello4321");

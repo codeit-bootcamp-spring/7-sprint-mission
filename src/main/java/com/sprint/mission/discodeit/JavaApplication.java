@@ -64,7 +64,7 @@ public class JavaApplication {
             userService.createUser("조조", "jojo", "jojo@naver.com", "010-1234-5678", "abc12345", "qwer12345");
             userService.createUser("홍길동", "hong", "honggd@naver.com", "010-2431-6540", "fert1234", "q1w2e3r4");
             userService.createUser("김도윤", "doyoon", "doyoon17@gmail.com", "010-5832-1745", "iddoyoon", "pass9832");
-            userService.createUser("이지민", "jimin", "jimin_09@naver.com", "010-4275-6081", "idjimin", "pw4127!");
+            userService.createUser("이지민", "jimin", "jimin_09@naver.com", "010-4275-6081", "idjimin", "pw4127!!");
             userService.createUser("김철수", "chulsoo", "chulsoo01@naver.com", "010-1111-2222", "idchulsoo", "pass1234");
 
 
