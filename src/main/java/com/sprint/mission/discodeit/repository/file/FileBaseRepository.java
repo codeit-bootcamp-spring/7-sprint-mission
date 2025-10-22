@@ -8,11 +8,12 @@ import java.util.*;
 
 public class FileBaseRepository<T extends BaseEntity> implements BaseRepository<T> {
 
+    private static final String BASE_ROOT = "/Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload/";
     private final String ROOT_PATH;
     protected Map<UUID, T> data = new HashMap<>();
 
     public FileBaseRepository(String rooPath) {
-        this.ROOT_PATH = "/Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload/" + rooPath;
+        this.ROOT_PATH = BASE_ROOT + rooPath;
         File file = new File(ROOT_PATH).getParentFile();
         if (!file.exists()) {
             file.mkdir();       // 생성해야 할 폴더 경로가 하나일 때

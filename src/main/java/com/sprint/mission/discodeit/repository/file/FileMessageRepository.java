@@ -13,8 +13,10 @@ import java.util.stream.Collectors;
 @Repository
 public class FileMessageRepository extends FileBaseRepository<Message> implements MessageRepository {
 
-    public FileMessageRepository(String rootPath) {
-        super(rootPath + "Data.ser");
+    private static final String MESSAGE_DATA_FILE = "messageData.ser";
+
+    public FileMessageRepository() {
+        super(MESSAGE_DATA_FILE);
     }
 
     @Override

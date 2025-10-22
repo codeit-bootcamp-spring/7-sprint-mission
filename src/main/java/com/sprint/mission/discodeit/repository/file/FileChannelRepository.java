@@ -10,8 +10,10 @@ import java.util.UUID;
 @Repository
 public class FileChannelRepository extends FileBaseRepository<Channel> implements ChannelRepository {
 
-    public FileChannelRepository(String rootPath) {
-        super(rootPath + "Data.ser");
+    private static final String CHANNEL_DATA_FILE = "channelData.ser";
+
+    public FileChannelRepository() {
+        super(CHANNEL_DATA_FILE);
     }
 
     @Override

@@ -45,9 +45,9 @@ public class JavaApplication {
 //        MessageRepository messageRepository = new JCFMessageRepository();
 
         // FileRepository를 사용할 경우
-        UserRepository userRepository = new FileUserRepository("user");
-        ChannelRepository channelRepository = new FileChannelRepository("channel");
-        MessageRepository messageRepository = new FileMessageRepository("message");
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
 
         UserService userService = new BasicUserService(userRepository, channelRepository);
         ChannelService channelService = new BasicChannelService(channelRepository, userService);

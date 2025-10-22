@@ -9,8 +9,10 @@ import java.util.*;
 @Repository
 public class FileUserRepository extends FileBaseRepository<User> implements UserRepository {
 
-    public FileUserRepository(String rootPath) {
-        super(rootPath + "Data.ser");
+    private static final String USER_DATA_FILE = "userData.ser";
+
+    public FileUserRepository() {
+        super(USER_DATA_FILE);
     }
 
     public Optional<User> findByEmail(String email) {
