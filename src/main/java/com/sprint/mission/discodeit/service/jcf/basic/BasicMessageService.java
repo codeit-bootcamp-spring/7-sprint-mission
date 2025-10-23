@@ -2,82 +2,66 @@ package com.sprint.mission.discodeit.service.jcf.basic;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
 
 public class BasicMessageService implements MessageService {
 
-    //파이널 필드
-    private  final List<Message> messages;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
+    private final MessageRepository messageRepository;
 
-    //유일 인스턴스  스태틱파이널로 불변생성
-    private static final BasicMessageService INSTANCE = new BasicMessageService();
+    //의존성 주입이긴한데 이거 일커지면 더 늘어나는데
+    public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
+        this.userRepository = userRepository;
+        this.messageRepository = messageRepository;
+        this.channelRepository = channelRepository;
 
-    //생성자로 필드 초기화
-    private BasicMessageService() {
-         messages  = new LinkedList<>();
-    }
-   //그 인스턴스 가지고오는 용도
-    public static BasicMessageService getInstance() {
-        return INSTANCE;
-    }
-
-
-    @Override
-    public Message create(User sender, User receiver, String message) {
-         Message newMessage = new Message(sender,receiver,message);
-           messages.add(newMessage);
-           return newMessage;
     }
 
     @Override
-    public Message read(UUID messageId) {
-
-        Message message = messages.stream()
-                .filter(u -> u.getId().equals(messageId))
-                .findFirst()
-                .orElse(null);
-
-        if (message == null) {
-            System.out.println("해당 메시지 없습니다: " + messageId);
-        } else {
-            System.out.println(message);
+    public Message create(String content, UUID channelId, UUID authorId) {
+        //둘의 uuid가 존재유무판단
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("채널UUID가없어 :" + channelId);
         }
-         return message;
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException("매시지UUID가 없어 :" + authorId);
+        }
+
+        Message message = new Message( channelId, authorId,content);
+        return messageRepository.save(message);
     }
-
-
-
-     @Override
-    public List<Message> readAll() {
-
-        System.out.printf("%d개의 메시지@@@\n",messages.size());
-                messages
-                        .forEach(System.out::println);
-        return messages;
-    }
-
 
     @Override
-    public Message update(UUID messageId,String content) {
-        Message m = messages.stream()
-                .filter(msg -> msg.getId().equals(messageId))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("찾는 메시지가 없오: " + messageId));
-
-        m.setContent(content);
-        m.setUpdatedAt(System.currentTimeMillis());
-        return m;
-
+    public Message find(UUID messageId) {
+        return  messageRepository
+                .findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("메시지UUID가 없어:" + messageId));
     }
-
-
 
     @Override
-    public boolean delete(UUID messageId) {
-        return messages.removeIf(u -> u.getId().equals(messageId));
-
+    public List<Message> findAll() {
+        return messageRepository.findAll();
     }
 
+    @Override
+    public Message update(UUID messageId, String newContent) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+        return messageRepository.save(message);
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        if (!messageRepository.existsById(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
+        }
+        messageRepository.deleteById(messageId);
+    }
 }

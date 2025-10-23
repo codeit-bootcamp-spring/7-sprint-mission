@@ -9,11 +9,12 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public interface ChannelService {
-    Channel  create(User user,String channelName);
-    Channel read(UUID channelId);
-    List<Channel> readAll();
-    Channel update(UUID channelId, Consumer<Channel> updater);
-    boolean delete(UUID channelId);
+
+    Channel create(UUID bose,String channelName);
+    Channel find(UUID channelId);
+    List<Channel> findAll();
+    Channel update(UUID channel,String newChannelName, UUID newBose, List<UUID> newUsers);
+    void delete(UUID channelId);
 
 
 }

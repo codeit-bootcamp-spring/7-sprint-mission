@@ -2,81 +2,58 @@ package com.sprint.mission.discodeit.service.jcf.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 public class BasicChannelService implements ChannelService {
 
-    private  final  List<Channel>  channels;
+    private final ChannelRepository channelRepository;
 
-    private static final BasicChannelService INSTANCE = new BasicChannelService();
-
-    private BasicChannelService(){
-        channels = new LinkedList<>();
+    public BasicChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
-
-    //이것도 다 똑같다
-    public static BasicChannelService getInstance(){
-        return INSTANCE;
-    }
-
-
-
 
 
     @Override
-    public Channel create(User user,String channelName) {
-        Channel ch = new Channel(user,channelName);
-        channels.add(ch);
-        ch.setChannelName(channelName);
-        System.out.printf("%s가 채널을 만들엇습니다\n",user.getUserName());
-        return ch;
+    public Channel create( UUID bose, String chennalName) {
+        Channel channel = new Channel(bose, chennalName);
+        return channelRepository.save(channel);
     }
 
     @Override
-    public  Channel read(UUID channelId) {
-        Channel channel = channels.stream()
-                .filter(ch -> ch.getId().equals(channelId))
-                .findFirst()
-                .orElse(null);
-        if (channel == null) {
-            System.out.println("해당 채널 없습니다: " + channelId);
-        } else {
-            System.out.println(channel);
+    public Channel find(UUID channelId) {
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("채널을 찾을수가 없어" + channelId ));
+    }
+
+    @Override
+    public List<Channel> findAll() {
+        return channelRepository.findAll();
+    }
+
+    @Override
+    public Channel update(UUID channelId,String newChannelName, UUID newBose, List<UUID> newUsers) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("채널을 찾을수가 없어 " + channelId ));
+        channel.update(newChannelName, newBose,newUsers);
+        return channelRepository.save(channel);
+    }
+
+    @Override
+    public void delete(UUID channelId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
-       return channel;
-    }
-
-    @Override
-    public List<Channel> readAll() {
-        System.out.printf("%d개의 채널@@@\n",channels.size());
-        channels
-                .forEach(System.out::println);
-        return channels;
-    }
-    //파라미터 어떻게 해야할것같다
-
-    @Override
-    public Channel update(UUID channelId, Consumer<Channel> updater) {
-        System.out.println("수정");
-        return channels.stream()
-                .filter(u -> u.getId().equals(channelId))
-                .findFirst()
-                .map(u -> {
-                    updater.accept(u); // 여러개 가능하게
-                    return u;
-                })
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + channelId));
+        channelRepository.deleteById(channelId);
     }
 
 
-    @Override
-    public boolean delete(UUID channelId) {
-        return channels.removeIf(u -> u.getId().equals(channelId));
 
-    }
+
 }

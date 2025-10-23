@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf.basic;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
@@ -13,95 +14,45 @@ public class BasicUserService implements UserService {
     //왜 리스트였냐 수업중에 조회는,수정은 리스트
     // 추가(중간정도) , 삭제가 빈번하면 링크라들었다
     //마지막에 컴퓨터 좋아지면서 리스트를 많이쓴다 해서 리스트했다
-    private final List<User> users;
+    private final UserRepository userRepository;
 
-    //생성자 초기화 외부에서 못쓰게
-    private BasicUserService() {
-        this.users = new ArrayList<>();
-    }
-
-    //싱글톤 클래스내부에서 마지막에 불변 해서 올려놓고
-    private static final BasicUserService INSTANCE = new BasicUserService();
-
-
-    //메인에 호출할 유일 인스턴스 메인에서 쓰려고
-    public static BasicUserService getInstance() {
-        return INSTANCE;
+    public BasicUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
 
     @Override
-    public User create(String userId,String password,String userName,String userNickname) {
-         User user = new User(userId,password,userName,userNickname);
-         users.add(user);
-         return user;
+    public User create(String username, String email, String password,String userNickname) {
+        User user = new User(username, email, password,userNickname);
+        return userRepository.save(user);
     }
 
     @Override
-    public User read(UUID userId) {
+    public User find(UUID userId) {
+        return userRepository
+                .findById(userId)
+                .orElseThrow(()-> new NoSuchElementException("이런 uuid는 없어"+ userId));
+    }
 
-        User user = users.stream()
-                .filter(u -> u.getId().equals(userId))
-                .findFirst()
-                .orElse(null);
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
 
-        if (user == null) {
-            System.out.println("해당 유저가 없습니다: " + userId);
-        } else {
-            System.out.println(user.toString());
+    @Override
+    //이게진짜 이해가 안된다
+    public User update(UUID userId, String newUsername, String newEmail,String newPassword ,String newNickname) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+userId));
+         user.update(newUsername,newEmail,newPassword,newNickname);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void delete(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("유저uuid못찾아용"+userId);
         }
-        return user;
+        userRepository.deleteById(userId);
     }
-
-
-    @Override
-    public List<User> readAll() {
-        System.out.printf("유저 %d명@@@\n",users.size());
-         return users;
-    }
-
-    @Override
-    public User updateName(UUID uuid, String userName) {
-        return users.stream()
-                .filter(u -> u.getId().equals(uuid))
-                .findFirst()
-                .map(u -> {
-                    u.setUserName(userName);
-                    return u;
-                })
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다" + uuid));
-    }
-
-    @Override
-    public User updateNickName(UUID uuid, String userNickname) {
-        return users.stream()
-                .filter(u -> u.getId().equals(uuid))
-                .findFirst()
-                .map(u -> {
-                    u.setUserNickname(userNickname);
-                    return u;
-                })
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + uuid));
-    }
-
-    // 이건 내가 원하는거
-    @Override
-    public User update(UUID uuid, Consumer<User> updater) {
-        System.out.println("수정");
-         return users.stream()
-                .filter(u -> u.getId().equals(uuid))
-                .findFirst()
-                .map(u -> {
-                    updater.accept(u);
-                    // 여러개 가능하게
-                    return u;
-                })
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + uuid));
-    }
-
-
-    public boolean delete(UUID userId) {
-        return users.removeIf(u -> u.getId().equals(userId));
-    }
-
 }

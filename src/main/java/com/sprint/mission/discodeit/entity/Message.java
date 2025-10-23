@@ -7,8 +7,8 @@ import java.util.UUID;
 public class Message extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private UUID sender;
-    private UUID receiver;
+    private UUID authorId;
+    private UUID channelId;
     private Long time;
     private String content;
 
@@ -16,27 +16,27 @@ public class Message extends Common implements Serializable {
     }
 
 
-    public  Message(UUID send,UUID receiver,String content ){
-        this.sender = send;
-        this.receiver = receiver;
+    public  Message(UUID channelId,UUID authorId,String content ){
+        this.authorId = authorId;
+        this.channelId = channelId;
         this.time = System.currentTimeMillis();
         this.content = content;
     }
 
     public UUID getSender() {
-        return sender;
+        return authorId;
     }
 
     public void setSender(UUID sender) {
-        this.sender = sender;
+        this.authorId = sender;
     }
 
     public UUID getReceiver() {
-        return receiver;
+        return channelId;
     }
 
     public void setReceiver(UUID receiver) {
-        this.receiver = receiver;
+        this.channelId = receiver;
     }
 
     public long getTime() {
@@ -58,8 +58,8 @@ public class Message extends Common implements Serializable {
     @Override
     public String toString() {
         return "Message{" +
-                "발신자 UUID  =" + sender+
-                ", 수신자 UUID =" + receiver+
+                "채널 UUID =" + channelId+
+                ",발신자 UUID  =" + authorId+
                 ", 생성시간 =" + time +
                 ",  내용 ='" + content + '\'' +
                 '}';
