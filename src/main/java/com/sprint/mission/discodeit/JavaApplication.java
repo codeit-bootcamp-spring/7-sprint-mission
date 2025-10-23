@@ -14,7 +14,6 @@ import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.jcf.*;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -132,13 +131,13 @@ public class JavaApplication {
         System.out.println("2. Channel Service 체크");
         titlePrint("등록");
         Channel channel1 = channelService
-                .create(new Channel(ChType.VOICE, "Sprint1"));
+                .create(new Channel(ChannelType.VOICE, "Sprint1"));
         Channel channel2 = channelService
-                .create(new Channel(ChType.TEXT, "Sprint2"));
+                .create(new Channel(ChannelType.TEXT, "Sprint2"));
         Channel channel3 = channelService
-                .create(new Channel(ChType.VOICE, "Sprint3"));
+                .create(new Channel(ChannelType.VOICE, "Sprint3"));
         Channel channel4 = channelService
-                .create(new Channel(ChType.TEXT, "Sprint4"));
+                .create(new Channel(ChannelType.TEXT, "Sprint4"));
 
         System.out.println("채널 생성 완료!");
         System.out.println("현재 채널 수: " + channelService.getAll().size());
@@ -255,7 +254,7 @@ public class JavaApplication {
 
         // 이후 사용하기 위해 재등록
         channel1 = channelService
-                .create(new Channel(ChType.VOICE, "Sprint1"));
+                .create(new Channel(ChannelType.VOICE, "Sprint1"));
         // 3. Message Service 체크 시작 직전
         channelService.join(channel1.getId(), user1.getId()); // message1: user1 -> channel1
         channelService.join(channel2.getId(), user2.getId()); // message2: user2 -> channel2
