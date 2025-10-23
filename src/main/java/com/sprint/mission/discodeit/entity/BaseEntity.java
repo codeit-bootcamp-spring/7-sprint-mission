@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.entity;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
+import java.time.Instant;
 import java.util.UUID;
 /*
 1. id : 객체를 식별하기 위한 id로 UUID 타입으로 선언
@@ -8,53 +13,22 @@ import java.util.UUID;
 나타내기 위한 필드로 long 타입으로 선언한다.
  */
 
+@Getter
+@EqualsAndHashCode
+@ToString
 public abstract class BaseEntity implements Serializable {
     private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private static final long serialVersionUID = 1L;
 
     protected BaseEntity() {
         id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
-        updatedAt = createdAt;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if(this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BaseEntity that = (BaseEntity) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() +
-                "{ id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
     protected void reUpdatedAt() {
-        updatedAt = System.currentTimeMillis();
+        updatedAt = Instant.now();
     }
 }
