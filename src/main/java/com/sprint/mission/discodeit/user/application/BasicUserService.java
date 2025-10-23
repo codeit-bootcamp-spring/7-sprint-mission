@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class FileUserService implements UserService {
+public class BasicUserService implements UserService {
 
 
     private final UserRepository userRepository;
     private final FriendRequestRepository requestRepository;
     private final FriendShipRepository friendShipRepository;
 
-    public FileUserService(UserRepository userRepository, FriendRequestRepository requestRepository,
-                           FriendShipRepository friendShipRepository) {
+    public BasicUserService(UserRepository userRepository, FriendRequestRepository requestRepository,
+                            FriendShipRepository friendShipRepository) {
         this.userRepository = userRepository;
         this.requestRepository = requestRepository;
         this.friendShipRepository = friendShipRepository;
@@ -57,7 +57,6 @@ public class FileUserService implements UserService {
 
     @Override
     public FriendRequest sendFriendRequest(User sender, User target) {
-        validateNotSelf(sender, target);
         validateNotAlreadyFriend(sender, target);
         validateNotDuplicateRequest(sender, target);
         FriendRequest friendRequest = sender.sendFriendRequestTo(target);
@@ -83,13 +82,18 @@ public class FileUserService implements UserService {
         friendShipRepository.save(friendShip);
     }
 
+    public void register(User user) {
+        validateNotDuplicateUser(user);
+        save(user);
+    }
 
-    private void validateNotSelf(User sender, User target) {
-        if (sender.getId().equals(target.getId())) {
-            //메서드에 잘못된 인자가 들어왔을 때 -> IllegalArgumentException
-            throw new IllegalArgumentException("자기 자신에게 친구 요청을 보낼 수 없습니다.");
+    private void validateNotDuplicateUser(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new DuplicateUserException("이미 존재하는 이메일입니다: " + user.getEmail());
         }
     }
+
+
 
     // 이미 친구인지 검사
     private void validateNotAlreadyFriend(User sender, User target) {
@@ -103,7 +107,7 @@ public class FileUserService implements UserService {
         }
     }
 
-    // 중복 요청 및 역방향 요청 검사
+    // 중복 요청 검사
     private void validateNotDuplicateRequest(User sender, User target) {
         boolean alreadySent = requestRepository.findAll().stream()
                 .anyMatch(req -> req.getSenderId().equals(sender.getId()) &&
@@ -114,15 +118,8 @@ public class FileUserService implements UserService {
         }
     }
 
-    private void validateNotDuplicateUser(User user) {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new DuplicateUserException("이미 존재하는 이메일입니다: " + user.getEmail());
-        }
-    }
 
-    public void register(User user) {
-        validateNotDuplicateUser(user);
-        save(user);
-    }
+
+
 
 }

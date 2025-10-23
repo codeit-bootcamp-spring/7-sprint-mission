@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class FileServerService implements ServerService {
+public class BasicServerService implements ServerService {
 
 
     private final ServerRepository serverRepository;
 
-    public FileServerService(ServerRepository serverRepository) {
+    public BasicServerService(ServerRepository serverRepository) {
         this.serverRepository = serverRepository;
     }
 

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.user;
 import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
 import com.sprint.mission.discodeit.friendrequest.infrastructure.MemoryFriendRequestRepository;
 import com.sprint.mission.discodeit.friendship.infrastructure.MemoryFriendShipRepository;
-import com.sprint.mission.discodeit.user.application.FileUserService;
+import com.sprint.mission.discodeit.user.application.BasicUserService;
 import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.user.domain.exception.DuplicateUserException;
 import com.sprint.mission.discodeit.user.infrastructure.MemoryUserRepository;
@@ -15,15 +15,15 @@ import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class FileUserServiceTest {
+public class BasicUserServiceTest {
 
 
-    private FileUserService userService;
+    private BasicUserService userService;
 
     @BeforeEach
     void beforeAll(){
         this.userService =
-                new FileUserService(new MemoryUserRepository(), new MemoryFriendRequestRepository(), new MemoryFriendShipRepository());
+                new BasicUserService(new MemoryUserRepository(), new MemoryFriendRequestRepository(), new MemoryFriendShipRepository());
     }
 
 

@@ -21,11 +21,11 @@ public class DiscodeitApplication {
         //메서드 안에서는 접근자 세팅 불가능
         //어차피 {}안에서만 유효하니까.
 
-        WebConfig webConfig = new WebConfig();
+        DiContainer diContainer = new DiContainer();
 
-        UserService userService = webConfig.getUserService();
-        MessageRoomService messageRoomService= webConfig.getMessageRoomService();
-        ServerService serverService = webConfig.getServerService();
+        UserService userService = diContainer.getUserService();
+        MessageRoomService messageRoomService= diContainer.getMessageRoomService();
+        ServerService serverService = diContainer.getServerService();
 
 
 

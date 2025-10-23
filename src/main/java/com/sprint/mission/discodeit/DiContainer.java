@@ -6,13 +6,13 @@ import com.sprint.mission.discodeit.messageroom.infrastructure.MemoryMessageRoom
 import com.sprint.mission.discodeit.friendrequest.infrastructure.FriendRequestRepository;
 import com.sprint.mission.discodeit.server.application.ServerRepository;
 import com.sprint.mission.discodeit.server.application.ServerService;
-import com.sprint.mission.discodeit.server.application.FileServerService;
+import com.sprint.mission.discodeit.server.application.BasicServerService;
 import com.sprint.mission.discodeit.friendship.infrastructure.FriendShipRepository;
-import com.sprint.mission.discodeit.messageroom.application.FileMessageRoomService;
+import com.sprint.mission.discodeit.messageroom.application.BasicMessageRoomService;
 import com.sprint.mission.discodeit.messageroom.application.MessageRoomRepository;
 import com.sprint.mission.discodeit.messageroom.application.MessageRoomService;
 import com.sprint.mission.discodeit.server.infrastructure.MemoryServerRepository;
-import com.sprint.mission.discodeit.user.application.FileUserService;
+import com.sprint.mission.discodeit.user.application.BasicUserService;
 import com.sprint.mission.discodeit.user.application.UserRepository;
 import com.sprint.mission.discodeit.user.application.UserService;
 import com.sprint.mission.discodeit.user.infrastructure.MemoryUserRepository;
@@ -20,7 +20,7 @@ import lombok.Getter;
 
 //의존성 주입
 @Getter
-public class WebConfig {
+public class DiContainer {
 
     private final UserRepository userRepository = new MemoryUserRepository();
     private final MessageRoomRepository messageRoomRepository = new MemoryMessageRoomRepository();
@@ -34,7 +34,7 @@ public class WebConfig {
 //    private final FriendRequestRepository friendRequestRepository = new FileFriendRequestRepository();
 //    private final FriendShipRepository friendShipRepository =new FileFriendShipRepository();
 
-    private final UserService userService = new FileUserService(userRepository, friendRequestRepository, friendShipRepository);
-    private final MessageRoomService messageRoomService = new FileMessageRoomService(messageRoomRepository);
-    private final ServerService serverService = new FileServerService(serverRepository);
+    private final UserService userService = new BasicUserService(userRepository, friendRequestRepository, friendShipRepository);
+    private final MessageRoomService messageRoomService = new BasicMessageRoomService(messageRoomRepository);
+    private final ServerService serverService = new BasicServerService(serverRepository);
 }

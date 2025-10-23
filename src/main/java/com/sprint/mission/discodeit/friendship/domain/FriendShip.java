@@ -3,25 +3,32 @@ package com.sprint.mission.discodeit.friendship.domain;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
 public class FriendShip implements Serializable {
     private static final long serialVersionUID = 5L;
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
     private final UUID userAId;
     private final UUID userBId;
 
+    public static FriendShip create(UUID userAId, UUID userBId){
 
-    public FriendShip(UUID userAId, UUID userBId) {
+        return new FriendShip(userAId, userBId);
+    }
+
+    private FriendShip(UUID userAId, UUID userBId) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.userAId=userAId;
         this.userBId=userBId;
-
     }
+
+
+
 }

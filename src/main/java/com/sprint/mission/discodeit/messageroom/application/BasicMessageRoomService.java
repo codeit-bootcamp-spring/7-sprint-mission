@@ -6,11 +6,11 @@ import com.sprint.mission.discodeit.messageroom.domain.MessageRoom;
 
 import java.util.*;
 
-public class FileMessageRoomService implements MessageRoomService {
+public class BasicMessageRoomService implements MessageRoomService {
 
     private final MessageRoomRepository messageRoomRepository;
 
-    public FileMessageRoomService(MessageRoomRepository messageRoomRepository) {
+    public BasicMessageRoomService(MessageRoomRepository messageRoomRepository) {
         this.messageRoomRepository=messageRoomRepository;
     }
 
