@@ -1,25 +1,30 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.global.util.file.FileManager;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Repository;
 
+import java.nio.file.Path;
 import java.util.*;
 
 @Repository
 public class FileChannelRepository implements ChannelRepository {
-    private final FileManager<Channel> fileManager;
+    private final Path filePath;
     private final Map<UUID, Channel> channels;
 
-    public FileChannelRepository(FileManager<Channel> fileManager) {
-        this.fileManager = fileManager;
-        this.channels = new HashMap<>();
+    public FileChannelRepository(@Value("${file.path.channelPath}") Path channelFilePath) {
+        this.filePath = channelFilePath;
+        FileManager.init(filePath);
+        this.channels = FileManager.readFile(filePath);
     }
 
     @Override
     public void save(Channel channel) {
         channels.put(channel.getId(), channel);
-        fileManager.writeFile(channels);
+        FileManager.writeFile(filePath,channels);
     }
 
     @Override
@@ -35,7 +40,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteById(UUID channelId) {
         channels.remove(channelId);
-        fileManager.writeFile(channels);
+        FileManager.writeFile(filePath, channels);
     }
 
     @Override

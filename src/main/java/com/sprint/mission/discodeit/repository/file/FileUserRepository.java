@@ -1,25 +1,29 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.global.util.file.FileManager;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import java.nio.file.Path;
 import java.util.*;
 
 @Repository
 public class FileUserRepository implements UserRepository {
-    private final FileManager<User> fileManager;
+    private final Path filePath;
     private final Map<UUID, User> users;
 
-    public FileUserRepository(FileManager<User> fileManager) {
-        this.fileManager = fileManager;
-        this.users = new HashMap<>();
+    public FileUserRepository(@Value("${file.path.userPath}")Path userFilePath) {
+        this.filePath = userFilePath;
+        FileManager.init(filePath);
+        this.users = FileManager.readFile(filePath);
     }
 
     @Override
     public void save(User user) {
         users.put(user.getId(), user);
-        fileManager.writeFile(users);
+        FileManager.writeFile(filePath, users);
     }
 
     @Override
@@ -35,7 +39,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void deleteById(UUID userId) {
         users.remove(userId);
-        fileManager.writeFile(users);
+        FileManager.writeFile(filePath, users);
     }
 
     @Override

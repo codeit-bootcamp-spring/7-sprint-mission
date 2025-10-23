@@ -1,25 +1,29 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.global.util.file.FileManager;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import java.nio.file.Path;
 import java.util.*;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {
-    private final FileManager<Message> fileManager;
+    private final Path filePath;
     private Map<UUID, Message> messages;
 
-    public FileMessageRepository(FileManager<Message> fileManager) {
-        this.fileManager = fileManager;
-        this.messages = new HashMap<>();
+    public FileMessageRepository(@Value("${file.path.messagePath}")Path messageFilePath) {
+        this.filePath = messageFilePath;
+        FileManager.init(messageFilePath);
+        this.messages = FileManager.readFile(messageFilePath);
     }
 
     @Override
     public void save(Message message) {
         messages.put(message.getId(), message);
-        fileManager.writeFile(messages);
+        FileManager.writeFile(filePath, messages);
     }
 
     @Override
@@ -35,7 +39,7 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void deleteById(UUID messageId) {
         messages.remove(messageId);
-        fileManager.writeFile(messages);
+        FileManager.writeFile(filePath, messages);
     }
 
     @Override
