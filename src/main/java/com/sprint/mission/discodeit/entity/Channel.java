@@ -24,8 +24,4 @@ public class Channel extends Common {
     }
 
 
-    public enum ChannelType {
-        PUBLIC, PRIVATE
-    }
-
 }
