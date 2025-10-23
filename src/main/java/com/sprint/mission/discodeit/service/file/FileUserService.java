@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -18,10 +20,13 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User createUser(String username, String email, String phoneNumber, String pronoun) {
-        User newUser = new User(username, email, phoneNumber, pronoun);
-        userRepository.save(newUser);
-        return newUser;
+    public User createUser(CreateUserDto createUserDto) {
+        User user = new User(
+                createUserDto.getUsername(), createUserDto.getEmail(), createUserDto.getPassword(),
+                createUserDto.getPhoneNumber(), createUserDto.getPronoun());
+
+        userRepository.save(user);
+        return user;
     }
 
     @Override
@@ -36,21 +41,22 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void updateUser(UUID userId, String username, String email, String phoneNumber, String pronoun) {
-        User user = this.getUser(userId);
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPhoneNumber(phoneNumber);
-        user.setPronoun(pronoun);
-        user.touch();
+    public void updateUser(UpdateUserDto updateUserDto) {
+        if (!userRepository.existsById(updateUserDto.getUserId())) {
+            throw new NoSuchElementException("찾을 수 없는 유저: " + updateUserDto.getUserId());
+        }
+
+        User user = this.getUser(updateUserDto.getUserId());
+        user.updateUser(updateUserDto);
         userRepository.save(user);
     }
 
     @Override
     public void deleteUser(UUID userId) {
-        if (!this.isExistsUser(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("찾을 수 없는 유저: " + userId);
         }
+
         userRepository.deleteById(userId);
     }
 
