@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
@@ -35,3 +36,5 @@ public class JCFUserService implements UserService {
     // 로그아웃
     @Override public User logout(String email) {return basicUserService.logout(email);}
 }
+
+ */

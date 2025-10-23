@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
@@ -23,3 +24,5 @@ public class JCFChannelService implements ChannelService {
     @Override public boolean leave(UUID channelId, UUID userId) {return basicChannelService.leave(channelId, userId);}
     @Override public void setSlowModeSeconds(UUID channelId, int slowModeSeconds) {basicChannelService.setSlowModeSeconds(channelId, slowModeSeconds);}
 }
+
+ */
