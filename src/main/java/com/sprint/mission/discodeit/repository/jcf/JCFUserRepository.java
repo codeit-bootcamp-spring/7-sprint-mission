@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import lombok.Data;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
-@Data
-public class JCFUserRepository implements UserRepository {}
+public class JCFUserRepository implements UserRepository {
+    private final List<User> data = new ArrayList<>();
+
+    @Override
+    public User save(User user) {
+        data.add(user);
+        return user;
+    }
+}
