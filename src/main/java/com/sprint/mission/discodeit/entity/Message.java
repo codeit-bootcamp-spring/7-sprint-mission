@@ -3,10 +3,10 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class Message extends BaseEntity{
-    public final UUID senderId;
-    public final UUID receiverId;
-    public final ReceiveType receiveType;
-    public String content;
+    private final UUID senderId;
+    private final UUID receiverId;
+    private final ReceiveType receiveType;
+    private String content;
 
     public enum ReceiveType{
         USER("유저"), CHANNEL("채널");
