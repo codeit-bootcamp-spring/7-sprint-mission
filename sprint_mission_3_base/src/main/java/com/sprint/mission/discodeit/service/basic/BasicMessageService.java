@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+
 @Service
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;

@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -13,32 +15,34 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class DiscodeitApplication {
 
     public static void main(String[] args) {
+        // Spring Context 실행
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-        // ✅ Spring Context에서 Bean 조회
+        // ✅ Spring이 관리하는 Bean들을 가져옴
         UserService userService = context.getBean(UserService.class);
         ChannelService channelService = context.getBean(ChannelService.class);
         MessageService messageService = context.getBean(MessageService.class);
 
-        // ✅ 아래 코드는 JavaApplication에서 복사해올 예정
-        //    (setupUser, setupChannel, messageCreateTest 등)
+        // ✅ 셋업
         User user = setupUser(userService);
         Channel channel = setupChannel(channelService);
+
+        // ✅ 테스트
         messageCreateTest(messageService, channel, user);
     }
 
-    // 아래 3개 메서드는 JavaApplication에서 복사해 넣어야 함
     private static User setupUser(UserService userService) {
-        // TODO: JavaApplication에서 복사
-        return null;
+        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        return user;
     }
 
     private static Channel setupChannel(ChannelService channelService) {
-        // TODO: JavaApplication에서 복사
-        return null;
+        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        return channel;
     }
 
-    private static void messageCreateTest(MessageService messageService, Channel channel, User user) {
-        // TODO: JavaApplication에서 복사
+    private static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+        Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
+        System.out.println("메시지 생성: " + message.getId());
     }
 }
