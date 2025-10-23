@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-public enum ChType {
+public enum ChannelType {
     VOICE,
     TEXT
 }
