@@ -1,33 +1,27 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import lombok.Data;
-
 import java.util.UUID;
 
-@Data
 public class Message {
     //Common field
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final UUID id;              //각 메세지 UUID
+    private final Long createdAt;       //메세지 생성일
+    private Long updatedAt;             //메세지 수정일
 
-    //Channel field
-    private Channel channel;
-    private User speaker;
-    private String content;
+    //Message field
+    //[Need Fix] : 아래 둘 final 로 변경
+    private UUID speakerId;             //화자 UUID
+    private UUID channelId;             //채널 UUID
+    private String content;             //메세지 내용
 
-    //기본 생성자
-    public Message(){
+    //Constructor
+    public Message(UUID channelId, String content) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
-        this.speaker = JCFUserService.loginUser;
-    }
-
-    public Message(Channel channel, String content){
-        this();
-        this.channel = channel;
+        //[Need Fix] : loginUser를 speaker 로 넣기
+        //this.speaker = JCFUserService.loginUser;
+        this.channelId = channelId;
         this.content = content;
     }
 }
