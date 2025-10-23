@@ -1,25 +1,25 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.*;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfo;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
+import com.sprint.mission.discodeit.exception.NotFoundChannelException;
+import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepo;
     private final UserService userService;
     private final ChannelService channelService;
-
-    public BasicMessageService(MessageRepository messageRepo, UserService userService, ChannelService channelService) {
-        this.messageRepo = messageRepo;
-        this.userService = userService;
-        this.channelService = channelService;
-    }
 
     // Message Create
     @Override
@@ -28,9 +28,9 @@ public class BasicMessageService implements MessageService {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }
         User author = userService.findUserEntityById(authorId)
-                .orElseThrow(() -> new NoSuchElementException("메시지를 보내는 사용자를 찾을 수 없음"));
+                .orElseThrow(() -> new NotFoundUserException("메시지를 보내는 사용자를 찾을 수 없음"));
         User receiver = userService.findUserEntityById(receiverId)
-                .orElseThrow(() -> new NoSuchElementException("메시지를 받을 사용자를 찾을 수 없음"));
+                .orElseThrow(() -> new NotFoundUserException("메시지를 받을 사용자를 찾을 수 없음"));
         Message message = new Message(author, receiver, content);
         messageRepo.save(message);
         return new MessageInfo(message);
@@ -43,9 +43,9 @@ public class BasicMessageService implements MessageService {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }
         User author = userService.findUserEntityById(authorId)
-                .orElseThrow(() -> new NoSuchElementException("메시지를 보내는 사용자를 찾을 수 없음"));
+                .orElseThrow(() -> new NotFoundUserException("메시지를 보내는 사용자를 찾을 수 없음"));
         Channel channel = channelService.findChannelEntityById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("메시지를 받을 채널을 찾을 수 없음"));
+                .orElseThrow(() -> new NotFoundChannelException("메시지를 받을 채널을 찾을 수 없음"));
         Message message = new Message(author, channel, content);
         messageRepo.save(message);
         return new MessageInfo(message);

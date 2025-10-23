@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserState;
-import com.sprint.mission.discodeit.entity.dto.UserInfo;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -64,24 +64,24 @@ public class FileUserService implements UserService {
 
     // 생성
     @Override
-    public UserInfo createUser(String email, String password, String userName, String phoneNum) {
+    public UserInfoDto createUser(String email, String password, String userName, String phoneNum) {
         validateEmailIsUnique(email);
         User newUser = new User(email, password, userName, phoneNum);
         data.put(newUser.getId(), newUser);
 
         saveUserData();
-        return new UserInfo(newUser);
+        return new UserInfoDto(newUser);
     }
 
     @Override
-    public UserInfo createUser(String email, String password, String userName) {
+    public UserInfoDto createUser(String email, String password, String userName) {
         return createUser(email, password, userName, null);
     }
 
     // 조회
     @Override
-    public Optional<UserInfo> findUserInfoById(UUID userId) {
-        return Optional.ofNullable(data.get(userId)).map(UserInfo::new);
+    public Optional<UserInfoDto> findUserInfoById(UUID userId) {
+        return Optional.ofNullable(data.get(userId)).map(UserInfoDto::new);
     }
 
     public Optional<User> findUserEntityById(UUID userId) {
@@ -89,47 +89,47 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public List<UserInfo> findAllUsers() {
+    public List<UserInfoDto> findAllUsers() {
 
         return data.values().stream()
-                .map(UserInfo::new).collect(Collectors.toList());
+                .map(UserInfoDto::new).collect(Collectors.toList());
     }
 
     @Override
-    public Optional<UserInfo> findUserInfoByEmail(String email) {
+    public Optional<UserInfoDto> findUserInfoByEmail(String email) {
         User user = data.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
-        return Optional.ofNullable(user).map(UserInfo::new);
+        return Optional.ofNullable(user).map(UserInfoDto::new);
     }
 
     // 수정
     @Override
-    public Optional<UserInfo> updateProfile(UUID userId, String newUserName, String newPhoneNum) {
+    public Optional<UserInfoDto> updateProfile(UUID userId, String newUserName, String newPhoneNum) {
 
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updateUserName(newUserName);
             user.updatePhoneNum(newPhoneNum);
             saveUserData();
-            return new UserInfo(user);
+            return new UserInfoDto(user);
         });
     }
 
     @Override
-    public Optional<UserInfo> changePassword(UUID userId, String newPassword) {
+    public Optional<UserInfoDto> changePassword(UUID userId, String newPassword) {
 
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updatePassword(newPassword);
             saveUserData();
-            return new UserInfo(user);
+            return new UserInfoDto(user);
         });
     }
 
     @Override
-    public Optional<UserInfo> updateState(UUID userId, UserState newState) {
+    public Optional<UserInfoDto> updateState(UUID userId, UserState newState) {
 
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updateState(newState);
             saveUserData();
-            return new UserInfo(user);
+            return new UserInfoDto(user);
         });
     }
 

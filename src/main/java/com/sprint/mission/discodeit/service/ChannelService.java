@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
 
 import java.util.List;
 import java.util.Optional;

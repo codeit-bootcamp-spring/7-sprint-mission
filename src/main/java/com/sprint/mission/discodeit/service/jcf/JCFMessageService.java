@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.*;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfo;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 import com.sprint.mission.discodeit.service.*;
 

@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.*;
-import com.sprint.mission.discodeit.entity.dto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
 
 import java.util.*;
 

@@ -1,7 +1,8 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.entity.dto.channelDto;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
 
+@Getter
 public class ChannelInfo {
 
     private final UUID id;
@@ -28,25 +30,6 @@ public class ChannelInfo {
         this.updatedAt = changeTime(channel.getUpdatedAt());
         this.members = channel.getMembers().stream().map(User::getUserName)
                 .collect(Collectors.toList());
-    }
-
-    public UUID getId() {
-        return id;
-    }
-    public String getChannelAdmin() {
-        return channelAdmin;
-    }
-    public String getChannelName() {
-        return channelName;
-    }
-    public String getChannelType() {
-        return channelType;
-    }
-    public String getCreatedAt() {
-        return createdAt;
-    }
-    public List<String> getMembers() {
-        return members;
     }
 
     public String toString() {

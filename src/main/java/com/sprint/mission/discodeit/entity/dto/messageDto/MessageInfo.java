@@ -1,15 +1,14 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.entity.dto.messageDto;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.MessageType;
+import lombok.Getter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Objects;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
 
+@Getter
 public class MessageInfo {
 
     private final UUID id;
@@ -28,23 +27,6 @@ public class MessageInfo {
         this.receiver = message.getType() == MessageType.DIRECT ?
                 message.getReceiver().getUserName() :
                 message.getChannel().getChannelName();
-    }
-
-    public UUID getId() { return id; }
-    public String getAuthor() {
-        return author;
-    }
-    public String getReceiver() {
-        return receiver;
-    }
-    public String getContent() {
-        return content;
-    }
-    public String getCreatedAt() {
-        return createdAt;
-    }
-    public String getUpdatedAt() {
-        return updatedAt;
     }
 
     @Override

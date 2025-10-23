@@ -1,7 +1,8 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.*;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 import com.sprint.mission.discodeit.service.jcf.*;
 
@@ -15,8 +16,8 @@ public class ChannelTest {
         JCFChannelService channelService = new JCFChannelService(userService);
 
         // --- 유저 및 채널 생성 ---
-        UserInfo User1 = userService.createUser("test@codeit.com", "QWERty1!", "admin");
-        UserInfo User2 = userService.createUser("newbie@codeit.com", "NewbiePass1!", "newbie");
+        UserInfoDto User1 = userService.createUser("test@codeit.com", "QWERty1!", "admin");
+        UserInfoDto User2 = userService.createUser("newbie@codeit.com", "NewbiePass1!", "newbie");
         UUID user1Id = User1.getId();
         UUID user2Id = User2.getId();
 

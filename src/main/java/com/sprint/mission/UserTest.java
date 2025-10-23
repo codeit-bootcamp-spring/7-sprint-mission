@@ -1,13 +1,11 @@
 package com.sprint.mission;
 
-import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.UserInfo;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.exception.*;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class UserTest {
@@ -19,7 +17,7 @@ public class UserTest {
     }
     // 유저 모두 조회
     public static void readAll() {
-        List<UserInfo> users = userService.findAllUsers();
+        List<UserInfoDto> users = userService.findAllUsers();
         if (users.isEmpty()) {
             System.out.println("유저를 찾을 수 없음");
         }
@@ -33,7 +31,7 @@ public class UserTest {
     // 메인
     public static void main(String[] args) {
 
-        UserInfo user1 = null;
+        UserInfoDto user1 = null;
 
         // --- 사용자 생성 ---
         System.out.println("--- 사용자 생성 ---");

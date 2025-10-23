@@ -1,5 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@ToString
 public class Message extends BaseEntity {
     private final User author;
     private String content;
@@ -26,30 +31,9 @@ public class Message extends BaseEntity {
         this.receiver = null;
     }   // CM
 
-    public User getAuthor() {return author;}
-    public User getReceiver() {return receiver;}
-    public String getContent() {return content;}
-    public Channel getChannel() {return channel;}
-    public MessageType getType() {return type;}
-
     public void updateContent(String content) {
         this.content = content;
         updateTimestamp();
-    }
-
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "author=" + author +
-                ", content='" + content + '\'' +
-                ", receiver=" + receiver +
-                ", channel=" + channel +
-                ", type=" + type +
-                ", createdAt=" + createdAt +
-                ", id=" + id +
-                ", updatedAt=" + updatedAt +
-                '}';
     }
 }
 

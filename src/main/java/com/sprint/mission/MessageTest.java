@@ -1,7 +1,9 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.*;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfo;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.service.jcf.*;
 
 import java.util.List;
@@ -16,9 +18,9 @@ public class MessageTest {
         JCFMessageService messageService = new JCFMessageService(userService, channelService);
 
         // --- 유저 및 채널 생성 ---
-        UserInfo user1 = userService.createUser("test@codeit.com", "QWERty1!", "admin");
-        UserInfo user2 = userService.createUser("newbie@codeit.com", "NewbiePass1!", "newbie");
-        UserInfo user3 = userService.createUser("asd@codeit.com", "aaaaPass1!", "Arang");
+        UserInfoDto user1 = userService.createUser("test@codeit.com", "QWERty1!", "admin");
+        UserInfoDto user2 = userService.createUser("newbie@codeit.com", "NewbiePass1!", "newbie");
+        UserInfoDto user3 = userService.createUser("asd@codeit.com", "aaaaPass1!", "Arang");
         UUID user1Id = user1.getId();
         UUID user2Id = user2.getId();
         UUID user3Id = user3.getId();

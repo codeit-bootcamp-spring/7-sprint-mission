@@ -1,10 +1,11 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.*;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfo;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
-import com.sprint.mission.discodeit.repository.jcf.*;
 import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.service.basic.*;
 
@@ -15,7 +16,7 @@ import java.util.UUID;
 
 public class JavaApplication {
 
-    private static UserInfo userCreateOrLoad(UserService userService
+    private static UserInfoDto userCreateOrLoad(UserService userService
             , String email, String password, String userName, String phoneNum) {
         return userService.findUserInfoByEmail(email)
                 .orElseGet(() -> {
@@ -24,7 +25,7 @@ public class JavaApplication {
                 });
     }
 
-    private static UserInfo userCreateOrLoad(UserService userService
+    private static UserInfoDto userCreateOrLoad(UserService userService
             , String email, String password, String userName) {
         return userCreateOrLoad(userService, email, password, userName, null);
     }
@@ -55,8 +56,8 @@ public class JavaApplication {
 
         // --- 2. 테스트 데이터 생성 ---
         System.out.println("\n---️ 테스트 데이터 설정 ---");
-        UserInfo admin = userCreateOrLoad(userService, "admin@discodeit.com", "AdminPass1!", "관리자");
-        UserInfo user = userCreateOrLoad(userService, "user@discodeit.com", "UserPass1!", "일반유저");
+        UserInfoDto admin = userCreateOrLoad(userService, "admin@discodeit.com", "AdminPass1!", "관리자");
+        UserInfoDto user = userCreateOrLoad(userService, "user@discodeit.com", "UserPass1!", "일반유저");
         UUID adminId = admin.getId();
         UUID userId = user.getId();
 
@@ -94,7 +95,7 @@ public class JavaApplication {
         // --- 5. 일반 유저 삭제 테스트 (논리 삭제) ---
         System.out.println("\n--- 일반 유저 논리 삭제 ---");
         userService.deleteUser(userId);
-        Optional<UserInfo> deletedUser = userService.findUserInfoById(userId);
+        Optional<UserInfoDto> deletedUser = userService.findUserInfoById(userId);
 
 
         // --- 6. 최종 상태 확인 ---

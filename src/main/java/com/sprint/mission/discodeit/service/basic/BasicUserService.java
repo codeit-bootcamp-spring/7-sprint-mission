@@ -2,90 +2,95 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserState;
-import com.sprint.mission.discodeit.entity.dto.UserInfo;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
 
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-    public BasicUserService(UserRepository userRepository, ChannelRepository channelRepository) {
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
-    }
-
     // 생성
     @Override
-    public UserInfo createUser(String email, String password, String userName, String phoneNum) {
-        userRepository.findByEmail(email).ifPresent(user
+    public UserInfoDto createUser(UserCreateDto createDto) {
+        userRepository.findByEmail(createDto.getEmail()).ifPresent(user
                 -> {throw new DuplicateEmailException("이미 존재하는 이메일");});
-        User newUser = new User(email, password, userName, phoneNum);
+
+        User newUser = User.builder()
+                .email(createDto.getEmail())
+                .userName(createDto.getUserName())
+                .password(createDto.getPassword())
+                .phoneNum(createDto.getPhoneNum())
+                .build();
+
         userRepository.save(newUser);
-        return new UserInfo(newUser);
-
+        return UserInfoDto.from(newUser);
     }
+
+    // --- 조회 ---
+
+    // ID로 출력
     @Override
-    public UserInfo createUser(String email, String password, String userName) {
-        return createUser(email, password, userName, null);
+    public Optional<UserInfoDto> findUserInfoById(UUID userId) {
+        return userRepository.findById(userId).map(UserInfoDto::from);
     }
-
-    // 조회
+    // 이메일로 출력
     @Override
-    public Optional<UserInfo> findUserInfoById(UUID userId) {
-        return userRepository.findById(userId).map(UserInfo::new);
+    public Optional<UserInfoDto> findUserInfoByEmail(String email) {
+        return userRepository.findByEmail(email).map(UserInfoDto::from);
     }
-
+    // 전체출력
+    @Override
+    public List<UserInfoDto> findAllUsers() {
+        return userRepository.findAll().stream().map(UserInfoDto::from)
+                .collect(Collectors.toList());
+    }
+    // 접근
     public Optional<User> findUserEntityById(UUID userId) {
         return userRepository.findById(userId);
     }
 
+    // --- 수정 ---
     @Override
-    public List<UserInfo> findAllUsers() {
-        return userRepository.findAll().stream().map(UserInfo::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Optional<UserInfo> findUserInfoByEmail(String email) {
-        return userRepository.findByEmail(email).map(UserInfo::new);
-    }
-
-    // 수정
-    @Override
-    public Optional<UserInfo> updateProfile(UUID userId, String newUserName, String newPhoneNum) {
+    public Optional<UserInfoDto> updateProfile(UUID userId, String newUserName, String newPhoneNum) {
 
         return userRepository.findById(userId).map(user -> {
             user.updateUserName(newUserName);
             user.updatePhoneNum(newPhoneNum);
             userRepository.save(user);
-            return new UserInfo(user);
+            return UserInfoDto.from(user);
         });
     }
 
     @Override
-    public Optional<UserInfo> changePassword(UUID userId, String newPassword) {
+    public Optional<UserInfoDto> changePassword(UUID userId, String newPassword) {
 
         return userRepository.findById(userId).map(user -> {
             user.updatePassword(newPassword);
             userRepository.save(user);
-            return new UserInfo(user);
+            return UserInfoDto.from(user);
         });
     }
 
     @Override
-    public Optional<UserInfo> updateState(UUID userId, UserState newState) {
+    public Optional<UserInfoDto> updateState(UUID userId, UserState newState) {
 
         return userRepository.findById(userId).map(user -> {
             user.updateState(newState);
             userRepository.save(user);
-            return new UserInfo(user);
+            return UserInfoDto.from(user);
         });
     }
 
@@ -98,7 +103,7 @@ public class BasicUserService implements UserService {
                 throw new IllegalStateException("채널관리자는 삭제할 수 없습니다.");
             }
             userDelete.softDelete();
-            userRepository.save(userDelete);
+            userRepository.save(userDelete);    // 유저만 저장해서 재시작 시 채널이나 메시지에는 적용이 안됨;;
             return true;
         }).orElse(false);
     }

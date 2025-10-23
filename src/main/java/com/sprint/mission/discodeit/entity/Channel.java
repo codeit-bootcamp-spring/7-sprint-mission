@@ -1,18 +1,20 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.exception.InvalidInputException;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@ToString
 public class Channel extends BaseEntity {
 
     private String channelName;
     private final ChannelType type;    // 채널타입
     private final User channelAdmin;
     private final List<User> members;
-
-
 
     public Channel(User user, String channelName, ChannelType type) {
         super();
@@ -29,12 +31,6 @@ public class Channel extends BaseEntity {
     public Channel(User user, ChannelType type) {
         this(user, null, type);
     }
-
-    // getter
-    public ChannelType getType() { return type; }
-    public User getChannelAdmin() { return channelAdmin; }
-    public List<User> getMembers() { return members; }
-    public String getChannelName() { return channelName; }
 
     // updateMessage
     public void changeChannelName(String channelName) {
@@ -63,21 +59,9 @@ public class Channel extends BaseEntity {
         return false;
     }
 
-// 현재 코드가 '누가' '어떤 채널'의 정보를 바꾼다는 것이 아니라 미구현
-//    public boolean isAdmin(User user) {
-//        return this.channelAdmin.getId().equals(user.getId());
-//    }
-
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "channelName='" + channelName + '\'' +
-                ", type=" + type +
-                ", channelAdmin=" + channelAdmin +
-                ", members=" + members +
-                ", id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+/* 현재 코드가 '누가' '어떤 채널'의 정보를 바꾼다는 것이 아니라 미구현
+    public boolean isAdmin(User user) {
+        return this.channelAdmin.getId().equals(user.getId());
     }
+*/
 }

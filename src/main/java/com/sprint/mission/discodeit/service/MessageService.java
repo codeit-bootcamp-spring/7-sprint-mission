@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.dto.MessageInfo;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfo;
 
 import java.util.List;
 import java.util.Optional;

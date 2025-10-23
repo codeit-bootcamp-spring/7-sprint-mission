@@ -1,28 +1,27 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.*;
-import com.sprint.mission.discodeit.entity.dto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+@Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final UserService userService;
 
-    public BasicChannelService(ChannelRepository channelRepository, UserService userService) {
-        this.channelRepository = channelRepository;
-        this.userService = userService;
-    }
-
     @Override
     public ChannelInfo createChannel(UUID userId, String channelName, ChannelType type) {
         User user = userService.findUserEntityById(userId)
-                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없음"));
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
         if (channelName == null || channelName.isBlank())
             channelName = user.getUserName() + "의 채널";
 
