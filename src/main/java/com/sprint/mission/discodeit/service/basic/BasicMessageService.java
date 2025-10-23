@@ -7,22 +7,19 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.OptionalLong;
-import java.util.UUID;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
-
-    public BasicMessageService(MessageRepository messageRepository,  ChannelRepository channelRepository,  UserRepository userRepository) {
-        this.messageRepository = VerifiedUtils.verifyNull(messageRepository);
-        this.channelRepository = VerifiedUtils.verifyNull(channelRepository);
-        this.userRepository = VerifiedUtils.verifyNull(userRepository);
-    }
 
     @Override
     public Message create(Message message) {
@@ -43,19 +40,20 @@ public class BasicMessageService implements MessageService {
         }
 
         if ( slow > 0 ) {
-            long timeNow = System.currentTimeMillis();
-            long windowTime = slow * 1000L;
+            Instant timeNow = Instant.now();
 
-            OptionalLong last = messageRepository.findByChannelIdAndAuthorId(msg.getChannelId(),msg.getAuthorId())
+            Optional<Instant> last = messageRepository.findByChannelIdAndAuthorId(msg.getChannelId(),msg.getAuthorId())
                     .stream()
                     .filter(m -> !m.isDeleted())
-                    .mapToLong(m -> m.getCreatedAt())
-                    .max();
+                    .map(m -> m.getCreatedAt())
+                    .max(Comparator.naturalOrder());
 
-            if (last.isPresent() && (timeNow - last.getAsLong()) < windowTime) {
-                long leftTime = windowTime - (timeNow - last.getAsLong());
-                long seconds = (leftTime + 999) / 1000;
-                throw new IllegalStateException("SlowModeSeconds wait : " + seconds + "s");
+            if (last.isPresent()) {
+                Instant nextAllowed = last.get().plusSeconds(slow);
+                if(timeNow.isBefore(nextAllowed)) {
+                    long waitSeconds = Duration.between(timeNow, nextAllowed).toSeconds();
+                    throw new IllegalStateException("SlowModeSeconds wait : " + waitSeconds + "s");
+                }
             }
         }
         return messageRepository.save(msg);
