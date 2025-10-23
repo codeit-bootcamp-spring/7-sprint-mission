@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
-import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfo;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -68,13 +68,13 @@ public class DiscodeitApplication {
         // --- 3. 메시지 기능 테스트 ---
         System.out.println("\n--- 메시지 기능 테스트 ---");
         messageService.createChannelMessage(adminId, noticeChannelId, "여기는 공지 채널입니다.");
-        MessageInfo userMessage = messageService.createChannelMessage(userId, noticeChannelId, "반갑습니다.");
+        MessageInfoDto userMessage = messageService.createChannelMessage(userId, noticeChannelId, "반갑습니다.");
         messageService.createDirectMessage(adminId, userId, "안녕하세요!");
 
-        List<MessageInfo> channelMessages = messageService.findChannelMessage(noticeChannelId);
+        List<MessageInfoDto> channelMessages = messageService.findChannelMessage(noticeChannelId);
         System.out.println("\n[공지사항 채널 대화 내용]");
         channelMessages.forEach(System.out::println);
-        List<MessageInfo> directMessages = messageService.findMessageBetweenUsers(adminId, userId);
+        List<MessageInfoDto> directMessages = messageService.findMessageBetweenUsers(adminId, userId);
         System.out.println("\n[둘의 대화 내용]");
         directMessages.forEach(System.out::println);
 
@@ -99,7 +99,7 @@ public class DiscodeitApplication {
         // --- 6. 최종 상태 확인 ---
         System.out.println("\n--- 최종 데이터 상태 확인 ---");
         System.out.println("[삭제 후 공지사항 채널 대화 내용]");
-        List<MessageInfo> finalMessages = messageService.findChannelMessage(noticeChannelId);
+        List<MessageInfoDto> finalMessages = messageService.findChannelMessage(noticeChannelId);
         finalMessages.forEach(System.out::println);
 
 	}

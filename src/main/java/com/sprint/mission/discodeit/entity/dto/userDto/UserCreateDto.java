@@ -11,6 +11,6 @@ public class UserCreateDto {
     private String email;
     private String userName;
     private String password;
-    private String phoneNum;    // 선택
+    private String phoneNum;    // 선택사항
 
 }

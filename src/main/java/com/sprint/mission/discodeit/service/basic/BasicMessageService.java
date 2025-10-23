@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfo;
+import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 import com.sprint.mission.discodeit.exception.NotFoundChannelException;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
@@ -23,60 +25,60 @@ public class BasicMessageService implements MessageService {
 
     // Message Create
     @Override
-    public MessageInfo createDirectMessage(UUID authorId, UUID receiverId, String content) {
-        if (content == null || content.isBlank()) {
+    public MessageInfoDto createDirectMessage(DirectMessageCreateDto createDto) {
+        if (createDto.getContent() == null || createDto.getContent().isBlank()) {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }
-        User author = userService.findUserEntityById(authorId)
+        User author = userService.findUserEntityById(createDto.getAuthorId())
                 .orElseThrow(() -> new NotFoundUserException("메시지를 보내는 사용자를 찾을 수 없음"));
-        User receiver = userService.findUserEntityById(receiverId)
+        User receiver = userService.findUserEntityById(createDto.getReceiverId())
                 .orElseThrow(() -> new NotFoundUserException("메시지를 받을 사용자를 찾을 수 없음"));
-        Message message = new Message(author, receiver, content);
+        Message message = new Message(author, receiver, createDto.getContent());
         messageRepo.save(message);
-        return new MessageInfo(message);
+        return MessageInfoDto.from(message);
 
     }
 
     @Override
-    public MessageInfo createChannelMessage(UUID authorId, UUID channelId, String content) {
-        if (content == null || content.isBlank()) {
+    public MessageInfoDto createChannelMessage(ChannelMessageCreateDto createDto) {
+        if (createDto.getContent() == null || createDto.getContent().isBlank()) {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }
-        User author = userService.findUserEntityById(authorId)
+        User author = userService.findUserEntityById(createDto.getAuthorId())
                 .orElseThrow(() -> new NotFoundUserException("메시지를 보내는 사용자를 찾을 수 없음"));
-        Channel channel = channelService.findChannelEntityById(channelId)
+        Channel channel = channelService.findChannelEntityById(createDto.getChannelId())
                 .orElseThrow(() -> new NotFoundChannelException("메시지를 받을 채널을 찾을 수 없음"));
-        Message message = new Message(author, channel, content);
+        Message message = new Message(author, channel, createDto.getContent());
         messageRepo.save(message);
-        return new MessageInfo(message);
+        return MessageInfoDto.from(message);
 
     }
 
 
     // Message Read
     @Override
-    public Optional<MessageInfo> findMessageById(UUID messageId) {
-        return messageRepo.findById(messageId).map(MessageInfo::new);
+    public Optional<MessageInfoDto> findMessageById(UUID messageId) {
+        return messageRepo.findById(messageId).map(MessageInfoDto::from);
     }
 
     // update를 해도 순서는 바뀌지않음 생성일자로 정렬
     @Override
-    public List<MessageInfo> findMessageBetweenUsers(UUID userId1, UUID userId2) {
+    public List<MessageInfoDto> findMessageBetweenUsers(UUID userId1, UUID userId2) {
         return messageRepo.findAllByBetweenUserIds(userId1, userId2)
                 .stream().sorted(Comparator.comparing(Message::getCreatedAt))
-                .map(MessageInfo::new).collect(Collectors.toList());
+                .map(MessageInfoDto::from).collect(Collectors.toList());
     }
 
     @Override
-    public List<MessageInfo> findChannelMessage(UUID channelId) {
+    public List<MessageInfoDto> findChannelMessage(UUID channelId) {
         return messageRepo.findAllByChannelId(channelId).stream()
                 .sorted(Comparator.comparing(Message::getCreatedAt))
-                .map(MessageInfo::new).collect(Collectors.toList());
+                .map(MessageInfoDto::from).collect(Collectors.toList());
     }
 
     // Message Update
     @Override
-    public Optional<MessageInfo> updateMessage(UUID messageId, String newContent) {
+    public Optional<MessageInfoDto> updateMessage(UUID messageId, String newContent) {
         if (newContent == null || newContent.isBlank()) {
             deleteMessage(messageId);
             return Optional.empty();
@@ -85,7 +87,7 @@ public class BasicMessageService implements MessageService {
         return messageRepo.findById(messageId).map(message -> {
             message.updateContent(newContent);
             messageRepo.save(message);
-            return new MessageInfo(message);
+            return MessageInfoDto.from(message);
         });
     }
 

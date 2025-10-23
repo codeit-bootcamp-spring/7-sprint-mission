@@ -22,6 +22,7 @@ public class Message extends BaseEntity {
         this.type = MessageType.DIRECT;
         this.channel = null;
     }   // DM
+
     public Message(User author, Channel channel, String content) {
         super();
         this.author = author;

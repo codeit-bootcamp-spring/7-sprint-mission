@@ -2,21 +2,20 @@ package com.sprint.mission.discodeit.entity.dto.userDto;
 
 import com.sprint.mission.discodeit.entity.User;
 import lombok.Builder;
-import lombok.Getter;
+
+import java.util.UUID;
 
 import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
 
-@Getter
+/**
+ * @param createAt 가입시기
+ */
 @Builder
-public class UserInfoDto {
-
-    private final String userName;
-    private final String state;
-    private final String createAt;  // 가입시기
-    private final String phoneNum;
+public record UserInfoDto(UUID Id, String userName, String state, String createAt, String phoneNum) {
 
     public static UserInfoDto from(User user) {
         return UserInfoDto.builder()
+                .Id(user.getId())
                 .userName(user.getUserName())
                 .state(user.getUserState().getDescState())
                 .createAt(changeTime(user.getCreatedAt()))

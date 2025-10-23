@@ -2,7 +2,7 @@ package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
-import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfo;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.service.jcf.*;
 
@@ -37,9 +37,9 @@ public class MessageTest {
         messageService.createDirectMessage(user1Id, user2Id, "안녕하세요!");
         messageService.createDirectMessage(user2Id, user1Id, "네 좋은 아침이예요");
 
-        List<MessageInfo> dm = messageService.findMessageBetweenUsers(user1Id, user2Id);
+        List<MessageInfoDto> dm = messageService.findMessageBetweenUsers(user1Id, user2Id);
         System.out.println("==========================");
-        System.out.printf("%s <-> %s\n", user1.getUserName(), user2.getUserName());
+        System.out.printf("%s <-> %s\n", user1.userName(), user2.userName());
         dm.forEach(System.out::println);
         System.out.println("==========================");
 
@@ -47,7 +47,7 @@ public class MessageTest {
         System.out.println("\n--- 채널 메시지 전송 및 조회 ---");
         messageService.createChannelMessage(user1Id, channelId, "여러분 안녕하세요");
         messageService.createChannelMessage(user2Id, channelId, "안녕하세요");
-        MessageInfo cm = messageService.createChannelMessage(user3Id, channelId, "반가워요");
+        MessageInfoDto cm = messageService.createChannelMessage(user3Id, channelId, "반가워요");
 
         System.out.println("===========================");
         System.out.println(channel.getChannelName());
@@ -56,7 +56,7 @@ public class MessageTest {
 
         // --- 메시지 수정 ---
         System.out.println("\n--- 메시지 수정 ---");
-        UUID cmId = cm.getId();
+        UUID cmId = cm.id();
         messageService.updateMessage(cmId, "반갑습니다!!!!");
         System.out.println("=========수정 후 출력=========");
         System.out.println(channel.getChannelName());
