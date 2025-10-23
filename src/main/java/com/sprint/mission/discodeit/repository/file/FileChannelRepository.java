@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FileUserRepository implements UserRepository {
+public class FileChannelRepository implements ChannelRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileUserRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+    public FileChannelRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Channel.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
@@ -31,38 +31,38 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User save(User user) {
-        Path path = resolvePath(user.getId());
+    public Channel save(Channel channel) {
+        Path path = resolvePath(channel.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
-            oos.writeObject(user);
+            oos.writeObject(channel);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return user;
+        return channel;
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
-        User userNullable = null;
+    public Optional<Channel> findById(UUID id) {
+        Channel channelNullable = null;
         Path path = resolvePath(id);
         if (Files.exists(path)) {
             try (
                     FileInputStream fis = new FileInputStream(path.toFile());
                     ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-                userNullable = (User) ois.readObject();
+                channelNullable = (Channel) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
-        return Optional.ofNullable(userNullable);
+        return Optional.ofNullable(channelNullable);
     }
 
     @Override
-    public List<User> findAll() {
+    public List<Channel> findAll() {
         try {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
@@ -71,7 +71,7 @@ public class FileUserRepository implements UserRepository {
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
                         ) {
-                            return (User) ois.readObject();
+                            return (Channel) ois.readObject();
                         } catch (IOException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }

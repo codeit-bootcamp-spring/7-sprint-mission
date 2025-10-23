@@ -1,30 +1,30 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
 
-public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> data;
+public class JCFChannelRepository implements ChannelRepository {
+    private final Map<UUID, Channel> data;
 
-    public JCFUserRepository() {
+    public JCFChannelRepository() {
         this.data = new HashMap<>();
     }
 
     @Override
-    public User save(User user) {
-        this.data.put(user.getId(), user);
-        return user;
+    public Channel save(Channel channel) {
+        this.data.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
+    public Optional<Channel> findById(UUID id) {
         return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public List<User> findAll() {
+    public List<Channel> findAll() {
         return this.data.values().stream().toList();
     }
 
