@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.messageroom.application;
+package com.sprint.mission.discodeit.messageroom.presentation;
 
 
 import com.sprint.mission.discodeit.messageroom.domain.MessageRoom;

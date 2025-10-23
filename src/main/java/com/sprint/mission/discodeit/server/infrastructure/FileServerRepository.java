@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.server.infrastructure;
 
 import com.sprint.mission.discodeit.server.application.ServerRepository;
 import com.sprint.mission.discodeit.server.domain.Server;
+import org.springframework.stereotype.Repository;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -9,9 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+@Repository
 public class FileServerRepository implements ServerRepository {
 
-    private final String FILE_PATH = "data/channels.ser"; // 저장 파일 경로
+    private final String FILE_PATH = "data/servers.ser"; // 저장 파일 경로
 
     // 유저 데이터 전체를 파일에서 불러오기
     private Map<UUID, Server> load() {
@@ -64,7 +66,7 @@ public class FileServerRepository implements ServerRepository {
     @Override
     public List<Server> findAll() {
         Map<UUID, Server> store = load();
-        return List.copyOf(store.values().stream().toList());
+        return List.copyOf(store.values());
     }
 
 }

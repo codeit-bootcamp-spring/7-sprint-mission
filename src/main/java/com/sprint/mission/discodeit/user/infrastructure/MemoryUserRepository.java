@@ -36,6 +36,11 @@ public class MemoryUserRepository implements UserRepository {
         return Optional.ofNullable(store.get(uuid));
     }
 
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return store.values().stream().filter(user -> user.getUsername().equals(username)).findAny();
+    }
+
 
     @Override
     public List<User> findAll() {

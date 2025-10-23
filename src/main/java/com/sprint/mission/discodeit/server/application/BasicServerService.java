@@ -2,11 +2,13 @@ package com.sprint.mission.discodeit.server.application;
 
 
 import com.sprint.mission.discodeit.server.domain.Server;
+import com.sprint.mission.discodeit.server.presentation.ServerService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
+@Service
 public class BasicServerService implements ServerService {
 
 

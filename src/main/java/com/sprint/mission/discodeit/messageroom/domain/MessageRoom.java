@@ -29,6 +29,23 @@ public class MessageRoom implements Serializable {
         return new MessageRoom(messageRoomName, messageRoomType);
     }
 
+    private MessageRoom(String messageRoomName,MessageRoomType messageRoomType) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.updatedAt=Instant.now();
+        this.messageRoomType=messageRoomType;
+        this.MessageRoomName=messageRoomName;
+
+    }
+
+    private static void validateMessageRoomName(String messageRoomName){
+        if(messageRoomName==null || messageRoomName.length()<1){
+            throw new IllegalArgumentException("채팅방 이름을 입력하세요");
+        }
+    }
+
+
+
     public List<UUID> getParticipants() {
         return List.copyOf(participants);
     }
@@ -46,18 +63,5 @@ public class MessageRoom implements Serializable {
         history.add(messageVo);
     }
 
-    private static void validateMessageRoomName(String messageRoomName){
-        if(messageRoomName==null || messageRoomName.length()<1){
-            throw new IllegalArgumentException("채팅방 이름을 입력하세요");
-        }
-    }
 
-    private MessageRoom(String messageRoomName,MessageRoomType messageRoomType) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt=Instant.now();
-        this.messageRoomType=messageRoomType;
-        this.MessageRoomName=messageRoomName;
-
-    }
 }

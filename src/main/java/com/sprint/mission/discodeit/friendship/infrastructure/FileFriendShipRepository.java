@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.friendship.infrastructure;
 
+import com.sprint.mission.discodeit.friendship.application.FriendShipRepository;
 import com.sprint.mission.discodeit.friendship.domain.FriendShip;
+import org.springframework.stereotype.Repository;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -8,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+@Repository
 public class FileFriendShipRepository implements FriendShipRepository {
 
     private final String FILE_PATH = "data/FriendShip.ser"; // 저장 파일 경로

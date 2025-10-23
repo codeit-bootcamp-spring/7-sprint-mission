@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.friendship.infrastructure;
+package com.sprint.mission.discodeit.friendship.application;
 
 import com.sprint.mission.discodeit.friendship.domain.FriendShip;
 

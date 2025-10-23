@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.friendship.infrastructure;
 
+import com.sprint.mission.discodeit.friendship.application.FriendShipRepository;
 import com.sprint.mission.discodeit.friendship.domain.FriendShip;
 
 import java.util.*;

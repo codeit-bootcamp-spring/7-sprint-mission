@@ -3,9 +3,12 @@ package com.sprint.mission.discodeit.messageroom.application;
 
 
 import com.sprint.mission.discodeit.messageroom.domain.MessageRoom;
+import com.sprint.mission.discodeit.messageroom.presentation.MessageRoomService;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service
 public class BasicMessageRoomService implements MessageRoomService {
 
     private final MessageRoomRepository messageRoomRepository;

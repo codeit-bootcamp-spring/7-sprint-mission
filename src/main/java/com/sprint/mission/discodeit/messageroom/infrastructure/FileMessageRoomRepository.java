@@ -3,16 +3,17 @@ package com.sprint.mission.discodeit.messageroom.infrastructure;
 
 import com.sprint.mission.discodeit.messageroom.application.MessageRoomRepository;
 import com.sprint.mission.discodeit.messageroom.domain.MessageRoom;
+import org.springframework.stereotype.Repository;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-
+@Repository
 public class FileMessageRoomRepository implements MessageRoomRepository {
 
-    private final String FILE_PATH = "data/messageRoom.ser"; // 저장 파일 경로
+    private final String FILE_PATH = "data/messageRooms.ser"; // 저장 파일 경로
 
 
     private Map<UUID, MessageRoom> load() {
@@ -62,7 +63,7 @@ public class FileMessageRoomRepository implements MessageRoomRepository {
     @Override
     public List<MessageRoom> findAll() {
         Map<UUID, MessageRoom> store= load();
-        return List.copyOf(store.values().stream().toList());
+        return List.copyOf(store.values());
     }
 
 }

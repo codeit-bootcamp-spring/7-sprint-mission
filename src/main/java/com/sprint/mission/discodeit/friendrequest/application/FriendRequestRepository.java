@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.friendrequest.infrastructure;
+package com.sprint.mission.discodeit.friendrequest.application;
 
 import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
 

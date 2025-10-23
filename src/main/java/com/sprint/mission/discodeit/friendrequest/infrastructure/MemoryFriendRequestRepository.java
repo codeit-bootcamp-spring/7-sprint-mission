@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.friendrequest.infrastructure;
 
+import com.sprint.mission.discodeit.friendrequest.application.FriendRequestRepository;
 import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
 
 import java.util.*;

@@ -34,6 +34,20 @@ public class Server implements Serializable {
         return new Server(serverName);
     }
 
+    private Server(String serverName) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.serverName=serverName;
+        this.serverLevel=1L;
+        this.isPrivate=false;
+    }
+
+    private static void validateServerName(String serverName){
+        if (serverName == null || serverName.length()<1){
+            throw new IllegalArgumentException("서버의 이름을 입력하세요");
+        }
+    }
+
 
     public void updateServerName(String newServerName){
         this.updatedAt=Instant.now();
@@ -72,20 +86,5 @@ public class Server implements Serializable {
         messageRooms.add(id);
         updatedAt=Instant.now();
     }
-
-    private Server(String serverName) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.serverName=serverName;
-        this.serverLevel=1L;
-        this.isPrivate=false;
-    }
-
-    private static void validateServerName(String serverName){
-        if (serverName == null || serverName.length()<1){
-            throw new IllegalArgumentException("서버의 이름을 입력하세요");
-        }
-    }
-
 
 }

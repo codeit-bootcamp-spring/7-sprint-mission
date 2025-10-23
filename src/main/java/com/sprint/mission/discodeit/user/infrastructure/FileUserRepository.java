@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.user.infrastructure;
 
 import com.sprint.mission.discodeit.user.application.UserRepository;
 import com.sprint.mission.discodeit.user.domain.User;
+import org.springframework.stereotype.Repository;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+@Repository
 public class FileUserRepository implements UserRepository {
 
     private final String FILE_PATH = "data/users.ser"; // 저장 파일 경로
@@ -78,6 +80,12 @@ public class FileUserRepository implements UserRepository {
     @Override
     public List<User> findAll() {
         Map<UUID, User> store = load();
-        return List.copyOf(store.values().stream().toList());
+        return List.copyOf(store.values());
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        Map<UUID, User> store = load();
+        return store.values().stream().filter(u -> u.getEmail().equals(username)).findFirst();
     }
 }

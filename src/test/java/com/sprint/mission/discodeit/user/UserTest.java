@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.user.domain.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
+
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -70,7 +72,7 @@ public class UserTest {
     void 이메일_정상_수정_성공() {
         // given
         User user = User.create("test@email.com", "abcd1234", "Ian", "010-1234-5678");
-        long beforeUpdate = user.getUpdatedAt();
+
 
         // when
         user.updateEmail("new@email.com");
@@ -94,7 +96,7 @@ public class UserTest {
     void 비밀번호_정상_수정_성공() {
         // given
         User user = User.create("test@email.com", "abcd1234", "Ian", "010-1234-5678");
-        long beforeUpdate = user.getUpdatedAt();
+
 
         // when
 
@@ -118,7 +120,7 @@ public class UserTest {
     void 사용자이름_정상_수정_성공() {
         // given
         User user = User.create("test@email.com", "abcd1234", "Ian", "010-1234-5678");
-        long beforeUpdate = user.getUpdatedAt();
+
 
         // when
         user.updateUsername("Neo");
@@ -138,18 +140,6 @@ public class UserTest {
                 .isInstanceOf(ValidationException.class);
     }
 
-    @Test
-    void 닉네임_수정_성공() {
-        // given
-        User user = User.create("test@email.com", "abcd1234", "Ian", "010-1234-5678");
-        long beforeUpdate = user.getUpdatedAt();
 
-        // when
-        user.updateNickname("아이언");
-
-        // then
-        assertThat(user.getNickname()).isEqualTo("아이언");
-
-    }
 }
 

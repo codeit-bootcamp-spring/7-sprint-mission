@@ -27,7 +27,6 @@ public class User implements Serializable {
     private String username;
     private String password;
     private String email;
-    private String nickname;
     private String phoneNumber;
 
 
@@ -40,65 +39,7 @@ public class User implements Serializable {
     }
 
 
-
-    public void UpdatedPassword(String password) {
-        validatePassword(password);
-        this.password = password;
-        this.updatedAt = Instant.now();
-    }
-
-
-    public void updateUsername(String username) {
-        validateUsername(username);
-        this.username = username;
-        this.updatedAt = Instant.now();
-    }
-
-    public void updatePassword(String password) {
-        validatePassword(password);
-
-        this.password = password;
-        this.updatedAt = Instant.now();
-    }
-
-    public void updateEmail(String email) {
-        validateEmail(email);
-        this.email = email;
-        this.updatedAt = Instant.now();
-    }
-
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-        this.updatedAt = Instant.now();
-    }
-
-    public void updatePhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-        this.updatedAt = Instant.now();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof User user)) return false;
-        return Objects.equals(id, user.id) && Objects.equals(createdAt, user.createdAt) && Objects.equals(updatedAt, user.updatedAt) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(nickname, user.nickname) && Objects.equals(phoneNumber, user.phoneNumber);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, createdAt, updatedAt, username, password, email, nickname, phoneNumber);
-    }
-
-
-    //친구 요청 보내기
-    public FriendRequest sendFriendRequestTo(User target) {
-        return FriendRequest.create(this.id, target.getId());
-    }
-
-    //친구 요청 수락
-    public FriendShip acceptFriendRequest(FriendRequest request) {
-        return FriendShip.create(request.getSenderId(), this.id);
-    }
-
+    //가독성과 유지보수의 편의성을 위해서 private 메서드임에도 생성자와 검증 메서드는 위로 올렸음
     private User(String email, String password, String username, String phoneNumber) {
         this.id = UUID.randomUUID();
         this.createdAt =Instant.now();
@@ -132,4 +73,62 @@ public class User implements Serializable {
             throw new ValidationException(ErrorType.INVALID_PHONE_NUMBER);
         }
     }
+
+
+    public void UpdatedPassword(String password) {
+        validatePassword(password);
+        this.password = password;
+        this.updatedAt = Instant.now();
+    }
+
+    //username을 식별자처럼 쓰는데 변경 가능해도 되나?
+    public void updateUsername(String username) {
+        validateUsername(username);
+        this.username = username;
+        this.updatedAt = Instant.now();
+    }
+
+    public void updatePassword(String password) {
+        validatePassword(password);
+
+        this.password = password;
+        this.updatedAt = Instant.now();
+    }
+
+    public void updateEmail(String email) {
+        validateEmail(email);
+        this.email = email;
+        this.updatedAt = Instant.now();
+    }
+
+
+
+    public void updatePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+        this.updatedAt = Instant.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(id, user.id) && Objects.equals(createdAt, user.createdAt) && Objects.equals(updatedAt, user.updatedAt) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(phoneNumber, user.phoneNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, createdAt, updatedAt, username, password, email, phoneNumber);
+    }
+
+
+    //친구 요청 보내기
+    public FriendRequest sendFriendRequestTo(User target) {
+        return FriendRequest.create(this.id, target.getId());
+    }
+
+    //친구 요청 수락
+    public FriendShip acceptFriendRequest(FriendRequest request) {
+        return FriendShip.create(request.getSenderId(), this.id);
+    }
+
+
 }

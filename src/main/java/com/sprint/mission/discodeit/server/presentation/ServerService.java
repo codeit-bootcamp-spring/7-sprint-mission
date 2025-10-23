@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.server.application;
+package com.sprint.mission.discodeit.server.presentation;
 
 import com.sprint.mission.discodeit.server.domain.Server;
 
