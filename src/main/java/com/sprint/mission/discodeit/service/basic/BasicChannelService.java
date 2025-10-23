@@ -92,7 +92,7 @@ public class BasicChannelService implements ChannelService {
         return Optional.of(new ChannelInfo(channel));
 
 
-        /* 와! 플랩맵!!
+        /* flatMap으로 구현
         return channelRepository.findById(channelId)
                 .flatMap(channel -> userService.findUserEntityById(userId)
                                 .map(user -> {
@@ -128,10 +128,18 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public boolean deleteChannel(UUID id) {
+
+        return channelRepository.findById(id).map(channel -> {
+            channelRepository.deleteById(id);
+            return true;
+        }).orElse(false);
+
+        /*
         if (channelRepository.findById(id).isPresent()) {
             channelRepository.deleteById(id);
             return true;
         }
         return false;
+         */
     }
 }

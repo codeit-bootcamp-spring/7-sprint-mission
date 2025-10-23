@@ -92,10 +92,18 @@ public class BasicMessageService implements MessageService {
     // Message Delete
     @Override
     public boolean deleteMessage(UUID id) {
+
+        return messageRepo.findById(id).map(message -> {
+            messageRepo.deleteById(id);
+            return true;
+        }).orElse(false);
+
+        /*
         if (messageRepo.findById(id).isPresent()) {
             messageRepo.deleteById(id);
             return true;
         }
         return false;
+         */
     }
 }

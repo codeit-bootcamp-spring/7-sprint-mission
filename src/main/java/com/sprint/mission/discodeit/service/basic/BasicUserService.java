@@ -66,9 +66,6 @@ public class BasicUserService implements UserService {
             user.updatePhoneNum(newPhoneNum);
             userRepository.save(user);
             return new UserInfo(user);
-        }).or(() -> {
-            System.out.println("변경 실패");
-            return Optional.empty();
         });
     }
 
@@ -79,9 +76,6 @@ public class BasicUserService implements UserService {
             user.updatePassword(newPassword);
             userRepository.save(user);
             return new UserInfo(user);
-        }).or(()->{
-            System.out.println("변경 실패");
-            return Optional.empty();
         });
     }
 
@@ -92,9 +86,6 @@ public class BasicUserService implements UserService {
             user.updateState(newState);
             userRepository.save(user);
             return new UserInfo(user);
-        }).or(()->{
-            System.out.println("변경 실패");
-            return Optional.empty();
         });
     }
 
@@ -108,11 +99,7 @@ public class BasicUserService implements UserService {
             }
             userDelete.softDelete();
             userRepository.save(userDelete);
-            System.out.println("유저 삭제 완료");
             return true;
-        }).orElseGet(() -> {
-            System.out.println("삭제 실패");
-            return false;
-        });
+        }).orElse(false);
     }
 }
