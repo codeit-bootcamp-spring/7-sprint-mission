@@ -1,7 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.ToString;
+
 import java.util.UUID;
 
+@Getter
+@ToString
 public class Message extends BaseEntity {
     private String content;
     private String userName;
@@ -17,9 +22,6 @@ public class Message extends BaseEntity {
         this.isDeleted = false;
     }
 
-    public String getUserName() {
-        return userName;
-    }
 
     public void setUserName(String name) {
         if(isDeleted) { throw new IllegalStateException("Cannot set userName on deleted Message"); }
@@ -30,9 +32,6 @@ public class Message extends BaseEntity {
         }
     }
 
-    public String getContent() {
-        return content;
-    }
     public void setContent(String content) {
         if(isDeleted){ throw new IllegalStateException("Cannot set content on deleted Message"); }
         String vn = VerifiedUtils.verifyContent(content);
@@ -40,18 +39,6 @@ public class Message extends BaseEntity {
             this.content = vn;
             reUpdatedAt();
         }
-    }
-
-    public UUID getAuthorId() {
-        return authorId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
     }
 
     public boolean delete() {
@@ -69,12 +56,5 @@ public class Message extends BaseEntity {
         } else {
             return content;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "content='" + content + '\'' +
-                '}';
     }
 }

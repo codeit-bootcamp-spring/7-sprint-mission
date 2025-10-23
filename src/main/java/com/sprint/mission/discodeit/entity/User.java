@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.Objects;
 
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@ToString
 public class User extends BaseEntity {
     private String username; // 유저 이름 ( 별명 x)
     private String password;
@@ -15,20 +19,12 @@ public class User extends BaseEntity {
         this.userState = UserState.ONLINE;
     }
 
-    public UserState getUserState() {
-        return userState;
-    }
-
     public void setUserState(UserState userState) {
         UserState state = VerifiedUtils.verifyNull(userState);
         if (this.userState != state) {
             this.userState = state;
             reUpdatedAt();
         }
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public void setUsername(String username) {
@@ -47,9 +43,6 @@ public class User extends BaseEntity {
         }
     }
 
-    public String getEmail() {
-        return email;
-    }
 
     public void setEmail(String email) {
         String v = VerifiedUtils.verifyEmail(email);
@@ -57,14 +50,6 @@ public class User extends BaseEntity {
             this.email = v;
             reUpdatedAt();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                '}';
     }
 
     public void update(String username, String password, String email) {

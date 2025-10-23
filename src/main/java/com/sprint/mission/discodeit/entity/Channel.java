@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.ToString;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -24,25 +27,19 @@ memberId :
  */
 
     // 데이터 관리, 실제 변경 부분 구현!!
+@Getter
+@ToString
 public class Channel extends BaseEntity {
     private String channelName; // 채널 명
-    private final ChType type; // 0: 음성채널, 1: 채팅채널
+    private final ChannelType type; // 0: 음성채널, 1: 채팅채널
     private int slowModeSeconds; // 슬로우모드 초(s)
     private final Map<UUID, UserRole> members = new HashMap<>();
    // private UUID ownerId; // 추후 채널 삭제/멤버 강퇴 등 권한적인 내용 사용시 사용
 
-    public Channel(ChType type, String channelName) {
+    public Channel(ChannelType type, String channelName) {
         if(type == null) { throw new IllegalArgumentException("type cannot be null"); }
         this.type = type;
         this.channelName = VerifiedUtils.verifyName(channelName);
-    }
-
-    public ChType getType() {
-        return type;
-    }
-
-    public String getChannelName() {
-        return channelName;
     }
 
     public void setChannelName(String channelName) {
@@ -61,22 +58,6 @@ public class Channel extends BaseEntity {
             this.slowModeSeconds = slowModeSeconds;
             reUpdatedAt();
         }
-    }
-
-    public int getSlowModeSeconds() {
-        return slowModeSeconds;
-    }
-
-    public Map<UUID, UserRole> getMembers() {
-        return members;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() +
-                "{ channelName='" + channelName + '\'' +
-                ", type=" + type + ", slowModeSeconds=" + slowModeSeconds +
-                '}';
     }
 
     public boolean join(UUID memberId) {
