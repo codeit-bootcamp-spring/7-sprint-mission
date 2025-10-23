@@ -18,6 +18,7 @@ public class Channel extends BaseEntity {
 
     public Channel(User user, String channelName, ChannelType type) {
         super();
+
         this.channelAdmin = user;
         if (channelName == null || channelName.isBlank()) {
             this.channelName = user.getUserName() + "의 채널";

@@ -11,11 +11,11 @@ import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
  * @param createAt 가입시기
  */
 @Builder
-public record UserInfoDto(UUID Id, String userName, String state, String createAt, String phoneNum) {
+public record UserInfoDto(UUID id, String userName, String state, String createAt, String phoneNum) {
 
     public static UserInfoDto from(User user) {
         return UserInfoDto.builder()
-                .Id(user.getId())
+                .id(user.getId())
                 .userName(user.getUserName())
                 .state(user.getUserState().getDescState())
                 .createAt(changeTime(user.getCreatedAt()))

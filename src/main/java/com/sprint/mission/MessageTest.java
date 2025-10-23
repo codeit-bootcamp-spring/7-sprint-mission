@@ -1,7 +1,7 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
 import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.service.jcf.*;
@@ -25,8 +25,8 @@ public class MessageTest {
         UUID user2Id = user2.getId();
         UUID user3Id = user3.getId();
 
-        ChannelInfo channel = channelService.createChannel(user1Id, ChannelType.TEXT);
-        UUID channelId = channel.getId();
+        ChannelInfoDto channel = channelService.createChannel(user1Id, ChannelType.TEXT);
+        UUID channelId = channel.id();
 
         // --- 채널에 유저 추가 ---
         channelService.addMemberToChannel(channelId, user2Id);
@@ -50,7 +50,7 @@ public class MessageTest {
         MessageInfoDto cm = messageService.createChannelMessage(user3Id, channelId, "반가워요");
 
         System.out.println("===========================");
-        System.out.println(channel.getChannelName());
+        System.out.println(channel.channelName());
         messageService.findChannelMessage(channelId).forEach(System.out::println);
         System.out.println("===========================");
 
@@ -59,7 +59,7 @@ public class MessageTest {
         UUID cmId = cm.id();
         messageService.updateMessage(cmId, "반갑습니다!!!!");
         System.out.println("=========수정 후 출력=========");
-        System.out.println(channel.getChannelName());
+        System.out.println(channel.channelName());
         messageService.findChannelMessage(channelId).forEach(System.out::println);
         System.out.println("===========================");
 
@@ -69,7 +69,7 @@ public class MessageTest {
         System.out.println(" 메시지 삭제 " + (isDeleted ? "성공" : "실패"));
 
         System.out.println("===========================");
-        System.out.println(channel.getChannelName());
+        System.out.println(channel.channelName());
         messageService.findChannelMessage(channelId).forEach(System.out::println);
         System.out.println("===========================");
 

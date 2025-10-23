@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateDto;
 import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -24,7 +28,15 @@ public class DiscodeitApplication {
         return userService.findUserInfoByEmail(email)
                 .orElseGet(() -> {
                     System.out.println("새로운 계정 가입: " + userName);
-                    return userService.createUser(email, password, userName, phoneNum);
+
+                    return userService.createUser(
+                            UserCreateDto.builder()
+                            .email(email)
+                            .password(password)
+                            .userName(userName)
+                            .phoneNum(phoneNum)
+                            .build()
+                    );
                 });
     }
 
@@ -33,18 +45,25 @@ public class DiscodeitApplication {
         return userCreateOrLoad(userService, email, password, userName, null);
     }
 
-    private static ChannelInfo channelCreateOrLoad(ChannelService channelService
+    private static ChannelInfoDto channelCreateOrLoad(ChannelService channelService
             , UUID adminId, String channelName, ChannelType type) {
         return channelService.findChannelInfoByChannelName(channelName)
                 .orElseGet(() -> {
                     System.out.println("새로운 채널 개설: " + channelName);
-                    return channelService.createChannel(adminId, channelName, type);
+
+                    return channelService.createChannel(
+                            ChannelCreateDto.builder()
+                                    .adminId(adminId)
+                                    .channelName(channelName)
+                                    .type(type)
+                                    .build()
+                    );
                 });
     }
 
 
-	public static void main(String[] args) {
-		ConfigurableApplicationContext ctx = SpringApplication.run(DiscodeitApplication.class, args);
+    public static void main(String[] args) {
+        ConfigurableApplicationContext ctx = SpringApplication.run(DiscodeitApplication.class, args);
 
         // JavaApplication의 main 메소드에서 Service를 초기화하는 코드
         UserService userService = ctx.getBean(UserService.class);
@@ -55,11 +74,11 @@ public class DiscodeitApplication {
         System.out.println("\n---️ 데이터 셋업 ---");
         UserInfoDto admin = userCreateOrLoad(userService, "admin@discodeit.com", "AdminPass1!", "관리자");
         UserInfoDto user = userCreateOrLoad(userService, "user@discodeit.com", "UserPass1!", "일반유저", "010-1234-5678");
-        UUID adminId = admin.getId();
-        UUID userId = user.getId();
+        UUID adminId = admin.id();
+        UUID userId = user.id();
 
-        ChannelInfo noticeChannel = channelCreateOrLoad(channelService, adminId, "공지사항", ChannelType.TEXT);
-        UUID noticeChannelId = noticeChannel.getId();
+        ChannelInfoDto noticeChannel = channelCreateOrLoad(channelService, adminId, "공지사항", ChannelType.TEXT);
+        UUID noticeChannelId = noticeChannel.id();
 
         channelService.addMemberToChannel(noticeChannelId, userId);
 
@@ -67,9 +86,27 @@ public class DiscodeitApplication {
 
         // --- 3. 메시지 기능 테스트 ---
         System.out.println("\n--- 메시지 기능 테스트 ---");
-        messageService.createChannelMessage(adminId, noticeChannelId, "여기는 공지 채널입니다.");
-        MessageInfoDto userMessage = messageService.createChannelMessage(userId, noticeChannelId, "반갑습니다.");
-        messageService.createDirectMessage(adminId, userId, "안녕하세요!");
+        messageService.createChannelMessage(
+                ChannelMessageCreateDto.builder()
+                        .authorId(adminId)
+                        .channelId(noticeChannelId)
+                        .content("여기는 공지 채널입니다.")
+                        .build()
+        );
+        MessageInfoDto userMessage = messageService.createChannelMessage(
+                ChannelMessageCreateDto.builder()
+                        .authorId(userId)
+                        .channelId(noticeChannelId)
+                        .content("반갑습니다.")
+                        .build()
+        );
+        messageService.createDirectMessage(
+                DirectMessageCreateDto.builder()
+                .authorId(adminId)
+                .receiverId(userId)
+                .content("안녕하세요!!")
+                .build()
+        );
 
         List<MessageInfoDto> channelMessages = messageService.findChannelMessage(noticeChannelId);
         System.out.println("\n[공지사항 채널 대화 내용]");
@@ -102,7 +139,7 @@ public class DiscodeitApplication {
         List<MessageInfoDto> finalMessages = messageService.findChannelMessage(noticeChannelId);
         finalMessages.forEach(System.out::println);
 
-	}
+    }
     /* [ ] JavaApplication과 DiscodeitApplication에서 Service를 초기화하는 방식의 차이에 대해 다음의 키워드를 중심으로 정리해보세요.
     - IoC Container (제어 역전)
     - Dependency Injection (의존성 주입)

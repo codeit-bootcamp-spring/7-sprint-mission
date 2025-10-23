@@ -1,7 +1,7 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
 import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.repository.*;
@@ -30,7 +30,7 @@ public class JavaApplication {
         return userCreateOrLoad(userService, email, password, userName, null);
     }
 
-    private static ChannelInfo channelCreateOrLoad(ChannelService channelService
+    private static ChannelInfoDto channelCreateOrLoad(ChannelService channelService
             , UUID adminId, String channelName, ChannelType type) {
         return channelService.findChannelInfoByChannelName(channelName)
                 .orElseGet(() -> {
@@ -61,8 +61,8 @@ public class JavaApplication {
         UUID adminId = admin.getId();
         UUID userId = user.getId();
 
-        ChannelInfo noticeChannel = channelCreateOrLoad(channelService, adminId, "공지사항", ChannelType.TEXT);
-        UUID noticeChannelId = noticeChannel.getId();
+        ChannelInfoDto noticeChannel = channelCreateOrLoad(channelService, adminId, "공지사항", ChannelType.TEXT);
+        UUID noticeChannelId = noticeChannel.id();
 
         System.out.println("--- 채널 멤버 추가 ---");     // 버그 발생...
         channelService.addMemberToChannel(noticeChannelId, userId);

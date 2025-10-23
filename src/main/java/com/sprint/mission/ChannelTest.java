@@ -1,7 +1,7 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 import com.sprint.mission.discodeit.service.jcf.*;
@@ -21,8 +21,8 @@ public class ChannelTest {
         UUID user1Id = User1.getId();
         UUID user2Id = User2.getId();
 
-        ChannelInfo channel1 = channelService.createChannel(user1Id, ChannelType.TEXT);
-        UUID channelId = channel1.getId();
+        ChannelInfoDto channel1 = channelService.createChannel(user1Id, ChannelType.TEXT);
+        UUID channelId = channel1.id();
 
         System.out.println("--- 채널 조회 ---");
         channelService.findChannelInfoById(channelId).ifPresent(System.out::println);
@@ -37,8 +37,8 @@ public class ChannelTest {
         channelService.findChannelInfoById(channelId).ifPresent(System.out::println);
 
         // --- 채널2 생성 ---
-        ChannelInfo channel2 = channelService.createChannel(user2Id, "채널2", ChannelType.VOICE);
-        UUID channel2Id = channel2.getId();
+        ChannelInfoDto channel2 = channelService.createChannel(user2Id, "채널2", ChannelType.VOICE);
+        UUID channel2Id = channel2.id();
 
         // --- 채널 전체 조회 ---
         System.out.println("--- 채널 전체 조회 ---");

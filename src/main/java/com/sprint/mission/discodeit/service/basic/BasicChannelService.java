@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateDto;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.*;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,26 +20,18 @@ public class BasicChannelService implements ChannelService {
     private final UserService userService;
 
     @Override
-    public ChannelInfo createChannel(UUID userId, String channelName, ChannelType type) {
-        User user = userService.findUserEntityById(userId)
+    public ChannelInfoDto createChannel(ChannelCreateDto createDto) {
+        User user = userService.findUserEntityById(createDto.getAdminId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
-        if (channelName == null || channelName.isBlank())
-            channelName = user.getUserName() + "의 채널";
 
-        Channel newChannel = new Channel(user, channelName, type);
+        Channel newChannel = new Channel(user, createDto.getChannelName(), createDto.getType());
         channelRepository.save(newChannel);
-        return new ChannelInfo(newChannel);
+        return ChannelInfoDto.from(newChannel);
     }
 
     @Override
-    public ChannelInfo createChannel(UUID userId, ChannelType type) {
-        return this.createChannel(userId, null, type);
-    }
-
-
-    @Override
-    public Optional<ChannelInfo> findChannelInfoById(UUID id) {
-        return channelRepository.findById(id).map(ChannelInfo::new);
+    public Optional<ChannelInfoDto> findChannelInfoById(UUID id) {
+        return channelRepository.findById(id).map(ChannelInfoDto::from);
     }
 
     // message에 채널을 주기위해
@@ -47,31 +40,31 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelInfo> findAll() {
-        return channelRepository.findAll().stream().map(ChannelInfo::new).collect(Collectors.toList());
+    public List<ChannelInfoDto> findAll() {
+        return channelRepository.findAll().stream().map(ChannelInfoDto::from).collect(Collectors.toList());
     }
 
     @Override
-    public Optional<ChannelInfo> findChannelInfoByChannelName(String channelName) {
-        return channelRepository.findByChannelName(channelName).map(ChannelInfo::new);
+    public Optional<ChannelInfoDto> findChannelInfoByChannelName(String channelName) {
+        return channelRepository.findByChannelName(channelName).map(ChannelInfoDto::from);
     }
 
-    public Optional<ChannelInfo> findChannelByName(String channelName) {
-        return channelRepository.findByChannelName(channelName).map(ChannelInfo::new);
+    public Optional<ChannelInfoDto> findChannelByName(String channelName) {
+        return channelRepository.findByChannelName(channelName).map(ChannelInfoDto::from);
     }
 
     @Override
-    public Optional<ChannelInfo> updateChannelName(UUID id, String newChannelName) {
+    public Optional<ChannelInfoDto> updateChannelName(UUID id, String newChannelName) {
 
         return channelRepository.findById(id).map(channel -> {
             channel.changeChannelName(newChannelName);
             channelRepository.save(channel);
-            return new ChannelInfo(channel);
+            return ChannelInfoDto.from(channel);
         });
     }
 
     @Override
-    public Optional<ChannelInfo> addMemberToChannel(UUID channelId, UUID userId) {
+    public Optional<ChannelInfoDto> addMemberToChannel(UUID channelId, UUID userId) {
 
         Optional<Channel> channelOp = channelRepository.findById(channelId);
         Optional<User> userOp = userService.findUserEntityById(userId);
@@ -88,7 +81,7 @@ public class BasicChannelService implements ChannelService {
         } else System.out.println("이미 참여하고 있는 유저");
 
         channelRepository.save(channel);
-        return Optional.of(new ChannelInfo(channel));
+        return Optional.of(ChannelInfoDto.from(channel));
 
 
         /* flatMap으로 구현
@@ -99,14 +92,14 @@ public class BasicChannelService implements ChannelService {
                                         System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에 참가");
                                     } else System.out.println("이미 참여하고 있는 유저");
                                     channelRepository.save(channel);
-                                    return new ChannelInfo(channel);
+                                    return ChannelInfo.from(channel);
                                 })
                 );
          */
     }
 
     @Override
-    public Optional<ChannelInfo> removeMemberFromChannel(UUID channelId, UUID userId) {
+    public Optional<ChannelInfoDto> removeMemberFromChannel(UUID channelId, UUID userId) {
         Optional<Channel> channelOp = channelRepository.findById(channelId);
         Optional<User> userOptional = userService.findUserEntityById(userId);
 
@@ -122,7 +115,7 @@ public class BasicChannelService implements ChannelService {
         } else System.out.println("채널에 없는 유저");
 
         channelRepository.save(channel);
-        return Optional.of(new ChannelInfo(channel));
+        return Optional.of(ChannelInfoDto.from(channel));
     }
 
     @Override

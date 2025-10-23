@@ -10,7 +10,7 @@ import java.util.UUID;
 public class ChannelMessageCreateDto {
 
     private UUID authorId;
-    private UUID ChannelId;
+    private UUID channelId;
     private String content;
 
 }
