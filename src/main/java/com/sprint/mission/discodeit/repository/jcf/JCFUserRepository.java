@@ -10,7 +10,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void save(User user) {
-        usersRepository.put(user.getCommon().getId(), user);
+        usersRepository.put(user.getId(), user);
     }
 
     @Override

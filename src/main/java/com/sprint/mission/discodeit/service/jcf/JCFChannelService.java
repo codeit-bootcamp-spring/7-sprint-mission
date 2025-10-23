@@ -39,7 +39,7 @@ public class JCFChannelService implements ChannelService {
         channel.setType(type);
         channel.setChannelName(channelName);
         channel.setDesc(channelDescription);
-        channel.getCommon().touch();
+        channel.touch();
     }
 
     @Override

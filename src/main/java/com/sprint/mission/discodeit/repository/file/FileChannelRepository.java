@@ -16,7 +16,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void save(Channel channel) {
         Map<UUID, Channel> channels = fileManager.readFile();
-        channels.put(channel.getCommon().getId(), channel);
+        channels.put(channel.getId(), channel);
         fileManager.writeFile(channels);
     }
 

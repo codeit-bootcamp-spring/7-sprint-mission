@@ -36,7 +36,7 @@ public class JCFMessageService implements MessageService {
     public void updateMessage(UUID messageId, String content) {
         Message message = this.getMessage(messageId);
         message.setContent(content);
-        message.getCommon().touch();
+        message.touch();
         messageRepository.save(message);
     }
 
@@ -52,7 +52,7 @@ public class JCFMessageService implements MessageService {
     public void deleteMessagesByChannel(UUID channelId) {
         for (Message message : getAllMessages()) {
             if (message.getChannelId().equals(channelId)) {
-                this.deleteMessage(message.getCommon().getId());
+                this.deleteMessage(message.getId());
             }
         }
     }
@@ -61,7 +61,7 @@ public class JCFMessageService implements MessageService {
     public void deleteMessagesByUser(UUID userId) {
         for(Message message : getAllMessages()) {
             if (message.getUserId().equals(userId)) {
-                this.deleteMessage(message.getCommon().getId());
+                this.deleteMessage(message.getId());
             }
         }
     }

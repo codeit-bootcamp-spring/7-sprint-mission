@@ -16,7 +16,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void save(User user) {
         Map<UUID, User> users = fileManager.readFile();
-        users.put(user.getCommon().getId(), user);
+        users.put(user.getId(), user);
         fileManager.writeFile(users);
     }
 

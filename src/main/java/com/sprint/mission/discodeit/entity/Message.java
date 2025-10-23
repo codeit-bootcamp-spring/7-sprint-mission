@@ -1,14 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.io.Serial;
-import java.io.Serializable;
-import java.util.Objects;
 import java.util.UUID;
 
-public class Message implements Serializable {
+@Getter @Setter //Setter의 경우 추후 수정 가능성
+@ToString
+public class Message extends Common {
     @Serial
     private static final long serialVersionUID = 1L;
-    private final Common common;
     private String content;
     private final UUID channelId;
     private final UUID userId;
@@ -17,48 +20,6 @@ public class Message implements Serializable {
         this.content = content;
         this.channelId = channelId;
         this.userId = userId;
-        this.common = new Common();
     }
 
-    public Common getCommon() {
-        return common;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "common=" + common +
-                ", content='" + content + '\'' +
-                ", channelId=" + channelId +
-                ", userId=" + userId +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Message message = (Message) o;
-        return Objects.equals(common, message.common) && Objects.equals(content, message.content) && Objects.equals(channelId, message.channelId) && Objects.equals(userId, message.userId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(common, content, channelId, userId);
-    }
 }
