@@ -8,7 +8,8 @@ import lombok.ToString;
 import java.io.Serial;
 
 @Getter @Setter //Setter의 경우 추후 수정 가능성
-@ToString
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class Channel extends Common {
     @Serial
     private static final long serialVersionUID = 1L;
