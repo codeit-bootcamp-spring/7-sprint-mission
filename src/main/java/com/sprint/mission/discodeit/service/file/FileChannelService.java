@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.file;
 
 
@@ -30,3 +31,5 @@ public class FileChannelService implements ChannelService {
     @Override public boolean leave(UUID channelId, UUID userId) {return basicChannelService.leave(channelId, userId);}
     @Override public void setSlowModeSeconds(UUID channelId, int slowModeSeconds) {basicChannelService.setSlowModeSeconds(channelId, slowModeSeconds);}
 }
+
+ */

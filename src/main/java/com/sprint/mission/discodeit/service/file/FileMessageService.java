@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.file;
 
 
@@ -42,3 +43,5 @@ public class FileMessageService implements MessageService {
     // 특정 키워드 검색
     @Override public List<Message> searchByKeyword(String keyword) {return basicMessageService.searchByKeyword(keyword);}
 }
+
+ */
