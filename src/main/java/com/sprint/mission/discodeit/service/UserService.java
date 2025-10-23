@@ -9,5 +9,9 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 public interface UserService {
-    public User create(UserCreatedReq req);
+    User create(UserCreatedReq req);
+    User findById(UUID id);
+    List<User> findAll();
+    User findByEmail(String email);
+    User findByNickname(String nickname);
 }

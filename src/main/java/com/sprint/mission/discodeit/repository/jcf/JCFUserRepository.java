@@ -2,16 +2,52 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
-    private final List<User> data = new ArrayList<>();
+
+    //싱글톤 구현
+    private final static JCFUserRepository userRepository = getInstance();
+
+    private JCFUserRepository(){}
+
+    public static JCFUserRepository getInstance(){
+        return userRepository;
+    }
+    
+    //유저 데이터
+    private final Map<UUID, User> data = new HashMap<>();
 
     @Override
     public User save(User user) {
-        data.add(user);
+
         return user;
+    }
+
+    @Override
+    public List<User> findAll() {
+        return List.copyOf(data);
+    }
+
+    @Override
+    public User findById(UUID id) {
+        return data.;
+    }
+
+    @Override
+    public User updateNickname(String nickname) {
+        return null;
+    }
+
+    @Override
+    public User updatePassword(String password) {
+        return null;
+    }
+
+    @Override
+    public User delete(UUID userId) {
+        return null;
     }
 }

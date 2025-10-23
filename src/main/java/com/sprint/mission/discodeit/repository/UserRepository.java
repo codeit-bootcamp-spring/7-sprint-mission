@@ -6,5 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserRepository {
-    public User save(User user);
+    User save(User user);
+    List<User> findAll();
+    User findById(UUID id);
+    User updateNickname(String nickname);
+    User updatePassword(String password);
+    User delete(UUID userId);
 }
