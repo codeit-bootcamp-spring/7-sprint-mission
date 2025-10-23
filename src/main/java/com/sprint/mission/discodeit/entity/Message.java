@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -12,13 +13,15 @@ public class Message extends BaseEntity {
     private String userName;
     private final UUID authorId;
     private final UUID channelId;
+    private final List<UUID> attachmentIds;
     private boolean isDeleted;
 
-    public Message(String content, String userName, UUID authorId, UUID channelId) {
+    public Message(String content, String userName, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
         this.content = VerifiedUtils.verifyContent(content);
         this.userName = VerifiedUtils.verifyName(userName);
         this.authorId = VerifiedUtils.verifyNull(authorId);
         this.channelId = VerifiedUtils.verifyNull(channelId);
+        this.attachmentIds = VerifiedUtils.verifyNull(attachmentIds);
         this.isDeleted = false;
     }
 
