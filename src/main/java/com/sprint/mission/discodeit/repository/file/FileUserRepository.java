@@ -2,90 +2,55 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.entity.User;
+
+import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
-import com.sprint.mission.discodeit.service.file.ReadService;
-import com.sprint.mission.discodeit.service.file.LoadService;
+
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileIo;
+import com.sprint.mission.discodeit.service.file.Path;
 
 
 public class FileUserRepository implements UserRepository {
 
-    private static final String filename = "users";
+    private final String filename = "users";
 
     //로드 세이브
-    private List<User> loadAll() {
-        List<User> list = ReadService.read(filename, User.class);
-        return (list != null) ? list : new ArrayList<>();
-    }
-    private void saveAll(List<User> list) {
-        LoadService.load(filename, list);
+    //근데 잘해보면 한번에 할수있겟는데?
+    @Override
+    public User save(User user) {
+       FileIo.save(filename, user);
+      return user;
     }
 
     @Override
-    public User create(String userId, String password, String userName, String userNickname) {
-        User user = new User(userId, password, userName, userNickname);
-        List<User> users = loadAll();
-        users.add(user);
-        saveAll(users);
-        return user;
+    public Optional<User> findById(UUID id) {
+        return FileIo.read(filename, id, User.class);
     }
 
     @Override
-    public User read(UUID userId) {
-        return loadAll().stream()
-                .filter(u -> u.getId().equals(userId))
-                .findFirst()
-                .orElse(null);
+    public List<User> findAll() {
+        return FileIo.readAll(filename, User.class);
     }
 
     @Override
-    public List<User> readAll() {
-        return loadAll();
+    public boolean existsById(UUID id) {
+        String path = Path.RooT_PATH.getPath() + "/" + filename + "/" + id + ".sav";
+        File file = new File(path);
+        return file.exists();
     }
 
     @Override
-    public boolean delete(UUID userId) {
-        List<User> users = loadAll();
-        boolean removed = users.removeIf(u -> u.getId().equals(userId));
-        if (removed) saveAll(users);
-        return removed;
+    public void deleteById(UUID id) {
+        String path = Path.RooT_PATH.getPath() + "/" + filename + "/" + id + ".sav";
+        File file = new File(path);
+        if (file.exists()) {
+            file.delete();
+        }
     }
 
-    @Override
-    public User updateName(UUID uuid, String userName) {
-        List<User> users = loadAll();
-        User u = users.stream()
-                .filter(x -> x.getId().equals(uuid))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + uuid));
-        u.setUserName(userName);
-        saveAll(users);
-        return u;
-    }
-
-    @Override
-    public User updateNickName(UUID uuid, String userNickname) {
-        List<User> users = loadAll();
-        User u = users.stream()
-                .filter(x -> x.getId().equals(uuid))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + uuid));
-        u.setUserNickname(userNickname);
-        saveAll(users);
-        return u;
-    }
-
-    @Override
-    public User update(UUID uuid, Consumer<User> updater) {
-        List<User> users = loadAll();
-        User u = users.stream()
-                .filter(x -> x.getId().equals(uuid))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + uuid));
-        updater.accept(u);
-        saveAll(users);
-        return u;
-    }
 }
