@@ -3,17 +3,17 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
+@Component
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-    private ChannelRepository channelRepository;
-
-    public BasicChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
+    private final ChannelRepository channelRepository;
 
     @Override
     public Channel createChannel(String channelName) {
@@ -40,15 +40,15 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel addMember(UUID channelId, UUID userId) {
-        Channel byId = channelRepository.findById(userId);
-        byId.addMember(channelId);
+        Channel byId = channelRepository.findById(channelId);
+        byId.addMember(userId);
         return channelRepository.save(byId);
     }
 
     @Override
     public Channel removeMember(UUID channelId, UUID userId) {
-        Channel byId = channelRepository.findById(userId);
-        byId.removeMember(channelId);
+        Channel byId = channelRepository.findById(channelId);
+        byId.removeMember(userId);
         return channelRepository.save(byId);
     }
 
