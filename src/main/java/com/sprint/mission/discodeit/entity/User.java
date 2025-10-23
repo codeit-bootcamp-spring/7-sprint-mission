@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.common.Common;
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
 
+@Getter
 public class User extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -25,33 +29,33 @@ public class User extends Common implements Serializable {
 
 
 
-    public String getUserNickname() {
+  /*  public String getUserNickname() {
         return userNickname;
-    }
+    }*/
 
     public void setUserNickname(String userNickname) {
         this.userNickname = userNickname;
     }
 
-    public String getUserName() {
+  /*  public String getUserName() {
         return userName;
-    }
+    }*/
 
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
-    public String getUserId() {
+ /*   public String getUserId() {
         return UserEmail;
-    }
+    }*/
 
     public void setUserId(String userId) {
         this.UserEmail = userId;
     }
 
-    public String getPassword() {
+    /*public String getPassword() {
         return password;
-    }
+    }*/
 
     public void setPassword(String password) {
         this.password = password;

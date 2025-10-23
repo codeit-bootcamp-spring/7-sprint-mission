@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.service.jcf.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
 
+@Service
 public class BasicUserService implements UserService {
 
     //컬렉션 필드  final  메서드들은 이 데이터를 가지고 만들꺼다

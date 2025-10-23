@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.file.FileIo;
 import com.sprint.mission.discodeit.service.file.Path;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -13,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-
+@Repository
 public class FileChannelRepository implements ChannelRepository {
 
     private static final String filename = "channels";

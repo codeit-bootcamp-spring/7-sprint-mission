@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.common.Common;
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class Message extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -16,7 +20,7 @@ public class Message extends Common implements Serializable {
     }
 
 
-    public  Message(UUID channelId,UUID authorId,String content ){
+    public  Message(String content,UUID channelId,UUID authorId ){
         this.authorId = authorId;
         this.channelId = channelId;
         this.time = System.currentTimeMillis();

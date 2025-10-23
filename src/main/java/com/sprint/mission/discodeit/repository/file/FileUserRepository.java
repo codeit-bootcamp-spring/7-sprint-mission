@@ -13,8 +13,9 @@ import java.util.function.Consumer;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.file.FileIo;
 import com.sprint.mission.discodeit.service.file.Path;
+import org.springframework.stereotype.Repository;
 
-
+@Repository
 public class FileUserRepository implements UserRepository {
 
     private final String filename = "users";

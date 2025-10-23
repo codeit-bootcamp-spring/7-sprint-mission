@@ -4,11 +4,12 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.file.FileIo;
 import com.sprint.mission.discodeit.service.file.Path;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.util.*;
 
-
+@Repository
 public class FileMessageRepository implements MessageRepository {
 
     private static final String filename = "messages";

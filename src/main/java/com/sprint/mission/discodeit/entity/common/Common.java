@@ -1,8 +1,13 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.common;
+
+import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
+
+@Getter
 public  class Common implements Serializable {
 
     //고유값이긴한데
@@ -10,9 +15,9 @@ public  class Common implements Serializable {
     //아니면 삭제해도 삭제기록같은걸 저장해서 고유번호는 정말 고유번호인걸까
     private final UUID id;
     //이건 생성시간이니 불변이겠고
-    private final Long  createdAt;
+    private final Instant createdAt;
     //이것도
-    private Long  updatedAt;
+    private Instant  updatedAt;
 
 
 
@@ -24,8 +29,8 @@ public  class Common implements Serializable {
 
     public Common() {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
 
@@ -34,20 +39,21 @@ public  class Common implements Serializable {
 
     //set은 안얻을꺼같은데
     //내가 수정을 해야 할 이유가 없는 필드같다
-    public long getCreatedAt() {
+/*    public long getCreatedAt() {
         return createdAt;
-    }
+    }*/
 
-    public UUID getId() {
+  /*  public UUID getId() {
         return id;
-    }
+    }*/
 
 
-    public long getUpdatedAt() {
+   /* public long getUpdatedAt() {
         return updatedAt;
-    }
+    }*/
     //이건 넣어줄수있을듯한데
-    public void setUpdatedAt(long updatedAt) {
+
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

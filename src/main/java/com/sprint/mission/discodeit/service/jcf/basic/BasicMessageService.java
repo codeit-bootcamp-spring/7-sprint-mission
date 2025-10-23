@@ -6,9 +6,11 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service
 public class BasicMessageService implements MessageService {
 
     private final UserRepository userRepository;
@@ -33,7 +35,7 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("매시지UUID가 없어 :" + authorId);
         }
 
-        Message message = new Message( channelId, authorId,content);
+        Message message = new Message(content, channelId, authorId);
         return messageRepository.save(message);
     }
 

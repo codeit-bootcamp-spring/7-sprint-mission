@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.Common;
+import com.sprint.mission.discodeit.entity.common.Common;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FileIo {
 
