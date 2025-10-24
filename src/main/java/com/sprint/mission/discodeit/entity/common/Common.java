@@ -30,7 +30,7 @@ public  class Common implements Serializable {
     public Common() {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+        this.updatedAt = this.createdAt;
     }
 
 

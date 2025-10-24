@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.service.jcf.basic;
 
+import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.response.UserCreateResponse;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Service
 public class BasicUserService implements UserService {
@@ -24,10 +26,34 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public User create(String username, String email, String password,String userNickname) {
-        User user = new User(username, email, password,userNickname);
-        return userRepository.save(user);
+    public UserCreateResponse create(UserCreateRequest userCreateRequest) {
+     //이메일매칭
+     if(userRepository.findAll().stream()
+             .anyMatch(user -> user.getUserEmail().equals(userCreateRequest.email()))){
+         throw new RuntimeException("Email already exists");
+     }
+     //닉네임매칭
+     if(userRepository.findAll().stream()
+                .anyMatch(user -> user.getUserNickname().equals(userCreateRequest.userNickname()))){
+         throw new RuntimeException("Nickname already exists");
+     }
+
+
+
+     //저장을위한 모든 정보
+        User user = new User(
+                userCreateRequest.username()
+                ,userCreateRequest.email()
+                ,userCreateRequest.rawPassword()
+                ,userCreateRequest.userNickname());
+       //유저저장
+       userRepository.save(user);
+
+        //유저 스테이터스 생성
+        new  UserStatus(user.getId());
+      return new UserCreateResponse(user.getId(),user.getUserNickname(),userCreateRequest.userNickname());
     }
+
 
     @Override
     public User find(UUID userId) {
@@ -43,10 +69,10 @@ public class BasicUserService implements UserService {
 
     @Override
     //이게진짜 이해가 안된다
-    public User update(UUID userId, String newUsername, String newEmail,String newPassword ,String newNickname) {
+    public User update(UUID userId, String newUsername, String newEmail,String newPassword ,String newNickname,String newProfilePicture) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+userId));
-         user.update(newUsername,newEmail,newPassword,newNickname);
+         user.update(newUsername,newEmail,newPassword,newNickname,newProfilePicture);
         return userRepository.save(user);
     }
 

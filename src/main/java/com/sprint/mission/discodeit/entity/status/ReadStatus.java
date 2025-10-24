@@ -1,11 +1,22 @@
 package com.sprint.mission.discodeit.entity.status;
 
+import com.sprint.mission.discodeit.entity.common.Common;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.nio.channels.Pipe;
+import java.time.Instant;
 import java.util.UUID;
 
-public class ReadStatus {
+@Getter
+@AllArgsConstructor
+public class ReadStatus extends Common {
 
-    UUID userId;
-    UUID channelId;
+  private final UUID userId;
+    private final  UUID channelId;
+
+
+
 
 
 }

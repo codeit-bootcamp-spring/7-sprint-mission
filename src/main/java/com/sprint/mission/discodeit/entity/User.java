@@ -14,6 +14,7 @@ public class User extends Common implements Serializable {
     private String password;
     private  String userName;
     private  String userNickname;
+    private  String profilePicture;
 
 
 
@@ -74,7 +75,7 @@ public class User extends Common implements Serializable {
 
     //업데이트하면 하난하나 적용해서 트루로체크해
     //끝가지가면 트루 아니면 false된다
-    public void update(String newUsername, String newEmail, String newPassword, String newUserNickname) {
+    public void update(String newUsername, String newEmail, String newPassword, String newUserNickname,String newProfilePicture) {
         boolean anyValueUpdated = false;
         if (newUsername != null && !newUsername.equals(this.userName)) {
             this.userName = newUsername;
@@ -92,9 +93,12 @@ public class User extends Common implements Serializable {
             this.userNickname = newUserNickname;
             anyValueUpdated = true;
         }
+        if (newProfilePicture != null && !newProfilePicture.equals(this.profilePicture)) {
+            this.profilePicture = newProfilePicture;
+        }
 
         if (anyValueUpdated) {
-            this.setUpdatedAt(Instant.now().getEpochSecond());
+            this.setUpdatedAt(Instant.ofEpochSecond(Instant.now().getEpochSecond()));
         }
     }
 
