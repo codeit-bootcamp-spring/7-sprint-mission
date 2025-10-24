@@ -1,23 +1,24 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+// Basic은 요구사항 상 들어가는 코드
+// 사실상 jcf, file, basic 서비스는 다 똑같은 코드라 할 수 있음.
 
-public class FileUserService implements UserService {
+@Service
+@RequiredArgsConstructor
+public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-
-    public FileUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public User createUser(CreateUserDto createUserDto) {
@@ -49,7 +50,7 @@ public class FileUserService implements UserService {
                 updateUserDto.getEmail(),
                 updateUserDto.getPhoneNumber(),
                 updateUserDto.getPronoun()
-                );
+        );
         userRepository.save(user);
     }
 

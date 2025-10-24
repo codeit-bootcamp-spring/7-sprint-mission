@@ -1,25 +1,21 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-
-public class FileChannelService implements ChannelService {
-
+@Service
+@RequiredArgsConstructor
+public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-
-    public FileChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
 
     @Override
     public Channel createChannel(CreateChannelDto createChannelDto) {
@@ -64,4 +60,3 @@ public class FileChannelService implements ChannelService {
         channelRepository.deleteById(channelId);
     }
 }
-
