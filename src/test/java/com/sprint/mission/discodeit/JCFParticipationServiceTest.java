@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Participation;
-import com.sprint.mission.discodeit.entity.enums.Role;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.impl.ChannelRepositoryImpl;
-import com.sprint.mission.discodeit.repository.impl.ParticipationRepositoryImpl;
-import com.sprint.mission.discodeit.repository.impl.UserRepositoryImpl;
-import com.sprint.mission.discodeit.service.impl.ParticipationServiceImpl;
-import com.sprint.mission.discodeit.utils.ParticipationDualKey;
+import com.sprint.mission.discodeit.channel.Channel;
+import com.sprint.mission.discodeit.participation.Participation;
+import com.sprint.mission.discodeit.config.enums.Role;
+import com.sprint.mission.discodeit.user.User;
+import com.sprint.mission.discodeit.channel.ChannelRepositoryImpl;
+import com.sprint.mission.discodeit.participation.ParticipationRepositoryImpl;
+import com.sprint.mission.discodeit.user.UserRepositoryImpl;
+import com.sprint.mission.discodeit.participation.ParticipationServiceImpl;
+import com.sprint.mission.discodeit.common.utils.ParticipationDualKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.view;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.impl.UserServiceImpl;
-import com.sprint.mission.discodeit.utils.AppConfigRegacy;
+import com.sprint.mission.discodeit.user.User;
+import com.sprint.mission.discodeit.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

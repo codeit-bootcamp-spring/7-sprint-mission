@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.view;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Participation;
-import com.sprint.mission.discodeit.entity.enums.Role;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ParticipationService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.channel.Channel;
+import com.sprint.mission.discodeit.participation.Participation;
+import com.sprint.mission.discodeit.config.enums.Role;
+import com.sprint.mission.discodeit.user.User;
+import com.sprint.mission.discodeit.channel.ChannelService;
+import com.sprint.mission.discodeit.participation.ParticipationService;
+import com.sprint.mission.discodeit.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

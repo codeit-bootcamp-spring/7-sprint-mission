@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.view;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.enums.ChannelType;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.channel.Channel;
+import com.sprint.mission.discodeit.config.enums.ChannelType;
+import com.sprint.mission.discodeit.channel.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

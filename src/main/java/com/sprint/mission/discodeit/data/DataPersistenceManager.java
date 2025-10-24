@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.data;
 
-import com.sprint.mission.discodeit.repository.ChannelMessageRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.ParticipationRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.impl.*;
+import com.sprint.mission.discodeit.channel.ChannelRepositoryImpl;
+import com.sprint.mission.discodeit.message.channel.ChannelMessageRepositoryImpl;
+import com.sprint.mission.discodeit.message.direct.DirectMessageRepositoryImpl;
+import com.sprint.mission.discodeit.participation.ParticipationRepositoryImpl;
+import com.sprint.mission.discodeit.user.UserRepositoryImpl;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;

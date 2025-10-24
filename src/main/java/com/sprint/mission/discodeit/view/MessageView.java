@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.view;
 
-import com.sprint.mission.discodeit.utils.AppConfigRegacy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
