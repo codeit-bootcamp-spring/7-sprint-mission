@@ -6,26 +6,21 @@ import com.sprint.mission.discodeit.entity.Participation;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelMessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.impl.ChannelMessageServiceImpl;
-import com.sprint.mission.discodeit.service.impl.UserServiceImpl;
 import com.sprint.mission.discodeit.utils.AppConfigRegacy;
 import com.sprint.mission.discodeit.utils.DateUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Scanner;
 
+@Component
+@RequiredArgsConstructor
 public class ChannelMessageView {
     private final ChannelMessageService channelMessageService;
     private final UserService userService;
     private final Scanner sc;
     private final SharedView sharedView;
-
-    public ChannelMessageView(AppConfigRegacy appConfigRegacy, Scanner scanner, SharedView sharedView) {
-        this.channelMessageService = appConfigRegacy.getChannelMessageService();
-        this.userService = appConfigRegacy.getUserService();
-        this.sc = scanner;
-        this.sharedView = sharedView;
-    }
 
     public void showChannelMessageMenu() {
         while (true) {

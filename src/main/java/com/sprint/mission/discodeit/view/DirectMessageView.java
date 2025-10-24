@@ -2,26 +2,26 @@ package com.sprint.mission.discodeit.view;
 
 import com.sprint.mission.discodeit.entity.DirectMessage;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.DirectMessageServiceImpl;
-import com.sprint.mission.discodeit.service.jcf.UserServiceImpl;
+import com.sprint.mission.discodeit.service.DirectMessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.impl.DirectMessageServiceImpl;
+import com.sprint.mission.discodeit.service.impl.UserServiceImpl;
 import com.sprint.mission.discodeit.utils.AppConfigRegacy;
 import com.sprint.mission.discodeit.utils.DateUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Scanner;
 
+@Component
+@RequiredArgsConstructor
 public class DirectMessageView {
-    private final DirectMessageServiceImpl directMessageService;
-    private final UserServiceImpl userService;
+    private final DirectMessageService directMessageService;
+    private final UserService userService;
     private final Scanner sc;
     private final SharedView sharedView;
 
-    public DirectMessageView(AppConfigRegacy appConfigRegacy, Scanner scanner, SharedView sharedView) {
-        this.directMessageService = appConfigRegacy.getDirectMessageService();
-        this.userService = appConfigRegacy.getUserService();
-        this.sc = scanner;
-        this.sharedView = sharedView;
-    }
 
     public void showDirectMessageMenu() {
         while (true) {

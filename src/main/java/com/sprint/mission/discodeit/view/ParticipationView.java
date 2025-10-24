@@ -4,27 +4,26 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Participation;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFParticipationService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.utils.AppConfig;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ParticipationService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.impl.ChannelServiceImpl;
+import com.sprint.mission.discodeit.service.impl.ParticipationServiceImpl;
+import com.sprint.mission.discodeit.service.impl.UserServiceImpl;
+import com.sprint.mission.discodeit.utils.AppConfigRegacy;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
 
+@Component
+@RequiredArgsConstructor
 public class ParticipationView {
-    private final JCFParticipationService participationService;
-    private final JCFUserService userService;
-    private final JCFChannelService channelService;
+    private final ParticipationService participationService;
+    private final UserService userService;
+    private final ChannelService channelService;
     private final Scanner sc;
     private final SharedView sharedView; // 공통 헬퍼 View
-
-    public ParticipationView(AppConfig appConfig, Scanner scanner, SharedView sharedView) {
-        this.participationService = appConfig.getParticipationService();
-        this.userService = appConfig.getUserService();
-        this.channelService = appConfig.getChannelService();
-        this.sc = scanner;
-        this.sharedView = sharedView; // 주입받은 SharedView 저장
-    }
 
     public void showParticipationMenu() {
         while (true) {

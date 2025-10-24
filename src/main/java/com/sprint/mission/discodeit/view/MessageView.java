@@ -1,20 +1,19 @@
 package com.sprint.mission.discodeit.view;
 
-import com.sprint.mission.discodeit.utils.AppConfig;
+import com.sprint.mission.discodeit.utils.AppConfigRegacy;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.util.Scanner;
 
+@Component
+@RequiredArgsConstructor
 public class MessageView {
     private final ChannelMessageView channelMessageView;
     private final DirectMessageView directMessageView;
     private final SharedView sharedView;
     private final Scanner sc;
 
-    public MessageView(AppConfig appConfig, Scanner scanner,SharedView sharedView) {
-        this.sharedView = sharedView;
-        this.channelMessageView = new ChannelMessageView(appConfig, scanner, sharedView);
-        this.directMessageView = new DirectMessageView(appConfig, scanner, sharedView);
-        this.sc = scanner;
-    }
 
     public void showMessageMenu() {
         while (true) {

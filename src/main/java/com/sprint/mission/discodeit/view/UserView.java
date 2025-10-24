@@ -1,22 +1,21 @@
 package com.sprint.mission.discodeit.view;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.utils.AppConfig;
-import java.util.List;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.impl.UserServiceImpl;
+import com.sprint.mission.discodeit.utils.AppConfigRegacy;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.util.Scanner;
 
+@Component
+@RequiredArgsConstructor
 public class UserView {
 
-    private final JCFUserService userService;
+    private final UserService userService;
     private final Scanner sc;
     private final SharedView sharedView;
-
-    public UserView(AppConfig appConfig, Scanner scanner, SharedView sharedView) {
-        this.userService = appConfig.getUserService();
-        this.sc = scanner;
-        this.sharedView = sharedView;
-    }
 
     public void showUserMenu() {
         while (true) {

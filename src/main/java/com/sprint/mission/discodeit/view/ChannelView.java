@@ -2,21 +2,21 @@ package com.sprint.mission.discodeit.view;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.utils.AppConfig;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.impl.ChannelServiceImpl;
+import com.sprint.mission.discodeit.utils.AppConfigRegacy;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.Scanner;
 
+@Component
+@RequiredArgsConstructor
 public class ChannelView {
-    private final JCFChannelService channelService;
+    private final ChannelService channelService;
     private final Scanner sc;
     private final SharedView sharedView;
-
-    public ChannelView(AppConfig appConfig, Scanner scanner, SharedView sharedView) {
-        this.channelService = appConfig.getChannelService();
-        this.sc = scanner;
-        this.sharedView = sharedView;
-    }
 
     public void showChannelMenu() {
         while (true) {

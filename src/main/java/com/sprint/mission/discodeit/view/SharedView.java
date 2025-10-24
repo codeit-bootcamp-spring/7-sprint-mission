@@ -3,31 +3,26 @@ package com.sprint.mission.discodeit.view;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Participation;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFParticipationService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.utils.AppConfig;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ParticipationService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.impl.ChannelServiceImpl;
+import com.sprint.mission.discodeit.service.impl.ParticipationServiceImpl;
+import com.sprint.mission.discodeit.service.impl.UserServiceImpl;
+import com.sprint.mission.discodeit.utils.AppConfigRegacy;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
-/**
- * 여러 View 클래스에서 공통적으로 사용되는 UI 헬퍼 메서드를 모아놓은 클래스입니다.
- * (예: 사용자 목록 출력 및 선택, 채널 목록 출력 및 선택 등)
- */
+@Component
+@RequiredArgsConstructor
 public class SharedView {
-    private final JCFUserService userService;
-    private final JCFChannelService channelService;
-    private final JCFParticipationService participationService;
+    private final UserService userService;
+    private final ChannelService channelService;
+    private final ParticipationService participationService;
     private final Scanner sc;
-
-    public SharedView(AppConfig appConfig, Scanner scanner) {
-        this.userService = appConfig.getUserService();
-        this.channelService = appConfig.getChannelService();
-        this.participationService = appConfig.getParticipationService();
-        this.sc = scanner;
-    }
 
     /**
      * 사용자 목록을 출력하고 사용자로부터 한 명을 선택받습니다.
