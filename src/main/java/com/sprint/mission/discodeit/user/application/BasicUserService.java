@@ -210,5 +210,4 @@ public class BasicUserService implements UserService {
         userStatusRepository.findByUserId(userId);
     }
 
-
 }

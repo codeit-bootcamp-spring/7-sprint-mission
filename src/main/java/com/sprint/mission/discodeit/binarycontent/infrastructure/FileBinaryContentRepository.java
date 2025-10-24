@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.binarycontent.infrastructure;
 
 import com.sprint.mission.discodeit.binarycontent.application.BinaryContentRepository;
 import com.sprint.mission.discodeit.binarycontent.domain.BinaryContent;
+import org.springframework.stereotype.Repository;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+@Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
     private final String FILE_PATH = "data/binarycontents.ser"; // 저장 파일 경로
