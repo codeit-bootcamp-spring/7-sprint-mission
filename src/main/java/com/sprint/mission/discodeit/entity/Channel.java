@@ -7,7 +7,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 
-@Getter @Setter //Setter의 경우 추후 수정 가능성
+@Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Channel extends Common {

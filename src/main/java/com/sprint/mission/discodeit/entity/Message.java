@@ -8,7 +8,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.util.UUID;
 
-@Getter @Setter //Setter의 경우 추후 수정 가능성
+@Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Message extends Common {
