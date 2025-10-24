@@ -6,6 +6,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter @ToString
@@ -15,16 +16,16 @@ public class Common implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public final UUID id;
-    public final Long createAt;
-    public Long updateAt;
+    public final Instant createAt;
+    public Instant updateAt;
 
     public Common() {
         this.id = UUID.randomUUID();
-        this.createAt = System.currentTimeMillis();
-        this.updateAt = System.currentTimeMillis();
+        this.createAt = Instant.now();
+        this.updateAt = Instant.now();
     }
 
     public void touch(){
-        this.updateAt = System.currentTimeMillis();
+        this.updateAt = Instant.now();
     }
 }
