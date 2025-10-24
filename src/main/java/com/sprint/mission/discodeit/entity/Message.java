@@ -24,4 +24,10 @@ public class Message extends Common {
         this.userId = userId;
     }
 
+    public void messageUpdate(String content) {
+        if(this.content != null) {
+            this.content = content;
+        }
+    }
+
 }

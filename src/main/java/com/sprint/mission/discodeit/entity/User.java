@@ -1,16 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.UserRequestDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -35,15 +32,14 @@ public class User extends Common {
         this.pronoun = pronoun;
     }
 
-    public User updateUser(UpdateUserDto updateUserDto) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.pronoun = pronoun;
+    // 별로 좋지 않은 방법.. 일어나면 물어보얗함
+    public void updateUser(String username, String password, String  email, String phoneNumber, String pronoun) {
+        if(username != null) this.username = username;
+        if(password != null) this.password = password;
+        if(email != null) this.email = email;
+        if(phoneNumber != null) this.phoneNumber = phoneNumber;
+        if(pronoun != null) this.pronoun = pronoun;
         touch();
-
-        return this;
     }
 
     public void addChannel(UUID channelID) {

@@ -23,5 +23,11 @@ public class Channel extends Common {
         this.desc = desc;
     }
 
+    public void updateChannel(ChannelType type, String channelName, String desc) {
+        if(type != null) this.type = type;
+        if(channelName != null) this.channelName = channelName;
+        if(desc != null) this.desc = desc;
+    }
+
 
 }
