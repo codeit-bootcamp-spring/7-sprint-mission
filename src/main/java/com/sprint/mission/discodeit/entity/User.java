@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.enums.State;
+
 import java.time.Instant;
 import java.util.UUID;
 

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.enums.ChannelType;
+
 import java.util.UUID;
 
 /**

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.enums;
 
 /**
  * 사용자의 다양한 상태를 나타내는 열거형(Enum)입니다.

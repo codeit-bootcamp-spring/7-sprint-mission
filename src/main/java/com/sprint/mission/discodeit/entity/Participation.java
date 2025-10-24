@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.utils.ParticipationDualKey;
 
 import java.util.UUID;
