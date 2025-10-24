@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.repository.BaseRepository;
 import java.io.*;
 import java.util.*;
 
-public class FileBaseRepository<T extends BaseEntity> implements BaseRepository<T> {
+public abstract class FileBaseRepository<T extends BaseEntity> implements BaseRepository<T> {
 
     private static final String BASE_ROOT = "/Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload/";
     private final String ROOT_PATH;
