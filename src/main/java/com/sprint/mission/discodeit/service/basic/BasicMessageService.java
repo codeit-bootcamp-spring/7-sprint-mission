@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -6,12 +6,13 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * JCFMessageService
+ * BasicMessageService
  * -----------------
  * MessageService 인터페이스의 구현체로,
  * Repository를 주입받아 실제 메시지 처리 로직을 수행합니다.
@@ -19,14 +20,14 @@ import java.util.stream.Stream;
  * - 비즈니스 로직: 메시지 생성, 필터링, 최신 메시지 조회 등
  * - 데이터 저장/조회: MessageRepository에 위임
  */
-public class JCFMessageService implements MessageService {
+public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
 
     /**
      * 생성자에서 Repository를 주입받습니다.
      * (의존성 주입 방식 - DI)
      */
-    public JCFMessageService(MessageRepository JCFMessageRepository) {
+    public BasicMessageService(MessageRepository JCFMessageRepository) {
         this.messageRepository = JCFMessageRepository;
     }
 

@@ -62,4 +62,14 @@ public interface ChannelService {
      * 채널 멤버 삭제
      */
     void deleteChannelMember(UUID id, User requester, User target);
+
+    /**
+     * 유저가 채널에 속해있는지 확인
+     */
+    boolean isUserJoinedChannel(User user, Channel channel);
+
+    /**
+     * 채널 이름 중복 확인
+     */
+    void existsByName(String name);
 }

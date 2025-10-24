@@ -34,8 +34,9 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Optional<Channel> findById(UUID id) {
-        return Optional.ofNullable(channelStore.get(id));
+    public Channel findById(UUID id) {
+        return Optional.ofNullable(channelStore.get(id))
+                .orElseThrow(() -> new IllegalArgumentException("해당 UUID를 가진 채널이 존재하지 않습니다."));
     }
 
     @Override
@@ -59,30 +60,23 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void updateName(UUID id, String name) {
-        Channel channel = channelStore.get(id);
-        if (channel != null) {
-            channel.setChannelName(name);
-            channelStore.put(id, channel);
-        }
+        Channel channel = findById(id);
+        channel.setChannelName(name);
+        channelStore.put(id, channel);
     }
 
     @Override
     public void updateAdmin(UUID id, User admin) {
-        Channel channel = channelStore.get(id);
-        if (channel != null) {
-            channel.setAdmin(admin);
-            channelStore.put(id, channel);
-        }
+        Channel channel = findById(id);
+        channel.setAdmin(admin);
+        channelStore.put(id, channel);
     }
 
     @Override
     public void deleteById(UUID id) {
-        Channel channel = findById(id).orElse(null);
-
         // 삭제되는 채널 id를 유저들이 속해 있는 채널 리스트(joinedChannels)에서도 삭제
-        for(User member : channel.getMembers()){
-            deleteChannelIdForUser(id, member);
-        }
+        findById(id).getMembers()
+                .forEach(member -> deleteChannelIdForUser(id, member));
 
         channelStore.remove(id);
     }
@@ -103,10 +97,10 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteChannelIdForUser(UUID channelId, User user) {
-        Set<UUID> channelIds = joinedChannels.get(user.getId());
-        if (channelIds != null) {
-            channelIds.remove(channelId);
-        }
+        Set<UUID> channelIds = Optional.ofNullable(joinedChannels.get(user.getId()))
+                .orElseThrow(() -> new IllegalArgumentException("삭제될 유저가 속한 채널이 없거나 유저가 존재하지 않습니다."));
+
+        channelIds.remove(channelId);
         joinedChannels.put(user.getId(), channelIds); // 채널 삭제 후 저장
     }
 

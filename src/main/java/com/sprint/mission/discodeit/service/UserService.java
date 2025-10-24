@@ -59,6 +59,11 @@ public interface UserService {
      * 사용자 정보 업데이트
      */
     void updateUser(User user);
+    void updateName(User user, String newName);
+    void updateNickName(User user, String newNickName);
+    void updateEmail(User user, String newEmail);
+    void updatePassword(User user, String newPassword);
+    void updatePhoneNum(User user, String newPhoneNum);
 
     /**
      * 사용자 삭제

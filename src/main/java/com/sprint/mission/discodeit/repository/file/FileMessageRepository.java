@@ -6,10 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * FileMessageRepository
@@ -29,7 +26,7 @@ import java.util.UUID;
  * - messages.sav : 메시지 객체들이 직렬화되어 저장되는 파일
  */
 public class FileMessageRepository implements MessageRepository {
-    private final List<Message> messageStore = new ArrayList<>();
+    private final Map<UUID, Message> messageStore = new LinkedHashMap<>();
     private final String filePath = AppConfig.DATA_PATH + "\\messages.sav";
 
     private FileMessageRepository() {
@@ -39,7 +36,7 @@ public class FileMessageRepository implements MessageRepository {
     private static FileMessageRepository instance = new FileMessageRepository();
 
     public static FileMessageRepository getInstance() {
-        return new FileMessageRepository();
+        return instance;
     }
 
     // --- 파일 저장 (직렬화) ---
@@ -58,9 +55,9 @@ public class FileMessageRepository implements MessageRepository {
         if (!file.exists()) return;
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            List<Message> loaded = (List<Message>) ois.readObject();
+            Map<UUID, Message> loaded = (Map<UUID, Message>) ois.readObject();
             messageStore.clear();
-            messageStore.addAll(loaded);
+            messageStore.putAll(loaded);
             System.out.println("[로드 완료] 메시지 데이터 로드됨");
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("[오류] 메시지 로드 실패: " + e.getMessage());
@@ -69,44 +66,39 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void save(Message message) {
-        messageStore.add(message);
+        messageStore.put(message.getId(), message);
         saveMessagesToFile();
     }
 
     @Override
     public List<Message> findAll() {
         // 외부에서 리스트를 수정하지 못하도록 복사본 반환
-        return new ArrayList<>(messageStore);
+        return new ArrayList<>(messageStore.values());
     }
 
     @Override
-    public Optional<Message> findById(UUID id) {
-        return messageStore.stream()
-                .filter(m -> m.getId().equals(id))
-                .findFirst();
+    public Message findById(UUID id) {
+        return Optional.ofNullable(messageStore.get(id))
+                .orElseThrow(() -> new IllegalArgumentException("해당 UUID를 가진 메시지가 존재하지 않습니다."));
     }
 
     @Override
     public void update(Message updatedMessage) {
-        for (int i = 0; i < messageStore.size(); i++) {
-            if (messageStore.get(i).getId().equals(updatedMessage.getId())) {
-                messageStore.set(i, updatedMessage);
-                saveMessagesToFile();
-                break;
-            }
-        }
+        messageStore.put(updatedMessage.getId(), updatedMessage);
+        saveMessagesToFile();
     }
 
     @Override
     public void deleteById(UUID id) {
-        messageStore.removeIf(m -> m.getId().equals(id));
+        Optional.ofNullable(messageStore.remove(id))
+                .orElseThrow(() -> new IllegalArgumentException("삭제할 메시지가 존재하지 않습니다."));
         saveMessagesToFile();
     }
 
     @Override
     public void deleteByUser(User user) {
         // 특정 유저가 보낸 메시지 전부 삭제
-        messageStore.removeIf(m -> m.getSenderId().equals(user.getId()));
+        messageStore.values().removeIf(m -> user.getId().equals(m.getSenderId()));
         saveMessagesToFile();
     }
 }

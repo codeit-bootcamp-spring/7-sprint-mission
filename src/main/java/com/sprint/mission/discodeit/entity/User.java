@@ -20,7 +20,7 @@ public class User extends BaseEntity{
         this.userName = userName;
         this.nickName = nickName;
         this.email = email;
-        this.phoneNum = phoneNum;
+        this.phoneNum = formatPhoneNum(phoneNum);
         this.userId = userId;
         this.password = password;
     }
@@ -61,7 +61,7 @@ public class User extends BaseEntity{
     public void setPhoneNum(String phoneNum) {
         UserVaildator.vaildatePhoneNum(phoneNum);
         this.setUpdatedAt();
-        this.phoneNum = phoneNum;
+        this.phoneNum = formatPhoneNum(phoneNum);
     }
 
     public String getUserId() {
@@ -76,7 +76,19 @@ public class User extends BaseEntity{
         UserVaildator.vaildatePassword(password);
         this.setUpdatedAt();
         this.password = password;
-        System.out.println("비밀번호가 재설정되었습니다. 다시 로그인 해주세요.");
+    }
+
+    private String formatPhoneNum(String phoneNum){
+        phoneNum = phoneNum.replaceAll("[^0-9]", ""); //숫자를 제외한 나머지 문자열 삭제
+        if (phoneNum.matches("^010\\d{8}$")) {
+            phoneNum = phoneNum.replaceFirst("^(010)(\\d{4})(\\d{4})$", "$1-$2-$3");
+        }
+        else if (phoneNum.matches("^01[1-9]\\d{7}$")) { // 10자리 번호 (일부 구형 011, 016 등)
+            phoneNum = phoneNum.replaceFirst("^(01[1-9])(\\d{3,4})(\\d{4})$", "$1-$2-$3");
+        } else {
+            throw new IllegalArgumentException("전화번호 형식이 맞지 않습니다.");
+        }
+        return phoneNum;
     }
 
     @Override

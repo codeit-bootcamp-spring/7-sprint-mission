@@ -5,10 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * FileUserRepository
@@ -28,7 +25,7 @@ import java.util.UUID;
  * - users.sav : 메시지 객체들이 직렬화되어 저장되는 파일
  */
 public class FileUserRepository implements UserRepository {
-    private final List<User> userStore = new ArrayList<>();
+    private final Map<UUID, User> userStore = new HashMap<>();
     private final String filePath = AppConfig.DATA_PATH + "\\users.sav";
 
     private FileUserRepository() {
@@ -62,9 +59,9 @@ public class FileUserRepository implements UserRepository {
         }
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            List<User> loaded = (List<User>) ois.readObject();
+            Map<UUID, User> loaded = (Map<UUID, User>) ois.readObject();
             userStore.clear();
-            userStore.addAll(loaded);
+            userStore.putAll(loaded);
             System.out.println("✅ 사용자 정보를 파일에서 불러왔습니다.");
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("❌ 사용자 정보 불러오기 중 오류 발생: " + e.getMessage());
@@ -73,49 +70,70 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void save(User user) {
-        userStore.add(user);
+        userStore.put(user.getId(), user);
         saveUsersToFile();
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
-        return userStore.stream().filter(u -> u.getId().equals(id)).findFirst();
+    public User findById(UUID id) {
+        if(!isExist(id)){
+            throw new IllegalArgumentException("해당 UUID를 가진 유저가 존재하지 않습니다.");
+        }
+
+        // 해당 key(UUID) 값에 value(유저)가 null로 저장되어 있는 경우 예외 발생
+        return Optional.ofNullable(userStore.get(id))
+                .orElseThrow(() -> new IllegalArgumentException("해당 UUID를 가진 유저가 존재하지 않습니다."));
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return userStore.stream().filter(u -> u.getEmail().equals(email)).findFirst();
+    public User findByEmail(String email) {
+        return userStore.values().stream()
+                .filter(u -> u.getEmail().equals(email))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일을 사용하는 유저가 존재하지 않습니다."));
     }
 
     @Override
-    public Optional<User> findByPhone(String phoneNum) {
-        return userStore.stream().filter(u -> u.getPhoneNum().equals(phoneNum)).findFirst();
+    public User findByPhone(String phoneNum) {
+        return userStore.values().stream()
+                .filter(u -> u.getPhoneNum().equals(phoneNum))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 전화번호를 사용하는 유저가 존재하지 않습니다."));
     }
 
     @Override
     public Optional<User> findByUserId(String userId) {
-        return userStore.stream().filter(u -> u.getUserId().equals(userId)).findFirst();
+        return userStore.values().stream()
+                .filter(u -> u.getUserId().equals(userId))
+                .findFirst();
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(userStore);
+        return new ArrayList<>(userStore.values());
     }
 
     @Override
     public void update(User user) {
-        for (int i = 0; i < userStore.size(); i++) {
-            if (userStore.get(i).getId().equals(user.getId())) {
-                userStore.set(i, user);
-                saveUsersToFile();
-                break;
-            }
+        if(isExist(user.getId())){
+            userStore.replace(user.getId(), user);
+            saveUsersToFile();
+        } else {
+            throw new IllegalArgumentException("해당 유저가 존재하지 않아 정보 수정에 실패하였습니다.");
         }
     }
 
     @Override
     public void deleteById(UUID id) {
-        userStore.removeIf(u -> u.getId().equals(id));
+        if(!isExist(id)) {
+            throw new IllegalArgumentException("삭제할 유저가 존재하지 않습니다.");
+        }
+        userStore.remove(id);
         saveUsersToFile();
+    }
+
+    @Override
+    public boolean isExist(UUID id) {
+        return userStore.containsKey(id);
     }
 }

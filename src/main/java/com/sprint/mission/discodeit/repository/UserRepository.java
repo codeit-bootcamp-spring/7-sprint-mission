@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,13 +19,13 @@ public interface UserRepository {
     void save(User user);
 
     /** ID(UUID)로 유저를 조회 */
-    Optional<User> findById(UUID id);
+    User findById(UUID id);
 
     /** 이메일로 유저를 조회 */
-    Optional<User> findByEmail(String email);
+    User findByEmail(String email);
 
     /** 전화번호로 유저를 조회 */
-    Optional<User> findByPhone(String phoneNum);
+    User findByPhone(String phoneNum);
 
     /** 아이디로 유저를 조회 */
     Optional<User> findByUserId(String userId);
@@ -37,4 +38,7 @@ public interface UserRepository {
 
     /** ID(UUID)로 유저를 삭제 */
     void deleteById(UUID id);
+
+    /** ID(UUID)로 유저 존재 여부 확인*/
+    boolean isExist(UUID id);
 }

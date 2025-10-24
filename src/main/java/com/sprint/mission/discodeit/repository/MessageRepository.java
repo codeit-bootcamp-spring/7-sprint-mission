@@ -21,7 +21,7 @@ public interface MessageRepository {
     List<Message> findAll();
 
     /** ID(UUID)로 메시지를 조회 */
-    Optional<Message> findById(UUID id);
+    Message findById(UUID id);
 
     /** 메시지를 수정 (내용 변경 등) */
     void update(Message message);

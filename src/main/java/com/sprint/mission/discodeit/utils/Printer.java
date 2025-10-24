@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.utils;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -7,6 +8,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
+import java.util.Optional;
 
 public class Printer {
     public static void printInfo(User user){
@@ -33,7 +35,7 @@ public class Printer {
                 System.out.printf("====================%s====================\n", date);
             }
 
-            if(msg.senderId.equals(user.getId())){
+            if(msg.getSenderId().equals(user.getId())){
                 System.out.printf("%s 나: %s\n", time, msg.getContents());
             } else {
                 System.out.printf("%s %s: %s\n", time, userService.getUserNickName(msg.getSenderId()), msg.getContents());
@@ -42,17 +44,23 @@ public class Printer {
     }
 
     public static void printChatLatest(MessageService messageService, User user1, User user2){
-        Message message = messageService.getLastestMessage(user1, user2);
-        long unixTime;
-        String KST, time;
+        Optional.ofNullable(messageService.getLastestMessage(user1, user2))
+                .ifPresentOrElse(
+                        message -> {
+                            long unixTime = message.getCreatedAt();
+                            String KST = TimeConvert.time(unixTime);
+                            String time = KST.split(" ")[1];
+                            System.out.printf("%s: %s(%s)\n", user2.getNickName(), message.getContents(), time);
+                        },
+                        () -> System.out.printf("%s\n", user2.getNickName()) //이전 메시지가 없다면 닉네임만 출력
+                );
+    }
 
-        if(message == null){ //이전 메시지가 없다면 닉네임만 출력
-            System.out.printf("%s\n", user2.getNickName());
-        } else {
-            unixTime = message.getCreatedAt();
-            KST = TimeConvert.time(unixTime);
-            time = KST.split(" ")[1];
-            System.out.printf("%s: %s(%s)\n", user2.getNickName(), message.getContents(), time);
+    public static void printChannelMember(Channel channel){
+        System.out.println("채널 멤버 조회");
+        List<User> channelMember = channel.getMembers();
+        for (int i = 0; i < channelMember.size(); i++) {
+            System.out.printf("%d. %s\n", i + 1, channelMember.get(i).getNickName());
         }
     }
 

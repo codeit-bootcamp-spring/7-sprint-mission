@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -6,13 +6,13 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.io.*;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
-public class FileChannelService implements ChannelService {
+public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
-    public FileChannelService(ChannelRepository channelRepository) {
+    public BasicChannelService(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
     }
 
@@ -86,7 +86,7 @@ public class FileChannelService implements ChannelService {
             throw new IllegalArgumentException("관리자가 아니므로 채널을 삭제할 수 없습니다.");
         }
 
-        channelRepository.deleteById(id);
+        channelRepository.deleteById(id); // 채널 삭제
     }
 
     @Override

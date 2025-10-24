@@ -24,7 +24,7 @@ public interface ChannelRepository {
     /**
      * UUID로 채널 조회
      */
-    Optional<Channel> findById(UUID id);
+    Channel findById(UUID id);
 
     /**
      * 사용자로 채널 조회

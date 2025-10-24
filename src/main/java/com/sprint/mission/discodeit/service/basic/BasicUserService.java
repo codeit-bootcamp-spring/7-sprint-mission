@@ -1,28 +1,19 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.io.*;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * FileUserService
- * -----------------
- * UserService 인터페이스의 파일 기반 구현체로,
- * FileUserRepository를 주입받아 메시지 처리 로직을 수행합니다.
- *
- * - 기능은 JCFUserService와 동일하나,
- *   데이터 저장 및 조회가 파일(.sav) 단위로 이루어집니다.
- */
-public class FileUserService implements UserService {
+public class BasicUserService implements UserService{
+
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
 
-    public FileUserService(UserRepository userRepository, MessageRepository messageRepository) {
+    public BasicUserService(UserRepository userRepository, MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
     }

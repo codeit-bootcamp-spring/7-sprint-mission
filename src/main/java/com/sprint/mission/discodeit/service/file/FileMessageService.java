@@ -48,16 +48,16 @@ public class FileMessageService implements MessageService {
         // 최신순(역순)으로 순회
         Stream<Message> reversed = IntStream.iterate(allMessages.size() - 1, i -> i - 1)
                 .limit(allMessages.size())
-                .mapToObj(index -> allMessages.get(index));
+                .mapToObj(allMessages::get);
 
         if(receiver instanceof User user2){
             return reversed.filter(m ->
-                            (m.getSenderId().equals(user.getId()) && m.getReceiverId().equals(user2.getId())) ||
-                                    (m.getSenderId().equals(user2.getId()) && m.getReceiverId().equals(user.getId())))
+                            (user.getId().equals(m.getSenderId()) && user2.getId().equals(m.getReceiverId())) ||
+                                    (user2.getId().equals(m.getSenderId()) && user.getId().equals(m.getReceiverId())))
                     .findFirst().orElse(null);
         } else if(receiver instanceof Channel channel){
             return reversed.filter(m ->
-                            m.getSenderId().equals(user.getId()) && m.getReceiverId().equals(channel.getId()))
+                            user.getId().equals(m.getSenderId()) && channel.getId().equals(m.getReceiverId()))
                     .findFirst().orElse(null);
         } else {
             return null;
@@ -67,31 +67,30 @@ public class FileMessageService implements MessageService {
     @Override
     public List<Message> getMessagesBetween(User user1, User user2) {
         return messageRepository.findAll().stream()
-                .filter(m -> (m.getSenderId().equals(user1.getId()) && m.getReceiverId().equals(user2.getId())) ||
-                        (m.getSenderId().equals(user2.getId()) && m.getReceiverId().equals(user1.getId())))
+                .filter(m -> (user1.getId().equals(m.getSenderId()) && user2.getId().equals(m.getReceiverId())) ||
+                        (user2.getId().equals(m.getSenderId()) && user1.getId().equals(m.getReceiverId())))
                 .toList();
     }
 
     @Override
     public List<Message> getAllMessagesByUser(User user) {
         return messageRepository.findAll().stream()
-                .filter(m -> m.getSenderId().equals(user.getId()) || m.getReceiverId().equals(user.getId()))
+                .filter(m -> user.getId().equals(m.getSenderId()) || user.getId().equals(m.getReceiverId()))
                 .toList();
     }
 
     @Override
     public List<Message> getAllByChannel(Channel channel) {
         return messageRepository.findAll().stream()
-                .filter(m -> m.getReceiverId().equals(channel.getId()))
+                .filter(m -> channel.getId().equals(m.getReceiverId()))
                 .toList();
     }
 
     @Override
     public void updateMessage(UUID id, String content) {
-        messageRepository.findById(id).ifPresent(message -> {
-            message.setContents(content);
-            messageRepository.update(message);
-        });
+        Message message = messageRepository.findById(id);
+        message.setContents(content);
+        messageRepository.update(message);
     }
 
     @Override

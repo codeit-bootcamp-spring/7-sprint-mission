@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * JCFUserRepository
@@ -16,7 +13,7 @@ import java.util.UUID;
  * 실제 DB를 사용하지 않고 List<User>를 저장소로 활용합니다.
  */
 public class JCFUserRepository implements UserRepository {
-    private final List<User> userStore = new ArrayList<>();
+    private final Map<UUID, User> userStore = new HashMap<>();
 
     private JCFUserRepository() {}
 
@@ -28,46 +25,67 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void save(User user) {
-        userStore.add(user);
+        userStore.put(user.getId(), user);
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
-        return userStore.stream().filter(u -> u.getId().equals(id)).findFirst();
+    public User findById(UUID id) {
+        if(!isExist(id)){
+            throw new IllegalArgumentException("해당 UUID를 가진 유저가 존재하지 않습니다.");
+        }
+
+        // 해당 key(UUID) 값에 value(유저)가 null로 저장되어 있는 경우 예외 발생
+        return Optional.ofNullable(userStore.get(id))
+                .orElseThrow(() -> new IllegalArgumentException("해당 UUID를 가진 유저가 존재하지 않습니다."));
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return userStore.stream().filter(u -> u.getEmail().equals(email)).findFirst();
+    public User findByEmail(String email) {
+        return userStore.values().stream()
+                .filter(u -> u.getEmail().equals(email))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일을 사용하는 유저가 존재하지 않습니다."));
     }
 
     @Override
-    public Optional<User> findByPhone(String phoneNum) {
-        return userStore.stream().filter(u -> u.getPhoneNum().equals(phoneNum)).findFirst();
+    public User findByPhone(String phoneNum) {
+        return userStore.values().stream()
+                .filter(u -> u.getPhoneNum().equals(phoneNum))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 전화번호를 사용하는 유저가 존재하지 않습니다."));
     }
 
     @Override
     public Optional<User> findByUserId(String userId) {
-        return userStore.stream().filter(u -> u.getUserId().equals(userId)).findFirst();
+        return userStore.values().stream()
+                .filter(u -> u.getUserId().equals(userId))
+                .findFirst();
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(userStore);
+        return new ArrayList<>(userStore.values());
     }
 
     @Override
     public void update(User user) {
-        for (int i = 0; i < userStore.size(); i++) {
-            if (userStore.get(i).getId().equals(user.getId())) {
-                userStore.set(i, user);
-                break;
-            }
+        if(isExist(user.getId())){
+            userStore.replace(user.getId(), user);
+        } else {
+            throw new IllegalArgumentException("해당 유저가 존재하지 않아 정보 수정에 실패하였습니다.");
         }
     }
 
     @Override
     public void deleteById(UUID id) {
-        userStore.removeIf(u -> u.getId().equals(id));
+        if(!isExist(id)) {
+            throw new IllegalArgumentException("삭제할 유저가 존재하지 않습니다.");
+        }
+        userStore.remove(id);
+    }
+
+    @Override
+    public boolean isExist(UUID id) {
+        return userStore.containsKey(id);
     }
 }
