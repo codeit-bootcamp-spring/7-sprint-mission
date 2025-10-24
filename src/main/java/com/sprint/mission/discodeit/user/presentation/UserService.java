@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.user.presentation.dto.request.UserRequestDto
 import com.sprint.mission.discodeit.user.presentation.dto.request.UserUpdateDto;
 import com.sprint.mission.discodeit.user.presentation.dto.response.UserResponseDto;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,14 +34,14 @@ public interface UserService{
 //    void register(User user);
 
     //고도화
-    UserResponseDto createUser(UserCreateRequestDto requestDto);
+    UserResponseDto createUser(UserCreateRequestDto requestDto) throws IOException;
 
 
     // find & findAll
     UserResponseDto getUser(UserRequestDto requestDto);
     List<UserResponseDto> getAllUsers();
 
-    UserResponseDto updateUserInfo(UserUpdateDto updateDto);
+    UserResponseDto updateUserInfo(UserUpdateDto updateDto) throws IOException;
 
     //도메인과 관련된 것 모두 삭제
     void delete(UserRequestDto requestDto);

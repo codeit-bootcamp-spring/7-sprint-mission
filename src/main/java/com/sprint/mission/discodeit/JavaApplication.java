@@ -1,18 +1,12 @@
 package com.sprint.mission.discodeit;
 
 
-import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
-import com.sprint.mission.discodeit.messageroom.domain.MessageRoom;
-import com.sprint.mission.discodeit.messageroom.domain.MessageRoomType;
 import com.sprint.mission.discodeit.server.presentation.ServerService;
-import com.sprint.mission.discodeit.messageroom.presentation.MessageRoomService;
-import com.sprint.mission.discodeit.server.domain.Server;
+import com.sprint.mission.discodeit.channel.presentation.ChannelService;
 import com.sprint.mission.discodeit.user.presentation.UserService;
 import com.sprint.mission.discodeit.user.domain.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-
-import java.util.List;
 
 
 public class JavaApplication {
@@ -44,7 +38,7 @@ public class JavaApplication {
         ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
         UserService userService = context.getBean(UserService.class);
-        MessageRoomService messageRoomService= context.getBean(MessageRoomService.class);
+        ChannelService channelService = context.getBean(ChannelService.class);
         ServerService serverService = context.getBean(ServerService.class);
 
 

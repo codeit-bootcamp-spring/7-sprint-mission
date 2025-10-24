@@ -1,20 +1,5 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.friendrequest.infrastructure.MemoryFriendRequestRepository;
-import com.sprint.mission.discodeit.friendship.infrastructure.MemoryFriendShipRepository;
-import com.sprint.mission.discodeit.messageroom.infrastructure.MemoryMessageRoomRepository;
-import com.sprint.mission.discodeit.friendrequest.application.FriendRequestRepository;
-import com.sprint.mission.discodeit.server.application.ServerRepository;
-import com.sprint.mission.discodeit.server.presentation.ServerService;
-import com.sprint.mission.discodeit.server.application.BasicServerService;
-import com.sprint.mission.discodeit.friendship.application.FriendShipRepository;
-import com.sprint.mission.discodeit.messageroom.application.BasicMessageRoomService;
-import com.sprint.mission.discodeit.messageroom.application.MessageRoomRepository;
-import com.sprint.mission.discodeit.messageroom.presentation.MessageRoomService;
-import com.sprint.mission.discodeit.server.infrastructure.MemoryServerRepository;
-import com.sprint.mission.discodeit.user.application.BasicUserService;
-import com.sprint.mission.discodeit.user.application.UserRepository;
-import com.sprint.mission.discodeit.user.infrastructure.MemoryUserRepository;
 import lombok.Getter;
 
 //의존성 주입

@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.user.application;
 
 
-import com.sprint.mission.discodeit.auth.AuthManager;
+
+import com.sprint.mission.discodeit.common.manager.FileManager;
 import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
 import com.sprint.mission.discodeit.friendrequest.application.FriendRequestRepository;
 import com.sprint.mission.discodeit.friendship.domain.FriendShip;
@@ -17,9 +18,12 @@ import com.sprint.mission.discodeit.userstatus.application.UserStatusRepository;
 import com.sprint.mission.discodeit.userstatus.domain.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,18 +35,25 @@ public class BasicUserService implements UserService {
     private final FriendRequestRepository requestRepository;
     private final FriendShipRepository friendShipRepository;
     private final UserStatusRepository userStatusRepository;
-    private final AuthManager authManager;
+    private final FileManager fileManager;
 
 
 
 
     @Override
-    public UserResponseDto createUser(UserCreateRequestDto requestDto) {
-        checkDuplicateEmail(requestDto.email());
-        checkDuplicateUsername(requestDto.username());
+    public UserResponseDto createUser(UserCreateRequestDto requestDto) throws IOException {
+        validateDuplicateEmail(requestDto.email());
+        validateDuplicateUsername(requestDto.username());
         User user = userCreateDtoToUser(requestDto);
-        save(user);
+        userRepository.save(user);
         createUserStatue(user.getId());
+
+        //유저 전용 폴더 생성 & 파일 저장
+        fileManager.createUserFolder(user.getId());
+        if(requestDto.profileImage()!=null){
+            fileManager.saveUserFile(user.getId(), requestDto.profileImage());
+        }
+
         return userToResponseDto(user);
     }
 
@@ -54,12 +65,15 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<UserResponseDto> getAllUsers() {
-        return findAll().stream().map(this::userToResponseDto).toList();
+        return userRepository.findAll().stream().map(this::userToResponseDto).toList();
     }
 
     @Override
-    public UserResponseDto updateUserInfo(UserUpdateDto updateDto) {
+    public UserResponseDto updateUserInfo(UserUpdateDto updateDto) throws IOException {
         User user = findById(updateDto.id());
+        if (updateDto.updateFile()!=null){
+            fileManager.saveUserFile(user.getId(), updateDto.updateFile());
+        }
         if(updateDto.username()!=null){
             user.updateUsername(updateDto.username());
         }
@@ -69,38 +83,24 @@ public class BasicUserService implements UserService {
         if(updateDto.phoneNumber()!=null){
             user.updatePhoneNumber(updateDto.phoneNumber());
         }
-        save(user);
+
+        userRepository.save(user);
         return userToResponseDto(user);
     }
 
     @Override
     public void delete(UserRequestDto requestDto) {
-        remove(requestDto.id());
-        removeUserStatusById(requestDto.id());
+        userRepository.remove(findById(requestDto.id()));
+        fileManager.deleteUserFolder(requestDto.id());
+        UserStatus userStatus = userStatusRepository.findByUserId(requestDto.id())
+                .orElseThrow(()-> new NoSuchElementException());
+        userStatusRepository.remove(userStatus);
+
     }
-
-    //간단하게 crud하는 로직이지만 우선은 메서드의 책임을 분리해보고 싶었음.
-    private void save(User user) {
-        userRepository.save(user);
-        System.out.println("유저 저장 성공");
-    }
-
-
-    private void remove(UUID id) {
-        userRepository.remove(findById(id));
-        System.out.println("유저 삭제 성공");
-    }
-
 
     private User findById(UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("유저를 찾을 수 없습니다."));
     }
-
-
-    private List<User> findAll() {
-        return userRepository.findAll();
-    }
-    //
 
     //이메일로 유저 정보 가져오기
     private User findByEmail(String email) {
@@ -171,13 +171,13 @@ public class BasicUserService implements UserService {
     }
 
 
-    private void checkDuplicateUsername(String username) {
+    private void validateDuplicateUsername(String username) {
         userRepository.findByUsername(username).ifPresent(u -> {
             throw new DuplicateUserException("이미 존재하는 사용자 이름입니다.");
         });
     }
 
-    private void checkDuplicateEmail(String email) {
+    private void validateDuplicateEmail(String email) {
         userRepository.findByEmail(email).ifPresent(u -> {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         });
@@ -206,8 +206,6 @@ public class BasicUserService implements UserService {
         return userStatusRepository.findByUserId(id).orElse(null);
     }
 
-    private void removeUserStatusById(UUID userId){
-        userStatusRepository.findByUserId(userId);
-    }
-
+    //예외는 컨트롤러로 다 던져야 하나? 나중에 @ControllerAdvice로 처리할 수 있게? 우선은 그렇게 해보자
+    //멘토님에게 물어보기
 }

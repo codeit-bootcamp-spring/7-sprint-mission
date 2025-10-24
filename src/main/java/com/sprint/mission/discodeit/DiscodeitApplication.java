@@ -1,17 +1,7 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
-import com.sprint.mission.discodeit.messageroom.presentation.MessageRoomService;
-import com.sprint.mission.discodeit.messageroom.domain.MessageRoom;
-import com.sprint.mission.discodeit.messageroom.domain.MessageRoomType;
-import com.sprint.mission.discodeit.server.presentation.ServerService;
-import com.sprint.mission.discodeit.server.domain.Server;
-import com.sprint.mission.discodeit.user.presentation.UserService;
-import com.sprint.mission.discodeit.user.domain.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.List;
 
 @SpringBootApplication
 public class DiscodeitApplication {

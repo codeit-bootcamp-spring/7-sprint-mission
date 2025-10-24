@@ -1,0 +1,31 @@
+package com.sprint.mission.discodeit.channel.infrastructure;
+
+import com.sprint.mission.discodeit.channel.application.ChannelRoomRepository;
+import com.sprint.mission.discodeit.channel.domain.Channel;
+
+import java.util.*;
+
+public class MemoryChannelRoomRepository implements ChannelRoomRepository {
+
+    private final Map<UUID, Channel> store= new HashMap<>();
+
+    public void save(Channel channel){
+        UUID key = channel.getId();
+        store.put(key, channel);
+    }
+
+    public void remove(Channel channel){
+        UUID key = channel.getId();
+        store.remove(key);
+    }
+
+    public Optional<Channel> findById(UUID id){
+        return Optional.ofNullable(store.get(id));
+    }
+
+    @Override
+    public List<Channel> findAll() {
+        return List.copyOf(store.values().stream().toList());
+    }
+
+}
