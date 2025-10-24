@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity.dto.userDto;
 import com.sprint.mission.discodeit.entity.User;
 import lombok.Builder;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
@@ -11,14 +12,14 @@ import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
  * @param createAt 가입시기
  */
 @Builder
-public record UserInfoDto(UUID id, String userName, String state, String createAt, String phoneNum) {
+public record UserInfoDto(UUID id, String userName, String state, Instant createAt, String phoneNum) {
 
     public static UserInfoDto from(User user) {
         return UserInfoDto.builder()
                 .id(user.getId())
                 .userName(user.getUserName())
                 .state(user.getUserState().getDescState())
-                .createAt(changeTime(user.getCreatedAt()))
+                .createAt(user.getCreatedAt())
                 .phoneNum(user.getPhoneNum())
                 .build();
     }

@@ -3,12 +3,13 @@ package com.sprint.mission.discodeit.entity.dto.messageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import lombok.Builder;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
 
 @Builder
-public record MessageInfoDto(UUID id, String authorName, String content, String createdAt, String updatedAt) {
+public record MessageInfoDto(UUID id, String authorName, String content, Instant createdAt, Instant updatedAt) {
 
     public static MessageInfoDto from(Message message) {
 
@@ -16,8 +17,8 @@ public record MessageInfoDto(UUID id, String authorName, String content, String 
                 .id(message.getId())
                 .authorName(message.getAuthor().getUserName())
                 .content(message.getContent())
-                .createdAt(changeTime(message.getCreatedAt()))
-                .updatedAt(changeTime(message.getUpdatedAt()))
+                .createdAt(message.getCreatedAt())
+                .updatedAt(message.getUpdatedAt())
                 .build();
     }
 

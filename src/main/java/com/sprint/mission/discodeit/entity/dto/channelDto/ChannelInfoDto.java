@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import lombok.Builder;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -11,8 +12,8 @@ import java.util.stream.Collectors;
 import static com.sprint.mission.discodeit.entity.dto.ChangeTime.changeTime;
 
 @Builder
-public record ChannelInfoDto(UUID id, String channelName, String channelAdmin, String channelType, String createdAt,
-                             String updatedAt, List<String> members) {
+public record ChannelInfoDto(UUID id, String channelName, String channelAdmin, String channelType, Instant createdAt,
+                             Instant updatedAt, List<String> members) {
 
     public static ChannelInfoDto from(Channel channel) {
 
@@ -21,8 +22,8 @@ public record ChannelInfoDto(UUID id, String channelName, String channelAdmin, S
                 .channelName(channel.getChannelName())
                 .channelAdmin(channel.getChannelAdmin().getUserName())
                 .channelType(channel.getType().toString())
-                .createdAt(changeTime(channel.getCreatedAt()))
-                .updatedAt(changeTime(channel.getUpdatedAt()))
+                .createdAt(channel.getCreatedAt())
+                .updatedAt(channel.getUpdatedAt())
                 .members(channel.getMembers().stream().map(User::getUserName)
                         .collect(Collectors.toList()))
                 .build();
