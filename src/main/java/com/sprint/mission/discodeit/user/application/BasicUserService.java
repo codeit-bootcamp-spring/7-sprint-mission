@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.user.application;
 
 
-
 import com.sprint.mission.discodeit.common.manager.FileManager;
-import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
 import com.sprint.mission.discodeit.friendrequest.application.FriendRequestRepository;
-import com.sprint.mission.discodeit.friendship.domain.FriendShip;
+import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
 import com.sprint.mission.discodeit.friendship.application.FriendShipRepository;
+import com.sprint.mission.discodeit.friendship.domain.FriendShip;
 import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.user.domain.exception.DuplicateUserException;
 import com.sprint.mission.discodeit.user.presentation.UserService;
@@ -18,12 +17,10 @@ import com.sprint.mission.discodeit.userstatus.application.UserStatusRepository;
 import com.sprint.mission.discodeit.userstatus.domain.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -38,19 +35,21 @@ public class BasicUserService implements UserService {
     private final FileManager fileManager;
 
 
-
-
     @Override
     public UserResponseDto createUser(UserCreateRequestDto requestDto) throws IOException {
         validateDuplicateEmail(requestDto.email());
         validateDuplicateUsername(requestDto.username());
-        User user = userCreateDtoToUser(requestDto);
+        User user = User.create(
+                requestDto.email(),
+                requestDto.password(),
+                requestDto.username(),
+                requestDto.phoneNumber());
         userRepository.save(user);
         createUserStatue(user.getId());
 
         //유저 전용 폴더 생성 & 파일 저장
         fileManager.createUserFolder(user.getId());
-        if(requestDto.profileImage()!=null){
+        if (requestDto.profileImage() != null) {
             fileManager.saveUserFile(user.getId(), requestDto.profileImage());
         }
 
@@ -71,16 +70,16 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponseDto updateUserInfo(UserUpdateDto updateDto) throws IOException {
         User user = findById(updateDto.id());
-        if (updateDto.updateFile()!=null){
+        if (updateDto.updateFile() != null) {
             fileManager.saveUserFile(user.getId(), updateDto.updateFile());
         }
-        if(updateDto.username()!=null){
+        if (updateDto.username() != null) {
             user.updateUsername(updateDto.username());
         }
-        if(updateDto.password()!=null){
+        if (updateDto.password() != null) {
             user.updatePassword(updateDto.password());
         }
-        if(updateDto.phoneNumber()!=null){
+        if (updateDto.phoneNumber() != null) {
             user.updatePhoneNumber(updateDto.phoneNumber());
         }
 
@@ -93,7 +92,7 @@ public class BasicUserService implements UserService {
         userRepository.remove(findById(requestDto.id()));
         fileManager.deleteUserFolder(requestDto.id());
         UserStatus userStatus = userStatusRepository.findByUserId(requestDto.id())
-                .orElseThrow(()-> new NoSuchElementException());
+                .orElseThrow(() -> new NoSuchElementException());
         userStatusRepository.remove(userStatus);
 
     }
@@ -146,7 +145,6 @@ public class BasicUserService implements UserService {
     }
 
 
-
     // 이미 친구인지 검사
     private void validateNotAlreadyFriend(User sender, User target) {
         boolean alreadyFriends =
@@ -183,26 +181,18 @@ public class BasicUserService implements UserService {
         });
     }
 
-    private User userCreateDtoToUser(UserCreateRequestDto requestDto){
-        return User.create(
-                requestDto.email(),
-                requestDto.password(),
-                requestDto.username(),
-                requestDto.phoneNumber()
-        );
-    }
-    private UserResponseDto userToResponseDto(User user){
-        return new UserResponseDto(user.getEmail(), user.getUsername(),user.getPhoneNumber());
+    private UserResponseDto userToResponseDto(User user) {
+        return new UserResponseDto(user.getEmail(), user.getUsername(), user.getPhoneNumber());
     }
 
     //UserStatus 관련 CRUD
-    private UserStatus createUserStatue(UUID userId){
+    private UserStatus createUserStatue(UUID userId) {
         UserStatus userStatus = UserStatus.create(userId);
         userStatusRepository.save(userStatus);
         return userStatus;
     }
 
-    private UserStatus findUserStatusByUserId(UUID id){
+    private UserStatus findUserStatusByUserId(UUID id) {
         return userStatusRepository.findByUserId(id).orElse(null);
     }
 

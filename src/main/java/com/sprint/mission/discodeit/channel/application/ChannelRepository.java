@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ChannelRoomRepository {
+public interface ChannelRepository {
     void save(Channel channel);
 
     void remove(Channel channel);
@@ -14,4 +14,6 @@ public interface ChannelRoomRepository {
     Optional<Channel> findById(UUID id);
 
     List<Channel> findAll();
+
+
 }

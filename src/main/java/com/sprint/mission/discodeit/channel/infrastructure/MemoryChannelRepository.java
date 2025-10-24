@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.channel.infrastructure;
 
-import com.sprint.mission.discodeit.channel.application.ChannelRoomRepository;
+import com.sprint.mission.discodeit.channel.application.ChannelRepository;
 import com.sprint.mission.discodeit.channel.domain.Channel;
 
 import java.util.*;
 
-public class MemoryChannelRoomRepository implements ChannelRoomRepository {
+public class MemoryChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> store= new HashMap<>();
 

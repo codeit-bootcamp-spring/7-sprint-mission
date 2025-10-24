@@ -2,17 +2,25 @@ package com.sprint.mission.discodeit.channel.presentation;
 
 
 import com.sprint.mission.discodeit.channel.domain.Channel;
+import com.sprint.mission.discodeit.channel.presentation.dto.request.ChannelCreateRequestDto;
+import com.sprint.mission.discodeit.channel.presentation.dto.request.ChannelRequestDto;
+import com.sprint.mission.discodeit.channel.presentation.dto.response.ChannelResponseDto;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    void save(Channel channel);
 
-    void remove(Channel channel);
+    ChannelResponseDto createChannel(ChannelCreateRequestDto requestDto);
 
-    Channel findById(UUID id);
+    ChannelResponseDto findById(UUID id);
 
-    List<Channel> findAll();
+    List<ChannelResponseDto> findAllByServer(UUID serverId);
+
+    ChannelResponseDto updateChannel(ChannelRequestDto requestDto);
+
+    void deleteAllByServer(UUID serverId);
+
+    void deleteChannel(UUID channelId);
 
 }

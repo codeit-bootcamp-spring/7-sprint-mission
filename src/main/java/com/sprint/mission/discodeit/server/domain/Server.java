@@ -26,7 +26,7 @@ public class Server implements Serializable {
     private Long serverLevel;
     private boolean isPrivate; //true -> private
     private final List<UUID> members;
-    private final List<UUID> messageRooms = new ArrayList<>();
+    private final List<UUID> channels = new ArrayList<>();
 
     //객체 생성을 위한 팩토리 메서드
     public static Server create(String serverName, boolean isPrivate, Long serverLevel, List<UUID> members){
@@ -102,12 +102,12 @@ public class Server implements Serializable {
         updatedAt=Instant.now();
     }
 
-    public List<UUID> getMessageRooms() {
-        return List.copyOf(messageRooms);
+    public List<UUID> getChannel() {
+        return List.copyOf(channels);
     }
 
-    public void addMessageRoom(Channel channel){
-        messageRooms.add(channel.getId());
+    public void makeChannel(Channel channel){
+        channels.add(channel.getId());
         updatedAt=Instant.now();
     }
 

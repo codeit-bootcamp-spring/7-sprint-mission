@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.channel.infrastructure;
 
 
-import com.sprint.mission.discodeit.channel.application.ChannelRoomRepository;
+import com.sprint.mission.discodeit.channel.application.ChannelRepository;
 import com.sprint.mission.discodeit.channel.domain.Channel;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 @Repository
-public class FileChannelRoomRepository implements ChannelRoomRepository {
+public class FileChannelRepository implements ChannelRepository {
 
     private final String FILE_PATH = "data/messageRooms.ser"; // 저장 파일 경로
 

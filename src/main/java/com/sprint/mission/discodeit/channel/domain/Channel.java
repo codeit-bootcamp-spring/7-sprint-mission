@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.channel.domain;
 
+import com.sprint.mission.discodeit.server.domain.Server;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,36 +11,35 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Setter
 public class Channel implements Serializable {
+
     private static final long serialVersionUID = 3L;
+
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
 
-
-    private final List<UUID> participants= new ArrayList<>();
+    private final UUID serverId;
+    private String channelName;
+    //message의 id
     private final List<UUID> history = new ArrayList<>();
 
-    private String MessageRoomName;
-
-    public static Channel createChannel(String messageRoomName){
-        validateChannelName(messageRoomName);
-        return new Channel(messageRoomName);
+    public static Channel create(String ChannelName, UUID serverId){
+        validateChannelName(ChannelName);
+        return new Channel(ChannelName,serverId);
     }
 
-    public static Channel createDM(String messageRoomName){
-        validateChannelName(messageRoomName);
-        return new Channel(messageRoomName);
-    }
-
-    private Channel(String messageRoomName) {
+    private Channel(String channelName,UUID serverId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt=Instant.now();
+        this.serverId=serverId;
+        this.channelName=channelName;
+    }
 
-        this.MessageRoomName=messageRoomName;
-
+    public void updateChannelName(String name){
+        validateChannelName(name);
+        this.channelName=channelName;
     }
 
     private static void validateChannelName(String name){
@@ -48,19 +48,8 @@ public class Channel implements Serializable {
         }
     }
 
-
-
-    public List<UUID> getParticipants() {
-        return List.copyOf(participants);
-    }
-
     public List<UUID> getHistory() {
         return List.copyOf(history);
-    }
-
-
-    public void addParticipants(UUID id){
-        participants.add(id);
     }
 
     public void addHistory(UUID id){
