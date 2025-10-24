@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateDto;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -49,27 +50,20 @@ public class FileChannelService implements ChannelService {
     //============================================생성=====
 
     @Override
-    public ChannelInfoDto createChannel(UUID userId, String channelName, ChannelType type) {
-        User user = userService.findUserEntityById(userId)
+    public ChannelInfoDto createChannel(ChannelCreateDto dto) {
+        User user = userService.findUserEntityById(dto.getAdminId())
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없음"));
-        if (channelName == null || channelName.isBlank())
-            channelName = user.getUserName() + "의 채널";
-        Channel newChannel = new Channel(user, channelName, type);
+
+        Channel newChannel = new Channel(user, dto.getChannelName(), dto.getType());
         this.data.put(newChannel.getId(), newChannel);
 
         saveChannelData();
-        return new ChannelInfoDto(newChannel);
+        return ChannelInfoDto.from(newChannel);
     }
-
-    @Override
-    public ChannelInfoDto createChannel(UUID userId, ChannelType type) {
-        return this.createChannel(userId, null, type);
-    }
-
 
     @Override
     public Optional<ChannelInfoDto> findChannelInfoById(UUID id) {
-        return Optional.ofNullable(data.get(id)).map(ChannelInfoDto::new);
+        return Optional.ofNullable(data.get(id)).map(ChannelInfoDto::from);
     }
 
     // message에 채널을 주기위해
@@ -79,14 +73,14 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public List<ChannelInfoDto> findAll() {
-        return data.values().stream().map(ChannelInfoDto::new).toList();
+        return data.values().stream().map(ChannelInfoDto::from).toList();
     }
 
     @Override
     public Optional<ChannelInfoDto> findChannelInfoByChannelName(String channelName) {
         Channel ch = data.values().stream().filter(channel ->
                         channel.getChannelName().equals(channelName)).findFirst().orElse(null);
-        return Optional.ofNullable(ch).map(ChannelInfoDto::new);
+        return Optional.ofNullable(ch).map(ChannelInfoDto::from);
     }
 
     @Override
@@ -95,7 +89,7 @@ public class FileChannelService implements ChannelService {
         return findChannelEntityById(id).map(channel -> {
             channel.changeChannelName(newChannelName);
             saveChannelData();
-            return new ChannelInfoDto(channel);
+            return ChannelInfoDto.from(channel);
         });
     }
 
@@ -114,7 +108,7 @@ public class FileChannelService implements ChannelService {
                 System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에 참가");
             } else System.out.println("이미 참여하고 있는 유저");
             saveChannelData();
-            return Optional.of(new ChannelInfoDto(channel));
+            return Optional.of(ChannelInfoDto.from(channel));
 
     }
 
@@ -134,7 +128,7 @@ public class FileChannelService implements ChannelService {
             System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에서 삭제됨");
         } else System.out.println("채널에 없는 유저");
         saveChannelData();
-        return Optional.of(new ChannelInfoDto(channel));
+        return Optional.of(ChannelInfoDto.from(channel));
 
     }
 

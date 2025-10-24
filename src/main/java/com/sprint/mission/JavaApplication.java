@@ -1,8 +1,12 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateDto;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateDto;
 import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
@@ -21,7 +25,14 @@ public class JavaApplication {
         return userService.findUserInfoByEmail(email)
                 .orElseGet(() -> {
                     System.out.println("새로운 계정 가입: " + userName);
-                    return userService.createUser(email, password, userName, phoneNum);
+                    return userService.createUser(
+                            UserCreateDto.builder()
+                                    .email(email)
+                                    .password(password)
+                                    .userName(userName)
+                                    .phoneNum(phoneNum)
+                                    .build()
+                    );
                 });
     }
 
@@ -35,7 +46,13 @@ public class JavaApplication {
         return channelService.findChannelInfoByChannelName(channelName)
                 .orElseGet(() -> {
                     System.out.println("새로운 채널 개설: " + channelName);
-                    return channelService.createChannel(adminId, channelName, type);
+                    return channelService.createChannel(
+                            ChannelCreateDto.builder()
+                                    .adminId(adminId)
+                                    .channelName(channelName)
+                                    .type(type)
+                                    .build()
+                    );
                 });
     }
 
@@ -58,8 +75,8 @@ public class JavaApplication {
         System.out.println("\n---️ 테스트 데이터 설정 ---");
         UserInfoDto admin = userCreateOrLoad(userService, "admin@discodeit.com", "AdminPass1!", "관리자");
         UserInfoDto user = userCreateOrLoad(userService, "user@discodeit.com", "UserPass1!", "일반유저");
-        UUID adminId = admin.getId();
-        UUID userId = user.getId();
+        UUID adminId = admin.id();
+        UUID userId = user.id();
 
         ChannelInfoDto noticeChannel = channelCreateOrLoad(channelService, adminId, "공지사항", ChannelType.TEXT);
         UUID noticeChannelId = noticeChannel.id();
@@ -70,9 +87,27 @@ public class JavaApplication {
 
         // --- 3. 메시지 기능 테스트 ---
         System.out.println("\n--- 메시지 기능 테스트 ---");
-        messageService.createChannelMessage(adminId, noticeChannelId, "여기는 공지 채널입니다.");
-        MessageInfoDto userMessage = messageService.createChannelMessage(userId, noticeChannelId, "반갑습니다.");
-        messageService.createDirectMessage(adminId, userId, "안녕하세요!");
+        messageService.createChannelMessage(
+                ChannelMessageCreateDto.builder()
+                        .authorId(adminId)
+                        .channelId(noticeChannelId)
+                        .content("여기는 공지 채널입니다.")
+                        .build()
+                );
+        MessageInfoDto userMessage = messageService.createChannelMessage(
+                ChannelMessageCreateDto.builder()
+                        .authorId(userId)
+                        .channelId(noticeChannelId)
+                        .content("반갑습니다.")
+                        .build()
+                );
+        messageService.createDirectMessage(
+                DirectMessageCreateDto.builder()
+                        .authorId(adminId)
+                        .receiverId(noticeChannelId)
+                        .content("안녕하세요!")
+                        .build()
+                );
 
         List<MessageInfoDto> channelMessages = messageService.findChannelMessage(noticeChannelId);
         System.out.println("\n[공지사항 채널 대화 내용]");

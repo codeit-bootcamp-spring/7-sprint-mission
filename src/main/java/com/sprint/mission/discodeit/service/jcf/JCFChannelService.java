@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateDto;
 import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
 
@@ -18,26 +19,18 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelInfoDto createChannel(UUID userId, String channelName, ChannelType type) {
-        User user = userService.findUserEntityById(userId)
+    public ChannelInfoDto createChannel(ChannelCreateDto dto) {
+        User user = userService.findUserEntityById(dto.getAdminId())
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없음"));
-        if (channelName == null || channelName.isBlank())
-            channelName = user.getUserName() + "의 채널";
 
-        Channel newChannel = new Channel(user, channelName, type);
+        Channel newChannel = new Channel(user, dto.getChannelName(), dto.getType());
         this.data.put(newChannel.getId(), newChannel);
-        return new ChannelInfoDto(newChannel);
+        return ChannelInfoDto.from(newChannel);
     }
-
-    @Override
-    public ChannelInfoDto createChannel(UUID userId, ChannelType type) {
-        return this.createChannel(userId, null, type);
-    }
-
 
     @Override
     public Optional<ChannelInfoDto> findChannelInfoById(UUID id) {
-        return Optional.ofNullable(data.get(id)).map(ChannelInfoDto::new);
+        return Optional.ofNullable(data.get(id)).map(ChannelInfoDto::from);
     }
 
     // message에 채널을 주기위해
@@ -47,14 +40,14 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public List<ChannelInfoDto> findAll() {
-        return data.values().stream().map(ChannelInfoDto::new).toList();
+        return data.values().stream().map(ChannelInfoDto::from).toList();
     }
 
     @Override
     public Optional<ChannelInfoDto> findChannelInfoByChannelName(String channelName) {
         Channel ch = data.values().stream().filter(channel ->
                 channel.getChannelName().equals(channelName)).findFirst().orElse(null);
-        return Optional.ofNullable(ch).map(ChannelInfoDto::new);
+        return Optional.ofNullable(ch).map(ChannelInfoDto::from);
     }
 
 
@@ -63,7 +56,7 @@ public class JCFChannelService implements ChannelService {
 
         return Optional.ofNullable(data.get(id)).map(channel -> {
             channel.changeChannelName(newChannelName);
-            return new ChannelInfoDto(channel);
+            return ChannelInfoDto.from(channel);
         });
     }
 
@@ -78,7 +71,7 @@ public class JCFChannelService implements ChannelService {
             if (channel.addMember(user)) {
                 System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에 참가");
             } else System.out.println("이미 참여하고 있는 유저");
-            return Optional.of(new ChannelInfoDto(channel));
+            return Optional.of(ChannelInfoDto.from(channel));
         }
         System.out.println("잘못된 입력");
         return Optional.empty();
@@ -94,7 +87,7 @@ public class JCFChannelService implements ChannelService {
             if (channel.removeMember(user)) {
                 System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에서 삭제됨");
             } else System.out.println("채널에 없는 유저");
-            return Optional.of(new ChannelInfoDto(channel));
+            return Optional.of(ChannelInfoDto.from(channel));
         }
         System.out.println("잘못된 입력");
         return Optional.empty();

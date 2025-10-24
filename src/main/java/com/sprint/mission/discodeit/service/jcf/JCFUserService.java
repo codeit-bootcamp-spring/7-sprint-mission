@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserState;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.service.*;
@@ -27,22 +28,18 @@ public class JCFUserService implements UserService {
 
     // 생성
     @Override
-    public UserInfoDto createUser(String email, String password, String userName, String phoneNum) {
-        validateEmailIsUnique(email);
-        User newUser = new User(email, password, userName, phoneNum);
+    public UserInfoDto createUser(UserCreateDto dto) {
+        validateEmailIsUnique(dto.getEmail());
+        User newUser = new User(dto.getEmail(), dto.getPassword(), dto.getUserName(), dto.getPhoneNum());
         data.put(newUser.getId(), newUser);
-        return new UserInfoDto(newUser);
+        return UserInfoDto.from(newUser);
 
-    }
-    @Override
-    public UserInfoDto createUser(String email, String password, String userName) {
-        return createUser(email, password, userName, null);
     }
 
     // 조회
     @Override
     public Optional<UserInfoDto> findUserInfoById(UUID userId) {
-        return Optional.ofNullable(data.get(userId)).map(UserInfoDto::new);
+        return Optional.ofNullable(data.get(userId)).map(UserInfoDto::from);
     }
 
     public Optional<User> findUserEntityById(UUID userId) {
@@ -53,13 +50,13 @@ public class JCFUserService implements UserService {
     public List<UserInfoDto> findAllUsers() {
 
         return data.values().stream()
-                .map(UserInfoDto::new).toList();
+                .map(UserInfoDto::from).toList();
     }
 
     @Override
     public Optional<UserInfoDto> findUserInfoByEmail(String email) {
         User user = data.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
-        return Optional.ofNullable(user).map(UserInfoDto::new);
+        return Optional.ofNullable(user).map(UserInfoDto::from);
     }
 
     // 수정
@@ -69,7 +66,7 @@ public class JCFUserService implements UserService {
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updateUserName(newUserName);
             user.updatePhoneNum(newPhoneNum);
-            return new UserInfoDto(user);
+            return UserInfoDto.from(user);
         });
     }
 
@@ -78,7 +75,7 @@ public class JCFUserService implements UserService {
 
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updatePassword(newPassword);
-            return new UserInfoDto(user);
+            return UserInfoDto.from(user);
         });
     }
 
@@ -87,7 +84,7 @@ public class JCFUserService implements UserService {
 
         return Optional.ofNullable(data.get(userId)).map(user -> {
             user.updateState(newState);
-            return new UserInfoDto(user);
+            return UserInfoDto.from(user);
         });
     }
 
