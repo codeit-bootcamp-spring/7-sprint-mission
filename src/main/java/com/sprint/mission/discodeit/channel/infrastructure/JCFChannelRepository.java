@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.channel.domain.Channel;
 
 import java.util.*;
 
-public class MemoryChannelRepository implements ChannelRepository {
+public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> store= new HashMap<>();
 

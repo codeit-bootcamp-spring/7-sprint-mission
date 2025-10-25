@@ -1,19 +1,6 @@
 package com.sprint.mission.discodeit.user;
 
-import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
-import com.sprint.mission.discodeit.friendrequest.infrastructure.MemoryFriendRequestRepository;
-import com.sprint.mission.discodeit.friendship.infrastructure.MemoryFriendShipRepository;
 import com.sprint.mission.discodeit.user.application.BasicUserService;
-import com.sprint.mission.discodeit.user.domain.User;
-import com.sprint.mission.discodeit.user.domain.exception.DuplicateUserException;
-import com.sprint.mission.discodeit.user.infrastructure.MemoryUserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static org.assertj.core.api.Assertions.*;
 
 public class BasicUserServiceTest {
 

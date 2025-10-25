@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.friendship.domain.FriendShip;
 
 import java.util.*;
 
-public class MemoryFriendShipRepository implements FriendShipRepository {
+public class JCFFriendShipRepository implements FriendShipRepository {
 
     private final Map<UUID, FriendShip> store = new HashMap<>();
 

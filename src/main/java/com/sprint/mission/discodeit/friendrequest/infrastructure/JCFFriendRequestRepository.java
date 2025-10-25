@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
 
 import java.util.*;
 
-public class MemoryFriendRequestRepository implements FriendRequestRepository {
+public class JCFFriendRequestRepository implements FriendRequestRepository {
 
     private final Map<UUID, FriendRequest> store = new HashMap<>();
 

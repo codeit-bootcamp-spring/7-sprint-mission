@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 
-//dto의 변환로직은 dto가 가지고 있으면 되는구나!!!
+//dto의 변환로직을 모아주는 Mapper클래스는 만드는 것도 방법 같다
 
 @Service
 @RequiredArgsConstructor

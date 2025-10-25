@@ -2,8 +2,6 @@ package com.sprint.mission.discodeit.auth;
 
 import com.sprint.mission.discodeit.user.application.UserRepository;
 import com.sprint.mission.discodeit.user.domain.User;
-import com.sprint.mission.discodeit.user.presentation.dto.request.UserLoginRequestDto;
-import com.sprint.mission.discodeit.userstatus.application.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +12,9 @@ public class AuthManager {
 
     private final UserRepository userRepository;
 
-    public User login(String loginId, String password){
+    public User login(String loginId, String password) {
         return userRepository.findByUsername(loginId)
-                .filter(m->m.getPassword().equals(password))
+                .filter(m -> m.getPassword().equals(password))
                 .orElse(null);
     }
-
 }
