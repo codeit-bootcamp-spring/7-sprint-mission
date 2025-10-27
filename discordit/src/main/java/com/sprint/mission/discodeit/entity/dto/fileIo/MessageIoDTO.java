@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.entity.dto.fileIo;
 
 
 import com.sprint.mission.discodeit.enums.ReceiverType;
@@ -13,7 +13,7 @@ import java.util.UUID;
  * User와 Receivable 객체 대신 UUID만 저장하여 직렬화 문제를 해결합니다.
  */
 @Getter
-public class MessageDTO implements Serializable {
+public class MessageIoDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // Getters
@@ -26,9 +26,9 @@ public class MessageDTO implements Serializable {
     private ReceiverType receiverType; // "USER" 또는 "CHANNEL"
     private String message;
 
-    public MessageDTO(UUID uuid, Instant createdAt, Instant updatedAt,
-                      UUID senderUuid, String senderUserId,
-                      UUID receiverUuid, ReceiverType receiverType, String message) {
+    public MessageIoDTO(UUID uuid, Instant createdAt, Instant updatedAt,
+                        UUID senderUuid, String senderUserId,
+                        UUID receiverUuid, ReceiverType receiverType, String message) {
         this.uuid = uuid;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

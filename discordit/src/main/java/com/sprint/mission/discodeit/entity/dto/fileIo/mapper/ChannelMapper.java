@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.entity.dto.mapper;
+package com.sprint.mission.discodeit.entity.dto.fileIo.mapper;
 
 import com.sprint.mission.discodeit.entity.base.Channel;
 import com.sprint.mission.discodeit.entity.base.User;
-import com.sprint.mission.discodeit.entity.dto.ChannelDTO;
+import com.sprint.mission.discodeit.entity.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.HashSet;
@@ -11,7 +11,7 @@ import java.util.HashSet;
 final class ChannelMapper {
     private ChannelMapper() {}
 
-    public static Channel toChannel(ChannelDTO dto, UserRepository userRepository){
+    public static Channel toChannel(ChannelIoDTO dto, UserRepository userRepository){
         return Channel.fromDto(
                 dto.getUuid(),
                 dto.getCreatedAt(),
@@ -23,8 +23,8 @@ final class ChannelMapper {
         );
     }
 
-    public static ChannelDTO toDto(Channel channel) {
-        return new ChannelDTO(
+    public static ChannelIoDTO toDto(Channel channel) {
+        return new ChannelIoDTO(
                 channel.getUuid(),
                 channel.getCreatedAt(),
                 channel.getUpdatedAt(),

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.entity.dto.fileIo;
 
 import lombok.Getter;
 
@@ -10,7 +10,7 @@ import java.util.UUID;
  * 파일 저장용 User DTO
  */
 @Getter
-public class UserDTO implements Serializable {
+public class UserIoDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private UUID uuid;
@@ -22,9 +22,9 @@ public class UserDTO implements Serializable {
     private String bio;          // 엔터티의 bio
     private String onlineStatus; // User.UserStatus.name()
 
-    public UserDTO(UUID uuid, Instant createdAt, Instant updatedAt,
-                   String userId, String passwd, String displayName,
-                   String bio, String onlineStatus) {
+    public UserIoDTO(UUID uuid, Instant createdAt, Instant updatedAt,
+                     String userId, String passwd, String displayName,
+                     String bio, String onlineStatus) {
         this.uuid = uuid;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

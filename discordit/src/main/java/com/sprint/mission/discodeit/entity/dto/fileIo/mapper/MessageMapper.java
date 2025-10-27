@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.entity.dto.mapper;
+package com.sprint.mission.discodeit.entity.dto.fileIo.mapper;
 
 import com.sprint.mission.discodeit.entity.base.*;
-import com.sprint.mission.discodeit.entity.dto.MessageDTO;
+import com.sprint.mission.discodeit.entity.dto.fileIo.MessageIoDTO;
 import com.sprint.mission.discodeit.enums.ReceiverType;
 import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -12,7 +12,7 @@ import java.util.UUID;
 final class MessageMapper {
     private MessageMapper() {}
 
-    public static MessageDTO toDto(Message<? extends Receivable> message) {
+    public static MessageIoDTO toDto(Message<? extends Receivable> message) {
         ReceiverType receiverType;
         UUID receiverUuid;
         if (message.getReceiver() instanceof User u) {
@@ -25,7 +25,7 @@ final class MessageMapper {
             throw new IllegalArgumentException("Unsupported receiver type: " + message.getReceiver().getClass());
         }
 
-        return new MessageDTO(
+        return new MessageIoDTO(
                 message.getUuid(),
                 message.getCreatedAt(),
                 message.getUpdatedAt(),
@@ -37,7 +37,7 @@ final class MessageMapper {
         );
     }
 
-    public static Message<Receivable> toMessage(MessageDTO dto,
+    public static Message<Receivable> toMessage(MessageIoDTO dto,
                                                 UserRepository userRepository,
                                                 ChannelRepository channelRepository) {
         User sender = userRepository.findById(dto.getSenderUserId());

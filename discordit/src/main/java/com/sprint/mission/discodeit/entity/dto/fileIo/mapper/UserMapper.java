@@ -1,12 +1,13 @@
-package com.sprint.mission.discodeit.entity.dto.mapper;
+package com.sprint.mission.discodeit.entity.dto.fileIo.mapper;
 
 import com.sprint.mission.discodeit.entity.base.User;
-import com.sprint.mission.discodeit.entity.dto.UserDTO;
+import com.sprint.mission.discodeit.entity.dto.fileIo.UserIoDTO;
+import com.sprint.mission.discodeit.enums.OnlineStatus;
 
 final class UserMapper {
     private UserMapper() {}
 
-    public static User toUser(UserDTO dto) {
+    public static User toUser(UserIoDTO dto) {
         return User.fromDto(
                 dto.getUuid(),
                 dto.getCreatedAt(),
@@ -15,12 +16,12 @@ final class UserMapper {
                 dto.getPasswd(),
                 dto.getDisplayName(),
                 dto.getBio(),
-                User.UserStatus.valueOf(dto.getOnlineStatus())
+                OnlineStatus.valueOf(dto.getOnlineStatus())
         );
     }
 
-    public static UserDTO toDto(User user) {
-        return new UserDTO(
+    public static UserIoDTO toDto(User user) {
+        return new UserIoDTO(
                 user.getUuid(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
@@ -28,7 +29,7 @@ final class UserMapper {
                 user.getPasswd(),
                 user.getDisplayName(),
                 user.getBio(),
-                user.getOnlineUserStatus().name()
+                user.getOnlineStatus().name()
         );
     }
 }

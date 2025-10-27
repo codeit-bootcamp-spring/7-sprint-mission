@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.entity.dto.fileIo;
 
 public enum ChannelType {
     TEXT("텍스트"),
