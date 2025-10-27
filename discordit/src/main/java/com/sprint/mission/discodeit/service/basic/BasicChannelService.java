@@ -60,7 +60,6 @@ public class BasicChannelService implements ChannelService {
     public void setChannelName(UUID uuid, String name) {
         Channel channel = channelRepository.findById(uuid);
         channel.setChannelName(name);
-        channelRepository.update(channel);
     }
 
     @Override

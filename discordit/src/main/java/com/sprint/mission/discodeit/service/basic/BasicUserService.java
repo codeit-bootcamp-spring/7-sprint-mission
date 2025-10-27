@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -40,8 +41,10 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public void signIn(String userId, String passwd, String displayName) {
-        userRepository.save(new User(userId, passwd, displayName));
+    public void create(UserCreateRequestDto dto) {
+        User user = new User(dto.id(), dto.passwd(), dto.displayName());
+        dto.profileImage().ifPresent(user::setProfileImage);
+        userRepository.save(user);
     }
 
     @Override
