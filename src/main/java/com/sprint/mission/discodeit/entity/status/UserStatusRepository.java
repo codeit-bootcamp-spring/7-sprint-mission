@@ -12,4 +12,6 @@ public interface UserStatusRepository extends BaseRepository<UserStatus> {
     // 유저 아이디로 상태찾기
     Optional<UserStatus> findStatusByUserId(UUID userId);
 
+    void deleteStatusByUserId(UUID userId);
+
 }

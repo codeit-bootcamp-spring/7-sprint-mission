@@ -8,8 +8,11 @@ import lombok.*;
 @Builder
 public class UserCreateRequestDto {
 
+    @NonNull
     private String email;
+    @NonNull
     private String userName;
+    @NonNull
     private String password;
     private String phoneNum;    // 선택사항
 

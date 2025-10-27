@@ -9,7 +9,7 @@ import java.util.UUID;
 @Repository
 public interface BinaryContentRepository {
 
-    BinaryContent save(BinaryContent t);
+    BinaryContent save(BinaryContent b);
 
     Optional<BinaryContent> findById(UUID id);
 
@@ -25,4 +25,6 @@ public interface BinaryContentRepository {
 
     // 서비스에서 채널을 받아 UUID만 가져와서 binary만 뽑기 -> 한 채널의 모든 이미지, 파일 검색
     List<BinaryContent> findAllByMessageId(List<UUID> messageIds);
+
+    void deleteProfileImageByUserId(UUID userId);
 }

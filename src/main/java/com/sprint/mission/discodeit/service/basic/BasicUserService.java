@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserState;
+import com.sprint.mission.discodeit.entity.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.entity.binaryContent.BinaryContentRepository;
+import com.sprint.mission.discodeit.entity.binaryContent.dto.UserProfileImageRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
@@ -46,10 +48,24 @@ public class BasicUserService implements UserService {
                 .build();
 
         userRepository.save(newUser);
+
+        UserStatus newUserStatus = new UserStatus(newUser.getId());
+        userStatusRepository.save(newUserStatus);
+
+        // 이미지 추가
+        if (createDto.getProfileImage() != null) {
+            BinaryContent newImage = new BinaryContent(
+                    newUser.getId(),
+                    createDto.getProfileImage(),
+                    createDto.getProfileName(),
+                    createDto.getProfileType()
+                    // messageId = null;
+            );
+            binaryContentRepository.save(newImage);
+        }
+
+
         return UserInfoDto.from(newUser, true);
-
-        // BinaryContent Dto 추가
-
     }
 
     // User -> UserInfoDto
@@ -121,6 +137,26 @@ public class BasicUserService implements UserService {
         });
     }
 
+    @Override
+    public Optional<UserInfoDto> updateProfileImage(UserProfileImageRequestDto imageRequestDto) {
+        return userRepository.findById(imageRequestDto.getUserId()).map(user -> {
+            // 기존 이미지 삭제
+            binaryContentRepository.deleteProfileImageByUserId(user.getId());
+            // 새로운 이미지 업데이트
+            if (imageRequestDto.getImage() != null) {
+                BinaryContent newImage = new BinaryContent(
+                        user.getId(),
+                        imageRequestDto.getImage(),
+                        imageRequestDto.getImageName(),
+                        imageRequestDto.getImageType()
+                );
+                binaryContentRepository.save(newImage);
+            }
+            return toDto(user);
+        });
+    }
+
+
     // 논리 삭제
     @Override
     public boolean deleteUser(UUID userId) {
@@ -129,8 +165,14 @@ public class BasicUserService implements UserService {
             if(channelRepository.existsByAdminId(userId)) {
                 throw new IllegalStateException("채널관리자는 삭제할 수 없습니다.");
             }
-            userDelete.softDelete();
-            userRepository.save(userDelete);    // 유저만 저장해서 재시작 시 채널이나 메시지에는 적용이 안됨;;
+
+            // 상태 삭제
+            userStatusRepository.deleteStatusByUserId(userId);
+            // 이미지 삭제
+            binaryContentRepository.deleteProfileImageByUserId(userId);
+
+            userDelete.softDelete(); // 논리 삭제
+            userRepository.save(userDelete);    // 유저만 저장해서, 재시작 시 채널이나 메시지에는 적용이 안됨;;
             return true;
         }).orElse(false);
     }
