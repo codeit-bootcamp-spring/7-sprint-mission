@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.user;
 
 
-import com.sprint.mission.discodeit.user.domain.User;
-import com.sprint.mission.discodeit.user.domain.exception.ValidationException;
+import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.domain.user.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
 

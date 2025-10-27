@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.user;
 
-import com.sprint.mission.discodeit.user.application.BasicUserService;
+import com.sprint.mission.discodeit.application.BasicUserService;
 
 public class BasicUserServiceTest {
 

@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit;
 
 
-import com.sprint.mission.discodeit.server.presentation.ServerService;
-import com.sprint.mission.discodeit.channel.presentation.ChannelService;
-import com.sprint.mission.discodeit.user.application.UserRepository;
-import com.sprint.mission.discodeit.user.presentation.UserService;
-import com.sprint.mission.discodeit.user.domain.User;
+import com.sprint.mission.discodeit.application.ServerService;
+import com.sprint.mission.discodeit.application.ChannelService;
+import com.sprint.mission.discodeit.domain.user.UserRepository;
+import com.sprint.mission.discodeit.application.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 
