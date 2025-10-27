@@ -15,7 +15,7 @@ final class UserMapper {
                 dto.getPasswd(),
                 dto.getDisplayName(),
                 dto.getBio(),
-                User.Status.valueOf(dto.getOnlineStatus())
+                User.UserStatus.valueOf(dto.getOnlineStatus())
         );
     }
 
@@ -28,7 +28,7 @@ final class UserMapper {
                 user.getPasswd(),
                 user.getDisplayName(),
                 user.getBio(),
-                user.getOnlineStatus().name()
+                user.getOnlineUserStatus().name()
         );
     }
 }

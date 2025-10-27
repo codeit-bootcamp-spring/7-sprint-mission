@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.dto.mapper;
 
 import com.sprint.mission.discodeit.entity.base.*;
 import com.sprint.mission.discodeit.entity.dto.MessageDTO;
+import com.sprint.mission.discodeit.enums.ReceiverType;
 import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;

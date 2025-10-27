@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.entity.dto;
 
 
-import com.sprint.mission.discodeit.entity.base.ReceiverType;
+import com.sprint.mission.discodeit.enums.ReceiverType;
 import lombok.Getter;
 
 import java.io.Serializable;

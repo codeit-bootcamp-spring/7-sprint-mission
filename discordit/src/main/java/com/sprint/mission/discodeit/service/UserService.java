@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.enums.OnlineStatus;
 
 import java.util.List;
 
@@ -17,12 +18,9 @@ public interface UserService {
 
     void setPasswd(String id, String passwd);
     void setBio(String id, String bio);
-    void setOnlineStatus(String id, User.Status status);
-
-    User.Status getOnlineStatus(String id);
+    void setOnlineStatus(String id, OnlineStatus userStatus);
+    OnlineStatus getOnlineStatus(String id);
     String getDisplayName(String id);
-
-    boolean isOnline(String id);
 
     String getBio(String userId);
 

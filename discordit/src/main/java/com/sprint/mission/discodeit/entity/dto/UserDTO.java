@@ -20,7 +20,7 @@ public class UserDTO implements Serializable {
     private String passwd;       // 엔터티의 passwd와 일치
     private String displayName;  // 엔터티의 displayName과 일치
     private String bio;          // 엔터티의 bio
-    private String onlineStatus; // User.Status.name()
+    private String onlineStatus; // User.UserStatus.name()
 
     public UserDTO(UUID uuid, Instant createdAt, Instant updatedAt,
                    String userId, String passwd, String displayName,

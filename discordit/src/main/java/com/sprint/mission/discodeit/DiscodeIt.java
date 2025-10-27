@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.base.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.base.Message;
 import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.enums.OnlineStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -221,11 +222,11 @@ public class DiscodeIt {
             }
             case 4 -> {
                 System.out.print("변경할 상태를 선택해주세요. ");
-                User.Status[] statuses = User.Status.values();
-                for (int i = 0; i < statuses.length; i++) {
-                    System.out.printf("\t%d. \t\t%s ", i + 1, statuses[i]);
+                OnlineStatus[] userStatuses = OnlineStatus.values();
+                for (int i = 0; i < userStatuses.length; i++) {
+                    System.out.printf("\t%d. \t\t%s ", i + 1, userStatuses[i]);
                 }
-                userService.setOnlineStatus(loginId, statuses[getInput(statuses.length + 1) - 1]);
+                userService.setOnlineStatus(loginId, userStatuses[getInput(userStatuses.length + 1) - 1]);
             }
         }
         System.out.println("정상적으로 변경되었습니다.");
@@ -233,7 +234,7 @@ public class DiscodeIt {
 
     private void logout() {
         System.out.println("로그아웃 합니다...");
-        userService.setOnlineStatus(loginId, User.Status.OFFLINE);
+        userService.setOnlineStatus(loginId, OnlineStatus.OFFLINE);
         loginId = null;
     }
 
@@ -434,7 +435,7 @@ public class DiscodeIt {
     private void printAllRegisteredUser(UUID uuid) {
         Set<User> users = channelService.getAllMembers(uuid);
         for (User user : users) {
-            System.out.printf("\t- %s(%s)\n", user.getDisplayName(), user.getOnlineStatus());
+            System.out.printf("\t- %s(%s)\n", user.getDisplayName(), user.getOnlineUserStatus());
         }
     }
 

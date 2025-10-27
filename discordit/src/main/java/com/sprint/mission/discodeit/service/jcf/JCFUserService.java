@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.enums.OnlineStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -30,7 +31,7 @@ public class JCFUserService implements UserService {
     @Override
     public List<String> getOnlineUsers() {
         return repository.findAll().stream()
-                .filter(u -> u.getOnlineStatus() != User.Status.OFFLINE)
+                .filter(u -> u.getOnlineStatus() != OnlineStatus.OFFLINE)
                 .map(User::getUserId)
                 .toList();
     }
@@ -48,7 +49,7 @@ public class JCFUserService implements UserService {
         if(!user.getPasswd().equals(passwd))
             throw new IllegalArgumentException("아이디와 비밀번호가 일치하지 않습니다.");
 
-        user.setOnlineStatus(User.Status.ONLINE);
+        user.setOnlineStatus(OnlineStatus.ONLINE);
         repository.update(user);
         return true;
     }
@@ -69,23 +70,18 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void setOnlineStatus(String id, User.Status status) {
-        getById(id).setOnlineStatus(status);
+    public void setOnlineStatus(String id, OnlineStatus userStatus) {
+        getById(id).setOnlineStatus(userStatus);
     }
 
     @Override
-    public User.Status getOnlineStatus(String id) {
+    public OnlineStatus getOnlineStatus(String id) {
         return getById(id).getOnlineStatus();
     }
 
     @Override
     public String getDisplayName(String id) {
         return getById(id).getDisplayName();
-    }
-
-    @Override
-    public boolean isOnline(String id) {
-        return getById(id).getOnlineStatus() == User.Status.ONLINE;
     }
 
     @Override

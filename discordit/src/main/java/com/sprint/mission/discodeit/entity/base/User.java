@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity.base;
 
+import com.sprint.mission.discodeit.enums.OnlineStatus;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -17,7 +18,7 @@ public class User extends BaseEntity implements Receivable {
 
     private String displayName;
     private String bio;
-    private Status onlineStatus;
+    private OnlineStatus onlineStatus;
 
     public User(String userId, String passwd, String displayName) {
         validateId(userId);
@@ -27,7 +28,7 @@ public class User extends BaseEntity implements Receivable {
         this.userId = userId;
         this.passwd = passwd;
         this.displayName = displayName;
-        this.onlineStatus = Status.OFFLINE;
+        this.onlineStatus = OnlineStatus.OFFLINE;
     }
 
     public void setPasswd(String passwd) {
@@ -47,7 +48,7 @@ public class User extends BaseEntity implements Receivable {
         update();
     }
 
-    public void setOnlineStatus(Status onlineStatus) {
+    public void setOnlineStatus(OnlineStatus onlineStatus) {
         this.onlineStatus = onlineStatus;
         update();
     }
@@ -74,13 +75,13 @@ public class User extends BaseEntity implements Receivable {
     // 파일 IO시 필드 복원을 위한 메서드
     public static User fromDto(UUID uuid, Instant createdAt, Instant updatedAt,
                                String userId, String passwd, String displayName,
-                               String bio, Status status){
+                               String bio, OnlineStatus OnlineStatus){
         User user = new User(userId, passwd, displayName);
         user.uuid = uuid;
         user.createdAt = createdAt;
         user.updatedAt = updatedAt;
         user.bio = bio;
-        user.onlineStatus = status;
+        user.onlineStatus = OnlineStatus;
         return user;
     }
 
@@ -105,16 +106,6 @@ public class User extends BaseEntity implements Receivable {
                 ", bio='" + bio + '\'' +
                 ", onlineStatus=" + onlineStatus +
                 '}';
-    }
-
-    public enum Status{
-        ONLINE("온라인"),
-        OFFLINE("오프라인"),
-        AWAY("자리비움"),
-        DO_NOT_DISTURB("방해금지");
-
-        Status(String description){
-        }
     }
 
 }
