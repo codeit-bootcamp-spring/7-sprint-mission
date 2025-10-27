@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.common.Common;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
+@Setter
 public class User extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -30,37 +33,37 @@ public class User extends Common implements Serializable {
 
 
 
-  /*  public String getUserNickname() {
+/*  *//*  public String getUserNickname() {
         return userNickname;
-    }*/
+    }*//*
 
     public void setUserNickname(String userNickname) {
         this.userNickname = userNickname;
     }
 
-  /*  public String getUserName() {
+  *//*  public String getUserName() {
         return userName;
-    }*/
+    }*//*
 
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
- /*   public String getUserId() {
+ *//*   public String getUserId() {
         return UserEmail;
-    }*/
+    }*//*
 
     public void setUserId(String userId) {
         this.UserEmail = userId;
     }
 
-    /*public String getPassword() {
+    *//*public String getPassword() {
         return password;
-    }*/
+    }*//*
 
     public void setPassword(String password) {
         this.password = password;
-    }
+    }*/
 
     @Override
     public String toString() {
@@ -75,26 +78,26 @@ public class User extends Common implements Serializable {
 
     //업데이트하면 하난하나 적용해서 트루로체크해
     //끝가지가면 트루 아니면 false된다
-    public void update(String newUsername, String newEmail, String newPassword, String newUserNickname,String newProfilePicture) {
+    public void update(UserUpdateRequest userUpdateRequest) {
         boolean anyValueUpdated = false;
-        if (newUsername != null && !newUsername.equals(this.userName)) {
-            this.userName = newUsername;
+        if (userUpdateRequest.username() != null && !userUpdateRequest.username().equals(this.userName)) {
+            this.userName = userUpdateRequest.username();
             anyValueUpdated = true;
         }
-        if (newEmail != null && !newEmail.equals(this.UserEmail)) {
-            this.UserEmail = newEmail;
+        if (userUpdateRequest.email() != null && !userUpdateRequest.email().equals(this.UserEmail)) {
+            this.UserEmail = userUpdateRequest.email();
             anyValueUpdated = true;
         }
-        if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
+        if (userUpdateRequest.Password() != null && !userUpdateRequest.Password().equals(this.password)) {
+            this.password = userUpdateRequest.Password();
             anyValueUpdated = true;
         }
-        if (newUserNickname != null && !newUserNickname.equals(this.userNickname)) {
-            this.userNickname = newUserNickname;
+        if (userUpdateRequest.userNickname() != null && !userUpdateRequest.userNickname().equals(this.userNickname)) {
+            this.userNickname = userUpdateRequest.userNickname();
             anyValueUpdated = true;
         }
-        if (newProfilePicture != null && !newProfilePicture.equals(this.profilePicture)) {
-            this.profilePicture = newProfilePicture;
+        if (userUpdateRequest.profileImageUrl() != null && !userUpdateRequest.profileImageUrl().equals(this.profilePicture)) {
+            this.profilePicture = userUpdateRequest.profileImageUrl();
         }
 
         if (anyValueUpdated) {

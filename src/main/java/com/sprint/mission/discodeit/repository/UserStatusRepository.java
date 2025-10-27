@@ -12,7 +12,7 @@ public interface UserStatusRepository {
     Optional<UserStatus> findByUserId(UUID userId);
 
 
-    UserStatus save(UserStatus status);
+    UserStatus save(UUID UserUUID);
 
 
     void deleteByUserId(UUID userId);

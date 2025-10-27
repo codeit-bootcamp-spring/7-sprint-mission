@@ -1,11 +1,16 @@
 package com.sprint.mission.discodeit.service.jcf.basic;
 
 import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserCreateResponse;
+import com.sprint.mission.discodeit.dto.user.response.UserFindResponse;
+import com.sprint.mission.discodeit.dto.user.response.UserUpdateResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,14 +24,19 @@ public class BasicUserService implements UserService {
     // 추가(중간정도) , 삭제가 빈번하면 링크라들었다
     //마지막에 컴퓨터 좋아지면서 리스트를 많이쓴다 해서 리스트했다
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
-    public BasicUserService(UserRepository userRepository) {
+    public BasicUserService(@Qualifier("JCFuser") UserRepository userRepository
+                            ,@Qualifier("JCFstatus") UserStatusRepository userStatusRepository)
+    {
         this.userRepository = userRepository;
+        this.userStatusRepository = userStatusRepository;
     }
 
 
     @Override
     public UserCreateResponse create(UserCreateRequest userCreateRequest) {
+
      //이메일매칭
      if(userRepository.findAll().stream()
              .anyMatch(user -> user.getUserEmail().equals(userCreateRequest.email()))){
@@ -38,42 +48,62 @@ public class BasicUserService implements UserService {
          throw new RuntimeException("Nickname already exists");
      }
 
-
-
      //저장을위한 모든 정보
         User user = new User(
                 userCreateRequest.username()
                 ,userCreateRequest.email()
                 ,userCreateRequest.rawPassword()
                 ,userCreateRequest.userNickname());
-       //유저저장
-       userRepository.save(user);
-
+       //혹시이미지가 있니 없니
+        if (userCreateRequest.profileImageUrl() != null && !userCreateRequest.profileImageUrl().isBlank()) {
+            user.setProfilePicture(userCreateRequest.profileImageUrl());
+        }
+        //유저정보저장
+        userRepository.save(user);
+        //유저 상태 저장
+        userStatusRepository.save(user.getId());
         //유저 스테이터스 생성
         new  UserStatus(user.getId());
-      return new UserCreateResponse(user.getId(),user.getUserNickname(),userCreateRequest.userNickname());
+      return  UserCreateResponse.from(user);
     }
 
 
     @Override
-    public User find(UUID userId) {
-        return userRepository
-                .findById(userId)
-                .orElseThrow(()-> new NoSuchElementException("이런 uuid는 없어"+ userId));
+    public UserFindResponse find(UUID userId) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
+        User finduser = userRepository.findById(userId)
+                .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+userId));
+
+        //유저 스타터스추가
+        return UserFindResponse.from(finduser,userStatus);
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserFindResponse> findAll() {
+        List<UserFindResponse>  userList = new ArrayList<>(List.of());
+        for(User user:userRepository.findAll()){
+
+            UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                    .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + user.getId()));
+
+            userList.add(UserFindResponse.from(user,userStatus));
+        }
+
+        return userList;
     }
 
     @Override
     //이게진짜 이해가 안된다
-    public User update(UUID userId, String newUsername, String newEmail,String newPassword ,String newNickname,String newProfilePicture) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+userId));
-         user.update(newUsername,newEmail,newPassword,newNickname,newProfilePicture);
-        return userRepository.save(user);
+    public UserUpdateResponse update(UUID uuid, UserUpdateRequest userUpdateRequest) {
+        //id있는지확인
+        User user = userRepository.findById(uuid)
+                .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+uuid));
+        //저장용
+         user.update(userUpdateRequest);
+          userRepository.save(user);
+          //폼으로 바로넣고주자
+        return UserUpdateResponse.from(uuid,user);
     }
 
     @Override
