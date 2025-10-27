@@ -1,17 +1,12 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.DataPath;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.UserDTO;
-import com.sprint.mission.discodeit.entity.dto.mapper.Mapper;
+import com.sprint.mission.discodeit.entity.base.User;
 import com.sprint.mission.discodeit.exceptions.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.util.*;
 
 @Repository

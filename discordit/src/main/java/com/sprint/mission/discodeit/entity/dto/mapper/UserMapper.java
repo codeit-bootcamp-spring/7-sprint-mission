@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.entity.dto.mapper;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.User;
 import com.sprint.mission.discodeit.entity.dto.UserDTO;
 
 final class UserMapper {
     private UserMapper() {}
 
     public static User toUser(UserDTO dto) {
-        return User.rehydrate(
+        return User.fromDto(
                 dto.getUuid(),
                 dto.getCreatedAt(),
                 dto.getUpdatedAt(),

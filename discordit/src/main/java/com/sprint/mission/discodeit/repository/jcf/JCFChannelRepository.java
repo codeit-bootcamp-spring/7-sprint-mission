@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.base.Channel;
 import com.sprint.mission.discodeit.exceptions.ChannelAlreadyExistsException;
 import com.sprint.mission.discodeit.exceptions.ChannelNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;

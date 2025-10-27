@@ -1,18 +1,12 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.DataPath;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.ChannelDTO;
-import com.sprint.mission.discodeit.entity.dto.mapper.Mapper;
+import com.sprint.mission.discodeit.entity.base.Channel;
 import com.sprint.mission.discodeit.exceptions.ChannelAlreadyExistsException;
 import com.sprint.mission.discodeit.exceptions.ChannelNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.util.*;
 
 @Repository

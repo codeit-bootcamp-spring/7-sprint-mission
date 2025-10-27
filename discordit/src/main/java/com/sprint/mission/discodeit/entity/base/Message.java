@@ -1,7 +1,11 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.base;
 
+import com.sprint.mission.discodeit.entity.content.BinaryContent;
 import lombok.Getter;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -13,6 +17,7 @@ public class Message<T extends Receivable> extends BaseEntity {
     private final User sender;
     private final Receivable receiver;
     private final String message;
+    private final List<BinaryContent> attachments = new ArrayList<>();
 
     public Message(User sender, T receiver, String message) {
         this.sender = sender;
@@ -21,7 +26,7 @@ public class Message<T extends Receivable> extends BaseEntity {
     }
 
     // 더미 데이터 생성 or 파일 데이터 복원용 (createdAt, updateAt 조작 위해 엔터티 내 배치.)
-    public static <T extends Receivable> Message<T> fromDto(UUID uuid, Long createdAt, Long updatedAt,
+    public static <T extends Receivable> Message<T> fromDto(UUID uuid, Instant createdAt, Instant updatedAt,
                                                             User sender, T receiver, String message) {
         Message<T> msg = new Message<>(sender, receiver, message);
         msg.uuid = uuid;

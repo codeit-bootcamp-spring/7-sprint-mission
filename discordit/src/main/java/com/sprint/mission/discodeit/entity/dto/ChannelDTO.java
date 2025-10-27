@@ -1,19 +1,23 @@
 package com.sprint.mission.discodeit.entity.dto;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * 파일 저장용 Channel DTO
  */
+@Getter
 public class ChannelDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // 공통
     private UUID uuid;
-    private Long createdAt;
-    private Long updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 
     // 엔터티 매핑 필드
     private String channelName;        // Channel.getDisplayName()
@@ -22,7 +26,7 @@ public class ChannelDTO implements Serializable {
     private List<String> moderatorUserIds; // 채널 운영자의 userId 목록
 
     // 권장 생성자 (엔터티 정합성)
-    public ChannelDTO(UUID uuid, Long createdAt, Long updatedAt,
+    public ChannelDTO(UUID uuid, Instant createdAt, Instant updatedAt,
                       String channelName, String type,
                       List<String> memberUserIds, List<String> moderatorUserIds) {
         this.uuid = uuid;
@@ -34,11 +38,4 @@ public class ChannelDTO implements Serializable {
         this.moderatorUserIds = moderatorUserIds;
     }
 
-    public UUID getUuid() { return uuid; }
-    public Long getCreatedAt() { return createdAt; }
-    public Long getUpdatedAt() { return updatedAt; }
-    public String getChannelName() { return channelName; }
-    public String getType() { return type; }
-    public List<String> getMemberUserIds() { return memberUserIds; }
-    public List<String> getModeratorUserIds() { return moderatorUserIds; }
 }

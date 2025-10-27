@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.Receivable;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.Message;
+import com.sprint.mission.discodeit.entity.base.Receivable;
+import com.sprint.mission.discodeit.entity.base.User;
 
 import java.util.List;
 

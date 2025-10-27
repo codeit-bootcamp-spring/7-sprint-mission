@@ -1,7 +1,8 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.base;
 
 import lombok.Getter;
 
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -31,49 +32,49 @@ public class User extends BaseEntity implements Receivable {
 
     public void setPasswd(String passwd) {
         validatePasswd(passwd);
-        this.updatedAt = getUnixTimestamp();
         this.passwd = passwd;
+        update();
     }
 
     public void setDisplayName(String displayName) {
         validateDisplayName(displayName);
-        this.updatedAt = getUnixTimestamp();
         this.displayName = displayName;
+        update();
     }
 
     public void setBio(String bio) {
-        this.updatedAt = getUnixTimestamp();
         this.bio = bio;
+        update();
     }
 
     public void setOnlineStatus(Status onlineStatus) {
-        this.updatedAt = getUnixTimestamp();
         this.onlineStatus = onlineStatus;
+        update();
     }
 
-    public static void validateId(String id){
+    private static void validateId(String id){
         if (id.length() < 4 || id.length() > 10){
             throw new IllegalArgumentException("아이디는 4에서 10자 사이로 입력해주세요.");
         }
     }
 
-    public static void validatePasswd(String passwd) {
+    private static void validatePasswd(String passwd) {
         // 지금은 아이디와 제약사항이 같지만 나중에 변경될 수 있어 분리함
         if (passwd.length() < 4 || passwd.length() > 10){
             throw new IllegalArgumentException("비밀번호는 4에서 10자 사이로 입력해주세요.");
         }
     }
 
-    public static void validateDisplayName(String displayName) {
+    private static void validateDisplayName(String displayName) {
         if (displayName.length() > 10){
             throw new IllegalArgumentException("닉네임은 10자 이하로 입력되어야 합니다. 입력 글자 수 :" + displayName.length());
         }
     }
 
     // 파일 IO시 필드 복원을 위한 메서드
-    public static User rehydrate(UUID uuid, Long createdAt, Long updatedAt,
-                                 String userId, String passwd, String displayName,
-                                 String bio, Status status){
+    public static User fromDto(UUID uuid, Instant createdAt, Instant updatedAt,
+                               String userId, String passwd, String displayName,
+                               String bio, Status status){
         User user = new User(userId, passwd, displayName);
         user.uuid = uuid;
         user.createdAt = createdAt;

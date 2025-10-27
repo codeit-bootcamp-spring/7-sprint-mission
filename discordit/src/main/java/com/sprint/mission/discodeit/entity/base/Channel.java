@@ -1,7 +1,8 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.base;
 
 import lombok.Getter;
 
+import java.time.Instant;
 import java.util.*;
 
 @Getter
@@ -23,43 +24,43 @@ public class Channel extends BaseEntity implements Receivable {
 
     public void setChannelName(String channelName) {
         this.channelName = channelName;
-        this.updatedAt = getUnixTimestamp();
+        update();
     }
 
     public void setType(ChannelType type) {
         this.type = type;
-        this.updatedAt = getUnixTimestamp();
+        update();
     }
 
     public void setMembers(Set<User> members) {
         this.members = members;
-        this.updatedAt = getUnixTimestamp();
+        update();
     }
 
     public void addMember(User user){
         this.members.add(user);
-        this.updatedAt = getUnixTimestamp();
+        update();
     }
 
     public void deleteMember(User user) {
         this.members.remove(user);
-        this.updatedAt = getUnixTimestamp();
+        update();
     }
 
     public void setModerators(Set<User> moderators) {
         this.moderators = moderators;
-        this.updatedAt = getUnixTimestamp();
+        update();
     }
 
     public void addModerator(User user){
         this.members.add(user);
         this.moderators.add(user);
-        this.updatedAt = getUnixTimestamp();
+        update();
     }
 
     public void deleteModerator(User user) {
         this.moderators.remove(user);
-        this.updatedAt = getUnixTimestamp();
+        update();
     }
 
     public String getDisplayName() {
@@ -74,9 +75,9 @@ public class Channel extends BaseEntity implements Receivable {
         }
     }
 
-    public static Channel rehydrate(UUID uuid, Long createdAt, Long updatedAt,
-                                    String channelName, ChannelType type,
-                                    Set<User> moderators, Set<User> members) {
+    public static Channel fromDto(UUID uuid, Instant createdAt, Instant updatedAt,
+                                  String channelName, ChannelType type,
+                                  Set<User> moderators, Set<User> members) {
         Channel channel = new Channel(channelName, type, moderators);
         channel.uuid = uuid;
         channel.createdAt = createdAt;

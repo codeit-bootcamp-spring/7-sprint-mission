@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.entity.dto.mapper;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.Receivable;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.Channel;
+import com.sprint.mission.discodeit.entity.base.Message;
+import com.sprint.mission.discodeit.entity.base.Receivable;
+import com.sprint.mission.discodeit.entity.base.User;
 import com.sprint.mission.discodeit.entity.dto.ChannelDTO;
 import com.sprint.mission.discodeit.entity.dto.MessageDTO;
 import com.sprint.mission.discodeit.entity.dto.UserDTO;

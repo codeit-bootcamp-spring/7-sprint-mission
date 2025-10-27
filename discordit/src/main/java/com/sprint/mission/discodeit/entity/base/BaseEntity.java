@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.base;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -13,18 +12,18 @@ import java.util.UUID;
 @Getter
 public class BaseEntity {
     protected UUID uuid;
-    protected Long createdAt;
-    protected Long updatedAt;
+    protected Instant createdAt;
+    protected Instant updatedAt;
 
     BaseEntity () {
         this.uuid = UUID.randomUUID();
-        this.createdAt = getUnixTimestamp();
+        this.createdAt = Instant.now();
         this.updatedAt = createdAt;
     }
 
     public String getFormattedCreationTime() {
         LocalDateTime dateTime = LocalDateTime.ofInstant(
-                Instant.ofEpochSecond(createdAt),
+                createdAt,
                 ZoneId.systemDefault()
         );
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -32,7 +31,7 @@ public class BaseEntity {
     }
 
     protected void update() {
-        updatedAt = Instant.now().getEpochSecond();
+        updatedAt = Instant.now();
     }
 
     protected static long getUnixTimestamp() {
