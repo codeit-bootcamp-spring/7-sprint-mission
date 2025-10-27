@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.user.response.UserFindResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserUpdateResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -25,12 +26,15 @@ public class BasicUserService implements UserService {
     //마지막에 컴퓨터 좋아지면서 리스트를 많이쓴다 해서 리스트했다
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private final BinaryRepository binaryRepository;
 
     public BasicUserService(@Qualifier("JCFuser") UserRepository userRepository
-                            ,@Qualifier("JCFstatus") UserStatusRepository userStatusRepository)
+                            ,@Qualifier("JCFstatus") UserStatusRepository userStatusRepository
+                            ,@Qualifier("JCFBinary") BinaryRepository binaryRepository)
     {
         this.userRepository = userRepository;
         this.userStatusRepository = userStatusRepository;
+        this.binaryRepository = binaryRepository;
     }
 
 
@@ -94,7 +98,6 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    //이게진짜 이해가 안된다
     public UserUpdateResponse update(UUID uuid, UserUpdateRequest userUpdateRequest) {
         //id있는지확인
         User user = userRepository.findById(uuid)

@@ -9,14 +9,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
 public class ReadStatus extends Common {
 
-  private final UUID userId;
-    private final  UUID channelId;
-
-
-
-
+  private  UUID userId;
+    private  UUID channelId;
 
 }

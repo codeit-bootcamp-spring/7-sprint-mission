@@ -12,7 +12,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class UserStatus extends Common {
-   private final UUID userId;
+   private  UUID userId;
 
 
 

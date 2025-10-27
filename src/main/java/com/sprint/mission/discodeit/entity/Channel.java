@@ -84,7 +84,7 @@ public class Channel extends Common implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.setUpdatedAt(Instant.now().getEpochSecond());
+            this.setUpdatedAt(Instant.ofEpochSecond(Instant.now().getEpochSecond()));
         }
     }
 }
