@@ -26,6 +26,7 @@ public class User implements Serializable {
     private String password;
     private String email;
     private String phoneNumber;
+    private UserStatus userStatus;
 
     private final List<UUID> receivedInvitations = new ArrayList<>();
     private final List<UUID> friends = new ArrayList<>();
@@ -43,6 +44,7 @@ public class User implements Serializable {
         this.password = password;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.userStatus = new UserStatus(OnlineStatus.OFFLINE);
     }
 
     public void sendFriendInvitation(User user){
@@ -57,6 +59,18 @@ public class User implements Serializable {
         this.friends.add(user.id);
         user.friends.add(this.id);
     }
+
+
+
+
+    private void markOnline(){
+        this.userStatus=new UserStatus(OnlineStatus.ONLINE);
+    }
+
+    private void markOffline(){
+        this.userStatus =  new UserStatus(OnlineStatus.OFFLINE);
+    }
+
 
     public void UpdatedPassword(String password) {
         validatePassword(password);

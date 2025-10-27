@@ -9,8 +9,7 @@ import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.user.UserRepository;
 import com.sprint.mission.discodeit.domain.user.exception.DuplicateUserException;
-import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
-import com.sprint.mission.discodeit.domain.userstatus.UserStatusRepository;
+import com.sprint.mission.discodeit.domain.user.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

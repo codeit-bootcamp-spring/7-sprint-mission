@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.application.dto.request.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.ChannelRequestDto;
 import com.sprint.mission.discodeit.application.dto.response.ChannelResponseDto;
+
 import com.sprint.mission.discodeit.domain.server.ServerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,13 +22,13 @@ import java.util.*;
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final ServerRepository serverRepository;
+
 
 
 
     @Override
     public ChannelResponseDto createChannel(ChannelCreateRequestDto requestDto) {
-        Channel channel = Channel.create(requestDto.channelName(), requestDto.serverId());
+        Channel channel = new Channel(requestDto.channelName(), requestDto.serverId());
         channelRepository.save(channel);
         return channelToResponseDto(channel);
     }

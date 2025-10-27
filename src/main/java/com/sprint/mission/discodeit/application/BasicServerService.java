@@ -28,7 +28,7 @@ public class BasicServerService implements ServerService {
 
     @Override
     public void createPublicServer(ServerCreateRequestDto requestDto) {
-        Server server = Server.create(
+        Server server = new Server(
                 requestDto.serverName(),
                 false,
                 requestDto.serverLevel(),
@@ -40,14 +40,14 @@ public class BasicServerService implements ServerService {
 
     @Override
     public void createPrivateServer(ServerCreateRequestDto requestDto) {
-        Server server = Server.create(
+        Server server = new Server(
                 requestDto.serverName(),
                 true,
                 requestDto.serverLevel(),
                 requestDto.members());
         serverRepository.save(server);
         requestDto.members().stream()
-                .map(id -> ReadStatus.create(id, server.getId()))
+                .map(id -> new ReadStatus(id, server.getId()))
                 .toList()
                 .forEach(rs->readStatusRepository.save(rs));
 
