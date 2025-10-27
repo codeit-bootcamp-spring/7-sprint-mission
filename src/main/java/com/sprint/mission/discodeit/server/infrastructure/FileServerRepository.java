@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.server.infrastructure;
 
 import com.sprint.mission.discodeit.server.application.ServerRepository;
 import com.sprint.mission.discodeit.server.domain.Server;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.ObjectInputStream;
@@ -11,6 +12,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 @Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file")
 public class FileServerRepository implements ServerRepository {
 
     private final String FILE_PATH = "data/servers.ser"; // 저장 파일 경로

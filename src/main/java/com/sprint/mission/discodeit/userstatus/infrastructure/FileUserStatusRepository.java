@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.userstatus.infrastructure;
 
 import com.sprint.mission.discodeit.userstatus.application.UserStatusRepository;
 import com.sprint.mission.discodeit.userstatus.domain.UserStatus;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.ObjectInputStream;
@@ -11,6 +13,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 @Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file")
 public class FileUserStatusRepository implements UserStatusRepository {
 
     private final String FILE_PATH = "data/userstatuses.ser"; // 저장 파일 경로

@@ -2,9 +2,12 @@ package com.sprint.mission.discodeit.user.infrastructure;
 
 import com.sprint.mission.discodeit.user.application.UserRepository;
 import com.sprint.mission.discodeit.user.domain.User;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
-
+@Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf")
 public class JCFUserRepository implements UserRepository {
 
     //자바에서 final이 붙는 건 참조 자체를 변경할 수 없게 만든다는 뜻

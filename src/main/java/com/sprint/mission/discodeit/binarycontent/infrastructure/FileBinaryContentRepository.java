@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.binarycontent.infrastructure;
 
 import com.sprint.mission.discodeit.binarycontent.application.BinaryContentRepository;
 import com.sprint.mission.discodeit.binarycontent.domain.BinaryContent;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.ObjectInputStream;
@@ -11,6 +12,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 @Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file")
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
     private final String FILE_PATH = "data/binarycontents.ser"; // 저장 파일 경로

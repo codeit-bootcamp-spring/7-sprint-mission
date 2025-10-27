@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.server.presentation.ServerService;
 import com.sprint.mission.discodeit.channel.presentation.ChannelService;
+import com.sprint.mission.discodeit.user.application.UserRepository;
 import com.sprint.mission.discodeit.user.presentation.UserService;
 import com.sprint.mission.discodeit.user.domain.User;
 import org.springframework.boot.SpringApplication;
@@ -41,31 +42,33 @@ public class JavaApplication {
         ChannelService channelService = context.getBean(ChannelService.class);
         ServerService serverService = context.getBean(ServerService.class);
 
+        UserRepository userRepository = context.getBean(UserRepository.class);
+        System.out.println("현재 등록된 UserRepository 구현체: " + userRepository.getClass().getName());
 
 
         //User생성 - 필수 필드 입력 안할 시 실패
 
-        try {
-            User.create(""," "," ","");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        printLine();
-
+//        try {
+//            User.create(""," "," ","");
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//        }
+//        printLine();
+//
 //        //User 생성 -필수 필드 입력 시 성공!
 //        User user = User.create("test@email.com", "abcd1234", "Ian", "010-1234-5678");
-//        userService.register(user);
+//        userService.createUser(user);
 //        printLine();
 //
 //
 //        //User 찾기
-//        User findUser = userService.findById(user.getId());
+//        User findUser = userService.getUser(user.getId());
 //        System.out.println("같은 객체인가?"+ (findUser.equals(user)));
 //        printLine();
 //
 //
 //        //User 삭제 - 유저가 저장되어 있을 경우
-//        userService.remove(user);
+//        userService.delete(user);
 //        printLine();
 //
 //        //User삭제 - 유저가 없을 경우
@@ -75,7 +78,7 @@ public class JavaApplication {
 //            System.out.println(e.getMessage());
 //        }
 //        printLine();
-//
+
 //
 //        //서버 생성 실패
 //

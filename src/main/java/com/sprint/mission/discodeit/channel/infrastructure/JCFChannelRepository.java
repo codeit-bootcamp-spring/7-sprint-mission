@@ -2,9 +2,13 @@ package com.sprint.mission.discodeit.channel.infrastructure;
 
 import com.sprint.mission.discodeit.channel.application.ChannelRepository;
 import com.sprint.mission.discodeit.channel.domain.Channel;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf")
 public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> store= new HashMap<>();

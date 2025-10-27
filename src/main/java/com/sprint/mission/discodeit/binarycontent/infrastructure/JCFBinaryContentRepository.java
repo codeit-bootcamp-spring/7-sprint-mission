@@ -3,9 +3,13 @@ package com.sprint.mission.discodeit.binarycontent.infrastructure;
 import com.sprint.mission.discodeit.binarycontent.application.BinaryContentRepository;
 import com.sprint.mission.discodeit.binarycontent.domain.BinaryContent;
 import com.sprint.mission.discodeit.readstatus.domain.ReadStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf")
 public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     private final Map<UUID, BinaryContent> store = new HashMap<>();

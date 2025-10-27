@@ -3,9 +3,13 @@ package com.sprint.mission.discodeit.userstatus.infrastructure;
 import com.sprint.mission.discodeit.server.domain.Server;
 import com.sprint.mission.discodeit.userstatus.application.UserStatusRepository;
 import com.sprint.mission.discodeit.userstatus.domain.UserStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf")
 public class JCFUserStatusRepository implements UserStatusRepository {
 
 

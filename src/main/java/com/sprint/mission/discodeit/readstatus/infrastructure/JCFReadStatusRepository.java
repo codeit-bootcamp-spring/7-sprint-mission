@@ -2,9 +2,13 @@ package com.sprint.mission.discodeit.readstatus.infrastructure;
 
 import com.sprint.mission.discodeit.readstatus.application.ReadStatusRepository;
 import com.sprint.mission.discodeit.readstatus.domain.ReadStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf")
 public class JCFReadStatusRepository implements ReadStatusRepository {
 
     private final Map<UUID, ReadStatus> store = new HashMap<>();

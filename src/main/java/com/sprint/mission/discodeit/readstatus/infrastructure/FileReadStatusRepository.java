@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.readstatus.infrastructure;
 
 import com.sprint.mission.discodeit.readstatus.application.ReadStatusRepository;
 import com.sprint.mission.discodeit.readstatus.domain.ReadStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 
@@ -12,6 +13,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 @Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file")
 public class FileReadStatusRepository implements ReadStatusRepository {
 
     private final String FILE_PATH = "data/readstatuses.ser"; // 저장 파일 경로

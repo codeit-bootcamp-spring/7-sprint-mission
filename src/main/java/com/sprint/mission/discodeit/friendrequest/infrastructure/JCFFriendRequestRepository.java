@@ -2,9 +2,13 @@ package com.sprint.mission.discodeit.friendrequest.infrastructure;
 
 import com.sprint.mission.discodeit.friendrequest.application.FriendRequestRepository;
 import com.sprint.mission.discodeit.friendrequest.domain.FriendRequest;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf")
 public class JCFFriendRequestRepository implements FriendRequestRepository {
 
     private final Map<UUID, FriendRequest> store = new HashMap<>();

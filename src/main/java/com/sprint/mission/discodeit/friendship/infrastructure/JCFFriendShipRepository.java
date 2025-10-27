@@ -2,9 +2,13 @@ package com.sprint.mission.discodeit.friendship.infrastructure;
 
 import com.sprint.mission.discodeit.friendship.application.FriendShipRepository;
 import com.sprint.mission.discodeit.friendship.domain.FriendShip;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf")
 public class JCFFriendShipRepository implements FriendShipRepository {
 
     private final Map<UUID, FriendShip> store = new HashMap<>();
