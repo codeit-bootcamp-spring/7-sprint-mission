@@ -19,8 +19,10 @@ public class Channel implements Serializable {
 
     private final UUID serverId;
     private String channelName;
-    //message의 id
-    private final List<UUID> history = new ArrayList<>();
+
+    private List<ChannelMember> members = new ArrayList<>();
+
+    private final List<Message> history = new ArrayList<>();
 
     public Channel(String channelName,UUID serverId) {
         validateChannelName(channelName);
@@ -42,13 +44,10 @@ public class Channel implements Serializable {
         }
     }
 
-    public List<UUID> getHistory() {
+    public List<Message> getHistory() {
         return List.copyOf(history);
     }
 
-    public void addHistory(UUID id){
-        history.add(id);
-    }
 
 
 }

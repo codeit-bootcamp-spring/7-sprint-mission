@@ -24,7 +24,7 @@ public class BasicUserService implements UserService {
 
 
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
+
     private final FileManager fileManager;
 
 
@@ -38,7 +38,6 @@ public class BasicUserService implements UserService {
                 requestDto.username(),
                 requestDto.phoneNumber());
         userRepository.save(user);
-        createUserStatue(user.getId());
 
         //유저 전용 폴더 생성 & 파일 저장
         fileManager.createUserFolder(user.getId());
@@ -84,9 +83,6 @@ public class BasicUserService implements UserService {
     public void delete(UserRequestDto requestDto) {
         userRepository.remove(findById(requestDto.id()));
         fileManager.deleteUserFolder(requestDto.id());
-        UserStatus userStatus = userStatusRepository.findByUserId(requestDto.id())
-                .orElseThrow(() -> new NoSuchElementException());
-        userStatusRepository.remove(userStatus);
 
     }
 
@@ -126,18 +122,4 @@ public class BasicUserService implements UserService {
     private UserResponseDto userToResponseDto(User user) {
         return new UserResponseDto(user.getEmail(), user.getUsername(), user.getPhoneNumber());
     }
-
-    //UserStatus 관련 CRUD
-    private UserStatus createUserStatue(UUID userId) {
-        UserStatus userStatus = UserStatus.create(userId);
-        userStatusRepository.save(userStatus);
-        return userStatus;
-    }
-
-    private UserStatus findUserStatusByUserId(UUID id) {
-        return userStatusRepository.findByUserId(id).orElse(null);
-    }
-
-    //예외는 컨트롤러로 다 던져야 하나? 나중에 @ControllerAdvice로 처리할 수 있게? 우선은 그렇게 해보자
-    //멘토님에게 물어보기
 }

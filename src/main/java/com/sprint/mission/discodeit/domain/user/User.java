@@ -52,6 +52,7 @@ public class User implements Serializable {
             acceptInvitation(user);
             receivedInvitations.removeAll(List.of(user.id));
         }
+        //같은 클래스의 객체끼리는 이런식으로 가능?
         user.receivedInvitations.add(this.id);
     }
 

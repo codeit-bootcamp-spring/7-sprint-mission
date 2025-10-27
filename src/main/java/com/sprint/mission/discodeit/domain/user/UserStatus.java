@@ -11,13 +11,12 @@ public class UserStatus implements Serializable {
 
 
 
-    private final Instant createdAt;
+
     private final Instant lastLoginAt;
     private final OnlineStatus onlineStatus;
 
 
     public UserStatus(OnlineStatus status) {
-        this.createdAt=Instant.now();
         this.lastLoginAt=Instant.now();
         this.onlineStatus = status;
     }
