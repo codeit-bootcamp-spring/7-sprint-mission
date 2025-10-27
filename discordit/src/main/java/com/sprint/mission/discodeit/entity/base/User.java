@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity.base;
 
+import com.sprint.mission.discodeit.entity.content.BinaryContent;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 import lombok.Getter;
 
@@ -19,6 +20,7 @@ public class User extends BaseEntity implements Receivable {
     private String displayName;
     private String bio;
     private OnlineStatus onlineStatus;
+    private BinaryContent profileImage;
 
     public User(String userId, String passwd, String displayName) {
         validateId(userId);
@@ -45,6 +47,11 @@ public class User extends BaseEntity implements Receivable {
 
     public void setBio(String bio) {
         this.bio = bio;
+        update();
+    }
+
+    public void setProfileImage(BinaryContent profileImage) {
+        this.profileImage = profileImage;
         update();
     }
 
