@@ -4,10 +4,10 @@ import com.sprint.mission.discodeit.entity.base.Channel;
 import com.sprint.mission.discodeit.entity.base.Message;
 import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
-import com.sprint.mission.discodeit.entity.dto.ChannelDTO;
-import com.sprint.mission.discodeit.entity.dto.MessageDTO;
-import com.sprint.mission.discodeit.entity.dto.UserDTO;
-import com.sprint.mission.discodeit.entity.dto.mapper.Mapper;
+import com.sprint.mission.discodeit.entity.dto.fileIo.ChannelIoDTO;
+import com.sprint.mission.discodeit.entity.dto.fileIo.MessageIoDTO;
+import com.sprint.mission.discodeit.entity.dto.fileIo.UserIoDTO;
+import com.sprint.mission.discodeit.entity.dto.fileIo.mapper.Mapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -48,7 +48,7 @@ public class DataLoader {
         }
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(MESSAGE_FILE_PATH))) {
-            List<Message<Receivable>> objects = ((List<MessageDTO>) ois.readObject()).stream()
+            List<Message<Receivable>> objects = ((List<MessageIoDTO>) ois.readObject()).stream()
                     .map(m -> Mapper.toMessage(m, userRepository, channelRepository))
                     .sorted(Comparator.comparing(Message::getCreatedAt)) // 메세지 반환시 순서 보장을 위함
                     .toList();
@@ -76,7 +76,7 @@ public class DataLoader {
         }
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_FILE_PATH))) {
-            List<User> objects = ((List<UserDTO>) ois.readObject()).stream()
+            List<User> objects = ((List<UserIoDTO>) ois.readObject()).stream()
                     .map(Mapper::toUser)
                     .toList();
             for (User user : objects) {
@@ -102,7 +102,7 @@ public class DataLoader {
             return;
         }
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(CHANNEL_FILE_PATH))) {
-            List<Channel> objects = ((List<ChannelDTO>) ois.readObject()).stream()
+            List<Channel> objects = ((List<ChannelIoDTO>) ois.readObject()).stream()
                     .map(c -> Mapper.toChannel(c, userRepository))
                     .toList();
             for (Channel object : objects) {
