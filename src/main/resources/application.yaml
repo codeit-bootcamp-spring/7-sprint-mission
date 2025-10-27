@@ -3,3 +3,4 @@ file:
     userPath: src/main/resources/Users.ser
     messagePath: src/main/resources/Messages.ser
     channelPath: src/main/resources/Channels.ser
+    userstatusPath: src/main/resources/UserStatuses.ser
