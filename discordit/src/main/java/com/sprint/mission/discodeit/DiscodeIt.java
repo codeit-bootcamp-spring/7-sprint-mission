@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.base.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.base.Message;
 import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -435,7 +436,7 @@ public class DiscodeIt {
     private void printAllRegisteredUser(UUID uuid) {
         Set<User> users = channelService.getAllMembers(uuid);
         for (User user : users) {
-            System.out.printf("\t- %s(%s)\n", user.getDisplayName(), user.getOnlineUserStatus());
+            System.out.printf("\t- %s(%s)\n", user.getDisplayName(), user.getOnlineStatus());
         }
     }
 
@@ -490,7 +491,7 @@ public class DiscodeIt {
             }
 
             try {
-                userService.signIn(id, passwd, displayName);
+                userService.create(new UserCreateRequestDto(id, passwd, displayName, null));
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 continue;
