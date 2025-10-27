@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -15,10 +18,14 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(Channel.ChannelType type, String channelName, String channelDescription) {
-        Channel newChannel = new Channel(type, channelName, channelDescription);
-        channelRepository.save(newChannel);
-        return newChannel;
+    public Channel createChannel(CreateChannelDto createChannelDto) {
+        Channel channel = new Channel(
+                createChannelDto.getChannelType(),
+                createChannelDto.getChannelName(),
+                createChannelDto.getDesc()
+        );
+        channelRepository.save(channel);
+        return channel;
     }
 
     @Override
@@ -33,12 +40,10 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID channelId, Channel.ChannelType type, String channelName, String channelDescription) {
-        Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다." + channelId));
-        channel.setType(type);
-        channel.setChannelName(channelName);
-        channel.setDesc(channelDescription);
+    public void updateChannel(UpdateChannelDto updateChannelDto) {
+        Channel channel = channelRepository.findById(updateChannelDto.getChannelId())
+                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다." + updateChannelDto.getChannelId()));
+        channel.updateChannel(updateChannelDto.getChannelType(), updateChannelDto.getChannelName(), updateChannelDto.getDesc());
         channel.touch();
     }
 
@@ -53,6 +58,23 @@ public class JCFChannelService implements ChannelService {
             throw new NoSuchElementException("채널을 찾을 수 없습니다." + channelId);
         }
         channelRepository.deleteById(channelId);
+    }
+
+    @Override
+    public void addUserToChannel(Channel channel, User user) {
+        if (!channel.getParticipants().contains(user)) {
+            channel.getParticipants().add(user);
+            channel.touch();
+            channelRepository.save(channel);
+        }
+    }
+
+    @Override
+    public void removeUserFromChannel(Channel channel, User user) {
+        channel.removeParticipant(user);
+        channel.touch();// 도메인 메서드
+        channelRepository.save(channel);
+
     }
 }
 

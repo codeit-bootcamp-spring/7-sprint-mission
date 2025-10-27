@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -19,8 +21,8 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(String content, UUID channelId, UUID userId) {
-        Message newMessage = new Message(content, channelId, userId);
+    public Message createMessage(CreateMessageDto createMessageDto) {
+        Message newMessage = new Message(createMessageDto.getContent(), createMessageDto.getChannelID(), createMessageDto.getUserId());
         messageRepository.save(newMessage);
         return newMessage;
     }
@@ -37,10 +39,10 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(UUID messageId, String content) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("삭제할 메시지를 찾을 수 없습니다: " + messageId));
-        message.messageUpdate(content);
+    public void updateMessage(UpdateMessageDto updateMessageDto) {
+        Message message = messageRepository.findById(updateMessageDto.getMessageId())
+                .orElseThrow(() -> new NoSuchElementException("삭제할 메시지를 찾을 수 없습니다: " + updateMessageDto.getMessageId()));
+        message.messageUpdate(updateMessageDto.getContent());
         messageRepository.save(message);
     }
 

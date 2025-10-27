@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.dto.UserRequestDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -18,9 +18,17 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createUser(CreateUserDto createUserDto) {
+        if(userRepository.findByUsername(createUserDto.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("이미 등록된 유저입니다." + createUserDto.getUsername());
+        }
+        if(userRepository.findByEmail(createUserDto.getEmail()).isPresent()){
+            throw new IllegalArgumentException("이미 등록된 이메일입니다." + createUserDto.getUsername());
+        }
         User user = new User(
                 createUserDto.getUsername(), createUserDto.getEmail(), createUserDto.getPassword(),
                 createUserDto.getPhoneNumber(), createUserDto.getPronoun());
+
+
         userRepository.save(user);
         return user;
     }
@@ -38,20 +46,23 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUser(UpdateUserDto updateUserDto) {
-        if (!userRepository.existsById(updateUserDto.getUserId())) {
-            throw new NoSuchElementException("찾을 수 없는 유저: " + updateUserDto.getUserId());
-        }
-
-        User user = this.getUser(updateUserDto.getUserId());
-        user.updateUser(updateUserDto);
+        User user = userRepository.findById(updateUserDto.getUserId())
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + updateUserDto.getUserId()));
+        user.updateUser(updateUserDto.getUsername(),
+                updateUserDto.getPassword(),
+                updateUserDto.getEmail(),
+                updateUserDto.getPhoneNumber(),
+                updateUserDto.getPronoun()
+        );
         userRepository.save(user);
     }
 
     @Override
     public void deleteUser(UUID userId) {
-        if (!this.isExistsUser(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("찾을 수 없는 유저: " + userId);
         }
+
         userRepository.deleteById(userId);
     }
 
@@ -61,19 +72,19 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void addChannelToUser(UUID userId, UUID channelId) {
-        User user = getUser(userId);
-        if (!user.getJoinChannels().contains(channelId)) {
-            user.addChannel(channelId);
+    public void addChannelToUser(User user, Channel channel) {
+        if (!user.getJoinChannels().contains(channel)) {
+            user.getJoinChannels().add(channel);
             user.touch();
             userRepository.save(user);
         }
+
     }
 
     @Override
-    public void removeChannelFromAllUsers(UUID channelId) {
+    public void removeChannelFromAllUsers(Channel channel) {
         for (User user : this.getAllUsers()) {
-            user.removeChannel(channelId);
+            user.leaveChannel(channel);
             user.touch();
             userRepository.save(user);
         }

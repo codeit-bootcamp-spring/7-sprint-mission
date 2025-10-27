@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -8,7 +7,6 @@ import lombok.ToString;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @ToString(callSuper = true)
@@ -22,7 +20,9 @@ public class User extends Common {
     private String password;
     private String phoneNumber;
     private String pronoun; // 대명사 (디스코드에 있음)
-    private final List<UUID> joinChannels = new ArrayList<>(); // 현재 참여중인 채널 리스트(UUID 리스트)
+
+    @ToString.Exclude
+    private final List<Channel> joinChannels = new ArrayList<>(); // 현재 참여중인 채널 리스트(UUID 리스트)
 
     public User(String username, String email, String password, String phoneNumber, String pronoun) {
         this.username = username;
@@ -32,7 +32,6 @@ public class User extends Common {
         this.pronoun = pronoun;
     }
 
-    // 별로 좋지 않은 방법.. 일어나면 물어보얗함
     public void updateUser(String username, String password, String  email, String phoneNumber, String pronoun) {
         if(username != null) this.username = username;
         if(password != null) this.password = password;
@@ -42,15 +41,18 @@ public class User extends Common {
         touch();
     }
 
-    public void addChannel(UUID channelID) {
-        if (!joinChannels.contains(channelID)) {
-            joinChannels.add(channelID);
+    public void joinChannel(Channel channel) {
+        if (channel != null && !joinChannels.contains(channel)) {
+            joinChannels.add(channel);
             touch();
         }
     }
 
-    public void removeChannel(UUID channelID) {
-        joinChannels.remove(channelID);
-        touch();
+    public void leaveChannel(Channel channel) {
+        if(channel != null && joinChannels.contains(channel)) {
+            joinChannels.remove(channel);
+            touch();
+        }
+
     }
 }

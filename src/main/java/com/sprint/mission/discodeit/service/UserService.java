@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.UserRequestDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -16,6 +16,6 @@ public interface UserService {
     void deleteUser(UUID uuid);
     boolean isExistsUser(UUID userId);
 
-    void addChannelToUser(UUID userId, UUID channelId);
-    void removeChannelFromAllUsers(UUID channelId);
+    void addChannelToUser(User user, Channel channel);
+    void removeChannelFromAllUsers(Channel channel);
 }

@@ -12,7 +12,7 @@ import java.util.*;
 @Repository
 public class FileMessageRepository implements MessageRepository {
     private final Path filePath;
-    private Map<UUID, Message> messages;
+    private final Map<UUID, Message> messages;
 
     public FileMessageRepository(@Value("${file.path.messagePath}")Path messageFilePath) {
         this.filePath = messageFilePath;

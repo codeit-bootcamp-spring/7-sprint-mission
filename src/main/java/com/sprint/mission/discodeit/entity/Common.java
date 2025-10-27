@@ -15,7 +15,9 @@ public class Common implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @EqualsAndHashCode.Include
     public final UUID id;
+
     public final Instant createAt;
     public Instant updateAt;
 

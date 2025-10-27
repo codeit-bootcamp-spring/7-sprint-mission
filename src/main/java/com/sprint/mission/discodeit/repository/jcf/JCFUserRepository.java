@@ -33,5 +33,17 @@ public class JCFUserRepository implements UserRepository {
         return usersRepository.containsKey(id);
     }
 
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return usersRepository.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
 
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return usersRepository.values().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst();
+    }
 }

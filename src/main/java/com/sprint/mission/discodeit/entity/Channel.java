@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.enums.ChannelType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @ToString(callSuper = true)
@@ -16,6 +18,10 @@ public class Channel extends Common {
     private ChannelType type;
     private String channelName;
     private String desc;
+
+    @ToString.Exclude
+    private List<User> participants = new ArrayList<>();
+
 
     public Channel(ChannelType type, String channelName, String desc) {
         this.type = type;
@@ -28,6 +34,25 @@ public class Channel extends Common {
         if(channelName != null) this.channelName = channelName;
         if(desc != null) this.desc = desc;
     }
+
+    // 유저 추가
+    public void addParticipant(User user) {
+        if (user != null && !participants.contains(user)) {
+            participants.add(user);
+            touch();
+        }
+    }
+
+    // 유저 제거
+    public void removeParticipant(User user) {
+        if (user != null && participants.remove(user)) {
+            participants.remove(user);
+            touch();
+        }
+    }
+
+
+
 
 
 }

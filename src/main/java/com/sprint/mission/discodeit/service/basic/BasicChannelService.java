@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +59,22 @@ public class BasicChannelService implements ChannelService {
             throw new NoSuchElementException("채널을 찾을 수 없습니다." + channelId);
         }
         channelRepository.deleteById(channelId);
+    }
+
+    @Override
+    public void addUserToChannel(Channel channel, User user) {
+        if (!channel.getParticipants().contains(user)) {
+            channel.getParticipants().add(user);
+            channel.touch();
+            channelRepository.save(channel);
+        }
+    }
+
+    @Override
+    public void removeUserFromChannel(Channel channel, User user) {
+        channel.removeParticipant(user);
+        channel.touch();// 도메인 메서드
+        channelRepository.save(channel);
+
     }
 }

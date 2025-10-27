@@ -46,4 +46,18 @@ public class FileUserRepository implements UserRepository {
     public boolean existsById(UUID userId) {
         return users.containsKey(userId);
     }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return users.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return users.values().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst();
+    }
 }

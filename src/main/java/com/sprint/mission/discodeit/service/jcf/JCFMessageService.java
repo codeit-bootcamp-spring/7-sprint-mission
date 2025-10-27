@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -15,8 +17,8 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(String content, UUID channelId, UUID userId) {
-        Message newMessage = new Message(content, channelId, userId);
+    public Message createMessage(CreateMessageDto createMessageDto) {
+        Message newMessage = new Message(createMessageDto.getContent(), createMessageDto.getChannelID(), createMessageDto.getUserId());
         messageRepository.save(newMessage);
         return newMessage;
     }
@@ -24,7 +26,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message getMessage(UUID messageId) {
         return messageRepository.findById(messageId)
-                .orElseThrow(()->new NoSuchElementException("찾을 수 없는 메시지: " + messageId));
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 메시지: " + messageId));
     }
 
     @Override
@@ -33,10 +35,10 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(UUID messageId, String content) {
-        Message message = this.getMessage(messageId);
-        message.setContent(content);
-        message.touch();
+    public void updateMessage(UpdateMessageDto updateMessageDto) {
+        Message message = messageRepository.findById(updateMessageDto.getMessageId())
+                .orElseThrow(() -> new NoSuchElementException("삭제할 메시지를 찾을 수 없습니다: " + updateMessageDto.getMessageId()));
+        message.messageUpdate(updateMessageDto.getContent());
         messageRepository.save(message);
     }
 
@@ -59,7 +61,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void deleteMessagesByUser(UUID userId) {
-        for(Message message : getAllMessages()) {
+        for (Message message : getAllMessages()) {
             if (message.getUserId().equals(userId)) {
                 this.deleteMessage(message.getId());
             }
