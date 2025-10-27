@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.UUID;
 
+@Getter
 public class Message extends BaseEntity{
     private final UUID senderId;
     private final UUID receiverId;
@@ -25,21 +28,9 @@ public class Message extends BaseEntity{
         this.content = content;
     }
 
-    public String getContents() {
-        return content;
-    }
-
-    public void setContents(String content) {
+    public void setContent(String content) {
         this.setUpdatedAt();
         this.content = content;
-    }
-
-    public UUID getSenderId() {
-        return senderId;
-    }
-
-    public UUID getReceiverId() {
-        return receiverId;
     }
 
     @Override

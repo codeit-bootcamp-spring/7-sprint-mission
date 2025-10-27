@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class Channel extends BaseEntity{
     private String channelName;
     private final ChannelType channelType;
@@ -17,21 +20,9 @@ public class Channel extends BaseEntity{
         this.members.add(admin);
     }
 
-    public String getChannelName() {
-        return channelName;
-    }
-
     public void setChannelName(String channelName) {
         this.setUpdatedAt();
         this.channelName = channelName;
-    }
-
-    public ChannelType getChannelType() {
-        return channelType;
-    }
-
-    public User getAdmin() {
-        return admin;
     }
 
     public void setAdmin(User admin) {

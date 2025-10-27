@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.utils;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -36,9 +35,9 @@ public class Printer {
             }
 
             if(msg.getSenderId().equals(user.getId())){
-                System.out.printf("%s 나: %s\n", time, msg.getContents());
+                System.out.printf("%s 나: %s\n", time, msg.getContent());
             } else {
-                System.out.printf("%s %s: %s\n", time, userService.getUserNickName(msg.getSenderId()), msg.getContents());
+                System.out.printf("%s %s: %s\n", time, userService.getUserNickName(msg.getSenderId()), msg.getContent());
             }
         }
     }
@@ -50,7 +49,7 @@ public class Printer {
                             long unixTime = message.getCreatedAt();
                             String KST = TimeConvert.time(unixTime);
                             String time = KST.split(" ")[1];
-                            System.out.printf("%s: %s(%s)\n", user2.getNickName(), message.getContents(), time);
+                            System.out.printf("%s: %s(%s)\n", user2.getNickName(), message.getContent(), time);
                         },
                         () -> System.out.printf("%s\n", user2.getNickName()) //이전 메시지가 없다면 닉네임만 출력
                 );

@@ -89,7 +89,7 @@ public class FileMessageService implements MessageService {
     @Override
     public void updateMessage(UUID id, String content) {
         Message message = messageRepository.findById(id);
-        message.setContents(content);
+        message.setContent(content);
         messageRepository.update(message);
     }
 

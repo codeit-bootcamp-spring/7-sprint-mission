@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.entity;
 
 
 import com.sprint.mission.discodeit.entity.vaildator.UserVaildator;
+import lombok.Getter;
 
+@Getter
 public class User extends BaseEntity{
     private String userName;
     private String nickName;
@@ -25,17 +27,9 @@ public class User extends BaseEntity{
         this.password = password;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
     public void setUserName(String userName) {
         this.setUpdatedAt();
         this.userName = userName;
-    }
-
-    public String getNickName() {
-        return nickName;
     }
 
     public void setNickName(String nickName) {
@@ -44,32 +38,16 @@ public class User extends BaseEntity{
         this.nickName = nickName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public void setEmail(String email) {
         UserVaildator.vaildateEmail(email);
         this.setUpdatedAt();
         this.email = email;
     }
 
-    public String getPhoneNum() {
-        return phoneNum;
-    }
-
     public void setPhoneNum(String phoneNum) {
         UserVaildator.vaildatePhoneNum(phoneNum);
         this.setUpdatedAt();
         this.phoneNum = formatPhoneNum(phoneNum);
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {

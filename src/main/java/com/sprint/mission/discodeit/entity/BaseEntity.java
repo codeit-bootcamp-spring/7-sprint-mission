@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
 public class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
@@ -15,18 +18,6 @@ public class BaseEntity implements Serializable {
         this.id = UUID.randomUUID(); // 랜덤 UUID로 초기화
         this.createdAt = now;
         this.updatedAt = now;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
     }
 
     public void setUpdatedAt() {
