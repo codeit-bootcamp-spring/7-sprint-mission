@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-public class ChannelCreateDto {
+public class ChannelCreateRequestDto {
 
     private String channelName;
     private ChannelType type;    // 채널타입

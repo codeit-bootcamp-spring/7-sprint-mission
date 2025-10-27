@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
 
@@ -19,7 +19,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelInfoDto createChannel(ChannelCreateDto dto) {
+    public ChannelInfoDto createChannel(ChannelCreateRequestDto dto) {
         User user = userService.findUserEntityById(dto.getAdminId())
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없음"));
 

@@ -2,8 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserState;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateDto;
+import com.sprint.mission.discodeit.entity.binaryContent.BinaryContentRepository;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
+import com.sprint.mission.discodeit.entity.status.UserStatus;
+import com.sprint.mission.discodeit.entity.status.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -22,11 +25,18 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
+    // 고도화 의존성 추가
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
+
     // 생성
     @Override
-    public UserInfoDto createUser(UserCreateDto createDto) {
+    public UserInfoDto createUser(UserCreateRequestDto createDto) {
         userRepository.findByEmail(createDto.getEmail()).ifPresent(user
                 -> {throw new DuplicateEmailException("이미 존재하는 이메일");});
+
+        userRepository.findByUserName(createDto.getUserName()).ifPresent(user
+                -> {throw new DuplicateEmailException("이미 존재하는 닉네임");});
 
         User newUser = User.builder()
                 .email(createDto.getEmail())
@@ -36,7 +46,18 @@ public class BasicUserService implements UserService {
                 .build();
 
         userRepository.save(newUser);
-        return UserInfoDto.from(newUser);
+        return UserInfoDto.from(newUser, true);
+
+        // BinaryContent Dto 추가
+
+    }
+
+    // User -> UserInfoDto
+    private UserInfoDto toDto(User user) {
+        // 반복되는 부분을 헬퍼 메소드로
+        boolean isOnline = userStatusRepository.findStatusByUserId(user.getId())
+                .map(UserStatus::isOnline).orElse(false);
+        return UserInfoDto.from(user, isOnline);
     }
 
     // --- 조회 ---
@@ -44,19 +65,25 @@ public class BasicUserService implements UserService {
     // ID로 출력
     @Override
     public Optional<UserInfoDto> findUserInfoById(UUID userId) {
-        return userRepository.findById(userId).map(UserInfoDto::from);
+        // 반복되는 부분
+        return userRepository.findById(userId).map(user -> {
+            boolean isOnline = userStatusRepository.findStatusByUserId(userId)
+                    .map(UserStatus::isOnline).orElse(false);
+            return UserInfoDto.from(user, isOnline);
+        });
     }
     // 이메일로 출력
     @Override
     public Optional<UserInfoDto> findUserInfoByEmail(String email) {
-        return userRepository.findByEmail(email).map(UserInfoDto::from);
+        return userRepository.findByEmail(email).map(this::toDto);
     }
+
     // 전체출력
     @Override
     public List<UserInfoDto> findAllUsers() {
-        return userRepository.findAll().stream().map(UserInfoDto::from)
-                .collect(Collectors.toList());
-    }
+        return userRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+    }       // N + 1 문제 발생??? 무슨 문제인지는 이해는 했는데 해결하기 위한 방법을 이해하지 못함...
+
     // 접근
     public Optional<User> findUserEntityById(UUID userId) {
         return userRepository.findById(userId);
@@ -70,7 +97,7 @@ public class BasicUserService implements UserService {
             user.updateUserName(newUserName);
             user.updatePhoneNum(newPhoneNum);
             userRepository.save(user);
-            return UserInfoDto.from(user);
+            return toDto(user);
         });
     }
 
@@ -80,7 +107,7 @@ public class BasicUserService implements UserService {
         return userRepository.findById(userId).map(user -> {
             user.updatePassword(newPassword);
             userRepository.save(user);
-            return UserInfoDto.from(user);
+            return toDto(user);
         });
     }
 
@@ -90,7 +117,7 @@ public class BasicUserService implements UserService {
         return userRepository.findById(userId).map(user -> {
             user.updateState(newState);
             userRepository.save(user);
-            return UserInfoDto.from(user);
+            return toDto(user);
         });
     }
 

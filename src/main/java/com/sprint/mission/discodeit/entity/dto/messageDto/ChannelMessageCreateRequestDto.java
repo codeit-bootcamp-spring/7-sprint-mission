@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-public class ChannelMessageCreateDto {
+public class ChannelMessageCreateRequestDto {
 
     private UUID authorId;
     private UUID channelId;

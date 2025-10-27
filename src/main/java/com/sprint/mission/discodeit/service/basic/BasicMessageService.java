@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateDto;
-import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateRequestDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 import com.sprint.mission.discodeit.exception.NotFoundChannelException;
@@ -25,7 +25,7 @@ public class BasicMessageService implements MessageService {
 
     // Message Create
     @Override
-    public MessageInfoDto createDirectMessage(DirectMessageCreateDto createDto) {
+    public MessageInfoDto createDirectMessage(DirectMessageCreateRequestDto createDto) {
         if (createDto.getContent() == null || createDto.getContent().isBlank()) {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }
@@ -40,7 +40,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageInfoDto createChannelMessage(ChannelMessageCreateDto createDto) {
+    public MessageInfoDto createChannelMessage(ChannelMessageCreateRequestDto createDto) {
         if (createDto.getContent() == null || createDto.getContent().isBlank()) {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }

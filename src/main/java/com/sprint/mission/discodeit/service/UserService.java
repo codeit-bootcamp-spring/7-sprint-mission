@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserState;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface UserService {
 
     // 생성
-    UserInfoDto createUser(UserCreateDto userCreateDto);
+    UserInfoDto createUser(UserCreateRequestDto userCreateDto);
 
     // 조회
     Optional<UserInfoDto> findUserInfoById(UUID userId);

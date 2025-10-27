@@ -4,9 +4,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.MessageType;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateDto;
-import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateDto;
-import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateRequestDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -58,7 +57,7 @@ public class FileMessageService implements MessageService {
 
     // Message Create
     @Override
-    public MessageInfoDto createDirectMessage(DirectMessageCreateDto dto) {
+    public MessageInfoDto createDirectMessage(DirectMessageCreateRequestDto dto) {
         if (dto.getContent() == null || dto.getContent().isBlank()) {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }
@@ -73,7 +72,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public MessageInfoDto createChannelMessage(ChannelMessageCreateDto dto) {
+    public MessageInfoDto createChannelMessage(ChannelMessageCreateRequestDto dto) {
         if (dto.getContent() == null || dto.getContent().isBlank()) {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }

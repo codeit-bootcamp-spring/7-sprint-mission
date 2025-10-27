@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateDto;
-import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateRequestDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
 
 import java.util.List;
@@ -10,8 +10,8 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    MessageInfoDto createDirectMessage(DirectMessageCreateDto createDto); // 생성
-    MessageInfoDto createChannelMessage(ChannelMessageCreateDto createDto);
+    MessageInfoDto createDirectMessage(DirectMessageCreateRequestDto createDto); // 생성
+    MessageInfoDto createChannelMessage(ChannelMessageCreateRequestDto createDto);
 
     Optional<MessageInfoDto> findMessageById(UUID messageId);
 

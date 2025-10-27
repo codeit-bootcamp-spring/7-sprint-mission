@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserState;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -65,7 +65,7 @@ public class FileUserService implements UserService {
 
     // 생성
     @Override
-    public UserInfoDto createUser(UserCreateDto dto) {
+    public UserInfoDto createUser(UserCreateRequestDto dto) {
         validateEmailIsUnique(dto.getEmail());
         User newUser = new User(dto.getEmail(), dto.getPassword(), dto.getUserName(), dto.getPhoneNum());
         data.put(newUser.getId(), newUser);

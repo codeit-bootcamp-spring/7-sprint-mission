@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
-import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateDto;
-import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateRequestDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.messageDto.MessageInfoDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -30,7 +30,7 @@ public class DiscodeitApplication {
                     System.out.println("새로운 계정 가입: " + userName);
 
                     return userService.createUser(
-                            UserCreateDto.builder()
+                            UserCreateRequestDto.builder()
                             .email(email)
                             .password(password)
                             .userName(userName)
@@ -52,7 +52,7 @@ public class DiscodeitApplication {
                     System.out.println("새로운 채널 개설: " + channelName);
 
                     return channelService.createChannel(
-                            ChannelCreateDto.builder()
+                            ChannelCreateRequestDto.builder()
                                     .adminId(adminId)
                                     .channelName(channelName)
                                     .type(type)
@@ -87,21 +87,21 @@ public class DiscodeitApplication {
         // --- 3. 메시지 기능 테스트 ---
         System.out.println("\n--- 메시지 기능 테스트 ---");
         messageService.createChannelMessage(
-                ChannelMessageCreateDto.builder()
+                ChannelMessageCreateRequestDto.builder()
                         .authorId(adminId)
                         .channelId(noticeChannelId)
                         .content("여기는 공지 채널입니다.")
                         .build()
         );
         MessageInfoDto userMessage = messageService.createChannelMessage(
-                ChannelMessageCreateDto.builder()
+                ChannelMessageCreateRequestDto.builder()
                         .authorId(userId)
                         .channelId(noticeChannelId)
                         .content("반갑습니다.")
                         .build()
         );
         messageService.createDirectMessage(
-                DirectMessageCreateDto.builder()
+                DirectMessageCreateRequestDto.builder()
                 .authorId(adminId)
                 .receiverId(userId)
                 .content("안녕하세요!!")

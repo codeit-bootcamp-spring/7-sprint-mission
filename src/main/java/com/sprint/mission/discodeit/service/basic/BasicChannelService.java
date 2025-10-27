@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.*;
@@ -20,7 +20,7 @@ public class BasicChannelService implements ChannelService {
     private final UserService userService;
 
     @Override
-    public ChannelInfoDto createChannel(ChannelCreateDto createDto) {
+    public ChannelInfoDto createChannel(ChannelCreateRequestDto createDto) {
         User user = userService.findUserEntityById(createDto.getAdminId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
 

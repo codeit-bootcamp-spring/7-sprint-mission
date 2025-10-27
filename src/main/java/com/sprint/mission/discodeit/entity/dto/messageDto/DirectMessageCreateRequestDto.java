@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-public class DirectMessageCreateDto {
+public class DirectMessageCreateRequestDto {
 
     private UUID authorId;
     private UUID receiverId;
