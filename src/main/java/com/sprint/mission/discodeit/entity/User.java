@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -8,12 +9,13 @@ import java.util.UUID;
 
 @Getter
 @ToString
+@Builder
 public class User extends BaseEntity {
     private String username; // 유저 이름 ( 별명 x)
     private String password;
     private String email;
     private UserState userState; // 0: 오프라인 , 1: 온라인
-    private final UUID profileId;
+    private UUID profileId;
 
     public User(String username, String password, String email, UUID profileId) {
         this.username = VerifiedUtils.verifyName(username);
@@ -54,6 +56,10 @@ public class User extends BaseEntity {
             this.email = v;
             reUpdatedAt();
         }
+    }
+
+    public void setProfileId(UUID profileId) {
+        this.profileId = profileId;
     }
 
     public void update(String username, String password, String email) {
