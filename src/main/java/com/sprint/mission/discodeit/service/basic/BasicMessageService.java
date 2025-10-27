@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,16 +22,10 @@ import java.util.stream.Stream;
  * - 비즈니스 로직: 메시지 생성, 필터링, 최신 메시지 조회 등
  * - 데이터 저장/조회: MessageRepository에 위임
  */
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
-
-    /**
-     * 생성자에서 Repository를 주입받습니다.
-     * (의존성 주입 방식 - DI)
-     */
-    public BasicMessageService(MessageRepository JCFMessageRepository) {
-        this.messageRepository = JCFMessageRepository;
-    }
 
     /**
      * 새로운 메시지를 생성하여 Repository에 저장

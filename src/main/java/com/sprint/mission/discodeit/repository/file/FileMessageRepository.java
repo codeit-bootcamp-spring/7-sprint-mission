@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
@@ -25,6 +26,8 @@ import java.util.*;
  * 사용 파일:
  * - messages.sav : 메시지 객체들이 직렬화되어 저장되는 파일
  */
+
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messageStore = new LinkedHashMap<>();
     private final String filePath = AppConfig.DATA_PATH + "\\messages.sav";

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
@@ -24,6 +25,8 @@ import java.util.*;
  * 사용 파일:
  * - users.sav : 메시지 객체들이 직렬화되어 저장되는 파일
  */
+
+@Repository
 public class FileUserRepository implements UserRepository {
     private final Map<UUID, User> userStore = new HashMap<>();
     private final String filePath = AppConfig.DATA_PATH + "\\users.sav";

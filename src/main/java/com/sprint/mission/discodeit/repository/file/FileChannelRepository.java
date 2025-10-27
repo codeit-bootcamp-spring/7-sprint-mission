@@ -5,11 +5,13 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channelStore = new HashMap<>();
     private final Map<UUID, Set<UUID>> joinedChannels = new HashMap<>();
