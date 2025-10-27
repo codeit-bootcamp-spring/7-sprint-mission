@@ -36,7 +36,7 @@ public class Channel implements Serializable {
         this.channelName=channelName;
     }
 
-    private static void validateChannelName(String name){
+    private void validateChannelName(String name){
         if(name==null || name.length()<1){
             throw new IllegalArgumentException("채널 이름을 입력하세요");
         }

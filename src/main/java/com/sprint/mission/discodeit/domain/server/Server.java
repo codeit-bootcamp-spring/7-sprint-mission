@@ -40,23 +40,7 @@ public class Server implements Serializable {
         this.members=members;
     }
 
-    private static void validateServerName(String serverName){
-        if (serverName == null || serverName.length()<1){
-            throw new IllegalArgumentException("서버의 이름을 입력하세요");
-        }
-    }
 
-    private static void validateServerLevel(Long level){
-        if (level<0 || level>3){
-            throw new IllegalArgumentException("서버의 레벨을 1-3이어야 합니다.");
-        }
-    }
-
-    private static void validateMembersNumber(List<UUID> members){
-        if (members.size()<0){
-            throw new IllegalArgumentException("서버에는 최소 한 명의 멤버가 있어야 합니다");
-        }
-    }
 
 
     public void updateServerName(String newServerName){
@@ -105,5 +89,21 @@ public class Server implements Serializable {
         updatedAt=Instant.now();
     }
 
+    private void validateServerName(String serverName){
+        if (serverName == null || serverName.length()<1){
+            throw new IllegalArgumentException("서버의 이름을 입력하세요");
+        }
+    }
 
+    private void validateServerLevel(Long level){
+        if (level<0 || level>3){
+            throw new IllegalArgumentException("서버의 레벨을 1-3이어야 합니다.");
+        }
+    }
+
+    private void validateMembersNumber(List<UUID> members){
+        if (members.size()<0){
+            throw new IllegalArgumentException("서버에는 최소 한 명의 멤버가 있어야 합니다");
+        }
+    }
 }

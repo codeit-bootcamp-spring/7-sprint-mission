@@ -2,19 +2,15 @@ package com.sprint.mission.discodeit.application;
 
 
 import com.sprint.mission.discodeit.application.common.FileManager;
-import com.sprint.mission.discodeit.domain.friendrequest.FriendRequestRepository;
-import com.sprint.mission.discodeit.domain.friendrequest.FriendRequest;
-import com.sprint.mission.discodeit.domain.friendship.FriendShipRepository;
-import com.sprint.mission.discodeit.domain.friendship.FriendShip;
-import com.sprint.mission.discodeit.domain.user.UserRepository;
-import com.sprint.mission.discodeit.domain.user.User;
-import com.sprint.mission.discodeit.domain.user.exception.DuplicateUserException;
 import com.sprint.mission.discodeit.application.dto.request.UserCreateRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.UserRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.UserUpdateDto;
 import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
-import com.sprint.mission.discodeit.domain.userstatus.UserStatusRepository;
+import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.domain.user.UserRepository;
+import com.sprint.mission.discodeit.domain.user.exception.DuplicateUserException;
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
+import com.sprint.mission.discodeit.domain.userstatus.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +25,6 @@ public class BasicUserService implements UserService {
 
 
     private final UserRepository userRepository;
-    private final FriendRequestRepository requestRepository;
-    private final FriendShipRepository friendShipRepository;
     private final UserStatusRepository userStatusRepository;
     private final FileManager fileManager;
 
@@ -39,7 +33,7 @@ public class BasicUserService implements UserService {
     public UserResponseDto createUser(UserCreateRequestDto requestDto) throws IOException {
         validateDuplicateEmail(requestDto.email());
         validateDuplicateUsername(requestDto.username());
-        User user = User.create(
+        User user = new User(
                 requestDto.email(),
                 requestDto.password(),
                 requestDto.username(),
@@ -110,62 +104,11 @@ public class BasicUserService implements UserService {
         return userRepository.findByEmail(username).orElseThrow(() -> new NoSuchElementException("유저를 찾을 수 없습니다."));
     }
 
-    //애매 이거 수정
-    public FriendRequest sendFriendRequest(User sender, User target) {
-        validateNotAlreadyFriend(sender, target);
-        validateNotDuplicateRequest(sender, target);
-        FriendRequest friendRequest = sender.sendFriendRequestTo(target);
-        requestRepository.save(friendRequest);
-        return friendRequest;
-
-    }
-
-    //애매 이거 수정
-    public List<FriendRequest> getSentFriendRequests(User user) {
-        return requestRepository.findAll().stream().filter(r -> r.getSenderId().equals(user.getId())).toList();
-    }
-
-    //애매 이거 수정
-    public List<FriendRequest> getReceivedFriendRequests(User user) {
-        return requestRepository.findAll().stream().filter(r -> r.getReceiverId().equals(user.getId())).toList();
-    }
-
-    //애매 이거 수정
-    public void acceptFriendRequest(User receiver, FriendRequest request) {
-        FriendShip friendShip = receiver.acceptFriendRequest(request);
-        requestRepository.remove(request);
-        friendShipRepository.save(friendShip);
-    }
-
 
     private void validateNotDuplicateUser(String email) {
         userRepository.findByEmail(email).ifPresent(u -> {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         });
-    }
-
-
-    // 이미 친구인지 검사
-    private void validateNotAlreadyFriend(User sender, User target) {
-        boolean alreadyFriends =
-                friendShipRepository.findAll().stream()
-                        .anyMatch(fs ->
-                                (fs.getUserAId().equals(sender.getId()) && fs.getUserBId().equals(target.getId())) ||
-                                        (fs.getUserAId().equals(target.getId()) && fs.getUserBId().equals(sender.getId())));
-        if (alreadyFriends) {
-            throw new IllegalStateException("이미 친구 관계입니다");
-        }
-    }
-
-    // 중복 요청 검사
-    private void validateNotDuplicateRequest(User sender, User target) {
-        boolean alreadySent = requestRepository.findAll().stream()
-                .anyMatch(req -> req.getSenderId().equals(sender.getId()) &&
-
-                        req.getReceiverId().equals(target.getId()));
-        if (alreadySent) {
-            throw new IllegalStateException("이미 친구 요청을 보냈습니다");
-        }
     }
 
 
