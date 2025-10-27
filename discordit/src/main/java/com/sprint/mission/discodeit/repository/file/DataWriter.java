@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.base.Channel;
 import com.sprint.mission.discodeit.entity.base.Message;
 import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
-import com.sprint.mission.discodeit.entity.dto.fileIo.mapper.Mapper;
+import com.sprint.mission.discodeit.dto.fileIo.mapper.Mapper;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

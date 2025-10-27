@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto.fileIo;
+package com.sprint.mission.discodeit.dto.fileIo;
 
 
 import com.sprint.mission.discodeit.enums.ReceiverType;

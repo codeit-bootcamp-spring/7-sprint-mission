@@ -1,5 +1,7 @@
-package com.sprint.mission.discodeit.entity.dto.fileIo;
+package com.sprint.mission.discodeit.dto.fileIo;
 
+import com.sprint.mission.discodeit.enums.ChannelScope;
+import com.sprint.mission.discodeit.enums.ChannelType;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -21,19 +23,22 @@ public class ChannelIoDTO implements Serializable {
 
     // 엔터티 매핑 필드
     private String channelName;        // Channel.getDisplayName()
-    private String type;               // ChannelType.name()
+    private ChannelType type;               // ChannelType.name()
+    private ChannelScope scope;
+    private String description;
     private List<String> memberUserIds;    // 채널 멤버의 userId 목록
     private List<String> moderatorUserIds; // 채널 운영자의 userId 목록
 
-    // 권장 생성자 (엔터티 정합성)
     public ChannelIoDTO(UUID uuid, Instant createdAt, Instant updatedAt,
-                        String channelName, String type,
+                        String channelName, ChannelType type, ChannelScope scope, String description,
                         List<String> memberUserIds, List<String> moderatorUserIds) {
         this.uuid = uuid;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.channelName = channelName;
         this.type = type;
+        this.scope = scope;
+        this.description = description;
         this.memberUserIds = memberUserIds;
         this.moderatorUserIds = moderatorUserIds;
     }

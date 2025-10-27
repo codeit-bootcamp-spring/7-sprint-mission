@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.base;
 
 import com.sprint.mission.discodeit.entity.content.BinaryContent;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
+import jakarta.validation.constraints.Email;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -16,19 +17,22 @@ public class User extends BaseEntity implements Receivable {
 
     private final String userId;
     private String passwd;
+    @Email
+    private String email;
 
     private String displayName;
     private String bio;
     private OnlineStatus onlineStatus;
     private BinaryContent profileImage;
 
-    public User(String userId, String passwd, String displayName) {
+    public User(String userId, String passwd, String email, String displayName) {
         validateId(userId);
-        validateId(passwd);
+        validatePasswd(passwd);
         validateDisplayName(displayName);
 
         this.userId = userId;
         this.passwd = passwd;
+        this.email = email;
         this.displayName = displayName;
         this.onlineStatus = OnlineStatus.OFFLINE;
     }
@@ -60,6 +64,11 @@ public class User extends BaseEntity implements Receivable {
         update();
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+        update();
+    }
+
     private static void validateId(String id){
         if (id.length() < 4 || id.length() > 10){
             throw new IllegalArgumentException("아이디는 4에서 10자 사이로 입력해주세요.");
@@ -81,14 +90,15 @@ public class User extends BaseEntity implements Receivable {
 
     // 파일 IO시 필드 복원을 위한 메서드
     public static User fromDto(UUID uuid, Instant createdAt, Instant updatedAt,
-                               String userId, String passwd, String displayName,
-                               String bio, OnlineStatus OnlineStatus){
-        User user = new User(userId, passwd, displayName);
+                               String userId, String passwd, String email, String displayName,
+                               String bio, OnlineStatus OnlineStatus, BinaryContent profileImage){
+        User user = new User(userId, passwd, email, displayName);
         user.uuid = uuid;
         user.createdAt = createdAt;
         user.updatedAt = updatedAt;
         user.bio = bio;
         user.onlineStatus = OnlineStatus;
+        user.profileImage = profileImage;
         return user;
     }
 

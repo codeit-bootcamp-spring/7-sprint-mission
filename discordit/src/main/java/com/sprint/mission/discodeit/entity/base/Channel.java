@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity.base;
 
+import com.sprint.mission.discodeit.enums.ChannelScope;
+import com.sprint.mission.discodeit.enums.ChannelType;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -9,13 +11,16 @@ import java.util.*;
 public class Channel extends BaseEntity implements Receivable {
 
     private String channelName;
-    private ChannelType type;
+    private final ChannelScope scope;
+    private final ChannelType type;
+    private String description;
 
     private Set<User> members; // 채널 등록 멤버 목록
     private Set<User> moderators;// 운영진
 
-    public Channel(String channelName, ChannelType type, Set<User> moderators) {
+    public Channel(String channelName, ChannelScope scope, ChannelType type, Set<User> moderators) {
         this.channelName = channelName;
+        this.scope = scope;
         this.type = type;
         this.members = new HashSet<>();
         this.moderators = moderators;
@@ -27,13 +32,13 @@ public class Channel extends BaseEntity implements Receivable {
         update();
     }
 
-    public void setType(ChannelType type) {
-        this.type = type;
+    public void setMembers(Set<User> members) {
+        this.members = members;
         update();
     }
 
-    public void setMembers(Set<User> members) {
-        this.members = members;
+    public void setDescription(String description) {
+        this.description = description;
         update();
     }
 
@@ -67,22 +72,15 @@ public class Channel extends BaseEntity implements Receivable {
         return channelName;
     }
 
-    public enum ChannelType {
-        TEXT("텍스트"),
-        VOICE("음성");
-
-        ChannelType(String description) {
-        }
-    }
-
     public static Channel fromDto(UUID uuid, Instant createdAt, Instant updatedAt,
-                                  String channelName, ChannelType type,
+                                  String channelName, String description, ChannelScope scope, ChannelType type,
                                   Set<User> moderators, Set<User> members) {
-        Channel channel = new Channel(channelName, type, moderators);
-        channel.uuid = uuid;
+        Channel channel = new Channel(channelName, scope, type, moderators);
         channel.createdAt = createdAt;
-        channel.updatedAt = updatedAt;
+        channel.uuid = uuid;
+        channel.description = description;
         channel.members = members;
+        channel.updatedAt = updatedAt;
         return channel;
     }
 
