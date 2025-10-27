@@ -55,7 +55,7 @@ final class MessageMapper {
             default -> throw new IllegalArgumentException("Unknown receiverType: " + dto.getReceiverType());
         }
 
-        return Message.rehydrate(
+        return Message.fromDto(
                 dto.getUuid(),
                 dto.getCreatedAt(),
                 dto.getUpdatedAt(),

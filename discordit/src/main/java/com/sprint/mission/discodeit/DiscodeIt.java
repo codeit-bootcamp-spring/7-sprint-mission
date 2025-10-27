@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 
 @Component
@@ -105,7 +103,7 @@ public class DiscodeIt {
                 message.getSender().getUserId(),
                 message.getReceiver().getDisplayName(),
                 message.getMessage(),
-                message.getCreatedTime());
+                message.getFormattedCreationTime());
     }
 
     private void user() {
