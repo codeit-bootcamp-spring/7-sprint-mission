@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.*;
 
+@Getter
 public class Channel extends BaseEntity implements Receivable {
 
     private String channelName;
@@ -18,26 +21,14 @@ public class Channel extends BaseEntity implements Receivable {
     }
 
 
-    public String getChannelName() {
-        return channelName;
-    }
-
     public void setChannelName(String channelName) {
         this.channelName = channelName;
         this.updatedAt = getUnixTimestamp();
     }
 
-    public ChannelType getType() {
-        return type;
-    }
-
     public void setType(ChannelType type) {
         this.type = type;
         this.updatedAt = getUnixTimestamp();
-    }
-
-    public Set<User> getMembers() {
-        return members;
     }
 
     public void setMembers(Set<User> members) {
@@ -53,10 +44,6 @@ public class Channel extends BaseEntity implements Receivable {
     public void deleteMember(User user) {
         this.members.remove(user);
         this.updatedAt = getUnixTimestamp();
-    }
-
-    public Set<User> getModerators() {
-        return moderators;
     }
 
     public void setModerators(Set<User> moderators) {

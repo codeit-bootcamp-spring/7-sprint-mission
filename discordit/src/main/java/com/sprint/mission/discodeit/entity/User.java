@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
 public class User extends BaseEntity implements Receivable {
 
     // 직렬화 및 역직렬화를 수행할 때 이 클래스의 버전을 의미
@@ -26,22 +29,10 @@ public class User extends BaseEntity implements Receivable {
         this.onlineStatus = Status.OFFLINE;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getPasswd() {
-        return passwd;
-    }
-
     public void setPasswd(String passwd) {
         validatePasswd(passwd);
         this.updatedAt = getUnixTimestamp();
         this.passwd = passwd;
-    }
-
-    public String getDisplayName() {
-        return displayName;
     }
 
     public void setDisplayName(String displayName) {
@@ -50,17 +41,9 @@ public class User extends BaseEntity implements Receivable {
         this.displayName = displayName;
     }
 
-    public String getBio() {
-        return bio;
-    }
-
     public void setBio(String bio) {
         this.updatedAt = getUnixTimestamp();
         this.bio = bio;
-    }
-
-    public Status getOnlineStatus() {
-        return onlineStatus;
     }
 
     public void setOnlineStatus(Status onlineStatus) {
