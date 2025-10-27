@@ -22,12 +22,8 @@ public class Channel implements Serializable {
     //message의 id
     private final List<UUID> history = new ArrayList<>();
 
-    public static Channel create(String ChannelName, UUID serverId){
-        validateChannelName(ChannelName);
-        return new Channel(ChannelName,serverId);
-    }
-
-    private Channel(String channelName,UUID serverId) {
+    public Channel(String channelName,UUID serverId) {
+        validateChannelName(channelName);
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt=Instant.now();

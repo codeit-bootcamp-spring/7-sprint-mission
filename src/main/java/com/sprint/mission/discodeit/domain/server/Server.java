@@ -28,16 +28,10 @@ public class Server implements Serializable {
     private final List<UUID> members;
     private final List<UUID> channels = new ArrayList<>();
 
-    //객체 생성을 위한 팩토리 메서드
-    public static Server create(String serverName, boolean isPrivate, Long serverLevel, List<UUID> members){
+    public Server(String serverName, boolean isPrivate,Long serverLevel, List<UUID> members) {
         validateServerName(serverName);
         validateServerLevel(serverLevel);
         validateMembersNumber(members);
-        return new Server(serverName, isPrivate, serverLevel,members);
-
-    }
-
-    private Server(String serverName, boolean isPrivate,Long serverLevel, List<UUID> members) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.serverName=serverName;

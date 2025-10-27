@@ -28,17 +28,13 @@ public class User implements Serializable {
     private String phoneNumber;
 
 
-    public static User create(String email, String password, String username, String phoneNumber) {
+
+    //가독성과 유지보수의 편의성을 위해서 private 메서드임에도 생성자와 검증 메서드는 위로 올렸음
+    public User(String email, String password, String username, String phoneNumber) {
         validateEmail(email);
         validatePassword(password);
         validateUsername(username);
         validatePhoneNumber(phoneNumber);
-        return new User(email, password, username, phoneNumber);
-    }
-
-
-    //가독성과 유지보수의 편의성을 위해서 private 메서드임에도 생성자와 검증 메서드는 위로 올렸음
-    private User(String email, String password, String username, String phoneNumber) {
         this.id = UUID.randomUUID();
         this.createdAt =Instant.now();
         this.updatedAt = Instant.now();

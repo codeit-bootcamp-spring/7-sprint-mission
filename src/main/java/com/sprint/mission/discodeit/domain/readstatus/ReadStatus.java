@@ -19,21 +19,20 @@ public class ReadStatus implements Serializable {
     private final Instant createdAt;
     private Instant lastReadAt;
 
-    public static ReadStatus create(UUID userId, UUID serverId){
-        return new ReadStatus(serverId,userId);
-    }
-    // 읽은 시간 갱신하는 메서드
-    public void markAsRead(Instant lastReadAt){
-        this.lastReadAt=lastReadAt;
-    }
-
-    private ReadStatus(UUID serverId, UUID userId) {
+    public ReadStatus(UUID serverId, UUID userId) {
         this.id=UUID.randomUUID();
         this.serverId = serverId;
         this.userId = userId;
         this.createdAt=Instant.now();
         this.lastReadAt=Instant.now();
     }
+
+    // 읽은 시간 갱신하는 메서드
+    public void markAsRead(Instant lastReadAt){
+        this.lastReadAt=lastReadAt;
+    }
+
+
 
     public long minutesSinceLastRead(Instant now) {
         return Duration.between(lastReadAt, now).toMinutes();

@@ -16,12 +16,8 @@ public class FriendShip implements Serializable {
     private final UUID userAId;
     private final UUID userBId;
 
-    public static FriendShip create(UUID userAId, UUID userBId){
 
-        return new FriendShip(userAId, userBId);
-    }
-
-    private FriendShip(UUID userAId, UUID userBId) {
+    public FriendShip(UUID userAId, UUID userBId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
