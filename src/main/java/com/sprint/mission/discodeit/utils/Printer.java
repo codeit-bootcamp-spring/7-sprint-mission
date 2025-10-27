@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,16 +23,20 @@ public class Printer {
     }
 
     public static void printChatHistory(UserService userService, User user, List<Message> msgs) {
-        long unixTime;
+        Instant unixTime;
         String KST, date = null, time;
+
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("Asia/Seoul"));
 
         for(Message msg : msgs){
             unixTime = msg.getCreatedAt();
-            KST = TimeConvert.time(unixTime);
+
+            KST = formatter.format(unixTime);
             time = KST.split(" ")[1]; // 시간만 저장
 
             if(!KST.split(" ")[0].equals(date)){ //날짜가 다르다면
-                KST = TimeConvert.time(unixTime);
                 date = KST.split(" ")[0]; // 날짜만 저장
                 System.out.printf("====================%s====================\n", date);
             }
@@ -46,8 +53,11 @@ public class Printer {
         Optional.ofNullable(messageService.getLastestMessage(user1, user2))
                 .ifPresentOrElse(
                         message -> {
-                            long unixTime = message.getCreatedAt();
-                            String KST = TimeConvert.time(unixTime);
+                            DateTimeFormatter formatter = DateTimeFormatter
+                                    .ofPattern("yyyy-MM-dd HH:mm:ss")
+                                    .withZone(ZoneId.of("Asia/Seoul"));
+
+                            String KST = formatter.format(message.getCreatedAt());
                             String time = KST.split(" ")[1];
                             System.out.printf("%s: %s(%s)\n", user2.getNickName(), message.getContent(), time);
                         },
