@@ -66,39 +66,20 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public <T>void updateReadStatus(ReadStatusUpdateRequestDto<T> readStatusUpdateRequestDto) {
 
-//        Channel channel = channelRepository.getChannelById(updateChannelRequestDto.getId()).
-//                orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
-//
-//        Channel.channelElement channelElement = updateChannelRequestDto.getType();
-//
-//        BiConsumer<Channel ,T> biConsumer = (BiConsumer<Channel, T>) channelElement.setter;
-//        biConsumer.accept(channel,updateChannelRequestDto.getUpdatedValue());
-//        channel.updateEntity();
-//        channelRepository.updateChannel(channel);
-
         ReadStatus readStatus = readStatusRepository.readReadStatus(readStatusUpdateRequestDto.getReadStatusId()).orElseThrow(()->new IllegalArgumentException("존재하지 않는 readStatus 입니다."));
         Channel channel = channelRepository.getChannelById(readStatus.getChannelId()).orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
-//        if(!channel.isPublic() && readStatusUpdateRequestDto.getType() == ReadStatusElement.CHANNEL_ID){
-//            throw new IllegalArgumentException("Private Channel은 수정할 수 없습니다");
-//
-//        }
         ReadStatusElement readStatusElement = readStatusUpdateRequestDto.getType();
         BiConsumer<ReadStatus ,T> biConsumer = (BiConsumer<ReadStatus, T>) readStatusElement.setter;
         biConsumer.accept(readStatus, readStatusUpdateRequestDto.getUpdateValue());
         readStatus.updateEntity();
         readStatusRepository.updateReadStatus(readStatus);
     }
-
     @Override
     public ReadStatus readReadStatus(UUID readStatusID) {
         return readStatusRepository.readReadStatus(readStatusID).orElseThrow(()->new IllegalArgumentException("존재하지 않는 readStatus 입니다.")) ;
-
     }
-
     @Override
     public List<ReadStatus> findAllyByUserId(UUID userID) {
         return readStatusRepository.readAllReadStatus().stream().filter(x->x.getUserId().equals(userID)).toList();
     }
-
-
 }

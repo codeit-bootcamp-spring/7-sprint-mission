@@ -231,7 +231,5 @@ public class BasicChannelService implements ChannelService {
                         && x.getChannelId().equals(tempChannel.getId()))
                 .findFirst().orElseThrow().getId());
 
-
-
     }
 }

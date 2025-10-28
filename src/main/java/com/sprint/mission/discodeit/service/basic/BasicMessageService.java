@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -35,7 +36,6 @@ public class BasicMessageService implements MessageService {
     public Message createMessage(MessageCreateRequestDto messageCreateRequestDto){
         //todo channel id 랑 sender id 관련 안전성 확인, 일단 지금은 안함
         List<Channel> channelList = channelRepository.getAllChannel();
-
         Message message = messageRepository.saveMessage(Message.builder()
                 .content(messageCreateRequestDto.getContent())
                 .channelId(messageCreateRequestDto.getChannelId())
@@ -54,6 +54,7 @@ public class BasicMessageService implements MessageService {
                 )
                 .build());
         Channel channel2 = channelRepository.getChannelById(message.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
+        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(message.getSenderId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
         channel2.getMessageIdList().add(message.getId());
         channelRepository.updateChannel(channel2);
         return message;
@@ -90,7 +91,6 @@ public class BasicMessageService implements MessageService {
     @Override
     public List<Message> findallByChannelId(UUID channelId) {
         Channel targetChannel = channelRepository.getChannelById(channelId).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
-
         List<Message> messageList = messageRepository.getAllMessage();
         return messageList.stream().filter(x -> x.getChannelId().equals(channelId)).toList();
     }

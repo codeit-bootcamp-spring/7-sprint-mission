@@ -109,7 +109,9 @@ public class BasicUserService implements UserService {
             binaryContentRepository.deleteBinaryContent(userId);
         }
         UserStatus targetUserStatus = userStatusList.stream().filter(x -> x.getUserId().equals(userId)).findFirst().orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+
         userStatusRepository.deleteUserStatus(targetUserStatus.getId());
+
         channelList.stream().filter(x ->
                         x.getJoinUserList()
                                 .removeIf(y -> y.equals(userId))

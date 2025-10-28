@@ -66,12 +66,9 @@ class BasicUserStatusServiceTest {
         //given
         var user = userRepository.saveUser(User.builder().userName("testUser").name("테스트 유저").email("").password("").build());
         var userStatus = basicUserStatusService.createUserStatus(new UserStatusCreateRequestDto(user.getId(), Instant.now()));
-
         //when & then
         assertThrows(IllegalArgumentException.class, () -> basicUserStatusService.createUserStatus(new UserStatusCreateRequestDto(user.getId(), Instant.now())));
-
     }
-
     @Test
     @DisplayName("[에러 케이스] - 존재하지 않는 유저 생성 에러")
     void createNotExistUserError(){

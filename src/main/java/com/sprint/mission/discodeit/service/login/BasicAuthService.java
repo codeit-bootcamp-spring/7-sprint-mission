@@ -24,6 +24,4 @@ public class BasicAuthService implements AuthService {
         User existUser = optionalUser.orElseThrow(IllegalArgumentException::new);
         return LoginResponseDto.of(existUser);
     }
-
-
 }
