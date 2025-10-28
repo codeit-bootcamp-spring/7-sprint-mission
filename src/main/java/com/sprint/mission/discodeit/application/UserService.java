@@ -16,22 +16,6 @@ import java.util.List;
 //우선은 가이드를 조금 따라보는 걸로..
 public interface UserService{
 
-//    void save(User userDto);
-//
-//    void remove(User userDto);
-//
-//    User findById(UUID id);
-//
-//    List<User> findAll();
-//
-//    User findByEmail(String email);
-//
-//    FriendRequest sendFriendRequest(User sender,User target);
-//    List<FriendRequest> getSentFriendRequests(User user);
-//    List<FriendRequest> getReceivedFriendRequests(User user);
-//    void acceptFriendRequest(User user, FriendRequest request);
-//    void register(User user);
-
     //고도화
     UserResponseDto createUser(UserCreateRequestDto requestDto) throws IOException;
 

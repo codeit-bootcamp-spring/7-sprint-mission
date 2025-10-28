@@ -2,29 +2,26 @@ package com.sprint.mission.discodeit.application;
 
 
 
+import com.sprint.mission.discodeit.application.dto.ChannelDtoMapper;
 import com.sprint.mission.discodeit.domain.channel.ChannelRepository;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.application.dto.request.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.ChannelRequestDto;
 import com.sprint.mission.discodeit.application.dto.response.ChannelResponseDto;
 
-import com.sprint.mission.discodeit.domain.server.ServerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.sprint.mission.discodeit.application.dto.ChannelDtoMapper.channelToResponseDto;
 
-//dto의 변환로직을 모아주는 Mapper클래스는 만드는 것도 방법 같다
 
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
-
-
-
 
     @Override
     public ChannelResponseDto createChannel(ChannelCreateRequestDto requestDto) {
@@ -39,7 +36,7 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findAll()
                 .stream()
                 .filter(c-> c.getServerId().equals(serverId))
-                .map(this::channelToResponseDto)
+                .map(ChannelDtoMapper::channelToResponseDto)
                 .toList();
 
     }
@@ -74,9 +71,4 @@ public class BasicChannelService implements ChannelService {
 
         return channelToResponseDto(channel);
     }
-
-    private ChannelResponseDto channelToResponseDto(Channel channel){
-        return new ChannelResponseDto(channel.getChannelName(), channel.getServerId(),channel.getHistory(),channel.getId());
-    }
-
 }

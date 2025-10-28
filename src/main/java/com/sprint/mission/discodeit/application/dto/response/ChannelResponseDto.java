@@ -6,7 +6,6 @@ import java.util.UUID;
 public record ChannelResponseDto(
         String channelName,
         UUID serverId,
-        List<UUID> history,
         UUID channelId
 ) {
 }

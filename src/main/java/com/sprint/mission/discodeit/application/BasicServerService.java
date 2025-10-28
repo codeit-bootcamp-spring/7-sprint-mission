@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.application;
 
-
-import com.sprint.mission.discodeit.domain.readstatus.ReadStatusRepository;
-import com.sprint.mission.discodeit.domain.channel.ReadStatus;
+import com.sprint.mission.discodeit.application.dto.ServerDtoMapper;
 import com.sprint.mission.discodeit.domain.server.ServerRepository;
 import com.sprint.mission.discodeit.domain.server.Server;
 import com.sprint.mission.discodeit.application.dto.request.ServerCreateRequestDto;
@@ -14,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.sprint.mission.discodeit.application.dto.ServerDtoMapper.*;
 import static java.util.Comparator.*;
 
 @Service
@@ -22,7 +21,6 @@ public class BasicServerService implements ServerService {
 
 
     private final ServerRepository serverRepository;
-    private final ReadStatusRepository readStatusRepository;
 
 
 
@@ -46,17 +44,12 @@ public class BasicServerService implements ServerService {
                 requestDto.serverLevel(),
                 requestDto.members());
         serverRepository.save(server);
-        requestDto.members().stream()
-                .map(id -> new ReadStatus(id, server.getId()))
-                .toList()
-                .forEach(rs->readStatusRepository.save(rs));
 
     }
 
     @Override
     public ServerReadStatusDto findRecentReadStatus(ServerRequestDto requestDto) {
         Server server = findById(requestDto.serverId());
-        ServerReadStatusDto serverReadStatusDto = serverToRecentDto(server);
 
         return null;
     }
@@ -93,33 +86,10 @@ public class BasicServerService implements ServerService {
     @Override
     public void deleteServer(ServerRequestDto requestDto) {
         serverRepository.remove(findById(requestDto.serverId()));
-        readStatusRepository.findAll().stream()
-                .filter(rs -> rs.getServerId().equals(requestDto.serverId()))
-                .forEach(rs->readStatusRepository.remove(rs));
     }
 
-    private ServerReadStatusDto serverToRecentDto(Server server){
 
-        //가장 최근 메세지 읽은 시간와 서버 멤버 +읽은 멤버
-        UUID serverId = server.getId();
-        ReadStatus readStatus = readStatusRepository.findAll().stream()
-                .filter(rs -> rs.getServerId().equals(serverId))
-                .max(comparing(ReadStatus::getLastReadAt)).orElseThrow(()-> new NoSuchElementException());
 
-        if (server.isPrivate()){
-            return new ServerReadStatusDto(readStatus.getLastReadAt(), server.getMembers(),readStatus.getUserId());
-        }
-
-        //public일 경우 가장 최근 메세지 읽은 시간와 서버 멤버
-        return new ServerReadStatusDto(readStatus.getLastReadAt(),server.getMembers(),null);
-
-    }
-
-    private ServerResponseDto serverToResponseDto(Server server){
-        return new ServerResponseDto(server.getServerName(),
-                server.getServerLevel(),
-                server.isPrivate());
-    }
 
 
 

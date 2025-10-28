@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.application;
 
 
 import com.sprint.mission.discodeit.application.common.FileManager;
+import com.sprint.mission.discodeit.application.dto.UserDtoMapper;
 import com.sprint.mission.discodeit.application.dto.request.UserCreateRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.UserRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.UserUpdateDto;
@@ -9,7 +10,6 @@ import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.user.UserRepository;
 import com.sprint.mission.discodeit.domain.user.exception.DuplicateUserException;
-import com.sprint.mission.discodeit.domain.user.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
+import static com.sprint.mission.discodeit.application.dto.UserDtoMapper.userToResponseDto;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +58,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<UserResponseDto> getAllUsers() {
-        return userRepository.findAll().stream().map(this::userToResponseDto).toList();
+        return userRepository.findAll().stream().map(UserDtoMapper::userToResponseDto).toList();
     }
 
     @Override
@@ -100,13 +102,6 @@ public class BasicUserService implements UserService {
     }
 
 
-    private void validateNotDuplicateUser(String email) {
-        userRepository.findByEmail(email).ifPresent(u -> {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
-        });
-    }
-
-
     private void validateDuplicateUsername(String username) {
         userRepository.findByUsername(username).ifPresent(u -> {
             throw new DuplicateUserException("이미 존재하는 사용자 이름입니다.");
@@ -119,7 +114,5 @@ public class BasicUserService implements UserService {
         });
     }
 
-    private UserResponseDto userToResponseDto(User user) {
-        return new UserResponseDto(user.getEmail(), user.getUsername(), user.getPhoneNumber());
-    }
+
 }

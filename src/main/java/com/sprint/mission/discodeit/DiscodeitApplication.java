@@ -11,7 +11,7 @@ public class DiscodeitApplication {
         //메서드 안에서는 접근자 세팅 불가능
         //어차피 {}안에서만 유효하니까.
 
-        DiContainer diContainer = new DiContainer();
+//        DiContainer diContainer = new DiContainer();
 
 //        UserService userService = diContainer.getUserService();
 //        MessageRoomService messageRoomService= diContainer.getMessageRoomService();

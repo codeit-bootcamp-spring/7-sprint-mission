@@ -21,7 +21,6 @@ public class Channel implements Serializable {
     private String channelName;
 
     private List<ChannelMember> members = new ArrayList<>();
-
     private final List<Message> history = new ArrayList<>();
 
     public Channel(String channelName,UUID serverId) {

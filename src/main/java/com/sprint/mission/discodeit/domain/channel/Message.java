@@ -16,6 +16,6 @@ public class Message implements Serializable {
     private final String content;
     private final BinaryContent binaryContentId;
     private final Instant createdAt;
-
+    private final Instant updatedAt;
 
 }
