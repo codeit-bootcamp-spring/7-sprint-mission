@@ -1,18 +1,17 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.config.AppConfig;
-import com.sprint.mission.discodeit.dto.request.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.request.UpdatePasswordRequestDto;
-import com.sprint.mission.discodeit.dto.request.UpdateType;
-import com.sprint.mission.discodeit.dto.request.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.dto.request.*;
 import com.sprint.mission.discodeit.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
 import com.sprint.mission.discodeit.repository.jcf.*;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicAuthService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
@@ -27,6 +26,7 @@ public class DiscodeitTest {
     private final UserService userService;
     private final ChannelService channelService;
     private final MessageService messageService;
+    private final AuthService authService;
 
     private static Scanner sc = new Scanner(System.in);
     private UserResponseDto loginUser;
@@ -37,6 +37,7 @@ public class DiscodeitTest {
         userService = new BasicUserService(userRepository, messageRepository, userStatusRepository, binaryContentRepository);
         channelService = new BasicChannelService(channelRepository);
         messageService = new BasicMessageService(messageRepository);
+        authService = new BasicAuthService(userRepository, userStatusRepository);
 
         //테스트를 위한 유저, 채널, 메시지 데이터 생성
         //File I/O 서비스 사용시 파일이 없다면 생성
@@ -155,7 +156,7 @@ public class DiscodeitTest {
         String password = sc.nextLine();
 
         try {
-            loginUser = userService.login(userId, password);
+            loginUser = authService.login(new LoginUserDto(userId, password));
             login = true;
             userMenu();
         } catch (IllegalArgumentException e) { // 잘못된 아이디 또는 비밀번호 입력시 발생

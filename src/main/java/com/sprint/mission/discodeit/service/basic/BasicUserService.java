@@ -112,17 +112,6 @@ public class BasicUserService implements UserService{
     }
 
     @Override
-    public UserResponseDto login(String userId, String password) {
-        User user = userRepository.findByUserId(userId)
-                .filter(u -> u.getPassword().equals(password))
-                .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호를 잘못 입력하셨습니다."));
-
-        userStatusRepository.updateLoginTime(user.getId());
-
-        return UserResponseDto.from(user, true);
-    }
-
-    @Override
     public String getUserNickName(UUID id) {
         return userRepository.findById(id).getNickName();
     }

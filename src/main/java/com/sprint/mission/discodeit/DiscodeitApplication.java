@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -15,9 +16,10 @@ public class DiscodeitApplication {
         UserService userService = context.getBean(UserService.class);
         ChannelService channelService = context.getBean(ChannelService.class);
         MessageService messageService = context.getBean(MessageService.class);
+        AuthService authService = context.getBean(AuthService.class);
 
         //요구사항을 이용한 간단한 프로그램 실행
-        DiscodeitSpringTest discodeitSpringTest = new DiscodeitSpringTest(userService, channelService, messageService);
+        DiscodeitSpringTest discodeitSpringTest = new DiscodeitSpringTest(userService, channelService, messageService, authService);
         discodeitSpringTest.run();
 
         // ===========================================

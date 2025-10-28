@@ -43,14 +43,6 @@ public interface UserService {
     List<UserResponseDto> getAllUsers();
 
     /**
-     * 로그인
-     * @param userId 사용자ID
-     * @param password 비밀번호
-     * @return 로그인 성공 시 User, 실패 시 null
-     */
-    UserResponseDto login(String userId, String password);
-
-    /**
      * UUID로 사용자 닉네임 조회
      */
     String getUserNickName(UUID id);
