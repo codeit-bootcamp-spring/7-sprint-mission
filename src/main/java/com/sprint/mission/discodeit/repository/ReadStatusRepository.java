@@ -11,11 +11,13 @@ public interface ReadStatusRepository {
     Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
 
     //저장또는 수정
-    ReadStatus save(ReadStatus status);
+  //  ReadStatus save(ReadStatus status);
 
     /** 한 유저의 모든 채널 읽음 상태 보기 */
     List<ReadStatus> findAllByUserId(UUID userId);
 
     /** 필요 시 정리/삭제 */
     void deleteById(UUID id);
+
+    void save(UUID bose, UUID id);
 }

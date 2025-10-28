@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@AllArgsConstructor
 public class ReadStatus extends Common {
 
   private  UUID userId;

@@ -13,7 +13,7 @@ public class Message extends Common implements Serializable {
 
     private UUID authorId;
     private UUID channelId;
-    private Long time;
+    private Instant time;
     private String content;
 
     public Message() {
@@ -23,7 +23,7 @@ public class Message extends Common implements Serializable {
     public  Message(String content,UUID channelId,UUID authorId ){
         this.authorId = authorId;
         this.channelId = channelId;
-        this.time = System.currentTimeMillis();
+        this.time = Instant.now();
         this.content = content;
     }
 
@@ -43,11 +43,11 @@ public class Message extends Common implements Serializable {
         this.channelId = receiver;
     }
 
-    public long getTime() {
+    public Instant getTime() {
         return time;
     }
 
-    public void setTime(long time) {
+    public void setTime(Instant time) {
         this.time = time;
     }
 

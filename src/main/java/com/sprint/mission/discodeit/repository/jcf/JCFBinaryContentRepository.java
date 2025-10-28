@@ -32,12 +32,12 @@ public class JCFBinaryContentRepository implements BinaryRepository {
     }
 
     @Override
-    public Optional<BinaryContent> findByUuid(UUID contentId) {
+    public Optional<BinaryContent> findByUuid(UUID contentId,ContentsType contentsType) {
         return Optional.ofNullable(this.data.get(contentId));
     }
 
     @Override
-    public void deleteByUserId(UUID contentId, ContentsType contentsType) {
+    public void deleteByUuid(UUID contentId, ContentsType contentsType) {
          data.remove(contentId);
     }
 }

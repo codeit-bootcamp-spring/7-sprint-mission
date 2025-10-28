@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.function.Consumer;
-@Repository
+@Repository("JCFCannel")
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data;
 
