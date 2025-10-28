@@ -1,26 +1,32 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.UUID;
 
+@Getter
 public class User extends BasicEntity {
 
     private String username; // 유저 이름
     private String nickName; // 유저 닉네임
+    private String email; // 이메일
+    private String password; // 유저 비밀번호
+    private UUID profileId;
 
 
-    public User(String username, String nickName) {
+    public User(String username, String nickName, String email, String password) {
         super();
         this.username = username;
         this.nickName = nickName;
+        this.email = email;
+        this.password = password;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-
-    public String getNickName() {
-        return nickName;
+    public void setProfileId(UUID profileId) {
+        this.profileId = profileId;
+        update();
     }
 
     public void setUsername(String username) {
@@ -28,17 +34,15 @@ public class User extends BasicEntity {
         update();
     }
 
-    public void setNickName(String nickName){
+    public void setNickName(String nickName) {
         this.nickName = nickName;
         update();
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", nickName='" + nickName + '\'' +
-                ", id='" + getId() + '\'' +
-                '}';
+    public void setEmail(String email) {
+        this.email = email;
+        update();
     }
+
+
 }
