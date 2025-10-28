@@ -15,7 +15,7 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
-    //update Nickname
+    //update Nickname, password
     public User update(String nickname, String password) {
         super.update();
         this.nickname = nickname;
