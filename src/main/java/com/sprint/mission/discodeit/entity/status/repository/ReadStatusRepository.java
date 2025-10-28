@@ -1,12 +1,10 @@
-package com.sprint.mission.discodeit.entity.status;
+package com.sprint.mission.discodeit.entity.status.repository;
 
 import com.sprint.mission.discodeit.repository.BaseRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface ReadStatusRepository extends BaseRepository<ReadStatus> {
     // 유저가 채널에서 얼마나 읽었는지 확인
     Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);

@@ -51,7 +51,7 @@
 //
 //        System.out.println("===========================");
 //        System.out.println(channel.channelName());
-//        messageService.findChannelMessage(channelId).forEach(System.out::println);
+//        messageService.findAllByChannelId(channelId).forEach(System.out::println);
 //        System.out.println("===========================");
 //
 //        // --- 메시지 수정 ---
@@ -60,7 +60,7 @@
 //        messageService.updateMessage(cmId, "반갑습니다!!!!");
 //        System.out.println("=========수정 후 출력=========");
 //        System.out.println(channel.channelName());
-//        messageService.findChannelMessage(channelId).forEach(System.out::println);
+//        messageService.findAllByChannelId(channelId).forEach(System.out::println);
 //        System.out.println("===========================");
 //
 //        // --- 메시지 삭제 ---
@@ -70,7 +70,7 @@
 //
 //        System.out.println("===========================");
 //        System.out.println(channel.channelName());
-//        messageService.findChannelMessage(channelId).forEach(System.out::println);
+//        messageService.findAllByChannelId(channelId).forEach(System.out::println);
 //        System.out.println("===========================");
 //
 //        System.out.println("\n종료");

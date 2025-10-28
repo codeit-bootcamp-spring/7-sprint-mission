@@ -5,17 +5,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Builder
-@AllArgsConstructor
 public class ChannelMessageCreateRequestDto {
 
     @NonNull
-    private UUID authorId;
+    private final UUID authorId;
     @NonNull
-    private UUID channelId;
+    private final UUID channelId;
     private String content;
+
+    private final List<AttachmentDto> files;
 
 }

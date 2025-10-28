@@ -5,16 +5,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Builder
-@AllArgsConstructor
 public class DirectMessageCreateRequestDto {
     @NonNull
-    private UUID authorId;
+    private final UUID authorId;
     @NonNull
-    private UUID receiverId;
+    private final UUID receiverId;
     private String content;
 
+    private List<AttachmentDto> files;
 }

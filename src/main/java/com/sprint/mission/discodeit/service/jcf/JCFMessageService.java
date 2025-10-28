@@ -70,7 +70,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageInfoDto> findChannelMessage(UUID channelId) {
+    public List<MessageInfoDto> findAllByChannelId(UUID channelId) {
         return data.values().stream()
                 .filter(m -> m.getType() == MessageType.CHANNEL)
                 .filter(m -> m.getChannel().getId().equals(channelId))

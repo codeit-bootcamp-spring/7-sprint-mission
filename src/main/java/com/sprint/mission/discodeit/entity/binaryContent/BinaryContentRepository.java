@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface BinaryContentRepository {
 
     BinaryContent save(BinaryContent b);
@@ -23,8 +22,12 @@ public interface BinaryContentRepository {
     // 유저의 프로필 이미지 확인 (채널Id가 null이어야함)
     Optional<BinaryContent> findProfileImageByUserId(UUID userId);
 
-    // 서비스에서 채널을 받아 UUID만 가져와서 binary만 뽑기 -> 한 채널의 모든 이미지, 파일 검색
-    List<BinaryContent> findAllByMessageId(List<UUID> messageIds);
+    // 하나의 메시지에 있는 모든 첨부파일
+    List<BinaryContent> findAllByMessageId(UUID messageId);
 
+    // 하나의 메시지에 있는 모든 첨부파일 삭제
+    void deleteAllByMessageId(UUID messageId);
+
+    // 유저 프로필 이미지 삭제
     void deleteProfileImageByUserId(UUID userId);
 }

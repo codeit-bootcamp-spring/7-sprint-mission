@@ -109,7 +109,7 @@ public class JavaApplication {
                         .build()
                 );
 
-        List<MessageInfoDto> channelMessages = messageService.findChannelMessage(noticeChannelId);
+        List<MessageInfoDto> channelMessages = messageService.findAllByChannelId(noticeChannelId);
         System.out.println("\n[공지사항 채널 대화 내용]");
         channelMessages.forEach(System.out::println);
         List<MessageInfoDto> directMessages = messageService.findMessageBetweenUsers(adminId, userId);
@@ -136,7 +136,7 @@ public class JavaApplication {
         // --- 6. 최종 상태 확인 ---
         System.out.println("\n--- 최종 데이터 상태 확인 ---");
         System.out.println("[삭제 후 공지사항 채널 대화 내용]");
-        List<MessageInfoDto> finalMessages = messageService.findChannelMessage(noticeChannelId);
+        List<MessageInfoDto> finalMessages = messageService.findAllByChannelId(noticeChannelId);
         finalMessages.forEach(System.out::println);
 
         System.out.println(" 테스트가 종료되었습니다.");

@@ -10,8 +10,8 @@ import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserNameUpdate
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPasswordUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPhoneNumUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserStateUpdateDto;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
-import com.sprint.mission.discodeit.entity.status.UserStatusRepository;
+import com.sprint.mission.discodeit.entity.status.repository.UserStatus;
+import com.sprint.mission.discodeit.entity.status.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
