@@ -41,4 +41,9 @@ public interface UserRepository {
 
     /** ID(UUID)로 유저 존재 여부 확인*/
     boolean isExist(UUID id);
+
+    void existsByNickName(String NickName);
+
+    void existsByEmail(String email);
+
 }

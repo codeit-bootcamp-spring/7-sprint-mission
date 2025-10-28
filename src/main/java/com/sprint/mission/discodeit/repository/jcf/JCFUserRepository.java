@@ -19,9 +19,7 @@ public class JCFUserRepository implements UserRepository {
 
     private static JCFUserRepository instance = new JCFUserRepository();
 
-    public static JCFUserRepository getInstance() {
-        return instance;
-    }
+    public static JCFUserRepository getInstance() { return instance; }
 
     @Override
     public void save(User user) {
@@ -87,5 +85,19 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public boolean isExist(UUID id) {
         return userStore.containsKey(id);
+    }
+
+    @Override
+    public void existsByNickName(String NickName) {
+        if(findAll().stream().anyMatch(u -> u.getNickName().equals(NickName))){
+            throw new IllegalArgumentException("이미 사용 중인 nickname입니다.");
+        }
+    }
+
+    @Override
+    public void existsByEmail(String email) {
+        if(findAll().stream().anyMatch(u -> u.getEmail().equals(email))){
+            throw new IllegalArgumentException("이미 사용 중인 email입니다.");
+        }
     }
 }

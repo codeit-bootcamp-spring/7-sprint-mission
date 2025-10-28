@@ -77,27 +77,27 @@ public class FileChannelRepository implements ChannelRepository {
     // key : user uuid
     // value : 유저가 속한 channel uuid 목록
     @Override
-    public void addChannelIdForUser(UUID channelId, User user) {
+    public void addChannelIdForUser(UUID channelId, UUID userId) {
         Set<UUID> channelIds;
 
-        if (joinedChannels.containsKey(user.getId())) {
-            channelIds = joinedChannels.get(user.getId());
+        if (joinedChannels.containsKey(userId)) {
+            channelIds = joinedChannels.get(userId);
         } else {
             channelIds = new HashSet<>();
         }
 
         channelIds.add(channelId);
-        joinedChannels.put(user.getId(), channelIds); // 채널 추가 후 저장
+        joinedChannels.put(userId, channelIds); // 채널 추가 후 저장
     }
 
     // 채널에서 유저가 나가거나 채널이 삭제되면 joinedChannels 목록에서 삭제
     @Override
-    public void deleteChannelIdForUser(UUID channelId, User user) {
-        Set<UUID> channelIds = Optional.ofNullable(joinedChannels.get(user.getId()))
+    public void deleteChannelIdForUser(UUID channelId, UUID userId) {
+        Set<UUID> channelIds = Optional.ofNullable(joinedChannels.get(userId))
                 .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
         channelIds.remove(channelId);
-        joinedChannels.put(user.getId(), channelIds); // 채널 삭제 후 저장
+        joinedChannels.put(userId, channelIds); // 채널 삭제 후 저장
     }
 
     @Override
@@ -114,8 +114,8 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findByUser(User user) {
-        return joinedChannels.get(user.getId()).stream()
+    public List<Channel> findByUser(UUID userId) {
+        return joinedChannels.get(userId).stream()
                 .map(key -> channelStore.get(key))
                 .collect(Collectors.toList());
     }
@@ -141,9 +141,9 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void updateAdmin(UUID id, User admin) {
+    public void updateAdmin(UUID id, UUID adminId) {
         Channel channel = findById(id);
-        channel.setAdmin(admin);
+        channel.setAdmin(adminId);
         channelStore.put(id, channel);
         saveChannels();
     }
@@ -162,9 +162,9 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void deleteMember(Channel channel, User target){
-        deleteChannelIdForUser(channel.getId(), target); // 강퇴된 유저가 가진 채널 목록에서 채널 UUID 삭제
-        channel.delMember(target); // 채널에서 강퇴된 유저 삭제
+    public void deleteMember(Channel channel, UUID targetId){
+        deleteChannelIdForUser(channel.getId(), targetId); // 강퇴된 유저가 가진 채널 목록에서 채널 UUID 삭제
+        channel.delMember(targetId); // 채널에서 강퇴된 유저 삭제
         save(channel); // 변경된 채널 정보 저장
     }
 }

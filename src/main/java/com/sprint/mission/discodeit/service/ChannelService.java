@@ -16,12 +16,12 @@ public interface ChannelService {
     /**
      * 새로운 채널 생성
      */
-    Channel createChannel(ChannelType channelType, String channelName, User admin);
+    Channel createChannel(ChannelType channelType, String channelName, UUID adminId);
 
     /**
      * 채널에 멤버 추가
      */
-    void addMember(UUID id, User member);
+    void addMember(UUID id, UUID userId);
 
     /**
      * UUID로 채널 조회
@@ -31,7 +31,7 @@ public interface ChannelService {
     /**
      * 사용자가 속한 채널 조회
      */
-    List<Channel> getChannelByUser(User user);
+    List<Channel> getChannelByUser(UUID userId);
 
     /**
      * 채널 타입으로 조회
@@ -46,7 +46,7 @@ public interface ChannelService {
     /**
      * 채널 관리자 변경
      */
-    void updateAdmin(UUID id, User user);
+    void updateAdmin(UUID channelId, UUID userId);
 
     /**
      * 채널 이름 변경
@@ -56,17 +56,17 @@ public interface ChannelService {
     /**
      * 채널 삭제 (관리자 권한 필요)
      */
-    void deleteChannel(UUID id, User user);
+    void deleteChannel(UUID channelId, UUID userId);
 
     /**
      * 채널 멤버 삭제
      */
-    void deleteChannelMember(UUID id, User requester, User target);
+    void deleteChannelMember(UUID id, UUID requesterId, UUID targetId);
 
     /**
      * 유저가 채널에 속해있는지 확인
      */
-    boolean isUserJoinedChannel(User user, Channel channel);
+    boolean isUserJoinedChannel(UUID userId, Channel channel);
 
     /**
      * 채널 이름 중복 확인

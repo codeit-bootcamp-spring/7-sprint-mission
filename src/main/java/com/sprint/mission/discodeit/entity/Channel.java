@@ -4,20 +4,21 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class Channel extends BaseEntity{
     private String channelName;
     private final ChannelType channelType;
-    private User admin;
-    private List<User> members;
+    private UUID adminId;
+    private List<UUID> memberIds;
 
-    public Channel(ChannelType channelType, String channelName, User admin) {
+    public Channel(ChannelType channelType, String channelName, UUID adminId) {
         this.channelType = channelType;
         this.channelName = channelName;
-        this.admin = admin;
-        this.members = new ArrayList<>();
-        this.members.add(admin);
+        this.adminId = adminId;
+        this.memberIds = new ArrayList<>();
+        this.memberIds.add(adminId);
     }
 
     public void setChannelName(String channelName) {
@@ -25,23 +26,23 @@ public class Channel extends BaseEntity{
         this.channelName = channelName;
     }
 
-    public void setAdmin(User admin) {
+    public void setAdmin(UUID adminId) {
         this.setUpdatedAt();
-        this.admin = admin;
+        this.adminId = adminId;
     }
 
-    public List<User> getMembers() {
-        return new ArrayList<>(members);
+    public List<UUID> getMembers() {
+        return new ArrayList<>(memberIds);
     }
 
-    public void addMember(User user) {
+    public void addMember(UUID userId) {
         this.setUpdatedAt();
-        this.members.add(user);
+        this.memberIds.add(userId);
     }
 
-    public void delMember(User user){
+    public void delMember(UUID userId){
         this.setUpdatedAt();
-        this.members.remove(user);
+        this.memberIds.remove(userId);
     }
 
     @Override
@@ -51,8 +52,8 @@ public class Channel extends BaseEntity{
         return "Channel{" +
                 "channelName='" + channelName + '\'' +
                 ", channelType=" + channelType +
-                ", admin=" + admin.getUserName() +
-                ", members=" + members.stream().map(m -> m.getUserName()).toList() +
+                ", adminId=" + adminId +
+                ", memberIds=" + memberIds +
                 str +
                 '}';
     }

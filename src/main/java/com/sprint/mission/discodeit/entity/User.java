@@ -4,6 +4,8 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.vaildator.UserVaildator;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class User extends BaseEntity{
     private String userName;
@@ -12,6 +14,7 @@ public class User extends BaseEntity{
     private String phoneNum;
     private final String userId;
     private String password;
+    private UUID profileId;
 
     public User(String userName, String nickName, String email, String phoneNum, String userId, String password) {
         UserVaildator.vaildateNickname(nickName);
@@ -25,6 +28,11 @@ public class User extends BaseEntity{
         this.phoneNum = formatPhoneNum(phoneNum);
         this.userId = userId;
         this.password = password;
+    }
+
+    public User(String userName, String nickName, String email, String phoneNum, String userId, String password, UUID profileId) {
+        this(userName, nickName, email, phoneNum, userId, password);
+        this.profileId = profileId;
     }
 
     public void setUserName(String userName) {
@@ -54,6 +62,11 @@ public class User extends BaseEntity{
         UserVaildator.vaildatePassword(password);
         this.setUpdatedAt();
         this.password = password;
+    }
+
+    public void setProfileId(UUID profileId) {
+        this.setUpdatedAt();
+        this.profileId = profileId;
     }
 
     private String formatPhoneNum(String phoneNum){

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -31,15 +32,15 @@ public class BasicMessageService implements MessageService {
      * 새로운 메시지를 생성하여 Repository에 저장
      */
     @Override
-    public <T> void createMessage(User user, T receiver, String content) {
+    public void createMessage(UUID senderId, UUID receiverId, String content, ReceiveType receiverType) {
         Message newMessage;
 
         // 수신자가 User인 경우
-        if(receiver instanceof User user2){
-            newMessage = new Message(user.getId(), user2.getId(), Message.ReceiveType.USER, content);
+        if(receiverType == ReceiveType.USER){
+            newMessage = new Message(senderId, receiverId, receiverType, content);
         // 수신자가 Channel인 경우
-        } else if(receiver instanceof Channel channel){
-            newMessage = new Message(user.getId(), channel.getId(), Message.ReceiveType.CHANNEL, content);
+        } else if(receiverType == ReceiveType.CHANNEL){
+            newMessage = new Message(senderId, receiverId, receiverType, content);
         } else return; // 그 외의 타입은 무시
 
         messageRepository.save(newMessage);
@@ -49,7 +50,7 @@ public class BasicMessageService implements MessageService {
      * 특정 유저/채널과의 최신 메시지를 조회
      */
     @Override
-    public <T> Message getLastestMessage(User user, T receiver) {
+    public Message getLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType) {
         List<Message> allMessages = messageRepository.findAll();
 
         // 최신순(역순)으로 순회
@@ -59,16 +60,16 @@ public class BasicMessageService implements MessageService {
 
         // 최근 메시지는 Printer 클래스의 printChatLatest 메서드에서
         // Optional의 ifPresentOrElse를 통해 null을 저장할 경우 닉네임만 출력하기 때문에 null을 반환
-        if (receiver instanceof User user2) {
+        if (receiverType == ReceiveType.USER) {
             // 유저 간의 대화 중 가장 마지막 메시지
             return reversed.filter(m ->
-                            (user.getId().equals(m.getSenderId()) && user2.getId().equals(m.getReceiverId())) ||
-                                    (user2.getId().equals(m.getSenderId()) && user.getId().equals(m.getReceiverId())))
+                            (senderId.equals(m.getSenderId()) && receiverId.equals(m.getReceiverId())) ||
+                                    (receiverId.equals(m.getSenderId()) && senderId.equals(m.getReceiverId())))
                     .findFirst().orElse(null);
-        } else if (receiver instanceof Channel channel) {
+        } else if (receiverType == ReceiveType.CHANNEL) {
             // 특정 채널에 보낸 마지막 메시지
             return reversed.filter(m ->
-                            user.getId().equals(m.getSenderId()) && channel.getId().equals(m.getReceiverId()))
+                            senderId.equals(m.getSenderId()) && receiverId.equals(m.getReceiverId()))
                     .findFirst().orElse(null);
         } else {
             return null;
@@ -79,10 +80,10 @@ public class BasicMessageService implements MessageService {
      * 두 유저 간의 모든 메시지 목록 반환
      */
     @Override
-    public List<Message> getMessagesBetween(User user1, User user2) {
+    public List<Message> getMessagesBetween(UUID userId1, UUID userId2) {
         return messageRepository.findAll().stream()
-                .filter(m -> (user1.getId().equals(m.getSenderId()) && user2.getId().equals(m.getReceiverId())) ||
-                        (user2.getId().equals(m.getSenderId()) && user1.getId().equals(m.getReceiverId())))
+                .filter(m -> (userId1.equals(m.getSenderId()) && userId2.equals(m.getReceiverId())) ||
+                        (userId2.equals(m.getSenderId()) && userId1.equals(m.getReceiverId())))
                 .toList();
     }
 

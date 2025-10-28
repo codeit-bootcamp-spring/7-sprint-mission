@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -10,16 +11,7 @@ public class Message extends BaseEntity{
     private final UUID receiverId;
     private final ReceiveType receiveType;
     private String content;
-
-    public enum ReceiveType{
-        USER("유저"), CHANNEL("채널");
-
-        private final String desc;
-
-        ReceiveType(String desc) {
-            this.desc = desc;
-        }
-    }
+    private List<UUID> attachmentIds;
 
     public Message(UUID senderId, UUID receiverId, ReceiveType receiveType, String content) {
         this.senderId = senderId;

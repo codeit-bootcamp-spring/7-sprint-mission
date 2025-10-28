@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.Collection;
@@ -17,13 +18,13 @@ import java.util.UUID;
 public interface MessageService {
 
     /** 새로운 메시지를 생성 */
-    <T> void createMessage(User user, T receiver, String content);
+    void createMessage(UUID senderId, UUID receiverId, String content, ReceiveType type);
 
     /** 두 유저 또는 채널 간의 최신 메시지(가장 마지막 메시지)를 가져옴 */
-    <T> Message getLastestMessage(User user, T receiver);
+    Message getLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType);
 
     /** 두 유저 간의 전체 메시지 목록을 조회 */
-    List<Message> getMessagesBetween(User user1, User user2);
+    List<Message> getMessagesBetween(UUID userId1, UUID userId2);
 
     /** 특정 유저가 보낸 또는 받은 모든 메시지 조회 */
     List<Message> getAllMessagesByUser(User user);

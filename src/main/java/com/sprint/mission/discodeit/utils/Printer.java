@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.utils;
 
+import com.sprint.mission.discodeit.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -13,7 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class Printer {
-    public static void printInfo(User user){
+
+    public static void printInfo(UserResponseDto user){
         System.out.printf("%s님의 정보\n", user.getNickName());
         System.out.printf("이름: %s\n", user.getUserName());
         System.out.printf("닉네임: %s\n", user.getNickName());
@@ -22,7 +27,7 @@ public class Printer {
         System.out.printf("아이디: %s\n", user.getUserId());
     }
 
-    public static void printChatHistory(UserService userService, User user, List<Message> msgs) {
+    public static void printChatHistory(UserService userService, UserResponseDto user, List<Message> msgs) {
         Instant unixTime;
         String KST, date = null, time;
 
@@ -49,8 +54,8 @@ public class Printer {
         }
     }
 
-    public static void printChatLatest(MessageService messageService, User user1, User user2){
-        Optional.ofNullable(messageService.getLastestMessage(user1, user2))
+    public static void printChatLatest(MessageService messageService, UserResponseDto user1, UserResponseDto user2){
+        Optional.ofNullable(messageService.getLastestMessage(user1.getId(), user2.getId(), ReceiveType.USER))
                 .ifPresentOrElse(
                         message -> {
                             DateTimeFormatter formatter = DateTimeFormatter
@@ -66,8 +71,13 @@ public class Printer {
     }
 
     public static void printChannelMember(Channel channel){
+        UserRepository userRepository = FileUserRepository.getInstance();
+
         System.out.println("채널 멤버 조회");
-        List<User> channelMember = channel.getMembers();
+        List<User> channelMember = channel.getMembers().stream()
+                .map(id -> userRepository.findById(id))
+                .toList();
+
         for (int i = 0; i < channelMember.size(); i++) {
             System.out.printf("%d. %s\n", i + 1, channelMember.get(i).getNickName());
         }
