@@ -46,7 +46,7 @@ public class DiscodeitApplication {
 
 
         User user1 = userService.createUser(new UserCreateRequestDto("testUser", "testUser", "codeit.org", "1209"));
-        User user2 = userService.createUser(new UserCreateRequestDto("testUser2", "testUser2", "codeit.org", "1209"));
+        User user2 = userService.createUser(new UserCreateRequestDto("testUser2", "testUser2", "codeit.org2", "1209"));
         Channel channel1 = channelService.createPrivateChannel(new ChannelPrivateCreateRequestDto(new HashSet<>(List.of(user1.getId())), "testChannel", "testChannel", true ));
         Channel channel2 = channelService.createPrivateChannel(new ChannelPrivateCreateRequestDto(new HashSet<>(List.of(user2.getId())), "testChannel2", "testChannel2", true ));
 
@@ -71,7 +71,7 @@ public class DiscodeitApplication {
         /// 생성
         System.out.println("========================업데이트 함수 확인 구역=============================");
         userService.updateUser(userUpdateRequestDto1);
-        channelService.updateChannel(channelUpdateRequestDto1);
+       // channelService.updateChannel(channelUpdateRequestDto1);
         messageService.updateMessage(messageUpdateRequestDto1);
 
         System.out.println(userService.readUser(user1.getId()).getName());

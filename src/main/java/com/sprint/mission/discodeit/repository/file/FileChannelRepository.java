@@ -3,9 +3,12 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -23,10 +26,13 @@ import static com.sprint.mission.discodeit.service.util.StaticString.*;
 public class FileChannelRepository implements ChannelRepository {
 
 
-    private final String channelRepositoryDataPath = DATA_PATH +"channelRepository.ser";
-    private final File channelRepositoryFile = new File(channelRepositoryDataPath);
+    private final String channelRepositoryDataPath;
+    private final File channelRepositoryFile;
 
-    public FileChannelRepository() {
+    public FileChannelRepository(Environment env) {
+        channelRepositoryDataPath = env.getProperty("discodeit.repository.file-directory")+"channelRepository.ser";
+        System.out.println(channelRepositoryDataPath);
+        channelRepositoryFile = new File(channelRepositoryDataPath);
         repositoryCheck();
         resetChannelRepository();
     }
@@ -46,9 +52,6 @@ public class FileChannelRepository implements ChannelRepository {
 
         return getChannelById(channel.getId());
     }
-
-
-
 
     @Override
     public void deleteChannel(Channel channel) {
@@ -93,14 +96,7 @@ public class FileChannelRepository implements ChannelRepository {
                 e.printStackTrace();
             }
         }
-
-
-
     }
-
-
-
-
 
     @Override
     public void resetChannelRepository() {
@@ -114,7 +110,7 @@ public class FileChannelRepository implements ChannelRepository {
 
 
     private void saveAllChannel(Map<UUID,Channel>channelMap){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(channelRepositoryDataPath,false));){
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(channelRepositoryFile,false));){
             oos.writeObject(channelMap);
             oos.flush();
         }
@@ -128,7 +124,7 @@ public class FileChannelRepository implements ChannelRepository {
         if(!channelRepositoryFile.exists() || channelRepositoryFile.length() == 0) {
             return new HashMap<>();
         }
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(channelRepositoryDataPath));){
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(channelRepositoryFile));){
             return (Map<UUID, Channel>) ois.readObject();
         }
         catch (Exception e){

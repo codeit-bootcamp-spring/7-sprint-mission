@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.entityElement.UserElement;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
 import org.assertj.core.api.Assertions;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -57,6 +59,7 @@ class BasicUserServiceTest {
         channelRepository.resetChannelRepository();
         messageRepository.resetMessageRepository();
         userStatusRepository.resetRepository();
+        binaryContentRepository.resetBinaryContentRepository();
     }
 
     @Test
@@ -196,5 +199,26 @@ class BasicUserServiceTest {
         assertThat(actualResultUser.getJoinChannelList().contains(channel.getId())).as("유저의 채널 확인").isFalse();
         assertThat(actualResultChannel.getJoinUserList().contains(user.getId())).as("채널의 유저 확인").isFalse();
 
+    }
+
+    @Test
+    @DisplayName("[예외 케이스] - 유저 이름 이메일 중복 에러")
+    void user_name_email_duplicate_error(){
+        //given
+        var user1 = basicUserService.createUser(Instancio.create(UserCreateRequestDto.class));
+        //when & then
+        assertThrows(IllegalArgumentException.class,
+                ()->basicUserService.createUser(
+                        Instancio.of(UserCreateRequestDto.class)
+                                .set(field(UserCreateRequestDto::getEmail), user1.getEmail())
+                                .create()
+                ));
+        assertThatThrownBy(()->
+                basicUserService.createUser(
+                        Instancio.of(UserCreateRequestDto.class)
+                                .set(field(UserCreateRequestDto::getUserName), user1.getUserName())
+                                .create()
+                )
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 }

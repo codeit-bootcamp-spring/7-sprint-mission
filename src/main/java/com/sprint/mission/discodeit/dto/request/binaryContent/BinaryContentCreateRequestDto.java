@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.request.binaryContent;
 
-import com.sprint.mission.discodeit.entity.BinaryContentUsage;
+import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

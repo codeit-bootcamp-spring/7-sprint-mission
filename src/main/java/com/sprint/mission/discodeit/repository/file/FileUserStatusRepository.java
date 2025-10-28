@@ -4,9 +4,11 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.util.StaticString;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 
 import javax.swing.text.html.Option;
@@ -23,10 +25,14 @@ import static com.sprint.mission.discodeit.service.util.StaticString.*;
         matchIfMissing = true
 )
 public class FileUserStatusRepository implements UserStatusRepository {
-    private final String USER_STATUS_DATA_PATH = DATA_PATH+"userStatusRepository.ser";
-    private final File userStatusRepositoryFile = new File(USER_STATUS_DATA_PATH);
 
-    public FileUserStatusRepository() {
+
+    private final String USER_STATUS_DATA_PATH;
+    private final File userStatusRepositoryFile;
+
+    public FileUserStatusRepository(Environment env) {
+        USER_STATUS_DATA_PATH =env.getProperty("discodeit.repository.file-directory")+"userStatusRepository.ser";
+        userStatusRepositoryFile = new File(USER_STATUS_DATA_PATH);
         repositoryCheck();
         resetRepository();
     }
@@ -81,7 +87,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
         if(!userStatusRepositoryFile.exists() || userStatusRepositoryFile.length() == 0) {
             return new HashMap<>();
         }
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_STATUS_DATA_PATH))){
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(userStatusRepositoryFile))){
             return ( Map<UUID,UserStatus>) ois.readObject();
         }
         catch (Exception e){

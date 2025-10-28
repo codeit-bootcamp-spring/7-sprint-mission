@@ -4,9 +4,11 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -27,19 +29,19 @@ public class FileUserRepository implements UserRepository {
     public boolean isUserExit(UUID userId) {
         return loadAllUser().containsKey(userId);
     }
-
     @Override
     public void resetUserRepository() {
         saveAllUser(new HashMap<>());
-
-
     }
 
+    @Value("${discodeit.repository.file-directory}")
+    private final String USER_DATA_ROOT ;
+    private final File userRepositoryFile;
 
-    private final String USER_DATA_ROOT = DATA_PATH + "userRepository.ser";
-    private File userRepositoryFile = new File(USER_DATA_ROOT);
-
-    public FileUserRepository() {
+    public FileUserRepository(Environment env) {
+        USER_DATA_ROOT = env.getProperty("discodeit.repository.file-directory")+"userRepository.ser";
+        System.out.println("USER_DATA_ROOT = " + USER_DATA_ROOT);
+        userRepositoryFile = new File(USER_DATA_ROOT);
         repositoryFileCheck();
         resetUserRepository();
     }
@@ -113,7 +115,7 @@ public class FileUserRepository implements UserRepository {
 
 
     private void saveAllUser(Map<UUID,User>userList){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_DATA_ROOT));){
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(userRepositoryFile));){
             oos.writeObject(userList);
             oos.flush();
         }
@@ -125,7 +127,7 @@ public class FileUserRepository implements UserRepository {
         if(!userRepositoryFile.exists() || userRepositoryFile.length() == 0) {
             return new HashMap<>();
         }
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));){
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(userRepositoryFile));){
             return ( Map<UUID,User>) ois.readObject();
         }
         catch (Exception e){

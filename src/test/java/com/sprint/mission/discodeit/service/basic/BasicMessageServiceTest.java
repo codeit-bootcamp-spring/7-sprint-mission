@@ -5,11 +5,13 @@ import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entityElement.MessageElement;
 import com.sprint.mission.discodeit.repository.*;
 import org.assertj.core.api.Assertions;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +22,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -165,5 +169,17 @@ class BasicMessageServiceTest {
 
         //then
         assertThat(actualResult.size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("[예외 케이스] - 없는 채널 id로 조회")
+    void findallByChannelIdNotExistChannel(){
+        //given
+
+        var message = messageRepository.saveMessage(Instancio.of(Message.class).create());
+        var message2 = messageRepository.saveMessage(Instancio.of(Message.class).create());
+        //when & then
+        assertThatThrownBy(()->basicMessageService.findallByChannelId(UUID.randomUUID()))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

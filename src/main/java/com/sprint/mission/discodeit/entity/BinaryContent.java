@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.awt.*;
-import java.io.File;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;

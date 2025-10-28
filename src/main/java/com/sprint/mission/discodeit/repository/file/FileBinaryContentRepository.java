@@ -1,10 +1,17 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import ch.qos.logback.classic.pattern.PrefixCompositeConverter;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.util.StaticString;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 
+import javax.naming.Name;
 import java.io.*;
 import java.util.*;
 
@@ -17,12 +24,16 @@ import static com.sprint.mission.discodeit.service.util.StaticString.DATA_PATH;
         havingValue = "file",
         matchIfMissing = true
 )
+
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    private final String binaryContentRepositoryPath = DATA_PATH +"binaryContentRepository.ser";
-    private File binaryContentRepositoryFile = new File(binaryContentRepositoryPath);
 
-    public FileBinaryContentRepository() {
+    private final String binaryContentRepositoryPath;
+    private final File binaryContentRepositoryFile;
+
+    public FileBinaryContentRepository(Environment env){
+        binaryContentRepositoryPath = env.getProperty("discodeit.repository.file-directory")+"binaryContentRepository.ser";
+        binaryContentRepositoryFile = new File(binaryContentRepositoryPath);
         repositoryCheck();
         resetBinaryContentRepository();
     }
@@ -60,7 +71,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     private void saveAllBinaryContent(Map<UUID, BinaryContent> binaryContentMap){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(binaryContentRepositoryPath,false));){
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(binaryContentRepositoryFile,false));){
             oos.writeObject(binaryContentMap);
             oos.flush();
         }
@@ -74,7 +85,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         if(!binaryContentRepositoryFile.exists() || binaryContentRepositoryFile.length() == 0) {
             return new HashMap<>();
         }
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(binaryContentRepositoryPath));){
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(binaryContentRepositoryFile));){
             return (Map<UUID, BinaryContent>) ois.readObject();
         }
         catch (Exception e){

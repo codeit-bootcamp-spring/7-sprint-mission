@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entityElement.ChannelElement;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -11,10 +12,8 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AutoClose;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.instancio.Instancio;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class BasicChannelServiceTest {
@@ -79,7 +79,6 @@ class BasicChannelServiceTest {
         //given
         var user1 = userRepository.saveUser(User.builder().userName("testUser").name("테스트 유저").email("").password("").build());
         var dto = new ChannelPublicCreateRequestDto(new HashSet<>(List.of(user1.getId())), "테스트 채널", "테스트 채널 설명",false);
-
         //when
         var actualResultChannel = basicChannelService.createPublicChannel(dto);
         var actualResultReadStatus = readStatusRepository.readAllReadStatus();
@@ -88,7 +87,6 @@ class BasicChannelServiceTest {
         assertThat(basicChannelService.readChannel(actualResultChannel.getId())).isNotNull();
         assertThat(basicChannelService.readChannel(actualResultChannel.getId()).isPublic()).isTrue();
         assertThat(actualResultReadStatus.size()).isEqualTo(0);
-
     }
 
     @Test
@@ -114,11 +112,17 @@ class BasicChannelServiceTest {
     void findAllByUserId() {
         //given
         var user1 = userRepository.saveUser(User.builder().userName("testUser").name("테스트 유저").email("").password("").build());
+        var user2 = userRepository.saveUser(Instancio.create(User.class));
         var dto = new ChannelPublicCreateRequestDto(new HashSet<>(List.of(user1.getId())), "테스트 채널", "테스트 채널 설명",false);
         var dto2 = new ChannelPrivateCreateRequestDto(new HashSet<>(List.of(user1.getId())), "테스트 채널2", "테스트 채널 설명", false);
 
         basicChannelService.createPrivateChannel(dto2);
         basicChannelService.createPublicChannel(dto);
+        basicChannelService.createPrivateChannel(Instancio.of(ChannelPrivateCreateRequestDto.class)
+                .set(field(ChannelPrivateCreateRequestDto::getUserIdList)
+                        , new HashSet<>(List.of(user2.getId())))
+                .create()
+        );
 
         //when
         var actualResult = basicChannelService.findAllByUserId(user1.getId());
@@ -194,4 +198,21 @@ class BasicChannelServiceTest {
         //then
         assertThat(actualResult.getUserIdList().size()).isEqualTo(0);
     }
+
+    @RepeatedTest(value = 10, name = "{displayName} {currentRepetition}/{totalRepetitions}")
+    @DisplayName("[예외 케이스] - 프라이빗 채널 변경 ")
+    void update_private_channel_error() {
+        //given
+        var user1 = userRepository.saveUser(Instancio.create(User.class));
+        var channel = channelRepository.saveChannel(Instancio.of(Channel.class)
+                .set(field(Channel::isPublic),false)
+                .create()
+        );
+
+        //when & then
+        assertThatThrownBy(
+                ()-> basicChannelService.updateChannel(new ChannelUpdateRequestDto<>(channel.getId(), ChannelElement.NAME, "테스트 채널업데이트"))
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
 }

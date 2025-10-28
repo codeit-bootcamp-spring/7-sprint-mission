@@ -4,3 +4,5 @@ spring:
 discodeit:
   repository:
     type: file
+    file-directory:  "${user.home}/Documents/discodeit/data/"
+

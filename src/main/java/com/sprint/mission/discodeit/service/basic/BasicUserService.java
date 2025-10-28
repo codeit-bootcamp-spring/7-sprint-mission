@@ -7,9 +7,9 @@ import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.UserReadResponseDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.util.StaticString;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +45,8 @@ public class BasicUserService implements UserService {
                 .lastOnlineTime(Instant.now())
                 .build();
 
+        userNameEmailCheck(user);
+
         userStatusRepository.createUserStatus(userStatus);
         return userRepository.saveUser(user);
 
@@ -71,6 +73,9 @@ public class BasicUserService implements UserService {
                 .userId(user.getId())
                 .lastOnlineTime(Instant.now())
                 .build();
+
+        userNameEmailCheck(user);
+
         binaryContentRepository.createBinaryContent(binaryContent);
         userRepository.saveUser(user);
         userStatusRepository.createUserStatus(userStatus);
@@ -139,7 +144,11 @@ public class BasicUserService implements UserService {
                 .build();
 
         userRepository.updateUser(user);
-        binaryContentRepository.deleteBinaryContent(user.getId());
+        binaryContentRepository.deleteBinaryContent(
+                binaryContentRepository.readAllBinaryContent().stream().filter(x->
+                        x.getId() == user.getProfileId()).findFirst().orElseThrow(()->new IllegalArgumentException("Profile not found"))
+                        .getId()
+        );
         binaryContentRepository.createBinaryContent(binaryContent);
 
     }
@@ -182,6 +191,12 @@ public class BasicUserService implements UserService {
         channel.removeUserFromChannel(userId);
         userRepository.updateUser(user);
         channelRepository.updateChannel(channel);
+    }
+    private void userNameEmailCheck(User user){
+        boolean isUserNameExit = userRepository.getAllUser().stream().anyMatch(x -> x.getUserName().equals(user.getUserName()));
+        boolean isEmailExit = userRepository.getAllUser().stream().anyMatch(x -> x.getEmail().equals(user.getEmail()));
+        if(isUserNameExit) throw new IllegalArgumentException("USERNAME_ALREADY_EXIST");
+        if(isEmailExit) throw new IllegalArgumentException("EMAIL_ALREADY_EXIST");
     }
 
 }

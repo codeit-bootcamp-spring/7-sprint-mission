@@ -4,9 +4,12 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.util.StaticString;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -22,11 +25,13 @@ import java.util.*;
 )
 public class FileMessageRepository implements MessageRepository {
 
-    private final String MESSAGE_DATA_PATH = StaticString.DATA_PATH+"messageRepository.ser";
+    private final String MESSAGE_DATA_PATH ;
+    private final File messageRepositoryFile ;
 
-    private File messageRepositoryFile = new File(MESSAGE_DATA_PATH);
 
-    public FileMessageRepository() {
+    public FileMessageRepository(Environment env) {
+        MESSAGE_DATA_PATH = env.getProperty("discodeit.repository.file-directory")+"messageRepository.ser";
+        messageRepositoryFile = new File(MESSAGE_DATA_PATH);
         repositoryCheck();
         resetMessageRepository();
     }

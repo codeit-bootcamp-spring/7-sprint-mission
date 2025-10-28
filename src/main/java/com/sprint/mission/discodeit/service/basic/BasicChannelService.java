@@ -123,6 +123,7 @@ public class BasicChannelService implements ChannelService {
         List<Channel> userContainPrivateChannel = channelList.stream().filter(
                 x->x.getJoinUserList().stream().anyMatch(y->y.equals(userId))&&!x.isPublic()
         ).toList();
+
         return Stream.concat(publicChannelList.stream(),userContainPrivateChannel.stream())
                 .map(x->
                         ChannelReadResponseDto.builder()

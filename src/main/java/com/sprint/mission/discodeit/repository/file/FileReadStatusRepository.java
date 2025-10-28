@@ -4,9 +4,11 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.util.StaticString;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -20,12 +22,18 @@ import java.util.*;
         matchIfMissing = true
 )
 public class FileReadStatusRepository implements ReadStatusRepository {
-    private final String READ_STATUS_DATA_PATH = StaticString.DATA_PATH+"readStatusRepository.ser";
-    private File readStatusRepositoryFile = new File(READ_STATUS_DATA_PATH);
 
 
 
-    public FileReadStatusRepository() {
+    private final String READ_STATUS_DATA_PATH;
+    private final File readStatusRepositoryFile;
+
+
+
+    public FileReadStatusRepository(Environment env) {
+        READ_STATUS_DATA_PATH = env.getProperty("discodeit.repository.file-directory") +"readStatusRepository.ser";
+        readStatusRepositoryFile = new File(READ_STATUS_DATA_PATH);
+
         repositoryCheck();
         resetRepository();
     }
@@ -82,7 +90,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         if(!readStatusRepositoryFile.exists() || readStatusRepositoryFile.length() == 0) {
             return new HashMap<>();
         }
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(READ_STATUS_DATA_PATH));){
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(readStatusRepositoryFile));){
             return (Map<UUID, ReadStatus>) ois.readObject();
         }
         catch (Exception e){

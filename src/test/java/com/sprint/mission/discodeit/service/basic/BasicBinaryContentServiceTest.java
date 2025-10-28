@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.binaryContent.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.entity.BinaryContentUsage;
+import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

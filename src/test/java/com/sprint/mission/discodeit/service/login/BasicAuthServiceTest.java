@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.authService.LoginRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.assertj.core.api.Assertions;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -50,6 +51,19 @@ class BasicAuthServiceTest {
 
         //when
         var exception =assertThrows(IllegalArgumentException.class,()->basicAuthService.checkLoginUser(new LoginRequestDto(id,pw)));
+
+    }
+
+    @Test
+    @DisplayName("[예외 케이스] - Null 삽입")
+            void check_null_input()
+    {
+        var user = userRepository.saveUser(Instancio.create(User.class));
+        //when & then
+
+        assertThatThrownBy(()->
+                basicAuthService.checkLoginUser(null))
+                .isInstanceOf(NullPointerException.class);
 
     }
 }
