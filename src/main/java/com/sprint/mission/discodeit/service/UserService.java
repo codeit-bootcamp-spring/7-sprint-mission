@@ -5,6 +5,10 @@ import com.sprint.mission.discodeit.entity.UserState;
 import com.sprint.mission.discodeit.entity.binaryContent.dto.UserProfileImageRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserNameUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPasswordUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPhoneNumUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserStateUpdateDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,9 +27,10 @@ public interface UserService {
     Optional<UserInfoDto> findUserInfoByEmail(String email);
 
     // 수정
-    Optional<UserInfoDto> updateProfile(UUID userId, String newUserName, String newPhoneNum);
-    Optional<UserInfoDto> changePassword(UUID userId, String newPassword);
-    Optional<UserInfoDto> updateState(UUID userId, UserState newState);
+    Optional<UserInfoDto> updateUserName(UserNameUpdateDto updateDto);
+    Optional<UserInfoDto> changePassword(UserPasswordUpdateDto updateDto);
+    Optional<UserInfoDto> updateState(UserStateUpdateDto updateDto);
+    Optional<UserInfoDto> updatePhoneNum(UserPhoneNumUpdateDto updateDto);
 
     // 프로필 이미지 변경
     Optional<UserInfoDto> updateProfileImage(UserProfileImageRequestDto userProfileImageRequestDto);

@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserState;
 import com.sprint.mission.discodeit.entity.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.entity.binaryContent.BinaryContentRepository;
 import com.sprint.mission.discodeit.entity.binaryContent.dto.UserProfileImageRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserNameUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPasswordUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPhoneNumUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserStateUpdateDto;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.entity.status.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
@@ -107,31 +110,44 @@ public class BasicUserService implements UserService {
 
     // --- 수정 ---
     @Override
-    public Optional<UserInfoDto> updateProfile(UUID userId, String newUserName, String newPhoneNum) {
+    public Optional<UserInfoDto> updateUserName(UserNameUpdateDto dto) {
 
-        return userRepository.findById(userId).map(user -> {
-            user.updateUserName(newUserName);
-            user.updatePhoneNum(newPhoneNum);
+        userRepository.findByUserName(dto.newUserName()).ifPresent(user -> {
+            if (!user.getUserName().equals(dto.newUserName()))
+                throw new DuplicateEmailException("이미 사용중인 닉네임입니다.");
+        });
+
+        return userRepository.findById(dto.userId()).map(user -> {
+            user.updateUserName(dto.newUserName());
             userRepository.save(user);
             return toDto(user);
         });
     }
 
     @Override
-    public Optional<UserInfoDto> changePassword(UUID userId, String newPassword) {
+    public Optional<UserInfoDto> changePassword(UserPasswordUpdateDto dto) {
 
-        return userRepository.findById(userId).map(user -> {
-            user.updatePassword(newPassword);
+        return userRepository.findById(dto.userId()).map(user -> {
+            user.updatePassword(dto.newPassword());
             userRepository.save(user);
             return toDto(user);
         });
     }
 
     @Override
-    public Optional<UserInfoDto> updateState(UUID userId, UserState newState) {
+    public Optional<UserInfoDto> updateState(UserStateUpdateDto dto) {
 
-        return userRepository.findById(userId).map(user -> {
-            user.updateState(newState);
+        return userRepository.findById(dto.userId()).map(user -> {
+            user.updateState(dto.newState());
+            userRepository.save(user);
+            return toDto(user);
+        });
+    }
+
+    @Override
+    public Optional<UserInfoDto> updatePhoneNum(UserPhoneNumUpdateDto dto) {
+        return userRepository.findById(dto.userId()).map(user -> {
+            user.updatePhoneNum(dto.phoneNum());
             userRepository.save(user);
             return toDto(user);
         });

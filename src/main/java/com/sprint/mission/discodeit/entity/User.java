@@ -41,12 +41,6 @@ public class User extends BaseEntity {
         this.phoneNum = phoneNum==null || phoneNum.isBlank() ? "비어있음" :  phoneNum;
     }
 
-    /* builder패턴 사용으로 필요없음
-    public User(String email, String password, String userName) {
-        this(email, password, userName, null);
-    }
-     */
-
     // Update
     public void updateUserName(String userName) {
         validateUserName(userName);

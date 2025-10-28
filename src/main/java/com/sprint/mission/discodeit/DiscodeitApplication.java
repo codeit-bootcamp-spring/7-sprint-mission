@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
 import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.messageDto.DirectMessageCreateRequestDto;
@@ -52,7 +52,7 @@ public class DiscodeitApplication {
                     System.out.println("새로운 채널 개설: " + channelName);
 
                     return channelService.createChannel(
-                            ChannelCreateRequestDto.builder()
+                            PublicChannelCreateRequestDto.builder()
                                     .adminId(adminId)
                                     .channelName(channelName)
                                     .type(type)

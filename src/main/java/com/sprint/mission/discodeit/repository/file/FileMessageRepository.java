@@ -6,7 +6,9 @@ import com.sprint.mission.discodeit.repository.BaseRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,5 +36,17 @@ public class FileMessageRepository extends FileBaseRepository<Message> implement
                         && m.getReceiver().getId().equals(userId2))
                         || m.getAuthor().getId().equals(userId2) &&  m.getReceiver().getId().equals(userId1))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+
+    }
+
+    @Override
+    public Optional<Message> findTopByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(m -> m.getChannel().getId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt));
     }
 }

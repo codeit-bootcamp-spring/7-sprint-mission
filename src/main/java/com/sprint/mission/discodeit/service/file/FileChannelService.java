@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelCreateRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -49,11 +49,11 @@ public class FileChannelService implements ChannelService {
     //============================================생성=====
 
     @Override
-    public ChannelInfoDto createChannel(ChannelCreateRequestDto dto) {
-        User user = userService.findUserEntityById(dto.getAdminId())
+    public ChannelInfoDto createChannel(PublicChannelCreateRequestDto dto) {
+        User user = userService.findUserEntityById(dto.adminId())
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없음"));
 
-        Channel newChannel = new Channel(user, dto.getChannelName(), dto.getType());
+        Channel newChannel = new Channel(user, dto.channelName(), dto.getType());
         this.data.put(newChannel.getId(), newChannel);
 
         saveChannelData();
