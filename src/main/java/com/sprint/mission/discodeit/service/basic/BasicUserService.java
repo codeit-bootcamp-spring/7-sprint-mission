@@ -35,19 +35,13 @@ public class BasicUserService implements UserService {
     //이메일 찾기
     @Override
     public User findByEmail(String email) {
-        return jcfUserRepository.findAll().stream()
-                .filter(u -> u.getEmail().equals(email))
-                .findFirst()
-                .orElse(null);
+        return jcfUserRepository.findByEmail(email);
     }
 
     //닉네임으로 찾기
     @Override
-    public User findByNickname(String nickname) {
-        return jcfUserRepository.findAll().stream()
-                .filter(u -> u.getNickname().equals(nickname))
-                .findFirst()
-                .orElse(null);
+    public List<User> findByNickname(String nickname) {
+        return jcfUserRepository.findByNickname(nickname);
     }
 
     //삭제

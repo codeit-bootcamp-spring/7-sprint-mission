@@ -63,10 +63,11 @@ class BasicUserServiceTest {
     void findByNickname() {
         User user = userService.create("nick@example.com", "닉테스트", "pw");
 
-        User found = userService.findByNickname("닉테스트");
+        List<User> foundList = userService.findByNickname("닉테스트");
 
-        assertNotNull(found);
-        assertEquals(user.getId(), found.getId());
+        assertNotNull(foundList);
+        assertFalse(foundList.isEmpty());
+        assertEquals(user.getId(), foundList.get(0).getId());
     }
 
     @Test

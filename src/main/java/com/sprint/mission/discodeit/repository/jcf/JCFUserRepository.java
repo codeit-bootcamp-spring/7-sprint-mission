@@ -38,6 +38,23 @@ public class JCFUserRepository implements UserRepository {
         return data.get(id);
     }
 
+    //유저 email
+    @Override
+    public User findByEmail(String email) {
+        return findAll().stream()
+                .filter(u -> u.getEmail().equals(email))
+                .findFirst()
+                .orElse(null);
+    }
+
+    //유저 nickname
+    @Override
+    public List<User> findByNickname(String nickname) {
+        return findAll().stream()
+                .filter(u -> u.getNickname().equals(nickname))
+                .toList();
+    }
+
     @Override
     public User update(UUID userId, String nickname, String password){
         return findById(userId).update(nickname, password);

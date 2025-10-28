@@ -9,7 +9,7 @@ public interface UserService {
     User create(String email, String nickname, String password);
     List<User> findAll();
     User findByEmail(String email);
-    User findByNickname(String nickname);
+    List<User> findByNickname(String nickname);
     User delete(UUID id);
     User update(UUID id, String nickname, String password);
 }
