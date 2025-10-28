@@ -213,7 +213,7 @@ public class BasicChannelService implements ChannelService {
         for(Message m : messageRepository.findByChannel(channelId)) {
             messageRepository.deleteById(m.getId());
         }
-        readStatusRepository.deleteByChannelId(channelId);
+        readStatusRepository.deleteById(channelId);
 
         return channelRepository.deleteById(channelId);
     }
