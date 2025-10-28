@@ -1,8 +1,15 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
+
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-// Channel 전용 저장소 인터페이스
-public interface ChannelRepository extends  CrudRepository<UUID, Channel> {
+public interface ChannelRepository {
+    Channel save(Channel channel);
+    Optional<Channel> findById(UUID id);
+    List<Channel> findAll();
+    boolean existsById(UUID id);
+    void deleteById(UUID id);
 }

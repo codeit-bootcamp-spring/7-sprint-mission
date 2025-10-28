@@ -1,36 +1,65 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends DefEntity{
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
+
+public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
-    private  String channelName;
-    private String channelTopic;
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private ChannelType type;
+    private String name;
+    private String description;
 
-
-    // getter
-    public String getChannelName() {
-        return channelName;
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
 
-    public String getChannelTopic() {
-        return channelTopic;
+    public UUID getId() {
+        return id;
     }
 
-    // 생성자: 필수 값인 채널 이름만 받음
-    public Channel(String channelName) {
-        super();    // DefEntity의 생성자 호출 (기본 필드 초기화)
-        this.channelName = channelName;
-        this.channelTopic = null; // 토픽은 선택 사항이므로 null로 초기화
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public void updateChannelName(String newName) {
-        this.channelName = newName;
-        touch();
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void updateChannelTopic(String newTopic) {
-        this.channelTopic = newTopic;
-        touch();
+    public ChannelType getType() {
+        return type;
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
 }

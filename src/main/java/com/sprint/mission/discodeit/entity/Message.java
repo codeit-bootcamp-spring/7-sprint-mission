@@ -1,35 +1,63 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message extends DefEntity{
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
-    private UUID senderId;
-    private UUID channelId;
+
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
     private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
 
-    public Message(UUID senderId, UUID channelId, String content) {
-        this.senderId = senderId;
-        this.channelId = channelId;
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
         this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public void updateContent(String newContent) {
-        this.content = newContent;
-        touch(); // 수정 시간 갱신
+    public UUID getId() {
+        return id;
     }
 
-
-    public UUID getSenderId() {
-        return senderId;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public UUID getChannelId() {
-        return channelId;
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
     public String getContent() {
         return content;
     }
 
+    public UUID getChannelId() {
+        return channelId;
+    }
+
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
 }

@@ -1,59 +1,70 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-/**
- * ✅ User 엔티티
- * - 디스코드 사용자 정보를 나타냄
- * - 공통 필드(id, createdAt, updatedAt)는 DefEntity(부모)로부터 상속받음
- */
-public class User extends DefEntity {
+public class User implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
     private String username;
     private String email;
-    private boolean active; // 활성화 여부
+    private String password;
 
-    // --- 생성자 ---
-    public User(String username, String email, boolean active) {
-        super(); // DefEntity의 id, createdAt, updatedAt 초기화
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
         this.username = username;
         this.email = email;
-        this.active = active;
+        this.password = password;
     }
 
-    // --- 2인자 생성자 오버로딩 ---
-    public User(String username, String email) {
-        this(username, email, true); // 기본값 active=true
+    public UUID getId() {
+        return id;
     }
 
-    // --- Getter ---
-    public String getUsername() { return username; }
-    public String getEmail() { return email; }
-    public boolean isActive() { return active; }
-
-    // --- Update 메서드 ---
-    /**
-     * 이름 변경
-     */
-    public void updateUsername(String newName) {
-        this.username = newName;
-        touch(); // updatedAt 갱신
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    /**
-     * 이메일 변경
-     */
-    public void updateEmail(String newEmail) {
-        this.email = newEmail;
-        touch(); // updatedAt 갱신
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    /**
-     * 활성화 상태 변경 (setter 역할)
-     * - JCFUserService에서 호출
-     */
-    public void setActive(boolean active) {
-        this.active = active;
-        touch(); // 상태 변경 시 수정 시간도 업데이트
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }
