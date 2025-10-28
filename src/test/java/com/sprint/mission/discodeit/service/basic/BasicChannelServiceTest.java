@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -96,15 +97,9 @@ class BasicChannelServiceTest {
         var dto =  new ChannelPublicCreateRequestDto(new HashSet<>(), "테스트 채널", "테스트 채널 설명",false);
         var expectedResult = basicChannelService.createPublicChannel(dto);
         //when
-
         var actualResult = basicChannelService.readChannel(expectedResult.getId());
-
         //then
-
         assertThat(actualResult.getName()).isEqualTo(expectedResult.getName());
-
-
-
     }
 
     @Test
@@ -181,7 +176,6 @@ class BasicChannelServiceTest {
 
         //then
         assertThat(actualResult.getUserIdList().size()).isEqualTo(2);
-
     }
 
     @Test
@@ -196,8 +190,41 @@ class BasicChannelServiceTest {
         basicChannelService.deleteUserFromChannel(user1.getId(),channel1.getId());
         var actualResult = basicChannelService.readChannel(channel1.getId());
         //then
-        assertThat(actualResult.getUserIdList().size()).isEqualTo(0);
+        assertThat(actualResult.getUserIdList().isEmpty()).isTrue();
     }
+
+    @RepeatedTest(value = 10, name = "{displayName} {currentRepetition}/{totalRepetitions}")
+    @DisplayName("[정상 케이스] - 가장 최근 메세지 조회 ")
+    void read_last_message(){
+        //given
+        var user1 = userRepository.saveUser(Instancio.create(User.class));
+        var channel = basicChannelService.createPublicChannel(Instancio.of(ChannelPublicCreateRequestDto.class)
+                .set(field(ChannelPublicCreateRequestDto::getUserIdList), new HashSet<>(List.of(user1.getId())))
+                .create()
+        );
+        var message1 = messageRepository.saveMessage(Instancio.of(com.sprint.mission.discodeit.entity.Message.class)
+                .set(field(com.sprint.mission.discodeit.entity.Message::getChannelId), channel.getId())
+                .set(field(com.sprint.mission.discodeit.entity.Message::getSenderId), user1.getId())
+                .create()
+        );
+        var message3 = messageRepository.saveMessage(Instancio.of(com.sprint.mission.discodeit.entity.Message.class)
+                .set(field(com.sprint.mission.discodeit.entity.Message::getChannelId), channel.getId())
+                .set(field(com.sprint.mission.discodeit.entity.Message::getSenderId), user1.getId())
+                .create()
+        );
+        var message2 = messageRepository.saveMessage(Instancio.of(com.sprint.mission.discodeit.entity.Message.class)
+        .set(field(com.sprint.mission.discodeit.entity.Message::getChannelId), channel.getId())
+        .set(field(com.sprint.mission.discodeit.entity.Message::getSenderId), user1.getId())
+        .create()
+        );
+
+        var recentTime = List.of(message1,message2,message3).stream().map(x->x.getUpdatedAt()).max(Comparator.naturalOrder()).orElseThrow();
+        //when
+        var actualResult = basicChannelService.readChannel(channel.getId()).getRecentPostTime();
+        //then
+        assertThat(actualResult).isEqualTo(recentTime);
+    }
+
 
     @RepeatedTest(value = 10, name = "{displayName} {currentRepetition}/{totalRepetitions}")
     @DisplayName("[예외 케이스] - 프라이빗 채널 변경 ")

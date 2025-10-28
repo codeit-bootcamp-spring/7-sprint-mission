@@ -21,7 +21,7 @@ public class UserStatus extends Entity{
     private Instant lastOnlineTime;
 
     public boolean isUserOnline(){
-        Instant minusMinute =  now().minusSeconds(this.lastOnlineTime.getEpochSecond());
-        return !minusMinute.isAfter(ofEpochSecond(300));
+        Duration duration = Duration.between(this.lastOnlineTime, now());
+        return duration.getSeconds()<300;
     }
 }

@@ -182,4 +182,23 @@ class BasicMessageServiceTest {
         assertThatThrownBy(()->basicMessageService.findallByChannelId(UUID.randomUUID()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    @DisplayName("[예외 케이스] - 없는 유저 id,채널 id 설정")
+    void illegal_input_id(){
+        //given
+        var channel = channelRepository.saveChannel(Instancio.of(Channel.class).create());
+
+        //when & then
+        assertThatThrownBy(()->basicMessageService.createMessage(
+                Instancio.of(MessageCreateRequestDto.class)
+                        .set(field(MessageCreateRequestDto::getChannelId), channel.getId())
+                        .create()
+        )).isInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(()->basicMessageService.createMessage(
+                Instancio.create(MessageCreateRequestDto.class)
+                )
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
 }
