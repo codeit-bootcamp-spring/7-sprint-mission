@@ -9,7 +9,6 @@ public interface UserRepository {
     User save(User user);
     List<User> findAll();
     User findById(UUID id);
-    User updateNickname(String nickname);
-    User updatePassword(String password);
+    User update(UUID userId, String nickname, String password);
     User delete(UUID userId);
 }
