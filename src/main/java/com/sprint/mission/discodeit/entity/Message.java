@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 @Getter
 @ToString
+@Builder
 public class Message extends BaseEntity {
     private String content;
     private String userName;
@@ -42,6 +44,14 @@ public class Message extends BaseEntity {
             this.content = vn;
             reUpdatedAt();
         }
+    }
+
+    public void setAttachmentIds(List<UUID> attachmentIds) {
+        this.attachmentIds.clear();
+        if(attachmentIds != null) {
+            this.attachmentIds.addAll(attachmentIds);
+        }
+        reUpdatedAt();
     }
 
     public boolean delete() {
