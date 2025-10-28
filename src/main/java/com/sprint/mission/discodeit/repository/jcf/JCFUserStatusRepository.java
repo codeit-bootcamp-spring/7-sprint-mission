@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.*;
 
-@Repository("JCFstatus")
+//@Repository("JCFstatus")
 public class JCFUserStatusRepository implements UserStatusRepository {
 
 

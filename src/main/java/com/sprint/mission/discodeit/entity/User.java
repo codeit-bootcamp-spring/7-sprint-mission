@@ -33,38 +33,6 @@ public class User extends Common implements Serializable {
 
 
 
-/*  *//*  public String getUserNickname() {
-        return userNickname;
-    }*//*
-
-    public void setUserNickname(String userNickname) {
-        this.userNickname = userNickname;
-    }
-
-  *//*  public String getUserName() {
-        return userName;
-    }*//*
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
- *//*   public String getUserId() {
-        return UserEmail;
-    }*//*
-
-    public void setUserId(String userId) {
-        this.UserEmail = userId;
-    }
-
-    *//*public String getPassword() {
-        return password;
-    }*//*
-
-    public void setPassword(String password) {
-        this.password = password;
-    }*/
-
     @Override
     public String toString() {
         return "User{" +

@@ -6,10 +6,11 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-
+@RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
 
@@ -18,12 +19,12 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
 
     //의존성 주입이긴한데 이거 일커지면 더 늘어나는데
-    public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
+  /*  public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
         this.channelRepository = channelRepository;
 
-    }
+    }*/
 
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {

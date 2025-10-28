@@ -12,27 +12,32 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@RequiredArgsConstructor
 @Service
 public class BasicChannelService implements ChannelService {
 
+    @Qualifier("JCFCannel")
     private final ChannelRepository channelRepository;
+    @Qualifier("JCFReadStatus")
     private final ReadStatusRepository readStatusRepository;
+    @Qualifier("JCFMessage")
     private final MessageRepository messageRepository;
 
-    public BasicChannelService(@Qualifier("JCFCannel") ChannelRepository channelRepository
+/*    public BasicChannelService(@Qualifier("JCFCannel") ChannelRepository channelRepository
                               , @Qualifier("JCFReadStatus") ReadStatusRepository readStatusRepository
-                               ,@Qualifier("JCFReadStatus") MessageRepository messageRepository
+                               ,@Qualifier("JCFMessage") MessageRepository messageRepository
     ) {
         this.channelRepository = channelRepository;
         this.readStatusRepository = readStatusRepository;
-    }
+        this.messageRepository = messageRepository;
+    }*/
 
 
     @Override
@@ -81,20 +86,38 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelFindResponse> findAll() {
-        List<Channel> channels = channelRepository.findAll();
-        // 2) 모든 메시지 → 채널별 최신 시간 맵
-        Map<UUID, Instant> latestTimeByChannel = messageRepository.findAll().stream()
-                .collect(Collectors.toMap(
-                        Message::getChannelId,
-                        Message::getTime,
-                        // 같은 채널이면 더 최신(큰) 시간으로 병합
-                        (t1, t2) -> t1.isAfter(t2) ? t1 : t2
-                ));
+        return channelRepository.findAll().stream()
+                .filter(channel -> channel.getType() == ChannelType.PUBLIC)
+                .map(channel -> {
+                    Instant latestTime = messageRepository.findAll().stream()
+                            .filter(msg -> msg.getChannelId().equals(channel.getId()))
+                            .map(Message::getTime)
+                            .max(Comparator.naturalOrder())
+                            .orElseThrow(() -> new NoSuchElementException("매새지없는거아니야?"));
+                    return ChannelFindResponse.from(channel, latestTime);
+                })
+                .toList();
     }
 
     @Override
     public List<ChannelFindResponse> findAllByUserId(UUID userId) {
-        return List.of();
+        return channelRepository.findAll().stream()
+                .filter(channel ->
+                        channel.getType() == ChannelType.PUBLIC || channel.getUsers().contains(userId)
+                )
+                .map(channel -> {
+                    Instant latest = messageRepository.findAll().stream()
+                            .filter(msg -> msg.getChannelId().equals(channel.getId()))
+                            .map(Message::getTime)
+                            .max(Comparator.naturalOrder())
+                            .orElse(null);
+
+                    if (channel.getType() == ChannelType.PRIVATE) {
+                        return ChannelFindResponse.from(channel, latest).isPrivate(channel);
+                    }
+                    return ChannelFindResponse.from(channel, latest);
+                })
+                .toList();
     }
 
     @Override

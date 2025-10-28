@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Setter
 public class Channel extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
 

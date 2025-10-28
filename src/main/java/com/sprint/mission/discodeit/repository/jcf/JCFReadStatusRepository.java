@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository("JCFReadStatus")
+//@Repository("JCFReadStatus")
 public class JCFReadStatusRepository implements ReadStatusRepository {
 
     private final Map<UUID, ReadStatus> data;

@@ -6,17 +6,19 @@ import com.sprint.mission.discodeit.dto.user.response.UserCreateResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserFindResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserUpdateResponse;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.content.ContentsType;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.List;
-
+@RequiredArgsConstructor
 @Service
 public class BasicUserService implements UserService {
 
@@ -28,14 +30,14 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryRepository binaryRepository;
 
-    public BasicUserService(@Qualifier("JCFuser") UserRepository userRepository
+ /*   public BasicUserService(@Qualifier("JCFuser") UserRepository userRepository
                             ,@Qualifier("JCFstatus") UserStatusRepository userStatusRepository
                             ,@Qualifier("JCFBinary") BinaryRepository binaryRepository)
     {
         this.userRepository = userRepository;
         this.userStatusRepository = userStatusRepository;
         this.binaryRepository = binaryRepository;
-    }
+    }*/
 
 
     @Override
@@ -114,6 +116,8 @@ public class BasicUserService implements UserService {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("유저uuid못찾아용"+userId);
         }
+        binaryRepository.deleteByUuid(userId, ContentsType.PROFILE_IMAGE);
+        userStatusRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
     }
 }

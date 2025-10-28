@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository("JCFBinary")
+//@Repository("JCFBinary")
 public class JCFBinaryContentRepository implements BinaryRepository {
 
     private final Map<UUID, BinaryContent> data;

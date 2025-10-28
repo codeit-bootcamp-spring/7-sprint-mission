@@ -27,7 +27,7 @@ public class Message extends Common implements Serializable {
         this.content = content;
     }
 
-    public UUID getSender() {
+/*    public UUID getSender() {
         return authorId;
     }
 
@@ -57,7 +57,7 @@ public class Message extends Common implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
-    }
+    }*/
 
     @Override
     public String toString() {
