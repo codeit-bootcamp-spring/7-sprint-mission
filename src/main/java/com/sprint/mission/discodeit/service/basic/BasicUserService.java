@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.request.ProfileRequestDto;
-import com.sprint.mission.discodeit.dto.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.request.CreateUserCommand;
+import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.update.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -27,23 +27,23 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User createUser(CreateUserRequestDto userRequestDto, ProfileRequestDto profileRequestDto) {
-
+    public User createUser(CreateUserCommand request){
         // username, email 중복 체크
-        if(userRepository.findByUsername(userRequestDto.getUsername()).isPresent()){
+        if(userRepository.findByUsername(request.username()).isPresent()){
             throw new IllegalArgumentException("이미 유저 이름이 있습니다.");
         }
-        if(userRepository.findByEmail(userRequestDto.getEmail()).isPresent()){
+        if(userRepository.findByEmail(request.email()).isPresent()){
             throw new IllegalArgumentException("이미 이메일이 있습니다.");
         }
 
-        // 프로필 이미지 선택적 로직
+        // 프로필 이미지 선택적 로직, ID로 체크해서. 컨텐츠 만들어서
         UUID profileId = null;
-        if(profileRequestDto != null) {
+        if(request.data() != null){
             BinaryContent content = new BinaryContent(
-                    profileRequestDto.getData(),
-                    profileRequestDto.getFileName(),
-                    profileRequestDto.getFileType());
+                    request.data(),
+                    request.fileName(),
+                    request.fileType()
+            );
 
             BinaryContent saved = binaryContentRepository.save(content);
 
@@ -52,13 +52,13 @@ public class BasicUserService implements UserService {
 
         // User 생성
         User user = new User(
-                userRequestDto.getUsername(),
-                userRequestDto.getNickName(),
-                userRequestDto.getEmail(),
-                userRequestDto.getPassword()
+                request.username(),
+                request.nickName(),
+                request.email(),
+                request.password(),
+                profileId
         );
 
-        user.setProfileId(profileId);
         User userCreated = userRepository.save(user);
 
         // UserStatus 생성
@@ -94,32 +94,32 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto updateUser(UUID id, UpdateUserDto updateUserDto, ProfileRequestDto profileRequestDto) {
+    public UserResponseDto updateUser(UUID id, UpdateUserDto updateRequest, CreateBinaryContentRequestDto contentRequest) {
         //유저 찾기
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         // 프로필 이미지 선택적 로직
         UUID profileId = null;
-        if (profileRequestDto != null) {
+        if(contentRequest.data() != null){
             BinaryContent content = new BinaryContent(
-                    profileRequestDto.getData(),
-                    profileRequestDto.getFileName(),
-                    profileRequestDto.getFileType());
+                    contentRequest.data(),
+                    contentRequest.fileName(),
+                    contentRequest.fileType()
+            );
 
             BinaryContent saved = binaryContentRepository.save(content);
 
             profileId = saved.getId();
         }
-        user.setProfileId(profileId);
 
-        String username = updateUserDto.getUsername();
-        String nickName = updateUserDto.getNickName();
-        String email = updateUserDto.getEmail();
+        user.updateInfo(
+                updateRequest.username(),
+                updateRequest.nickName(),
+                updateRequest.email()
+        );
 
-        user.setUsername(username);
-        user.setNickName(nickName);
-        user.setEmail(email);
+        user.updateProfile(profileId);
 
         User updated = userRepository.save(user);
 

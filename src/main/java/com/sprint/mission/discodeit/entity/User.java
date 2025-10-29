@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.UUID;
 
@@ -16,33 +14,23 @@ public class User extends BasicEntity {
     private UUID profileId;
 
 
-    public User(String username, String nickName, String email, String password) {
+    public User(String username, String nickName, String email, String password, UUID profileId) {
         super();
         this.username = username;
         this.nickName = nickName;
         this.email = email;
         this.password = password;
-    }
-
-    public void setProfileId(UUID profileId) {
         this.profileId = profileId;
+    }
+    public void updateProfile(UUID NewProfileId) {
+        this.profileId = NewProfileId;
         update();
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-        update();
-    }
-
-    public void setNickName(String nickName) {
+    public void updateInfo(String name, String nickName, String email){
+        this.username = name;
         this.nickName = nickName;
-        update();
-    }
-
-    public void setEmail(String email) {
         this.email = email;
         update();
     }
-
-
 }
