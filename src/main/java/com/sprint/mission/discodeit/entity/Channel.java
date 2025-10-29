@@ -28,4 +28,8 @@ public class Channel extends BaseEntity{
     public String getName() {
         return name;
     }
+
+    public UUID getManagerId() {
+        return managerId;
+    }
 }
