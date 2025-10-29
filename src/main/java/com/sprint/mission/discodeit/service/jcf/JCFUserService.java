@@ -9,16 +9,16 @@ import java.util.UUID;
 
 public class JCFUserService implements UserService {
     //싱글톤 구현
-    private final static JCFUserService basicUserService = new JCFUserService();
+    private final static JCFUserService jcfUserService = new JCFUserService();
 
     private JCFUserService(){}
 
     public static JCFUserService getInstance(){
-        return basicUserService;
+        return jcfUserService;
     }
 
     //리포지토리
-    JCFUserRepository jcfUserRepository = JCFUserRepository.getInstance();
+    private final JCFUserRepository jcfUserRepository = JCFUserRepository.getInstance();
 
     //유저 추가
     @Override

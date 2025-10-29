@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
@@ -9,50 +9,55 @@ import java.util.UUID;
 
 public class BasicUserService implements UserService {
     //싱글톤 구현
-    private final static BasicUserService basicUserService = new BasicUserService();
+    private static BasicUserService instance;
 
-    private BasicUserService(){}
+    private BasicUserService(UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
 
-    public static BasicUserService getInstance(){
-        return basicUserService;
+    public static BasicUserService getInstance(UserRepository userRepository){
+        if (instance == null) {
+            instance = new BasicUserService(userRepository);
+        }
+        return instance;
     }
 
     //리포지토리
-    JCFUserRepository jcfUserRepository = JCFUserRepository.getInstance();
+    private final UserRepository userRepository;
 
     //유저 추가
     @Override
     public User create(String email, String nickname, String password){
-        return jcfUserRepository.save(new User(email, nickname, password));
+        return userRepository.save(new User(email, nickname, password));
     }
 
     //유저 목록
     @Override
     public List<User> findAll(){
-        return jcfUserRepository.findAll();
+        return userRepository.findAll();
     }
 
     //이메일 찾기
     @Override
     public User findByEmail(String email) {
-        return jcfUserRepository.findByEmail(email);
+        return userRepository.findByEmail(email);
     }
 
     //닉네임으로 찾기
     @Override
     public List<User> findByNickname(String nickname) {
-        return jcfUserRepository.findByNickname(nickname);
+        return userRepository.findByNickname(nickname);
     }
 
     //삭제
     @Override
     public User delete(UUID id) {
-        return jcfUserRepository.delete(id);
+        return userRepository.delete(id);
     }
 
     //업데이트
     @Override
     public User update(UUID id, String nickname, String password) {
-        return jcfUserRepository.update(id,nickname,password);
+        return userRepository.update(id,nickname,password);
     }
 }
