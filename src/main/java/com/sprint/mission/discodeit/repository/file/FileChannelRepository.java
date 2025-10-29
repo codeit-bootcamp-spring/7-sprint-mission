@@ -54,7 +54,7 @@ public class FileChannelRepository extends BaseFileRepository<Channel> implement
         }
         channel.update(name);
         saveToFile(channel.getId(), channel);
-        return null;
+        return channel;
     }
 
     //채널 삭제
