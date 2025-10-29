@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.infrastructure.jcf;
 
-import com.sprint.mission.discodeit.domain.server.ServerRepository;
-import com.sprint.mission.discodeit.domain.server.Server;
+import com.sprint.mission.discodeit.domain.repository.ServerRepository;
+import com.sprint.mission.discodeit.domain.Server;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 @Repository
-@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf")
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf",
+matchIfMissing = true)
 public class JCFServerRepository implements ServerRepository {
 
     private final Map<UUID, Server> store = new HashMap<>();

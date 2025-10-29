@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.infrastructure.jcf;
 
-import com.sprint.mission.discodeit.domain.binarycontent.BinaryContentRepository;
-import com.sprint.mission.discodeit.domain.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.domain.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.domain.BinaryContent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
-@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf")
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf", matchIfMissing = true)
 public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     private final Map<UUID, BinaryContent> store = new HashMap<>();

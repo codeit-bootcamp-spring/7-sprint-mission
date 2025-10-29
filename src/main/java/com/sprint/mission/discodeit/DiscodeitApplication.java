@@ -1,15 +1,67 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.application.dto.request.UserCreateRequestDto;
+import com.sprint.mission.discodeit.application.facade.UserFacade;
+import com.sprint.mission.discodeit.domain.User;
+import com.sprint.mission.discodeit.domain.repository.UserRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import java.io.IOException;
 
 @SpringBootApplication
 public class DiscodeitApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DiscodeitApplication.class, args);
-        //메서드 안에서는 접근자 세팅 불가능
-        //어차피 {}안에서만 유효하니까.
+        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+//        new를 이용해 필요한 객체를 생성하게 되면 개발자 필요한 곳에서 객체를 직접 생성해야 하고 객체의 생명주기를 직접 관리하게 된다.
+//        같은 타입의 다른 객체가 필요할 경우, 객체 생성하는 코드를 직접 수정해야 하기도 한다.
+//        그리고 같은 객체가 여러번 생성되지 않게 주의를 기울여야 한다
+//        빈이라는 개념도 없고 그냥 객체가 존재한다.
+//
+//        나 같은 경우는 원래
+//        WebConfig 클래스를 통해 모든 클래스들의 의존성 관리를 하고 있었다,
+//                WebConfig를 생성해, 필요한 객체들을 가져와서 사용할 수 있었고, 다른 클래스로 갈아키우고 싶으면 WebConfig만 수정하면 되었다.
+//        그리고 WebConfig에게 같은 타입의 객체를 요청하면 같은 매번 같은 객체가 응답된다.
+//
+//                내가 만든 WebConfig의 기능을 더 쉽게 해주는 게 스프링 컨테이너이다.
+//        @Component 계열(@Repository, @Service, @Controller 등등)이 붙은 클래스들을 자동으로 빈 등록을 해준다
+//
+//        내가 만든 WebConfig에서는 객체 생성에 필요한 매개변수들을 직접 코딩해야 했다
+//        그러나 이제는 스프링 컨테이너가 자동으로 해준다.
+//        스프링 컨테이너가 관리하는 객체를 Bean이라고 하며, Bean은 컨테이너에서 기본적으로는 싱글톤으로 관리되고, 필요할 때 자동으로 주입된다.
+//                객체의 생명주기도 컨테이너에서 자동으로 관리를 한다.
+
+
+        //ApplicationContext의 하위 인터페이스인 ConfigurableApplicationContext를 사용해도 ok
+
+
+        UserFacade userService = context.getBean(UserFacade.class);
+        UserRepository userRepository = context.getBean(UserRepository.class);
+
+        //유저 추가 dto 만들고 회원가입
+        UserCreateRequestDto test1 =
+                new UserCreateRequestDto(
+                        "test@email",
+                        "1234",
+                        "test1",
+                        "010-1234-1234",
+                        null);
+
+        try {
+            userService.createUser(test1);
+
+        } catch (IOException e) {
+            System.out.println( e.getMessage());
+        }
+        User user =
+                userRepository.findByEmail("test@email").orElse(null);
+        System.out.println(user.getEmail());
+        System.out.println(user.getPassword());
+        System.out.println(user.getPhoneNumber());
+        System.out.println(user.getUsername());
 
 //        DiContainer diContainer = new DiContainer();
 

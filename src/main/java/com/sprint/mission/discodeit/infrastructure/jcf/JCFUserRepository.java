@@ -1,19 +1,21 @@
 package com.sprint.mission.discodeit.infrastructure.jcf;
 
-import com.sprint.mission.discodeit.domain.user.UserRepository;
-import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.domain.repository.UserRepository;
+import com.sprint.mission.discodeit.domain.User;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 @Repository
-@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf")
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf",
+matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
 
     //자바에서 final이 붙는 건 참조 자체를 변경할 수 없게 만든다는 뜻
     //그래서 리스트 안에 있는 내용은 수정 가능
     private final Map<UUID, User> store = new HashMap<>();
     private final Map<String, UUID> store2 = new HashMap<>();
+
     @Override
     public void save(User user){
         UUID key = user.getId();

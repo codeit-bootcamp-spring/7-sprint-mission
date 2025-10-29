@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.application.dto;
 
 import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
-import com.sprint.mission.discodeit.domain.user.User;
-import org.springframework.stereotype.Service;
+import com.sprint.mission.discodeit.domain.User;
 
 
 public final class UserDtoMapper {

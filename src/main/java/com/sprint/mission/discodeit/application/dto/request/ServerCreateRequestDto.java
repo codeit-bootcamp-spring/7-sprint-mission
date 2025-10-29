@@ -7,6 +7,7 @@ public record ServerCreateRequestDto(
 
         String serverName,
         Long serverLevel,
-        List<UUID> members
+        List<UUID> members,
+        boolean isPrivate
 ) {
 }

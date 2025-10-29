@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.infrastructure.file;
 
 
-import com.sprint.mission.discodeit.domain.channel.ChannelRepository;
-import com.sprint.mission.discodeit.domain.channel.Channel;
+import com.sprint.mission.discodeit.domain.repository.ChannelRepository;
+import com.sprint.mission.discodeit.domain.Channel;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 

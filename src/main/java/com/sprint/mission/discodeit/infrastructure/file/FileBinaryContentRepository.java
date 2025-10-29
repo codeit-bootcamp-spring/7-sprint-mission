@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.infrastructure.file;
 
-import com.sprint.mission.discodeit.domain.binarycontent.BinaryContentRepository;
-import com.sprint.mission.discodeit.domain.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.domain.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.domain.BinaryContent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 

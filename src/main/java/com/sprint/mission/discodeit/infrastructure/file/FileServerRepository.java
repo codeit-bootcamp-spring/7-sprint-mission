@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.infrastructure.file;
 
-import com.sprint.mission.discodeit.domain.server.ServerRepository;
-import com.sprint.mission.discodeit.domain.server.Server;
+import com.sprint.mission.discodeit.domain.repository.ServerRepository;
+import com.sprint.mission.discodeit.domain.Server;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 

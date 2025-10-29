@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.application;
 
 
 import com.sprint.mission.discodeit.application.dto.ChannelDtoMapper;
-import com.sprint.mission.discodeit.domain.channel.ChannelRepository;
-import com.sprint.mission.discodeit.domain.channel.Channel;
+import com.sprint.mission.discodeit.domain.repository.ChannelRepository;
+import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.application.dto.request.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.ChannelRequestDto;
 import com.sprint.mission.discodeit.application.dto.response.ChannelResponseDto;
@@ -14,36 +14,29 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.sprint.mission.discodeit.application.ChannelFindHelper.*;
 import static com.sprint.mission.discodeit.application.dto.ChannelDtoMapper.channelToResponseDto;
 
 
 @Service
 @RequiredArgsConstructor
-public class BasicChannelService implements ChannelService {
+public class BasicChannelService {
 
     private final ChannelRepository channelRepository;
 
-    @Override
-    public ChannelResponseDto createChannel(ChannelCreateRequestDto requestDto) {
-        Channel channel = new Channel(requestDto.channelName(), requestDto.serverId());
-        channelRepository.save(channel);
-        return channelToResponseDto(channel);
-    }
 
 
-    @Override
+
     public List<ChannelResponseDto> findAllByServer(UUID serverId) {
-        return channelRepository.findAll()
+        return findByServer(channelRepository, serverId)
                 .stream()
-                .filter(c-> c.getServerId().equals(serverId))
                 .map(ChannelDtoMapper::channelToResponseDto)
                 .toList();
-
     }
 
-    @Override
+
     public ChannelResponseDto updateChannel(ChannelRequestDto requestDto) {
-        Channel channel = channelRepository.findById(requestDto.channelId()).orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다."));
+        Channel channel = findById(channelRepository, requestDto.channelId());
         if (requestDto.channelName()!=null){
             channel.updateChannelName(requestDto.channelName());
         }
@@ -51,24 +44,16 @@ public class BasicChannelService implements ChannelService {
         return channelToResponseDto(channel);
     }
 
-    @Override
+
     public void deleteAllByServer(UUID serverId) {
-        channelRepository.findAll()
+        findByServer(channelRepository,serverId)
                 .stream()
-                .filter(c-> c.getServerId().equals(serverId))
                 .forEach(channelRepository::remove);
     }
 
-    @Override
+
     public void deleteChannel(UUID channelId) {
-        Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException());
+        Channel channel = findById(channelRepository, channelId);
         channelRepository.remove(channel);
-    }
-
-    @Override
-    public ChannelResponseDto findById(UUID uuid) {
-        Channel channel = channelRepository.findById(uuid).orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다."));
-
-        return channelToResponseDto(channel);
     }
 }

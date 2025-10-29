@@ -6,4 +6,4 @@ spring:
 
 discodeit:
   repository:
-    type: file
+    type: jcf
