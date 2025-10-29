@@ -13,18 +13,21 @@ public class UserStatus extends BaseEntity{
 
     //Field
     private final UUID userId;
-    private boolean online;
     private Instant offlineAt;
 
     //Constructor
     public UserStatus(UUID userId) {
         this.userId = userId;
-        this.online = false;
+    }
+
+    //종료되었을 때
+    public void updateOfflineAt(){
+        this.offlineAt = Instant.now();
     }
 
     //온라인 상태 계산
-    public void online(){
+    public boolean IsOnline(){
         Instant baseTime = Instant.now().minusMillis(300);
-        this.online = offlineAt.isAfter(baseTime);
+        return offlineAt.isAfter(baseTime);
     }
 }
