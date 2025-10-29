@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.channel.request.CreateChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,42 +18,43 @@ public interface ChannelService {
     /**
      * 새로운 채널 생성
      */
-    Channel createChannel(ChannelType channelType, String channelName, UUID adminId);
+    ChannelResponseDto createPublicChannel(CreateChannelRequestDto request);
+    PrivateChannelResponseDto createPrivateChannel(CreateChannelRequestDto request);
 
     /**
      * 채널에 멤버 추가
      */
-    void addMember(UUID id, UUID userId);
+    void addMember(UpdateChannelRequestDto request);
 
     /**
      * UUID로 채널 조회
      */
-    Channel getChannel(UUID id);
+    ChannelResponseDto getChannel(UUID id);
 
     /**
      * 사용자가 속한 채널 조회
      */
-    List<Channel> getChannelByUser(UUID userId);
+    List<ChannelResponseDto> getChannelByUser(UUID userId);
 
     /**
      * 채널 타입으로 조회
      */
-    List<Channel> getChannelByType(ChannelType channelType);
+    List<ChannelResponseDto> getChannelByType(ChannelType channelType);
 
     /**
      * 전체 채널 조회
      */
-    List<Channel> getAllChannels();
+    List<ChannelResponseDto> getAllChannels(UUID userId);
 
     /**
      * 채널 관리자 변경
      */
-    void updateAdmin(UUID channelId, UUID userId);
+    void updateAdmin(UpdateChannelRequestDto request);
 
     /**
      * 채널 이름 변경
      */
-    void updateName(UUID id, String name);
+    void updateName(UUID channelId, String name);
 
     /**
      * 채널 삭제 (관리자 권한 필요)
@@ -61,12 +64,17 @@ public interface ChannelService {
     /**
      * 채널 멤버 삭제
      */
-    void deleteChannelMember(UUID id, UUID requesterId, UUID targetId);
+    void deleteChannelMember(UUID channelId, UUID requesterId, UUID targetId);
 
     /**
      * 유저가 채널에 속해있는지 확인
      */
-    boolean isUserJoinedChannel(UUID userId, Channel channel);
+    boolean isUserJoinedChannel(UUID userId, UUID channelId);
+
+    /**
+     * 채널 존재 여부 확인
+     */
+    boolean existsById(UUID channelId);
 
     /**
      * 채널 이름 중복 확인

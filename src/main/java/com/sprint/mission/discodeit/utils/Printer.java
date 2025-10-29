@@ -1,20 +1,21 @@
 package com.sprint.mission.discodeit.utils;
 
-import com.sprint.mission.discodeit.dto.response.UserResponseDto;
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class Printer {
 
@@ -31,23 +32,19 @@ public class Printer {
         Instant unixTime;
         String KST, date = null, time;
 
-        DateTimeFormatter formatter = DateTimeFormatter
-                .ofPattern("yyyy-MM-dd HH:mm:ss")
-                .withZone(ZoneId.of("Asia/Seoul"));
-
-        for(Message msg : msgs){
-            unixTime = msg.getCreatedAt();
-
-            KST = formatter.format(unixTime);
+        for(Message msg : msgs) {
+            KST = TimeConvert.time(msg.getCreatedAt()); // Instant 값을 "yyyy-MM-dd HH:mm:ss" 형태로 변환
             time = KST.split(" ")[1]; // 시간만 저장
 
-            if(!KST.split(" ")[0].equals(date)){ //날짜가 다르다면
+            if (!KST.split(" ")[0].equals(date)) { //날짜가 다르다면
                 date = KST.split(" ")[0]; // 날짜만 저장
                 System.out.printf("====================%s====================\n", date);
             }
 
-            if(msg.getSenderId().equals(user.getId())){
+            if (msg.getSenderId().equals(user.getId())) {
                 System.out.printf("%s 나: %s\n", time, msg.getContent());
+            } else if(!msg.getReceiverId().equals(user.getId()) && msg.getReceiverId().equals(msg.getSenderId())) { // 채널이 보낸 메시지의 경우
+                System.out.printf("%s\n", msg.getContent());
             } else {
                 System.out.printf("%s %s: %s\n", time, userService.getUserNickName(msg.getSenderId()), msg.getContent());
             }
@@ -58,11 +55,7 @@ public class Printer {
         Optional.ofNullable(messageService.getLastestMessage(user1.getId(), user2.getId(), ReceiveType.USER))
                 .ifPresentOrElse(
                         message -> {
-                            DateTimeFormatter formatter = DateTimeFormatter
-                                    .ofPattern("yyyy-MM-dd HH:mm:ss")
-                                    .withZone(ZoneId.of("Asia/Seoul"));
-
-                            String KST = formatter.format(message.getCreatedAt());
+                            String KST = TimeConvert.time(message.getCreatedAt());
                             String time = KST.split(" ")[1];
                             System.out.printf("%s: %s(%s)\n", user2.getNickName(), message.getContent(), time);
                         },
@@ -70,11 +63,17 @@ public class Printer {
                 );
     }
 
-    public static void printChannelMember(Channel channel){
+    public static void printChannelInfo(ChannelResponseDto channel, int num){
+        System.out.printf("%d. %s(%s, %s)\n", num + 1, channel.getChannelName(), channel.getChannelType(), channel.getVisibility());
+        System.out.printf("   └ 최근 대화: %s\n", TimeConvert.time(channel.getLastedMessageAt()));
+    }
+
+    public static void printChannelMember(ChannelService channelService, UUID channelId){
+        PrivateChannelResponseDto channel = (PrivateChannelResponseDto) channelService.getChannel(channelId);
         UserRepository userRepository = FileUserRepository.getInstance();
 
         System.out.println("채널 멤버 조회");
-        List<User> channelMember = channel.getMembers().stream()
+        List<User> channelMember = channel.getMemberIds().stream()
                 .map(id -> userRepository.findById(id))
                 .toList();
 

@@ -30,7 +30,7 @@ public interface MessageService {
     List<Message> getAllMessagesByUser(User user);
 
     /** 특정 채널에 포함된 모든 메시지 조회 */
-    List<Message> getAllByChannel(Channel channel);
+    List<Message> getAllByChannel(UUID channelId);
 
     /** 메시지 내용(content)을 수정 */
     void updateMessage(UUID id, String content);
@@ -39,5 +39,5 @@ public interface MessageService {
     void deleteMessage(UUID id);
 
     /** 특정 유저가 보낸 모든 메시지를 삭제 */
-    void deleteMessagesByUser(User user);
+    void deleteMessagesByUser(UUID userId);
 }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.request;
+package com.sprint.mission.discodeit.dto.auth.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

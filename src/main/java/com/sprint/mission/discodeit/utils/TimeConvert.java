@@ -6,12 +6,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class TimeConvert {
-    public static String time(long unixTime){
-        long time = unixTime;
-        Instant instant = Instant.ofEpochMilli(time);
-        LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        String formatted = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    public static String time(Instant unixTime){
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("Asia/Seoul"));
 
-        return formatted;
+        return formatter.format(unixTime);
     }
 }

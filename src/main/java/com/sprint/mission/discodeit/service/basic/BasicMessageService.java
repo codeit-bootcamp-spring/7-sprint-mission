@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.entity.User;
@@ -101,9 +100,9 @@ public class BasicMessageService implements MessageService {
      * 특정 채널에 포함된 모든 메시지 조회
      */
     @Override
-    public List<Message> getAllByChannel(Channel channel) {
+    public List<Message> getAllByChannel(UUID channelId) {
         return messageRepository.findAll().stream()
-                .filter(m -> channel.getId().equals(m.getReceiverId()))
+                .filter(m -> channelId.equals(m.getReceiverId()))
                 .toList();
     }
 
@@ -129,7 +128,7 @@ public class BasicMessageService implements MessageService {
      * 특정 유저가 보낸 모든 메시지 삭제
      */
     @Override
-    public void deleteMessagesByUser(User user) {
-        messageRepository.deleteByUser(user);
+    public void deleteMessagesByUser(UUID userId) {
+        messageRepository.deleteByUser(userId);
     }
 }

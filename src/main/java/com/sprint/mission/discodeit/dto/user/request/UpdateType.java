@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.request;
+package com.sprint.mission.discodeit.dto.user.request;
 
 public enum UpdateType {
     USER_NAME("이름"),

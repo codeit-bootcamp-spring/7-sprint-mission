@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.request.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.request.UpdatePasswordRequestDto;
-import com.sprint.mission.discodeit.dto.request.UpdateUserRequestDto;
-import com.sprint.mission.discodeit.dto.response.UserResponseDto;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.request.UpdatePasswordRequestDto;
+import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 
 import java.util.List;
 import java.util.UUID;

@@ -10,11 +10,13 @@ import java.util.UUID;
 public class Channel extends BaseEntity{
     private String channelName;
     private final ChannelType channelType;
+    private final ChannelVisibility visibility;
     private UUID adminId;
     private List<UUID> memberIds;
 
-    public Channel(ChannelType channelType, String channelName, UUID adminId) {
+    public Channel(ChannelType channelType, ChannelVisibility visibility, String channelName, UUID adminId) {
         this.channelType = channelType;
+        this.visibility = visibility;
         this.channelName = channelName;
         this.adminId = adminId;
         this.memberIds = new ArrayList<>();
@@ -31,7 +33,7 @@ public class Channel extends BaseEntity{
         this.adminId = adminId;
     }
 
-    public List<UUID> getMembers() {
+    public List<UUID> getMemberIds() {
         return new ArrayList<>(memberIds);
     }
 
@@ -52,6 +54,7 @@ public class Channel extends BaseEntity{
         return "Channel{" +
                 "channelName='" + channelName + '\'' +
                 ", channelType=" + channelType +
+                ", channelVisibility=" + visibility +
                 ", adminId=" + adminId +
                 ", memberIds=" + memberIds +
                 str +

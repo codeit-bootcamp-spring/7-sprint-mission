@@ -1,8 +1,16 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.config.AppConfig;
-import com.sprint.mission.discodeit.dto.request.*;
-import com.sprint.mission.discodeit.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.dto.auth.request.LoginUserDto;
+import com.sprint.mission.discodeit.dto.channel.request.CreateChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.request.UpdatePasswordRequestDto;
+import com.sprint.mission.discodeit.dto.user.request.UpdateType;
+import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
@@ -33,9 +41,9 @@ public class DiscodeitTest {
     boolean login = false;
 
     private DiscodeitTest(UserRepository userRepository, ChannelRepository channelRepository, MessageRepository messageRepository,
-                          UserStatusRepository userStatusRepository, BinaryContentRepository binaryContentRepository) {
+                          UserStatusRepository userStatusRepository, BinaryContentRepository binaryContentRepository, ReadStatusRepository readStatusRepository) {
         userService = new BasicUserService(userRepository, messageRepository, userStatusRepository, binaryContentRepository);
-        channelService = new BasicChannelService(channelRepository);
+        channelService = new BasicChannelService(channelRepository, messageRepository, readStatusRepository);
         messageService = new BasicMessageService(messageRepository);
         authService = new BasicAuthService(userRepository, userStatusRepository);
 
@@ -67,7 +75,8 @@ public class DiscodeitTest {
                                 JCFChannelRepository.getInstance(),
                                 JCFMessageRepository.getInstance(),
                                 new JCFUserStatusRepository(),
-                                new JCFBinaryContentRepository()
+                                new JCFBinaryContentRepository(),
+                                new JCFReadStatusRepository()
                         );
                     }
                     case 2 -> {
@@ -77,7 +86,8 @@ public class DiscodeitTest {
                                 FileChannelRepository.getInstance(),
                                 FileMessageRepository.getInstance(),
                                 new FileUserStatusRepository(),
-                                new FileBinaryContentRepository()
+                                new FileBinaryContentRepository(),
+                                new FileReadStatusRepository()
                         );
                     }
                     case 3 -> exit();
@@ -200,7 +210,7 @@ public class DiscodeitTest {
 
     private void chatMenu() {
         List<UserResponseDto> users = userService.getAllUsers();
-        users.remove(loginUser); // 닉네임 출력을 위해 내 정보 리스트에서 삭제
+        users.removeIf(u -> loginUser.getId().equals(u.getId())); // 닉네임 출력을 위해 내 정보 리스트에서 삭제
         int choice;
 
         try {
@@ -276,11 +286,28 @@ public class DiscodeitTest {
     }
 
     private void channelChoice() {
-        Channel c;
+        ChannelResponseDto channel;
+        List<ChannelResponseDto> userChannels;
         int choice;
 
         while(true) {
-            List<Channel> userChannels = channelService.getChannelByUser(loginUser.getId());
+            Printer.printLine();
+            System.out.println("1. 모든 채널 조회 2. 비공개 채널 조회 3. 이전 메뉴");
+            System.out.printf("입력: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch(choice) {
+                case 1 -> {
+                    userChannels = channelService.getAllChannels(loginUser.getId());
+                }
+                case 2 -> userChannels = channelService.getChannelByUser(loginUser.getId());
+                case 3 -> { return; }
+                default -> {
+                    System.out.println("메뉴 내 숫자만 입력해주세요.");
+                    continue;
+                }
+            }
 
             if (userChannels.isEmpty()) { // 참여하고 있는 채널 여부 확인
                 System.out.println("현재 속해있는 채널이 없습니다.");
@@ -289,9 +316,10 @@ public class DiscodeitTest {
 
             Printer.printHalfLine();
             System.out.println("입장을 원하시는 채널을 선택해주세요.");
+
             for (int i = 0; i < userChannels.size(); i++) {
-                c = userChannels.get(i);
-                System.out.printf("%d. %s(%s)\n", i + 1, c.getChannelName(), c.getChannelType());
+                channel = userChannels.get(i);
+                Printer.printChannelInfo(channel, i);
             }
             System.out.printf("%d. 이전 메뉴\n", userChannels.size() + 1);
 
@@ -308,8 +336,7 @@ public class DiscodeitTest {
                 }
 
                 UUID channelId = userChannels.get(choice - 1).getId();
-                Channel channel = channelService.getChannel(channelId); //선택된 채널 불러오기
-                channelActionMenu(channel);
+                channelActionMenu(channelId);
 
             } catch (InputMismatchException e) {
                 System.out.println("숫자를 입력해주세요.");
@@ -320,8 +347,11 @@ public class DiscodeitTest {
         }
     }
 
-    private void channelActionMenu(Channel channel) {
+    private void channelActionMenu(UUID channelId) {
+        ChannelResponseDto channel;
         while (true) {
+            channel = channelService.getChannel(channelId);
+
             Printer.printLine();
             System.out.printf("%s에 입장하였습니다.\n", channel.getChannelName());
             boolean isAdmin = channel.getAdminId().equals(loginUser.getId()); // 로그인 유저가 채널 관리자인지 확인
@@ -333,18 +363,33 @@ public class DiscodeitTest {
                 System.out.print("1. 통화방 입장 ");
             }
 
-            System.out.print("2. 채널 멤버 조회 ");
+            if(channel.getVisibility() == ChannelVisibility.PRIVATE) { // 비공개 채널의 경우
+                System.out.print("2. 채널 멤버 조회 ");
 
-            if (isAdmin) { // 관리자 전용 메뉴 출력
-                System.out.println("3. 채널 이름 변경 4. 채널 관리자 변경 5. 채널 내 멤버 삭제 6. 채널 삭제 7. 이전 메뉴");
-            } else {
-                System.out.println("3. 채널 나가기 4. 이전 메뉴");
+                if (isAdmin) { // 관리자 전용 메뉴 출력
+                    System.out.println("3. 채널 이름 변경 4. 채널 관리자 변경 5. 채널 내 멤버 삭제 6. 채널 삭제 7. 이전 메뉴");
+                } else {
+                    System.out.println("3. 채널 나가기 4. 이전 메뉴");
+                }
+            } else if(channel.getVisibility() == ChannelVisibility.PUBLIC){ // 공개 채널의 경우
+                if (isAdmin) { // 관리자 전용 메뉴 출력
+                    System.out.println("2. 채널 이름 변경 3. 채널 삭제 4. 이전 메뉴");
+                } else {
+                    System.out.println("2. 채널 나가기 3. 이전 메뉴");
+                }
             }
+
             System.out.print("입력: ");
 
             try {
                 int choice = sc.nextInt();
                 sc.nextLine();
+
+                // 공개채널과 비공개 채널 선택 숫자 동일하게 바꾸기 위함
+                if(channel.getVisibility() == ChannelVisibility.PUBLIC && choice > 1) {
+                    choice += 1;
+                    if (isAdmin && choice >= 4) choice += 2;
+                }
 
                 if ((isAdmin && (choice < 1 || choice > 7)) || (!isAdmin && (choice < 1 || choice > 4))) {
                     System.out.println("메뉴 내 숫자를 입력해주세요.");
@@ -358,10 +403,10 @@ public class DiscodeitTest {
                     case 1 -> joinChannelRoom(channel);
                     case 2 -> {
                         Printer.printHalfLine();
-                        Printer.printChannelMember(channel);
+                        Printer.printChannelMember(channelService, channel.getId());
                         Printer.printHalfLine();
                     }
-                    case 3 -> renameChannel(channel);
+                    case 3 -> renameChannel(channel.getId());
                     case 4 -> updateChannelAdmin(channel);
                     case 5 -> deleteChannelMember(channel);
                     case 6, 8 -> {
@@ -369,7 +414,7 @@ public class DiscodeitTest {
                         else leaveChannel(channel); // 관리자가 아닌 유저가 채널 나가기 선택시 메서드 실행
 
                         // 채널이 삭제되거나 채널을 나가게 되면 채널 선택 메뉴로 이동
-                        if (!channelService.isUserJoinedChannel(loginUser.getId(), channel)){
+                        if (!channelService.existsById(channel.getId()) && !channelService.isUserJoinedChannel(loginUser.getId(), channel.getId())){
                             System.out.println("채널 선택 메뉴로 돌아갑니다.");
                             return;
                         }
@@ -387,7 +432,7 @@ public class DiscodeitTest {
         }
     }
 
-    private void joinChannelRoom(Channel channel) {
+    private void joinChannelRoom(ChannelResponseDto channel) {
         String input;
 
         //채팅방과 통화방 나누기
@@ -396,7 +441,8 @@ public class DiscodeitTest {
             System.out.println("채널 채팅 입장");
             Printer.printLine();
 
-            List<Message> channelMessages = messageService.getAllByChannel(channel);
+            UUID channelId = channel.getId();
+            List<Message> channelMessages = messageService.getAllByChannel(channelId);
             Printer.printChatHistory(userService, loginUser, channelMessages);
             while (true) {
                 Printer.printHalfLine();
@@ -405,7 +451,7 @@ public class DiscodeitTest {
                 input = sc.nextLine();
 
                 if (input.equals("1")) {
-                    channelMessages = messageService.getAllByChannel(channel);
+                    channelMessages = messageService.getAllByChannel(channel.getId());
                     Printer.printChatHistory(userService, loginUser, channelMessages);
                 } else if (input.equals("-1")) return;
                 else {
@@ -424,14 +470,14 @@ public class DiscodeitTest {
         }
     }
 
-    private void renameChannel(Channel channel) {
+    private void renameChannel(UUID channelId) {
         while (true) {
             try {
                 System.out.println("채널 이름 변경을 선택하였습니다. 변경 이름 작성해주세요. 이전 메뉴로 가시려면 -1을 입력하세요");
                 System.out.print("변경할 채널 이름: ");
                 String newChannelName = sc.nextLine();
                 if (!newChannelName.equals("-1")) {
-                    channelService.updateName(channel.getId(), newChannelName);
+                    channelService.updateName(channelId, newChannelName);
                     System.out.printf("%s로 채널 이름이 변경되었습니다.\n", newChannelName);
                 }
                 System.out.println("이전 메뉴로 돌아갑니다.");
@@ -442,14 +488,17 @@ public class DiscodeitTest {
         }
     }
 
-    private void updateChannelAdmin(Channel channel) {
-        List<UserResponseDto> members = channel.getMembers().stream()
-                .map(m -> userService.getUserById(m))
-                .collect(Collectors.toList());
-        members.remove(loginUser);
+    private void updateChannelAdmin(ChannelResponseDto channel) {
+        PrivateChannelResponseDto privateChannel;
 
         while (true) {
             try {
+                privateChannel = (PrivateChannelResponseDto) channel;
+                List<UserResponseDto> members = privateChannel.getMemberIds().stream()
+                        .map(m -> userService.getUserById(m))
+                        .collect(Collectors.toList());
+                members.removeIf(u -> u.getId().equals(loginUser.getId()));
+
                 Printer.printLine();
                 System.out.println("채널 관리자 변경을 선택하였습니다. 변경을 원하는 멤버를 선택해주세요.");
                 for (int i = 0; i < members.size(); i++) {
@@ -463,7 +512,7 @@ public class DiscodeitTest {
 
                 if (choice >= 1 && choice <= members.size()) {
                     UserResponseDto newAdmin = members.get(choice - 1);
-                    channelService.updateAdmin(channel.getId(), newAdmin.getId());
+                    channelService.updateAdmin(new UpdateChannelRequestDto(privateChannel.getId(), newAdmin.getId()));
                     System.out.println("관리자가 변경되었습니다. 이전 메뉴로 돌아갑니다.");
                     return;
                 } else if (choice == members.size() + 1) {
@@ -472,6 +521,9 @@ public class DiscodeitTest {
                 } else {
                     System.out.println("올바르지 않은 입력입니다.");
                 }
+            } catch(ClassCastException e) {
+                System.out.println("공개 채널은 관리자를 변경할 수 없습니다. 이전 메뉴로 돌아갑니다.");
+                return;
             } catch (InputMismatchException e) {
                 System.out.println("숫자만 입력해주세요.");
                 sc.nextLine();
@@ -484,14 +536,17 @@ public class DiscodeitTest {
         }
     }
 
-    private void deleteChannelMember(Channel channel) {
-        List<UserResponseDto> channelMember = channel.getMembers().stream()
-                .map(m -> userService.getUserById(m))
-                .collect(Collectors.toList());
-        channelMember.remove(loginUser); //로그인 된 유저의 정보는 제외
+    private void deleteChannelMember(ChannelResponseDto channel) {
+        PrivateChannelResponseDto privateChannel;
 
         while(true) {
             try {
+                privateChannel = (PrivateChannelResponseDto) channel;
+                List<UserResponseDto> channelMember = privateChannel.getMemberIds().stream()
+                        .map(m -> userService.getUserById(m))
+                        .collect(Collectors.toList());
+                channelMember.removeIf(u -> u.getId().equals(loginUser.getId())); //로그인 된 유저의 정보는 제외
+
                 Printer.printLine();
                 System.out.println("삭제할 멤버를 선택해주세요");
                 for (int i = 0; i < channelMember.size(); i++) {
@@ -515,12 +570,15 @@ public class DiscodeitTest {
                 String userName = sc.nextLine();
 
                 if (target.getNickName().equals(userName)) {
-                    channelService.deleteChannelMember(channel.getId(), loginUser.getId(), target.getId());
+                    channelService.deleteChannelMember(privateChannel.getId(), loginUser.getId(), target.getId());
                     System.out.println("선택된 멤버가 삭제되었습니다.\n이전메뉴로 돌아갑니다.");
                     return;
                 } else {
                     System.out.println("닉네임이 정확하지 않습니다. 멤버를 다시 선택해주세요.");
                 }
+            } catch (ClassCastException e) {
+                System.out.println("공개채널은 채널 멤버를 삭제할 수 없습니다. 이전 메뉴로 돌아갑니다.");
+                return;
             } catch (InputMismatchException e) {
                 System.out.println("숫자만 입력해주세요.");
                 sc.nextLine();
@@ -540,7 +598,7 @@ public class DiscodeitTest {
         }
     }
 
-    private void deleteChannel(Channel channel) {
+    private void deleteChannel(ChannelResponseDto channel) {
         try {
             System.out.println("정말로 채널을 삭제하시겠습니까?");
             System.out.println("삭제를 원하시면 채널 이름을 정확히 입력해주세요");
@@ -564,7 +622,7 @@ public class DiscodeitTest {
         }
     }
 
-    private void leaveChannel(Channel channel) {
+    private void leaveChannel(ChannelResponseDto channel) {
         try {
             if (loginUser.getId().equals(channel.getAdminId())) {
                 System.out.println("관리자는 채널을 나갈 수 없습니다.");
@@ -601,19 +659,24 @@ public class DiscodeitTest {
     private void createChannel() {
         try {
             System.out.println("새로운 채널을 생성합니다. 정보를 입력해주세요");
-            System.out.println("채널 타입 : 1. 메시지 2. 음성");
+            System.out.println("채널 타입 및 공개 여부 : 1. 메시지(공개) 2. 메시지(비공개) 3. 음성(공개) 4. 음성(비공개) 5. 이전 메뉴");
             System.out.print("입력: ");
             int choice = sc.nextInt();
             sc.nextLine();
-            System.out.print("채널 이름: ");
-            String newChannelName = sc.nextLine();
+
             switch (choice) {
-                case 1 ->
-                        channelService.createChannel(ChannelType.MESSAGE, newChannelName, loginUser.getId());
-                case 2 ->
-                        channelService.createChannel(ChannelType.VOICE, newChannelName, loginUser.getId());
+                case 1, 2, 3, 4 -> {
+                    System.out.print("채널 이름: ");
+                    String newChannelName = sc.nextLine();
+
+                    if(choice == 1) channelService.createPublicChannel(new CreateChannelRequestDto(ChannelType.MESSAGE, newChannelName, loginUser.getId()));
+                    else if(choice == 2) channelService.createPrivateChannel(new CreateChannelRequestDto(ChannelType.MESSAGE, newChannelName, loginUser.getId()));
+                    else if(choice == 3) channelService.createPublicChannel(new CreateChannelRequestDto(ChannelType.VOICE, newChannelName, loginUser.getId()));
+                    else channelService.createPrivateChannel(new CreateChannelRequestDto(ChannelType.VOICE, newChannelName, loginUser.getId()));
+                }
+                case 5 -> { return; }
                 default -> {
-                    System.out.println("채널 타입을 정확히 골라주세요. 이전 메뉴로 돌아갑니다.");
+                    System.out.println("메뉴에서 정확히 골라주세요. 이전 메뉴로 돌아갑니다.");
                     return;
                 }
             }
@@ -682,6 +745,7 @@ public class DiscodeitTest {
                     System.out.println("메뉴 내 숫자를 입력해주세요.");
                 }
             }
+            loginUser = userService.getUserById(loginUser.getId()); //수정된 정보 저장
         } catch (InputMismatchException e) {
             System.out.println("숫자만 입력해주세요.");
             sc.nextLine();

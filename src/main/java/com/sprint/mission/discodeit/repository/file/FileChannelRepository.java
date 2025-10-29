@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.ChannelVisibility;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.stereotype.Repository;
 
@@ -104,7 +104,11 @@ public class FileChannelRepository implements ChannelRepository {
     public void save(Channel channel) {
         channelStore.put(channel.getId(), channel);
         saveChannels();
-        saveJoinedChannels();
+
+        // 비공개 채널의 경우에만 참여한 채널 정보 저장
+        if(channel.getVisibility() == ChannelVisibility.PRIVATE) {
+            saveJoinedChannels();
+        }
     }
 
     @Override
@@ -151,7 +155,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteById(UUID id) {
         // 삭제되는 채널 id를 유저들이 속해 있는 채널 리스트(joinedChannels)에서도 삭제
-        findById(id).getMembers()
+        findById(id).getMemberIds()
                 .forEach(member -> deleteChannelIdForUser(id, member));
 
         channelStore.remove(id);
