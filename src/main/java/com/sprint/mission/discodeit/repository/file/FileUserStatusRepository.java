@@ -23,6 +23,11 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
+    public List<UserStatus> findAll() {
+        return List.of();
+    }
+
+    @Override
     public UserStatus save(UUID UserUUID) {
         UserStatus userStatus = new UserStatus(UserUUID);
         FileIo.save(filename,userStatus);

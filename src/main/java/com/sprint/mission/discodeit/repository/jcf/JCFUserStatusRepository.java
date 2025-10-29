@@ -33,6 +33,11 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
+    public List<UserStatus> findAll() {
+        return List.of();
+    }
+
+    @Override
     public void deleteByUserId(UUID userId) {
        data.remove(userId);
     }

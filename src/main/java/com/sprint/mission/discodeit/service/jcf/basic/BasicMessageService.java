@@ -72,16 +72,16 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message update(UpdateMessageRequest request) {
         Message message = messageRepository.findById(request.messageId())
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + request.messageId() + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("매시지아이디가 없어 " + request.messageId()));
         message.update(request.newContent());
 
         return messageRepository.save(message);
-    }
+    } 
 
     @Override
     public void delete(UUID messageId) {
         if (!messageRepository.existsById(messageId)) {
-            throw new NoSuchElementException("Message with id " + messageId + " not found");
+            throw new NoSuchElementException("메시지 아이디가 없어" + messageId);
         }
         binaryRepository.deleteByUuid(messageId, ContentsType.MESSAGE_ATTACHMENT);
         messageRepository.deleteById(messageId);

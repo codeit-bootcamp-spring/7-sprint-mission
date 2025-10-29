@@ -29,14 +29,6 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
 
-/*    public BasicChannelService(@Qualifier("JCFCannel") ChannelRepository channelRepository
-                              , @Qualifier("JCFReadStatus") ReadStatusRepository readStatusRepository
-                               ,@Qualifier("JCFMessage") MessageRepository messageRepository
-    ) {
-        this.channelRepository = channelRepository;
-        this.readStatusRepository = readStatusRepository;
-        this.messageRepository = messageRepository;
-    }*/
 
 
     @Override
