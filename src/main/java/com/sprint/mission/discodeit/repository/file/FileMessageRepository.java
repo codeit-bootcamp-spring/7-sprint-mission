@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public class FileMessageRepository extends BaseFileRepository<Message> implements MessageRepository {
     //싱글톤 구현
     private final static FileMessageRepository instance = new FileMessageRepository();

@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public class FileChannelRepository extends BaseFileRepository<Channel> implements ChannelRepository {
     //싱글톤 구현
     private final static FileChannelRepository instance = new FileChannelRepository();

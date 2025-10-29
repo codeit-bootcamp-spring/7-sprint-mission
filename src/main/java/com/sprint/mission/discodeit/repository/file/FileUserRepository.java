@@ -2,9 +2,12 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public class FileUserRepository extends BaseFileRepository<User> implements UserRepository {
     //싱글톤 구현
     private final static FileUserRepository userRepository = new FileUserRepository();
