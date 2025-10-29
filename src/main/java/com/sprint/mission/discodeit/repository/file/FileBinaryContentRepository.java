@@ -19,7 +19,7 @@ public class FileBinaryContentRepository implements BinaryRepository {
     private static final String filename = "binary";
 
     @Override
-    public BinaryContent save(UUID binaryId, ContentsType contentsType, String contentID) {
+    public BinaryContent save(UUID binaryId, ContentsType contentsType, UUID contentID) {
         BinaryContent binary = new BinaryContent(binaryId,contentsType,contentID);
         FileIo.save(filename+"/"+contentsType, binary);
         return binary;

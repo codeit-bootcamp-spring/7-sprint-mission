@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
-@Setter
+
 public class User extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -43,6 +43,7 @@ public class User extends Common implements Serializable {
                 ", 닉네임 = '" + this.getId() + '\'' +
                 '}';
     }
+
 
     //업데이트하면 하난하나 적용해서 트루로체크해
     //끝가지가면 트루 아니면 false된다

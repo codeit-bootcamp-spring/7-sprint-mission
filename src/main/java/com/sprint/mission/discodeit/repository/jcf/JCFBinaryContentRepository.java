@@ -23,7 +23,7 @@ public class JCFBinaryContentRepository implements BinaryRepository {
 
 
     @Override
-    public BinaryContent save(UUID binaryId, ContentsType contentsType, String contentID) {
+    public BinaryContent save(UUID binaryId, ContentsType contentsType, UUID contentID) {
         BinaryContent binary = new BinaryContent(binaryId,contentsType,contentID);
        //여기서 바이너리로 하면  그 고유이긴한데
         this.data.put(binary.getTypeUUID(),binary);

@@ -15,7 +15,7 @@ public interface BinaryRepository {
     Optional<BinaryContent> findByUuid(UUID contentId,ContentsType contentsType);
 
 
-    BinaryContent save(UUID binaryId, ContentsType contentsType, String contentID);
+    BinaryContent save(UUID binaryId, ContentsType contentsType, UUID contentID);
 
 
     void deleteByUuid(UUID contentId, ContentsType contentsType);

@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.service.jcf.basic;
 
+import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.content.ContentsType;
+import com.sprint.mission.discodeit.repository.BinaryRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -17,6 +21,7 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
+    private final BinaryRepository binaryRepository;
 
     //의존성 주입이긴한데 이거 일커지면 더 늘어나는데
   /*  public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
@@ -27,17 +32,26 @@ public class BasicMessageService implements MessageService {
     }*/
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
+    public Message create(CreateMessageRequest request) {
         //둘의 uuid가 존재유무판단
-        if (!channelRepository.existsById(channelId)) {
-            throw new NoSuchElementException("채널UUID가없어 :" + channelId);
+        if (!channelRepository.existsById(request.channelId())) {
+            throw new NoSuchElementException("채널UUID가없어 :" + request.channelId());
         }
-        if (!userRepository.existsById(authorId)) {
-            throw new NoSuchElementException("매시지UUID가 없어 :" + authorId);
+        if (!userRepository.existsById(request.authorId())) {
+            throw new NoSuchElementException("매시지UUID가 없어 :" + request.authorId());
         }
-
-        Message message = new Message(content, channelId, authorId);
+        Message message = new Message(request.content(), request.channelId(), request.authorId());
+        //첨부파일이 없으면 그냥 저장
+        if(request.attachmentIds() == null || request.attachmentIds().isEmpty()){
+            return messageRepository.save(message);
+        }
+        //첨부파일이 있으면
+        //만들고 첨부파일 추가 저장
+        request.attachmentIds()
+                .forEach(id->binaryRepository.save(message.getId(), ContentsType.MESSAGE_ATTACHMENT,id));
         return messageRepository.save(message);
+
+
     }
 
     @Override
@@ -48,15 +62,19 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll();
+    public List<Message> findAllByChannelId(UUID channelId) {
+         return  messageRepository.findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
+
     }
 
     @Override
-    public Message update(UUID messageId, String newContent) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(newContent);
+    public Message update(UpdateMessageRequest request) {
+        Message message = messageRepository.findById(request.messageId())
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + request.messageId() + " not found"));
+        message.update(request.newContent());
+
         return messageRepository.save(message);
     }
 
@@ -65,6 +83,7 @@ public class BasicMessageService implements MessageService {
         if (!messageRepository.existsById(messageId)) {
             throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
+        binaryRepository.deleteByUuid(messageId, ContentsType.MESSAGE_ATTACHMENT);
         messageRepository.deleteById(messageId);
     }
 }

@@ -70,7 +70,7 @@ public class Channel extends Common implements Serializable {
                 '}';
     }
 
-    public void update(String newChannelName, UUID newBose, List<UUID> newUsers) {
+    public void update(String newChannelName, UUID newBose, List<UUID> newUsers,String newDescription) {
         boolean anyValueUpdated = false;
 
         if (newChannelName != null && !newChannelName.equals(this.channelName)) {
@@ -85,6 +85,10 @@ public class Channel extends Common implements Serializable {
 
         if (newUsers != null && !newUsers.equals(this.users)) {
             this.users = newUsers;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
             anyValueUpdated = true;
         }
 

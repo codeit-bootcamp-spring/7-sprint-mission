@@ -15,4 +15,11 @@ public class ReadStatus extends Common {
   private  UUID userId;
     private  UUID channelId;
 
+
+
+
+    public void update() {
+        this.setUpdatedAt(Instant.ofEpochSecond(Instant.now().getEpochSecond()));
+    }
 }
+

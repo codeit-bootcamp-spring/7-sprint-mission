@@ -16,9 +16,9 @@ public class BinaryContent extends Common {
     //하나로 묶는것이 좋지않을까
     private final UUID typeUUID;
     private final ContentsType contentsType;
-    private final String contentsId;
+    private final UUID contentsId;
 
-    public BinaryContent(UUID typeUUID,ContentsType contentsType,String contentsId) {
+    public BinaryContent(UUID typeUUID,ContentsType contentsType,UUID contentsId) {
         this.typeUUID = typeUUID;
         this.contentsType = contentsType;
         this.contentsId = contentsId;

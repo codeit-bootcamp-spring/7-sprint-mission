@@ -5,6 +5,8 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,6 +17,7 @@ public class Message extends Common implements Serializable {
     private UUID channelId;
     private Instant time;
     private String content;
+  //  private List<UUID> attachmentIds = new ArrayList<>();
 
     public Message() {
     }
@@ -79,5 +82,11 @@ public class Message extends Common implements Serializable {
         if (anyValueUpdated) {
             this.setUpdatedAt(Instant.ofEpochSecond(Instant.now().getEpochSecond()));
         }
+        
+        
     }
+    //첨부파일추가
+   /* public void addAttachmentId(UUID attachmentId) {
+        this.attachmentIds.add(attachmentId);
+    }*/
 }

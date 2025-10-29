@@ -46,12 +46,12 @@ public class BasicUserService implements UserService {
      //이메일매칭
      if(userRepository.findAll().stream()
              .anyMatch(user -> user.getUserEmail().equals(userCreateRequest.email()))){
-         throw new RuntimeException("Email already exists");
+         throw new RuntimeException("이메일이 이미 존재합니다");
      }
      //닉네임매칭
      if(userRepository.findAll().stream()
                 .anyMatch(user -> user.getUserNickname().equals(userCreateRequest.userNickname()))){
-         throw new RuntimeException("Nickname already exists");
+         throw new RuntimeException("닉네임이 이미 존재합니다");
      }
 
      //저장을위한 모든 정보
@@ -61,8 +61,8 @@ public class BasicUserService implements UserService {
                 ,userCreateRequest.rawPassword()
                 ,userCreateRequest.userNickname());
        //혹시이미지가 있니 없니
-        if (userCreateRequest.profileImageUrl() != null && !userCreateRequest.profileImageUrl().isBlank()) {
-            user.setProfilePicture(userCreateRequest.profileImageUrl());
+        if (userCreateRequest.profileImageUrl() != null) {
+            binaryRepository.save(user.getId(),ContentsType.PROFILE_IMAGE,userCreateRequest.profileImageUrl());
         }
         //유저정보저장
         userRepository.save(user);
@@ -117,7 +117,8 @@ public class BasicUserService implements UserService {
             throw new NoSuchElementException("유저uuid못찾아용"+userId);
         }
         binaryRepository.deleteByUuid(userId, ContentsType.PROFILE_IMAGE);
-        userStatusRepository.deleteByUserId(userId);
+        //이런게 너무번거롭다 싫다
+        userStatusRepository.findByUserId(userId);
         userRepository.deleteById(userId);
     }
 }

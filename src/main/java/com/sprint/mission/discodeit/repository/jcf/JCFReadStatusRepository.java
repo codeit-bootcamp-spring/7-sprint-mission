@@ -16,13 +16,24 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
-        return Optional.empty();
+    public ReadStatus save(UUID userid, UUID channelId) {
+
+        return null;
     }
 
     @Override
-    public void save(UUID bose, UUID id) {
+    public ReadStatus find(UUID readStatusId) {
+        return null;
+    }
 
+    @Override
+    public List<ReadStatus> findAll() {
+        return List.of();
+    }
+
+    @Override
+    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
+        return Optional.empty();
     }
 
 
