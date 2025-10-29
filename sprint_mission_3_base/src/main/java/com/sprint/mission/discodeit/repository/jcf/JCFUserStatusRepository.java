@@ -5,13 +5,14 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.UUID;
 
 @Repository
-@Primary  // 같은 타입 구현이 여러 개일 때 이 구현을 우선 사용
+@Primary
 public class JCFUserStatusRepository implements UserStatusRepository {
 
 
@@ -53,4 +54,29 @@ public class JCFUserStatusRepository implements UserStatusRepository {
             byUserId.remove(removed.getUserId());
         }
     }
+
+    @Override
+    public Optional<UserStatus> findLastSeenByUserId(UUID userId) {
+        return store.values().stream()
+                .filter(s -> s.getUserId().equals(userId))
+                .max(Comparator.comparing(UserStatus::getLastSeenAt));
+    }
+
+    @Override
+    public List<UUID> findAllUserIdsOnlineWithinMinutes(long minutes) {
+        Instant threshold = Instant.now().minusSeconds(minutes * 60);
+        return store.values().stream()
+                .filter(s -> s.getLastSeenAt().isAfter(threshold))
+                .map(UserStatus::getUserId)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        UUID id = byUserId.remove(userId);
+        if (id != null) {
+            store.remove(id);
+        }
+    }
+
 }
