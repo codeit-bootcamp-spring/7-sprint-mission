@@ -21,6 +21,12 @@ public class JCFMessageRepository implements MessageRepository {
     //메세지 데이터
     private final Map<UUID, Message> data = new HashMap<>();
 
+    //메세지 전부 조회
+    @Override
+    public List<Message> findAll() {
+        return data.values().stream().toList();
+    }
+
     //말한 사람 메세지 조회
     @Override
     public List<Message> findAllByUserId(UUID userId) {

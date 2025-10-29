@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageRepository {
+    List<Message> findAll();
     List<Message> findAllByUserId(UUID userId);
     List<Message> findAllByChannelId(UUID channelId);
     List<Message> findByContentContaining(String searchText);
