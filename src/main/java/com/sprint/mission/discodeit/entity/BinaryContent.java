@@ -7,7 +7,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public abstract class BinaryContent implements Serializable {
+public class BinaryContent implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     //Field
     private final UUID id;                  //각 객체 UUID
     private final Instant createdAt;        //객체 생성 일시

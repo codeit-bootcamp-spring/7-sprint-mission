@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.UUID;
+
 @Getter
 @ToString
 public class User extends BaseEntity {
@@ -12,6 +14,7 @@ public class User extends BaseEntity {
     private final String email;         //이메일
     private String nickname;            //닉네임
     private String password;            //비밀번호
+    private UUID profileId;             //프로필 이미지 UUID
 
     //Constructor
     public User(String email, String nickname, String password){
@@ -26,5 +29,10 @@ public class User extends BaseEntity {
         this.nickname = nickname;
         this.password = password;
         return this;
+    }
+
+    //프로필 이미지 업데이트
+    public void updateProfileImg(UUID profileId){
+        this.profileId = profileId;
     }
 }
