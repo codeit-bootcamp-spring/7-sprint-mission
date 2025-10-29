@@ -15,11 +15,16 @@ public abstract class BaseFileRepository<T extends Serializable> {
 
     protected BaseFileRepository(Class<T> type) {
         this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", type.getSimpleName());
+        ensureDirectoryExists();
+    }
+
+    // 폴더 존재 확인 및 생성
+    private void ensureDirectoryExists() {
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to create directory: " + DIRECTORY, e);
             }
         }
     }
@@ -30,6 +35,7 @@ public abstract class BaseFileRepository<T extends Serializable> {
 
     //파일에 Object를 저장한다.
     protected void saveToFile(UUID id, T object) {
+        ensureDirectoryExists();
         Path path = resolvePath(id);
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());

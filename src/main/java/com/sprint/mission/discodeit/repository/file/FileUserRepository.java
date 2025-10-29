@@ -48,7 +48,7 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
     @Override
     public List<User> findByNickname(String nickname) {
         return findAllFiles().stream()
-                .filter(u -> u.getEmail().equals(nickname))
+                .filter(u -> u.getNickname().equals(nickname))
                 .toList();
     }
 
