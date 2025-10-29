@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +26,13 @@ public class BasicUserService implements UserService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public UserResponseDto getById(String id) {
-        return UserResponseDto.toDto(userRepository.findById(id));
+    public UserResponseDto getByUserId(String userId) {
+        return UserResponseDto.toDto(userRepository.findByUserId(userId));
+    }
+
+    @Override
+    public UserResponseDto getById(UUID uuid) {
+        return UserResponseDto.toDto(userRepository.findById(uuid));
     }
 
 
@@ -57,7 +63,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto login(String id, String passwd) {
-        User user = userRepository.findById(id);
+        User user = userRepository.findByUserId(id);
         if (!user.getPasswd().equals(passwd))
             throw new IllegalArgumentException("아이디와 비밀번호가 일치하지 않습니다.");
 
@@ -68,7 +74,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void update(UserUpdateRequestDto dto) {
-        User user = userRepository.findById(dto.userId());
+        User user = userRepository.findByUserId(dto.userId());
         if (dto.passwd() != null) {
             user.setPasswd(dto.passwd());
         }
@@ -92,9 +98,17 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void deleteById(String id){
-        userRepository.deleteById(id);
-        User user = userRepository.findById(id);
+    public void deleteByUserId(String id){
+        User user = userRepository.findByUserId(id);
+        userRepository.delete(user);
+        readStatusRepository.deleteAllByUser(user);
+        binaryContentRepository.delete(user.getProfileImage());
+    }
+
+    @Override
+    public void deleteById(UUID uuid) {
+        User user = userRepository.findById(uuid);
+        userRepository.delete(user);
         readStatusRepository.deleteAllByUser(user);
         binaryContentRepository.delete(user.getProfileImage());
     }

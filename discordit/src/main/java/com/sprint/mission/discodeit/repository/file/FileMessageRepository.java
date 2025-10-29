@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.base.Message;
 import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.enums.ReceiverType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -15,63 +16,82 @@ import java.util.UUID;
 @Primary
 public class FileMessageRepository implements MessageRepository {
 
-    private final List<Message<Receivable>> data = new ArrayList<>();
+    private final List<Message> data = new ArrayList<>();
 
     @Override
-    public void save(Message<Receivable> message) {
+    public void save(Message message) {
         data.add(message);
         write();
     }
 
     @Override
-    public List<Message<Receivable>> findAll() {
+    public List<Message> findAll() {
         return List.copyOf(data);
     }
 
     @Override
-    public List<Message<Receivable>> findBySender(User user) {
+    public List<Message> findBySender(User user) {
         return data.stream()
                 .filter(m -> m.getSender().equals(user))
                 .toList();
     }
 
     @Override
-    public <T extends Receivable> List<Message<T>> findByReceiver(T receiver) {
+    public List<Message> findByReceiver(Receivable receiver) {
         return data.stream()
                 .filter(m -> m.getReceiver().equals(receiver))
-                .map(m -> (Message<T>) m)
                 .toList();
     }
 
     @Override
-    public <T extends Receivable> List<Message<T>> findBySenderAndReceiver(User user, T receiver) {
+    public List<Message> findBySenderAndReceiver(User user, Receivable receiver) {
         return data.stream()
                 .filter(m ->
                         m.getSender().equals(user)
                                 && m.getReceiver().equals(receiver))
-                .map(m -> (Message<T>) m)
                 .toList();
+    }
+
+    @Override
+    public void deleteAllByReceiver(Receivable receiver) {
+        data.removeIf(m -> m.getReceiver().equals(receiver));
+        write();
+    }
+
+    @Override
+    public void delete(Message message) {
+        data.removeIf(m -> m.getUuid().equals(message.getUuid()));
+        write();
+    }
+
+    @Override
+    public Message findLast(Receivable receiver) {
+        List<Message> foundMessages = findByReceiver(receiver);
+        if (foundMessages.isEmpty()) {
+            throw new IllegalStateException("저장된 메시지가 없습니다.");
+        }
+
+        return foundMessages.get(foundMessages.size() - 1);
     }
 
     /**
      * 테스트용 임시 메서드
      */
-    private Message<Receivable> findById(UUID uuid) {
+    private Message findById(UUID uuid) {
         return data.stream()
                 .filter(m -> m.getUuid().equals(uuid))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 id: " + uuid));
     }
 
-
     /**
      * 테스트용 임시 메서드
      */
-    public <T extends Receivable> void update(Message<T> message) {
-        Message<Receivable> existing = findById(message.getUuid());
+    public void update(Message message) {
+        Message existing = findById(message.getUuid());
         int index = data.indexOf(existing);
         if (index != -1) {
-            data.set(index, (Message<Receivable>) message);
+            data.set(index, message);
             write();
         }
     }
@@ -79,7 +99,7 @@ public class FileMessageRepository implements MessageRepository {
     /**
      * 테스트용 임시 메서드: 마지막으로 저장된 메시지를 반환합니다.
      */
-    public Message<Receivable> getLast() {
+    public Message findLast() {
         if (data.isEmpty()) {
             throw new IllegalStateException("저장된 메시지가 없습니다.");
         }

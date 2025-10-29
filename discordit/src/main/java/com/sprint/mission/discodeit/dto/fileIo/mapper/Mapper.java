@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.dto.fileIo.mapper;
 
 import com.sprint.mission.discodeit.entity.base.Channel;
 import com.sprint.mission.discodeit.entity.base.Message;
-import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
 import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.MessageIoDTO;
@@ -29,13 +28,13 @@ public final class Mapper {
         return UserMapper.toDto(user);
     }
 
-    public static Message<Receivable> toMessage (MessageIoDTO dto,
-                                                 UserRepository userRepository,
-                                                 ChannelRepository channelRepository){
+    public static Message toMessage (MessageIoDTO dto,
+                                     UserRepository userRepository,
+                                     ChannelRepository channelRepository){
         return MessageMapper.toMessage(dto, userRepository, channelRepository);
     }
 
-    public static MessageIoDTO toMessageDto(Message<? extends Receivable> message) {
+    public static MessageIoDTO toMessageDto(Message message) {
         return MessageMapper.toDto(message);
     }
 

@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.dto.fileIo.mapper;
 
+import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.entity.base.Channel;
 import com.sprint.mission.discodeit.entity.base.User;
-import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.HashSet;
-
 
 final class ChannelMapper {
     private ChannelMapper() {}
@@ -20,8 +19,12 @@ final class ChannelMapper {
                 dto.getDescription(),
                 dto.getScope(),
                 dto.getType(),
-                new HashSet<>(userRepository.findByIds(dto.getModeratorUserIds().toArray(String[]::new))),
-                new HashSet<>(userRepository.findByIds(dto.getMemberUserIds().toArray(String[]::new)))
+                new HashSet<>(dto.getModeratorUuids().stream()
+                        .map(userRepository::findById)
+                        .toList()),
+                new HashSet<>(dto.getMemberUuids().stream()
+                        .map(userRepository::findById)
+                        .toList())
         );
     }
 
@@ -35,10 +38,10 @@ final class ChannelMapper {
                 channel.getScope(),
                 channel.getDescription(),
                 channel.getMembers().stream()
-                        .map(User::getUserId)
+                        .map(User::getUuid)
                         .toList(),
                 channel.getModerators().stream()
-                        .map(User::getUserId)
+                        .map(User::getUuid)
                         .toList());
     }
 }

@@ -26,7 +26,7 @@ class DataWriter {
         }
     }
 
-    public static void writeUser(Map<String, User> data) {
+    public static void writeUser(Map<UUID, User> data) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_FILE_PATH))) {
             oos.writeObject(data.values().stream()
                     .map(Mapper::toUserDto)
@@ -35,7 +35,7 @@ class DataWriter {
             throw new RuntimeException(e);
         }
     }
-    public static void writeMessage(List<Message<Receivable>> data) {
+    public static void writeMessage(List<Message> data) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(MESSAGE_FILE_PATH))) {
             oos.writeObject(data.stream()
                     .map(Mapper::toMessageDto)

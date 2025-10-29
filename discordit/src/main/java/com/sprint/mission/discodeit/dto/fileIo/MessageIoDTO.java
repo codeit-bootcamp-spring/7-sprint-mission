@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -21,23 +22,23 @@ public class MessageIoDTO implements Serializable {
     private Instant createdAt;
     private Instant updatedAt;
     private UUID senderUuid;
-    private String senderUserId; // User는 userId로 찾기 위함
     private UUID receiverUuid;
     private ReceiverType receiverType; // "USER" 또는 "CHANNEL"
     private String message;
+    private List<UUID> attachmentIds;
 
     public MessageIoDTO(UUID uuid, Instant createdAt, Instant updatedAt,
-                        UUID senderUuid, String senderUserId,
-                        UUID receiverUuid, ReceiverType receiverType, String message) {
+                        UUID senderUuid,
+                        UUID receiverUuid, ReceiverType receiverType,
+                        String message, List<UUID> attachments) {
         this.uuid = uuid;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.senderUuid = senderUuid;
-        this.senderUserId = senderUserId;
         this.receiverUuid = receiverUuid;
         this.receiverType = receiverType;
         this.message = message;
+        this.attachmentIds = attachments;
     }
 
 }
-

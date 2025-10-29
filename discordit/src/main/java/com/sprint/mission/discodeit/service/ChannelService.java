@@ -1,31 +1,35 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.base.Channel;
+import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.request.PrivateChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.request.PublicChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.base.User;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public interface ChannelService {
-    UUID createChannel(String name, Channel.ChannelType type, User... moderators); // 초기 운영자 한명일때
-    void setChannelName(UUID uuid, String name);
-    Channel getChannelById(UUID uuid);
+    UUID createPublicChannel(PublicChannelCreateRequestDto dto); // 초기 운영자 한명일때
+    UUID createPrivateChannel(PrivateChannelCreateRequestDto dto); // 초기 운영자 한명일때
 
-    Set<User> getAllMembers(UUID uuid);
+    void update(ChannelUpdateRequestDto dto);
 
-    Set<User> getAllModerators(UUID uuid);
-    void addMember(UUID uuid, User user);
+    void delete(UUID uuid);
+
+    List<UserResponseDto> getAllMembers(UUID uuid);
+    List<UserResponseDto> getAllModerators(UUID uuid);
 
     void addModerator(UUID uuid, User user);
-    void deleteMember(UUID uuid, User user);
+    void addMember(UUID uuid, User user);
 
     void deleteModerator(UUID uuid, User user);
+    void deleteMember(UUID uuid, User user);
 
-    List<UUID> getAllChannelIds();
-    UUID getNthChannel(int index);
+    ChannelResponseDto getById(UUID uuid);
+    List<ChannelResponseDto> getAll();
+    ChannelResponseDto getNth(int index);
 
-    List<UUID> getRegisteredChannels(User user);
-    List<UUID> getNotRegisteredChannels(User user);
-
+    List<ChannelResponseDto> getAllByUserId(String userId);
 }

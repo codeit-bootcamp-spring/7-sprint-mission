@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.base.Channel;
+import com.sprint.mission.discodeit.entity.base.User;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,8 +11,9 @@ public interface ChannelRepository {
     void update(Channel channel);
     Channel findById(UUID uuid);
     List<Channel> findAll();
+    List<Channel> findAllPublic();
+    List<Channel> findAllPrivateByUser(User user);
     void deleteById(UUID uuid);
     boolean existsById(UUID uuid);
     boolean existsByName(String name);
-
 }

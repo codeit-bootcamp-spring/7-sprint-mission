@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.base.Channel;
-import com.sprint.mission.discodeit.entity.base.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.base.Message;
 import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
@@ -78,7 +77,7 @@ public class DiscodeIt {
             case 1 -> {
                 System.out.print("아이디를 입력하세요 : ");
                 String userId = scanner.next();
-                messageList = messageService.getBySender(userService.getById(userId));
+                messageList = messageService.getBySender(userService.getByUserId(userId));
             }
             case 2 -> {
                 System.out.print("발신자 아이디를 입력하세요 : ");
@@ -86,13 +85,13 @@ public class DiscodeIt {
                 System.out.print("수신자 아이디를 입력하세요 : ");
                 String receiverId = scanner.next();
                 messageList = messageService.getBySenderAndReceiver(
-                        userService.getById(senderId),
-                        userService.getById(receiverId)
+                        userService.getByUserId(senderId),
+                        userService.getByUserId(receiverId)
                 );
             }
             case 3 -> {
-                UUID receiverId = displayChannelAndSelect(channelService.getAllChannelIds());
-                messageList = messageService.getByReceiver(channelService.getChannelById(receiverId));
+                UUID receiverId = displayChannelAndSelect(channelService.getAll());
+                messageList = messageService.getByReceiver(channelService.getById(receiverId));
             }
         }
         for (Message<Receivable> message : messageList) {
@@ -164,9 +163,7 @@ public class DiscodeIt {
                 return;
 
             messageService.sendMessage(
-                    userService.getById(loginId),
-                    userService.getById(receiveId),
-                    message
+                    userService.getByUserId(loginId)
             );
             display(messageService.getLastMessage());
         }
@@ -249,7 +246,7 @@ public class DiscodeIt {
             switch (userCommand) {
                 case 1 -> printRegisteredChannel();
                 case 2 -> {
-                    List<UUID> allChannel = channelService.getAllChannelIds();
+                    List<UUID> allChannel = channelService.getAll();
                     if (allChannel.isEmpty()) {
                         System.out.println("현재 개설된 채널이 없습니다.");
                     }
@@ -267,16 +264,16 @@ public class DiscodeIt {
     private void leaveChannel() {
 
         printLine();
-        List<UUID> registeredChannels = channelService.getRegisteredChannels(userService.getById(loginId));
+        List<UUID> registeredChannels = channelService.getAllByUserId(userService.getByUserId(loginId));
         System.out.print("나갈 채널을 선택해주세요. >>");
         UUID channel = displayChannelAndSelect(registeredChannels);
-        channelService.deleteMember(channel, userService.getById(loginId));
+        channelService.deleteMember(channel, userService.getByUserId(loginId));
         System.out.println("채널에서 나왔습니다.");
     }
 
     private void enterChannel() {
         printLine();
-        List<UUID> channels = channelService.getRegisteredChannels(userService.getById(loginId));
+        List<UUID> channels = channelService.getAllByUserId(userService.getByUserId(loginId));
         if (channels.isEmpty()) {
             System.out.println("가입된 채널이 없습니다.");
             return;
@@ -288,8 +285,8 @@ public class DiscodeIt {
     }
 
     private void channelMessageSend(UUID uuid) {
-        User sender = userService.getById(loginId);
-        Channel receiver = channelService.getChannelById(uuid);
+        User sender = userService.getByUserId(loginId);
+        Channel receiver = channelService.getById(uuid);
         String message;
 
         while (true) {
@@ -298,14 +295,14 @@ public class DiscodeIt {
 
             if (message.equals("0"))
                 return;
-            messageService.sendMessage(sender, receiver, message);
+            messageService.sendMessage(sender);
             display(messageService.getLastMessage());
         }
     }
 
     private void printRegisteredChannel() {
         printLine();
-        List<UUID> channels = channelService.getRegisteredChannels(userService.getById(loginId));
+        List<UUID> channels = channelService.getAllByUserId(userService.getByUserId(loginId));
 
         if (channels.isEmpty()) {
             System.out.println("가입된 채널이 없습니다.");
@@ -316,7 +313,7 @@ public class DiscodeIt {
     }
 
     private void registerChannel() {
-        List<UUID> channels = channelService.getNotRegisteredChannels(userService.getById(loginId));
+        List<UUID> channels = channelService.getNotRegisteredChannels(userService.getByUserId(loginId));
 
         if (channels.isEmpty()) {
             System.out.println("이미 모든 채널에 가입되어있습니다.");
@@ -324,8 +321,8 @@ public class DiscodeIt {
         }
 
         UUID selectedChannel = displayChannelAndSelect("가입되지 않은 채널 : ", channels);
-        channelService.addMember(selectedChannel, userService.getById(loginId));
-        System.out.printf("채널 [%s]에 가입되었습니다!\n", channelService.getChannelById(selectedChannel).getDisplayName());
+        channelService.addMember(selectedChannel, userService.getByUserId(loginId));
+        System.out.printf("채널 [%s]에 가입되었습니다!\n", channelService.getById(selectedChannel).getDisplayName());
     }
 
     private void userLogin() {
@@ -359,8 +356,8 @@ public class DiscodeIt {
         channelService.createChannel(
                 channelName,
                 types[type],
-                userService.getById(loginId),
-                userService.getById(loginId)
+                userService.getByUserId(loginId),
+                userService.getByUserId(loginId)
         );
         System.out.println("채널이 생성되었습니다.");
     }
@@ -369,7 +366,7 @@ public class DiscodeIt {
         printLine();
 
         for (UUID uuid : uuids) {
-            Channel channel = channelService.getChannelById(uuid);
+            Channel channel = channelService.getById(uuid);
             System.out.printf("\t- %s \t\t---\t%s\n", channel.getDisplayName(), channel.getType());
         }
     }
@@ -382,7 +379,7 @@ public class DiscodeIt {
      */
     private void printNumberedChannels(List<UUID> uuids) {
         for (int i = 0; i < uuids.size(); i++) {
-            Channel channel = channelService.getChannelById(uuids.get(i));
+            Channel channel = channelService.getById(uuids.get(i));
             System.out.printf("\t%d. \t\t%s \t(%s)\n", i + 1, channel.getDisplayName(), channel.getType());
         }
     }
@@ -405,7 +402,7 @@ public class DiscodeIt {
 
     private void enterChannel(UUID uuid) {
         printLine();
-        Channel channel = channelService.getChannelById(uuid);
+        Channel channel = channelService.getById(uuid);
         while (true) {
             System.out.printf("채널 [%s]에 접속하였습니다.\n" +
                             "1. 전체 사용자 보기 2. 메세지 보내기 3. 뒤로 돌아가기 >>",
@@ -421,14 +418,14 @@ public class DiscodeIt {
     }
 
     private void sendChannelMessage(UUID uuid) {
-        User user = userService.getById(loginId);
-        Channel channel = channelService.getChannelById(uuid);
+        User user = userService.getByUserId(loginId);
+        Channel channel = channelService.getById(uuid);
         System.out.print("메세지 입력(종료하려면 -를 입력) : ");
         while (true) {
             String message = scanner.next();
             if (message.equals("-"))
                 return;
-            messageService.sendMessage(user, channel, message);
+            messageService.sendMessage(user);
             display(messageService.getLastMessage());
         }
     }

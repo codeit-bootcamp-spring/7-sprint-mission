@@ -17,7 +17,7 @@ public class UserIoDTO implements Serializable {
     private UUID uuid;
     private Instant createdAt;
     private Instant updatedAt;
-    private String userId;
+    private String userId; // 로그인 ID
     private String passwd;       // 엔터티의 passwd와 일치
     private String email;
     private String displayName;  // 엔터티의 displayName과 일치

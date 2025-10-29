@@ -10,5 +10,5 @@ public interface ReadStatusRepository {
     ReadStatus find(User user, Channel channel);
     void delete(ReadStatus readStatus);
     void deleteAllByUser(User user);
-
+    void deleteAllByChannel(Channel channel);
 }

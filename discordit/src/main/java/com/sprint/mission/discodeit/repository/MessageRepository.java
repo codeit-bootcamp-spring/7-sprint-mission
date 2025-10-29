@@ -7,12 +7,18 @@ import com.sprint.mission.discodeit.entity.base.User;
 import java.util.List;
 
 public interface MessageRepository {
-    void save(Message<Receivable> message);
-    List<Message<Receivable>> findAll();
-    List<Message<Receivable>> findBySender(User user);
-    <T extends Receivable> List<Message<T>> findByReceiver(T receiver);
-    <T extends Receivable> List<Message<T>> findBySenderAndReceiver(User user, T receiver);
+    void save(Message message);
+    List<Message> findAll();
+    List<Message> findBySender(User user);
+    List<Message> findByReceiver(Receivable receiver);
+    List<Message> findBySenderAndReceiver(User user, Receivable receiver);
 
     // 더미 데이터 세팅용
-    Message<Receivable> getLast();
+    Message findLast();
+
+    Message findLast(Receivable receivable);
+
+    void deleteAllByReceiver(Receivable receiver);
+
+    void delete(Message message);
 }

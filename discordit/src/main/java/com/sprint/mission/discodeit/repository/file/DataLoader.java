@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.base.Channel;
 import com.sprint.mission.discodeit.entity.base.Message;
-import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
 import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.MessageIoDTO;
@@ -37,7 +36,7 @@ public class DataLoader {
     private void loadMessage() {
         File file = new File(MESSAGE_FILE_PATH);
 
-        // 파일이 없으면 디렉토리 생성 및 빈 데이터로 시작
+        // 파일이 없으면 디렉토리 생성 후 종료
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             return;
@@ -48,16 +47,16 @@ public class DataLoader {
         }
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(MESSAGE_FILE_PATH))) {
-            List<Message<Receivable>> objects = ((List<MessageIoDTO>) ois.readObject()).stream()
+            List<Message> objects = ((List<MessageIoDTO>) ois.readObject()).stream()
                     .map(m -> Mapper.toMessage(m, userRepository, channelRepository))
-                    .sorted(Comparator.comparing(Message::getCreatedAt)) // 메세지 반환시 순서 보장을 위함
+                    .sorted(Comparator.comparing(Message::getCreatedAt)) // 메시지 반환 순서 보장을 위해 정렬
                     .toList();
-            for (Message<Receivable> message : objects) {
+            for (Message message : objects) {
                 messageRepository.save(message);
             }
         } catch (FileNotFoundException e) {
-            // 파일이 없으면 빈 리스트로 시작
-            System.out.println("메시지 파일이 없어 새로 생성합니다.");
+            // 파일이 없으면 무시하고 동작
+            System.out.println("메시지 파일이 없어 새로 생성합니다");
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("메시지 파일 로드 중 오류 발생", e);
         }
@@ -66,7 +65,7 @@ public class DataLoader {
     private void loadUser() {
         File file = new File(USER_FILE_PATH);
 
-        // 파일이 없으면 디렉토리 생성 및 빈 데이터로 시작
+        // 파일이 없으면 디렉토리 생성
         if (!file.exists()) {
             file.getParentFile().mkdirs();
         }
@@ -77,13 +76,13 @@ public class DataLoader {
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_FILE_PATH))) {
             List<User> objects = ((List<UserIoDTO>) ois.readObject()).stream()
-                    .map(Mapper::toUser)
+                    .map(Mapper::toUser) // TODO: BinaryContentRepository 연계하여 프로필 이미지 복원 (차후 예정)
                     .toList();
             for (User user : objects) {
                 userRepository.save(user);
             }
         } catch (FileNotFoundException e) {
-            // 파일이 없으면 빈 맵으로 시작
+            // 파일이 없으면 무시
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("사용자 파일 로드 중 오류 발생", e);
         }
@@ -92,7 +91,7 @@ public class DataLoader {
     private void loadChannel() {
         File file = new File(CHANNEL_FILE_PATH);
 
-        // 파일이 없으면 디렉토리 생성 및 빈 데이터로 시작
+        // 파일이 없으면 디렉토리 생성 후 종료
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             return;
@@ -109,10 +108,11 @@ public class DataLoader {
                 channelRepository.save(object);
             }
         } catch (FileNotFoundException e) {
-            // 파일이 없으면 빈 맵으로 시작
-            System.out.println("채널 파일이 없어 새로 생성합니다.");
+            // 파일이 없으면 무시하고 동작
+            System.out.println("채널 파일이 없어 새로 생성합니다");
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("채널 파일 로드 중 오류 발생", e);
         }
     }
 }
+

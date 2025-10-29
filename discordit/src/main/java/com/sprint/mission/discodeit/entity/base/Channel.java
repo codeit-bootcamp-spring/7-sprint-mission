@@ -46,14 +46,19 @@ public class Channel extends BaseEntity implements Receivable {
         this.members.add(user);
         update();
     }
+    public void addMembers(Set<User> user){
+        this.members.addAll(user);
+        update();
+    }
 
     public void deleteMember(User user) {
         this.members.remove(user);
         update();
     }
 
-    public void setModerators(Set<User> moderators) {
-        this.moderators = moderators;
+    public void addModerators(Set<User> moderators) {
+        this.moderators.addAll(moderators);
+        this.members.addAll(moderators);
         update();
     }
 

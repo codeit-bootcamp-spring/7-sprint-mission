@@ -26,12 +26,12 @@ public class ChannelIoDTO implements Serializable {
     private ChannelType type;               // ChannelType.name()
     private ChannelScope scope;
     private String description;
-    private List<String> memberUserIds;    // 채널 멤버의 userId 목록
-    private List<String> moderatorUserIds; // 채널 운영자의 userId 목록
+    private List<UUID> memberUuids;    // 채널 멤버의 UUID 목록
+    private List<UUID> moderatorUuids; // 채널 운영자의 UUID 목록
 
     public ChannelIoDTO(UUID uuid, Instant createdAt, Instant updatedAt,
                         String channelName, ChannelType type, ChannelScope scope, String description,
-                        List<String> memberUserIds, List<String> moderatorUserIds) {
+                        List<UUID> memberUuids, List<UUID> moderatorUuids) {
         this.uuid = uuid;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -39,8 +39,8 @@ public class ChannelIoDTO implements Serializable {
         this.type = type;
         this.scope = scope;
         this.description = description;
-        this.memberUserIds = memberUserIds;
-        this.moderatorUserIds = moderatorUserIds;
+        this.memberUuids = memberUuids;
+        this.moderatorUuids = moderatorUuids;
     }
 
 }

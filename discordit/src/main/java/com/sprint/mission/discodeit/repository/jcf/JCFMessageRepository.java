@@ -20,24 +20,24 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void save(Message<Receivable> message) {
+    public void save(Message message) {
         data.add(message);
     }
 
     @Override
-    public List<Message<Receivable>> findAll() {
+    public List<Message> findAll() {
         return List.copyOf(data);
     }
 
     @Override
-    public List<Message<Receivable>> findBySender(User user) {
+    public List<Message> findBySender(User user) {
         return data.stream()
                 .filter(m -> m.getSender().equals(user))
                 .toList();
     }
 
     @Override
-    public <T extends Receivable> List<Message<T>> findByReceiver(T receiver) {
+    public <T extends Receivable> List<Message> findByReceiver(Receivable receiver) {
         return data.stream()
                 .filter(m -> m.getReceiver().equals(receiver))
                 .map(m -> (Message<T>) m)
@@ -56,9 +56,10 @@ public class JCFMessageRepository implements MessageRepository {
 
     /**
      * 테스트 데이터 세팅용 메서드
+     *
      * @return 마지막에 저장된 메세지
      */
-    public Message<Receivable> getLast(){
+    public Message findLast(){
         if (data.isEmpty()) {
             throw new IllegalStateException("저장된 메시지가 없습니다.");
         }

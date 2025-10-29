@@ -11,10 +11,12 @@ public class BinaryContent{
     private UUID id;
     private User uploadUser;
     private Instant createdAt;
+    private String fileUrl;
 
-    public BinaryContent(User uploadUser) {
+    public BinaryContent(User uploadUser, String fileUrl) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.uploadUser = uploadUser;
+        this.fileUrl = fileUrl;
     }
 }
