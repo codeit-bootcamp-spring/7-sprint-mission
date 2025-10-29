@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.repository.file;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +16,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FileMessageRepositoryTest {
+class FileMessageServiceTest {
+
     private FileMessageService messageService;
     private FileMessageRepository repository;
     private Path dataDir;
@@ -58,8 +59,8 @@ class FileMessageRepositoryTest {
         // -------------------
         // 1️⃣ create
         // -------------------
-        Message msg1 = messageService.create(new Message(userId, channelId, "Hello"));
-        Message msg2 = messageService.create(new Message(userId, channelId, "World"));
+        Message msg1 = messageService.create(new Message(channelId, userId, "Hello"));
+        Message msg2 = messageService.create(new Message(channelId, userId, "World"));
 
         assertNotNull(msg1.getId());
         assertNotNull(msg2.getId());

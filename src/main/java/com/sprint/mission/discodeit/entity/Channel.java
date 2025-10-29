@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.ToString;
+
 import java.util.List;
 import java.util.UUID;
 
+@ToString
 public class Channel extends BaseEntity{
     private static final long serialVersionUID = 1L;
 

@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.ToString;
+
+@ToString
 public class User extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
