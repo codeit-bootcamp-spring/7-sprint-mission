@@ -1,6 +1,12 @@
 server:
   port: 8080
 
+# application.yaml
+discodeit:
+  repository:
+    type: jcf   # jcf | file
+    file-directory: .discodeit
+
 
 spring:
   application:
