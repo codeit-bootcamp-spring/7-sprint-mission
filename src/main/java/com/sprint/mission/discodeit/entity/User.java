@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
 import lombok.ToString;
 
+@Getter
 @ToString
 public class User extends BaseEntity {
     private static final long serialVersionUID = 1L;
@@ -24,17 +26,5 @@ public class User extends BaseEntity {
         this.nickname = nickname;
         this.password = password;
         return this;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public String getPassword(){
-        return password;
     }
 }

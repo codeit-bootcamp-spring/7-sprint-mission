@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.UUID;
 
+@Getter
 public abstract class BaseEntity implements Serializable {
     //Field
     private final UUID id;              //각 객체 UUID
@@ -14,11 +17,6 @@ public abstract class BaseEntity implements Serializable {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
-    }
-
-    //Getter
-    public UUID getId() {
-        return id;
     }
 
     //객체 변경시 변경 일시 업데이트
