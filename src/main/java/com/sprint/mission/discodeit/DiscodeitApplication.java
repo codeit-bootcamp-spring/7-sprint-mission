@@ -22,24 +22,24 @@ public class DiscodeitApplication {
 	public static void main(String[] args) {
 		try (ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args)) {
 
-		// 1) Spring Context에서 Service 빈 조회 (요구사항 #3)
-		log.info("✅ Starting Discodeit application test sequence...");
+			log.info("✅ Starting Discodeit application test sequence...");
 
-		// 2) 셋업 & 테스트 호출부 (요구사항 #1, #4)
-		// ↳ 아래의 헬퍼 메소드들을 이 파일에 복사한 뒤, 주석을 해제하세요.
-		UserService userService = context.getBean(UserService.class);
-		ChannelService channelService = context.getBean(ChannelService.class);
-		MessageService messageService = context.getBean(MessageService.class);
+			// 서비스 초기화: Spring Context에서 Bean 조회 (요구사항 충족)
+			UserService userService = context.getBean(UserService.class);
+			ChannelService channelService = context.getBean(ChannelService.class);
+			MessageService messageService = context.getBean(MessageService.class);
 
+			// 셋업 & 테스트
 			User user = setupUser(userService);
 			Channel channel = setupChannel(channelService);
-			messageCreateTest(messageService, channel, user);
+			org.springframework.core.env.Environment env = context.getEnvironment();
+			String messageContent = env.getProperty("discodeit.message.content", "안녕하세요.");
+			messageCreateTest(messageService, channel, user, messageContent);
 
 			log.info("✅ Test sequence completed successfully.");
 		}
 	}
 
-	// -----------------------------------------------------------------------------
 
 	private static User setupUser(UserService userService) {
 		User user = userService.create("woody", "woody@codeit.com", "woody1234");
@@ -53,8 +53,9 @@ public class DiscodeitApplication {
 		return channel;
 	}
 
-	private static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-		Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
-		log.info("💬 메시지 생성: {} at {}", message.getId(), message.getCreatedAt());
+	private static void messageCreateTest(MessageService messageService, Channel channel, User author, String content) {
+		Message message = messageService.create(content, channel.getId(), author.getId());
+		String shortId = message.getId().toString().substring(0, 8);	// ID 앞 8자리만 표시 간소화
+		log.info("💬 메시지 생성: {} at {} | 내용: {}", shortId, message.getCreatedAt(), message.getContent());
 	}
 }
