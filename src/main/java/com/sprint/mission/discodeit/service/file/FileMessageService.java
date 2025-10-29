@@ -3,20 +3,16 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class FileMessageService implements MessageService {
-    //싱글톤 구현
-    private final static FileMessageService fileMessageService = new FileMessageService();
-    private FileMessageService(){}
-    public static FileMessageService getInstance(){
-        return fileMessageService;
-    }
-
     //레포지토리
-    private final FileMessageRepository fileMessageRepository = FileMessageRepository.getInstance();
+    private final FileMessageRepository fileMessageRepository;
 
     //한 유저가 말한 메세지들을 조회
     @Override

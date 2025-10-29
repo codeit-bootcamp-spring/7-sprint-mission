@@ -3,22 +3,16 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class FileUserService implements UserService {
-    //싱글톤 구현
-    private final static FileUserService fileUserService = new FileUserService();
-
-    private FileUserService(){}
-
-    public static FileUserService getInstance(){
-        return fileUserService;
-    }
-
     //리포지토리
-    private final FileUserRepository fileUserRepository = FileUserRepository.getInstance();
+    private final FileUserRepository fileUserRepository;
 
     //유저 추가
     @Override

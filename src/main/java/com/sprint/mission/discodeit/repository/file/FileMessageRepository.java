@@ -9,15 +9,8 @@ import java.util.UUID;
 
 @Repository
 public class FileMessageRepository extends BaseFileRepository<Message> implements MessageRepository {
-    //싱글톤 구현
-    private final static FileMessageRepository instance = new FileMessageRepository();
-
-    private FileMessageRepository() {
+    public FileMessageRepository() {
         super(Message.class);
-    }
-
-    public static FileMessageRepository getInstance() {
-        return instance;
     }
 
     //메세지 모두 찾기

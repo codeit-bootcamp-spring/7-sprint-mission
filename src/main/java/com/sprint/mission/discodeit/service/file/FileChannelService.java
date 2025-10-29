@@ -3,20 +3,17 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class FileChannelService implements ChannelService {
-    //싱글톤 구현
-    private final static FileChannelService fileChannelService = new FileChannelService();
-    private FileChannelService(){}
-    public static FileChannelService getInstance(){
-        return fileChannelService;
-    }
 
     //레포지토리
-    private final FileChannelRepository fileChannelRepository = FileChannelRepository.getInstance();
+    private final FileChannelRepository fileChannelRepository;
 
     //채널 생성
     @Override

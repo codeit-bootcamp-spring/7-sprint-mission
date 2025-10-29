@@ -14,7 +14,6 @@ public class DiscodeitApplication {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
         // 서비스 초기화
-        // TODO context에서 Bean을 조회하여 각 서비스 구현체 할당 코드 작성하세요.
         UserService userService;
         ChannelService channelService;
         MessageService messageService;

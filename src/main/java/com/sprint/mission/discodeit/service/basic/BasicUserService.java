@@ -3,27 +3,17 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+
+@RequiredArgsConstructor
 @Service
 public class BasicUserService implements UserService {
-    //싱글톤 구현
-    private static BasicUserService instance;
-
-    private BasicUserService(UserRepository userRepository){
-        this.userRepository = userRepository;
-    }
-
-    public static BasicUserService getInstance(UserRepository userRepository){
-        if (instance == null) {
-            instance = new BasicUserService(userRepository);
-        }
-        return instance;
-    }
-
     //리포지토리
     private final UserRepository userRepository;
 

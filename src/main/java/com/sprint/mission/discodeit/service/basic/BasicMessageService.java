@@ -3,27 +3,16 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
-    //싱글톤 구현
-    private static BasicMessageService instance;
-
-    private BasicMessageService(MessageRepository messageRepository){
-        this.messageRepository = messageRepository;
-    }
-
-    public static BasicMessageService getInstance(MessageRepository messageRepository){
-        if(instance == null){
-            instance = new BasicMessageService(messageRepository);
-        }
-        return instance;
-    }
-
     //레포지토리
     private final MessageRepository messageRepository;
 

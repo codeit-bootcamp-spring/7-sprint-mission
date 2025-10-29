@@ -23,8 +23,8 @@ class FileUserServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        userService = FileUserService.getInstance();
-        repository = FileUserRepository.getInstance();
+        repository = new FileUserRepository();
+        userService = new FileUserService(repository);
 
         // 파일 데이터 폴더 경로 확인
         dataDir = Paths.get(System.getProperty("user.dir"), "file-data-map", "User");

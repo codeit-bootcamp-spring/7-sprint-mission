@@ -9,15 +9,8 @@ import java.util.UUID;
 
 @Repository
 public class FileChannelRepository extends BaseFileRepository<Channel> implements ChannelRepository {
-    //싱글톤 구현
-    private final static FileChannelRepository instance = new FileChannelRepository();
-
-    private FileChannelRepository() {
+    public FileChannelRepository() {
         super(Channel.class);
-    }
-
-    public static FileChannelRepository getInstance() {
-        return instance;
     }
 
     //저장

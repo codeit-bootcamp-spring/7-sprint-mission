@@ -25,8 +25,8 @@ class FileChannelServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        channelService = FileChannelService.getInstance();
-        repository = FileChannelRepository.getInstance();
+        repository = new FileChannelRepository();
+        channelService = new FileChannelService(repository);
 
         // 파일 데이터 폴더 경로 확인
         dataDir = Paths.get(System.getProperty("user.dir"), "file-data-map", "Channel");

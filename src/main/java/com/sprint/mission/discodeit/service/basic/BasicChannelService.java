@@ -3,27 +3,16 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class BasicChannelService implements ChannelService {
-    //싱글톤 구현
-    private static BasicChannelService instance;
-
-    private BasicChannelService(ChannelRepository channelRepository){
-        this.channelRepository = channelRepository;
-    }
-
-    public static BasicChannelService getInstance(ChannelRepository channelRepository){
-        if(instance == null){
-            instance = new BasicChannelService(channelRepository);
-        }
-        return instance;
-    }
-
     //레포지토리
     private ChannelRepository channelRepository;
 

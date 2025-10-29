@@ -9,15 +9,8 @@ import java.util.UUID;
 
 @Repository
 public class FileUserRepository extends BaseFileRepository<User> implements UserRepository {
-    //싱글톤 구현
-    private final static FileUserRepository userRepository = new FileUserRepository();
-
-    private FileUserRepository(){
+    public FileUserRepository(){
         super(User.class);
-    }
-
-    public static FileUserRepository getInstance(){
-        return userRepository;
     }
     
     //저장

@@ -24,8 +24,9 @@ class FileMessageServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        messageService = FileMessageService.getInstance();
-        repository = FileMessageRepository.getInstance();
+
+        repository = new FileMessageRepository();
+        messageService = new FileMessageService(repository);
 
         // 파일 데이터 폴더 경로 확인
         dataDir = Paths.get(System.getProperty("user.dir"), "file-data-map", "Message");
