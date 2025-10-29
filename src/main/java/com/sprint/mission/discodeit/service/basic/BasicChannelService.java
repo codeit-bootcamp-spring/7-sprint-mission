@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class BasicChannelService implements ChannelService {
     //싱글톤 구현
-    private static BasicChannelService basicChannelService = new BasicChannelService();
+    private final static BasicChannelService basicChannelService = new BasicChannelService();
     private BasicChannelService(){}
     public static BasicChannelService getInstance(){
         return basicChannelService;
