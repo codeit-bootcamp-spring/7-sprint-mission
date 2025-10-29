@@ -12,25 +12,25 @@ public class BinaryContent {
     private final Instant createAt;
 
     private final byte[] binaryData;
-    private final String fileName;
-    private final String fileType;    // txt, zip, jpg등
+    private final String dataName;
+    private final String dataType;    // txt, zip, jpg등
 
     private final UUID userId;  // 프로필
     private final UUID messageId;   // 메시지첨부
 
 
-    public BinaryContent(UUID userId, UUID messageId, byte[] binaryData, String fileName, String fileType) {
+    public BinaryContent(UUID userId, UUID messageId, byte[] binaryData, String dataName, String dataType) {
         this.id = UUID.randomUUID();
         this.createAt = Instant.now();
         this.userId = userId;
         this.messageId = messageId;
         this.binaryData = binaryData;
-        this.fileName = fileName;
-        this.fileType = fileType;
+        this.dataName = dataName;
+        this.dataType = dataType;
     }
 
-    public BinaryContent(UUID userId, byte[] binaryData, String fileName, String fileType) {
-        this(userId, null, binaryData, fileName, fileType);
+    public BinaryContent(UUID userId, byte[] binaryData, String dataName, String dataType) {
+        this(userId, null, binaryData, dataName, dataType);
     }
 
 

@@ -10,6 +10,7 @@ public abstract class FileBaseRepository<T extends BaseEntity> implements BaseRe
 
     private static final String BASE_ROOT = "/Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload/";
     private final String ROOT_PATH;
+
     protected Map<UUID, T> data = new HashMap<>();
 
     public FileBaseRepository(String rooPath) {
@@ -35,7 +36,7 @@ public abstract class FileBaseRepository<T extends BaseEntity> implements BaseRe
         }
     }
 
-    private void saveData() {
+    protected void saveData() {
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(ROOT_PATH))){
             oos.writeObject(data);

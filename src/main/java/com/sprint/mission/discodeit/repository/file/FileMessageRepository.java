@@ -40,7 +40,7 @@ public class FileMessageRepository extends FileBaseRepository<Message> implement
 
     @Override
     public void deleteAllByChannelId(UUID channelId) {
-
+        data.values().removeIf(message-> message.getChannel().getId().equals(channelId));
     }
 
     @Override

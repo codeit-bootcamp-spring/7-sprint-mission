@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserState;
-import com.sprint.mission.discodeit.entity.binaryContent.dto.UserProfileImageRequestDto;
+import com.sprint.mission.discodeit.entity.binaryContent.dto.UserProfileImageUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserNameUpdateDto;
@@ -33,7 +32,7 @@ public interface UserService {
     Optional<UserInfoDto> updatePhoneNum(UserPhoneNumUpdateDto updateDto);
 
     // 프로필 이미지 변경
-    Optional<UserInfoDto> updateProfileImage(UserProfileImageRequestDto userProfileImageRequestDto);
+    Optional<UserInfoDto> updateProfileImage(UserProfileImageUpdateDto userProfileImageRequestDto);
 
     // 삭제
     boolean deleteUser(UUID userId); // 삭제 메서드 추가 (성공 여부 반환)

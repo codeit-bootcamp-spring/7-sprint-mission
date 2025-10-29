@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity.status.dto;
 
-import com.sprint.mission.discodeit.entity.status.repository.UserStatus;
+import com.sprint.mission.discodeit.entity.status.UserStatus;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -15,7 +15,7 @@ public class UserStatusInfoDto {
     private final Instant lastAccessAt;
     boolean isOnline;
 
-    public UserStatusInfoDto from(UserStatus userStatus) {
+    public static UserStatusInfoDto from(UserStatus userStatus) {
         return UserStatusInfoDto.builder()
                 .id(userStatus.getId())
                 .userId(userStatus.getUserId())

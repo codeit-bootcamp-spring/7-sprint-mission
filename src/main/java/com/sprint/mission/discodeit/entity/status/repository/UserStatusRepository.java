@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity.status.repository;
 
+import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.BaseRepository;
 
 import java.util.Optional;
@@ -11,5 +12,4 @@ public interface UserStatusRepository extends BaseRepository<UserStatus> {
     Optional<UserStatus> findStatusByUserId(UUID userId);
 
     void deleteStatusByUserId(UUID userId);
-
 }

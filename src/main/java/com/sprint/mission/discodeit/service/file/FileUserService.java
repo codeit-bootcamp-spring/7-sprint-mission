@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.util.*;
@@ -14,6 +15,11 @@ import java.util.stream.Collectors;
 
 public class FileUserService implements UserService {
     private static final long serialVersionUID = 1L;
+
+    /* yaml 경로
+    @Value("${discodeit.repository.file-directory}")
+    private String BASE_PATH;
+     */
 
     public static final String ROOT_PATH
             = "/Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload";

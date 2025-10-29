@@ -3,14 +3,14 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.entity.binaryContent.BinaryContentRepository;
-import com.sprint.mission.discodeit.entity.binaryContent.dto.UserProfileImageRequestDto;
+import com.sprint.mission.discodeit.entity.binaryContent.dto.UserProfileImageUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserNameUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPasswordUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPhoneNumUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserStateUpdateDto;
-import com.sprint.mission.discodeit.entity.status.repository.UserStatus;
+import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.entity.status.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
@@ -154,17 +153,17 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public Optional<UserInfoDto> updateProfileImage(UserProfileImageRequestDto imageRequestDto) {
-        return userRepository.findById(imageRequestDto.getUserId()).map(user -> {
+    public Optional<UserInfoDto> updateProfileImage(UserProfileImageUpdateDto imageRequestDto) {
+        return userRepository.findById(imageRequestDto.userId()).map(user -> {
             // 기존 이미지 삭제
             binaryContentRepository.deleteProfileImageByUserId(user.getId());
             // 새로운 이미지 업데이트
-            if (imageRequestDto.getImage() != null) {
+            if (imageRequestDto.image() != null) {
                 BinaryContent newImage = new BinaryContent(
                         user.getId(),
-                        imageRequestDto.getImage(),
-                        imageRequestDto.getImageName(),
-                        imageRequestDto.getImageType()
+                        imageRequestDto.image(),
+                        imageRequestDto.imageName(),
+                        imageRequestDto.imageType()
                 );
                 binaryContentRepository.save(newImage);
             }

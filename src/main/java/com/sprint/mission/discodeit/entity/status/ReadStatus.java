@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.status.repository;
+package com.sprint.mission.discodeit.entity.status;
 
 import com.sprint.mission.discodeit.entity.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class ReadStatus extends BaseEntity {
 

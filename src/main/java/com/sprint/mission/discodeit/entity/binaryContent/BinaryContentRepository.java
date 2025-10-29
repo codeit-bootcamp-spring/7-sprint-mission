@@ -21,13 +21,15 @@ public interface BinaryContentRepository {
 
     // 유저의 프로필 이미지 확인 (채널Id가 null이어야함)
     Optional<BinaryContent> findProfileImageByUserId(UUID userId);
-
-    // 하나의 메시지에 있는 모든 첨부파일
-    List<BinaryContent> findAllByMessageId(UUID messageId);
-
-    // 하나의 메시지에 있는 모든 첨부파일 삭제
-    void deleteAllByMessageId(UUID messageId);
-
     // 유저 프로필 이미지 삭제
     void deleteProfileImageByUserId(UUID userId);
+
+
+    // 하나의 메시지에 있는 모든 첨부파일 확인
+    List<BinaryContent> findAllByMessageId(UUID messageId);
+    // 하나의 메시지에 있는 모든 첨부파일 삭제
+    void deleteAllByMessageId(UUID messageId);
+    // 요구사항 findAll
+    List<BinaryContent> findAllByIdIn(List<UUID> ids);
+
 }

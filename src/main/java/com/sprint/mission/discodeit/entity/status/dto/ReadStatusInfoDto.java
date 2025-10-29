@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity.status.dto;
 
-import com.sprint.mission.discodeit.entity.status.repository.ReadStatus;
+import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -14,7 +14,7 @@ public record ReadStatusInfoDto(
         Instant createAt,
         Instant lastReadAt  // updateAt
 ){
-    public ReadStatusInfoDto from(ReadStatus readStatus) {
+    public static ReadStatusInfoDto from(ReadStatus readStatus) {
         return ReadStatusInfoDto.builder()
                 .id(readStatus.getId())
                 .userId(readStatus.getUserId())
