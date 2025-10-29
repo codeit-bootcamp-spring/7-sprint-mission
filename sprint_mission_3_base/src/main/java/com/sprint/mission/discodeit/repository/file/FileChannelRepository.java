@@ -7,12 +7,15 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
+import org.springframework.context.annotation.Profile;
 
 @Repository
+@Profile("file")
 public class FileChannelRepository implements ChannelRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
@@ -98,5 +101,25 @@ public class FileChannelRepository implements ChannelRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Channel> findAllPublic() {
+        return List.of();
+    }
+
+    @Override
+    public void setParticipants(UUID channelId, Collection<UUID> userIds) {
+
+    }
+
+    @Override
+    public List<UUID> participantUserIds(UUID channelId) {
+        return List.of();
+    }
+
+    @Override
+    public List<Channel> findAllPrivateByUserId(UUID userId) {
+        return List.of();
     }
 }

@@ -12,4 +12,12 @@ public interface UserRepository {
     List<User> findAll();
     boolean existsById(UUID id);
     void deleteById(UUID id);
+
+    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
+
+    default boolean existsByUsernameOrEmail(String username, String email) {
+        return findByUsername(username).isPresent() || findByEmail(email).isPresent();
+    }
+    Optional<User> findByUsernameAndPassword(String username, String password);
 }
