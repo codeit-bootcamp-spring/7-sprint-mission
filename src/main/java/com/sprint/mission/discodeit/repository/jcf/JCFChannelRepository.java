@@ -1,7 +1,61 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
 
+    //싱글톤 구현
+    private final static JCFChannelRepository jcfChannelRepository = new JCFChannelRepository();
+
+    private JCFChannelRepository() {}
+
+    public static JCFChannelRepository getInstance(){ return jcfChannelRepository;}
+
+    //채널 데이터
+    private final Map<UUID, Channel> data = new HashMap<>();
+
+    //저장
+    @Override
+    public Channel save(Channel channel) {
+        data.put(channel.getId(), channel);
+        return channel;
+    }
+    
+    //채널 목록
+    @Override
+    public List<Channel> findAll() {
+        return data.values().stream().toList();
+    }
+
+    //채널 ID 조회
+    @Override
+    public Channel findById(UUID id) {
+        return data.get(id);
+    }
+    
+    //채널 이름
+    @Override
+    public Channel findByName(String name) {
+        return findAll().stream()
+                .filter(ch -> ch.getName().equals(name))
+                .findFirst().orElse(null);
+    }
+
+    //수정
+    @Override
+    public Channel update(UUID id, String name) {
+        return findById(id).update(name);
+    }
+
+    //삭제
+    @Override
+    public Channel delete(UUID id) {
+        return data.remove(id);
+    }
 }
