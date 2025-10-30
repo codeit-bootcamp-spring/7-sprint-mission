@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.dto.fileIo.mapper;
 
 import com.sprint.mission.discodeit.dto.fileIo.MessageIoDTO;
-import com.sprint.mission.discodeit.entity.base.Channel;
-import com.sprint.mission.discodeit.entity.base.Message;
-import com.sprint.mission.discodeit.entity.base.Receivable;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Receivable;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.ReceiverType;
 import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
@@ -48,7 +49,8 @@ final class MessageMapper {
 
     public static Message toMessage(MessageIoDTO dto,
                                     UserRepository userRepository,
-                                    ChannelRepository channelRepository) {
+                                    ChannelRepository channelRepository,
+                                    BinaryContentRepository contentRepository) {
         User sender = userRepository.findById(dto.getSenderUuid());
 
         Receivable receiver;
@@ -61,7 +63,6 @@ final class MessageMapper {
             default -> throw new IllegalArgumentException("Unknown receiverType: " + dto.getReceiverType());
         }
 
-        // TODO: BinaryContentRepository를 사용해 attachmentIds를 BinaryContent 목록으로 복원 (차후 예정)
         return Message.fromDto(
                 dto.getUuid(),
                 dto.getCreatedAt(),
@@ -70,7 +71,9 @@ final class MessageMapper {
                 dto.getReceiverType(),
                 receiver,
                 dto.getMessage(),
-                List.of()
+                dto.getAttachmentIds().stream()
+                        .map(contentRepository::findById)
+                        .toList()
         );
     }
 }

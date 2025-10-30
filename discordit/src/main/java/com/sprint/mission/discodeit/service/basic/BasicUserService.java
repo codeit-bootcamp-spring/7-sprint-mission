@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.user.request.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.enums.OnlineStatus;

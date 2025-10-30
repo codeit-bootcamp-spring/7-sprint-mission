@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.dto.message.response;
 
-import com.sprint.mission.discodeit.entity.base.Channel;
-import com.sprint.mission.discodeit.entity.base.Message;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.ReceiverType;
 

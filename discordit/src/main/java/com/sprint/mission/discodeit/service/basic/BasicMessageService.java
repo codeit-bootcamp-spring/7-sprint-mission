@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.message.GetMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.SendMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
-import com.sprint.mission.discodeit.entity.base.Message;
-import com.sprint.mission.discodeit.entity.base.Receivable;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Receivable;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.ReceiverType;
 import com.sprint.mission.discodeit.exceptions.ReceiverNotFoundException;
@@ -30,7 +31,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public void sendMessage(SendMessageDto dto) {
+    public void send(SendMessageDto dto) {
         User sender = userRepository.findByUserId(dto.senderUserId());
 
         Receivable receiver;
@@ -63,15 +64,23 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageResponse> getBySender(User sender) {
-        return messageRepository.findBySender(sender).stream()
-                .map(MessageResponse::toDto)
-                .toList();
-    }
-
-    @Override
-    public List<MessageResponse> getByReceiver(Receivable receiver) {
-        return messageRepository.findByReceiver(receiver).stream()
+    public List<MessageResponse> get(GetMessageDto dto) {
+        List<Message> messages;
+        if (dto.senderId() != null && dto.receiverId() != null) {
+            messages = messageRepository.findBySenderAndReceiver(userRepository.findByUserId(dto.senderId()),
+                    dto.type() == ReceiverType.USER?
+                            userRepository.findByUserId(dto.receiverId()) :
+                            channelRepository.findById(UUID.fromString(dto.receiverId())));
+        } else if (dto.senderId() != null) {
+            messages = messageRepository.findBySender(userRepository.findByUserId(dto.senderId()));
+        } else {
+            if (dto.type() == ReceiverType.USER) {
+                messages = messageRepository.findByReceiver(userRepository.findByUserId(dto.receiverId()));
+            } else {
+                messages = messageRepository.findByReceiver(channelRepository.findById(UUID.fromString(dto.receiverId())));
+            }
+        }
+        return messages.stream()
                 .map(MessageResponse::toDto)
                 .toList();
     }
@@ -80,13 +89,6 @@ public class BasicMessageService implements MessageService {
     public void delete(Message message) {
         binaryContentRepository.deleteAll(message.getAttachments());
         messageRepository.delete(message);
-    }
-
-    @Override
-    public List<MessageResponse> getBySenderAndReceiver(User sender, Receivable receiver) {
-        return messageRepository.findBySenderAndReceiver(sender, receiver).stream()
-                .map(MessageResponse::toDto)
-                .toList();
     }
 
     /**

@@ -1,12 +1,17 @@
 package com.sprint.mission.discodeit.dto.fileIo.mapper;
 
-import com.sprint.mission.discodeit.entity.base.Channel;
-import com.sprint.mission.discodeit.entity.base.Message;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.dto.fileIo.BinaryContentIoDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.MessageIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.UserIoDTO;
+import com.sprint.mission.discodeit.dto.fileIo.ReadStatusIoDTO;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 public final class Mapper {
@@ -28,10 +33,15 @@ public final class Mapper {
         return UserMapper.toDto(user);
     }
 
+    public static User toUser(UserIoDTO dto, BinaryContentRepository contentRepository) {
+        return UserMapper.toUser(dto, contentRepository);
+    }
+
     public static Message toMessage (MessageIoDTO dto,
                                      UserRepository userRepository,
-                                     ChannelRepository channelRepository){
-        return MessageMapper.toMessage(dto, userRepository, channelRepository);
+                                     ChannelRepository channelRepository,
+                                     BinaryContentRepository contentRepository){
+        return MessageMapper.toMessage(dto, userRepository, channelRepository, contentRepository);
     }
 
     public static MessageIoDTO toMessageDto(Message message) {
@@ -39,4 +49,22 @@ public final class Mapper {
     }
 
 
+    public static BinaryContentIoDTO toDto(BinaryContent binaryContent) {
+        return BinaryContentMapper.toDto(binaryContent);
+    }
+
+    public static BinaryContent toBinaryContent(BinaryContentIoDTO dto,
+                                                UserRepository userRepository) {
+        return BinaryContentMapper.toBinaryContent(dto, userRepository);
+    }
+
+    public static ReadStatusIoDTO toDto(ReadStatus readStatus) {
+        return ReadStatusMapper.toDto(readStatus);
+    }
+
+    public static ReadStatus toReadStatus(ReadStatusIoDTO dto,
+                                          UserRepository userRepository,
+                                          ChannelRepository channelRepository) {
+        return ReadStatusMapper.toReadStatus(dto, userRepository, channelRepository);
+    }
 }

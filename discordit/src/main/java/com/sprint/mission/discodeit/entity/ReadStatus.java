@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.base.Channel;
-import com.sprint.mission.discodeit.entity.base.User;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -21,5 +19,12 @@ public class ReadStatus{
     public ReadStatus(User user, Channel channel) {
         this.user = user;
         this.channel = channel;
+    }
+
+    public static ReadStatus fromDto(UUID id, User user, Channel channel, Instant lastReadAt) {
+        ReadStatus r = new ReadStatus(user, channel);
+        r.id = id;
+        r.lastReadAt = lastReadAt;
+        return r;
     }
 }

@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.base.Channel;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exceptions.ReadStatusAlreadyExistsException;
 import com.sprint.mission.discodeit.exceptions.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -14,10 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-@RequiredArgsConstructor
 public class JCFReadStatusRepository implements ReadStatusRepository {
     private static final List<ReadStatus> data = new ArrayList<>();
-
 
     @Override
     public void save(ReadStatus readStatus) {

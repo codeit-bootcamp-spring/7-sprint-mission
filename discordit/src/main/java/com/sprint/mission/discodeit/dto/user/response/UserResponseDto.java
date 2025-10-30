@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.user.response;
 
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 

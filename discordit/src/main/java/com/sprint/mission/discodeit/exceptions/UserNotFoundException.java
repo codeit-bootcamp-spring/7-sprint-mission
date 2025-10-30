@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.exceptions;
 
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.UUID;
 

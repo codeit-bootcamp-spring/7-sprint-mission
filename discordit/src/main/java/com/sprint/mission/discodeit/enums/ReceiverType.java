@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.enums;
 
-import com.sprint.mission.discodeit.entity.base.Channel;
-import com.sprint.mission.discodeit.entity.base.Receivable;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Receivable;
+import com.sprint.mission.discodeit.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

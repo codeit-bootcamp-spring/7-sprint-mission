@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.base.Message;
-import com.sprint.mission.discodeit.entity.base.Receivable;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Receivable;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;

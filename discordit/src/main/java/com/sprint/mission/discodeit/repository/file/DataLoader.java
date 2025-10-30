@@ -1,15 +1,20 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.base.Channel;
-import com.sprint.mission.discodeit.entity.base.Message;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.fileIo.BinaryContentIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.MessageIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.UserIoDTO;
+import com.sprint.mission.discodeit.dto.fileIo.ReadStatusIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.mapper.Mapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,17 +31,40 @@ public class DataLoader {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final ReadStatusRepository readStatusRepository;
 
     public void loadAll() {
+        loadBinaryContent();
         loadUser();
         loadChannel();
+        loadReadStatus();
         loadMessage();
+    }
+
+    private void loadBinaryContent() {
+        File file = new File(BINARY_CONTENT_PATH);
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            return;
+        }
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(BINARY_CONTENT_PATH))) {
+            @SuppressWarnings("unchecked")
+            List<BinaryContentIoDTO> list = (List<BinaryContentIoDTO>) ois.readObject();
+            List<BinaryContent> objects = list.stream()
+                    .map(dto -> Mapper.toBinaryContent(dto, userRepository))
+                    .toList();
+            binaryContentRepository.saveAll(objects);
+        } catch (FileNotFoundException e) {
+            // ignore
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load binary content file", e);
+        }
     }
 
     private void loadMessage() {
         File file = new File(MESSAGE_FILE_PATH);
 
-        // 파일이 없으면 디렉토리 생성 후 종료
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             return;
@@ -48,24 +76,22 @@ public class DataLoader {
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(MESSAGE_FILE_PATH))) {
             List<Message> objects = ((List<MessageIoDTO>) ois.readObject()).stream()
-                    .map(m -> Mapper.toMessage(m, userRepository, channelRepository))
-                    .sorted(Comparator.comparing(Message::getCreatedAt)) // 메시지 반환 순서 보장을 위해 정렬
+                    .map(m -> Mapper.toMessage(m, userRepository, channelRepository, binaryContentRepository))
+                    .sorted(Comparator.comparing(Message::getCreatedAt))
                     .toList();
             for (Message message : objects) {
                 messageRepository.save(message);
             }
         } catch (FileNotFoundException e) {
-            // 파일이 없으면 무시하고 동작
-            System.out.println("메시지 파일이 없어 새로 생성합니다");
+            // ignore
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("메시지 파일 로드 중 오류 발생", e);
+            throw new RuntimeException("Failed to load message file", e);
         }
     }
 
     private void loadUser() {
         File file = new File(USER_FILE_PATH);
 
-        // 파일이 없으면 디렉토리 생성
         if (!file.exists()) {
             file.getParentFile().mkdirs();
         }
@@ -76,22 +102,21 @@ public class DataLoader {
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_FILE_PATH))) {
             List<User> objects = ((List<UserIoDTO>) ois.readObject()).stream()
-                    .map(Mapper::toUser) // TODO: BinaryContentRepository 연계하여 프로필 이미지 복원 (차후 예정)
+                    .map(dto -> Mapper.toUser(dto, binaryContentRepository))
                     .toList();
             for (User user : objects) {
                 userRepository.save(user);
             }
         } catch (FileNotFoundException e) {
-            // 파일이 없으면 무시
+            // ignore
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("사용자 파일 로드 중 오류 발생", e);
+            throw new RuntimeException("Failed to load user file", e);
         }
     }
 
     private void loadChannel() {
         File file = new File(CHANNEL_FILE_PATH);
 
-        // 파일이 없으면 디렉토리 생성 후 종료
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             return;
@@ -108,11 +133,31 @@ public class DataLoader {
                 channelRepository.save(object);
             }
         } catch (FileNotFoundException e) {
-            // 파일이 없으면 무시하고 동작
-            System.out.println("채널 파일이 없어 새로 생성합니다");
+            // ignore
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("채널 파일 로드 중 오류 발생", e);
+            throw new RuntimeException("Failed to load channel file", e);
+        }
+    }
+
+    private void loadReadStatus() {
+        File file = new File(READ_STATUS_FILE_PATH);
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            return;
+        }
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(READ_STATUS_FILE_PATH))) {
+            @SuppressWarnings("unchecked")
+            List<ReadStatusIoDTO> list = (List<ReadStatusIoDTO>) ois.readObject();
+            List<com.sprint.mission.discodeit.entity.ReadStatus> objects = list.stream()
+                    .map(dto -> Mapper.toReadStatus(dto, userRepository, channelRepository))
+                    .toList();
+            for (com.sprint.mission.discodeit.entity.ReadStatus rs : objects) {
+                readStatusRepository.save(rs);
+            }
+        } catch (FileNotFoundException e) {
+            // ignore
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load read status file", e);
         }
     }
 }
-

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exceptions.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
