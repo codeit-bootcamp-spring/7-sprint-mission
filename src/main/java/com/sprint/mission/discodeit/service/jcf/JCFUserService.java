@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.request.UserCreateReq;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -22,8 +23,8 @@ public class JCFUserService implements UserService {
 
     //유저 추가
     @Override
-    public User create(String email, String nickname, String password){
-        return jcfUserRepository.save(new User(email, nickname, password));
+    public User create(UserCreateReq req){
+        return jcfUserRepository.save(req.to());
     }
 
     //유저 목록
@@ -54,5 +55,15 @@ public class JCFUserService implements UserService {
     @Override
     public User update(UUID id, String nickname, String password) {
         return jcfUserRepository.update(id,nickname,password);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return jcfUserRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByNickname(String nickname) {
+        return jcfUserRepository.existsByNickname(nickname);
     }
 }

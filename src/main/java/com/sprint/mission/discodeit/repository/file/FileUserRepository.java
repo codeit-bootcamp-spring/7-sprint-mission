@@ -67,4 +67,18 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
         deleteFile(userId);
         return user;
     }
+
+    //이메일이 이미 존재하는지
+    @Override
+    public boolean existsByEmail(String email) {
+        return findAllFiles().stream()
+                .anyMatch(u -> u.getEmail().equals(email));
+    }
+
+    //닉네임이 이미 존재하는지
+    @Override
+    public boolean existsByNickname(String nickname) {
+        return findAllFiles().stream()
+                .anyMatch(u -> u.getNickname().equals(nickname));
+    }
 }

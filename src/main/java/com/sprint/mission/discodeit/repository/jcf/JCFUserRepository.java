@@ -66,4 +66,14 @@ public class JCFUserRepository implements UserRepository {
         data.remove(userId);
         return user;
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return false;
+    }
+
+    @Override
+    public boolean existsByNickname(String nickname) {
+        return false;
+    }
 }

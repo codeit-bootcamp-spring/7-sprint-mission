@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.request.UserCreateReq;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -16,8 +17,8 @@ public class FileUserService implements UserService {
 
     //유저 추가
     @Override
-    public User create(String email, String nickname, String password){
-        return fileUserRepository.save(new User(email, nickname, password));
+    public User create(UserCreateReq req){
+        return fileUserRepository.save(req.to());
     }
 
     //유저 목록
@@ -48,5 +49,15 @@ public class FileUserService implements UserService {
     @Override
     public User update(UUID id, String nickname, String password) {
         return fileUserRepository.update(id,nickname,password);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return fileUserRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByNickname(String nickname) {
+        return fileUserRepository.existsByNickname(nickname);
     }
 }

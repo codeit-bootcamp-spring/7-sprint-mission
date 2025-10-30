@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.request.UserCreateReq;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +19,20 @@ public class BasicUserService implements UserService {
 
     //유저 추가
     @Override
-    public User create(String email, String nickname, String password){
-        return userRepository.save(new User(email, nickname, password));
+    public User create(UserCreateReq req){
+        return userRepository.save(req.to());
+    }
+
+    //이메일 중복 검사
+    @Override
+    public boolean existsByEmail(String email){
+        return userRepository.existsByEmail(email);
+    }
+
+    //닉네임 중복 검사
+    @Override
+    public boolean existsByNickname(String nickname){
+        return userRepository.existsByNickname(nickname);
     }
 
     //유저 목록

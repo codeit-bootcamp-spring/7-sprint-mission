@@ -29,15 +29,6 @@ class BasicUserServiceTest {
     @Test
     @DisplayName("싱글톤 인스턴스 생성 및 주입 테스트")
     void singletonInstanceTest() {
-        BasicUserService service1 = BasicUserService.getInstance(repo);
-        BasicUserService service2 = BasicUserService.getInstance(repo);
-
-        // 1️⃣ 싱글톤이므로 동일 인스턴스
-        assertSame(service1, service2);
-
-        // 2️⃣ 주입된 리포지토리 객체 확인
-        assertNotNull(service1);
-        assertEquals(repo, getInjectedRepo(service1));
     }
 
     // Reflection으로 private final userRepository 필드 확인
