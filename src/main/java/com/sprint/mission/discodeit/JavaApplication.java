@@ -1,5 +1,5 @@
 package com.sprint.mission.discodeit;
-
+/*
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -144,13 +144,13 @@ public class JavaApplication {
 
         titlePrint("조회 단건");
         Channel channelStore = channelService.get(channel1.getId());
-        System.out.println("채널 확인: " + channelService.get(channelStore.getId()).getChannelName());
+        System.out.println("채널 확인: " + channelService.get(channelStore.getId()).channelName());
 
         titlePrint("조회 다건");
         System.out.println("채널 확인: " + channelService.getAll().size());
 
         titlePrint("Join");
-        String ch1 = channelService.get(channel1.getId()).getChannelName();
+        String ch1 = channelService.get(channel1.getId()).channelName();
         boolean joined1 = channelService.join(channel1.getId(), user2.getId());
         channelService.get(channel1.getId())
                 .getMembers()
@@ -237,7 +237,7 @@ public class JavaApplication {
 
         titlePrint("수정된 데이터 조회");
         channelService.get(channel1.getId());
-        System.out.println("채널 확인: " + channelService.get(channel1.getId()).getChannelName());
+        System.out.println("채널 확인: " + channelService.get(channel1.getId()).channelName());
 
         titlePrint("삭제");
         boolean deleted2 = channelService.delete(channel1.getId());
@@ -315,3 +315,5 @@ public class JavaApplication {
 
     }
 }
+
+ */
