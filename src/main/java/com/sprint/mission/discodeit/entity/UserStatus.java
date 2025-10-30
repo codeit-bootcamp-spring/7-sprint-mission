@@ -25,16 +25,18 @@ public class UserStatus extends BaseEntity{
     }
 
     //로그인 했을 때
-    public void updateOnlineAt(){
+    public UserStatus updateOnlineAt(){
         this.onlineAt = Instant.now();
+        return this;
     }
 
     //종료되었을 때
-    public void updateOfflineAt(){
+    public UserStatus updateOfflineAt(){
         this.offlineAt = Instant.now();
+        return this;
     }
 
-    //온라인 상태 계산
+    //온라인 상태 계산(근데 이건 프론트에서 하는게 맞지 않나...?)
     public boolean IsOnline(){
         return onlineAt.isAfter(offlineAt);
     }
