@@ -74,9 +74,9 @@ public class DiscodeitTest {
                     case 1 -> {
                         System.out.println("JCF 서비스로 테스트를 진행합니다.");
                         return new DiscodeitTest(
-                                JCFUserRepository.getInstance(),
-                                JCFChannelRepository.getInstance(),
-                                JCFMessageRepository.getInstance(),
+                                new JCFUserRepository(),
+                                new JCFChannelRepository(),
+                                new JCFMessageRepository(),
                                 new JCFUserStatusRepository(),
                                 new JCFBinaryContentRepository(),
                                 new JCFReadStatusRepository()
@@ -85,9 +85,9 @@ public class DiscodeitTest {
                     case 2 -> {
                         System.out.println("File I/O 서비스로 테스트를 진행합니다.");
                         return new DiscodeitTest(
-                                FileUserRepository.getInstance(),
-                                FileChannelRepository.getInstance(),
-                                FileMessageRepository.getInstance(),
+                                new FileUserRepository(),
+                                new FileChannelRepository(),
+                                new FileMessageRepository(),
                                 new FileUserStatusRepository(),
                                 new FileBinaryContentRepository(),
                                 new FileReadStatusRepository()
@@ -410,7 +410,7 @@ public class DiscodeitTest {
                     case 1 -> joinChannelRoom(channel);
                     case 2 -> {
                         Printer.printHalfLine();
-                        Printer.printChannelMember(channelService, channel.getId());
+                        Printer.printChannelMember(userService, channelService, channel.getId());
                         Printer.printHalfLine();
                     }
                     case 3 -> renameChannel(channel.getId());

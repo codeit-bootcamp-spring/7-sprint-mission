@@ -5,28 +5,20 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ChannelVisibility;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository
 public class FileChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channelStore = new HashMap<>();
     private final Map<UUID, Set<UUID>> joinedChannels = new HashMap<>();
     private final String channelPath = AppConfig.DATA_PATH + "\\channels.sav";
     private final String joinedPath = AppConfig.DATA_PATH + "\\joined.sav";
 
-    private FileChannelRepository() {
+    public FileChannelRepository() {
         loadChannels();
         loadJoinedChannels();
-    }
-
-    private static FileChannelRepository instance = new FileChannelRepository();
-
-    public static FileChannelRepository getInstance() {
-        return instance;
     }
 
     // --- 채널 정보 저장 ---

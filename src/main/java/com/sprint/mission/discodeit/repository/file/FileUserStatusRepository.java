@@ -3,12 +3,10 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
-@Repository
 public class FileUserStatusRepository implements UserStatusRepository {
     //파일 저장 필요
     private final Map<UUID, UserStatus> userStatusStore = new HashMap<>();

@@ -3,12 +3,10 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
-@Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
     Map<UUID, ReadStatus> readStatusStore = new HashMap<>();
     private final String filePath = AppConfig.DATA_PATH + "\\readstatus.sav";

@@ -19,12 +19,6 @@ public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channelStore = new HashMap<>();
     private final Map<UUID, Set<UUID>> joinedChannels = new HashMap<>();
 
-    private JCFChannelRepository() {}
-
-    private static JCFChannelRepository instance = new JCFChannelRepository();
-
-    public static JCFChannelRepository getInstance() { return instance; }
-
     @Override
     public void addChannelIdForUser(UUID channelId, UUID userId) {
         Set<UUID> channelIds;

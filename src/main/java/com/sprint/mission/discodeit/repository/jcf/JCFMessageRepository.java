@@ -17,15 +17,6 @@ import java.util.*;
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messageStore = new LinkedHashMap<>();
 
-    private JCFMessageRepository() {}
-
-    private static JCFMessageRepository instance = new JCFMessageRepository();
-
-    public static JCFMessageRepository getInstance() {
-        return instance;
-    }
-
-
     @Override
     public void save(Message message) {
         messageStore.put(message.getId(), message);

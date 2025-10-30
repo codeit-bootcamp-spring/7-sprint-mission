@@ -15,12 +15,6 @@ import java.util.*;
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> userStore = new HashMap<>();
 
-    private JCFUserRepository() {}
-
-    private static JCFUserRepository instance = new JCFUserRepository();
-
-    public static JCFUserRepository getInstance() { return instance; }
-
     @Override
     public void save(User user) {
         userStore.put(user.getId(), user);
