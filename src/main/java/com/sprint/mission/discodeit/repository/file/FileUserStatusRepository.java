@@ -6,10 +6,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class FileUserStatusRepository implements UserStatusRepository {
@@ -51,6 +48,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void save(UserStatus userStatus) {
+        // 유저는 하나의 UserStatus를 가지기 때문에 key를 유저 UUID로 설정
         userStatusStore.put(userStatus.getUserId(), userStatus);
         saveUsersToFile();
     }
@@ -58,7 +56,12 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public UserStatus findById(UUID id) {
         return Optional.ofNullable(userStatusStore.get(id))
-                .orElseThrow(() -> new IllegalStateException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalStateException("로그인 시간을 저장할 유저가 존재하지 않습니다."));
+    }
+
+    @Override
+    public List<UserStatus> findAll() {
+        return new ArrayList<>(userStatusStore.values());
     }
 
     @Override
@@ -74,5 +77,10 @@ public class FileUserStatusRepository implements UserStatusRepository {
     public void deleteById(UUID id) {
         userStatusStore.remove(id);
         saveUsersToFile();
+    }
+
+    @Override
+    public boolean isExist(UUID userId) {
+        return userStatusStore.containsKey(userId);
     }
 }
