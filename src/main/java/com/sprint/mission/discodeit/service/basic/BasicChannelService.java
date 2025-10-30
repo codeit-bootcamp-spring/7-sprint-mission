@@ -54,19 +54,29 @@ public class BasicChannelService implements ChannelService {
 
     //채널 목록
     @Override
-    public List<Channel> findAll() {
-        return channelRepository.findAll();
+    public List<ChannelInfoRes> findAll(UUID userId) {
+        return channelRepository.findAll().stream()
+                .filter(channel ->
+                        channel.getPublicType() == ChannelType.PUBLIC ||
+                        (channel.getPublicType() == ChannelType.PRIVATE &&
+                        channelRepository.isMember(userId, channel.getId()))
+                ).map(this::mapChannelToInfoRes).toList();
     }
 
     //채널명으로 찾기
     @Override
     public ChannelInfoRes findByName(String name) {
-        Channel channel = channelRepository.findByName(name);
+        return mapChannelToInfoRes(channelRepository.findByName(name));
+    }
+
+    // 채널의 공개 여부에 따라 ResDTO를 맞게 변환해주는 메소드
+    private ChannelInfoRes mapChannelToInfoRes(Channel channel) {
         Message lastMessage = messageRepository.findLastMessageByChannelId(channel.getId());
 
         return switch (channel.getPublicType()) {
-            case PUBLIC -> ChannelPublicInfoRes.from(channel);
+            case PUBLIC -> ChannelPublicInfoRes.from(channel, lastMessage);
             case PRIVATE -> ChannelPrivateInfoRes.from(channel, lastMessage);
+            default -> throw new IllegalStateException("Unknown ChannelType: " + channel.getPublicType());
         };
     }
 }

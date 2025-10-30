@@ -58,4 +58,12 @@ public class JCFChannelRepository implements ChannelRepository {
     public Channel delete(UUID id) {
         return data.remove(id);
     }
+
+    //유저가 해당 채널에 포함되어 있는지 확인
+    @Override
+    public boolean isMember(UUID userId, UUID channelId) {
+        return findAll().stream()
+                .filter(ch -> ch.getId().equals(channelId))
+                .anyMatch(ch -> ch.getUsers().contains(userId));
+    }
 }
