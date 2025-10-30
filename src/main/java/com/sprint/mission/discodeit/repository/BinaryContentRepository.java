@@ -13,6 +13,8 @@ public interface BinaryContentRepository {
 
     BinaryContent findById(UUID id);
 
+    List<BinaryContent> findAll();
+
     void delete(UUID id);
 
     /** 메시지 삭제 시 관련 파일들 삭제 */

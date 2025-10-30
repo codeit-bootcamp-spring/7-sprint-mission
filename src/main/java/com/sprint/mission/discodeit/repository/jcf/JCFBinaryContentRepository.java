@@ -20,6 +20,11 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
+    public List<BinaryContent> findAll() {
+        return new ArrayList<>(contentStore.values());
+    }
+
+    @Override
     public void delete(UUID id) {
         contentStore.remove(id);
     }
