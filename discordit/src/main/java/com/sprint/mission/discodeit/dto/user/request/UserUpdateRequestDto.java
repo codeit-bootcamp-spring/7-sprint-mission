@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.user.request;
 
-import com.sprint.mission.discodeit.entity.content.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;

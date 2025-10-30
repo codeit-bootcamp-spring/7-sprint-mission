@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity.base;
 
-import com.sprint.mission.discodeit.entity.content.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
