@@ -31,9 +31,6 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createPrivateChannel(CreatePrivateChannelDto dto) {
-        if(channelRepository.findByName(dto.channelName()).isPresent()){
-            throw new IllegalArgumentException("채널이 이미 존재합니다.");
-        }
         Channel channel = new Channel(
                 null,
                 null,
