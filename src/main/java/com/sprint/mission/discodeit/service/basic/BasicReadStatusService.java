@@ -24,8 +24,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusResponseDto create(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
-        UUID userId = Objects.requireNonNull(readStatusCreateRequestDto.getUserId());
-        UUID channelId = Objects.requireNonNull(readStatusCreateRequestDto.getChannelId());
+        UUID userId = Objects.requireNonNull(readStatusCreateRequestDto.userId());
+        UUID channelId = Objects.requireNonNull(readStatusCreateRequestDto.channelId());
 
         userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
         Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException("Channel not found"));
@@ -38,15 +38,15 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new IllegalStateException("User already has read status");
         }
 
-        Instant readAt = readStatusCreateRequestDto.getLastReadAt() != null
-                ? readStatusCreateRequestDto.getLastReadAt() :  Instant.now();
+        Instant readAt = readStatusCreateRequestDto.lastReadAt() != null
+                ? readStatusCreateRequestDto.lastReadAt() :  Instant.now();
 
         ReadStatus readStatus = readStatusRepository.save(
                 ReadStatus.builder()
-                .userId(userId)
-                .channelId(channelId)
-                .lastReadAt(readAt)
-                .build()
+                        .userId(userId)
+                        .channelId(channelId)
+                        .lastReadAt(readAt)
+                        .build()
         );
 
         return new ReadStatusResponseDto(
@@ -87,11 +87,11 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusResponseDto update(ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
         ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(readStatusUpdateRequestDto
-                .getId())).orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
+                .id())).orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
 
-        if (readStatusUpdateRequestDto.getLastReadAt() != null) {
-            if(readStatus.getLastReadAt() == null || readStatusUpdateRequestDto.getLastReadAt().isAfter(readStatus.getLastReadAt())) {
-                readStatus.setLastReadAt(readStatusUpdateRequestDto.getLastReadAt());
+        if (readStatusUpdateRequestDto.lastReadAt() != null) {
+            if(readStatus.getLastReadAt() == null || readStatusUpdateRequestDto.lastReadAt().isAfter(readStatus.getLastReadAt())) {
+                readStatus.readAt(readStatusUpdateRequestDto.lastReadAt());
             }
         }
 
