@@ -31,7 +31,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     private final File userStatusRepositoryFile;
 
     public FileUserStatusRepository(Environment env) {
-        USER_STATUS_DATA_PATH =env.getProperty("discodeit.repository.file-directory")+"userStatusRepository.ser";
+        USER_STATUS_DATA_PATH =env.getProperty(DISCODEIT_DIRECTORY)+"userStatusRepository.ser";
         userStatusRepositoryFile = new File(USER_STATUS_DATA_PATH);
         repositoryCheck();
         resetRepository();

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.service.util.StaticString;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,7 +31,7 @@ public class FileChannelRepository implements ChannelRepository {
     private final File channelRepositoryFile;
 
     public FileChannelRepository(Environment env) {
-        channelRepositoryDataPath = env.getProperty("discodeit.repository.file-directory")+"channelRepository.ser";
+        channelRepositoryDataPath = env.getProperty(DISCODEIT_DIRECTORY)+"channelRepository.ser";
         System.out.println(channelRepositoryDataPath);
         channelRepositoryFile = new File(channelRepositoryDataPath);
         repositoryCheck();

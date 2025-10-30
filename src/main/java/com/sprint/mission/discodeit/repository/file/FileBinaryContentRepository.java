@@ -15,6 +15,7 @@ import javax.naming.Name;
 import java.io.*;
 import java.util.*;
 
+import static com.sprint.mission.discodeit.service.util.StaticString.*;
 import static com.sprint.mission.discodeit.service.util.StaticString.DATA_PATH;
 
 @Repository
@@ -32,7 +33,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     private final File binaryContentRepositoryFile;
 
     public FileBinaryContentRepository(Environment env){
-        binaryContentRepositoryPath = env.getProperty("discodeit.repository.file-directory")+"binaryContentRepository.ser";
+        binaryContentRepositoryPath = env.getProperty(DISCODEIT_DIRECTORY)+"binaryContentRepository.ser";
         binaryContentRepositoryFile = new File(binaryContentRepositoryPath);
         repositoryCheck();
         resetBinaryContentRepository();

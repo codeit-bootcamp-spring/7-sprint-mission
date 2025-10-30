@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.util;
 
 import com.sprint.mission.discodeit.entity.User;
 
+import java.util.concurrent.Flow;
+
 public abstract class StaticString {
     public static final String DELETE_USER ="user is deleted : ";
     public static final String DELETE_MESSAGE ="message is deleted : ";
@@ -40,5 +42,6 @@ public abstract class StaticString {
             .email("")
             .isOnline(false)
             .build();
+    public static final String DISCODEIT_DIRECTORY = "discodeit.repository.file-directory";
 
 }

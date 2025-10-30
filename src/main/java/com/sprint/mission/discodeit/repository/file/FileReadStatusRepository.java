@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.util.*;
 
+import static com.sprint.mission.discodeit.service.util.StaticString.*;
+
 @Repository
 @ConditionalOnProperty(
         prefix = "discodeit.repository",
@@ -31,7 +33,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
 
     public FileReadStatusRepository(Environment env) {
-        READ_STATUS_DATA_PATH = env.getProperty("discodeit.repository.file-directory") +"readStatusRepository.ser";
+        READ_STATUS_DATA_PATH = env.getProperty(DISCODEIT_DIRECTORY) +"readStatusRepository.ser";
         readStatusRepositoryFile = new File(READ_STATUS_DATA_PATH);
 
         repositoryCheck();

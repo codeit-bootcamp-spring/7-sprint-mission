@@ -15,6 +15,8 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.util.*;
 
+import static com.sprint.mission.discodeit.service.util.StaticString.*;
+
 
 @Repository
 @ConditionalOnProperty(
@@ -30,7 +32,7 @@ public class FileMessageRepository implements MessageRepository {
 
 
     public FileMessageRepository(Environment env) {
-        MESSAGE_DATA_PATH = env.getProperty("discodeit.repository.file-directory")+"messageRepository.ser";
+        MESSAGE_DATA_PATH = env.getProperty(DISCODEIT_DIRECTORY)+"messageRepository.ser";
         messageRepositoryFile = new File(MESSAGE_DATA_PATH);
         repositoryCheck();
         resetMessageRepository();
