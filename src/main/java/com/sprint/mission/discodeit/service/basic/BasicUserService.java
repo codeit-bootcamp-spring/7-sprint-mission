@@ -27,7 +27,7 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User createUser(CreateUserCommand request){
+    public UserResponseDto createUser(CreateUserCommand request){
         // username, email 중복 체크
         if(userRepository.findByUsername(request.username()).isPresent()){
             throw new IllegalArgumentException("이미 유저 이름이 있습니다.");
@@ -65,7 +65,7 @@ public class BasicUserService implements UserService {
         UserStatus status = new UserStatus(userCreated.getId());
         userStatusRepository.save(status);
 
-        return userCreated;
+        return UserResponseDto.from(userCreated, status);
     }
 
     @Override

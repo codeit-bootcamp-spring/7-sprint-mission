@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface UserService {
 
-    User createUser(CreateUserCommand request); // 유저 생성
+    UserResponseDto createUser(CreateUserCommand request); // 유저 생성
     UserResponseDto find(UUID id); //유저 조회
     List<UserResponseDto> findAll(); // 모든 유저 조회
     UserResponseDto updateUser(UUID id, UpdateUserDto  updateRequest, CreateBinaryContentRequestDto contentRequest);
