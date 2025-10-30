@@ -14,7 +14,7 @@ import java.util.UUID;
 @Service
 public class BasicMessageService implements MessageService {
     //레포지토리
-    private final MessageRepository messageRepository;
+    private MessageRepository messageRepository;
 
     //한 유저가 말한 메세지들을 조회
     @Override

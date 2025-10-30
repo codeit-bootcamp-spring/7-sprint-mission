@@ -5,10 +5,10 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class BasicAuthService {
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
     public boolean login(String nickname, String password) {
         User user = userRepository.findByNickname(nickname);
