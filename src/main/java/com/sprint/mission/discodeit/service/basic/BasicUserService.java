@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.UserCreateReq;
 import com.sprint.mission.discodeit.dto.request.UserUpdateReq;
+import com.sprint.mission.discodeit.dto.response.UserInfoRes;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -20,6 +22,7 @@ public class BasicUserService implements UserService {
     //리포지토리
     private UserRepository userRepository;
     private UserStatusRepository userStatusRepository;
+    private BinaryContentRepository binaryContentRepository;
 
     //유저 추가
     @Override
@@ -47,20 +50,33 @@ public class BasicUserService implements UserService {
 
     //유저 목록
     @Override
-    public List<User> findAll(){
-        return userRepository.findAll();
+    public List<UserInfoRes> findAll(){
+        return userRepository.findAll().stream()
+                .map(user -> UserInfoRes.from(user,
+                        binaryContentRepository.findById(user.getProfileId()).getData()))
+                .toList();
     }
 
     //이메일 찾기
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public UserInfoRes findByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        if(user != null){
+            return UserInfoRes.from(user,
+                    binaryContentRepository.findById(user.getProfileId()).getData());
+        }
+        return null;
     }
 
     //닉네임으로 찾기
     @Override
-    public User findByNickname(String nickname) {
-        return userRepository.findByNickname(nickname);
+    public UserInfoRes findByNickname(String nickname) {
+        User user = userRepository.findByNickname(nickname);
+        if(user != null){
+            return UserInfoRes.from(user,
+                    binaryContentRepository.findById(user.getProfileId()).getData());
+        }
+        return null;
     }
 
     //삭제
