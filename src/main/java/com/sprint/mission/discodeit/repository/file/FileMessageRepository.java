@@ -95,7 +95,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findByChannel(UUID channelId) {
+    public List<Message> findByChannelId(UUID channelId) {
         Objects.requireNonNull(channelId, "channelId cannot be null");
         return cache.values()
                 .stream()
@@ -105,7 +105,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findByAuthor(UUID authorId) {
+    public List<Message> findByAuthorId(UUID authorId) {
         Objects.requireNonNull(authorId, "authorId cannot be null");
         return cache.values()
                 .stream()
