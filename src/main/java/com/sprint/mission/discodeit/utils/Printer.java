@@ -29,7 +29,6 @@ public class Printer {
     }
 
     public static void printChatHistory(UserService userService, UserResponseDto user, List<Message> msgs) {
-        Instant unixTime;
         String KST, date = null, time;
 
         for(Message msg : msgs) {

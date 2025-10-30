@@ -36,7 +36,6 @@ public class BasicUserService implements UserService{
         // 1. username/email 중복 검사
         userRepository.existsByNickName(request.getNickName());
         userRepository.existsByEmail(request.getEmail());
-        User newUser;
 
         // 2. 선택적 프로필 이미지 처리
         UUID profileImageId = null;
@@ -53,7 +52,7 @@ public class BasicUserService implements UserService{
             }
         }
 
-        newUser = new User(
+        User newUser  = new User(
                 request.getUserName(),
                 request.getNickName(),
                 request.getEmail(),
@@ -64,7 +63,6 @@ public class BasicUserService implements UserService{
         );
 
         userStatusRepository.save(new UserStatus(newUser.getId()));
-
         userRepository.save(newUser);
     }
 

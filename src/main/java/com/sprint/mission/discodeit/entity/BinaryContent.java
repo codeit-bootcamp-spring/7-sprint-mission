@@ -25,7 +25,7 @@ public class BinaryContent implements Serializable {
     public String toString() {
         return "BinaryContent{" +
                 "id=" + id +
-                ", createdAt=" + createdAt +
+                ", (" + content.length + " bytes)" +
                 '}';
     }
 
