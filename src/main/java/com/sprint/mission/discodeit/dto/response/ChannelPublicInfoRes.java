@@ -7,7 +7,7 @@ import lombok.Builder;
 public record ChannelPublicInfoRes(
         String name,
         String description
-) {
+)  implements ChannelInfoRes{
     public static ChannelPublicInfoRes from(Channel channel) {
         return ChannelPublicInfoRes.builder()
                 .name(channel.getName())

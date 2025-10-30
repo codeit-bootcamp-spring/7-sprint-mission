@@ -2,8 +2,14 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.ChannelCreateReq;
 import com.sprint.mission.discodeit.dto.request.ChannelCreateSecReq;
+import com.sprint.mission.discodeit.dto.response.ChannelInfoRes;
+import com.sprint.mission.discodeit.dto.response.ChannelPrivateInfoRes;
+import com.sprint.mission.discodeit.dto.response.ChannelPublicInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -17,6 +23,7 @@ import java.util.UUID;
 public class BasicChannelService implements ChannelService {
     //레포지토리
     private ChannelRepository channelRepository;
+    private MessageRepository messageRepository;
 
     //채널 생성
     @Override
@@ -53,8 +60,13 @@ public class BasicChannelService implements ChannelService {
 
     //채널명으로 찾기
     @Override
-    public Channel findByName(String name) {
-        return channelRepository.findByName(name);
-    }
+    public ChannelInfoRes findByName(String name) {
+        Channel channel = channelRepository.findByName(name);
+        Message lastMessage = messageRepository.findLastMessageByChannelId(channel.getId());
 
+        return switch (channel.getPublicType()) {
+            case PUBLIC -> ChannelPublicInfoRes.from(channel);
+            case PRIVATE -> ChannelPrivateInfoRes.from(channel, lastMessage);
+        };
+    }
 }

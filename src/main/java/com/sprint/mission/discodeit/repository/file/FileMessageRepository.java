@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,5 +74,13 @@ public class FileMessageRepository extends BaseFileRepository<Message> implement
         Message message = loadFromFile(id);
         deleteFile(id);
         return message;
+    }
+
+    @Override
+    public Message findLastMessageByChannelId(UUID channelId) {
+        return findAllFiles().stream()
+                .filter(m -> m.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt))
+                .orElse(null);
     }
 }

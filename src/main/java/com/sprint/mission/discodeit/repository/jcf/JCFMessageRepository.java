@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
     //싱글톤 구현
@@ -73,5 +70,14 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public Message delete(UUID id) {
         return data.remove(id);
+    }
+
+    //한 채널에서 가장 마지막으로 보낸 메세지 찾기
+    @Override
+    public Message findLastMessageByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(m -> m.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt))
+                .orElse(null);
     }
 }

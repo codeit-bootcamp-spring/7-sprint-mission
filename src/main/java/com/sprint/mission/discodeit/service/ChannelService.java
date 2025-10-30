@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.request.ChannelCreateReq;
 import com.sprint.mission.discodeit.dto.request.ChannelCreateSecReq;
+import com.sprint.mission.discodeit.dto.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
 
 import java.time.Instant;
@@ -15,5 +16,5 @@ public interface ChannelService {
                    String name);
     Channel delete(UUID id);
     List<Channel> findAll();
-    Channel findByName(String name);
+    ChannelInfoRes findByName(String name);
 }

@@ -14,4 +14,5 @@ public interface MessageRepository {
     Message save(Message message);
     Message update(UUID id, String content);
     Message delete(UUID id);
+    Message findLastMessageByChannelId(UUID channelId);
 }

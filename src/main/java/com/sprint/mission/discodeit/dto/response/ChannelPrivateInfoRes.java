@@ -12,7 +12,7 @@ import java.util.UUID;
 public record ChannelPrivateInfoRes(
         List<UUID> users,                   //채널 참가자
         Instant lastMessageTime            //가장 최근 메세지의 시간정보
-) {
+) implements ChannelInfoRes{
     public static ChannelPrivateInfoRes from(Channel channel, Message message) {
         return ChannelPrivateInfoRes.builder()
                 .users(channel.getUsers())
