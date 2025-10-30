@@ -31,28 +31,28 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponseDto create(UserCreateRequestDto userCreateRequestDto) {
         // 요구사항 - 유저 이름과 이메일은 다른 유저와 같으면 안된다.
-        if (!userRepository.findByName(userCreateRequestDto.getUsername()).isEmpty()) {
+        if (!userRepository.findByName(userCreateRequestDto.username()).isEmpty()) {
             throw new IllegalArgumentException("존재하는 유저입니다!");
         }
 
-        if (userRepository.findByEmail(userCreateRequestDto.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(userCreateRequestDto.email()).isPresent()) {
             throw new IllegalArgumentException("존재하는 이메일입니다!");
         }
 
         // 요구사항 - 프로밀 이미지를 등록할 수 있다!
         UUID profileId = null;
-        if(userCreateRequestDto.getProfileData() != null){
+        if(userCreateRequestDto.profileData() != null){
             BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(
-                    userCreateRequestDto.getProfileFileName(),
-                    userCreateRequestDto.getProfileContentType(),
-                    userCreateRequestDto.getProfileData()));
+                    userCreateRequestDto.profileFileName(),
+                    userCreateRequestDto.profileContentType(),
+                    userCreateRequestDto.profileData()));
             profileId = binaryContent.getId();
         }
 
         User user = User.builder()
-                .username(userCreateRequestDto.getUsername())
-                .password(userCreateRequestDto.getPassword())
-                .email(userCreateRequestDto.getEmail())
+                .username(userCreateRequestDto.username())
+                .password(userCreateRequestDto.password())
+                .email(userCreateRequestDto.email())
                 .profileId(profileId)
                 .build();
         user = userRepository.save(user);
@@ -115,36 +115,36 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto) {
-        User user = userRepository.findById(userUpdateRequestDto.getId()).orElseThrow(()
+        User user = userRepository.findById(userUpdateRequestDto.id()).orElseThrow(()
                 -> new NoSuchElementException("User not found"));
         // 유저 이름이 비어있지 않고, 기존 이름과 다르다면 수정!
-        if(userUpdateRequestDto.getUsername() != null && !userUpdateRequestDto.getUsername().equals(user.getUsername())){
-            if(!userRepository.findByName(userUpdateRequestDto.getUsername()).isEmpty()) {
+        if(userUpdateRequestDto.username() != null && !userUpdateRequestDto.username().equals(user.getUsername())){
+            if(!userRepository.findByName(userUpdateRequestDto.username()).isEmpty()) {
                 throw new IllegalArgumentException("존재하는 유저이름입니다!");
             }
-            user.setUsername(userUpdateRequestDto.getUsername());
+            user.setUsername(userUpdateRequestDto.username());
         }
 
         // 유저 이메일이 비어있지 않고, 기존 이메일과 다르다면 수정!
-        if(userUpdateRequestDto.getEmail() != null && !userUpdateRequestDto.getEmail().equals(user.getEmail())){
-            if(userRepository.findByEmail(userUpdateRequestDto.getEmail()).isPresent()) {
+        if(userUpdateRequestDto.email() != null && !userUpdateRequestDto.email().equals(user.getEmail())){
+            if(userRepository.findByEmail(userUpdateRequestDto.email()).isPresent()) {
                 throw new IllegalArgumentException("존재하는 이메일입니다!");
             }
-            user.setEmail(userUpdateRequestDto.getEmail());
+            user.setEmail(userUpdateRequestDto.email());
         }
 
-        if(userUpdateRequestDto.getPassword() != null) {
-            user.setPassword(userUpdateRequestDto.getPassword());
+        if(userUpdateRequestDto.password() != null) {
+            user.setPassword(userUpdateRequestDto.password());
         }
 
-        if(userUpdateRequestDto.getProfileData() != null){
+        if(userUpdateRequestDto.profileData() != null){
             if(user.getProfileId() != null){
                 binaryContentRepository.deleteById(user.getProfileId());
             }
             BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(
-                    userUpdateRequestDto.getProfileFileName(),
-                    userUpdateRequestDto.getProfileContentType(),
-                    userUpdateRequestDto.getProfileData()
+                    userUpdateRequestDto.profileFileName(),
+                    userUpdateRequestDto.profileContentType(),
+                    userUpdateRequestDto.profileData()
             ));
             user.setProfileId(binaryContent.getId());
         }
