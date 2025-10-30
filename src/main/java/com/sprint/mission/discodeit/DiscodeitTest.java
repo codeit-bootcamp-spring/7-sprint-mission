@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.channel.request.CreateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdatePasswordRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateType;
@@ -25,6 +27,7 @@ import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.utils.Printer;
 import com.sprint.mission.discodeit.utils.TestDataInitializer;
+import com.sprint.mission.discodeit.utils.TimeConvert;
 
 import java.io.File;
 import java.util.*;
@@ -44,7 +47,7 @@ public class DiscodeitTest {
                           UserStatusRepository userStatusRepository, BinaryContentRepository binaryContentRepository, ReadStatusRepository readStatusRepository) {
         userService = new BasicUserService(userRepository, messageRepository, userStatusRepository, binaryContentRepository);
         channelService = new BasicChannelService(channelRepository, messageRepository, readStatusRepository);
-        messageService = new BasicMessageService(messageRepository);
+        messageService = new BasicMessageService(messageRepository, binaryContentRepository);
         authService = new BasicAuthService(userRepository, userStatusRepository);
 
         //테스트를 위한 유저, 채널, 메시지 데이터 생성
@@ -242,16 +245,20 @@ public class DiscodeitTest {
 
             while (true) {
                 Printer.printHalfLine();
-                System.out.println("채팅 입력중(채팅방을 갱신 하려면 1, 채팅방에서 나가려면 -1을 입력하세요.)");
+                System.out.println("채팅 입력중(채팅방을 갱신 하려면 1, 메시지 수정/삭제 메뉴는 2, 채팅방에서 나가려면 -1을 입력하세요.)");
                 System.out.print("입력: ");
                 input = sc.nextLine();
 
-                if (input.equals("1")) {
+                if (input.equals("1") || input.equals("2")) {
+                    if(input.equals("2")) { // 메시지 수정 또는 삭제 이후 채팅방 갱신
+                        handleUserMessageAction(loginUser.getId(), receiver.getId());
+                    }
+
                     msgs = messageService.getMessagesBetween(loginUser.getId(), receiver.getId());
                     Printer.printChatHistory(userService, loginUser, msgs);
                 } else if (input.equals("-1")) break;
                 else {
-                    messageService.createMessage(loginUser.getId(), receiver.getId(), input, ReceiveType.USER);
+                    messageService.createMessage(new CreateMessageRequestDto(loginUser.getId(), receiver.getId(), input, ReceiveType.USER, null));
                 }
             }
 
@@ -446,16 +453,20 @@ public class DiscodeitTest {
             Printer.printChatHistory(userService, loginUser, channelMessages);
             while (true) {
                 Printer.printHalfLine();
-                System.out.println("채팅 입력중(채팅방을 갱신 하려면 1, 채팅방에서 나가려면 -1을 입력하세요.)");
+                System.out.println("채팅 입력중(채팅방을 갱신 하려면 1, 메시지 수정/삭제 메뉴는 2, 채팅방에서 나가려면 -1을 입력하세요.)");
                 System.out.print("입력: ");
                 input = sc.nextLine();
 
-                if (input.equals("1")) {
+                if (input.equals("1") || input.equals("2")) {
+                    if (input.equals("2")) { // 수정 또는 삭제 이후 채팅방 갱신
+                        handleUserMessageAction(loginUser.getId(), channelId);
+                    }
+
                     channelMessages = messageService.getAllByChannel(channel.getId());
                     Printer.printChatHistory(userService, loginUser, channelMessages);
                 } else if (input.equals("-1")) return;
                 else {
-                    messageService.createMessage(loginUser.getId(), channel.getId(), input, ReceiveType.CHANNEL);
+                    messageService.createMessage(new CreateMessageRequestDto(loginUser.getId(), channel.getId(), input, ReceiveType.CHANNEL, null));
                 }
             }
 
@@ -775,6 +786,64 @@ public class DiscodeitTest {
         } catch (IllegalArgumentException e) {
             // 삭제할 유저가 존재하지 않는 경우 예외 발생
             System.out.println(e.getMessage());
+        }
+    }
+
+    // 특정 유저가 보낸 메시지 수정/삭제를 위한 메서드
+    private void handleUserMessageAction(UUID userId, UUID targetId) {
+        String KST, date = null, time;
+
+        try {
+            Printer.printLine();
+            List<Message> messages = messageService.getAllSentByUser(userId, targetId);
+
+            if(messages.isEmpty()) {
+                System.out.println("수정/삭제를 할 메시지가 없습니다. 채팅방으로 이동합니다.");
+                return;
+            }
+
+            System.out.println("수정/삭제를 원하는 메시지를 선택해주세요.");
+            for(int i = 0; i < messages.size(); i++) {
+                Message msg = messages.get(i);
+                KST = TimeConvert.time(msg.getCreatedAt()); // Instant 값을 "yyyy-MM-dd HH:mm:ss" 형태로 변환
+                time = KST.split(" ")[1];
+                System.out.printf("%d. %s 나: %s\n", i+1, time, msg.getContent());
+            }
+            System.out.printf("%d. 채팅방으로 이동\n", messages.size() + 1);
+            int choice = sc.nextInt();
+
+            if(choice < 0 || choice >= messages.size() + 1) {
+                System.out.println("메시지를 선택하지 않아 채팅방으로 이동합니다.");
+                sc.nextLine();
+                return; // 이전메뉴로 이동
+            }
+
+            Message choiceMsg = messages.get(choice-1);
+
+            System.out.println("번호를 입력해 수정/삭제를 선택하세요");
+            System.out.println("1. 수정 2. 삭제 3. 채팅방으로 이동");
+            System.out.print("입력: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1 -> {
+                    System.out.println("내용을 입력해 수정하세요.");
+                    System.out.printf("기존 메시지 : %s\n", choiceMsg.getContent());
+                    System.out.printf("입력 : ");
+                    messageService.updateMessage(new UpdateMessageRequestDto(choiceMsg.getId(), sc.nextLine()));
+                    System.out.println("메시지가 수정되었습니다.");
+                }
+                case 2 -> {
+                    messageService.deleteMessage(choiceMsg.getId());
+                    System.out.println("메시지가 삭제되었습니다.");
+                }
+                default -> System.out.println("수정/삭제를 선택하지 않아 채팅방으로 이동합니다.");
+            }
+
+        } catch (InputMismatchException e) {
+            System.out.println("숫자만 입력하세요. 입력으로 돌아갑니다.");
+            sc.nextLine();
         }
     }
 }

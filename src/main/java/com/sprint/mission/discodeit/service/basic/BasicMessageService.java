@@ -1,14 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.ReceiveType;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -26,21 +28,28 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     /**
      * 새로운 메시지를 생성하여 Repository에 저장
      */
     @Override
-    public void createMessage(UUID senderId, UUID receiverId, String content, ReceiveType receiverType) {
-        Message newMessage;
+    public void createMessage(CreateMessageRequestDto request) {
+        Message newMessage = new Message(
+                request.getSenderId(),
+                request.getReceiverId(),
+                request.getReceiveType(),
+                request.getContent()
+        );
 
-        // 수신자가 User인 경우
-        if(receiverType == ReceiveType.USER){
-            newMessage = new Message(senderId, receiverId, receiverType, content);
-        // 수신자가 Channel인 경우
-        } else if(receiverType == ReceiveType.CHANNEL){
-            newMessage = new Message(senderId, receiverId, receiverType, content);
-        } else return; // 그 외의 타입은 무시
+        // 메시지에 첨부된 파일이 있는 경우에만 파일 저장
+        Optional.ofNullable(request.getBinaryContents()).ifPresent(
+                files -> files.forEach(file -> {
+                    new BinaryContent(file.getContent());
+                    newMessage.addAttachmentId(file.getId()); // 메시지에 파일 UUID 값 저장
+                    binaryContentRepository.save(file);
+                })
+        );
 
         messageRepository.save(newMessage);
     }
@@ -87,16 +96,6 @@ public class BasicMessageService implements MessageService {
     }
 
     /**
-     * 특정 유저가 보낸/받은 모든 메시지 조회
-     */
-    @Override
-    public List<Message> getAllMessagesByUser(User user) {
-        return messageRepository.findAll().stream()
-                .filter(m -> user.getId().equals(m.getSenderId()) || user.getId().equals(m.getReceiverId()))
-                .toList();
-    }
-
-    /**
      * 특정 채널에 포함된 모든 메시지 조회
      */
     @Override
@@ -107,12 +106,22 @@ public class BasicMessageService implements MessageService {
     }
 
     /**
+     * 유저가 보낸 메시지 조회
+     */
+    @Override
+    public List<Message> getAllSentByUser(UUID senderId, UUID receiverId) {
+        return messageRepository.findAll().stream()
+                .filter(m -> senderId.equals(m.getSenderId()) && receiverId.equals(m.getReceiverId()))
+                .toList();
+    }
+
+    /**
      * 메시지 내용(content) 수정
      */
     @Override
-    public void updateMessage(UUID id, String content) {
-        Message message = messageRepository.findById(id);
-        message.setContent(content);
+    public void updateMessage(UpdateMessageRequestDto request) {
+        Message message = messageRepository.findById(request.getId());
+        message.setContent(request.getContent());
         messageRepository.update(message);
     }
 
@@ -121,14 +130,8 @@ public class BasicMessageService implements MessageService {
      */
     @Override
     public void deleteMessage(UUID id) {
+        Message msg = messageRepository.findById(id);
+        binaryContentRepository.deleteByIds(msg.getAttachmentIds()); // 메시지와 관련된 파일들 삭제
         messageRepository.deleteById(id);
-    }
-
-    /**
-     * 특정 유저가 보낸 모든 메시지 삭제
-     */
-    @Override
-    public void deleteMessagesByUser(UUID userId) {
-        messageRepository.deleteByUser(userId);
     }
 }

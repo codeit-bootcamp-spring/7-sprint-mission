@@ -6,10 +6,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
@@ -63,6 +60,15 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public void delete(UUID id) {
         contentStore.remove(id);
+        saveUsersToFile();
+    }
+
+    @Override
+    public void deleteByIds(List<UUID> idList) {
+        idList.forEach(id -> {
+            contentStore.remove(id);
+        });
+
         saveUsersToFile();
     }
 }

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,12 +19,25 @@ public class Message extends BaseEntity{
         this.receiverId = receiverId;
         this.receiveType = receiveType;
         this.content = content;
+        this.attachmentIds = new ArrayList<>();
     }
 
     public void setContent(String content) {
         this.setUpdatedAt();
         this.content = content;
     }
+
+    public void addAttachmentId(UUID id) {
+        this.setUpdatedAt();
+        this.attachmentIds.add(id);
+    }
+
+    public void deleteAttachmentId(UUID id) {
+        this.setUpdatedAt();
+        this.attachmentIds.remove(id);
+    }
+
+
 
     @Override
     public String toString() {
