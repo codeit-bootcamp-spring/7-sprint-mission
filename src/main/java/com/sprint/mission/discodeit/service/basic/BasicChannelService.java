@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.request.ChannelCreateReq;
+import com.sprint.mission.discodeit.dto.request.ChannelCreateSecReq;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -18,8 +20,17 @@ public class BasicChannelService implements ChannelService {
 
     //채널 생성
     @Override
-    public Channel create(UUID managerId, String name) {
-        return channelRepository.save(new  Channel(managerId, name));
+    public Channel create(ChannelCreateReq req) {
+        return channelRepository.save(req.to());
+    }
+
+    //채널 생성: 비공개
+    @Override
+    public Channel create(ChannelCreateSecReq req) {
+        Channel newChannel = channelRepository.save(req.to());
+        // Todo : ReadStatus 정보 생성
+        return newChannel;
+
     }
     
     //채널 수정
@@ -45,4 +56,5 @@ public class BasicChannelService implements ChannelService {
     public Channel findByName(String name) {
         return channelRepository.findByName(name);
     }
+
 }
