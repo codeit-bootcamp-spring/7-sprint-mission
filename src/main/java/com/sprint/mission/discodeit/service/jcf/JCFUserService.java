@@ -42,7 +42,7 @@ public class JCFUserService implements UserService {
 
     //닉네임으로 찾기
     @Override
-    public List<User> findByNickname(String nickname) {
+    public User findByNickname(String nickname) {
         return jcfUserRepository.findByNickname(nickname);
     }
 

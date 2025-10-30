@@ -11,7 +11,7 @@ public interface UserService {
     User create(UserCreateReq req);
     List<User> findAll();
     User findByEmail(String email);
-    List<User> findByNickname(String nickname);
+    User findByNickname(String nickname);
     User delete(UUID id, UUID profileId, UUID userStatusId);
     User update(UUID id, UserUpdateReq req);
     boolean existsByEmail(String email);

@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +35,7 @@ public class FileUserService implements UserService {
 
     //닉네임으로 찾기
     @Override
-    public List<User> findByNickname(String nickname) {
+    public User findByNickname(String nickname) {
         return fileUserRepository.findByNickname(nickname);
     }
 

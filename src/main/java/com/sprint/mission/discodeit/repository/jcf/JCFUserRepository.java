@@ -49,10 +49,10 @@ public class JCFUserRepository implements UserRepository {
 
     //유저 nickname
     @Override
-    public List<User> findByNickname(String nickname) {
+    public User findByNickname(String nickname) {
         return findAll().stream()
                 .filter(u -> u.getNickname().equals(nickname))
-                .toList();
+                .findFirst().orElse(null);
     }
 
     @Override

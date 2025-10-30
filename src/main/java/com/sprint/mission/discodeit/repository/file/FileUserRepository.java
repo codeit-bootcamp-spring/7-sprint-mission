@@ -42,10 +42,10 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
 
     //유저 nickname으로 조회
     @Override
-    public List<User> findByNickname(String nickname) {
+    public User findByNickname(String nickname) {
         return findAllFiles().stream()
                 .filter(u -> u.getNickname().equals(nickname))
-                .toList();
+                .findFirst().orElse(null);
     }
 
     //유저 수정
