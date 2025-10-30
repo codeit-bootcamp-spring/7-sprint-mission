@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,7 +36,6 @@ public class BasicChannelService implements ChannelService {
         Channel newChannel = channelRepository.save(req.to());
         // Todo : ReadStatus 정보 생성
         return newChannel;
-
     }
     
     //채널 수정
