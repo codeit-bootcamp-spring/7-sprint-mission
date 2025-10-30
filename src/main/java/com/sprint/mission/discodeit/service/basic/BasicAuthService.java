@@ -24,8 +24,8 @@ public class BasicAuthService implements AuthService {
         if (authLoginRequestDto == null) {
             throw new IllegalArgumentException("Invalid request");
         }
-        String username = authLoginRequestDto.getUsername() == null ? "" : authLoginRequestDto.getUsername().trim();
-        String password = authLoginRequestDto.getPassword() == null ? "" : authLoginRequestDto.getPassword();
+        String username = authLoginRequestDto.username() == null ? "" : authLoginRequestDto.username().trim();
+        String password = authLoginRequestDto.password() == null ? "" : authLoginRequestDto.password();
 
         List<User> users = userRepository.findByName(username);
         if(users == null || users.isEmpty()) {

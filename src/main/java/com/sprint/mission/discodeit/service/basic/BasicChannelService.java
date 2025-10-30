@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.channel.PrivateChannelCreateRequ
 import com.sprint.mission.discodeit.dto.request.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -21,20 +22,21 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public ChannelResponseDto createPublic(PublicChannelCreateRequestDto channelCreateRequestDto) {
-        int slowMode = channelCreateRequestDto.getSlowModeSeconds() == null
-                ? 0 :  channelCreateRequestDto.getSlowModeSeconds();
+        int slowMode = channelCreateRequestDto.slowModeSeconds() == null
+                ? 0 :  channelCreateRequestDto.slowModeSeconds();
 
         Channel channel = Channel.builder()
-                .channelName(channelCreateRequestDto.getChannelName())
-                .type(channelCreateRequestDto.getChannelType())
+                .channelName(channelCreateRequestDto.channelName())
+                .type(channelCreateRequestDto.channelType())
                 .slowModeSeconds(slowMode)
+                .channelDescription(channelCreateRequestDto.description())
+                .privateChannel(false)
                 .build();
 
-        channel.setChannelDescription(channelCreateRequestDto.getDescription());
-        channel.setPrivateChannel(false);
         channel = channelRepository.save(channel);
 
         return new ChannelResponseDto(
@@ -51,28 +53,27 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponseDto createPrivate(PrivateChannelCreateRequestDto channelCreateRequestDto) {
-        int slowMode = channelCreateRequestDto.getSlowModeSeconds() == null
-                ? 0 :  channelCreateRequestDto.getSlowModeSeconds();
+        int slowMode = channelCreateRequestDto.slowModeSeconds() == null
+                ? 0 :  channelCreateRequestDto.slowModeSeconds();
 
         Channel channel = Channel.builder()
                 .channelName(null)
-                .type(channelCreateRequestDto.getChannelType())
+                .channelDescription(null)
+                .type(channelCreateRequestDto.channelType())
                 .slowModeSeconds(slowMode)
+                .privateChannel(true)
                 .build();
 
-        channel.setChannelDescription(null);
-        channel.setPrivateChannel(true);
-
-        if (channelCreateRequestDto.getUserIds() != null) {
-            for(UUID id : channelCreateRequestDto.getUserIds()) {
+        if (channelCreateRequestDto.userIds() != null) {
+            for(UUID id : channelCreateRequestDto.userIds()) {
                 channel.join(id);
             }
         }
         channel = channelRepository.save(channel);
 
-        if(channelCreateRequestDto.getUserIds() != null) {
-            for(UUID id : channelCreateRequestDto.getUserIds()) {
-                readStatusRepository.save(new ReadStatus(id, channel.getId()));
+        if(channelCreateRequestDto.userIds() != null) {
+            for(UUID id : channelCreateRequestDto.userIds()) {
+                readStatusRepository.save(new ReadStatus(id, channel.getId(), channel.getCreatedAt()));
             }
         }
 
@@ -83,8 +84,8 @@ public class BasicChannelService implements ChannelService {
                 slowMode,
                 null,
                 true,
-                channelCreateRequestDto.getUserIds() == null ?
-                List.of() : channelCreateRequestDto.getUserIds(),
+                channelCreateRequestDto.userIds() == null ?
+                List.of() : channelCreateRequestDto.userIds(),
                 channel.getType()
         );
     }
@@ -93,7 +94,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponseDto get(UUID channelId) {
         Channel channel = channelRepository.findById(Objects.requireNonNull(channelId))
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
-        Instant lastMessage = messageRepository.findByChannel(channel.getId())
+        Instant lastMessage = messageRepository.findByChannelId(channel.getId())
                 .stream()
                 .map(m -> m.getCreatedAt())
                 .max(Comparator.naturalOrder())
@@ -119,7 +120,7 @@ public class BasicChannelService implements ChannelService {
         List<Channel> all = channelRepository.findAll();
         List<ChannelResponseDto> channelResponseDtoList = new ArrayList<>();
         for (Channel channel : all) {
-            Instant lastMessage = messageRepository.findByChannel(channel.getId())
+            Instant lastMessage = messageRepository.findByChannelId(channel.getId())
                     .stream()
                     .map(m -> m.getCreatedAt())
                     .max(Comparator.naturalOrder())
@@ -148,7 +149,7 @@ public class BasicChannelService implements ChannelService {
         List<ChannelResponseDto> responseDto = new ArrayList<>();
         for (Channel channel : all) {
             if(!channel.isPrivateChannel() || channel.getMembers().containsKey(userId)) {
-                Instant lastMessage = messageRepository.findByChannel(channel.getId())
+                Instant lastMessage = messageRepository.findByChannelId(channel.getId())
                         .stream()
                         .map(m -> m.getCreatedAt())
                         .max(Comparator.naturalOrder())
@@ -174,23 +175,23 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponseDto update(ChannelUpdateRequestDto channelUpdateRequestDto) {
-        Channel channel = channelRepository.findById(Objects.requireNonNull(channelUpdateRequestDto.getChannelId()))
+        Channel channel = channelRepository.findById(Objects.requireNonNull(channelUpdateRequestDto.channelId()))
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
         if(channel.isPrivateChannel()) {
             throw new UnsupportedOperationException("PRIVATE channel cannot be updated");
         }
-        if(channelUpdateRequestDto.getChannelName() != null) {
-            channel.setChannelName(channelUpdateRequestDto.getChannelName());
+        if(channelUpdateRequestDto.channelName() != null) {
+            channel.rename(channelUpdateRequestDto.channelName());
         }
-        if(channelUpdateRequestDto.getChannelDescription() != null) {
-            channel.setChannelDescription(channelUpdateRequestDto.getChannelDescription());
+        if(channelUpdateRequestDto.channelDescription() != null) {
+            channel.changeChannelDescription(channelUpdateRequestDto.channelDescription());
         }
-        if(channelUpdateRequestDto.getSlowModeSeconds() != null) {
-            channel.setSlowModeSeconds(channelUpdateRequestDto.getSlowModeSeconds());
+        if(channelUpdateRequestDto.slowModeSeconds() != null) {
+            channel.changeSlowModeSeconds(channelUpdateRequestDto.slowModeSeconds());
         }
         channelRepository.save(channel);
 
-        Instant lastMessage = messageRepository.findByChannel(channel.getId())
+        Instant lastMessage = messageRepository.findByChannelId(channel.getId())
                 .stream()
                 .map(m -> m.getCreatedAt())
                 .max(Comparator.naturalOrder())
@@ -210,10 +211,17 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public boolean delete(UUID channelId) {
-        for(Message m : messageRepository.findByChannel(channelId)) {
+        Objects.requireNonNull(channelId);
+        List<Message> message = messageRepository.findByChannelId(channelId);
+        for(Message m : message) {
+            if(m.getAttachmentIds() != null) {
+                for(UUID attachmentId : m.getAttachmentIds()) {
+                    binaryContentRepository.deleteById(attachmentId);
+                }
+            }
             messageRepository.deleteById(m.getId());
         }
-        readStatusRepository.deleteById(channelId);
+        readStatusRepository.deleteAllByChannelId(channelId);
 
         return channelRepository.deleteById(channelId);
     }
@@ -248,7 +256,7 @@ public class BasicChannelService implements ChannelService {
         }
         Channel channel = channelRepository.findById(channelId)
                         .orElseThrow(() -> new NoSuchElementException("Channel not found"));
-        channel.setSlowModeSeconds(slowModeSeconds);
+        channel.changeSlowModeSeconds(slowModeSeconds);
         channelRepository.save(channel);
     }
 }
