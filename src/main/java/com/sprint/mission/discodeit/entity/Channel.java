@@ -15,6 +15,8 @@ public class Channel extends BaseEntity{
     private String name;            //채널명
     private final UUID managerId;   //채널 생성자 UUID
     private List<UUID> users;       //채널 참가자
+    private ChannelType publicType; //공개, 비공개 여부
+    private String description;     //채널 설명
 
     //Constructor
     public Channel(UUID managerId, String name) {
