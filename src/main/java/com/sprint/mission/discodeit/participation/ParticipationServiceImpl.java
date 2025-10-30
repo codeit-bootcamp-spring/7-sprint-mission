@@ -154,7 +154,7 @@ public class ParticipationServiceImpl extends BaseServiceImpl<Participation, Par
     @Override
     public boolean isOwner(UUID channelId, UUID userId) {
         try {
-            return findParticipation(channelId, userId).getRole() != Role.ADMIN;
+            return findParticipation(channelId, userId).getRole() == Role.ADMIN;
         } catch (NoSuchElementException e) {
             throw new NoSuchElementException("채널에 참여한 사용자가 아닙니다.");
         }

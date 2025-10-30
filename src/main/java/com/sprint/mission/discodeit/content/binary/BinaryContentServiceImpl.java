@@ -66,6 +66,7 @@ public class BinaryContentServiceImpl extends BaseServiceImpl<BinaryContent, UUI
                 try {
                     if( Files.deleteIfExists(filePath)){
                         System.out.println("✅ 물리적 파일 삭제 성공: " + strFilePath);
+                        repository.deleteById(content.getId());
                     }else{
                         System.out.println("⚠️ 물리적 파일을 찾을 수 없거나 삭제할 수 없습니다: " + strFilePath);
                     }
@@ -76,6 +77,5 @@ public class BinaryContentServiceImpl extends BaseServiceImpl<BinaryContent, UUI
                 System.out.println("⚠️ 해당 경로가 존재하지 않습니다:" + strFilePath);
             }
         }
-        repository.deleteAllByOwnerId(ownerId);
     }
 }

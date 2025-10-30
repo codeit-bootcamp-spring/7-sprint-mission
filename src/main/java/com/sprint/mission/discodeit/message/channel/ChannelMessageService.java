@@ -20,4 +20,6 @@ public interface ChannelMessageService extends BaseService<ChannelMessage, UUID>
     List<ChannelMSGResponseDTO> getMessagesByChannel(UUID channelId);
 
     void deleteAllBySenderId(UUID senderId);
+
+    int countNotReadChannelMessage(UUID channelId, UUID authorId);
 }
