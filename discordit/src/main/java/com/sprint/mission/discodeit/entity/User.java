@@ -1,19 +1,17 @@
-package com.sprint.mission.discodeit.entity.base;
+package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.config.OnlineThreshold;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 public class User extends BaseEntity implements Receivable {
-
-    // 직렬화 및 역직렬화를 수행할 때 이 클래스의 버전을 의미
-    private static final long serialVersionID = 1L;
 
     private final String userId;
     private String passwd;
@@ -25,6 +23,8 @@ public class User extends BaseEntity implements Receivable {
     private OnlineStatus onlineStatus;
     private BinaryContent profileImage;
 
+    private static final Duration ONLINE_THRESHOLD = OnlineThreshold.ONLINE_THRESHOLD;
+
     public User(String userId, String passwd, String email, String displayName) {
         validateId(userId);
         validatePasswd(passwd);
@@ -35,6 +35,17 @@ public class User extends BaseEntity implements Receivable {
         this.email = email;
         this.displayName = displayName;
         this.onlineStatus = OnlineStatus.OFFLINE;
+    }
+
+    public OnlineStatus getOnlineStatus() {
+        if (onlineStatus == OnlineStatus.ONLINE || onlineStatus == OnlineStatus.AWAY) {
+            if (updatedAt.isAfter(Instant.now().minus(ONLINE_THRESHOLD))) {
+                onlineStatus = OnlineStatus.ONLINE;
+            } else {
+                onlineStatus = OnlineStatus.AWAY;
+            }
+        }
+        return onlineStatus;
     }
 
     public void setPasswd(String passwd) {
@@ -98,7 +109,9 @@ public class User extends BaseEntity implements Receivable {
         user.updatedAt = updatedAt;
         user.bio = bio;
         user.onlineStatus = OnlineStatus;
-        user.profileImage = profileImage;
+        if (profileImage != null) {
+            user.profileImage = profileImage;
+        }
         return user;
     }
 
