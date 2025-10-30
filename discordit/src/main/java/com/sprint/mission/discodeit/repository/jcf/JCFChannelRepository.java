@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.base.Channel;
+import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.enums.ChannelScope;
 import com.sprint.mission.discodeit.exceptions.ChannelAlreadyExistsException;
 import com.sprint.mission.discodeit.exceptions.ChannelNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -8,19 +10,12 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.util.*;
 
 public class JCFChannelRepository implements ChannelRepository {
-    private static final JCFChannelRepository instance = new JCFChannelRepository();
-    private static final Map<UUID, Channel> data = new HashMap<>();
-
-    private JCFChannelRepository(){}
-
-    public static JCFChannelRepository getInstance() {
-        return instance;
-    }
+    private final Map<UUID, Channel> data = new HashMap<>();
 
 
     @Override
     public void save(Channel channel) {
-        if(existsById(channel.getUuid()))
+        if (existsById(channel.getUuid()))
             throw new ChannelAlreadyExistsException("채널 업데이트는 update를 사용해주세요.");
         data.put(channel.getUuid(), channel);
     }
@@ -29,6 +24,9 @@ public class JCFChannelRepository implements ChannelRepository {
     public void update(Channel channel) {
         if (!existsById(channel.getUuid())) {
             throw new ChannelNotFoundException(channel.getUuid());
+        }
+        if (channel.getScope() == ChannelScope.PRIVATE) {
+            throw new IllegalArgumentException("private 채널은 수정할 수 없습니다.");
         }
         data.put(channel.getUuid(), channel);
     }
@@ -43,6 +41,21 @@ public class JCFChannelRepository implements ChannelRepository {
     public List<Channel> findAll() {
         return data.values().stream()
                 .sorted(Comparator.comparing(Channel::getDisplayName))
+                .toList();
+    }
+
+    @Override
+    public List<Channel> findAllPublic() {
+        return data.values().stream()
+                .filter(c -> c.getScope() == ChannelScope.PUBLIC)
+                .toList();
+    }
+
+    @Override
+    public List<Channel> findAllPrivateByUser(User user) {
+        return data.values().stream()
+                .filter(c -> c.getScope() == ChannelScope.PRIVATE)
+                .filter(c -> c.getMembers().contains(user))
                 .toList();
     }
 

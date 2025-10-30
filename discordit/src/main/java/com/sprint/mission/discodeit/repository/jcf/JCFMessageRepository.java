@@ -4,20 +4,14 @@ import com.sprint.mission.discodeit.entity.base.Message;
 import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
-    private static final List<Message<Receivable>> data = new ArrayList<>();
-    private static final JCFMessageRepository instance = new JCFMessageRepository();
-
-    private JCFMessageRepository() {
-    }
-
-    public static JCFMessageRepository getInstance() {
-        return instance;
-    }
+    private static final List<Message> data = new ArrayList<>();
 
     @Override
     public void save(Message message) {
@@ -37,29 +31,66 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public <T extends Receivable> List<Message> findByReceiver(Receivable receiver) {
+    public List<Message> findByReceiver(Receivable receiver) {
         return data.stream()
                 .filter(m -> m.getReceiver().equals(receiver))
-                .map(m -> (Message<T>) m)
                 .toList();
     }
 
     @Override
-    public <T extends Receivable> List<Message<T>> findBySenderAndReceiver(User user, T receiver) {
+    public List<Message> findBySenderAndReceiver(User user, Receivable receiver) {
         return data.stream()
                 .filter(m ->
                         m.getSender().equals(user)
                                 && m.getReceiver().equals(receiver))
-                .map(m -> (Message<T>) m)
                 .toList();
     }
 
+    @Override
+    public void deleteAllByReceiver(Receivable receiver) {
+        data.removeIf(m -> m.getReceiver().equals(receiver));
+    }
+
+    @Override
+    public void delete(Message message) {
+        data.removeIf(m -> m.getUuid().equals(message.getUuid()));
+    }
+
+    @Override
+    public Message findLast(Receivable receiver) {
+        List<Message> foundMessages = findByReceiver(receiver);
+        if (foundMessages.isEmpty()) {
+            throw new IllegalStateException("저장된 메시지가 없습니다.");
+        }
+
+        return foundMessages.get(foundMessages.size() - 1);
+    }
+
     /**
-     * 테스트 데이터 세팅용 메서드
-     *
-     * @return 마지막에 저장된 메세지
+     * 테스트용 임시 메서드
      */
-    public Message findLast(){
+    private Message findById(UUID uuid) {
+        return data.stream()
+                .filter(m -> m.getUuid().equals(uuid))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 id: " + uuid));
+    }
+
+    /**
+     * 테스트용 임시 메서드
+     */
+    public void update(Message message) {
+        Message existing = findById(message.getUuid());
+        int index = data.indexOf(existing);
+        if (index != -1) {
+            data.set(index, message);
+        }
+    }
+
+    /**
+     * 테스트용 임시 메서드: 마지막으로 저장된 메시지를 반환합니다.
+     */
+    public Message findLast() {
         if (data.isEmpty()) {
             throw new IllegalStateException("저장된 메시지가 없습니다.");
         }

@@ -4,60 +4,81 @@ import com.sprint.mission.discodeit.entity.base.User;
 import com.sprint.mission.discodeit.exceptions.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class JCFUserRepository implements UserRepository {
-    private static final JCFUserRepository instance = new JCFUserRepository();
-    private static final Map<String, User> data = new HashMap<>();// 유저 id, User객체 (id검색을 빠르게 하기 위함)
-
-    private JCFUserRepository(){}
-
-    public static JCFUserRepository getInstance() {
-        return instance;
-    }
+    private final Map<UUID, User> data = new HashMap<>();
 
     @Override
     public void save(User user) {
-        if(isExsistId(user.getUserId()))
+        if (existsByUserId(user.getUserId())) {
             throw new UserAlreadyExistsException(user.getUserId());
-        data.put(user.getUserId(), user);
+        }
+        data.put(user.getUuid(), user);
     }
 
     @Override
     public void update(User user) {
-        if(!isExsistId(user.getUserId()))
+        if (!existsByUserId(user.getUserId())) {
             throw new UserNotFoundException(user.getUserId());
-        data.put(user.getUserId(), user);
-    }
-
-
-    @Override
-    public User findById(String id) {
-        if(isExsistId(id))
-            throw new UserNotFoundException(id);
-        return data.get(id);
+        }
+        if (!existsById(user.getUuid())) {
+            throw new UserNotFoundException(user.getUuid());
+        }
+        data.put(user.getUuid(), user);
     }
 
     @Override
-    public void deleteById(String id) {
-        if(!isExsistId(id))
-            throw new UserNotFoundException(id);
-        data.remove(id);
+    public void delete(User user) {
+        if (!data.containsValue(user)) {
+            throw new UserNotFoundException(user);
+        }
+        data.remove(user.getUuid());
     }
 
     @Override
-    public boolean isExsistId(String id) {
-        return data.containsKey(id);
+    public User findById(UUID uuid) {
+        if (!data.containsKey(uuid)) {
+            throw new UserNotFoundException(uuid);
+        }
+        return data.get(uuid);
     }
 
     @Override
-    public List<User> findByIds(String... ids) {
-        return Arrays.stream(ids)
-                .filter(this::isExsistId)
-                .map(data::get)
-                .sorted(Comparator.comparing(User::getUserId))
-                .toList();
+    public User findByUserId(String userId) {
+        return data.values().stream()
+                .filter(u -> u.getUserId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    @Override
+    public void deleteByUserId(String userId) {
+        if (!existsByUserId(userId)) {
+            throw new UserNotFoundException(userId);
+        }
+    }
+
+    @Override
+    public void deleteById(UUID uuid) {
+        if (!existsById(uuid)) {
+            throw new UserNotFoundException(uuid);
+        }
+        data.remove(uuid);
+    }
+
+    @Override
+    public boolean existsById(UUID uuid) {
+        return data.containsKey(uuid);
+    }
+
+    @Override
+    public boolean existsByUserId(String userId) {
+        return data.values().stream()
+                .anyMatch(u -> u.getUserId().equals(userId));
     }
 
     @Override
