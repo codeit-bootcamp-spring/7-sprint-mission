@@ -6,15 +6,16 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
     Map<UUID, ReadStatus> readStatusStore = new HashMap<>();
     private final String filePath = AppConfig.DATA_PATH + "\\readstatus.sav";
+
+    public FileReadStatusRepository() {
+        loadUsersFromFile();
+    }
 
     // 저장하기
     private void saveUsersToFile() {
@@ -59,6 +60,24 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
+        return readStatusStore.values().stream()
+                .filter(r -> r.getUserId().equals(userId) && r.getChannelId().equals(channelId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("유저가 해당 채널에 속해있지 않습니다."));
+    }
+
+    @Override
+    public List<ReadStatus> findAll() {
+        return new ArrayList<>(readStatusStore.values());
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        readStatusStore.remove(id);
+    }
+
+    @Override
     public void deleteByChannelId(UUID channelId) {
         readStatusStore.values().removeIf(s -> s.getChannelId().equals(channelId));
         saveUsersToFile();
@@ -68,5 +87,11 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     public void deleteByChannelMember(UUID channelId, UUID memberId) {
         readStatusStore.values().removeIf(s -> s.getChannelId().equals(channelId) &&  s.getUserId().equals(memberId));
         saveUsersToFile();
+    }
+
+    @Override
+    public boolean existsByUserIdAndChannelId(UUID userId, UUID channelId) {
+        return readStatusStore.values().stream()
+                .anyMatch(r -> userId.equals(r.getUserId()) && channelId.equals(r.getChannelId()));
     }
 }

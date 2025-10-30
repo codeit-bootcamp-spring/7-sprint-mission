@@ -1,0 +1,59 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.dto.readstatus.request.CreateReadStatusRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.request.UpdateReadStatusRequestDto;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.ReadStatusService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class BasicReadStatusService implements ReadStatusService {
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
+    private final ReadStatusRepository readStatusRepository;
+
+    @Override
+    public void createReadStatus(CreateReadStatusRequestDto request) {
+        userRepository.findById(request.getUserId()); // 유저가 존재하지 않으면 예외 발생
+        channelRepository.findById(request.getChannelId()); // 채널이 존재하지 않으면 예외 발생
+
+        if(!readStatusRepository.existsByUserIdAndChannelId(request.getUserId(),request.getChannelId())) {
+            readStatusRepository.save(new ReadStatus(request.getUserId(),request.getChannelId()));
+        } else {
+            throw new IllegalArgumentException("이미 유저가 채널에 속해있습니다.");
+        }
+    }
+
+    @Override
+    public ReadStatus findReadStatus(UUID id) {
+        return readStatusRepository.findById(id);
+    }
+
+    @Override
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAll().stream()
+                .filter(r -> userId.equals(r.getUserId()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateReadStatus(UpdateReadStatusRequestDto request) {
+        ReadStatus rs = readStatusRepository.findByUserIdAndChannelId(request.getUserId(),request.getChannelId());
+        rs.setUpdatedAt(); // 유저가 채널 메시지를 읽을 경우 읽은 시간 변경
+        readStatusRepository.save(rs);
+    }
+
+    @Override
+    public void deleteReadStatus(UUID id) {
+        readStatusRepository.deleteById(id);
+    }
+}
