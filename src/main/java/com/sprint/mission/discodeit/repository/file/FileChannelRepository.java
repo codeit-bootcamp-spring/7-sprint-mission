@@ -42,12 +42,12 @@ public class FileChannelRepository extends BaseFileRepository<Channel> implement
 
     //채널명 수정
     @Override
-    public Channel update(UUID id, String name) {
+    public Channel update(UUID id, String name, String description) {
         Channel channel = loadFromFile(id);
         if (channel == null) {
             throw new RuntimeException("Failed to update channel with id=" + id);
         }
-        channel.update(name);
+        channel.update(name, description);
         saveToFile(channel.getId(), channel);
         return channel;
     }
@@ -58,5 +58,13 @@ public class FileChannelRepository extends BaseFileRepository<Channel> implement
         Channel channel = loadFromFile(id);
         deleteFile(id);
         return channel;
+    }
+
+    //유저가 해당 채널에 포함되어 있는지 확인
+    @Override
+    public boolean isMember(UUID userId, UUID channelId) {
+        return findAllFiles().stream()
+                .filter(ch -> ch.getId().equals(channelId))
+                .anyMatch(ch -> ch.getUsers().contains(userId));
     }
 }

@@ -49,8 +49,8 @@ public class JCFChannelRepository implements ChannelRepository {
 
     //수정
     @Override
-    public Channel update(UUID id, String name) {
-        return findById(id).update(name);
+    public Channel update(UUID id, String name, String description) {
+        return findById(id).update(name, description);
     }
 
     //삭제

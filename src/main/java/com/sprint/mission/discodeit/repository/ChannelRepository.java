@@ -11,7 +11,7 @@ public interface ChannelRepository {
     List<Channel> findAll();
     Channel findById(UUID id);
     Channel findByName(String name);
-    Channel update(UUID id, String name);
+    Channel update(UUID id, String name, String description);
     Channel delete(UUID id);
     boolean isMember(UUID userId, UUID channelId);
 }

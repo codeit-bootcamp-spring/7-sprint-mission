@@ -35,9 +35,10 @@ public class Channel extends BaseEntity{
     }
 
     //update name
-    public Channel update(String name){
+    public Channel update(String name, String description){
         super.update();
         this.name = name;
+        this.description = description;
         return this;
     }
 }

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.ChannelCreateReq;
 import com.sprint.mission.discodeit.dto.request.ChannelCreateSecReq;
+import com.sprint.mission.discodeit.dto.request.ChannelUpdateReq;
 import com.sprint.mission.discodeit.dto.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.dto.response.ChannelPrivateInfoRes;
 import com.sprint.mission.discodeit.dto.response.ChannelPublicInfoRes;
@@ -40,8 +41,8 @@ public class BasicChannelService implements ChannelService {
     
     //채널 수정
     @Override
-    public Channel update(UUID id, String name) {
-        return channelRepository.update(id, name);
+    public Channel update(UUID id, ChannelUpdateReq req) {
+        return channelRepository.update(id, req.name(), req.description());
     }
 
     //채널 삭제
