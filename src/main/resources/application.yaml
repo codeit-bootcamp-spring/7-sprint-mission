@@ -1,6 +1,13 @@
 spring:
   application:
     name=discodeit
+
+  servlet:
+    multipart:
+      max-file-size: 500MB    # 기본은 1MB
+      max-request-size: 500MB
+
+
 server:
   port: 8080
 # application.yaml

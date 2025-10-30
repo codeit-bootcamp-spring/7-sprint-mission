@@ -51,7 +51,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageInfoDto createDirectMessage(DirectMessageCreateRequestDto createDto) {
         if ((createDto.getContent() == null || createDto.getContent().isBlank()) &&
-        createDto.getFiles() == null || createDto.getFiles().isEmpty()) {
+                (createDto.getFiles() == null || createDto.getFiles().isEmpty())) {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }
         User author = userRepository.findById(createDto.getAuthorId())
@@ -77,11 +77,16 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new NotFoundUserException("메시지를 보내는 사용자를 찾을 수 없음"));
         Channel channel = channelRepository.findById(createDto.getChannelId())
                 .orElseThrow(() -> new NotFoundChannelException("메시지를 받을 채널을 찾을 수 없음"));
+
+        // 텍스트만 보내면 getFiles == null
+        if (createDto.getFiles() != null && createDto.getFiles().size() > 10) {
+            throw new InvalidInputException("파일은 한번에 10개까지만 보낼 수 있습니다."); // 예외 임시
+        }
+
         Message message = new Message(author, channel, createDto.getContent());
         messageRepository.save(message);
         SaveAttachment(message, createDto.getFiles());
         return toDto(message);
-
     }
 
 

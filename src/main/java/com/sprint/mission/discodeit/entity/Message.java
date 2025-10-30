@@ -14,6 +14,8 @@ public class Message extends BaseEntity {
 
     private final MessageType type;
 
+    // 유저나 채널처럼 입력이 필요하지 않은 정보가 있을 땐 빌더 패턴이 좋아보이지만
+    // 전체 입력을 받아야하는 메시지는 안쓰는게 더 좋을지도?
     public Message(User author, User receiver, String content) {
         super();
         this.author = author;

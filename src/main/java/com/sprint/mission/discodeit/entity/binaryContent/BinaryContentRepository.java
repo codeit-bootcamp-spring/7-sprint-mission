@@ -27,9 +27,14 @@ public interface BinaryContentRepository {
 
     // 하나의 메시지에 있는 모든 첨부파일 확인
     List<BinaryContent> findAllByMessageId(UUID messageId);
-    // 하나의 메시지에 있는 모든 첨부파일 삭제
-    void deleteAllByMessageId(UUID messageId);
+
+    // 한 채널에서 모든 첨부파일을 찾기 위해
+    List<BinaryContent> findAllByMessageIdIn(List<UUID> messageIds);
+
     // 요구사항 findAll
     List<BinaryContent> findAllByIdIn(List<UUID> ids);
+
+    // 하나의 메시지에 있는 모든 첨부파일 삭제
+    void deleteAllByMessageId(UUID messageId);
 
 }

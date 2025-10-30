@@ -9,9 +9,9 @@ import java.util.UUID;
 
 @Builder
 public record BinaryContentInfoDto(
+        UUID id,
         UUID userId,
         UUID messageId,
-        UUID id,
         byte[] data,
         String dataName,
         String dataType,
@@ -19,9 +19,9 @@ public record BinaryContentInfoDto(
 
     public static BinaryContentInfoDto from(BinaryContent binaryContent) {
         return BinaryContentInfoDto.builder()
+                .id(binaryContent.getId())
                 .userId(binaryContent.getUserId())
                 .messageId(binaryContent.getMessageId())
-                .id(binaryContent.getId())
                 .data(binaryContent.getBinaryData())
                 .dataName(binaryContent.getDataName())
                 .dataType(binaryContent.getDataType())
