@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.dto.request.UserCreateReq;
+import com.sprint.mission.discodeit.dto.request.UserUpdateReq;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -41,14 +42,14 @@ public class FileUserService implements UserService {
 
     //삭제
     @Override
-    public User delete(UUID id) {
+    public User delete(UUID id, UUID profileId, UUID userStatusId) {
         return fileUserRepository.delete(id);
     }
 
     //업데이트
     @Override
-    public User update(UUID id, String nickname, String password) {
-        return fileUserRepository.update(id,nickname,password);
+    public User update(UUID id, UserUpdateReq req) {
+        return fileUserRepository.update(id,req.nickname(),req.password());
     }
 
     @Override

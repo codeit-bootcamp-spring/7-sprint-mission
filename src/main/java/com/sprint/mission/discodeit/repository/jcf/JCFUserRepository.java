@@ -61,6 +61,13 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public void updateProfileImg(UUID userId, UUID profileImgId) {
+        User user = findById(userId);
+        user.updateProfile(profileImgId);
+        save(user);
+    }
+
+    @Override
     public User delete(UUID userId) {
         User user = findById(userId);
         data.remove(userId);

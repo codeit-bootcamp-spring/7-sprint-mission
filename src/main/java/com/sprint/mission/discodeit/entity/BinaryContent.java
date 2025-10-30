@@ -16,7 +16,7 @@ public class BinaryContent implements Serializable {
     private final byte[] data;              //이미지의 데이터
 
     //Constructor
-    BinaryContent(byte[] data){
+    public BinaryContent(byte[] data){
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.data = data;

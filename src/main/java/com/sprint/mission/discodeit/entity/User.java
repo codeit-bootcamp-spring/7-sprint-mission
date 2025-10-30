@@ -19,13 +19,13 @@ public class User extends BaseEntity {
     private UUID profileId;             //프로필 이미지 UUID
 
     //Constructor
-    public User(String email, String nickname, String password){
+    public User(String email, String nickname, String password) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
     }
 
-    //update Nickname, password
+    //update
     public User update(String nickname, String password) {
         super.update();
         this.nickname = nickname;
@@ -33,8 +33,8 @@ public class User extends BaseEntity {
         return this;
     }
 
-    //프로필 이미지 업데이트
-    public void updateProfileImg(UUID profileId){
+    //profile update
+    public void updateProfile(UUID profileId) {
         this.profileId = profileId;
     }
 }

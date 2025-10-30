@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.dto.request.UserCreateReq;
+import com.sprint.mission.discodeit.dto.request.UserUpdateReq;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -47,14 +48,14 @@ public class JCFUserService implements UserService {
 
     //삭제
     @Override
-    public User delete(UUID id) {
+    public User delete(UUID id, UUID profileId, UUID userStatusId) {
         return jcfUserRepository.delete(id);
     }
 
     //업데이트
     @Override
-    public User update(UUID id, String nickname, String password) {
-        return jcfUserRepository.update(id,nickname,password);
+    public User update(UUID id, UserUpdateReq req) {
+        return jcfUserRepository.update(id,req.nickname(),req.password());
     }
 
     @Override

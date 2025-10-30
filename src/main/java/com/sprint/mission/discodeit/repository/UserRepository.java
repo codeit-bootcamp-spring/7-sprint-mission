@@ -12,6 +12,7 @@ public interface UserRepository {
     User findByEmail(String email);
     List<User> findByNickname(String nickname);
     User update(UUID userId, String nickname, String password);
+    void updateProfileImg(UUID userId, UUID profileImgId);
     User delete(UUID userId);
     boolean existsByEmail(String email);
     boolean existsByNickname(String nickname);

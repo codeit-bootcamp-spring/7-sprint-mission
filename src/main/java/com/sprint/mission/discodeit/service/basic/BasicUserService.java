@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.UserCreateReq;
+import com.sprint.mission.discodeit.dto.request.UserUpdateReq;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -21,9 +22,14 @@ public class BasicUserService implements UserService {
     //유저 추가
     @Override
     public User create(UserCreateReq req){
+        // 여기서부터
         User newUser = userRepository.save(req.to());
+        if(req.profileId() != null){
+            userRepository.updateProfileImg(newUser.getId(), req.profileId());
+        }
+        //여기까지.
 
-        //Todo : UserStatus인터페이스 구현 이후 저장 예정 일단 요구사항에 따라 만들기만 함.
+        //Todo : UserStatus인터페이스 구현 이후 저장 예정.
         // - 요구사항 : 인터페이스 아직 구현 X, UserStatus 생성
         new UserStatus(newUser.getId());
 
@@ -62,13 +68,18 @@ public class BasicUserService implements UserService {
 
     //삭제
     @Override
-    public User delete(UUID id) {
+    public User delete(UUID id, UUID profileId, UUID userStatusId) {
+        // Todo : BinaryContent, UserStatus 리포지토리를 이용하여 삭제
         return userRepository.delete(id);
     }
 
     //업데이트
     @Override
-    public User update(UUID id, String nickname, String password) {
-        return userRepository.update(id,nickname,password);
+    public User update(UUID id, UserUpdateReq req) {
+        User updatedUser = userRepository.update(id,req.nickname(),req.password());
+        if(req.profileId() != null){
+            userRepository.updateProfileImg(id, req.profileId());
+        }
+        return updatedUser;
     }
 }

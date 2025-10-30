@@ -60,6 +60,17 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
         return user;
     }
 
+    //유저 프로필 수정
+    @Override
+    public void updateProfileImg(UUID userId, UUID profileImgId) {
+        User user = loadFromFile(userId);
+        if(user == null){
+            throw new RuntimeException("User with id=" + userId + " not found");
+        }
+        user.updateProfile(profileImgId);
+        saveToFile(userId, user);
+    }
+
     //유저 삭제
     @Override
     public User delete(UUID userId) {
