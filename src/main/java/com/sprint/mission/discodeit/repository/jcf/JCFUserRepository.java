@@ -14,7 +14,7 @@ import java.util.*;
         prefix = "discodeit.repository",
         name = "type",
         havingValue = "jcf",
-        matchIfMissing = false
+        matchIfMissing = true
 )
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> userRepo;

@@ -94,20 +94,7 @@ public class DiscodeitApplication {
         );
         System.out.println(binaryContentService.find(user3.getProfileId()));
 
-
-
-
         ///
-
-
-
-
-
-
-
-
-
-
     }
 
 }

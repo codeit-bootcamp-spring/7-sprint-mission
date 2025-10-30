@@ -27,8 +27,6 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
-
-
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
@@ -49,8 +47,6 @@ public class BasicUserService implements UserService {
 
         userStatusRepository.createUserStatus(userStatus);
         return userRepository.saveUser(user);
-
-
     }
 
     @Override
@@ -160,20 +156,6 @@ public class BasicUserService implements UserService {
         return userRepository.getUpdatedUser();
     }
 
-//    @Override
-//    public void readDeletedUser() {
-//        if (userRepository.getDeletedUser().length == 0) {
-//            System.out.println("No Deleted User");
-//            return;
-//        }
-//        System.out.println("===Deleted User=== ");
-//        for (DeletedUserDto userDto : userRepository.getDeletedUser()) {
-//            System.out.println(userDto.toString());
-//        }
-//        System.out.println("================");
-//
-//    }
-
     @Override
     public void enterChannel(UUID userId, UUID channelId) {
         User user = userRepository.getUserById(userId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
@@ -182,7 +164,6 @@ public class BasicUserService implements UserService {
         channel.addUserToChannel(userId);
         userRepository.updateUser(user);
         channelRepository.updateChannel(channel);
-
     }
 
     @Override
@@ -194,11 +175,11 @@ public class BasicUserService implements UserService {
         userRepository.updateUser(user);
         channelRepository.updateChannel(channel);
     }
+
     private void userNameEmailCheck(User user){
         boolean isUserNameExit = userRepository.getAllUser().stream().anyMatch(x -> x.getUserName().equals(user.getUserName()));
         boolean isEmailExit = userRepository.getAllUser().stream().anyMatch(x -> x.getEmail().equals(user.getEmail()));
         if(isUserNameExit) throw new IllegalArgumentException("USERNAME_ALREADY_EXIST");
         if(isEmailExit) throw new IllegalArgumentException("EMAIL_ALREADY_EXIST");
     }
-
 }

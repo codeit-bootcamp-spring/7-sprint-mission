@@ -173,9 +173,13 @@ class BasicChannelServiceTest {
         //when
         basicChannelService.inviteUserToChannel(user2.getId(),channel1.getId());
         var actualResult = basicChannelService.readChannel(channel1.getId());
+        var actualResultReadStatus = readStatusRepository.readAllReadStatus().stream().anyMatch(x->x.getUserId().equals(user2.getId())
+        && x.getChannelId().equals(channel1.getId())
+        );
 
         //then
         assertThat(actualResult.getUserIdList().size()).isEqualTo(2);
+        assertThat(actualResultReadStatus).isTrue();
     }
 
     @Test
@@ -189,8 +193,12 @@ class BasicChannelServiceTest {
         //when
         basicChannelService.deleteUserFromChannel(user1.getId(),channel1.getId());
         var actualResult = basicChannelService.readChannel(channel1.getId());
+        var actualResultReadStatus = readStatusRepository.readAllReadStatus().stream().noneMatch(x->x.getUserId().equals(user1.getId())
+        && x.getChannelId().equals(channel1.getId())
+        );
         //then
         assertThat(actualResult.getUserIdList().isEmpty()).isTrue();
+        assertThat(actualResultReadStatus).isTrue();
     }
 
     @RepeatedTest(value = 10, name = "{displayName} {currentRepetition}/{totalRepetitions}")

@@ -17,8 +17,4 @@ public class BinaryContent implements Serializable {
     private final Instant createdAt = now();
     private byte [] binaryFile;
     private BinaryContentUsage binaryContentUsage;
-
-
-
-
 }

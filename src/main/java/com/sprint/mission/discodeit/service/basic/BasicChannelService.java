@@ -201,6 +201,7 @@ public class BasicChannelService implements ChannelService {
        User tempUser = userRepository.getUserById(userId).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
        Channel tempChannel = channelRepository.getChannelById(channelId).orElseThrow(()->new IllegalArgumentException("Channel not found"));
 
+
         tempChannel.addUserToChannel(userId);
         tempUser.addChannel(channelId);
 

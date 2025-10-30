@@ -14,5 +14,4 @@ public class ReadStatusCreateRequestDto {
     private UUID userId;
     private Instant readLastTime;
 
-
 }

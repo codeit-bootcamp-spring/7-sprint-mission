@@ -12,6 +12,4 @@ public class MessageUpdateRequestDto<T> {
     private UUID messageId;
     private MessageElement type;
     private T updateValue;
-
-
 }

@@ -13,7 +13,7 @@ import java.util.*;
         prefix = "discodeit.repository",
         name = "type",
         havingValue = "jcf",
-        matchIfMissing = false
+        matchIfMissing = true
 )
 public class JCFBinaryContentRepository implements BinaryContentRepository {
     private final Map <UUID,BinaryContent> binaryContentRepo;

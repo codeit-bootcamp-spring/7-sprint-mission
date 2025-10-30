@@ -19,7 +19,7 @@ import java.util.*;
         prefix = "discodeit.repository",
         name = "type",
         havingValue = "file",
-        matchIfMissing = true
+        matchIfMissing = false
 )
 public class FileReadStatusRepository implements ReadStatusRepository {
 

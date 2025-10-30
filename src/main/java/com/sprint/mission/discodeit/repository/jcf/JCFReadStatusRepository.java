@@ -13,7 +13,7 @@ import java.util.*;
         prefix = "discodeit.repository",
         name = "type",
         havingValue = "jcf",
-        matchIfMissing = false
+        matchIfMissing = true
 )
 public class JCFReadStatusRepository implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> readStatusRepo;

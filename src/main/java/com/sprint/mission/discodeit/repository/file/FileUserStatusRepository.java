@@ -22,7 +22,7 @@ import static com.sprint.mission.discodeit.service.util.StaticString.*;
         prefix = "discodeit.repository",
         name = "type",
         havingValue = "file",
-        matchIfMissing = true
+        matchIfMissing = false
 )
 public class FileUserStatusRepository implements UserStatusRepository {
 

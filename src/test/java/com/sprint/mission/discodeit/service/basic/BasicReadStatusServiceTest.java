@@ -177,4 +177,6 @@ class BasicReadStatusServiceTest {
         //then
         assertEquals(2,actualResult.size());
     }
+
+
 }
