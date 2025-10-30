@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.response.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
@@ -11,6 +12,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +26,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message createMessage(CreateMessageRequestDto request) {
+    public MessageResponseDto createMessage(CreateMessageRequestDto request) {
         userRepository.findById(request.authorId())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         channelRepository.findById(request.channelId())
@@ -43,27 +45,33 @@ public class BasicMessageService implements MessageService {
                 attachment
                 );
 
-        return messageRepository.save(message);
+        Message save = messageRepository.save(message);
+        return MessageResponseDto.from(save);
     }
 
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
+    public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
         channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
 
-        return messageRepository.findByChannelId(channelId);
+        List<Message> messages = messageRepository.findByChannelId(channelId);
+        List<MessageResponseDto> dtoList = new ArrayList<>();
+        for(Message message : messages){
+            dtoList.add(MessageResponseDto.from(message));
+        }
+        return dtoList;
     }
 
     @Override
-    public Message updateMessage(UUID messageId, UpdateMessageDto newContents) {
+    public MessageResponseDto updateMessage(UUID messageId, UpdateMessageDto newContents) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
 
         String newContent = newContents.newContent();
 
         message.updateContent(newContent);
-        return messageRepository.save(message);
-
+        Message save = messageRepository.save(message);
+        return MessageResponseDto.from(save);
     }
 
     @Override
