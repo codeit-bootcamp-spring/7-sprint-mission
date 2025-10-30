@@ -69,7 +69,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageInfoDto createChannelMessage(ChannelMessageCreateRequestDto createDto) {
         if ((createDto.getContent() == null || createDto.getContent().isBlank()) &&
-                createDto.getFiles() == null || createDto.getFiles().isEmpty()) {
+                (createDto.getFiles() == null || createDto.getFiles().isEmpty())) {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }
 

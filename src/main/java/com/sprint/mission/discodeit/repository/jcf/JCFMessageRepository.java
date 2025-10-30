@@ -47,4 +47,14 @@ public class JCFMessageRepository implements MessageRepository {
                 || m.getAuthor().getId().equals(userId2) &&  m.getReceiver().getId().equals(userId1))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        data.values().removeIf(message-> message.getChannel().getId().equals(channelId));
+    }
+
+    @Override
+    public Optional<Message> findTopByChannelId(UUID channelId) {
+        return Optional.empty();
+    }
 }

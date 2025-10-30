@@ -127,6 +127,11 @@ public class BasicChannelService implements ChannelService {
         }
 
         Channel channel = channelOp.get();
+        if (channel.getType() == ChannelType.PRIVATE) {
+            System.out.println("Private 채널은 수정이 불가능합니다.");
+            return Optional.empty();
+        }
+
         User user = userOp.get();
         if (channel.addMember(user)) {
             System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에 참가");
@@ -161,6 +166,11 @@ public class BasicChannelService implements ChannelService {
         }
 
         Channel channel = channelOp.get();
+        if (channel.getType() == ChannelType.PRIVATE) {
+            System.out.println("Private 채널은 수정이 불가능합니다.");
+            return Optional.empty();
+        }
+
         User user = userOptional.get();
         if (channel.removeMember(user)) {
             System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에서 삭제됨");

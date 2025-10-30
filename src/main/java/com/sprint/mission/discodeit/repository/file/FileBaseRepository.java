@@ -8,6 +8,11 @@ import java.util.*;
 
 public abstract class FileBaseRepository<T extends BaseEntity> implements BaseRepository<T> {
 
+    /* yaml 경로
+    @Value("${discodeit.repository.file-directory}")
+    private String BASE_PATH;
+    */
+
     private static final String BASE_ROOT = "/Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload/";
     private final String ROOT_PATH;
 

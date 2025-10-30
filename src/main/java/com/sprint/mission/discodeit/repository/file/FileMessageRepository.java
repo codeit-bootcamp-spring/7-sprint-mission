@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.MessageType;
 import com.sprint.mission.discodeit.repository.BaseRepository;
@@ -34,19 +35,23 @@ public class FileMessageRepository extends FileBaseRepository<Message> implement
                 .filter(m -> m.getType() == MessageType.DIRECT)
                 .filter(m -> (m.getAuthor().getId().equals(userId1)
                         && m.getReceiver().getId().equals(userId2))
-                        || m.getAuthor().getId().equals(userId2) &&  m.getReceiver().getId().equals(userId1))
+                        || m.getAuthor().getId().equals(userId2) && m.getReceiver().getId().equals(userId1))
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteAllByChannelId(UUID channelId) {
-        data.values().removeIf(message-> message.getChannel().getId().equals(channelId));
+        data.values().removeIf(message -> message.getChannel().getId().equals(channelId));
     }
 
     @Override
     public Optional<Message> findTopByChannelId(UUID channelId) {
         return data.values().stream()
-                .filter(m -> m.getChannel().getId().equals(channelId))
+                .filter(m ->
+                        m.getType() == MessageType.CHANNEL &&   // DM은 channelId == null
+                                m.getChannel() != null &&
+                                m.getChannel().getId().equals(channelId)
+                )
                 .max(Comparator.comparing(Message::getCreatedAt));
     }
 }
