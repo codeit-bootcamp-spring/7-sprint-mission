@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity.base;
 
-import com.sprint.mission.discodeit.entity.content.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.ReceiverType;
 import lombok.Getter;
 
@@ -22,18 +22,28 @@ public class Message extends BaseEntity {
     private final List<BinaryContent> attachments = new ArrayList<>();
 
     public Message(User sender, ReceiverType type, Receivable receiver,
-                   String message, List<BinaryContent> attachments) {
+                   String message) {
         this.sender = sender;
         this.type = type;
         this.receiver = receiver;
         this.message = message;
+    }
+
+    public void addAttachment(BinaryContent attachment) {
+        this.attachments.add(attachment);
+    }
+
+    public void addAttachments(List<BinaryContent> attachments) {
         this.attachments.addAll(attachments);
     }
+
+
 
     // 더미 데이터 생성 or 파일 데이터 복원용 (createdAt, updateAt 조작 위해 엔터티 내 배치.)
     public static Message fromDto(UUID uuid, Instant createdAt, Instant updatedAt,
                                   User sender, ReceiverType type, Receivable receiver, String message, List<BinaryContent> contents) {
-        Message msg = new Message(sender, type, receiver, message, contents);
+        Message msg = new Message(sender, type, receiver, message);
+        msg.attachments.addAll(contents);
         msg.uuid = uuid;
         msg.createdAt = createdAt;
         msg.updatedAt = updatedAt;

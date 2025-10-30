@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.base.Channel;
 import com.sprint.mission.discodeit.entity.base.Message;
 import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
-import com.sprint.mission.discodeit.entity.content.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.ReceiverType;
 import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;

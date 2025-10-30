@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
 import com.sprint.mission.discodeit.entity.base.Message;
 import com.sprint.mission.discodeit.entity.base.Receivable;
 import com.sprint.mission.discodeit.entity.base.User;
-import com.sprint.mission.discodeit.entity.content.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.ReceiverType;
 import com.sprint.mission.discodeit.exceptions.ReceiverNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -44,20 +44,22 @@ public class BasicMessageService implements MessageService {
             throw new ReceiverNotFoundException(dto.receiverId());
         }
 
+        Message message = new Message(
+                sender,
+                type,
+                receiver,
+                dto.message()
+        );
+
         if (dto.fileUrls() != null) {
             List<BinaryContent> contents = dto.fileUrls().stream()
                     .map(url -> new BinaryContent(sender, url))
                     .toList();
             binaryContentRepository.saveAll(contents);
+            message.addAttachments(contents);
         }
 
-        messageRepository.save(new Message(
-                sender,
-                type,
-                receiver,
-                dto.message(),
-                contents
-                ));
+        messageRepository.save(message);
     }
 
     @Override
