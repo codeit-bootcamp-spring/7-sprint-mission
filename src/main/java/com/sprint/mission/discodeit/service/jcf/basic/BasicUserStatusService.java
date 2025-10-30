@@ -29,7 +29,7 @@ public class BasicUserStatusService implements UserStatusService {
         Optional<User> repoUser = userRepository.findById(request.userId());
         Optional<UserStatus> statusUser = userStatusRepository.findByUserId(request.userId());
         //관련된 user가 존재하지 않아?
-        if (!(repoUser.isPresent())) {
+        if (repoUser.isEmpty()) {
             throw new IllegalStateException("받은 uuid에 해당하는 유저가 없어 : " + request.userId());
         }
         //이미 관련 객체가 있어?

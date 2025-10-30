@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.file.Path;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,9 +20,14 @@ public class FileBinaryContentRepository implements BinaryRepository {
     private static final String filename = "binary";
 
     @Override
-    public BinaryContent save(UUID binaryId, ContentsType contentsType, UUID contentID) {
-        BinaryContent binary = new BinaryContent(binaryId,contentsType,contentID);
-        FileIo.save(filename+"/"+contentsType, binary);
+    public List<BinaryContent> findAll() {
+        return List.of();
+    }
+
+    @Override
+    public BinaryContent save(BinaryContent binary) {
+
+        FileIo.save(filename+"/"+binary.getContentsType(), binary);
         return binary;
 
     }
@@ -31,6 +37,13 @@ public class FileBinaryContentRepository implements BinaryRepository {
 
         return FileIo.read(filename +"/"+contentsType, contentId, BinaryContent.class);
     }
+
+    @Override
+    public Optional<BinaryContent> find(UUID binaryId) {
+        return Optional.empty();
+    }
+
+
 
     @Override
     public void deleteByUuid(UUID contentId, ContentsType contentsType) {

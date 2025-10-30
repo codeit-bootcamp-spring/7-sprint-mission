@@ -17,7 +17,7 @@ public class Message extends Common implements Serializable {
     private UUID channelId;
     private Instant time;
     private String content;
-  //  private List<UUID> attachmentIds = new ArrayList<>();
+    private List<UUID> attachmentIds;
 
     public Message() {
     }

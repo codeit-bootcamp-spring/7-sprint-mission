@@ -18,6 +18,11 @@ public class FileUserStatusRepository implements UserStatusRepository {
     private final String filename = "usersStatus";
 
     @Override
+    public Optional<UserStatus> find(UUID binaryId) {
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
       return FileIo.read(filename, userId, UserStatus.class);
     }

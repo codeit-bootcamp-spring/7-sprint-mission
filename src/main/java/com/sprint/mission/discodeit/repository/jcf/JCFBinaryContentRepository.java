@@ -7,13 +7,11 @@ import com.sprint.mission.discodeit.entity.content.ContentsType;
 import com.sprint.mission.discodeit.repository.BinaryRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 //@Repository("JCFBinary")
 public class JCFBinaryContentRepository implements BinaryRepository {
+
 
     private final Map<UUID, BinaryContent> data;
 
@@ -23,17 +21,25 @@ public class JCFBinaryContentRepository implements BinaryRepository {
 
 
     @Override
-    public BinaryContent save(UUID binaryId, ContentsType contentsType, UUID contentID) {
-        BinaryContent binary = new BinaryContent(binaryId,contentsType,contentID);
-       //여기서 바이너리로 하면  그 고유이긴한데
-        this.data.put(binary.getTypeUUID(),binary);
-        return binary;
+    public BinaryContent save(BinaryContent binaryContent) {
 
+        this.data.put(binaryContent.getTypeUUID(),binaryContent);
+        return binaryContent;
+
+    }
+    @Override
+    public Optional<BinaryContent> find(UUID binaryId) {
+        return Optional.empty();
     }
 
     @Override
     public Optional<BinaryContent> findByUuid(UUID contentId,ContentsType contentsType) {
         return Optional.ofNullable(this.data.get(contentId));
+    }
+
+    @Override
+    public List<BinaryContent> findAll() {
+        return List.of();
     }
 
     @Override

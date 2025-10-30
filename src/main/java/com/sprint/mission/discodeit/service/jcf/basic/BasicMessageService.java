@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.content.BinaryContent;
 import com.sprint.mission.discodeit.entity.content.ContentsType;
 import com.sprint.mission.discodeit.repository.BinaryRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -47,8 +48,10 @@ public class BasicMessageService implements MessageService {
         }
         //첨부파일이 있으면
         //만들고 첨부파일 추가 저장
+
         request.attachmentIds()
-                .forEach(id->binaryRepository.save(message.getId(), ContentsType.MESSAGE_ATTACHMENT,id));
+                .forEach(id->
+                        binaryRepository.save(new BinaryContent(message.getId(), ContentsType.MESSAGE_ATTACHMENT,id)));
         return messageRepository.save(message);
 
 

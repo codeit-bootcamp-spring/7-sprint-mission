@@ -46,12 +46,12 @@ public class BasicUserService implements UserService {
      //이메일매칭
      if(userRepository.findAll().stream()
              .anyMatch(user -> user.getUserEmail().equals(userCreateRequest.email()))){
-         throw new RuntimeException("이메일이 이미 존재합니다");
+         throw new IllegalArgumentException("이메일이 이미 존재합니다");
      }
      //닉네임매칭
      if(userRepository.findAll().stream()
                 .anyMatch(user -> user.getUserNickname().equals(userCreateRequest.userNickname()))){
-         throw new RuntimeException("닉네임이 이미 존재합니다");
+         throw new IllegalArgumentException("닉네임이 이미 존재합니다");
      }
 
      //저장을위한 모든 정보
@@ -105,7 +105,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(uuid)
                 .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+uuid));
         //저장용
-         user.update(userUpdateRequest);
+         user.update(userUpdateRequest);//업데이트했으니 갱신해야지
           userRepository.save(user);
           //폼으로 바로넣고주자
         return UserUpdateResponse.from(uuid,user);

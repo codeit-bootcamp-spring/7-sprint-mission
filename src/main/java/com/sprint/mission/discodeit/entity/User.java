@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 
@@ -17,7 +18,7 @@ public class User extends Common implements Serializable {
     private String password;
     private  String userName;
     private  String userNickname;
-    private  String profilePicture;
+    private UUID profilePicture;
 
 
 
@@ -73,9 +74,6 @@ public class User extends Common implements Serializable {
             this.setUpdatedAt(Instant.ofEpochSecond(Instant.now().getEpochSecond()));
         }
     }
-
-
-
 
 
 }

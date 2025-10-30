@@ -9,7 +9,10 @@ import java.util.*;
 
 //@Repository("JCFstatus")
 public class JCFUserStatusRepository implements UserStatusRepository {
-
+    @Override
+    public Optional<UserStatus> find(UUID binaryId) {
+        return Optional.empty();
+    }
 
     //여기 uuid는 유저 uuid다
     private final Map<UUID,UserStatus> data;
