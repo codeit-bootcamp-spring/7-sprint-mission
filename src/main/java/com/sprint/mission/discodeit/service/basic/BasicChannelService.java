@@ -30,7 +30,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public Channel createPrivateChannel(CreatePrivateChannelDto dto) {
+    public ChannelResponseDto createPrivateChannel(CreatePrivateChannelDto dto) {
         Channel channel = new Channel(
                 null,
                 null,
@@ -45,11 +45,11 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.save(readStatus);
         }
 
-        return saved;
+        return ChannelResponseDto.from(saved, null, members);
     }
 
     @Override
-   public Channel createPublicChannel(CreatePublicChannelDto dto) {
+   public ChannelResponseDto createPublicChannel(CreatePublicChannelDto dto) {
        if(channelRepository.findByName(dto.channelName()).isPresent()){
            throw new IllegalArgumentException("채널이 이미 존재합니다.");
        }
@@ -59,7 +59,8 @@ public class BasicChannelService implements ChannelService {
                ChannelType.PUBLIC
        );
 
-       return channelRepository.save(channel);
+        channelRepository.save(channel);
+        return ChannelResponseDto.from(channel, null, null);
    }
 
     @Override
