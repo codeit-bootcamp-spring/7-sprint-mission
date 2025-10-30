@@ -48,8 +48,8 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User update(UUID userId, String nickname, String password){
-        return findById(userId).update(nickname, password);
+    public User update(UUID userId, String email, String nickname, String password){
+        return findById(userId).update(email, nickname, password);
     }
 
     @Override

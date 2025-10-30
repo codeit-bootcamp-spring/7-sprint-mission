@@ -14,7 +14,4 @@ public interface UserService {
     User findByNickname(String nickname);
     User delete(UUID id, UUID profileId, UUID userStatusId);
     User update(UUID id, UserUpdateReq req);
-    boolean existsByEmail(String email);
-    boolean existsByNickname(String nickname);
-
 }

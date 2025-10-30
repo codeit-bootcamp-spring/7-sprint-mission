@@ -50,12 +50,12 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
 
     //유저 수정
     @Override
-    public User update(UUID userId, String nickname, String password) {
+    public User update(UUID userId,String email, String nickname, String password) {
         User user = loadFromFile(userId);
         if(user == null){
             throw new RuntimeException("User with id=" + userId + " not found");
         }
-        user.update(nickname, password);
+        user.update(email, nickname, password);
         saveToFile(userId, user);
         return user;
     }

@@ -24,14 +24,7 @@ public class BasicUserService implements UserService {
     //유저 추가
     @Override
     public User create(UserCreateReq req){
-        //중복검사
-        if(existsByEmail(req.email())){
-            throw new RuntimeException("Email is already registered");
-        }
-        if(existsByNickname(req.nickname())){
-            throw new RuntimeException("Nickname is already registered");
-        }
-
+        validateDuplicate(req.email(), req.nickname());
         User newUser = userRepository.save(req.to());
 
         if(req.profileId() != null){
@@ -42,16 +35,14 @@ public class BasicUserService implements UserService {
         return newUser;
     }
 
-    //이메일 중복 검사
-    @Override
-    public boolean existsByEmail(String email){
-        return userRepository.existsByEmail(email);
-    }
-
-    //닉네임 중복 검사
-    @Override
-    public boolean existsByNickname(String nickname){
-        return userRepository.existsByNickname(nickname);
+    //중복 검사
+    private void validateDuplicate(String email, String nickname){
+        if(userRepository.existsByEmail(email)){
+            throw new RuntimeException("Email is already registered");
+        }
+        if(userRepository.existsByNickname(nickname)){
+            throw new RuntimeException("Nickname is already registered");
+        }
     }
 
     //유저 목록
@@ -82,7 +73,8 @@ public class BasicUserService implements UserService {
     //업데이트
     @Override
     public User update(UUID id, UserUpdateReq req) {
-        User updatedUser = userRepository.update(id,req.nickname(),req.password());
+        validateDuplicate(req.email(), req.nickname());
+        User updatedUser = userRepository.update(id,req.email(), req.nickname(),req.password());
         if(req.profileId() != null){
             userRepository.updateProfileImg(id, req.profileId());
         }
