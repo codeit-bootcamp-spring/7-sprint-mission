@@ -2,20 +2,12 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class JCFUserRepository implements UserRepository {
-
-    //싱글톤 구현
-    private final static JCFUserRepository userRepository = new JCFUserRepository();
-
-    private JCFUserRepository(){}
-
-    public static JCFUserRepository getInstance(){
-        return userRepository;
-    }
-    
     // 유저 데이터
     private final Map<UUID, User> data = new HashMap<>();
 
