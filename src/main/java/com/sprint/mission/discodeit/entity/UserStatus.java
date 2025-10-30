@@ -25,8 +25,7 @@ public class UserStatus extends BasicEntity{
     }
 
     // 유저 상태 업데이트
-    public void statusUpdate(){
-        this.lastAccessTime = Instant.now();
-        update();
+    public void statusUpdate(Instant newTime){
+        this.lastAccessTime = newTime;
     }
 }
