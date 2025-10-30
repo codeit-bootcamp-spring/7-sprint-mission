@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.base.User;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -18,5 +17,12 @@ public class BinaryContent{
         this.uploadedAt = Instant.now();
         this.uploadUser = uploadUser;
         this.fileUrl = fileUrl;
+    }
+
+    public static BinaryContent fromDto(UUID id, Instant uploadedAt, User uploadUser, String fileUrl) {
+        BinaryContent c = new BinaryContent(uploadUser, fileUrl);
+        c.id = id;
+        c.uploadedAt = uploadedAt;
+        return c;
     }
 }
