@@ -42,31 +42,38 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus findById(UUID uuid) {
-        return null;
+        return data.stream()
+                .filter(r -> r.getId().equals(uuid))
+                .findFirst()
+                .orElseThrow(() -> new ReadStatusNotFoundException(uuid));
     }
 
     @Override
     public void delete(ReadStatus readStatus) {
-
+        if (!data.remove(readStatus)) {
+            throw new ReadStatusNotFoundException(readStatus);
+        }
     }
 
     @Override
     public void deleteAllByUser(User user) {
-
+        data.removeIf(d -> d.getUser().equals(user));
     }
 
     @Override
     public void deleteAllByChannel(Channel channel) {
-
+        data.removeIf(d -> d.getChannel().equals(channel));
     }
 
     @Override
     public void deleteById(UUID uuid) {
-
+        data.removeIf(d -> d.getId().equals(uuid));
     }
 
     @Override
     public List<ReadStatus> findAllByUser(User user) {
-        return List.of();
+        return data.stream()
+                .filter(d -> d.getUser().equals(user))
+                .toList();
     }
 }
