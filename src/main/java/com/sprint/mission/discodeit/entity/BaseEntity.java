@@ -3,7 +3,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -14,7 +13,7 @@ import java.util.UUID;
  */
 
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "id")
 @ToString
 public abstract class BaseEntity implements Serializable {
     private final UUID id;

@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -16,11 +18,15 @@ public class BinaryContent {
     private final String contentType;
     private final byte[] data;
 
+    @Builder
     public BinaryContent(String fileName, String contentType, byte[] data) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        this.fileName = VerifiedUtils.verifyName(fileName);
-        this.contentType = VerifiedUtils.verifyNull(contentType);
-        this.data = VerifiedUtils.verifyNull(data);
+        this.fileName = Objects.requireNonNull(fileName).trim();
+        if(this.fileName.isEmpty() || this.fileName.length() > 255) {
+            throw new IllegalArgumentException("invalid file name");
+        }
+        this.contentType = Objects.requireNonNull(contentType);
+        this.data = Objects.requireNonNull(data);
     }
 }

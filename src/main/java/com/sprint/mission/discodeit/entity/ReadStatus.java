@@ -12,18 +12,17 @@ import java.util.UUID;
     사용자별 각 채널에 읽지 않은 메세지를 확인하기 위해 활용
  */
 @Getter
-@Setter
 @ToString
-@Builder
 public class ReadStatus extends BaseEntity {
     private final UUID userId;
     private final UUID channelId;
     private Instant lastReadAt;
 
-    public ReadStatus(UUID userId, UUID channelId) {
+    @Builder
+    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
         this.userId = VerifiedUtils.verifyNull(userId);
         this.channelId = VerifiedUtils.verifyNull(channelId);
-        this.lastReadAt = Instant.EPOCH;
+        this.lastReadAt = lastReadAt;
     }
 
     public void readNow() {

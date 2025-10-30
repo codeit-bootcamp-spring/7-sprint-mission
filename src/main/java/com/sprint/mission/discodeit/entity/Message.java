@@ -5,11 +5,11 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 @ToString
-@Builder
 public class Message extends BaseEntity {
     private String content;
     private String userName;
@@ -18,6 +18,7 @@ public class Message extends BaseEntity {
     private final List<UUID> attachmentIds;
     private boolean isDeleted;
 
+    @Builder
     public Message(String content, String userName, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
         this.content = VerifiedUtils.verifyContent(content);
         this.userName = VerifiedUtils.verifyName(userName);
@@ -47,10 +48,9 @@ public class Message extends BaseEntity {
     }
 
     public void setAttachmentIds(List<UUID> attachmentIds) {
+        Objects.requireNonNull(this.attachmentIds);
         this.attachmentIds.clear();
-        if(attachmentIds != null) {
-            this.attachmentIds.addAll(attachmentIds);
-        }
+        this.attachmentIds.addAll(attachmentIds);
         reUpdatedAt();
     }
 

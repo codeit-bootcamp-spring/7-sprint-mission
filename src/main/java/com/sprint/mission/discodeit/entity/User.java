@@ -5,11 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 @ToString
-@Builder
 public class User extends BaseEntity {
     private String username; // 유저 이름 ( 별명 x)
     private String password;
@@ -17,12 +17,13 @@ public class User extends BaseEntity {
     private UserState userState; // 0: 오프라인 , 1: 온라인
     private UUID profileId;
 
+    @Builder
     public User(String username, String password, String email, UUID profileId) {
         this.username = VerifiedUtils.verifyName(username);
         this.password = VerifiedUtils.verifyPassword(password);
         this.email = VerifiedUtils.verifyEmail(email);
         this.userState = UserState.ONLINE;
-        this.profileId = VerifiedUtils.verifyNull(profileId);
+        this.profileId = profileId;
     }
 
     public void setUserState(UserState userState) {
@@ -59,7 +60,10 @@ public class User extends BaseEntity {
     }
 
     public void setProfileId(UUID profileId) {
-        this.profileId = profileId;
+        if(profileId != this.profileId) {
+            this.profileId = profileId;
+            reUpdatedAt();
+        }
     }
 
     public void update(String username, String password, String email) {
