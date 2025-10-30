@@ -27,13 +27,13 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResponseDto create(MessageCreateRequestDto messageCreateRequestDto) {
-        UUID channelId = Objects.requireNonNull(messageCreateRequestDto.getChannelId());
-        UUID authorId = Objects.requireNonNull(messageCreateRequestDto.getAuthorId());
-        String content = Objects.requireNonNull(messageCreateRequestDto.getContent());
+        UUID channelId = Objects.requireNonNull(messageCreateRequestDto.channelId());
+        UUID authorId = Objects.requireNonNull(messageCreateRequestDto.authorId());
+        String content = Objects.requireNonNull(messageCreateRequestDto.content());
 
-        Channel ch =  channelRepository.findById(messageCreateRequestDto.getChannelId())
+        Channel ch =  channelRepository.findById(messageCreateRequestDto.channelId())
                 .orElseThrow(()-> new NoSuchElementException("Channel not found"));
-        userRepository.findById(messageCreateRequestDto.getAuthorId()).orElseThrow(()
+        userRepository.findById(messageCreateRequestDto.authorId()).orElseThrow(()
                 -> new NoSuchElementException("User not found"));
 
         if(ch.isPrivateChannel() && !ch.getMembers().containsKey(authorId)) {
@@ -50,7 +50,7 @@ public class BasicMessageService implements MessageService {
             Instant timeNow = Instant.now();
 
             Optional<Instant> last = messageRepository
-                    .findByChannelIdAndAuthorId(messageCreateRequestDto.getChannelId(),messageCreateRequestDto.getAuthorId())
+                    .findByChannelIdAndAuthorId(messageCreateRequestDto.channelId(),messageCreateRequestDto.authorId())
                     .stream()
                     .filter(m -> !m.isDeleted())
                     .map(m -> m.getCreatedAt())
@@ -65,14 +65,20 @@ public class BasicMessageService implements MessageService {
             }
         }
 
-        List<UUID> attachmentIds = messageCreateRequestDto.getAttachmentIds() == null
-                ? new ArrayList<>() : new ArrayList<>(messageCreateRequestDto.getAttachmentIds());
+        List<UUID> attachmentIds = messageCreateRequestDto.attachmentIds() == null
+                ? new ArrayList<>() : new ArrayList<>(messageCreateRequestDto.attachmentIds());
+
+        for(UUID attachmentId : attachmentIds) {
+            if(binaryContentRepository.findById(attachmentId).isEmpty()) {
+                throw new NoSuchElementException("Attachment not found");
+            }
+        }
 
         Message message = messageRepository.save(
                 Message.builder()
                 .attachmentIds(attachmentIds)
                 .channelId(channelId)
-                .userName(messageCreateRequestDto.getUserName())
+                .userName(messageCreateRequestDto.userName())
                 .authorId(authorId)
                 .content(content)
                 .build()
@@ -110,9 +116,6 @@ public class BasicMessageService implements MessageService {
         List<Message> all = messageRepository.findAll();
         List<MessageResponseDto> dtos = new ArrayList<>();
         for (Message message : all) {
-            if(message.isDeleted()) {
-                continue;
-            }
             dtos.add(new MessageResponseDto(
                     message.getContent(),
                     message.getUserName(),
@@ -128,7 +131,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<MessageResponseDto> getAllByChannelId(UUID channelId) {
-        List<Message> channelList = messageRepository.findByChannel(Objects.requireNonNull(channelId));
+        List<Message> channelList = messageRepository.findByChannelId(Objects.requireNonNull(channelId));
         channelList.removeIf(m -> m.isDeleted());
         channelList.sort(Comparator.comparing(m -> m.getCreatedAt()));
 
@@ -149,17 +152,23 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResponseDto update(MessageUpdateRequestDto messageUpdateRequestDto) {
-        UUID messageId = Objects.requireNonNull(messageUpdateRequestDto.getMessageId());
+        UUID messageId = Objects.requireNonNull(messageUpdateRequestDto.messageId());
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message not found"));
 
-        if(messageUpdateRequestDto.getContent() != null) {
-            message.setContent(messageUpdateRequestDto.getContent());
+        if(messageUpdateRequestDto.content() != null) {
+            message.setContent(messageUpdateRequestDto.content());
         }
 
-        if(messageUpdateRequestDto.getAttachmentIds() != null) {
-            message.setAttachmentIds(messageUpdateRequestDto.getAttachmentIds());
+        if(messageUpdateRequestDto.attachmentIds() != null) {
+            for(UUID attachmentId : messageUpdateRequestDto.attachmentIds()) {
+                if(binaryContentRepository.findById(attachmentId).isEmpty()) {
+                    throw new NoSuchElementException("Attachment not found");
+                }
+            }
+            message.setAttachmentIds(messageUpdateRequestDto.attachmentIds());
         }
+
         Message save = messageRepository.save(message);
         return new MessageResponseDto(
                 save.getContent(),
@@ -187,12 +196,12 @@ public class BasicMessageService implements MessageService {
     // 특정 채널별 메세지 조회
     @Override
     public List<Message> getMessagesByChannel(UUID channelId) {
-        return messageRepository.findByChannel(Objects.requireNonNull(channelId));
+        return messageRepository.findByChannelId(Objects.requireNonNull(channelId));
     }
     // 특정 작성자별 메세지 조회
     @Override
     public List<Message> getMessagesByAuthor(UUID authorId) {
-        return messageRepository.findByAuthor(Objects.requireNonNull(authorId));
+        return messageRepository.findByAuthorId(Objects.requireNonNull(authorId));
     }
     // 특정 채널의 특정 작성자 메세지 조회
     @Override
