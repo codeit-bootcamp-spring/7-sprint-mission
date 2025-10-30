@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.UserCreateReq;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,13 @@ public class BasicUserService implements UserService {
     //유저 추가
     @Override
     public User create(UserCreateReq req){
-        return userRepository.save(req.to());
+        User newUser = userRepository.save(req.to());
+
+        //Todo : UserStatus인터페이스 구현 이후 저장 예정 일단 요구사항에 따라 만들기만 함.
+        // - 요구사항 : 인터페이스 아직 구현 X, UserStatus 생성
+        new UserStatus(newUser.getId());
+
+        return newUser;
     }
 
     //이메일 중복 검사
