@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.response.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.update.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.CreateReadStatusRequestDto;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -10,6 +13,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,7 +34,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus createReadStatus(CreateReadStatusRequestDto request) {
+    public ReadStatusResponseDto createReadStatus(CreateReadStatusRequestDto request) {
         channelRepository.findById(request.channelId())
                 .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
 
@@ -50,26 +54,34 @@ public class BasicReadStatusService implements ReadStatusService {
                 request.channelId()
         );
 
-        return readStatusRepository.save(readStatus);
+        ReadStatus save = readStatusRepository.save(readStatus);
+        return ReadStatusResponseDto.from(save);
     }
 
     @Override
-    public ReadStatus find(UUID readStatusId) {
-        return getReadStatus(readStatusId);
+    public ReadStatusResponseDto find(UUID readStatusId) {
+        ReadStatus readStatus = getReadStatus(readStatusId);
+        return ReadStatusResponseDto.from(readStatus);
     }
 
     @Override
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
+    public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
+        List<ReadStatusResponseDto> dtoList = new ArrayList<>();
+        for(ReadStatus readStatus : readStatuses){
+            dtoList.add(ReadStatusResponseDto.from(readStatus));
+        }
+        return dtoList;
     }
 
     @Override
-    public ReadStatus updateReadStatus(UUID readStatusId, UpdateReadStatusDto updateReadStatus) {
+    public ReadStatusResponseDto updateReadStatus(UUID readStatusId, UpdateReadStatusDto updateReadStatus) {
         ReadStatus readStatus = getReadStatus(readStatusId);
 
         readStatus.updateReadTime();
 
-        return readStatusRepository.save(readStatus);
+        ReadStatus save = readStatusRepository.save(readStatus);
+        return ReadStatusResponseDto.from(save);
     }
 
     @Override
