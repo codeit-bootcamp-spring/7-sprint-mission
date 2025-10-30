@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.dto.fileIo.mapper;
 
 import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
-import com.sprint.mission.discodeit.entity.base.Channel;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.HashSet;

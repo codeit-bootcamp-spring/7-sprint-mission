@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.dto.channel.response;
 
-import com.sprint.mission.discodeit.entity.base.Channel;
-import com.sprint.mission.discodeit.entity.base.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.enums.ChannelScope;
 import com.sprint.mission.discodeit.enums.ChannelType;
 
