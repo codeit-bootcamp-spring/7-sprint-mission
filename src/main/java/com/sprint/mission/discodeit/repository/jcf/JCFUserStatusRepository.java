@@ -4,23 +4,47 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class JCFUserStatusRepository implements UserStatusRepository {
+    private final Map<UUID, UserStatus> data = new ConcurrentHashMap<>();
+
     @Override
     public UserStatus save(UserStatus userStatus) {
-        return null;
+        Objects.requireNonNull(userStatus);
+        data.put(userStatus.getId(), userStatus);
+        return userStatus;
     }
 
     @Override
-    public Optional<UserStatus> findByUserId(UUID id) {
-        return Optional.empty();
+    public Optional<UserStatus> findById(UUID Id) {
+        return Optional.ofNullable(data.get(Objects.requireNonNull(Id)));
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        Objects.requireNonNull(userId);
+        return data.values().stream()
+                .filter(rs -> rs.getUserId().equals(userId))
+                .findFirst();
+    }
 
+    @Override
+    public List<UserStatus> findAll() {
+        return data.values().stream().toList();
+    }
+
+    @Override
+    public boolean existsByUserId(UUID userId) {
+        Objects.requireNonNull(userId, "userId must not be null");
+        return data.values().stream()
+                .anyMatch(rs -> rs.getUserId().equals(userId));
+    }
+
+    @Override
+    public boolean deleteById(UUID id) {
+        return data.remove(Objects.requireNonNull(id)) != null;
     }
 }
