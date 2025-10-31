@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class ChannelCreationFacade {
-    private ChannelService channelService;
+    private final ChannelService channelService;
     private final ReadStatusService readStatusService;
 
     //공개 채널 추가
