@@ -19,7 +19,7 @@ public class ChannelViewFacade {
     private final ChannelService channelService;
     private final MessageService messageService;
     
-    //자신의 채널 목록
+    //채널 목록 : Public 인 경우 전부, Private 인 경우 자신이 참여한 채널만
     public List<ChannelInfoRes> findAllMyChannels(UUID userId) {
         return channelService.findAllByUserId(userId).stream()
                 .map(this::mapChannelToInfoRes).toList();
