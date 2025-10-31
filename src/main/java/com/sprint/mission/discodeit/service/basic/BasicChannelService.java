@@ -3,14 +3,9 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.ChannelCreateReq;
 import com.sprint.mission.discodeit.dto.request.ChannelCreateSecReq;
 import com.sprint.mission.discodeit.dto.request.ChannelUpdateReq;
-import com.sprint.mission.discodeit.dto.response.ChannelInfoRes;
-import com.sprint.mission.discodeit.dto.response.ChannelPrivateInfoRes;
-import com.sprint.mission.discodeit.dto.response.ChannelPublicInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +18,6 @@ import java.util.UUID;
 public class BasicChannelService implements ChannelService {
     //레포지토리
     private final ChannelRepository channelRepository;
-    private final MessageRepository messageRepository;
 
     //채널 생성
     @Override
@@ -49,31 +43,23 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.delete(id);
     }
 
-    //채널 목록
+    //채널 목록 : Public 인 경우 전부, Private 인 경우 자신이 참여한 채널만
     @Override
-    public List<ChannelInfoRes> findAll(UUID userId) {
-        return channelRepository.findAll().stream()
-                .filter(channel ->
-                        channel.getPublicType() == ChannelType.PUBLIC ||
-                        (channel.getPublicType() == ChannelType.PRIVATE &&
-                        channelRepository.isMember(userId, channel.getId()))
-                ).map(this::mapChannelToInfoRes).toList();
+    public List<Channel> findAll(UUID userId) {
+        return channelRepository.findAll().stream().filter(channel ->
+                channel.getPublicType() == ChannelType.PUBLIC ||
+                (channel.getPublicType() == ChannelType.PRIVATE &&
+                channelRepository.isMember(userId, channel.getId()))).toList();
+    }
+
+    //자신이 참여한 채널 목록 : Public과 Private 전부 자신이 참여한 채널들만
+    public List<Channel> findAllByUserId(UUID userId){
+        return channelRepository.findAllByUserId(userId);
     }
 
     //채널명으로 찾기
     @Override
-    public ChannelInfoRes findByName(String name) {
-        return mapChannelToInfoRes(channelRepository.findByName(name));
-    }
-
-    // 채널의 공개 여부에 따라 ResDTO를 맞게 변환해주는 메소드
-    private ChannelInfoRes mapChannelToInfoRes(Channel channel) {
-        Message lastMessage = messageRepository.findLastMessageByChannelId(channel.getId());
-
-        return switch (channel.getPublicType()) {
-            case PUBLIC -> ChannelPublicInfoRes.from(channel, lastMessage);
-            case PRIVATE -> ChannelPrivateInfoRes.from(channel, lastMessage);
-            default -> throw new IllegalStateException("Unknown ChannelType: " + channel.getPublicType());
-        };
+    public Channel findByName(String name) {
+        return channelRepository.findByName(name);
     }
 }

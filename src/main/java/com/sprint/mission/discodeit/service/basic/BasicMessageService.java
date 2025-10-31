@@ -34,6 +34,12 @@ public class BasicMessageService implements MessageService {
         return messageRepository.findByContentContaining(searchText);
     }
 
+    //채널에서 가장 마지막 메세지를 조회
+    @Override
+    public Message findLastMessageByChannelId(UUID channelId){
+        return messageRepository.findLastMessageByChannelId(channelId);
+    }
+
     //메세지 생성
     @Override
     public Message create(Message message) {

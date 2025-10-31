@@ -25,11 +25,20 @@ public class JCFChannelRepository implements ChannelRepository {
         return data.values().stream().toList();
     }
 
+    //채널 목록 중에 한 유저에게 해당하는 채널 목록
+    @Override
+    public List<Channel> findAllByUserId(UUID userId) {
+        return findAll().stream()
+                .filter(ch -> ch.getUsers().contains(userId))
+                .toList();
+    }
+
     //채널 ID 조회
     @Override
     public Channel findById(UUID id) {
         return data.get(id);
     }
+
     
     //채널 이름
     @Override

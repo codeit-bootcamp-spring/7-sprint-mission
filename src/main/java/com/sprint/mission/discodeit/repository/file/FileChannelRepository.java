@@ -23,6 +23,14 @@ public class FileChannelRepository extends BaseFileRepository<Channel> implement
     public List<Channel> findAll() {
         return findAllFiles();
     }
+
+    //채널 중에 한 유저에게 해당하는 채널 목록
+    @Override
+    public List<Channel> findAllByUserId(UUID userId) {
+        return findAllFiles().stream()
+                .filter(ch -> ch.getUsers().contains(userId))
+                .toList();
+    }
     
     //채널 id로 조회
     @Override

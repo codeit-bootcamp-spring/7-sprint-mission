@@ -9,6 +9,7 @@ import java.util.UUID;
 public interface ChannelRepository {
     Channel save(Channel channel);
     List<Channel> findAll();
+    List<Channel> findAllByUserId(UUID userId);
     Channel findById(UUID id);
     Channel findByName(String name);
     Channel update(UUID id, String name, String description);

@@ -13,12 +13,12 @@ public record ChannelPublicInfoRes(
         String description,
         Instant lastMessageTime
 )  implements ChannelInfoRes{
-    public static ChannelPublicInfoRes from(Channel channel, Message message) {
+    public static ChannelPublicInfoRes from(Channel channel, Instant lastMessageTime) {
         return ChannelPublicInfoRes.builder()
                 .type(channel.getPublicType().getValue())
                 .name(channel.getName())
                 .description(channel.getDescription())
-                .lastMessageTime(message.getCreatedAt())
+                .lastMessageTime(lastMessageTime)
                 .build();
     }
 }
