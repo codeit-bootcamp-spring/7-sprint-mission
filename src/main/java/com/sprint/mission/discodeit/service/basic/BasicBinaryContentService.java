@@ -14,6 +14,7 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
+    // ===== 🏗️ Domain Logic (Facade 용)  =====
     @Override
     public BinaryContent create(BinaryContent binaryContent) {
         return binaryContentRepository.save(binaryContent);

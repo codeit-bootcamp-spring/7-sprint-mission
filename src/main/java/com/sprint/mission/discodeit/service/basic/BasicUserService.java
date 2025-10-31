@@ -18,22 +18,12 @@ public class BasicUserService implements UserService {
     //리포지토리
     private final UserRepository userRepository;
 
-    // ===== Domain Logic (Facade 용) =====
+    // ===== 🏗️ Domain Logic (Facade 용)  =====
     //유저 추가
     @Override
     public User create(UserCreateReq req){
         validateDuplicate(req.email(), req.nickname());
         return userRepository.save(req.to());
-    }
-
-    //중복 검사
-    private void validateDuplicate(String email, String nickname){
-        if(userRepository.existsByEmail(email)){
-            throw new RuntimeException("Email is already registered");
-        }
-        if(userRepository.existsByNickname(nickname)){
-            throw new RuntimeException("Nickname is already registered");
-        }
     }
 
     //유저 목록
@@ -67,6 +57,14 @@ public class BasicUserService implements UserService {
         return userRepository.update(id,req.email(), req.nickname(),req.password());
     }
 
-    // ===== Controller Direct (DTO 반환) =====
-    // 없음
+    // ===== 🔒 Private Logic (내부 사용) =====
+    //중복 검사
+    private void validateDuplicate(String email, String nickname){
+        if(userRepository.existsByEmail(email)){
+            throw new RuntimeException("Email is already registered");
+        }
+        if(userRepository.existsByNickname(nickname)){
+            throw new RuntimeException("Nickname is already registered");
+        }
+    }
 }

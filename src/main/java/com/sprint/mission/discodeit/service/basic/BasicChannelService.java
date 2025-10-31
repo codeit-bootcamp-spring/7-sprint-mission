@@ -19,6 +19,7 @@ public class BasicChannelService implements ChannelService {
     //레포지토리
     private final ChannelRepository channelRepository;
 
+    // ===== 🏗️ Domain Logic (Facade 용)  =====
     //채널 생성
     @Override
     public Channel create(ChannelCreateReq req) {
@@ -29,16 +30,6 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel create(ChannelCreateSecReq req) {
         return channelRepository.save(req.to());
-    }
-    
-    //채널 수정
-    @Override
-    public Channel update(UUID id, ChannelUpdateReq req) {
-        Channel channel = channelRepository.findById(id);
-        if (channel.getPublicType() == ChannelType.PRIVATE){
-            throw new RuntimeException("Cannot update private channel");
-        }
-        return channelRepository.update(id, req.name(), req.description());
     }
 
     //채널 삭제
@@ -66,5 +57,16 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel findById(UUID id) {
         return channelRepository.findById(id);
+    }
+
+    // ===== 🔧 Controller Direct (단일 도메인 / void) =====
+    //채널 수정
+    @Override
+    public void update(UUID id, ChannelUpdateReq req) {
+        Channel channel = channelRepository.findById(id);
+        if (channel.getPublicType() == ChannelType.PRIVATE){
+            throw new RuntimeException("Cannot update private channel");
+        }
+        channelRepository.update(id, req.name(), req.description());
     }
 }

@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface ChannelService {
     Channel create(ChannelCreateReq req);
     Channel create(ChannelCreateSecReq req);
-    Channel update(UUID id,
+    void update(UUID id,
                    ChannelUpdateReq req);
     Channel delete(UUID id);
     List<Channel> findAllByUserId(UUID userId);
