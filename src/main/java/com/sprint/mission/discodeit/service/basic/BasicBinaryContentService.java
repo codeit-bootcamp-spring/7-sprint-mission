@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -15,21 +16,21 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent create(BinaryContent binaryContent) {
-        return null;
+        return binaryContentRepository.save(binaryContent);
     }
 
     @Override
     public BinaryContent findById(UUID id) {
-        return null;
+        return binaryContentRepository.findById(id);
     }
 
     @Override
-    public BinaryContent findAll() {
-        return null;
+    public List<BinaryContent> findAll() {
+        return binaryContentRepository.findAll();
     }
 
     @Override
     public BinaryContent delete(UUID id) {
-        return null;
+        return binaryContentRepository.delete(id);
     }
 }
