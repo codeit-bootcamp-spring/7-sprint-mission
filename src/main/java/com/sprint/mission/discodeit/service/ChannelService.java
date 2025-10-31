@@ -16,4 +16,5 @@ public interface ChannelService {
     Channel delete(UUID id);
     List<Channel> findAllByUserId(UUID userId);
     Channel findByName(String name);
+    Channel findById(UUID id);
 }

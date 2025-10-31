@@ -61,4 +61,10 @@ public class BasicChannelService implements ChannelService {
     public Channel findByName(String name) {
         return channelRepository.findByName(name);
     }
+
+    //채널 id 로 조회
+    @Override
+    public Channel findById(UUID id) {
+        return channelRepository.findById(id);
+    }
 }

@@ -25,6 +25,13 @@ implements ReadStatusRepository {
         return loadFromFile(statusId);
     }
 
+    @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return findAllFiles().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
+    }
+
     //삭제
     @Override
     public ReadStatus delete(UUID statusId) {
