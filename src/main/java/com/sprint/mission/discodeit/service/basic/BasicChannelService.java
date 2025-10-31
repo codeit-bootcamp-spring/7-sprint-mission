@@ -34,9 +34,7 @@ public class BasicChannelService implements ChannelService {
     //채널 생성: 비공개
     @Override
     public Channel create(ChannelCreateSecReq req) {
-        Channel newChannel = channelRepository.save(req.to());
-        // Todo : ReadStatus 정보 생성
-        return newChannel;
+        return channelRepository.save(req.to());
     }
     
     //채널 수정
