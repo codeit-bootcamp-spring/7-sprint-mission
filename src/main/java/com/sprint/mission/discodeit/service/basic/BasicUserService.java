@@ -34,6 +34,12 @@ public class BasicUserService implements UserService {
         return userRepository.findAll();
     }
 
+    //유저 아이디로 조회
+    @Override
+    public User findById(UUID id) {
+        return userRepository.findById(id);
+    }
+
     //이메일 찾기
     @Override
     public User findByEmail(String email) {
@@ -56,7 +62,7 @@ public class BasicUserService implements UserService {
     @Override
     public User update(UUID id, UserUpdateReq req) {
         validateDuplicate(req.email(), req.nickname());
-        return userRepository.update(id,req.email(), req.nickname(),req.password());
+        return userRepository.update(id, req.email(), req.nickname(),req.password());
     }
 
     // ===== 🔒 Private Logic (내부 사용) =====

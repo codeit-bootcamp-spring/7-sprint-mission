@@ -12,6 +12,7 @@ public interface UserService {
     List<User> findAll();
     User findByEmail(String email);
     User findByNickname(String nickname);
+    User findById(UUID id);
     User delete(UUID id);
     User update(UUID id, UserUpdateReq req);
 }
