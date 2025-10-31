@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateReq;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.factory.UserFactory;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -22,9 +23,9 @@ public class BasicUserService implements UserService {
     // ===== 🏗️ Domain Logic (Facade 용)  =====
     //유저 추가
     @Override
-    public User create(UserCreateReq req){
-        validateDuplicate(req.email(), req.nickname());
-        return userRepository.save(UserFactory.create(req));
+    public User create(User user){
+        validateDuplicate(user.getEmail(), user.getNickname());
+        return userRepository.save(user);
     }
 
     //유저 목록

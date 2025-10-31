@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User create(UserCreateReq req);
+    User create(User user);
     List<User> findAll();
     User findByEmail(String email);
     User findByNickname(String nickname);
