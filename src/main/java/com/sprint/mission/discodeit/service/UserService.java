@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public interface UserService {
     User create(UserCreateReq req);
-    List<UserInfoRes> findAll();
-    UserInfoRes findByEmail(String email);
-    UserInfoRes findByNickname(String nickname);
+    List<User> findAll();
+    User findByEmail(String email);
+    User findByNickname(String nickname);
     User delete(UUID id, UUID profileId, UUID userStatusId);
     User update(UUID id, UserUpdateReq req);
 }

@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.request.UserCreateReq;
 import com.sprint.mission.discodeit.dto.request.UserUpdateReq;
 import com.sprint.mission.discodeit.dto.response.UserInfoRes;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -21,21 +20,12 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
     //리포지토리
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
-    private final BinaryContentRepository binaryContentRepository;
 
     //유저 추가
     @Override
     public User create(UserCreateReq req){
         validateDuplicate(req.email(), req.nickname());
-        User newUser = userRepository.save(req.to());
-
-        if(req.profileId() != null){
-            userRepository.updateProfileImg(newUser.getId(), req.profileId());
-        }
-        userStatusRepository.save(new UserStatus(newUser.getId()));
-
-        return newUser;
+        return userRepository.save(req.to());
     }
 
     //중복 검사
@@ -50,39 +40,25 @@ public class BasicUserService implements UserService {
 
     //유저 목록
     @Override
-    public List<UserInfoRes> findAll(){
-        return userRepository.findAll().stream()
-                .map(user -> UserInfoRes.from(user,
-                        binaryContentRepository.findById(user.getProfileId()).getData()))
-                .toList();
+    public List<User> findAll(){
+        return userRepository.findAll();
     }
 
     //이메일 찾기
     @Override
-    public UserInfoRes findByEmail(String email) {
-        User user = userRepository.findByEmail(email);
-        if(user != null){
-            return UserInfoRes.from(user,
-                    binaryContentRepository.findById(user.getProfileId()).getData());
-        }
-        return null;
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     //닉네임으로 찾기
     @Override
-    public UserInfoRes findByNickname(String nickname) {
-        User user = userRepository.findByNickname(nickname);
-        if(user != null){
-            return UserInfoRes.from(user,
-                    binaryContentRepository.findById(user.getProfileId()).getData());
-        }
-        return null;
+    public User findByNickname(String nickname) {
+        return userRepository.findByNickname(nickname);
     }
 
     //삭제
     @Override
     public User delete(UUID id, UUID profileId, UUID userStatusId) {
-        // Todo : BinaryContent, UserStatus 리포지토리를 이용하여 삭제
         return userRepository.delete(id);
     }
 
@@ -90,10 +66,6 @@ public class BasicUserService implements UserService {
     @Override
     public User update(UUID id, UserUpdateReq req) {
         validateDuplicate(req.email(), req.nickname());
-        User updatedUser = userRepository.update(id,req.email(), req.nickname(),req.password());
-        if(req.profileId() != null){
-            userRepository.updateProfileImg(id, req.profileId());
-        }
-        return updatedUser;
+        return userRepository.update(id,req.email(), req.nickname(),req.password());
     }
 }
