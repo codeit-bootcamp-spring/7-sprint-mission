@@ -34,6 +34,10 @@ public class BasicChannelService implements ChannelService {
     //채널 수정
     @Override
     public Channel update(UUID id, ChannelUpdateReq req) {
+        Channel channel = channelRepository.findById(id);
+        if (channel.getPublicType() == ChannelType.PRIVATE){
+            throw new RuntimeException("Cannot update private channel");
+        }
         return channelRepository.update(id, req.name(), req.description());
     }
 
