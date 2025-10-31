@@ -11,7 +11,7 @@ public interface MessageService {
     List<Message> findAllByChannel(UUID channelId);
     List<Message> searchMessagesByContent(String searchText);
     Message findLastMessageByChannelId(UUID channelId);
-    Message create(MessageCreateReq req);
+    Message create(Message message);
     Message update(UUID id, String content);
     Message delete(UUID id);
 }

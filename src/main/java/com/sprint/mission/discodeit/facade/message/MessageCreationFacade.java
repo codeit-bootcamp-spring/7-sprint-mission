@@ -1,12 +1,16 @@
 package com.sprint.mission.discodeit.facade.message;
 
 import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.factory.BinaryContentFactory;
+import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,11 +21,18 @@ public class MessageCreationFacade {
     private final BinaryContentService binaryContentService;
 
     //메세지 추가
-    public MessageService createMessage(MessageCreateReq req){
-        Message message = messageService.create(req);
-        List<UUID> attachments = req.attachmentIds();
-        if(!attachments.isEmpty()){
-            attachments.stream().map(binaryId -> binaryContentService.create(binaryId))
+    public Message createMessage(MessageCreateReq req){
+        List<UUID> attachments = new ArrayList<>();
+        
+        if(!req.attachmentIds().isEmpty()){
+            req.attachmentIds().forEach(BinaryContentReq ->{
+                BinaryContent newBinaryContent = binaryContentService.create(
+                        BinaryContentFactory.create(BinaryContentReq)
+                );
+                attachments.add(newBinaryContent.getId());
+            });
         }
+
+        return messageService.create(MessageFactory.create(req, attachments));
     }
 }

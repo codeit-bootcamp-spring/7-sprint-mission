@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +41,8 @@ public class BasicMessageService implements MessageService {
 
     //메세지 생성
     @Override
-    public Message create(MessageCreateReq req) {
-        return messageRepository.save(MessageFactory.create(req));
+    public Message create(Message message) {
+        return messageRepository.save(message);
     }
     
     //메세지 수정
