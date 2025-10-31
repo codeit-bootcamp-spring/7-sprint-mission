@@ -19,11 +19,6 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public List<ReadStatus> findAll() {
-        return data.values().stream().toList();
-    }
-
-    @Override
     public ReadStatus findById(UUID statusId) {
         return data.get(statusId);
     }

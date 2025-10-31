@@ -19,12 +19,6 @@ implements ReadStatusRepository {
         return readStatus;
     }
 
-    //목록조회
-    @Override
-    public List<ReadStatus> findAll() {
-        return findAllFiles();
-    }
-
     //단일조회
     @Override
     public ReadStatus findById(UUID statusId) {
