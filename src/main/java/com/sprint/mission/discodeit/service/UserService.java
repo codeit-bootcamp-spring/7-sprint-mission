@@ -12,6 +12,6 @@ public interface UserService {
     List<User> findAll();
     User findByEmail(String email);
     User findByNickname(String nickname);
-    User delete(UUID id, UUID profileId, UUID userStatusId);
+    User delete(UUID id);
     User update(UUID id, UserUpdateReq req);
 }

@@ -55,7 +55,7 @@ public class BasicUserService implements UserService {
 
     //삭제
     @Override
-    public User delete(UUID id, UUID profileId, UUID userStatusId) {
+    public User delete(UUID id) {
         return userRepository.delete(id);
     }
 
