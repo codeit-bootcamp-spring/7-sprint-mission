@@ -49,16 +49,11 @@ public class BasicChannelService implements ChannelService {
 
     //채널 목록 : Public 인 경우 전부, Private 인 경우 자신이 참여한 채널만
     @Override
-    public List<Channel> findAll(UUID userId) {
+    public List<Channel> findAllByUserId(UUID userId){
         return channelRepository.findAll().stream().filter(channel ->
                 channel.getPublicType() == ChannelType.PUBLIC ||
                 (channel.getPublicType() == ChannelType.PRIVATE &&
                 channelRepository.isMember(userId, channel.getId()))).toList();
-    }
-
-    //자신이 참여한 채널 목록 : Public과 Private 전부 자신이 참여한 채널들만
-    public List<Channel> findAllByUserId(UUID userId){
-        return channelRepository.findAllByUserId(userId);
     }
 
     //채널명으로 찾기

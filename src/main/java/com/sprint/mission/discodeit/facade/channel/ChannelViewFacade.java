@@ -18,12 +18,6 @@ import java.util.UUID;
 public class ChannelViewFacade {
     private final ChannelService channelService;
     private final MessageService messageService;
-
-    //채널 모든 목록
-    public List<ChannelInfoRes> findAll(UUID userId) {
-        return channelService.findAll(userId).stream()
-                .map(this::mapChannelToInfoRes).toList();
-    }
     
     //자신의 채널 목록
     public List<ChannelInfoRes> findAllMyChannels(UUID userId) {
