@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.factory;
 
-import com.sprint.mission.discodeit.dto.request.ChannelCreateReq;
+import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateReq;
 import com.sprint.mission.discodeit.entity.Channel;
 
 public class ChannelFactory {

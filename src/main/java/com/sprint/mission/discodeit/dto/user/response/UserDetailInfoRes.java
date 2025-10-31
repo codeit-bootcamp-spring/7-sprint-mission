@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.response;
+package com.sprint.mission.discodeit.dto.user.response;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.util.DateTimeUtil;

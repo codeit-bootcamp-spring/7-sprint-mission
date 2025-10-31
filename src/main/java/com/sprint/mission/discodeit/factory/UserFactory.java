@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.factory;
 
-import com.sprint.mission.discodeit.dto.request.UserCreateReq;
+import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
 import com.sprint.mission.discodeit.entity.User;
 
 public class UserFactory {

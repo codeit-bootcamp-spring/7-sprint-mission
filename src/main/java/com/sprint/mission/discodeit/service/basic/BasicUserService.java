@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.UserCreateReq;
-import com.sprint.mission.discodeit.dto.request.UserUpdateReq;
+import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
+import com.sprint.mission.discodeit.dto.user.request.UserUpdateReq;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.UserFactory;
 import com.sprint.mission.discodeit.repository.UserRepository;

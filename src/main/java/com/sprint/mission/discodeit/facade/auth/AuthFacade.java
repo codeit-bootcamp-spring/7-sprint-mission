@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.facade.auth;
 
-import com.sprint.mission.discodeit.dto.request.UserLoginReq;
+import com.sprint.mission.discodeit.dto.user.request.UserLoginReq;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;

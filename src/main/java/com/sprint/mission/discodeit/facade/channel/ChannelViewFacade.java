@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.facade.channel;
 
-import com.sprint.mission.discodeit.dto.response.ChannelInfoRes;
-import com.sprint.mission.discodeit.dto.response.ChannelPrivateInfoRes;
-import com.sprint.mission.discodeit.dto.response.ChannelPublicInfoRes;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelPrivateInfoRes;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelPublicInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;

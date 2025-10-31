@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.dto.response;
+package com.sprint.mission.discodeit.dto.channel.response;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import lombok.Builder;
 
 import java.time.Instant;

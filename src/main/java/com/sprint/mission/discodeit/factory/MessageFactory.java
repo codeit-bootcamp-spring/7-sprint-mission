@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.factory;
 
-import com.sprint.mission.discodeit.dto.request.MessageCreateReq;
+import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
 import com.sprint.mission.discodeit.entity.Message;
 
 public class MessageFactory {
