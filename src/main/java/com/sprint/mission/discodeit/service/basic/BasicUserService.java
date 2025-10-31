@@ -18,6 +18,7 @@ public class BasicUserService implements UserService {
     //리포지토리
     private final UserRepository userRepository;
 
+    // ===== Domain Logic (Facade 용) =====
     //유저 추가
     @Override
     public User create(UserCreateReq req){
@@ -65,4 +66,7 @@ public class BasicUserService implements UserService {
         validateDuplicate(req.email(), req.nickname());
         return userRepository.update(id,req.email(), req.nickname(),req.password());
     }
+
+    // ===== Controller Direct (DTO 반환) =====
+    // 없음
 }
