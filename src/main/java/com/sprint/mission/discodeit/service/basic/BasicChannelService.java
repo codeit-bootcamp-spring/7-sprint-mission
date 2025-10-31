@@ -22,8 +22,8 @@ import java.util.UUID;
 @Service
 public class BasicChannelService implements ChannelService {
     //레포지토리
-    private ChannelRepository channelRepository;
-    private MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final MessageRepository messageRepository;
 
     //채널 생성
     @Override

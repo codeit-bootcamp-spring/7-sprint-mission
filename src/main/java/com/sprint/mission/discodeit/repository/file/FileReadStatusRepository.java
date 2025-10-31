@@ -2,16 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
-@Repository
 public class FileReadStatusRepository extends BaseFileRepository<ReadStatus>
 implements ReadStatusRepository {
-    protected FileReadStatusRepository(Class<ReadStatus> type) {
-        super(type);
+    public FileReadStatusRepository() {
+        super(ReadStatus.class);
     }
 
     //저장

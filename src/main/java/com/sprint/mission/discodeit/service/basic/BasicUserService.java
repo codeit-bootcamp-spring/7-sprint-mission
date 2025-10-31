@@ -20,9 +20,9 @@ import java.util.UUID;
 @Service
 public class BasicUserService implements UserService {
     //리포지토리
-    private UserRepository userRepository;
-    private UserStatusRepository userStatusRepository;
-    private BinaryContentRepository binaryContentRepository;
+    private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     //유저 추가
     @Override

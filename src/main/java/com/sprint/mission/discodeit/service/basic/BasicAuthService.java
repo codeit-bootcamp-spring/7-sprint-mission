@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class BasicAuthService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public boolean login(String nickname, String password) {
         User user = userRepository.findByNickname(nickname);
