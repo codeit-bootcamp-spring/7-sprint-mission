@@ -24,32 +24,32 @@ public class MessageUpdateFacade {
         List<UUID> updatedAttachmentIds = new ArrayList<>();
         List<BinaryContentUpdateReq> attachmentUpdateReqs = req.attachmentReqs();
 
-        //첨부 파일 없을 때
-        if(attachmentUpdateReqs.isEmpty()){
-            messageService.update(messageId, req.content(), List.of());
-            return;
-        }
-
-        //첨부 파일 존재
         attachmentUpdateReqs.forEach(binaryContentUpdateReq -> {
             if(binaryContentUpdateReq.binaryContentId() != null){
-                //기존에 있던 파일일 때
-                if(binaryContentUpdateReq.data() == null){
-                    //삭제된 파일
-                    binaryContentService.delete(binaryContentUpdateReq.binaryContentId());
-                }else{
-                    updatedAttachmentIds.add(binaryContentUpdateReq.binaryContentId());
-                }
+                handleExistingFile(binaryContentUpdateReq, updatedAttachmentIds);
             }else{
-                //새로 업로드 된 파일
-                BinaryContent newFile = binaryContentService.create(
-                    BinaryContentFactory.create(binaryContentUpdateReq)
-                );
-
-                //리스트에도 넣어줌.
-                updatedAttachmentIds.add(newFile.getId());
+                handleNewFile(binaryContentUpdateReq, updatedAttachmentIds);
             }
         });
+
         messageService.update(messageId, req.content(), updatedAttachmentIds);
     }
+
+    //기존 파일(데이터 없으면 삭제, 있으면 유지)
+    private void handleExistingFile(BinaryContentUpdateReq req, List<UUID> attachmentIds){
+        if(req.data() == null){
+            binaryContentService.delete(req.binaryContentId());
+        }else{
+            attachmentIds.add(req.binaryContentId());
+        }
+    }
+
+    //새로 업로드 된 파일
+    private void handleNewFile(BinaryContentUpdateReq req, List<UUID> attachmentIds){
+        BinaryContent newFile = binaryContentService.create(
+            BinaryContentFactory.create(req)
+        );
+        attachmentIds.add(newFile.getId());
+    }
 }
+
