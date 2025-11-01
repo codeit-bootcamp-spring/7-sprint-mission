@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.util.*;
@@ -26,9 +26,10 @@ import java.util.*;
  */
 public class FileUserRepository implements UserRepository {
     private final Map<UUID, User> userStore = new HashMap<>();
-    private final String filePath = AppConfig.DATA_PATH + "\\users.sav";
+    private final String filePath;
 
-    public FileUserRepository() {
+    public FileUserRepository(String filePath) {
+        this.filePath = filePath;
         loadUsersFromFile();
     }
 

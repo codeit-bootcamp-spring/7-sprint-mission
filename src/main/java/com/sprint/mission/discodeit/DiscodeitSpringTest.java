@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.dto.auth.request.LoginUserDto;
 import com.sprint.mission.discodeit.dto.channel.request.CreateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequestDto;
@@ -22,11 +21,15 @@ import com.sprint.mission.discodeit.utils.Printer;
 import com.sprint.mission.discodeit.utils.TestDataInitializer;
 import com.sprint.mission.discodeit.utils.TimeConvert;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Component
 @RequiredArgsConstructor
 public class DiscodeitSpringTest {
     private final UserService userService;
@@ -41,7 +44,9 @@ public class DiscodeitSpringTest {
     public void run() {
         //테스트를 위한 유저, 채널, 메시지 데이터 생성
         //File I/O 서비스 사용시 파일이 없다면 생성
-        if (!new File(AppConfig.DATA_PATH + "\\users.sav").exists()) {
+        String filePath = "C:\\Users\\user\\Workspace\\codeit-sprint-bootcamp\\7-sprint-mission\\data";
+
+        if (!new File(filePath + "\\user.sav").exists()) {
             TestDataInitializer.initialize(userService, channelService, messageService);
         }
 
@@ -347,7 +352,7 @@ public class DiscodeitSpringTest {
                     case 1 -> joinChannelRoom(channel);
                     case 2 -> {
                         Printer.printHalfLine();
-                        Printer.printChannelMember(channelService, channel.getId());
+                        Printer.printChannelMember(userService, channelService, channel.getId());
                         Printer.printHalfLine();
                     }
                     case 3 -> renameChannel(channel.getId());

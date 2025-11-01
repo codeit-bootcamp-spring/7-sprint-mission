@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.util.*;
@@ -10,9 +10,12 @@ import java.util.*;
 public class FileUserStatusRepository implements UserStatusRepository {
     //파일 저장 필요
     private final Map<UUID, UserStatus> userStatusStore = new HashMap<>();
-    private final String filePath = AppConfig.DATA_PATH + "\\userstatus.sav";
+    private final String filePath;
 
-    public FileUserStatusRepository() { loadUsersFromFile(); }
+    public FileUserStatusRepository(String filePath) {
+        this.filePath = filePath;
+        loadUsersFromFile();
+    }
 
     // 저장하기
     private void saveUsersToFile() {

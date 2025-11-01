@@ -1,17 +1,18 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.util.*;
 
 public class FileReadStatusRepository implements ReadStatusRepository {
     Map<UUID, ReadStatus> readStatusStore = new HashMap<>();
-    private final String filePath = AppConfig.DATA_PATH + "\\readstatus.sav";
+    private final String filePath;
 
-    public FileReadStatusRepository() {
+    public FileReadStatusRepository(String filePath) {
+        this.filePath = filePath;
         loadUsersFromFile();
     }
 

@@ -1,17 +1,20 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.util.*;
 
 public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Map<UUID, BinaryContent> contentStore = new HashMap<>();
-    private final String filePath = AppConfig.DATA_PATH + "\\content.sav";
+    private final String filePath;
 
-    public FileBinaryContentRepository() { loadUsersFromFile(); }
+    public FileBinaryContentRepository(String filePath) {
+        this.filePath = filePath;
+        loadUsersFromFile();
+    }
 
     // 저장하기
     private void saveUsersToFile() {

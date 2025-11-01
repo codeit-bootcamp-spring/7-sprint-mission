@@ -3,12 +3,34 @@ package com.sprint.mission.discodeit.config;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
 import com.sprint.mission.discodeit.repository.jcf.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RepositoryConfig {
+    @Value("${discodeit.repository.file-directory}\\user.sav")
+    private String userPath;
+
+    @Value("${discodeit.repository.file-directory}\\channel.sav")
+    private String channelPath;
+
+    @Value("${discodeit.repository.file-directory}\\joined.sav")
+    private String joinedPath;
+
+    @Value("${discodeit.repository.file-directory}\\message.sav")
+    private String messagePath;
+
+    @Value("${discodeit.repository.file-directory}\\readstatus.sav")
+    private String readstatusPath;
+
+    @Value("${discodeit.repository.file-directory}\\userstatus.sav")
+    private String userstatusPath;
+
+    @Value("${discodeit.repository.file-directory}\\content.sav")
+    private String binarycontentPath;
+
 
     // UserRepository
     @Bean
@@ -29,7 +51,7 @@ public class RepositoryConfig {
             havingValue = "file"
     )
     public UserRepository fileUserRepository() {
-        return new FileUserRepository();
+        return new FileUserRepository(userPath);
     }
 
 
@@ -52,7 +74,7 @@ public class RepositoryConfig {
             havingValue = "file"
     )
     public ChannelRepository fileChannelRepository() {
-        return new FileChannelRepository();
+        return new FileChannelRepository(channelPath, joinedPath);
     }
 
     // MessageRepository
@@ -74,7 +96,7 @@ public class RepositoryConfig {
             havingValue = "file"
     )
     public MessageRepository fileMessageRepository() {
-        return new FileMessageRepository();
+        return new FileMessageRepository(messagePath);
     }
 
     // ReadStatusRepository
@@ -96,7 +118,7 @@ public class RepositoryConfig {
             havingValue = "file"
     )
     public ReadStatusRepository fileReadStatusRepository() {
-        return new FileReadStatusRepository();
+        return new FileReadStatusRepository(readstatusPath);
     }
 
     // UserStatusRepository
@@ -118,7 +140,7 @@ public class RepositoryConfig {
             havingValue = "file"
     )
     public UserStatusRepository fileUserStatusRepository() {
-        return new FileUserStatusRepository();
+        return new FileUserStatusRepository(userstatusPath);
     }
 
     // BinaryContentRepository
@@ -139,7 +161,5 @@ public class RepositoryConfig {
             name = "type",
             havingValue = "file"
     )
-    public BinaryContentRepository fileBinaryContentRepository() {
-        return new FileBinaryContentRepository();
-    }
+    public BinaryContentRepository fileBinaryContentRepository() { return new FileBinaryContentRepository(binarycontentPath); }
 }

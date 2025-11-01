@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.dto.auth.request.LoginUserDto;
 import com.sprint.mission.discodeit.dto.channel.request.CreateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequestDto;
@@ -28,6 +27,7 @@ import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.utils.Printer;
 import com.sprint.mission.discodeit.utils.TestDataInitializer;
 import com.sprint.mission.discodeit.utils.TimeConvert;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.util.*;
@@ -43,6 +43,8 @@ public class DiscodeitTest {
     private UserResponseDto loginUser;
     boolean login = false;
 
+    private static final String filePath = "C:\\Users\\user\\Workspace\\codeit-sprint-bootcamp\\7-sprint-mission\\data";
+
     private DiscodeitTest(UserRepository userRepository, ChannelRepository channelRepository, MessageRepository messageRepository,
                           UserStatusRepository userStatusRepository, BinaryContentRepository binaryContentRepository, ReadStatusRepository readStatusRepository) {
         userService = new BasicUserService(userRepository, messageRepository, userStatusRepository, binaryContentRepository);
@@ -52,7 +54,7 @@ public class DiscodeitTest {
 
         //테스트를 위한 유저, 채널, 메시지 데이터 생성
         //File I/O 서비스 사용시 파일이 없다면 생성
-        if (userRepository instanceof JCFUserRepository || !new File(AppConfig.DATA_PATH + "\\users.sav").exists()) {
+        if (userRepository instanceof JCFUserRepository || !new File(filePath + "\\user.sav").exists()) {
             TestDataInitializer.initialize(userService, channelService, messageService);
         }
     }
@@ -85,12 +87,12 @@ public class DiscodeitTest {
                     case 2 -> {
                         System.out.println("File I/O 서비스로 테스트를 진행합니다.");
                         return new DiscodeitTest(
-                                new FileUserRepository(),
-                                new FileChannelRepository(),
-                                new FileMessageRepository(),
-                                new FileUserStatusRepository(),
-                                new FileBinaryContentRepository(),
-                                new FileReadStatusRepository()
+                                new FileUserRepository(filePath + "\\user.sav"),
+                                new FileChannelRepository(filePath + "\\channel.sav", filePath + "\\joined.sav"),
+                                new FileMessageRepository(filePath + "\\message.sav"),
+                                new FileUserStatusRepository(filePath + "\\userstatus.sav"),
+                                new FileBinaryContentRepository(filePath + "\\content.sav"),
+                                new FileReadStatusRepository(filePath + "\\readstatus.sav")
                         );
                     }
                     case 3 -> exit();

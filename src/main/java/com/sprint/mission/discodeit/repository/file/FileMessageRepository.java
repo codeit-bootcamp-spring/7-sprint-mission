@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.time.Instant;
@@ -28,9 +28,10 @@ import java.util.*;
  */
 public class FileMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messageStore = new LinkedHashMap<>();
-    private final String filePath = AppConfig.DATA_PATH + "\\messages.sav";
+    private final String filePath;
 
-    public FileMessageRepository() {
+    public FileMessageRepository(String filePath) {
+        this.filePath = filePath;
         loadMessagesFromFile();
     }
 
