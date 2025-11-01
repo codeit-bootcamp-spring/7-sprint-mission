@@ -40,6 +40,7 @@ public class UserStatus extends BaseEntity{
 
     //온라인 상태 계산
     public void updateOnline(){
+        super.update();
         this.isOnline = offlineAt.isAfter(Instant.now().minusSeconds(OFFLINE_THRESHOLD_SECONDS));
     }
 }

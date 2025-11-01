@@ -33,6 +33,13 @@ implements ReadStatusRepository {
     }
 
     @Override
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return findAllFiles().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .toList();
+    }
+
+    @Override
     public void update(UUID statusId) {
         ReadStatus readStatus = loadFromFile(statusId);
         if(readStatus == null) {

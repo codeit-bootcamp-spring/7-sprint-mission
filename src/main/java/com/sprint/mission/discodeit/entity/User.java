@@ -36,6 +36,7 @@ public class User extends BaseEntity {
 
     //profile update
     public void updateProfile(UUID profileId) {
+        super.update();
         this.profileId = profileId;
     }
 }

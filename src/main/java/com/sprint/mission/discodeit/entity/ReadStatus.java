@@ -26,6 +26,7 @@ public class ReadStatus extends BaseEntity{
 
     //사용자가 채널을 읽음.
     public void updateReadAt(){
+        super.update();
         this.readAt = Instant.now();
     }
 }

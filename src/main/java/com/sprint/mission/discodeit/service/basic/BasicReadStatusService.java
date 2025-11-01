@@ -39,4 +39,9 @@ public class BasicReadStatusService implements ReadStatusService {
     public List<ReadStatus> findAllByChannelId(UUID channelId){
         return readStatusRepository.findAllByChannelId(channelId);
     }
+
+    @Override
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAllByUserId(userId);
+    }
 }

@@ -31,6 +31,13 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return data.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .toList();
+    }
+
+    @Override
     public void update(UUID statusId) {
         data.get(statusId).update();
     }
