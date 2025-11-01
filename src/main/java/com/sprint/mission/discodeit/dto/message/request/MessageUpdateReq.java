@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.message.request;
 
-import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentUpdateReq;
+import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentUpdateReq;
 
 import java.util.List;
 

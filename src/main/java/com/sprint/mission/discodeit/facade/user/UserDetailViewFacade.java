@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.facade.user;
 
-import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentInfoRes;
+import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;

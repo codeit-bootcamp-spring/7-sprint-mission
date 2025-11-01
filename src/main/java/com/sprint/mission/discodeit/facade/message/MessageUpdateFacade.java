@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.facade.message;
 
-import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentUpdateReq;
+import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentUpdateReq;
 import com.sprint.mission.discodeit.dto.message.request.MessageUpdateReq;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;

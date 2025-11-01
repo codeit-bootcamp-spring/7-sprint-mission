@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.factory;
 
-import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentCreateReq;
-import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentUpdateReq;
+import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreateReq;
+import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentUpdateReq;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
 public class BinaryContentFactory {

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.binaryContent.response;
+package com.sprint.mission.discodeit.dto.binarycontent.response;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.util.DateTimeUtil;

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.facade.message;
 
-import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentInfoRes;
+import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.BinaryContentService;

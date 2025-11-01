@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.user.response;
 
-import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentInfoRes;
+import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.entity.User;
 import lombok.Builder;
 
