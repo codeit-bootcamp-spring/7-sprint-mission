@@ -25,14 +25,13 @@ public class BasicAuthService implements AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         if (user.getPassword().equals(password)) {
-            LoginResponseDto dto = new LoginResponseDto(
+            return new LoginResponseDto(
                     user.getId(),
                     user.getUsername(),
                     user.getNickName(),
                     user.getEmail(),
                     user.getProfileId()
             );
-            return dto;
         } else {
             throw new IllegalArgumentException("정보가 일치하지 않습니다.");
         }
