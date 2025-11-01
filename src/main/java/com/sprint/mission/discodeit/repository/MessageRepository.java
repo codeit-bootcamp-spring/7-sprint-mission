@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Message;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -20,7 +21,7 @@ public interface MessageRepository {
     List<Message> findAll();
 
     /** ID(UUID)로 메시지를 조회 */
-    Message findById(UUID id);
+    Optional<Message> findById(UUID id);
 
     /** 메시지를 수정 (내용 변경 등) */
     void update(Message message);

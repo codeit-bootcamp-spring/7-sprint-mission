@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.dto.auth.request.LoginUserDto;
 import com.sprint.mission.discodeit.dto.channel.request.CreateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelNameRequestDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
@@ -21,8 +22,6 @@ import com.sprint.mission.discodeit.utils.Printer;
 import com.sprint.mission.discodeit.utils.TestDataInitializer;
 import com.sprint.mission.discodeit.utils.TimeConvert;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -363,7 +362,7 @@ public class DiscodeitSpringTest {
                         else leaveChannel(channel); // 관리자가 아닌 유저가 채널 나가기 선택시 메서드 실행
 
                         // 채널이 삭제되거나 채널을 나가게 되면 채널 선택 메뉴로 이동
-                        if (!channelService.existsById(channel.getId()) && !channelService.isUserJoinedChannel(loginUser.getId(), channel.getId())){
+                        if (channelService.isChannelUnavailableForUser(loginUser.getId(), channel.getId())){
                             System.out.println("채널 선택 메뉴로 돌아갑니다.");
                             return;
                         }
@@ -430,7 +429,7 @@ public class DiscodeitSpringTest {
                 System.out.print("변경할 채널 이름: ");
                 String newChannelName = sc.nextLine();
                 if (!newChannelName.equals("-1")) {
-                    channelService.updateName(channelId, newChannelName);
+                    channelService.updateName(new UpdateChannelNameRequestDto(channelId, newChannelName));
                     System.out.printf("%s로 채널 이름이 변경되었습니다.\n", newChannelName);
                 }
                 System.out.println("이전 메뉴로 돌아갑니다.");

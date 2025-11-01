@@ -33,7 +33,8 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus findUserStatus(UUID id) {
-        return userStatusRepository.findById(id);
+        return userStatusRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("user status가 존재하지 않습니다."));
     }
 
     @Override
@@ -43,9 +44,10 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void updateUserStatus(UpdateUserStatusRequestDto request) {
-        UserStatus newUserStatus = userStatusRepository.findById(request.getUserId());
+        UserStatus newUserStatus = userStatusRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalStateException("user status가 존재하지 않습니다."));
         newUserStatus.setUpdatedAt(); // 로그인 시간 변경
-        userStatusRepository.save(newUserStatus);
+        userStatusRepository.update(newUserStatus);
     }
 
     @Override
@@ -55,10 +57,10 @@ public class BasicUserStatusService implements UserStatusService {
                 .findFirst()
                 .ifPresentOrElse(us -> {
                     us.setUpdatedAt();
-                    userStatusRepository.save(us);
+                    userStatusRepository.update(us);
                 },
                 () -> {
-                    throw new IllegalArgumentException("user status를 저장할 유저가 존재하지 않습니다.");
+                    throw new IllegalArgumentException("user status가 존재하지 않습니다.");
                 });
     }
 

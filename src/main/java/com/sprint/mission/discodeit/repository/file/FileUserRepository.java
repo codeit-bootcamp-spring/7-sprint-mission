@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.util.*;
@@ -70,30 +69,22 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID id) {
-        if(!isExist(id)){
-            throw new IllegalArgumentException("해당 UUID를 가진 유저가 존재하지 않습니다.");
-        }
-
-        // 해당 key(UUID) 값에 value(유저)가 null로 저장되어 있는 경우 예외 발생
-        return Optional.ofNullable(userStore.get(id))
-                .orElseThrow(() -> new IllegalArgumentException("해당 UUID를 가진 유저가 존재하지 않습니다."));
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(userStore.get(id));
     }
 
     @Override
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return userStore.values().stream()
                 .filter(u -> u.getEmail().equals(email))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 이메일을 사용하는 유저가 존재하지 않습니다."));
+                .findFirst();
     }
 
     @Override
-    public User findByPhone(String phoneNum) {
+    public Optional<User> findByPhone(String phoneNum) {
         return userStore.values().stream()
                 .filter(u -> u.getPhoneNum().equals(phoneNum))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 전화번호를 사용하는 유저가 존재하지 않습니다."));
+                .findFirst();
     }
 
     @Override
@@ -110,19 +101,12 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void update(User user) {
-        if(isExist(user.getId())){
-            userStore.replace(user.getId(), user);
-            saveUsersToFile();
-        } else {
-            throw new IllegalArgumentException("해당 유저가 존재하지 않아 정보 수정에 실패하였습니다.");
-        }
+        userStore.replace(user.getId(), user);
+        saveUsersToFile();
     }
 
     @Override
     public void deleteById(UUID id) {
-        if(!isExist(id)) {
-            throw new IllegalArgumentException("삭제할 유저가 존재하지 않습니다.");
-        }
         userStore.remove(id);
         saveUsersToFile();
     }
@@ -133,16 +117,12 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void existsByNickName(String NickName) {
-        if(findAll().stream().anyMatch(u -> u.getNickName().equals(NickName))){
-            throw new IllegalArgumentException("이미 사용 중인 nickname입니다.");
-        }
+    public boolean existsByNickName(String NickName) {
+        return findAll().stream().anyMatch(u -> u.getNickName().equals(NickName));
     }
 
     @Override
-    public void existsByEmail(String email) {
-        if(findAll().stream().anyMatch(u -> u.getEmail().equals(email))){
-            throw new IllegalArgumentException("이미 사용 중인 email입니다.");
-        }
+    public boolean existsByEmail(String email) {
+        return findAll().stream().anyMatch(u -> u.getEmail().equals(email));
     }
 }

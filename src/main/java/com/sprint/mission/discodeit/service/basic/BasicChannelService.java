@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.request.CreateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelNameRequestDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,13 +21,17 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
+    private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
 
     @Override
     public ChannelResponseDto createPublicChannel(CreateChannelRequestDto request) {
-        existsByName(request.getChannelName()); // 이름 중복 저장 불가
+        // 이름 중복 저장 불가
+        if(channelRepository.existsByName(request.getChannelName())) {
+            throw new IllegalArgumentException("채널 이름이 존재합니다. 다시 입력해주세요.");
+        }
 
         Channel newChannel = new Channel(
                 request.getChannelType(),
@@ -33,7 +39,6 @@ public class BasicChannelService implements ChannelService {
                 request.getChannelName(),
                 request.getAdminId());
 
-        messageRepository.save(new Message(newChannel.getId(), newChannel.getId(), ReceiveType.CHANNEL,"채널이 생성되었습니다."));
         channelRepository.save(newChannel);
 
         // 최근 메시지가 없으므로 채널 생성 시간으로 저장
@@ -42,7 +47,10 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public PrivateChannelResponseDto createPrivateChannel(CreateChannelRequestDto request) {
-        existsByName(request.getChannelName()); // 이름 중복 저장 불가
+        // 이름 중복 저장 불가
+        if(channelRepository.existsByName(request.getChannelName())) {
+            throw new IllegalArgumentException("채널 이름이 존재합니다. 다시 입력해주세요.");
+        }
 
         Channel newChannel = new Channel(
                 request.getChannelType(),
@@ -50,7 +58,6 @@ public class BasicChannelService implements ChannelService {
                 request.getChannelName(),
                 request.getAdminId());
 
-        messageRepository.save(new Message(newChannel.getId(), newChannel.getId(), ReceiveType.CHANNEL,"채널이 생성되었습니다."));
         channelRepository.addChannelIdForUser(newChannel.getId(), request.getAdminId()); // 유저 객체에 속한 채널 UUID 리스트 저장
         channelRepository.save(newChannel);
         readStatusRepository.save(new ReadStatus(request.getAdminId(), newChannel.getId()));
@@ -59,7 +66,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void addMember(UpdateChannelRequestDto request){
-        Channel channel = channelRepository.findById(request.getChannelId());
+        Channel channel = channelRepository.findById(request.getChannelId())
+                .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다."));
 
         if(channel.getMemberIds().contains(request.getUserid())){
             throw new IllegalArgumentException("이미 멤버가 채널에 속해있습니다.");
@@ -77,7 +85,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponseDto getChannel(UUID id){
-        Channel channel = channelRepository.findById(id);
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다."));
         Instant lastedMessageAt = messageRepository.searchLastedMessageTime(id);
         return channel.getVisibility() == ChannelVisibility.PRIVATE
                 ? PrivateChannelResponseDto.from(channel, lastedMessageAt)
@@ -93,7 +102,7 @@ public class BasicChannelService implements ChannelService {
                 .sorted(Comparator.comparing(ChannelResponseDto::getChannelType)
                         .thenComparing(c -> c.getChannelName())
                 )
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -104,7 +113,7 @@ public class BasicChannelService implements ChannelService {
                                 : ChannelResponseDto.from(c, messageRepository.searchLastedMessageTime(c.getId()))
                 )
                 .sorted(Comparator.comparing(c -> c.getChannelName()))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     // Public 채널 목록은 전체 조회 + Private 채널은 User가 참여한 채널만 조회
@@ -126,7 +135,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void updateAdmin(UpdateChannelRequestDto request) {
-        Channel channel = channelRepository.findById(request.getChannelId());
+        Channel channel = channelRepository.findById(request.getChannelId())
+                .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다."));
 
         if (!channel.getMemberIds().contains(request.getUserid())) {
             throw new IllegalArgumentException("그 유저는 이 채널에 속해 있지 않아 관리자로 변경할 수 없습니다.");
@@ -134,18 +144,30 @@ public class BasicChannelService implements ChannelService {
             throw new IllegalArgumentException("그 유저는 이미 이 채널의 관리자 입니다.");
         }
 
-        channelRepository.updateAdmin(request.getChannelId(), request.getUserid());
+        channel.setAdmin(request.getUserid());
+        channelRepository.update(channel);
     }
 
     @Override
-    public void updateName(UUID channelId, String name) {
-        existsByName(name);
-        channelRepository.updateName(channelId, name);
+    public void updateName(UpdateChannelNameRequestDto request) {
+        Channel channel = channelRepository.findById(request.getChannelId())
+                .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다."));
+
+        if (channelRepository.existsByName(request.getName())) {
+            throw new IllegalArgumentException("채널 이름이 존재합니다. 다시 입력해주세요.");
+        }
+
+        channel.setChannelName(request.getName());
+        channelRepository.update(channel);
     }
 
     @Override
     public void deleteChannel(UUID channelId, UUID userId) {
-        Channel channel = channelRepository.findById(channelId);
+        if(!userRepository.isExist(userId)) {
+            throw new IllegalArgumentException("유저가 존재하지 않습니다.");
+        }
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다."));
 
         if(!userId.equals(channel.getAdminId())) {
             throw new IllegalArgumentException("관리자가 아니므로 채널을 삭제할 수 없습니다.");
@@ -158,7 +180,11 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteChannelMember(UUID channelId, UUID requesterId, UUID targetId) {
-        Channel channel = channelRepository.findById(channelId);
+        if(!userRepository.isExist(targetId)) {
+            throw new IllegalArgumentException("유저가 존재하지 않습니다.");
+        }
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다."));
 
         //삭제 요청 유저와 삭제될 유저가 동일하지 않으면
         if(!requesterId.equals(targetId)){
@@ -177,20 +203,14 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public boolean isUserJoinedChannel(UUID userId, UUID channelId){
-        return channelRepository.findByUser(userId).stream()
-                .anyMatch(c -> channelId.equals(c.getId()));
-    }
-
-    @Override
-    public boolean existsById(UUID channelId) {
-        return channelRepository.findAll().stream().anyMatch(c -> channelId.equals(c.getId()));
-    }
-
-    @Override
-    public void existsByName(String name) {
-        if (channelRepository.findAll().stream().anyMatch(c -> c.getChannelName().equals(name))) {
-            throw new IllegalArgumentException("채널 이름이 존재합니다. 다시 입력해주세요.");
+    public boolean isChannelUnavailableForUser(UUID userId, UUID channelId) {
+        // 채널이 존재하거나 유저가 채널에 속해있다면 false를 반환
+        if(channelRepository.existsById(channelId) || channelRepository.isUserJoinedChannel(userId, channelId)) {
+            return false;
         }
+
+        return true;
     }
+
+
 }

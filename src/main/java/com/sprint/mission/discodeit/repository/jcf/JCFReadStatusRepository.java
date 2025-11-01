@@ -14,22 +14,25 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
-        return Optional.ofNullable(readStatusStore.get(id))
-                .orElseThrow(() -> new IllegalStateException("저장된 정보가 없습니다."));
+    public Optional<ReadStatus> findById(UUID id) {
+        return Optional.ofNullable(readStatusStore.get(id));
     }
 
     @Override
-    public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
+    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
         return readStatusStore.values().stream()
                 .filter(r -> r.getUserId().equals(userId) && r.getChannelId().equals(channelId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("유저가 해당 채널에 속해있지 않습니다."));
+                .findFirst();
     }
 
     @Override
     public List<ReadStatus> findAll() {
         return new ArrayList<>(readStatusStore.values());
+    }
+
+    @Override
+    public void update(ReadStatus readStatus) {
+        readStatusStore.replace(readStatus.getId(), readStatus);
     }
 
     @Override

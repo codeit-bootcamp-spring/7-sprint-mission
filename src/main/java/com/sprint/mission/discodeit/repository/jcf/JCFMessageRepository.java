@@ -29,20 +29,18 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID id) {
-        return Optional.ofNullable(messageStore.get(id))
-                .orElseThrow(() -> new IllegalArgumentException("해당 UUID를 가진 메시지가 존재하지 않습니다."));
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(messageStore.get(id));
     }
 
     @Override
     public void update(Message updatedMessage) {
-        messageStore.put(updatedMessage.getId(), updatedMessage);
+        messageStore.replace(updatedMessage.getId(), updatedMessage);
     }
 
     @Override
     public void deleteById(UUID id) {
-        Optional.ofNullable(messageStore.remove(id))
-                .orElseThrow(() -> new IllegalArgumentException("삭제할 메시지가 존재하지 않습니다."));
+        messageStore.remove(id);
     }
 
     @Override
@@ -59,11 +57,13 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Instant searchLastedMessageTime(UUID channelId) {
+        // 채널의 마지막 메시지를 보낸 시간 리턴
+        // 메시지를 저장하지 않은 채널의 경우 null을 리턴 : Printer에서 최근 시간 대신 다른 메시지를 출력
         return findAll().stream()
                 .filter(m -> channelId.equals(m.getReceiverId()) && m.getReceiveType() == ReceiveType.CHANNEL)
                 .map(m -> m.getUpdatedAt())
                 .sorted(Collections.reverseOrder())
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("채널에 메시지가 존재하지 않습니다."));
+                .get();
     }
 }

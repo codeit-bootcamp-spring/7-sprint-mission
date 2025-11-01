@@ -53,9 +53,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
-        return Optional.ofNullable(contentStore.get(id))
-                .orElseThrow(() -> new IllegalStateException("이미지 또는 파일이 존재하지 않습니다."));
+    public Optional<BinaryContent> findById(UUID id) {
+        return Optional.ofNullable(contentStore.get(id));
     }
 
     @Override

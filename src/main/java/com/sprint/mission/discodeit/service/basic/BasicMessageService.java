@@ -120,7 +120,8 @@ public class BasicMessageService implements MessageService {
      */
     @Override
     public void updateMessage(UpdateMessageRequestDto request) {
-        Message message = messageRepository.findById(request.getId());
+        Message message = messageRepository.findById(request.getId())
+                .orElseThrow(() -> new IllegalStateException("메시지가 존재하지 않습니다."));
         message.setContent(request.getContent());
         messageRepository.update(message);
     }
@@ -130,7 +131,8 @@ public class BasicMessageService implements MessageService {
      */
     @Override
     public void deleteMessage(UUID id) {
-        Message msg = messageRepository.findById(id);
+        Message msg = messageRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("메시지가 존재하지 않습니다."));
         binaryContentRepository.deleteByIds(msg.getAttachmentIds()); // 메시지와 관련된 파일들 삭제
         messageRepository.deleteById(id);
     }

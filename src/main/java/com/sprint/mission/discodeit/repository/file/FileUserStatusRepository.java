@@ -55,9 +55,8 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findById(UUID id) {
-        return Optional.ofNullable(userStatusStore.get(id))
-                .orElseThrow(() -> new IllegalStateException("로그인 시간을 저장할 유저가 존재하지 않습니다."));
+    public Optional<UserStatus> findById(UUID id) {
+        return Optional.ofNullable(userStatusStore.get(id));
     }
 
     @Override
@@ -66,11 +65,8 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void updateLoginTime(UUID id) {
-        UserStatus status = findById(id);
-        status.setUpdatedAt();
-
-        userStatusStore.put(id, status);
+    public void update(UserStatus status) {
+        userStatusStore.replace(status.getUserId(), status);
         saveUsersToFile();
     }
 

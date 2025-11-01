@@ -65,7 +65,12 @@ public class Printer {
 
     public static void printChannelInfo(ChannelResponseDto channel, int num){
         System.out.printf("%d. %s(%s, %s)\n", num + 1, channel.getChannelName(), channel.getChannelType(), channel.getVisibility());
-        System.out.printf("   └ 최근 대화: %s\n", TimeConvert.time(channel.getLastedMessageAt()));
+        Instant lastedMsgAt = channel.getLastedMessageAt();
+        Optional.ofNullable(lastedMsgAt).ifPresentOrElse(
+                value -> System.out.printf("   └ 최근 대화: %s\n", TimeConvert.time(value)),
+                () -> System.out.println("   └ 대화가 없습니다. 첫 대화를 시작해보세요.\n")
+        );
+
     }
 
     public static void printChannelMember(UserService userService, ChannelService channelService, UUID channelId){

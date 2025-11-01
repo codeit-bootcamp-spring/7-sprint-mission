@@ -35,22 +35,18 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteChannelIdForUser(UUID channelId, UUID userId) {
-        Set<UUID> channelIds = Optional.ofNullable(joinedChannels.get(userId))
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+        Set<UUID> channelIds = joinedChannels.get(userId);
 
         channelIds.remove(channelId);
         joinedChannels.put(userId, channelIds); // 채널 삭제 후 저장
     }
 
     @Override
-    public void save(Channel channel) {
-        channelStore.put(channel.getId(), channel);
-    }
+    public void save(Channel channel) { channelStore.put(channel.getId(), channel); }
 
     @Override
-    public Channel findById(UUID id) {
-        return Optional.ofNullable(channelStore.get(id))
-                .orElseThrow(() -> new IllegalArgumentException("해당 UUID를 가진 채널이 존재하지 않습니다."));
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(channelStore.get(id));
     }
 
     @Override
@@ -73,26 +69,18 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void updateName(UUID id, String name) {
-        Channel channel = findById(id);
-        channel.setChannelName(name);
-        channelStore.put(id, channel);
+    public void update(Channel channel) {
+        channelStore.replace(channel.getId(), channel);
     }
 
     @Override
-    public void updateAdmin(UUID id, UUID adminId) {
-        Channel channel = findById(id);
-        channel.setAdmin(adminId);
-        channelStore.put(id, channel);
-    }
-
-    @Override
-    public void deleteById(UUID id) {
+    public void deleteById(UUID channelId) {
         // 삭제되는 채널 id를 유저들이 속해 있는 채널 리스트(joinedChannels)에서도 삭제
-        findById(id).getMemberIds()
-                .forEach(memberId -> deleteChannelIdForUser(id, memberId));
+        findById(channelId).ifPresent(channel -> channel.getMemberIds()
+                .forEach(memberId -> deleteChannelIdForUser(channelId, memberId))
+        );
 
-        channelStore.remove(id);
+        channelStore.remove(channelId);
     }
 
     @Override
@@ -100,5 +88,21 @@ public class JCFChannelRepository implements ChannelRepository {
         deleteChannelIdForUser(channel.getId(), targetId); // 강퇴된 유저가 가진 채널 목록에서 채널 UUID 삭제
         channel.delMember(targetId); // 채널에서 강퇴된 유저 삭제
         save(channel); // 변경된 채널 정보 저장
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return findAll().stream().anyMatch(c -> c.getChannelName().equals(name));
+    }
+
+    @Override
+    public boolean existsById(UUID channelId) {
+        return channelStore.containsKey(channelId);
+    }
+
+    @Override
+    public boolean isUserJoinedChannel(UUID userId, UUID channelId){
+        return joinedChannels.get(userId).stream()
+                .anyMatch(id -> channelId.equals(id));
     }
 }

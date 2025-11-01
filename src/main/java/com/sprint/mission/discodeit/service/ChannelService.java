@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.channel.request.CreateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelNameRequestDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -54,7 +55,7 @@ public interface ChannelService {
     /**
      * 채널 이름 변경
      */
-    void updateName(UUID channelId, String name);
+    void updateName(UpdateChannelNameRequestDto request);
 
     /**
      * 채널 삭제 (관리자 권한 필요)
@@ -66,18 +67,5 @@ public interface ChannelService {
      */
     void deleteChannelMember(UUID channelId, UUID requesterId, UUID targetId);
 
-    /**
-     * 유저가 채널에 속해있는지 확인
-     */
-    boolean isUserJoinedChannel(UUID userId, UUID channelId);
-
-    /**
-     * 채널 존재 여부 확인
-     */
-    boolean existsById(UUID channelId);
-
-    /**
-     * 채널 이름 중복 확인
-     */
-    void existsByName(String name);
+    boolean isChannelUnavailableForUser(UUID userId, UUID channelId);
 }

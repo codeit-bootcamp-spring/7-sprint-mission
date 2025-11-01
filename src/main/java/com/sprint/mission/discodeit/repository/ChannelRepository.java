@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -24,7 +25,7 @@ public interface ChannelRepository {
     /**
      * UUID로 채널 조회
      */
-    Channel findById(UUID id);
+    Optional<Channel> findById(UUID id);
 
     /**
      * 사용자로 채널 조회
@@ -41,20 +42,12 @@ public interface ChannelRepository {
      */
     List<Channel> findAll();
 
-    /**
-     * 채널 이름 업데이트
-     */
-    void updateName(UUID id, String name);
-
-    /**
-     * 채널 관리자 업데이트
-     */
-    void updateAdmin(UUID id, UUID adminId);
+    void update(Channel channel);
 
     /**
      * 채널 삭제
      */
-    void deleteById(UUID id);
+    void deleteById(UUID channelId);
 
     /**
      * 사용자가 속한 채널 UUID 추가
@@ -70,4 +63,13 @@ public interface ChannelRepository {
      * 채널에서 멤버 삭제
      */
     void deleteMember(Channel channel, UUID targetId);
+
+    /**
+     * 채널 이름 중복 확인
+     */
+    boolean existsByName(String name);
+
+    boolean existsById(UUID channelId);
+
+    boolean isUserJoinedChannel(UUID userId, UUID channelId);
 }
