@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.facade.user;
 
+import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.user.response.UserSimpleInfoRes;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -25,8 +26,10 @@ public class UserOverviewFacade {
 
     //변환 메소드
     private UserSimpleInfoRes mapToSimpleInfo(User user) {
-        byte[] profileData = binaryContentService.findById(user.getProfileId()).getData();
+        BinaryContentInfoRes profileImg = BinaryContentInfoRes.from(
+                binaryContentService.findById(user.getProfileId())
+        );
         boolean online = userStatusService.findByUserId(user.getId()).IsOnline();
-        return UserSimpleInfoRes.from(user, profileData, online);
+        return UserSimpleInfoRes.from(user, profileImg, online);
     }
 }
