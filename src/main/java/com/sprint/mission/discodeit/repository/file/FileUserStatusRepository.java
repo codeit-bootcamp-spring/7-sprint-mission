@@ -41,26 +41,46 @@ implements UserStatusRepository {
 
     //online 시간 update
     @Override
-    public UserStatus updateOnlineAt(UUID id) {
+    public void updateOnlineAt(UUID id) {
         UserStatus userStatus = loadFromFile(id);
         if(userStatus == null){
             throw new RuntimeException("UserStatus with id=" + id + " not found");
         }
         userStatus.updateOnlineAt();
         saveToFile(id, userStatus);
-        return userStatus;
     }
 
     //offline 시간 update
     @Override
-    public UserStatus updateOfflineAt(UUID id) {
+    public void updateOfflineAt(UUID id) {
         UserStatus userStatus = loadFromFile(id);
         if(userStatus == null){
             throw new RuntimeException("UserStatus with id=" + id + " not found");
         }
         userStatus.updateOfflineAt();
         saveToFile(id, userStatus);
-        return userStatus;
+    }
+
+    @Override
+    public void update(UUID id) {
+        UserStatus userStatus = loadFromFile(id);
+        if(userStatus == null){
+             throw new RuntimeException("UserStatus with id=" + id + " not found");
+         }
+        userStatus.updateOnline();
+        saveToFile(id, userStatus);
+    }
+
+    @Override
+    public void updateByUserId(UUID userId) {
+        UserStatus userStatus =  findAllFiles().stream()
+                .filter(us -> us.getUserId().equals(userId))
+                .findFirst().orElseThrow(
+                        () -> new RuntimeException("UserStatus with userId=" + userId + " not found")
+                );
+
+        userStatus.updateOnline();
+        saveToFile(userStatus.getId(), userStatus);
     }
 
     //삭제

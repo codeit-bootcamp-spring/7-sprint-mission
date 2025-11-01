@@ -10,7 +10,9 @@ public interface UserStatusRepository {
     UserStatus findById(UUID id);
     UserStatus findByUserId(UUID userId);
     List<UserStatus> findAll();
-    UserStatus updateOnlineAt(UUID id);
-    UserStatus updateOfflineAt(UUID id);
+    void updateOnlineAt(UUID id);
+    void updateOfflineAt(UUID id);
+    void update(UUID id);
+    void updateByUserId(UUID userId);
     UserStatus delete(UUID userId);
 }

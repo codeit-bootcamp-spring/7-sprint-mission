@@ -40,13 +40,25 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus updateOnlineAt(UUID id) {
-        return findById(id).updateOnlineAt();
+    public void updateOnlineAt(UUID id) {
+        findById(id).updateOnlineAt();
     }
 
     @Override
-    public UserStatus updateOfflineAt(UUID id) {
-        return findById(id).updateOfflineAt();
+    public void updateOfflineAt(UUID id) {
+        findById(id).updateOfflineAt();
+    }
+
+    @Override
+    public void update(UUID id) {
+        UserStatus userStatus = findById(id);
+        userStatus.updateOnline();
+    }
+
+    @Override
+    public void updateByUserId(UUID userId) {
+        UserStatus userStatus = findByUserId(userId);
+        userStatus.updateOnline();
     }
 
     @Override

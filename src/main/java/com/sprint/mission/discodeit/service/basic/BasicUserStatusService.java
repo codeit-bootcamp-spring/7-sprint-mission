@@ -29,13 +29,23 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus updateOnlineAt(UUID userId) {
-        return userStatusRepository.updateOnlineAt(userId);
+    public void updateOnlineAt(UUID userId) {
+        userStatusRepository.updateOnlineAt(userId);
     }
 
     @Override
-    public UserStatus updateOfflineAt(UUID userId) {
-        return userStatusRepository.updateOfflineAt(userId);
+    public void updateOfflineAt(UUID userId) {
+        userStatusRepository.updateOfflineAt(userId);
+    }
+
+    @Override
+    public void update(UUID id) {
+        userStatusRepository.update(id);
+    }
+
+    @Override
+    public void updateByUserId(UUID userId) {
+        userStatusRepository.updateByUserId(userId);
     }
 
     @Override

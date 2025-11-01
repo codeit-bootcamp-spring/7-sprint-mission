@@ -8,7 +8,9 @@ public interface UserStatusService {
     UserStatus create(UserStatus userStatus);
     UserStatus findById(UUID id);
     UserStatus findByUserId(UUID userId);
-    UserStatus updateOnlineAt(UUID userId);
-    UserStatus updateOfflineAt(UUID userId);
+    void updateOnlineAt(UUID userId);
+    void updateOfflineAt(UUID userId);
+    void update(UUID id);
+    void updateByUserId(UUID userId);
     UserStatus delete(UUID id);
 }
