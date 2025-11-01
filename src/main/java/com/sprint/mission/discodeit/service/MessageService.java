@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
