@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -64,7 +65,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusResponseDto updateUserStatus(UpdateUserStatusDto updateDto) {
         UserStatus userStatus = getUserStatus(updateDto.userStatusId());
-        userStatus.statusUpdate(updateDto.newAccessTime());
+        userStatus.statusUpdate(Instant.now());
         UserStatus userstatus = userStatusRepository.save(userStatus);
         return UserStatusResponseDto.from(userstatus);
     }
@@ -73,7 +74,7 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatusResponseDto updateByUserId(UpdateUserIdStatusDto updateDto) {
         UserStatus user = userStatusRepository.findByUserId(updateDto.userId())
                 .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다."));
-        user.statusUpdate(updateDto.newAccessTime());
+        user.statusUpdate(Instant.now());
         UserStatus userstatus = userStatusRepository.save(user);
         return UserStatusResponseDto.from(userstatus);
     }
