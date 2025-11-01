@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.time.Instant;
 import java.util.List;
@@ -67,13 +68,12 @@ public class Printer {
         System.out.printf("   └ 최근 대화: %s\n", TimeConvert.time(channel.getLastedMessageAt()));
     }
 
-    public static void printChannelMember(ChannelService channelService, UUID channelId){
+    public static void printChannelMember(UserService userService, ChannelService channelService, UUID channelId){
         PrivateChannelResponseDto channel = (PrivateChannelResponseDto) channelService.getChannel(channelId);
-        UserRepository userRepository = FileUserRepository.getInstance();
 
         System.out.println("채널 멤버 조회");
-        List<User> channelMember = channel.getMemberIds().stream()
-                .map(id -> userRepository.findById(id))
+        List<UserResponseDto> channelMember = channel.getMemberIds().stream()
+                .map(id -> userService.getUserById(id))
                 .toList();
 
         for (int i = 0; i < channelMember.size(); i++) {
