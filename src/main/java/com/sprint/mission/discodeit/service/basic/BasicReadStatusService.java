@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusInfoRes;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -15,6 +16,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
 
+    // ===== 🏗️ Domain Logic (Facade 용)  =====
     @Override
     public ReadStatus create(ReadStatus readStatus) {
         return readStatusRepository.save(readStatus);
@@ -22,7 +24,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus findById(UUID id) {
-        return readStatusRepository.findById(id);
+        return readStatusRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("ReadStatus not found. id: " + id));
     }
 
     @Override
@@ -31,17 +34,22 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus delete(UUID id) {
-        return readStatusRepository.delete(id);
+    public void delete(UUID id) {
+        readStatusRepository.delete(id);
+    }
+
+    // ===== 🎯 Controller Direct (DTO 반환) =====
+    @Override
+    public List<ReadStatusInfoRes> findAllByChannelId(UUID channelId){
+        return readStatusRepository.findAllByChannelId(channelId).stream()
+                .map(ReadStatusInfoRes::from)
+                .toList();
     }
 
     @Override
-    public List<ReadStatus> findAllByChannelId(UUID channelId){
-        return readStatusRepository.findAllByChannelId(channelId);
-    }
-
-    @Override
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
+    public List<ReadStatusInfoRes> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAllByUserId(userId).stream()
+                .map(ReadStatusInfoRes::from)
+                .toList();
     }
 }

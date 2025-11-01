@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,8 +20,8 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus findById(UUID statusId) {
-        return data.get(statusId);
+    public Optional<ReadStatus> findById(UUID statusId) {
+        return Optional.ofNullable(data.get(statusId));
     }
 
     @Override
@@ -43,7 +44,12 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus delete(UUID statusId) {
-        return data.remove(statusId);
+    public void delete(UUID statusId) {
+        data.remove(statusId);
+    }
+
+    @Override
+    public boolean existsById(UUID statusId) {
+        return data.containsKey(statusId);
     }
 }

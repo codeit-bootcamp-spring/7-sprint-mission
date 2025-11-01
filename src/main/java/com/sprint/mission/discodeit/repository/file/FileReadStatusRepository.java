@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileReadStatusRepository extends BaseFileRepository<ReadStatus>
@@ -21,7 +22,7 @@ implements ReadStatusRepository {
 
     //단일조회
     @Override
-    public ReadStatus findById(UUID statusId) {
+    public Optional<ReadStatus> findById(UUID statusId) {
         return loadFromFile(statusId);
     }
 
@@ -41,19 +42,20 @@ implements ReadStatusRepository {
 
     @Override
     public void update(UUID statusId) {
-        ReadStatus readStatus = loadFromFile(statusId);
-        if(readStatus == null) {
-            throw new RuntimeException("ReadStatus with id=" + statusId + " not found");
-        }
-        readStatus.update();
-        saveToFile(statusId, readStatus);
+        loadFromFile(statusId).ifPresent(readStatus ->{
+            readStatus.update();
+            saveToFile(statusId, readStatus);
+        });
     }
 
     //삭제
     @Override
-    public ReadStatus delete(UUID statusId) {
-        ReadStatus readStatus = loadFromFile(statusId);
+    public void delete(UUID statusId) {
         deleteFile(statusId);
-        return readStatus;
+    }
+
+    @Override
+    public boolean existsById(UUID statusId) {
+        return fileExistsById(statusId);
     }
 }
