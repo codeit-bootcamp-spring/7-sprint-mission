@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.mapper;
+package com.sprint.mission.discodeit.facade.mapper;
 
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelPrivateInfoRes;
