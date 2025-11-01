@@ -15,6 +15,12 @@ public class BasicMessageService implements MessageService {
     //레포지토리
     private final MessageRepository messageRepository;
 
+    //메세지를 id 로 참음
+    @Override
+    public Message findById(UUID id) {
+        return messageRepository.findById(id);
+    }
+
     //한 유저가 말한 메세지들을 조회
     @Override
     public List<Message> findAllByUser(UUID userId) {
@@ -47,8 +53,8 @@ public class BasicMessageService implements MessageService {
     
     //메세지 수정
     @Override
-    public Message update(UUID id, String content) {
-        return messageRepository.update(id, content);
+    public Message update(UUID id, String content, List<UUID> attachmentIds) {
+        return messageRepository.update(id, content, attachmentIds);
     }
 
     //메세지 삭제
@@ -56,4 +62,6 @@ public class BasicMessageService implements MessageService {
     public Message delete(UUID id) {
         return messageRepository.delete(id);
     }
+
+
 }

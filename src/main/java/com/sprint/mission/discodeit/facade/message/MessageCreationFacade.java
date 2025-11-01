@@ -36,3 +36,4 @@ public class MessageCreationFacade {
         return messageService.create(MessageFactory.create(req, attachments));
     }
 }
+

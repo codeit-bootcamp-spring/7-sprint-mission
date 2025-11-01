@@ -12,7 +12,7 @@ public interface MessageRepository {
     List<Message> findByContentContaining(String searchText);
     Message findById(UUID id);
     Message save(Message message);
-    Message update(UUID id, String content);
+    Message update(UUID id, String content, List<UUID> attachmentIds);
     Message delete(UUID id);
     Message findLastMessageByChannelId(UUID channelId);
 }

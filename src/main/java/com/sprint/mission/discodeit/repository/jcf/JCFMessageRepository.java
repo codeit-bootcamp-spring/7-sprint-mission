@@ -54,8 +54,8 @@ public class JCFMessageRepository implements MessageRepository {
 
     //메세지 수정
     @Override
-    public Message update(UUID id, String content) {
-        return findById(id).update(content);
+    public Message update(UUID id, String content, List<UUID> attachmentIds) {
+        return findById(id).update(content, attachmentIds);
     }
 
     //메세지 삭제

@@ -12,6 +12,7 @@ public interface MessageService {
     List<Message> searchMessagesByContent(String searchText);
     Message findLastMessageByChannelId(UUID channelId);
     Message create(Message message);
-    Message update(UUID id, String content);
+    Message update(UUID id, String content, List<UUID> attachmentIds);
     Message delete(UUID id);
+    Message findById(UUID id);
 }

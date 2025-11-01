@@ -56,12 +56,12 @@ public class FileMessageRepository extends BaseFileRepository<Message> implement
 
     //메세지 수정
     @Override
-    public Message update(UUID id, String content) {
+    public Message update(UUID id, String content, List<UUID> attachmentIds) {
         Message message = loadFromFile(id);
         if(message == null){
             throw new RuntimeException("Message with id " + id + " not found");
         }
-        message.update(content);
+        message.update(content, attachmentIds);
         saveToFile(message.getId(), message);
         return message;
     }

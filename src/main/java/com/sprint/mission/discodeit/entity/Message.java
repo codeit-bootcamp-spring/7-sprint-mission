@@ -41,9 +41,4 @@ public class Message extends BaseEntity {
         this.attachmentIds = attachmentIds;
         return this;
     }
-
-    public Message update(String content){
-        update(content, this.attachmentIds);
-        return this;
-    }
 }
