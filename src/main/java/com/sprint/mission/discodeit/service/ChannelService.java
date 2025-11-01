@@ -13,7 +13,7 @@ public interface ChannelService {
     Channel create(ChannelCreateSecReq req);
     void update(UUID id,
                    ChannelUpdateReq req);
-    Channel delete(UUID id);
+    void delete(UUID id);
     List<Channel> findAllByUserId(UUID userId);
     Channel findByName(String name);
     Channel findById(UUID id);

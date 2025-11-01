@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,29 +36,29 @@ public class JCFChannelRepository implements ChannelRepository {
 
     //채널 ID 조회
     @Override
-    public Channel findById(UUID id) {
-        return data.get(id);
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     
     //채널 이름
     @Override
-    public Channel findByName(String name) {
+    public Optional<Channel> findByName(String name) {
         return findAll().stream()
                 .filter(ch -> ch.getName().equals(name))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     //수정
     @Override
-    public Channel update(UUID id, String name, String description) {
-        return findById(id).update(name, description);
+    public void update(UUID id, String name, String description) {
+        data.get(id).update(name, description);
     }
 
     //삭제
     @Override
-    public Channel delete(UUID id) {
-        return data.remove(id);
+    public void delete(UUID id) {
+        data.remove(id);
     }
 
     //유저가 해당 채널에 포함되어 있는지 확인
@@ -66,5 +67,10 @@ public class JCFChannelRepository implements ChannelRepository {
         return findAll().stream()
                 .filter(ch -> ch.getId().equals(channelId))
                 .anyMatch(ch -> ch.getUsers().contains(userId));
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return data.containsKey(id);
     }
 }

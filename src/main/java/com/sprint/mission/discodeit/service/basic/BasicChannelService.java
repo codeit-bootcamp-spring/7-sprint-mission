@@ -36,8 +36,11 @@ public class BasicChannelService implements ChannelService {
 
     //채널 삭제
     @Override
-    public Channel delete(UUID id) {
-        return channelRepository.delete(id);
+    public void delete(UUID id) {
+        if(!channelRepository.existsById(id)){
+            throw new RuntimeException("Channel not found. id: "+ id);
+        }
+        channelRepository.delete(id);
     }
 
     //채널 목록 : Public 인 경우 전부, Private 인 경우 자신이 참여한 채널만
@@ -52,20 +55,24 @@ public class BasicChannelService implements ChannelService {
     //채널명으로 찾기
     @Override
     public Channel findByName(String name) {
-        return channelRepository.findByName(name);
+        return channelRepository.findByName(name).orElseThrow(() ->
+                new RuntimeException("Channel not found. name: " + name));
     }
 
     //채널 id 로 조회
     @Override
     public Channel findById(UUID id) {
-        return channelRepository.findById(id);
+        return channelRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Channel not found. id: " + id));
     }
 
     // ===== 🔧 Controller Direct (단일 도메인 / void) =====
     //채널 수정
     @Override
     public void update(UUID id, ChannelUpdateReq req) {
-        Channel channel = channelRepository.findById(id);
+        Channel channel = channelRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Channel not found. id: "+ id)
+        );
         if (channel.getPublicType() == ChannelType.PRIVATE){
             throw new RuntimeException("Cannot update private channel");
         }

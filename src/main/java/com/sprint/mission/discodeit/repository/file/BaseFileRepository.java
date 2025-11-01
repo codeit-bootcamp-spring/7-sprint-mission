@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class BaseFileRepository<T extends Serializable> {
@@ -49,15 +50,18 @@ public abstract class BaseFileRepository<T extends Serializable> {
     }
 
     //파일에서 Obejct를 읽고 해당 Object 를 return 한다.
-    protected T loadFromFile(UUID id) {
+    protected Optional<T> loadFromFile(UUID id) {
         Path path = resolvePath(id);
-        if (!Files.exists(path)) return null;
+
+        if (!Files.exists(path)) {return Optional.empty();}
+
         try (
                 FileInputStream fis = new FileInputStream(path.toFile());
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 ObjectInputStream ois = new ObjectInputStream(bis)
         ) {
-            return (T) ois.readObject();
+            T obj = (T) ois.readObject();
+            return Optional.ofNullable(obj); // 혹시 모를 null 대응
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("Failed to load " + path, e);
         }
@@ -77,7 +81,10 @@ public abstract class BaseFileRepository<T extends Serializable> {
         List<T> list = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(DIRECTORY, "*" + EXTENSION)) {
             for (Path path : stream) {
-                list.add(loadFromFile(UUID.fromString(path.getFileName().toString().replace(EXTENSION, ""))));
+                UUID id = UUID.fromString(
+                        path.getFileName().toString().replace(EXTENSION, "")
+                );
+                loadFromFile(id).ifPresent(list::add);
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to read all files in " + DIRECTORY, e);
@@ -87,6 +94,6 @@ public abstract class BaseFileRepository<T extends Serializable> {
 
     //해당 id 가 존재하는지 확인한다
     protected boolean fileExistsById(UUID id){
-        return loadFromFile(id) != null;
+        return loadFromFile(id).isPresent();
     }
 }

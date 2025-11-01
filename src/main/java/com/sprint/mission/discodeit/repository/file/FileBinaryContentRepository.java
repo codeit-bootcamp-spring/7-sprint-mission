@@ -28,7 +28,7 @@ public class FileBinaryContentRepository extends BaseFileRepository<BinaryConten
     //id 로 찾기
     @Override
     public Optional<BinaryContent> findById(UUID binaryId) {
-        return Optional.ofNullable(loadFromFile(binaryId));
+        return loadFromFile(binaryId);
     }
 
     //삭제
