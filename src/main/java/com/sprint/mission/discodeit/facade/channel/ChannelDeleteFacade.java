@@ -18,7 +18,7 @@ public class ChannelDeleteFacade {
     public void deleteChannel(UUID channelId){
         readStatusService.findAllByChannelId(channelId)
                 .forEach(readStatus -> readStatusService.delete(readStatus.getId()));
-        messageService.findAllByChannel(channelId)
+        messageService.findAllByChannelId(channelId)
                 .forEach(message -> messageService.delete(message.getId()));
         channelService.delete(channelId);
     }
