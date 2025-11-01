@@ -22,7 +22,8 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent findById(UUID id) {
-        return binaryContentRepository.findById(id);
+        return binaryContentRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("바이너리 컨텐츠 입력값 잘못된 듯? "+ id));
     }
 
     @Override
@@ -31,7 +32,10 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContent delete(UUID id) {
-        return binaryContentRepository.delete(id);
+    public void delete(UUID id) {
+        if(!binaryContentRepository.existsById(id)){
+            throw new RuntimeException("BinaryContent not found. id: "+ id);
+        }
+        binaryContentRepository.delete(id);
     }
 }

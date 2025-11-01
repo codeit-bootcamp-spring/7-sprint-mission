@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,17 +26,18 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
         return data.values().stream().toList();
     }
 
-    //id 로 찾기
+    //id로 찾기
     @Override
-    public BinaryContent findById(UUID id) {
-        return data.get(id);
+    public Optional<BinaryContent> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     //삭제
     @Override
-    public BinaryContent delete(UUID id) {
-        BinaryContent binaryContent = findById(id);
-        data.remove(id);
-        return binaryContent;
+    public void delete(UUID id) {data.remove(id);}
+
+    @Override
+    public boolean existsById(UUID id) {
+        return data.containsKey(id);
     }
 }

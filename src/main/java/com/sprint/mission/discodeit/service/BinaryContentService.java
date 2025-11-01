@@ -9,5 +9,5 @@ public interface BinaryContentService {
     BinaryContent create(BinaryContent binaryContent);
     BinaryContent findById(UUID id);
     List<BinaryContent> findAll();
-    BinaryContent delete(UUID id);
+    void delete(UUID id);
 }

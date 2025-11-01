@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileBinaryContentRepository extends BaseFileRepository<BinaryContent> implements BinaryContentRepository {
@@ -18,20 +19,26 @@ public class FileBinaryContentRepository extends BaseFileRepository<BinaryConten
         return binaryContent;
     }
 
+    //바이너리 컨텐츠 목록
     @Override
     public List<BinaryContent> findAll() {
         return findAllFiles();
     }
 
+    //id 로 찾기
     @Override
-    public BinaryContent findById(UUID binaryId) {
-        return loadFromFile(binaryId);
+    public Optional<BinaryContent> findById(UUID binaryId) {
+        return Optional.ofNullable(loadFromFile(binaryId));
+    }
+
+    //삭제
+    @Override
+    public void delete(UUID binaryId) {
+        deleteFile(binaryId);
     }
 
     @Override
-    public BinaryContent delete(UUID binaryId) {
-        BinaryContent binaryContent = loadFromFile(binaryId);
-        deleteFile(binaryId);
-        return binaryContent;
+    public boolean existsById(UUID id) {
+        return fileExistsById(id);
     }
 }

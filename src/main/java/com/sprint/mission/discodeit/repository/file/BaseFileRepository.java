@@ -84,4 +84,9 @@ public abstract class BaseFileRepository<T extends Serializable> {
         }
         return list;
     }
+
+    //해당 id 가 존재하는지 확인한다
+    protected boolean fileExistsById(UUID id){
+        return loadFromFile(id) != null;
+    }
 }
