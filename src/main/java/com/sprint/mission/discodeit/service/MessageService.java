@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface MessageService {
     List<Message> findAllByUser(UUID userId);
-    List<Message> findAllByChannel(UUID channelId);
+    List<Message> findAllByChannelId(UUID channelId);
     List<Message> searchMessagesByContent(String searchText);
     Message findLastMessageByChannelId(UUID channelId);
     Message create(Message message);

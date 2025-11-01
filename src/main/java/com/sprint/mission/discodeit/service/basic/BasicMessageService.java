@@ -23,7 +23,7 @@ public class BasicMessageService implements MessageService {
 
     //채널 안의 메세지들을 모두 조회
     @Override
-    public List<Message> findAllByChannel(UUID channelId) {
+    public List<Message> findAllByChannelId(UUID channelId) {
         return messageRepository.findAllByChannelId(channelId);
     }
 
