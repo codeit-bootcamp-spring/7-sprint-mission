@@ -4,6 +4,5 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record UpdateUserIdStatusDto (
-    Instant newAccessTime,
     UUID userId
 ) {}
