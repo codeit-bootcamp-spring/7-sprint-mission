@@ -63,8 +63,8 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResponseDto updateMessage(UUID messageId, UpdateMessageDto newContents) {
-        Message message = messageRepository.findById(messageId)
+    public MessageResponseDto updateMessage(UpdateMessageDto newContents) {
+        Message message = messageRepository.findById(newContents.messageId())
                 .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
 
         String newContent = newContents.newContent();

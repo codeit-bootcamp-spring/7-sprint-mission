@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.response.UserStatusResponseDto;
+import com.sprint.mission.discodeit.dto.update.UpdateUserIdStatusDto;
 import com.sprint.mission.discodeit.dto.update.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.request.CreateUserStatusRequestDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -61,19 +62,19 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResponseDto updateUserStatus(UUID userStatusId, UpdateUserStatusDto updateDto) {
-        UserStatus userStatus = getUserStatus(userStatusId);
+    public UserStatusResponseDto updateUserStatus(UpdateUserStatusDto updateDto) {
+        UserStatus userStatus = getUserStatus(updateDto.userStatusId());
         userStatus.statusUpdate(updateDto.newAccessTime());
         UserStatus userstatus = userStatusRepository.save(userStatus);
         return UserStatusResponseDto.from(userstatus);
     }
 
     @Override
-    public UserStatusResponseDto updateByUserId(UUID userId, UpdateUserStatusDto updateDto) {
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저 상태가 없습니다."));
-        userStatus.statusUpdate(updateDto.newAccessTime());
-        UserStatus userstatus = userStatusRepository.save(userStatus);
+    public UserStatusResponseDto updateByUserId(UpdateUserIdStatusDto updateDto) {
+        UserStatus user = userStatusRepository.findByUserId(updateDto.userId())
+                .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다."));
+        user.statusUpdate(updateDto.newAccessTime());
+        UserStatus userstatus = userStatusRepository.save(user);
         return UserStatusResponseDto.from(userstatus);
     }
 

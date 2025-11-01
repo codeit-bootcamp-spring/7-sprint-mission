@@ -115,8 +115,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto updateChannel(UUID id, UpdateChannelDto updateChannelDto) {
-        Channel channel = channelRepository.findById(id)
+    public ChannelResponseDto updateChannel(UpdateChannelDto updateChannelDto) {
+        Channel channel = channelRepository.findById(updateChannelDto.channelId())
                 .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
 
         if(channel.getType() == ChannelType.PRIVATE){

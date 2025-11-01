@@ -13,6 +13,6 @@ public interface ReadStatusService {
     ReadStatusResponseDto createReadStatus(CreateReadStatusRequestDto request);
     ReadStatusResponseDto find(UUID readStatusId);
     List<ReadStatusResponseDto> findAllByUserId(UUID userId);
-    ReadStatusResponseDto updateReadStatus(UUID readStatusId, UpdateReadStatusDto updateReadStatus);
+    ReadStatusResponseDto updateReadStatus(UpdateReadStatusDto updateReadStatus);
     void deleteReadStatus(UUID readStatusId);
 }

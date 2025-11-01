@@ -14,6 +14,6 @@ public interface UserService {
     UserResponseDto createUser(CreateUserCommand request); // 유저 생성
     UserResponseDto find(UUID id); //유저 조회
     List<UserResponseDto> findAll(); // 모든 유저 조회
-    UserResponseDto updateUser(UUID id, UpdateUserDto  updateRequest, CreateBinaryContentRequestDto contentRequest);
+    UserResponseDto updateUser(UpdateUserDto  updateRequest, CreateBinaryContentRequestDto contentRequest);
     void deleteUser(UUID userId); // 유저 삭제
 }

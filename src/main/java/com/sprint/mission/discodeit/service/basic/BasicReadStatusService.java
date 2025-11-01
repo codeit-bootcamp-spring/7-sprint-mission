@@ -75,8 +75,8 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResponseDto updateReadStatus(UUID readStatusId, UpdateReadStatusDto updateReadStatus) {
-        ReadStatus readStatus = getReadStatus(readStatusId);
+    public ReadStatusResponseDto updateReadStatus(UpdateReadStatusDto updateReadStatus) {
+        ReadStatus readStatus = getReadStatus(updateReadStatus.readStatusId());
 
         readStatus.updateReadTime();
 

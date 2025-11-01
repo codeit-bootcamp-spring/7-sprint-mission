@@ -15,7 +15,7 @@ public interface ChannelService {
     ChannelResponseDto createPublicChannel(CreatePublicChannelDto createPublicChannelDto);
     ChannelResponseDto find(UUID channelId);
     List<ChannelResponseDto> findAllByUserId(UUID userId);
-    ChannelResponseDto updateChannel(UUID id, UpdateChannelDto updateChannelDto);
+    ChannelResponseDto updateChannel(UpdateChannelDto updateChannelDto);
     void deleteChannel(UUID channelId);
 
     // 요구사항부터 진행한 뒤 구현해보기

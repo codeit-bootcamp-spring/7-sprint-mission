@@ -94,9 +94,9 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto updateUser(UUID id, UpdateUserDto updateRequest, CreateBinaryContentRequestDto contentRequest) {
+    public UserResponseDto updateUser(UpdateUserDto updateRequest, CreateBinaryContentRequestDto contentRequest) {
         //유저 찾기
-        User user = userRepository.findById(id)
+        User user = userRepository.findById(updateRequest.userId())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         // 프로필 이미지 선택적 로직
