@@ -3,16 +3,16 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
-import java.io.*;
+import java.io.File;
 import java.util.*;
 
 public class FileChannelRepository extends AbstractFileRepository<Channel, UUID> implements ChannelRepository {
 
-    private static final String CHANNEL_FILE_PATH = "channels.ser";
+    private static final String FILE_PATH = "data" + File.separator + "channels.ser";
 
     @Override
     protected String getFilePath() {
-        return CHANNEL_FILE_PATH;
+        return FILE_PATH;
     }
 
     @Override
@@ -21,12 +21,9 @@ public class FileChannelRepository extends AbstractFileRepository<Channel, UUID>
     }
 
     @Override
-    public Channel findByName(String channelName) {
-        return entityMap.values()
-                .stream()
+    public Optional<Channel> findByName(String channelName) {
+        return findAll().stream()
                 .filter(channel -> channel.getChannelName().equals(channelName))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
-
 }
