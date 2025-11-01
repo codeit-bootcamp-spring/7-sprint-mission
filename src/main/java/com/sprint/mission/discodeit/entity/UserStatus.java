@@ -17,6 +17,7 @@ public class UserStatus extends BaseEntity{
     private final UUID userId;      //접속자 UUID
     private Instant offlineAt;      //로그아웃 한 시간
     private Instant onlineAt;       //로그인 한 시간
+    private boolean isOnline;
     public static final int OFFLINE_THRESHOLD_SECONDS = 300;       //오프라인 기준 타임
 
     //Constructor
@@ -38,7 +39,7 @@ public class UserStatus extends BaseEntity{
     }
 
     //온라인 상태 계산
-    public boolean IsOnline(){
-        return offlineAt.isAfter(Instant.now().minusSeconds(OFFLINE_THRESHOLD_SECONDS));
+    public void updateOnline(){
+        this.isOnline = offlineAt.isAfter(Instant.now().minusSeconds(OFFLINE_THRESHOLD_SECONDS));
     }
 }

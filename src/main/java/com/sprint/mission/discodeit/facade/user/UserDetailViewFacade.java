@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.facade.user;
 import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -33,7 +34,8 @@ public class UserDetailViewFacade {
         BinaryContentInfoRes profileImg = BinaryContentInfoRes.from(
                 binaryContentService.findById(user.getProfileId())
         );
-        boolean online = userStatusService.findByUserId(user.getId()).IsOnline();
-        return UserDetailInfoRes.from(user, profileImg, online);
+        UserStatus userStatus = userStatusService.findByUserId(user.getId());
+        userStatus.updateOnline();
+        return UserDetailInfoRes.from(user, profileImg, userStatus.isOnline());
     }
 }
