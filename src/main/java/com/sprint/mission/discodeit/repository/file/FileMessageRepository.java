@@ -10,11 +10,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileMessageRepository implements MessageRepository {
     private static final Path DATA_DIR = Paths.get("data");
     private static final Path MESSAGES_FILE = DATA_DIR.resolve("messages.ser");
-    private final Map<UUID, Message> cache = new HashMap<>();
+    private final Map<UUID, Message> cache = new ConcurrentHashMap<>();
 
     public FileMessageRepository() {
         try {
@@ -52,14 +53,16 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     private void saveAll() {
-        Path tmp = MESSAGES_FILE.resolveSibling("messages.ser.tmp");
-        try(ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(tmp))) {
-            oos.writeObject(cache);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
         try {
-            Files.move(tmp, MESSAGES_FILE, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            Path tmp = MESSAGES_FILE.resolveSibling("messages.ser.tmp");
+            try(ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(tmp))) {
+                oos.writeObject(cache);
+            }
+            try {
+                Files.move(tmp, MESSAGES_FILE, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (IOException e) {
+                Files.move(tmp, MESSAGES_FILE, StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -81,7 +84,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findAll() {
-        return new ArrayList<>(cache.values());
+        return cache.values().stream().toList();
     }
 
     @Override
