@@ -26,6 +26,11 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    public void update(UUID id) {
+        readStatusRepository.update(id);
+    }
+
+    @Override
     public ReadStatus delete(UUID id) {
         return readStatusRepository.delete(id);
     }

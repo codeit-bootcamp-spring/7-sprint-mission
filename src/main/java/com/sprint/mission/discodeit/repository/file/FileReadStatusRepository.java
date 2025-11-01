@@ -32,6 +32,16 @@ implements ReadStatusRepository {
                 .toList();
     }
 
+    @Override
+    public void update(UUID statusId) {
+        ReadStatus readStatus = loadFromFile(statusId);
+        if(readStatus == null) {
+            throw new RuntimeException("ReadStatus with id=" + statusId + " not found");
+        }
+        readStatus.update();
+        saveToFile(statusId, readStatus);
+    }
+
     //삭제
     @Override
     public ReadStatus delete(UUID statusId) {

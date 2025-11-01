@@ -31,6 +31,11 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public void update(UUID statusId) {
+        data.get(statusId).update();
+    }
+
+    @Override
     public ReadStatus delete(UUID statusId) {
         return data.remove(statusId);
     }
