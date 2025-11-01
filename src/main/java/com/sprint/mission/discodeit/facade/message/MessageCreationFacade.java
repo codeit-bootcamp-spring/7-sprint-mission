@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.facade.message;
 
 import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
+import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -19,9 +21,10 @@ import java.util.UUID;
 public class MessageCreationFacade {
     private final MessageService messageService;
     private final BinaryContentService binaryContentService;
+    private final MessageMapper messageMapper;
 
     //메세지 추가
-    public Message createMessage(MessageCreateReq req){
+    public MessageViewRes createMessage(MessageCreateReq req){
         List<UUID> attachments = new ArrayList<>();
         
         if(!req.attachmentIds().isEmpty()){
@@ -33,7 +36,8 @@ public class MessageCreationFacade {
             });
         }
 
-        return messageService.create(MessageFactory.create(req, attachments));
+        Message newMessage = messageService.create(MessageFactory.create(req, attachments));
+        return messageMapper.mapToView(newMessage);
     }
 }
 

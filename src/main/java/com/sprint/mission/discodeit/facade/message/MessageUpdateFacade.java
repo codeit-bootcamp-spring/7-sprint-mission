@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.facade.message;
 
 import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentUpdateReq;
 import com.sprint.mission.discodeit.dto.message.request.MessageUpdateReq;
+import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -18,9 +20,10 @@ import java.util.UUID;
 public class MessageUpdateFacade {
     private final MessageService messageService;
     private final BinaryContentService binaryContentService;
+    private final MessageMapper messageMapper;
 
     //메세지 수정
-    public void updateMessage(UUID messageId, MessageUpdateReq req){
+    public MessageViewRes updateMessage(UUID messageId, MessageUpdateReq req){
         List<UUID> updatedAttachmentIds = new ArrayList<>();
         List<BinaryContentUpdateReq> attachmentUpdateReqs = req.attachmentReqs();
 
@@ -33,6 +36,7 @@ public class MessageUpdateFacade {
         });
 
         messageService.update(messageId, req.content(), updatedAttachmentIds);
+        return messageMapper.mapToView(messageService.findById(messageId));
     }
 
     //기존 파일(데이터 없으면 삭제, 있으면 유지)

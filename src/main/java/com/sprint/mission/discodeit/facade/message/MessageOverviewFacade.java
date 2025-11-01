@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.facade.message;
 
-import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,26 +13,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MessageOverviewFacade {
     private final MessageService messageService;
-    private final UserService userService;
-    private final BinaryContentService binaryContentService;
+    private final MessageMapper messageMapper;
 
     //메세지 전체 조회
     public List<MessageViewRes> findAllByChannelId(UUID channelId){
         return messageService.findAllByChannelId(channelId).stream()
-                .map(this::mapToView).toList();
-    }
-    
-    //변환 메소드
-    private MessageViewRes mapToView(Message message){
-        List<BinaryContentInfoRes> imgs = message.getAttachmentIds().stream()
-                .map(binaryId -> BinaryContentInfoRes.from(
-                        binaryContentService.findById(binaryId))
-                ).toList();
-
-        return MessageViewRes.from(
-                message,
-                userService.findById(message.getSpeakerId()).getNickname(),
-                imgs
-        );
+                .map(messageMapper::mapToView).toList();
     }
 }

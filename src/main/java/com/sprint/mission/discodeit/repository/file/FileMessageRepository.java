@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageRepository extends BaseFileRepository<Message> implements MessageRepository {
@@ -42,8 +43,9 @@ public class FileMessageRepository extends BaseFileRepository<Message> implement
                 .toList();
     }
 
+    //id 로 조회
     @Override
-    public Message findById(UUID id) {
+    public Optional<Message> findById(UUID id) {
         return loadFromFile(id);
     }
 
@@ -56,29 +58,29 @@ public class FileMessageRepository extends BaseFileRepository<Message> implement
 
     //메세지 수정
     @Override
-    public Message update(UUID id, String content, List<UUID> attachmentIds) {
-        Message message = loadFromFile(id);
-        if(message == null){
-            throw new RuntimeException("Message with id " + id + " not found");
-        }
-        message.update(content, attachmentIds);
-        saveToFile(message.getId(), message);
-        return message;
+    public void update(UUID id, String content, List<UUID> attachmentIds) {
+        loadFromFile(id).ifPresent(message -> {
+            message.update(content, attachmentIds);
+            saveToFile(id, message);
+        });
     }
 
     //메세지 삭제
     @Override
-    public Message delete(UUID id) {
-        Message message = loadFromFile(id);
+    public void delete(UUID id) {
         deleteFile(id);
-        return message;
+    }
+
+    //채널의 마지막 메세지
+    @Override
+    public Optional<Message> findLastMessageByChannelId(UUID channelId) {
+        return findAllFiles().stream()
+                .filter(m -> m.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt));
     }
 
     @Override
-    public Message findLastMessageByChannelId(UUID channelId) {
-        return findAllFiles().stream()
-                .filter(m -> m.getChannelId().equals(channelId))
-                .max(Comparator.comparing(Message::getCreatedAt))
-                .orElse(null);
+    public boolean existsById(UUID id) {
+        return fileExistsById(id);
     }
 }

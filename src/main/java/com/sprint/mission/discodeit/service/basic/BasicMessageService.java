@@ -7,18 +7,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
+    // ===== 🏗️ Domain Logic (Facade 용)  =====
     //레포지토리
     private final MessageRepository messageRepository;
 
     //메세지를 id 로 참음
     @Override
     public Message findById(UUID id) {
-        return messageRepository.findById(id);
+        return messageRepository.findById(id).orElseThrow(()->
+                new RuntimeException("Message not found. id: " + id));
     }
 
     //한 유저가 말한 메세지들을 조회
@@ -41,8 +44,9 @@ public class BasicMessageService implements MessageService {
 
     //채널에서 가장 마지막 메세지를 조회
     @Override
-    public Message findLastMessageByChannelId(UUID channelId){
-        return messageRepository.findLastMessageByChannelId(channelId);
+    public Message findLastMessageByChannelId(UUID channelId) {
+        Optional<Message> lastMessageOpt = messageRepository.findLastMessageByChannelId(channelId);
+        return lastMessageOpt.orElse(null);
     }
 
     //메세지 생성
@@ -53,15 +57,19 @@ public class BasicMessageService implements MessageService {
     
     //메세지 수정
     @Override
-    public Message update(UUID id, String content, List<UUID> attachmentIds) {
-        return messageRepository.update(id, content, attachmentIds);
+    public void update(UUID id, String content, List<UUID> attachmentIds) {
+        if(!messageRepository.existsById(id)){
+            throw new RuntimeException("Message not found. id: "+ id);
+        }
+        messageRepository.update(id, content, attachmentIds);
     }
 
     //메세지 삭제
     @Override
-    public Message delete(UUID id) {
-        return messageRepository.delete(id);
+    public void delete(UUID id) {
+        if(!messageRepository.existsById(id)){
+            throw new RuntimeException("Message not found. id: "+ id);
+        }
+        messageRepository.delete(id);
     }
-
-
 }
