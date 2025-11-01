@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.facade.readstatus;
 
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateReq;
+import com.sprint.mission.discodeit.dto.readstatus.request.ReadStatusCreateReq;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.factory.ReadStatusFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
