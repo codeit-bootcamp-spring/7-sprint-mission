@@ -41,6 +41,7 @@ public class BasicChannelService implements ChannelService {
 
         List<UUID> members = dto.members();
         for (UUID member : members) {
+            saved.getMembers().add(member);
             ReadStatus readStatus = new ReadStatus(member, saved.getId());
             readStatusRepository.save(readStatus);
         }
@@ -59,8 +60,8 @@ public class BasicChannelService implements ChannelService {
                ChannelType.PUBLIC
        );
 
-        channelRepository.save(channel);
-        return ChannelResponseDto.from(channel, null, null);
+        Channel saved = channelRepository.save(channel);
+        return ChannelResponseDto.from(saved, null, saved.getMembers());
    }
 
     @Override
