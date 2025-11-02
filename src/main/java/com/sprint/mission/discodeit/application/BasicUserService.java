@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.application.dto.request.UserUpdateDto;
 import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
+import com.sprint.mission.discodeit.domain.UserStatus;
 import com.sprint.mission.discodeit.domain.repository.UserRepository;
 import com.sprint.mission.discodeit.domain.exception.DuplicateUserException;
 import lombok.RequiredArgsConstructor;

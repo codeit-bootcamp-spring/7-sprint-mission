@@ -81,14 +81,7 @@ public final class FileManager {
         return fileName;
     }
 
-    private void validateContentType(String contentType) {
-        if (contentType == null ||
-                !(contentType.equals("image/png")
-                        || contentType.equals("image/jpeg")
-                        || contentType.equals("image/gif"))) {
-            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다: " + contentType);
-        }
-    }
+
 
     public void deleteUserFolder(UUID userId) {
         Path userFolder = rootDir.resolve("user_" + userId.toString());
@@ -112,6 +105,15 @@ public final class FileManager {
             });
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void validateContentType(String contentType) {
+        if (contentType == null ||
+                !(contentType.equals("image/png")
+                        || contentType.equals("image/jpeg")
+                        || contentType.equals("image/gif"))) {
+            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다: " + contentType);
         }
     }
 

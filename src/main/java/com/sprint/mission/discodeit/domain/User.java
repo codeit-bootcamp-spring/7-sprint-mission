@@ -102,11 +102,11 @@ public class User implements Serializable {
         this.updatedAt = Instant.now();
     }
 
-    private void markOnline(){
+    public void markOnline(){
         this.userStatus=new UserStatus(OnlineStatus.ONLINE);
     }
 
-    private void markOffline(){
+    public void markOffline(){
         this.userStatus =  new UserStatus(OnlineStatus.OFFLINE);
     }
 

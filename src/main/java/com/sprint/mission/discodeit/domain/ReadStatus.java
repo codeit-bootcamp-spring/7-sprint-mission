@@ -15,5 +15,4 @@ public class ReadStatus implements Serializable {
     public ReadStatus() {
         this.lastReadAt=null;
     }
-
 }

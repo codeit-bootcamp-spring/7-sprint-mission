@@ -55,6 +55,10 @@ public class Channel implements Serializable {
         return List.copyOf(history);
     }
 
+    public List<ChannelMember> getChannelMember(){
+        return List.copyOf(members);
+    }
+
 
     public void sendMessage(Message message){
         history.add(message);
