@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFUserRepository implements UserRepository {
     // 유저 데이터
-    public final Map<UUID, User> data = new ConcurrentHashMap<>();
+    private final Map<UUID, User> data = new ConcurrentHashMap<>();
 
     // 저장
     @Override
