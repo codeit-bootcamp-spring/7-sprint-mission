@@ -52,7 +52,6 @@ public class JCFUserStatusRepository implements InterfaceUserStatusRepository {
 //        List<UserStatus> list = this.data.values().stream().toList();
 //        list.stream().anyMatch(userStatus -> userStatus.)
 //        this.data.values().stream().anyMatch(userStatus -> userStatus.)
-
         return false;
     }
 }
