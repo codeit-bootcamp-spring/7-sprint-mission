@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.entityType.UserState;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 import lombok.Builder;
 import lombok.Getter;

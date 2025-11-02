@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity.dto.userDto.userUpdate;
 
-import com.sprint.mission.discodeit.entity.UserState;
+import com.sprint.mission.discodeit.entity.entityType.UserState;
 import lombok.Builder;
 import lombok.NonNull;
 

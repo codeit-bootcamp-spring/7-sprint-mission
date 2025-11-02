@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.MessageType;
-import com.sprint.mission.discodeit.repository.BaseRepository;
+import com.sprint.mission.discodeit.entity.entityType.MessageType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Comparator;
 import java.util.List;

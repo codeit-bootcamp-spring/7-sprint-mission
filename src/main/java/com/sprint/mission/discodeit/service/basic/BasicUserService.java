@@ -1,17 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.binaryContent.BinaryContent;
-import com.sprint.mission.discodeit.entity.binaryContent.BinaryContentRepository;
-import com.sprint.mission.discodeit.entity.binaryContent.dto.UserProfileImageUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequestDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserInfoDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.entity.dto.binaryContentDto.UserProfileImageUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserRequestDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserResponseDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserNameUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPasswordUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPhoneNumUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserStateUpdateDto;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
-import com.sprint.mission.discodeit.entity.status.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -35,18 +35,18 @@ public class BasicUserService implements UserService {
 
     // 생성
     @Override
-    public UserInfoDto createUser(UserCreateRequestDto createDto) {
-        userRepository.findByEmail(createDto.getEmail()).ifPresent(user
+    public UserResponseDto createUser(UserRequestDto requestDto) {
+        userRepository.findByEmail(requestDto.getEmail()).ifPresent(user
                 -> {throw new DuplicateEmailException("이미 존재하는 이메일");});
 
-        userRepository.findByUserName(createDto.getUserName()).ifPresent(user
+        userRepository.findByUserName(requestDto.getUserName()).ifPresent(user
                 -> {throw new DuplicateEmailException("이미 존재하는 닉네임");});
 
         User newUser = User.builder()
-                .email(createDto.getEmail())
-                .userName(createDto.getUserName())
-                .password(createDto.getPassword())
-                .phoneNum(createDto.getPhoneNum())
+                .email(requestDto.getEmail())
+                .userName(requestDto.getUserName())
+                .password(requestDto.getPassword())
+                .phoneNum(requestDto.getPhoneNum())
                 .build();
 
         userRepository.save(newUser);
@@ -55,50 +55,50 @@ public class BasicUserService implements UserService {
         userStatusRepository.save(newUserStatus);
 
         // 이미지 추가
-        if (createDto.getProfileImage() != null) {
+        if (requestDto.getProfileImage() != null) {
             BinaryContent newImage = new BinaryContent(
                     newUser.getId(),
-                    createDto.getProfileImage(),
-                    createDto.getProfileName(),
-                    createDto.getProfileType()
+                    requestDto.getProfileImage(),
+                    requestDto.getProfileName(),
+                    requestDto.getProfileType()
                     // messageId = null;
             );
             binaryContentRepository.save(newImage);
         }
 
 
-        return UserInfoDto.from(newUser, true);
+        return UserResponseDto.from(newUser, true);
     }
 
     // User -> UserInfoDto
-    private UserInfoDto toDto(User user) {
+    private UserResponseDto toDto(User user) {
         // 반복되는 부분을 헬퍼 메소드로
         boolean isOnline = userStatusRepository.findStatusByUserId(user.getId())
                 .map(UserStatus::isOnline).orElse(false);
-        return UserInfoDto.from(user, isOnline);
+        return UserResponseDto.from(user, isOnline);
     }
 
     // --- 조회 ---
 
     // ID로 출력
     @Override
-    public Optional<UserInfoDto> findUserInfoById(UUID userId) {
+    public Optional<UserResponseDto> findUserInfoById(UUID userId) {
         // 반복되는 부분
         return userRepository.findById(userId).map(user -> {
             boolean isOnline = userStatusRepository.findStatusByUserId(userId)
                     .map(UserStatus::isOnline).orElse(false);
-            return UserInfoDto.from(user, isOnline);
+            return UserResponseDto.from(user, isOnline);
         });
     }
     // 이메일로 출력
     @Override
-    public Optional<UserInfoDto> findUserInfoByEmail(String email) {
+    public Optional<UserResponseDto> findUserInfoByEmail(String email) {
         return userRepository.findByEmail(email).map(this::toDto);
     }
 
     // 전체출력
     @Override
-    public List<UserInfoDto> findAllUsers() {
+    public List<UserResponseDto> findAllUsers() {
         return userRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
     }
 
@@ -109,64 +109,62 @@ public class BasicUserService implements UserService {
 
     // --- 수정 ---
     @Override
-    public Optional<UserInfoDto> updateUserName(UserNameUpdateDto dto) {
+    public Optional<UserResponseDto> updateUserName(UserNameUpdateDto updateDto) {
 
-        userRepository.findByUserName(dto.newUserName()).ifPresent(user -> {
-            if (!user.getUserName().equals(dto.newUserName()))
+        userRepository.findByUserName(updateDto.newUserName()).ifPresent(user -> {
+            if (!user.getUserName().equals(updateDto.newUserName()))
                 throw new DuplicateEmailException("이미 사용중인 닉네임입니다.");
         });
 
-        return userRepository.findById(dto.userId()).map(user -> {
-            user.updateUserName(dto.newUserName());
+        return userRepository.findById(updateDto.userId()).map(user -> {
+            user.updateUserName(updateDto.newUserName());
             userRepository.save(user);
             return toDto(user);
         });
     }
 
     @Override
-    public Optional<UserInfoDto> changePassword(UserPasswordUpdateDto dto) {
+    public Optional<UserResponseDto> changePassword(UserPasswordUpdateDto updateDto) {
 
-        return userRepository.findById(dto.userId()).map(user -> {
-            user.updatePassword(dto.newPassword());
+        return userRepository.findById(updateDto.userId()).map(user -> {
+            user.updatePassword(updateDto.newPassword());
             userRepository.save(user);
             return toDto(user);
         });
     }
 
     @Override
-    public Optional<UserInfoDto> updateState(UserStateUpdateDto dto) {
+    public Optional<UserResponseDto> updateState(UserStateUpdateDto updateDto) {
 
-        return userRepository.findById(dto.userId()).map(user -> {
-            user.updateState(dto.newState());
+        return userRepository.findById(updateDto.userId()).map(user -> {
+            user.updateState(updateDto.newState());
             userRepository.save(user);
             return toDto(user);
         });
     }
 
     @Override
-    public Optional<UserInfoDto> updatePhoneNum(UserPhoneNumUpdateDto dto) {
-        return userRepository.findById(dto.userId()).map(user -> {
-            user.updatePhoneNum(dto.phoneNum());
+    public Optional<UserResponseDto> updatePhoneNum(UserPhoneNumUpdateDto updateDto) {
+        return userRepository.findById(updateDto.userId()).map(user -> {
+            user.updatePhoneNum(updateDto.phoneNum());
             userRepository.save(user);
             return toDto(user);
         });
     }
 
     @Override
-    public Optional<UserInfoDto> updateProfileImage(UserProfileImageUpdateDto imageRequestDto) {
+    public Optional<UserResponseDto> updateProfileImage(UserProfileImageUpdateDto imageUpdateDto) {
 
-        // 들어온 사진이 없다면 그냥 넘김
-
-        return userRepository.findById(imageRequestDto.userId()).map(user -> {
+        return userRepository.findById(imageUpdateDto.userId()).map(user -> {
             // 기존 이미지 삭제
             binaryContentRepository.deleteProfileImageByUserId(user.getId());
             // 새로운 이미지 업데이트
-            if (imageRequestDto.image() != null) {
+            if (imageUpdateDto.image() != null) {
                 BinaryContent newImage = new BinaryContent(
                         user.getId(),
-                        imageRequestDto.image(),
-                        imageRequestDto.imageName(),
-                        imageRequestDto.imageType()
+                        imageUpdateDto.image(),
+                        imageUpdateDto.imageName(),
+                        imageUpdateDto.imageType()
                 );
                 binaryContentRepository.save(newImage);
             }

@@ -2,15 +2,16 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelCreateRequestDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelCreateRequestDto;
-import com.sprint.mission.discodeit.entity.status.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelRequestDto;
+import com.sprint.mission.discodeit.entity.entityType.ChannelType;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.*;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,34 +27,34 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    private ChannelInfoDto toDto(Channel channel) {
+    private ChannelResponseDto toDto(Channel channel) {
 //        Optional<Message> lastMessage = messageRepository.findAllByChannelId(channel.getId())
 //                .stream().findFirst();
 
         // 맨 위 메시지 찾기 -> createAt에서 max를 사용해서 찾는걸로
         Optional<Message> lastMessage = messageRepository.findTopByChannelId(channel.getId());
-        return ChannelInfoDto.from(channel, lastMessage.orElse(null));
+        return ChannelResponseDto.from(channel, lastMessage.orElse(null));
     }
 
 
     @Override
-    public ChannelInfoDto createPublicChannel(PublicChannelCreateRequestDto createDto) {
-        User admin = userRepository.findById(createDto.adminId())
+    public ChannelResponseDto createPublicChannel(PublicChannelRequestDto requestDto) {
+        User admin = userRepository.findById(requestDto.adminId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
 
-        Channel newChannel = new Channel(admin, createDto.channelName(), ChannelType.PUBLIC);
+        Channel newChannel = new Channel(admin, requestDto.channelName(), ChannelType.PUBLIC);
         channelRepository.save(newChannel);
         return toDto(newChannel);
     }
 
     @Override
-    public ChannelInfoDto createPrivateChannel(PrivateChannelCreateRequestDto createDto) {
-        User admin = userRepository.findById(createDto.adminId())
+    public ChannelResponseDto createPrivateChannel(PrivateChannelRequestDto requestDto) {
+        User admin = userRepository.findById(requestDto.adminId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
 
         Channel newChannel = new Channel(admin, null, ChannelType.PRIVATE);
 
-        Set<UUID> privateMemberIds = new HashSet<>(createDto.memberIds());
+        Set<UUID> privateMemberIds = new HashSet<>(requestDto.memberIds());
         for (UUID memberIds : privateMemberIds) {
             User member = userRepository.findById(memberIds)
                     .orElseThrow(() -> new NotFoundUserException("멤버를 찾을 수 없음"));
@@ -65,7 +66,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<ChannelInfoDto> findChannelInfoById(UUID id) {
+    public Optional<ChannelResponseDto> findChannelInfoById(UUID id) {
         return channelRepository.findById(id).map(this::toDto);
     }
 
@@ -76,7 +77,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public List<ChannelInfoDto> findAllByUserId(UUID userId) {
+    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
         List<Channel> allChannels = channelRepository.findAll();
 
         return allChannels.stream().filter(channel -> {
@@ -93,16 +94,16 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<ChannelInfoDto> findChannelInfoByChannelName(String channelName) {
+    public Optional<ChannelResponseDto> findChannelInfoByChannelName(String channelName) {
         return channelRepository.findByChannelName(channelName).map(this::toDto);
     }
 
-    public Optional<ChannelInfoDto> findChannelByName(String channelName) {
+    public Optional<ChannelResponseDto> findChannelByName(String channelName) {
         return channelRepository.findByChannelName(channelName).map(this::toDto);
     }
 
     @Override
-    public Optional<ChannelInfoDto> updateChannelName(ChannelUpdateDto updateDto) {
+    public Optional<ChannelResponseDto> updateChannelName(ChannelUpdateDto updateDto) {
 
         return channelRepository.findById(updateDto.channelId()).map(channel -> {
             if (channel.getType() == ChannelType.PRIVATE) {
@@ -116,7 +117,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<ChannelInfoDto> addMemberToChannel(UUID channelId, UUID userId) {
+    public Optional<ChannelResponseDto> addMemberToChannel(UUID channelId, UUID userId) {
 
         Optional<Channel> channelOp = channelRepository.findById(channelId);
         Optional<User> userOp = userRepository.findById(userId);
@@ -156,7 +157,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<ChannelInfoDto> removeMemberFromChannel(UUID channelId, UUID userId) {
+    public Optional<ChannelResponseDto> removeMemberFromChannel(UUID channelId, UUID userId) {
         Optional<Channel> channelOp = channelRepository.findById(channelId);
         Optional<User> userOptional = userRepository.findById(userId);
 

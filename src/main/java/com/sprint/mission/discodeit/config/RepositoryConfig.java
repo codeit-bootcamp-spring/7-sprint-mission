@@ -1,11 +1,6 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.entity.binaryContent.BinaryContentRepository;
-import com.sprint.mission.discodeit.entity.binaryContent.file.*;
-import com.sprint.mission.discodeit.entity.binaryContent.jcf.*;
-import com.sprint.mission.discodeit.entity.status.repository.*;
-import com.sprint.mission.discodeit.entity.status.repository.file.*;
-import com.sprint.mission.discodeit.entity.status.repository.jcf.*;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
 import com.sprint.mission.discodeit.repository.jcf.*;

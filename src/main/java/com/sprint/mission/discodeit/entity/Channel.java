@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.entityType.ChannelType;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 import lombok.Getter;
 import lombok.ToString;

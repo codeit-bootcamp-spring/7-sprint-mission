@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelCreateRequestDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelCreateRequestDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelInfoDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelResponseDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,20 +12,20 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-    ChannelInfoDto createPublicChannel(PublicChannelCreateRequestDto channelCreateDto);
-    ChannelInfoDto createPrivateChannel(PrivateChannelCreateRequestDto channelCreateDto);
+    ChannelResponseDto createPublicChannel(PublicChannelRequestDto requestDto);
+    ChannelResponseDto createPrivateChannel(PrivateChannelRequestDto requestDto);
 
-    Optional<ChannelInfoDto> findChannelInfoById(UUID id);
+    Optional<ChannelResponseDto> findChannelInfoById(UUID id);
     Optional<Channel> findChannelEntityById(UUID id);
 
     // findAll -> findAllByUserId
-    List<ChannelInfoDto> findAllByUserId(UUID userId);
+    List<ChannelResponseDto> findAllByUserId(UUID userId);
 
-    Optional<ChannelInfoDto> findChannelInfoByChannelName(String channelName);
+    Optional<ChannelResponseDto> findChannelInfoByChannelName(String channelName);
 
-    Optional<ChannelInfoDto> updateChannelName(ChannelUpdateDto channelUpdateDto);
-    Optional<ChannelInfoDto> addMemberToChannel(UUID channelId, UUID userId);
-    Optional<ChannelInfoDto> removeMemberFromChannel(UUID channelId, UUID userId);
+    Optional<ChannelResponseDto> updateChannelName(ChannelUpdateDto channelUpdateDto);
+    Optional<ChannelResponseDto> addMemberToChannel(UUID channelId, UUID userId);
+    Optional<ChannelResponseDto> removeMemberFromChannel(UUID channelId, UUID userId);
 
 
     boolean deleteChannel(UUID id);

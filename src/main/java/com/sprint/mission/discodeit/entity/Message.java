@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.entityType.MessageType;
 import lombok.Getter;
 import lombok.ToString;
 
