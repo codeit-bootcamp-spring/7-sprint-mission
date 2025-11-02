@@ -27,9 +27,15 @@ public class UserOverviewFacade {
 
     //변환 메소드
     private UserSimpleInfoRes mapToSimpleInfo(User user) {
-        BinaryContentInfoRes profileImg = BinaryContentInfoRes.from(
-                binaryContentService.findById(user.getProfileId())
-        );
+        BinaryContentInfoRes profileImg;
+
+        if(user.getProfileId() != null){
+            profileImg = BinaryContentInfoRes.from(
+                    binaryContentService.findById(user.getProfileId())
+            );
+        }else{
+            profileImg = null;
+        }
         UserStatus userStatus = userStatusService.findByUserId(user.getId());
         userStatus.updateOnline();
         return UserSimpleInfoRes.from(user, profileImg, userStatus.isOnline());

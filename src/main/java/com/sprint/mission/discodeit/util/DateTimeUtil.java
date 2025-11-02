@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.util;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class DateTimeUtil {
@@ -11,7 +12,9 @@ public class DateTimeUtil {
             return null;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT)
+                .withZone(ZoneId.systemDefault());
+
         return formatter.format(instant);
     }
 }
