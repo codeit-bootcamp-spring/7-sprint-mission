@@ -23,8 +23,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void create(CreateReadStatusRequestDto request) {
-        userRepository.findById(request.getUserId()); // 유저가 존재하지 않으면 예외 발생
-        channelRepository.findById(request.getChannelId()); // 채널이 존재하지 않으면 예외 발생
+        // 유저가 존재하지 않으면 예외 발생
+        userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+
+        // 채널이 존재하지 않으면 예외 발생
+        channelRepository.findById(request.getChannelId())
+                .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다."));
 
         if(!readStatusRepository.existsByUserIdAndChannelId(request.getUserId(),request.getChannelId())) {
             readStatusRepository.save(new ReadStatus(request.getUserId(),request.getChannelId()));
