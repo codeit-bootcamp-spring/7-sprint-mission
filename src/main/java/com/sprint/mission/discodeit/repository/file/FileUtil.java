@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
+
 import com.sprint.mission.discodeit.entity.*;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -138,5 +140,16 @@ public class FileUtil {
     public boolean existsRepository(UUID id) {
         Path path = resolvePath(id);
         return Files.exists(path);
+    }
+
+
+//    @AfterAll
+    public void cleanup() throws Exception {
+        // 테스트 종료 후 남은 .ser 파일 제거
+        Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "repo-data");
+        // 삭제할 디렉토리 객체 생성
+        File directoryToDelete = new File(DIRECTORY.toAbsolutePath().toString());
+        // 재귀적으로 삭제
+        FileSystemUtils.deleteRecursively(directoryToDelete);
     }
 }

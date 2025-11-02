@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.common.PrintUtil;
 import com.sprint.mission.discodeit.entity.dto.*;
+import com.sprint.mission.discodeit.repository.file.FileUtil;
 import com.sprint.mission.discodeit.service.basic.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,10 +12,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.sprint.mission.discodeit.entity.ModelType.USER;
+
+
 @SpringBootApplication
 public class DiscodeitApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
         test_UserService(context);
@@ -24,6 +28,9 @@ public class DiscodeitApplication {
         test_ReadStatusService(context);
 //        test_BinaryContentService(context);
         test_AuthService(context);
+
+        //🚨 테스트 후 폴더 삭제!!
+        new FileUtil(USER).cleanup();
 	}
 
     static void test_UserService(ConfigurableApplicationContext context) {
