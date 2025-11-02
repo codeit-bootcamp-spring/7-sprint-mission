@@ -81,10 +81,6 @@ class UserDeletionFacadeTest {
         UUID userId = createdUser.getId();
         UUID profileId = createdUser.getProfileId();
 
-        System.out.println("=================================");
-        System.out.println(createdUser);
-        System.out.println("=================================");
-
         // 존재 확인
         assertNotNull(createdUser);
         assertNotNull(userStatusService.findByUserId(userId));

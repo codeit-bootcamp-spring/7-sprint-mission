@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFMessageRepository implements MessageRepository {
     //메세지 데이터
-    private final Map<UUID, Message> data = new ConcurrentHashMap<>();
+    public final Map<UUID, Message> data = new ConcurrentHashMap<>();
 
     //메세지 전부 조회
     @Override
@@ -49,7 +49,8 @@ public class JCFMessageRepository implements MessageRepository {
     //메세지 저장
     @Override
     public Message save(Message message) {
-        return data.put(message.getId(), message);
+        data.put(message.getId(), message);
+        return message;
     }
 
     //메세지 수정

@@ -23,7 +23,7 @@ public class UserCreationFacade {
     private final UserStatusService userStatusService;
 
     //유저 추가
-    public void createUser(UserCreateReq req) {
+    public User createUser(UserCreateReq req) {
         UUID profileId = null;
 
         if (req.profileImage().data() != null) {
@@ -37,5 +37,6 @@ public class UserCreationFacade {
 
         User user = userService.create(UserFactory.create(req, profileId));
         userStatusService.create(new UserStatus(user.getId()));
+        return user;
     }
 }
