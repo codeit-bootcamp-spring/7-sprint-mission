@@ -32,13 +32,13 @@ public class User extends BaseEntity {
         validateEmail(email);
         validatePassword(password);
         validateUserName(userName);
-        //validatePhoneNum(phoneNum);
+        validatePhoneNum(phoneNum);
 
         this.email = email;             // 받을때 @ 있는지 확인
         this.password = password;       // 8자리 이상
         this.userName = userName;       // 특수문자 불가
         this.userState = UserState.ONLINE;      // 기본 상태
-        this.phoneNum = phoneNum==null || phoneNum.isBlank() ? "비어있음" :  phoneNum;
+        this.phoneNum = phoneNum == null || phoneNum.isBlank() ? "비어있음" : phoneNum;
     }
 
     // Update
@@ -96,10 +96,11 @@ public class User extends BaseEntity {
     }
 
     private void validatePhoneNum(String phoneNum) {
-        if (!phoneNum.isBlank()) {
-            if (!REGEX_PHONE_PATTERN.matcher(phoneNum).matches()) {
-                throw new InvalidInputException("전화번호 형식이 올바르지 않음");
-            }
+        if (phoneNum == null || phoneNum.isBlank()) {
+            return;
+        }
+        if (!REGEX_PHONE_PATTERN.matcher(phoneNum).matches()) {
+            throw new InvalidInputException("전화번호 형식이 올바르지 않음");
         }
     }
 }

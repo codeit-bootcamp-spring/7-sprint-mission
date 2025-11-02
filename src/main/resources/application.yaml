@@ -1,6 +1,6 @@
 spring:
   application:
-    name=discodeit
+    name: discodeit
 
   servlet:
     multipart:
@@ -13,6 +13,6 @@ server:
 # application.yaml
 discodeit:
   repository:
-    type: jcf   # jcf | file
-    file-directory: .discodeit
+    type: file   # jcf | file
+    file-directory: /Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload
 

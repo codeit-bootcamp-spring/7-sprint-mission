@@ -13,13 +13,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Repository
 public class FileMessageRepository extends FileBaseRepository<Message> implements MessageRepository {
 
     private static final String MESSAGE_DATA_FILE = "messageData.ser";
 
-    public FileMessageRepository() {
-        super(MESSAGE_DATA_FILE);
+    public FileMessageRepository(String basePath) {
+        super(basePath + "/" + MESSAGE_DATA_FILE);
     }
 
     @Override

@@ -100,7 +100,7 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserInfoDto> findAllUsers() {
         return userRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
-    }       // N + 1 문제 발생??? 무슨 문제인지는 이해는 했는데 해결하기 위한 방법을 이해하지 못함...
+    }
 
     // 접근
     public Optional<User> findUserEntityById(UUID userId) {
@@ -154,6 +154,9 @@ public class BasicUserService implements UserService {
 
     @Override
     public Optional<UserInfoDto> updateProfileImage(UserProfileImageUpdateDto imageRequestDto) {
+
+        // 들어온 사진이 없다면 그냥 넘김
+
         return userRepository.findById(imageRequestDto.userId()).map(user -> {
             // 기존 이미지 삭제
             binaryContentRepository.deleteProfileImageByUserId(user.getId());

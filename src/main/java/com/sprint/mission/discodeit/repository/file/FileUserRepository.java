@@ -6,13 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository
 public class FileUserRepository extends FileBaseRepository<User> implements UserRepository {
 
     private static final String USER_DATA_FILE = "userData.ser";
 
-    public FileUserRepository() {
-        super(USER_DATA_FILE);
+    public FileUserRepository(String basePath) {
+        super(basePath + "/" + USER_DATA_FILE);
     }
 
     public Optional<User> findByEmail(String email) {

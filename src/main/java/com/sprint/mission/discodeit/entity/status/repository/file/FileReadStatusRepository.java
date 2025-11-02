@@ -1,23 +1,20 @@
 package com.sprint.mission.discodeit.entity.status.repository.file;
 
-import com.sprint.mission.discodeit.entity.binaryContent.BinaryContentRepository;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.entity.status.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.file.FileBaseRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Repository
-public class FileReadStatusRepsitory extends FileBaseRepository<ReadStatus> implements ReadStatusRepository {
+public class FileReadStatusRepository extends FileBaseRepository<ReadStatus> implements ReadStatusRepository {
 
     private static final String READ_STATUS_DATA_FILE = "readStatusData.ser";
 
-    public FileReadStatusRepsitory() {
-        super(READ_STATUS_DATA_FILE);
+    public FileReadStatusRepository(String basePath) {
+        super(basePath + "/" + READ_STATUS_DATA_FILE);
     }
 
     @Override

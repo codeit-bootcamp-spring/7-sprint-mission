@@ -8,17 +8,15 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    private static final String BASE_ROOT = "/Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload/";
     private static final String BINARY_DATA_FILE = "binaryData.ser";
     private final String ROOT_PATH;
 
     protected Map<UUID, BinaryContent> data = new HashMap<>();
 
-    public FileBinaryContentRepository() {
-        this.ROOT_PATH = BASE_ROOT + BINARY_DATA_FILE;
+    public FileBinaryContentRepository(String path) {
+        this.ROOT_PATH = path + BINARY_DATA_FILE;
         File file = new File(ROOT_PATH).getParentFile();
         if (!file.exists()) {
             file.mkdir();       // 생성해야 할 폴더 경로가 하나일 때

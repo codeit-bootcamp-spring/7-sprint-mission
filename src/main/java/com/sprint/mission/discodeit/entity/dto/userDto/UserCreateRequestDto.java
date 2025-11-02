@@ -15,7 +15,7 @@ public class UserCreateRequestDto {
     private final String password;
     private String phoneNum;    // 선택사항
 
-    // 선택적으로 프로필 이미지 등록
+    // 선택적으로 프로필 이미지 등록 -> 이것도 dto로 받아서?
     private byte[] profileImage;
     private String profileName;
     private String profileType;

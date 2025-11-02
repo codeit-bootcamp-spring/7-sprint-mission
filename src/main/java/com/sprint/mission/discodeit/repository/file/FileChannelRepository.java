@@ -7,13 +7,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public class FileChannelRepository extends FileBaseRepository<Channel> implements ChannelRepository {
 
     private static final String CHANNEL_DATA_FILE = "channelData.ser";
 
-    public FileChannelRepository() {
-        super(CHANNEL_DATA_FILE);
+    public FileChannelRepository(String basePath) {
+        super(basePath + "/" + CHANNEL_DATA_FILE);
     }
 
     @Override

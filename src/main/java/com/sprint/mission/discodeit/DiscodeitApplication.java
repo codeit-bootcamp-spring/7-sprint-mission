@@ -151,4 +151,10 @@ public class DiscodeitApplication {
      */
 
 
+    // User에 UUID profileImage를 추가하고 유저 프로필 조회를 추가
+    // message에 List<UUID>binary 를 추가 -> 이 2개가 요구사항에 있었음
+    // BasicUserService에 프로필업데이트 전에 받은 프로필이 없다면 실행x
+
+
+
 }
