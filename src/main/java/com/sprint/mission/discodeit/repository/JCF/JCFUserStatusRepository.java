@@ -1,0 +1,58 @@
+package com.sprint.mission.discodeit.repository.JCF;
+
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.InterfaceUserStatusRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.*;
+
+@Repository
+public class JCFUserStatusRepository implements InterfaceUserStatusRepository {
+
+
+    private final Map<UUID, UserStatus> data;
+
+    public JCFUserStatusRepository() {
+        this.data = new HashMap<>();
+    }
+
+    @Override
+    public boolean isOnline() {
+        return false;
+    }
+
+    @Override
+    public void save(UserStatus model) {
+        this.data.put(model.getId(), model);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
+    }
+
+    @Override
+    public Optional<UserStatus> findById(UUID id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<List<UserStatus>> findAll() {
+        List<UserStatus> list = this.data.values().stream().toList();
+        return Optional.ofNullable(list);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+//        List<UserStatus> list = this.data.values().stream().toList();
+//        list.stream().anyMatch(userStatus -> userStatus.)
+//        this.data.values().stream().anyMatch(userStatus -> userStatus.)
+
+        return false;
+    }
+}
