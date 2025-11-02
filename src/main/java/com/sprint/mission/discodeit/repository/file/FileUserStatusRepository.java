@@ -81,4 +81,9 @@ implements UserStatusRepository {
     public void delete(UUID userId) {
         deleteFile(userId);
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return fileExistsById(id);
+    }
 }

@@ -44,18 +44,20 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void updateOnlineAt(UUID id) {
-
         data.get(id).updateOnlineAt();
+        save(data.get(id));
     }
 
     @Override
     public void updateOfflineAt(UUID id) {
         data.get(id).updateOfflineAt();
+        save(data.get(id));
     }
 
     @Override
     public void update(UUID id) {
         data.get(id).updateOnline();
+        save(data.get(id));
     }
 
     @Override
@@ -70,5 +72,10 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public void delete(UUID userId) {
         data.remove(userId);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return data.containsKey(id);
     }
 }

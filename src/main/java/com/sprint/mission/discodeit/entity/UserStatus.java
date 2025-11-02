@@ -30,12 +30,14 @@ public class UserStatus extends BaseEntity{
 
     //로그인 했을 때
     public UserStatus updateOnlineAt(){
+        super.update();
         this.onlineAt = Instant.now();
         return this;
     }
 
     //종료되었을 때
     public UserStatus updateOfflineAt(){
+        super.update();
         this.offlineAt = Instant.now();
         return this;
     }
