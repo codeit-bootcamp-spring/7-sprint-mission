@@ -40,13 +40,13 @@ public class BasicUserStatusService implements UserStatusService {
 
     // ===== 🔧 Controller Direct (단일 도메인 / void) =====
     @Override
-    public void updateOnlineAt(UUID userId) {
-        userStatusRepository.updateOnlineAt(userId);
+    public void updateOnlineAt(UUID id) {
+        userStatusRepository.updateOnlineAt(id);
     }
 
     @Override
-    public void updateOfflineAt(UUID userId) {
-        userStatusRepository.updateOfflineAt(userId);
+    public void updateOfflineAt(UUID id) {
+        userStatusRepository.updateOfflineAt(id);
     }
 
     @Override
