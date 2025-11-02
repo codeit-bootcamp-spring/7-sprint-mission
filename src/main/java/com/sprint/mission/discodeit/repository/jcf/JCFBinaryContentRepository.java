@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFBinaryContentRepository implements BinaryContentRepository {
     // 바이너리 컨텐츠 데이터
-    private final Map<UUID, BinaryContent> data = new ConcurrentHashMap<>();
+    public final Map<UUID, BinaryContent> data = new ConcurrentHashMap<>();
     
     //저장
     @Override

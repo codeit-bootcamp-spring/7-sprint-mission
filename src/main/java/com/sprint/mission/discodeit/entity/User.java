@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

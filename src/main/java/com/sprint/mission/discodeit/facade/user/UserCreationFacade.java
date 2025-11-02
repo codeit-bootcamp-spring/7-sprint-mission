@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.facade.user;
 
 
 import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
-import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -28,9 +27,11 @@ public class UserCreationFacade {
         UUID profileId = null;
 
         if (req.profileImage().data() != null) {
+
             BinaryContent profile = binaryContentService.create(
                     BinaryContentFactory.create(req.profileImage())
             );
+
             profileId = profile.getId();
         }
 
