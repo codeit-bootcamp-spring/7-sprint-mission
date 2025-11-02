@@ -101,7 +101,7 @@ public class BasicUserService implements UserService {
 
         // 프로필 이미지 선택적 로직
         UUID profileId = null;
-        if(contentRequest.data() != null){
+        if(contentRequest != null && contentRequest.data() != null){
             BinaryContent content = new BinaryContent(
                     contentRequest.data(),
                     contentRequest.fileName(),
