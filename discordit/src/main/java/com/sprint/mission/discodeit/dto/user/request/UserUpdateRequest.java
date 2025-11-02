@@ -6,7 +6,7 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
-public record UserUpdateRequestDto(
+public record UserUpdateRequest(
         @NotNull(message = "id는 필수입니다.")
         String userId,
 

@@ -1,40 +1,40 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.message.GetMessageDto;
-import com.sprint.mission.discodeit.dto.message.request.SendMessageDto;
+import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channel.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.message.request.MessageGetRequest;
+import com.sprint.mission.discodeit.dto.message.request.MessageSendRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
-import com.sprint.mission.discodeit.dto.user.request.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.enums.ChannelScope;
 import com.sprint.mission.discodeit.enums.ChannelType;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 import com.sprint.mission.discodeit.enums.ReceiverType;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
 import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Component
 @RequiredArgsConstructor
 public class DiscodeIt {
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
-
     private final UserService userService;
     private final ChannelService channelService;
     private final MessageService messageService;
-    private final BinaryContentService binaryContentService;
+    private final BasicBinaryContentService binaryContentService;
 
     private final Scanner scanner = new Scanner(System.in);
     private boolean exitFlag = false;
@@ -83,7 +83,7 @@ public class DiscodeIt {
             case 1 -> {
                 System.out.print("발신자 아이디: ");
                 String userId = scanner.next();
-                messageList = messageService.get(new GetMessageDto(userId, null, null));
+                messageList = messageService.get(new MessageGetRequest(userId, null, null));
             }
             case 2 -> {
                 System.out.print("발신자 아이디: ");
@@ -93,23 +93,21 @@ public class DiscodeIt {
                 ReceiverType type = (t == 1) ? ReceiverType.USER : ReceiverType.CHANNEL;
                 System.out.print("수신자 아이디(채널은 UUID): ");
                 String receiverId = scanner.next();
-                messageList = messageService.get(new GetMessageDto(senderId, type, receiverId));
+                messageList = messageService.get(new MessageGetRequest(senderId, type, receiverId));
             }
             case 3 -> {
-                List<UUID> uuids = channelRepository.findAll().stream()
-                        .map(Channel::getUuid)
-                        .toList();
+                List<UUID> uuids = channelService.getAllIds();
                 if (uuids.isEmpty()) {
                     System.out.println("채널이 없습니다.");
                     return;
                 }
                 UUID receiverId = displayChannelAndSelect(uuids);
-                messageList = messageService.get(new GetMessageDto(null, ReceiverType.CHANNEL, receiverId.toString()));
+                messageList = messageService.get(new MessageGetRequest(null, ReceiverType.CHANNEL, receiverId.toString()));
             }
             case 4 -> {
                 System.out.print("수신자 아이디: ");
                 String recv = scanner.next();
-                messageList = messageService.get(new GetMessageDto(null, ReceiverType.USER, recv));
+                messageList = messageService.get(new MessageGetRequest(null, ReceiverType.USER, recv));
             }
         }
         for (MessageResponse message : messageList) {
@@ -128,7 +126,7 @@ public class DiscodeIt {
     private void display(MessageResponse message) {
         System.out.printf("[%s] -> [%s] \n%s\n",
                 message.senderId(),
-                message.receiverId(),
+                message.receiverDisplayName(),
                 message.message());
     }
 
@@ -155,14 +153,14 @@ public class DiscodeIt {
     }
 
     private void printOnlineUsers() {
-        List<UserResponseDto> onlineUsers = userService.getOnlineUsers();
+        List<UserResponse> onlineUsers = userService.getOnlineUsers();
         System.out.println("현재 접속 중인 유저들: ");
         printUserDetails(onlineUsers);
     }
 
-    private void printUserDetails(List<UserResponseDto> users) {
+    private void printUserDetails(List<UserResponse> users) {
         for (int i = 0; i < users.size(); i++) {
-            UserResponseDto u = users.get(i);
+            UserResponse u = users.get(i);
             System.out.printf("-\t%d.[%s]\t%s(%s) \"%s\"\n",
                     i + 1,
                     u.userId(),
@@ -173,7 +171,7 @@ public class DiscodeIt {
     }
 
     private void sendDirectMessage() {
-        List<UserResponseDto> onlineUsers = userService.getOnlineUsers();
+        List<UserResponse> onlineUsers = userService.getOnlineUsers();
         if (onlineUsers.isEmpty()) {
             System.out.println("온라인 사용자가 없습니다.");
             return;
@@ -182,7 +180,7 @@ public class DiscodeIt {
         printUserDetails(onlineUsers);
         System.out.print("누구에게 메세지를 보낼까요? >> ");
 
-        UserResponseDto receiver = onlineUsers.get(getInput(onlineUsers.size()) - 1);
+        UserResponse receiver = onlineUsers.get(getInput(onlineUsers.size()) - 1);
 
         String msg;
         while (true) {
@@ -190,7 +188,7 @@ public class DiscodeIt {
             msg = scanner.next();
             if ("0".equals(msg)) return;
             List<String> files = promptFileUrls();
-            messageService.send(new SendMessageDto(
+            messageService.send(new MessageSendRequest(
                     loginId,
                     ReceiverType.USER,
                     receiver.userId(),
@@ -204,7 +202,7 @@ public class DiscodeIt {
     private void manageMyProfile() {
         printLine();
         System.out.println("[내정보]");
-        UserResponseDto me = userService.getByUserId(loginId);
+        UserResponse me = userService.getByUserId(loginId);
         System.out.printf("아이디: %s\n닉네임: %s\n소개말: %s\n현재 상태: %s\n",
                 me.userId(), me.displayName(), me.bio(), me.onlineStatus());
         System.out.println();
@@ -226,15 +224,15 @@ public class DiscodeIt {
                 }
                 System.out.print("새 비밀번호 >> ");
                 String newPw = scanner.next();
-                userService.update(new UserUpdateRequestDto(loginId, newPw, null, null, null, null, null));
+                userService.update(new UserUpdateRequest(loginId, newPw, null, null, null, null, null));
             }
             case 2 -> {
                 System.out.print("변경할 닉네임 >> ");
-                userService.update(new UserUpdateRequestDto(loginId, null, scanner.next(), null, null, null, null));
+                userService.update(new UserUpdateRequest(loginId, null, scanner.next(), null, null, null, null));
             }
             case 3 -> {
                 System.out.print("변경할 소개말 >> ");
-                userService.update(new UserUpdateRequestDto(loginId, null, null, null, scanner.next(), null, null));
+                userService.update(new UserUpdateRequest(loginId, null, null, null, scanner.next(), null, null));
             }
             case 4 -> {
                 System.out.print("변경할 상태를 선택해주세요. ");
@@ -243,7 +241,7 @@ public class DiscodeIt {
                     System.out.printf("\t%d. \t\t%s ", i + 1, userStatuses[i]);
                 }
                 OnlineStatus st = userStatuses[getInput(userStatuses.length) - 1];
-                userService.update(new UserUpdateRequestDto(loginId, null, null, null, null, st, null));
+                userService.update(new UserUpdateRequest(loginId, null, null, null, null, st, null));
             }
         }
         System.out.println("정상적으로 변경되었습니다.");
@@ -251,7 +249,7 @@ public class DiscodeIt {
 
     private void logout() {
         System.out.println("로그아웃 합니다..");
-        userService.update(new UserUpdateRequestDto(loginId, null, null, null, null, OnlineStatus.OFFLINE, null));
+        userService.update(new UserUpdateRequest(loginId, null, null, null, null, OnlineStatus.OFFLINE, null));
         loginId = null;
     }
 
@@ -276,9 +274,7 @@ public class DiscodeIt {
     }
 
     private void printAllChannels() {
-        List<UUID> allChannel = channelRepository.findAll().stream()
-                .map(Channel::getUuid)
-                .toList();
+        List<UUID> allChannel = channelService.getAllIds();
         if (allChannel.isEmpty()) {
             System.out.println("현재 개설된 채널이 없습니다.");
             return;
@@ -289,26 +285,20 @@ public class DiscodeIt {
 
     private void leaveChannel() {
         printLine();
-        List<UUID> registeredChannels = channelRepository.findAll().stream()
-                .filter(c -> c.getMembers().stream().anyMatch(u -> u.getUserId().equals(loginId)))
-                .map(Channel::getUuid)
-                .toList();
+        List<UUID> registeredChannels = channelService.getAllIdsByUserId(loginId);
         if (registeredChannels.isEmpty()) {
             System.out.println("가입된 채널이 없습니다.");
             return;
         }
-        System.out.print("나갈 채널을 선택해주세요. >> ");
+        System.out.println("나갈 채널을 선택해주세요. >> ");
         UUID channel = displayChannelAndSelect(registeredChannels);
-        channelService.deleteMember(channel, userRepository.findByUserId(loginId));
+        channelService.deleteMember(channel, loginId);
         System.out.println("채널에서 나왔습니다.");
     }
 
     private void enterChannel() {
         printLine();
-        List<UUID> channels = channelRepository.findAll().stream()
-                .filter(c -> c.getMembers().stream().anyMatch(u -> u.getUserId().equals(loginId)))
-                .map(Channel::getUuid)
-                .toList();
+        List<UUID> channels = channelService.getAllIdsByUserId(loginId);
         if (channels.isEmpty()) {
             System.out.println("가입된 채널이 없습니다.");
             return;
@@ -321,7 +311,7 @@ public class DiscodeIt {
 
     private void enterChannelInternal(UUID uuid) {
         printLine();
-        ChannelResponseDto channel = channelService.getById(uuid);
+        ChannelResponse channel = channelService.getById(uuid);
         while (true) {
             System.out.printf("채널 [%s]에 접속했습니다\n1. 사용자 보기 2. 메세지 보내기 3. 뒤로가기 >> ", channel.channelName());
             switch (getInput(3)) {
@@ -338,7 +328,7 @@ public class DiscodeIt {
             String message = scanner.next();
             if ("-".equals(message)) return;
             List<String> files = promptFileUrls();
-            messageService.send(new SendMessageDto(
+            messageService.send(new MessageSendRequest(
                     loginId,
                     ReceiverType.CHANNEL,
                     uuid.toString(),
@@ -351,10 +341,7 @@ public class DiscodeIt {
 
     private void printRegisteredChannel() {
         printLine();
-        List<UUID> channels = channelRepository.findAll().stream()
-                .filter(c -> c.getMembers().stream().anyMatch(u -> u.getUserId().equals(loginId)))
-                .map(Channel::getUuid)
-                .toList();
+        List<UUID> channels = channelService.getAllIdsByUserId(loginId);
         if (channels.isEmpty()) {
             System.out.println("가입된 채널이 없습니다.");
             return;
@@ -363,17 +350,18 @@ public class DiscodeIt {
     }
 
     private void registerChannel() {
-        List<UUID> notJoined = channelRepository.findAll().stream()
-            .filter(c -> c.getMembers().stream().noneMatch(u -> u.getUserId().equals(loginId)))
-            .map(Channel::getUuid)
+        List<UUID> allChannels = channelService.getAllIds();
+        List<UUID> myChannels = channelService.getAllIdsByUserId(loginId);
+        List<UUID> notJoined = allChannels.stream()
+            .filter(uuid -> !myChannels.contains(uuid))
             .toList();
         if (notJoined.isEmpty()) {
             System.out.println("가입할 수 있는 채널이 없습니다.");
             return;
         }
         UUID selectedChannel = displayChannelAndSelect("가입되지 않은 채널 : ", notJoined);
-        channelService.addMember(selectedChannel, userRepository.findByUserId(loginId));
-        ChannelResponseDto dto = channelService.getById(selectedChannel);
+        channelService.addMember(selectedChannel, loginId);
+        ChannelResponse dto = channelService.getById(selectedChannel);
         System.out.printf("채널 [%s]이(가) 가입되었습니다!\n", dto.channelName());
     }
 
@@ -389,7 +377,7 @@ public class DiscodeIt {
         System.out.println();
         ChannelType type = types[getInput(types.length) - 1];
 
-        channelService.createPublicChannel(new com.sprint.mission.discodeit.dto.channel.request.PublicChannelCreateRequestDto(
+        channelService.createPublicChannel(new PublicChannelCreateRequest(
                 channelName,
                 ChannelScope.PUBLIC,
                 type,
@@ -403,21 +391,21 @@ public class DiscodeIt {
     private void printChannelDetails(List<UUID> uuids) {
         printLine();
         for (UUID uuid : uuids) {
-            ChannelResponseDto channel = channelService.getById(uuid);
+            ChannelResponse channel = channelService.getById(uuid);
             System.out.printf("\t- %s \t\t---\t%s\n", channel.channelName(), channel.type());
         }
     }
 
     private void printAllRegisteredUser(UUID uuid) {
-        List<UserResponseDto> users = channelService.getAllMembers(uuid);
-        for (UserResponseDto u : users) {
+        List<UserResponse> users = channelService.getAllMembers(uuid);
+        for (UserResponse u : users) {
             System.out.printf("\t- %s(%s)\n", u.displayName(), u.onlineStatus());
         }
     }
 
     private void printNumberedChannels(List<UUID> uuids) {
         for (int i = 0; i < uuids.size(); i++) {
-            ChannelResponseDto channel = channelService.getById(uuids.get(i));
+            ChannelResponse channel = channelService.getById(uuids.get(i));
             System.out.printf("\t%d. \t\t%s \t(%s)\n", i + 1, channel.channelName(), channel.type());
         }
     }
@@ -450,7 +438,7 @@ public class DiscodeIt {
     private void changeMyEmail() {
         System.out.print("새 이메일 >> ");
         String email = scanner.next();
-        userService.update(new UserUpdateRequestDto(loginId, null, null, email, null, null, null));
+        userService.update(new UserUpdateRequest(loginId, null, null, email, null, null, null));
         System.out.println("이메일이 변경되었습니다.");
     }
 
@@ -505,7 +493,7 @@ public class DiscodeIt {
         System.out.print("관리자 아이디들(쉼표 구분, 비우면 본인만) >> ");
         String moderatorsLine = scanner.next();
         Set<String> moderators = parseIdsOrDefault(moderatorsLine, loginId);
-        channelService.createPrivateChannel(new com.sprint.mission.discodeit.dto.channel.request.PrivateChannelCreateRequestDto(
+        channelService.createPrivateChannel(new PrivateChannelCreateRequest(
                 ChannelScope.PRIVATE,
                 type,
                 moderators,
@@ -515,11 +503,7 @@ public class DiscodeIt {
     }
 
     private void manageChannel() {
-        List<UUID> channels = channelRepository.findAll().stream()
-                .filter(c -> c.getModerators().stream().anyMatch(u -> u.getUserId().equals(loginId))
-                        || c.getMembers().stream().anyMatch(u -> u.getUserId().equals(loginId)))
-                .map(Channel::getUuid)
-                .toList();
+        List<UUID> channels = channelService.getAllIdsByUserId(loginId);
         if (channels.isEmpty()) {
             System.out.println("관리 가능한 채널이 없습니다.");
             return;
@@ -535,31 +519,31 @@ public class DiscodeIt {
                     String desc = scanner.next();
                     String newName = "-".equals(name) ? null : name;
                     String newDesc = "-".equals(desc) ? null : desc;
-                    channelService.update(new com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequestDto(chId, newName, newDesc));
+                    channelService.update(new ChannelUpdateRequest(chId, newName, newDesc));
                     System.out.println("수정했습니다.");
                 }
                 case 2 -> {
                     System.out.print("추가할 멤버 아이디 >> ");
                     String uid = scanner.next();
-                    channelService.addMember(chId, userRepository.findByUserId(uid));
+                    channelService.addMember(chId, uid);
                     System.out.println("추가했습니다.");
                 }
                 case 3 -> {
                     System.out.print("제거할 멤버 아이디 >> ");
                     String uid = scanner.next();
-                    channelService.deleteMember(chId, userRepository.findByUserId(uid));
+                    channelService.deleteMember(chId, uid);
                     System.out.println("제거했습니다.");
                 }
                 case 4 -> {
                     System.out.print("추가할 관리자 아이디 >> ");
                     String uid = scanner.next();
-                    channelService.addModerator(chId, userRepository.findByUserId(uid));
+                    channelService.addModerator(chId, uid);
                     System.out.println("추가했습니다.");
                 }
                 case 5 -> {
                     System.out.print("제거할 관리자 아이디 >> ");
                     String uid = scanner.next();
-                    channelService.deleteModerator(chId, userRepository.findByUserId(uid));
+                    channelService.deleteModerator(chId, uid);
                     System.out.println("제거했습니다.");
                 }
                 case 6 -> {
@@ -616,7 +600,7 @@ public class DiscodeIt {
             if (displayName.isEmpty()) { System.out.println("닉네임은 비어있을 수 없습니다."); continue; }
 
             try {
-                userService.signIn(new UserCreateRequestDto(id, passwd, email, displayName, null));
+                userService.signIn(new UserCreateRequest(id, passwd, email, displayName, null));
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 continue;

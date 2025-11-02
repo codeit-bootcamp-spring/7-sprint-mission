@@ -12,22 +12,29 @@ public record MessageResponse(
         String senderId,
         ReceiverType type,
         String receiverId,
+        String receiverDisplayName,
         String message,
         List<String> fileUrls
 ) {
     public static MessageResponse toDto(Message message) {
         ReceiverType type = ReceiverType.from(message.getReceiver());
         String receiverId;
+        String receiverDisplayName;
         if (type == ReceiverType.USER) {
-            receiverId = ((User) message.getReceiver()).getUserId();
+            User receiver = (User) message.getReceiver();
+            receiverId = receiver.getUserId();
+            receiverDisplayName = receiver.getDisplayName();
         } else {
-            receiverId = ((Channel) message.getReceiver()).getUuid().toString();
+            Channel receiver = (Channel) message.getReceiver();
+            receiverId = receiver.getUuid().toString();
+            receiverDisplayName = receiver.getDisplayName();
         }
 
         return new MessageResponse(
                 message.getSender().getUserId(),
                 type,
                 receiverId,
+                receiverDisplayName,
                 message.getMessage(),
                 message.getAttachments().stream()
                         .map(BinaryContent::getFileUrl)

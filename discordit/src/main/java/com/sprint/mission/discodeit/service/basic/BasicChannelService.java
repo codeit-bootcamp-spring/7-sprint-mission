@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.channel.request.PrivateChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.channel.request.PublicChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
+import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channel.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -31,7 +31,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public UUID createPublicChannel(PublicChannelCreateRequestDto dto) {
+    public UUID createPublicChannel(PublicChannelCreateRequest dto) {
         Channel channel = new Channel(dto.channelName(),
                 dto.scope(),
                 dto.type(),
@@ -44,7 +44,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public UUID createPrivateChannel(PrivateChannelCreateRequestDto dto) {
+    public UUID createPrivateChannel(PrivateChannelCreateRequest dto) {
         Channel channel = new Channel("",
                 dto.scope(),
                 dto.type(),
@@ -62,7 +62,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void update(ChannelUpdateRequestDto dto) {
+    public void update(ChannelUpdateRequest dto) {
         Channel channel = channelRepository.findById(dto.id());
 
         if (dto.channelName() != null) {
@@ -85,18 +85,18 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelResponseDto> getAll() {
+    public List<ChannelResponse> getAll() {
         return channelRepository.findAll().stream()
                 .map(this::toDto)
                 .toList();
     }
 
-    public ChannelResponseDto getNth(int index) {
+    public ChannelResponse getNth(int index) {
         return toDto(channelRepository.findAll().get(index));
     }
 
     @Override
-    public List<ChannelResponseDto> getAllByUserId(String userId) {
+    public List<ChannelResponse> getAllByUserId(String userId) {
         User user = userRepository.findByUserId(userId);
         return Stream.concat(channelRepository.findAllPublic().stream(), channelRepository.findAllPrivateByUser(user).stream())
                 .map(this::toDto)
@@ -104,46 +104,77 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto getById(UUID uuid) {
+    public ChannelResponse getById(UUID uuid) {
         return toDto(channelRepository.findById(uuid));
     }
 
     @Override
-    public List<UserResponseDto> getAllMembers(UUID uuid) {
+    public List<UserResponse> getAllMembers(UUID uuid) {
         return channelRepository.findById(uuid).getMembers().stream()
-                .map(UserResponseDto::toDto)
+                .map(UserResponse::toDto)
                 .toList();
     }
 
     @Override
-    public List<UserResponseDto> getAllModerators(UUID uuid) {
+    public List<UserResponse> getAllModerators(UUID uuid) {
         return channelRepository.findById(uuid).getModerators().stream()
-                .map(UserResponseDto::toDto)
+                .map(UserResponse::toDto)
                 .toList();
     }
 
     @Override
-    public void addMember(UUID uuid, User user) {
+    public List<UUID> getAllIds() {
+        return channelRepository.findAll().stream()
+                .map(Channel::getUuid)
+                .toList();
+    }
+
+    @Override
+    public List<UUID> getAllIdsByUserId(String userId) {
+        User user = userRepository.findByUserId(userId);
+        return Stream.concat(
+                channelRepository.findAllPublic().stream(),
+                channelRepository.findAllPrivateByUser(user).stream()
+        ).map(Channel::getUuid).toList();
+    }
+
+    @Override
+    public String getDisplayName(UUID uuid) {
+        return channelRepository.findById(uuid).getDisplayName();
+    }
+
+    @Override
+    public com.sprint.mission.discodeit.enums.ChannelType getType(UUID uuid) {
+        return channelRepository.findById(uuid).getType();
+    }
+
+    // 멤버 수정 (userId 기반)
+    @Override
+    public void addMember(UUID uuid, String userId) {
+        User user = userRepository.findByUserId(userId);
         Channel channel = channelRepository.findById(uuid);
         channel.addMember(user);
     }
 
     @Override
-    public void addModerator(UUID uuid, User user) {
+    public void addModerator(UUID uuid, String userId) {
+        User user = userRepository.findByUserId(userId);
         channelRepository.findById(uuid).addModerator(user);
     }
 
     @Override
-    public void deleteMember(UUID uuid, User user) {
+    public void deleteMember(UUID uuid, String userId) {
+        User user = userRepository.findByUserId(userId);
         channelRepository.findById(uuid).deleteMember(user);
     }
 
     @Override
-    public void deleteModerator(UUID uuid, User user) {
+    public void deleteModerator(UUID uuid, String userId) {
+        User user = userRepository.findByUserId(userId);
         channelRepository.findById(uuid).deleteModerator(user);
     }
 
-    private ChannelResponseDto toDto(Channel channel) {
-        return ChannelResponseDto.toDto(channel, messageRepository.findLast(channel).getCreatedAt());
+    private ChannelResponse toDto(Channel channel) {
+        return ChannelResponse.toDto(channel, messageRepository.findLast(channel).getCreatedAt());
     }
 }

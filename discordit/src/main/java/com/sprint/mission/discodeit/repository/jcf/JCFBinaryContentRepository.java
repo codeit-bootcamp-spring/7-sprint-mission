@@ -41,6 +41,11 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
+    public List<BinaryContent> findAll() {
+        return List.copyOf(data.values());
+    }
+
+    @Override
     public List<BinaryContent> findAllByUser(User user) {
         return data.values().stream()
                 .filter(c -> c.getUploadUser().equals(user))

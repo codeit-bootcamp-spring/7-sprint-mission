@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public record ChannelResponseDto(
+public record ChannelResponse(
         String channelName,
         ChannelScope scope,
         ChannelType type,
@@ -19,8 +19,8 @@ public record ChannelResponseDto(
         Instant recentMessageTime
 
 ) {
-    public static ChannelResponseDto toDto(Channel channel, Instant recentTime) {
-        return new ChannelResponseDto(
+    public static ChannelResponse toDto(Channel channel, Instant recentTime) {
+        return new ChannelResponse(
                 channel.getChannelName(),
                 channel.getScope(),
                 channel.getType(),

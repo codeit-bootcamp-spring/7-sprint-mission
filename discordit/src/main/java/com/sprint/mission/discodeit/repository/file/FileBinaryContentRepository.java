@@ -48,6 +48,11 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
+    public List<BinaryContent> findAll() {
+        return List.copyOf(data.values());
+    }
+
+    @Override
     public List<BinaryContent> findAllByUser(User user) {
         return data.values().stream()
                 .filter(b -> b.getUploadUser().equals(user))

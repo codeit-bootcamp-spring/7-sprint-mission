@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.dto.user.request.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -26,34 +26,34 @@ public class BasicUserService implements UserService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public UserResponseDto getByUserId(String userId) {
-        return UserResponseDto.toDto(userRepository.findByUserId(userId));
+    public UserResponse getByUserId(String userId) {
+        return UserResponse.toDto(userRepository.findByUserId(userId));
     }
 
     @Override
-    public UserResponseDto getById(UUID uuid) {
-        return UserResponseDto.toDto(userRepository.findById(uuid));
+    public UserResponse getById(UUID uuid) {
+        return UserResponse.toDto(userRepository.findById(uuid));
     }
 
 
     @Override
-    public List<UserResponseDto> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(UserResponseDto::toDto)
+                .map(UserResponse::toDto)
                 .toList();
     }
 
     @Override
-    public List<UserResponseDto> getOnlineUsers() {
+    public List<UserResponse> getOnlineUsers() {
         return userRepository.findAll().stream()
                 .filter(u -> u.getOnlineStatus() != OnlineStatus.OFFLINE)
-                .map(UserResponseDto::toDto)
+                .map(UserResponse::toDto)
                 .toList();
     }
 
 
     @Override
-    public void signIn(UserCreateRequestDto dto) {
+    public void signIn(UserCreateRequest dto) {
         User user = new User(dto.id(), dto.passwd(), dto.email(), dto.displayName());
         if (dto.profileImage() != null) {
             user.setProfileImage(dto.profileImage());
@@ -62,18 +62,18 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto login(String id, String passwd) {
+    public UserResponse login(String id, String passwd) {
         User user = userRepository.findByUserId(id);
         if (!user.getPasswd().equals(passwd))
             throw new IllegalArgumentException("아이디와 비밀번호가 일치하지 않습니다.");
 
         user.setOnlineStatus(OnlineStatus.ONLINE);
         userRepository.update(user);
-        return UserResponseDto.toDto(user);
+        return UserResponse.toDto(user);
     }
 
     @Override
-    public void update(UserUpdateRequestDto dto) {
+    public void update(UserUpdateRequest dto) {
         User user = userRepository.findByUserId(dto.userId());
         if (dto.passwd() != null) {
             user.setPasswd(dto.passwd());

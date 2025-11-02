@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 
-public record UserResponseDto(
+public record UserResponse(
         String userId,
         String email,
         String displayName,
@@ -12,8 +12,8 @@ public record UserResponseDto(
         OnlineStatus onlineStatus,
         BinaryContent profileImage
 ) {
-    public static UserResponseDto toDto(User user) {
-        return new UserResponseDto(
+    public static UserResponse toDto(User user) {
+        return new UserResponse(
                 user.getUserId(),
                 user.getEmail(),
                 user.getDisplayName(),

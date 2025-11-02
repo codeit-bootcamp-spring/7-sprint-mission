@@ -49,6 +49,11 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public List<ReadStatus> findAll() {
+        return List.copyOf(data);
+    }
+
+    @Override
     public void delete(ReadStatus readStatus) {
         if (!data.remove(readStatus)) {
             throw new ReadStatusNotFoundException(readStatus);

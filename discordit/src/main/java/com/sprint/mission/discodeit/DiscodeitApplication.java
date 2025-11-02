@@ -16,7 +16,6 @@ public class DiscodeitApplication {
 		// 어차피 JCF는 더 안 쓸 거고 곧 데이터베이스 연결할 것 같아서 그냥 이렇게 사용함
 		// context로 가져온 이유는 미션 요구사항이라서
 		context.getBean("dataLoader", DataLoader.class).loadAll();
-
 		context.getBean("discodeIt", DiscodeIt.class).start();
 	}
 

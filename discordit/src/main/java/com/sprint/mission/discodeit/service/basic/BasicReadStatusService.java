@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -21,7 +21,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-    public ReadStatusResponse create(ReadStatusCreateRequestDto dto) {
+    public ReadStatusResponse create(ReadStatusCreateRequest dto) {
         ReadStatus readStatus = new ReadStatus(
                 userRepository.findByUserId(dto.userId()),
                 channelRepository.findById(dto.ChannelId())

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record SendMessageDto(
+public record MessageSendRequest(
         @NotNull(message = "보내는 사람은 필수입니다.")
         String senderUserId,
         @NotNull(message = "수신 타입은 필수입니다.")

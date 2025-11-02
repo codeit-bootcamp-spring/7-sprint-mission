@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.GetMessageDto;
-import com.sprint.mission.discodeit.dto.message.request.SendMessageDto;
+import com.sprint.mission.discodeit.dto.message.request.MessageGetRequest;
+import com.sprint.mission.discodeit.dto.message.request.MessageSendRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Receivable;
@@ -31,7 +31,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public void send(SendMessageDto dto) {
+    public void send(MessageSendRequest dto) {
         User sender = userRepository.findByUserId(dto.senderUserId());
 
         Receivable receiver;
@@ -64,7 +64,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageResponse> get(GetMessageDto dto) {
+    public List<MessageResponse> get(MessageGetRequest dto) {
         List<Message> messages;
         if (dto.senderId() != null && dto.receiverId() != null) {
             messages = messageRepository.findBySenderAndReceiver(userRepository.findByUserId(dto.senderId()),

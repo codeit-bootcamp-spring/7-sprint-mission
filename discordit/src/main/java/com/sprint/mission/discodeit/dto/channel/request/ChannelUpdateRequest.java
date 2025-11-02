@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public record ChannelUpdateRequestDto(
+public record ChannelUpdateRequest(
         @NotNull(message = "id는 필수입니다.")
         UUID id,
         @NotBlank(message = "채널 이름은 비어있을 수 없습니다.")

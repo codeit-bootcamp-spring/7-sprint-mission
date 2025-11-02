@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -66,5 +67,14 @@ class DataWriter {
             throw new RuntimeException(e);
         }
     }
-}
 
+    public static void writeUserStatus(Map<UUID, UserStatus> data) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_STATUS_FILE_PATH))) {
+            oos.writeObject(data.values().stream()
+                    .map(Mapper::toDto)
+                    .toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}

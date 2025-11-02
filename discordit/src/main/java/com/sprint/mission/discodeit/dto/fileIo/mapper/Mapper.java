@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.dto.fileIo.mapper;
 import com.sprint.mission.discodeit.dto.fileIo.BinaryContentIoDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -10,6 +11,7 @@ import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.MessageIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.UserIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.ReadStatusIoDTO;
+import com.sprint.mission.discodeit.dto.fileIo.UserStatusIoDTO;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -23,10 +25,6 @@ public final class Mapper {
 
     public static ChannelIoDTO toChannelDTO(Channel channel) {
         return ChannelMapper.toDto(channel);
-    }
-
-    public static User toUser(UserIoDTO dto){
-        return UserMapper.toUser(dto);
     }
 
     public static UserIoDTO toUserDto (User user) {
@@ -66,5 +64,14 @@ public final class Mapper {
                                           UserRepository userRepository,
                                           ChannelRepository channelRepository) {
         return ReadStatusMapper.toReadStatus(dto, userRepository, channelRepository);
+    }
+
+    public static UserStatusIoDTO toDto(UserStatus userStatus) {
+        return UserStatusMapper.toDto(userStatus);
+    }
+
+    public static UserStatus toUserStatus(UserStatusIoDTO dto,
+                                          UserRepository userRepository) {
+        return UserStatusMapper.toUserStatus(dto, userRepository);
     }
 }

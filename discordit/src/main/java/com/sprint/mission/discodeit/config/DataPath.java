@@ -13,4 +13,5 @@ public final class DataPath {
     public static final String MESSAGE_FILE_PATH = DataPath.FILE_DIR + "/message.sav";
     public static final String BINARY_CONTENT_PATH = DataPath.FILE_DIR + "/binary_content.sav";
     public static final String READ_STATUS_FILE_PATH = DataPath.FILE_DIR + "/read_status.sav";
+    public static final String USER_STATUS_FILE_PATH = DataPath.FILE_DIR + "/user_status.sav";
 }

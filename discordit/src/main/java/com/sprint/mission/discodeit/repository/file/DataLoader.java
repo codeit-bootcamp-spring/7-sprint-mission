@@ -4,17 +4,20 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.dto.fileIo.BinaryContentIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.MessageIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.UserIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.ReadStatusIoDTO;
+import com.sprint.mission.discodeit.dto.fileIo.UserStatusIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.mapper.Mapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -33,10 +36,12 @@ public class DataLoader {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final UserStatusRepository userStatusRepository;
 
     public void loadAll() {
         loadBinaryContent();
         loadUser();
+        loadUserStatus();
         loadChannel();
         loadReadStatus();
         loadMessage();
@@ -48,6 +53,11 @@ public class DataLoader {
             file.getParentFile().mkdirs();
             return;
         }
+
+        if (!binaryContentRepository.findAll().isEmpty()) {
+            return;
+        }
+
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(BINARY_CONTENT_PATH))) {
             @SuppressWarnings("unchecked")
             List<BinaryContentIoDTO> list = (List<BinaryContentIoDTO>) ois.readObject();
@@ -145,6 +155,11 @@ public class DataLoader {
             file.getParentFile().mkdirs();
             return;
         }
+
+        if (!readStatusRepository.findAll().isEmpty()) {
+            return;
+        }
+
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(READ_STATUS_FILE_PATH))) {
             @SuppressWarnings("unchecked")
             List<ReadStatusIoDTO> list = (List<ReadStatusIoDTO>) ois.readObject();
@@ -158,6 +173,33 @@ public class DataLoader {
             // ignore
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("Failed to load read status file", e);
+        }
+    }
+
+    private void loadUserStatus() {
+        File file = new File(USER_STATUS_FILE_PATH);
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            return;
+        }
+
+        if (!userStatusRepository.findAll().isEmpty()) {
+            return;
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_STATUS_FILE_PATH))) {
+            @SuppressWarnings("unchecked")
+            List<UserStatusIoDTO> list = (List<UserStatusIoDTO>) ois.readObject();
+            List<UserStatus> objects = list.stream()
+                    .map(dto -> Mapper.toUserStatus(dto, userRepository))
+                    .toList();
+            for (UserStatus us : objects) {
+                userStatusRepository.save(us);
+            }
+        } catch (FileNotFoundException e) {
+            // ignore
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load user status file", e);
         }
     }
 }

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Set;
 
-public record PublicChannelCreateRequestDto(
+public record PublicChannelCreateRequest(
         @NotNull(message = "채널이름은 필수입니다.")
         String channelName,
         @NotNull(message = "공개 범위는 필수입니다.")
