@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -11,8 +12,10 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
-    private final java.time.Instant createdAt;
-    private java.time.Instant updatedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final Instant createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Instant updatedAt;
     private String username;
     private String email;
     private String password;
