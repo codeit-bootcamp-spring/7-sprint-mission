@@ -14,6 +14,7 @@ public class ChannelDetailViewFacade {
 
     //채널명으로 찾기
     public ChannelInfoRes findByName(String name) {
+        if (channelService.findByName(name) == null) return null;
         return channelMapper.toInfoRes(channelService.findByName(name));
     }
 }

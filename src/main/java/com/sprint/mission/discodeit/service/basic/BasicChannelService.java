@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
-import com.sprint.mission.discodeit.factory.ChannelSecFactory;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public class BasicChannelService implements ChannelService {
     //채널 생성: 비공개
     @Override
     public Channel create(ChannelCreateSecReq req) {
-        return channelRepository.save(ChannelSecFactory.create(req));
+        return channelRepository.save(ChannelFactory.create(req));
     }
 
     //채널 삭제
