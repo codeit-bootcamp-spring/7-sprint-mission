@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusViewRes;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -13,21 +14,29 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
 
+    // ===== 🏗️ Domain Logic (Facade 용)  =====
     @Override
     public UserStatus create(UserStatus userStatus) {
         return userStatusRepository.save(userStatus);
     }
 
     @Override
-    public UserStatus findById(UUID id) {
-        return userStatusRepository.findById(id);
-    }
-
-    @Override
     public UserStatus findByUserId(UUID userId) {
-        return userStatusRepository.findByUserId(userId);
+        return userStatusRepository.findByUserId(userId).orElseThrow(
+                ()-> new RuntimeException("UserStatus not found. userId:"+userId)
+        );
     }
 
+    // ===== 🎯 Controller Direct (DTO 반환) =====
+    @Override
+    public UserStatusViewRes findById(UUID id) {
+        UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(
+                ()-> new RuntimeException("UserStatus not found. id:"+id)
+        );
+        return UserStatusViewRes.from(userStatus);
+    }
+
+    // ===== 🔧 Controller Direct (단일 도메인 / void) =====
     @Override
     public void updateOnlineAt(UUID userId) {
         userStatusRepository.updateOnlineAt(userId);
@@ -49,7 +58,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus delete(UUID id) {
-        return userStatusRepository.delete(id);
+    public void delete(UUID id) {
+        userStatusRepository.delete(id);
     }
 }

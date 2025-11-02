@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,44 +28,44 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     //단일 조회
     @Override
-    public UserStatus findById(UUID userId) {
-        return data.get(userId);
+    public Optional<UserStatus> findById(UUID userId) {
+        return Optional.ofNullable(data.get(userId));
     }
 
     //유저 id 로 조회
     @Override
-    public UserStatus findByUserId(UUID userId) {
+    public Optional<UserStatus> findByUserId(UUID userId) {
         return data.values().stream()
                 .filter(us -> us.getUserId().equals(userId))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     @Override
     public void updateOnlineAt(UUID id) {
-        findById(id).updateOnlineAt();
+        data.get(id).updateOnlineAt();
     }
 
     @Override
     public void updateOfflineAt(UUID id) {
-        findById(id).updateOfflineAt();
+        data.get(id).updateOfflineAt();
     }
 
     @Override
     public void update(UUID id) {
-        UserStatus userStatus = findById(id);
-        userStatus.updateOnline();
+        data.get(id).updateOnline();
     }
 
     @Override
     public void updateByUserId(UUID userId) {
-        UserStatus userStatus = findByUserId(userId);
-        userStatus.updateOnline();
+        data.values().stream().filter(userStatus ->userStatus.getUserId().equals(userId))
+        .findFirst().ifPresent(userStatus -> {
+            userStatus.updateOnline();
+            save(userStatus);
+        });
     }
 
     @Override
-    public UserStatus delete(UUID userId) {
-        UserStatus userStatus = findById(userId);
+    public void delete(UUID userId) {
         data.remove(userId);
-        return userStatus;
     }
 }
