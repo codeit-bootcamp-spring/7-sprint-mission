@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.factory;
 
 import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateReq;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 
 public class ChannelFactory {
     private ChannelFactory(){}
@@ -11,6 +12,7 @@ public class ChannelFactory {
                 .managerId(req.managerId())
                 .name(req.name())
                 .description(req.description())
+                .publicType(ChannelType.PUBLIC)
                 .build();
     }
 }
