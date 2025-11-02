@@ -36,12 +36,6 @@ public class Message extends BaseEntity {
         this.attachments.addAll(attachments);
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-
-
     // 더미 데이터 생성 or 파일 데이터 복원용 (createdAt, updateAt 조작 위해 엔터티 내 배치.)
     public static Message fromDto(UUID uuid, Instant createdAt, Instant updatedAt,
                                   User sender, ReceiverType type, Receivable receiver,
