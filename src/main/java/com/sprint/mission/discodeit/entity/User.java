@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,8 +17,11 @@ public class User extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     //Field
+    @Pattern(regexp = "^[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")
     private String email;         //이메일
+    @Pattern(regexp = "^[\\w가-힣]{2,}$")
     private String nickname;            //닉네임
+    @Pattern(regexp = "^.{4,}$")
     private String password;            //비밀번호
     private UUID profileId;             //프로필 이미지 UUID
 

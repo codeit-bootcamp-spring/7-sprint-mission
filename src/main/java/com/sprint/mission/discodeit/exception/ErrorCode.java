@@ -15,6 +15,12 @@ public enum ErrorCode {
             "해당 닉네임의 유저가 존재하지 않습니다."),
     INVALID_PASSWORD("AUTH_002", HttpStatus.UNAUTHORIZED,
             "비밀번호가 올바르지 않습니다."),
+    SIGNUP_EMAIL_INVALID("USER_003", HttpStatus.BAD_REQUEST,
+            "회원가입 이메일 형식이 올바르지 않습니다."),
+    SIGNUP_NICKNAME_INVALID("USER_004", HttpStatus.BAD_REQUEST,
+            "회원가입 닉네임은 2글자 이상이어야 합니다."),
+    SIGNUP_PASSWORD_INVALID("USER_005", HttpStatus.BAD_REQUEST,
+            "회원가입 비밀번호는 최소 6글자 이상이어야 합니다."),
 
     // BinaryContent
     BINARYCONTENT_NOT_FOUNT("BINARYCONTENT_001", HttpStatus.NOT_FOUND,
