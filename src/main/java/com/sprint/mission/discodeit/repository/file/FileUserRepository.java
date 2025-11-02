@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileUserRepository extends BaseFileRepository<User> implements UserRepository {
@@ -26,55 +27,39 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
 
     //유저 id로 조회
     @Override
-    public User findById(UUID id) {
+    public Optional<User> findById(UUID id) {
         return loadFromFile(id);
     }
 
     //유저 email로 조회
     @Override
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return findAllFiles().stream()
                 .filter(u -> u.getEmail().equals(email))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     //유저 nickname으로 조회
     @Override
-    public User findByNickname(String nickname) {
+    public Optional<User> findByNickname(String nickname) {
         return findAllFiles().stream()
                 .filter(u -> u.getNickname().equals(nickname))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     //유저 수정
     @Override
-    public User update(UUID userId,String email, String nickname, String password) {
-        User user = loadFromFile(userId);
-        if(user == null){
-            throw new RuntimeException("User with id=" + userId + " not found");
-        }
-        user.update(email, nickname, password);
-        saveToFile(userId, user);
-        return user;
-    }
-
-    //유저 프로필 수정
-    @Override
-    public void updateProfileImg(UUID userId, UUID profileImgId) {
-        User user = loadFromFile(userId);
-        if(user == null){
-            throw new RuntimeException("User with id=" + userId + " not found");
-        }
-        user.updateProfile(profileImgId);
-        saveToFile(userId, user);
+    public void update(UUID userId,String email, String nickname, String password) {
+        loadFromFile(userId).ifPresent(user -> {
+            user.update(email, nickname, password);
+            saveToFile(userId, user);
+        });
     }
 
     //유저 삭제
     @Override
-    public User delete(UUID userId) {
-        User user = loadFromFile(userId);
+    public void delete(UUID userId) {
         deleteFile(userId);
-        return user;
     }
 
     //이메일이 이미 존재하는지
@@ -89,5 +74,10 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
     public boolean existsByNickname(String nickname) {
         return findAllFiles().stream()
                 .anyMatch(u -> u.getNickname().equals(nickname));
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return fileExistsById(id);
     }
 }

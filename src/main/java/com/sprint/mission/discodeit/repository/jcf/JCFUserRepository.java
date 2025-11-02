@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,44 +28,34 @@ public class JCFUserRepository implements UserRepository {
 
     //유저 Id
     @Override
-    public User findById(UUID id) {
-        return data.get(id);
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     //유저 email
     @Override
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return findAll().stream()
                 .filter(u -> u.getEmail().equals(email))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     //유저 nickname
     @Override
-    public User findByNickname(String nickname) {
+    public Optional<User> findByNickname(String nickname) {
         return findAll().stream()
                 .filter(u -> u.getNickname().equals(nickname))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     @Override
-    public User update(UUID userId, String email, String nickname, String password){
-        return findById(userId).update(email, nickname, password);
+    public void update(UUID userId, String email, String nickname, String password){
+        data.get(userId).update(email, nickname, password);
     }
 
     @Override
-    public void updateProfileImg(UUID userId, UUID profileImgId) {
-        User user = findById(userId);
-        user.updateProfile(profileImgId);
-        save(user);
-    }
-
-    @Override
-    public User delete(UUID userId) {
-        User user = findById(userId);
+    public void delete(UUID userId) {
         data.remove(userId);
-        return user;
     }
 
     @Override
@@ -75,5 +66,10 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public boolean existsByNickname(String nickname) {
         return false;
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return data.containsKey(id);
     }
 }

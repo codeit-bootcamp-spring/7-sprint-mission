@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.facade.user;
 
+import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateReq;
+import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
@@ -20,7 +22,7 @@ public class UserUpdateFacade {
     private final UserStatusService userStatusService;
 
     //유저 수정
-    public User updateUser(UUID userId, UserUpdateReq req){
+    public void updateUser(UUID userId, UserUpdateReq req){
         User user = userService.findById(userId);
         UUID profileId = null;
         if(req.profileImage().data() != null){
@@ -35,7 +37,5 @@ public class UserUpdateFacade {
         }
         userService.update(userId, req);
         userStatusService.updateOnlineAt(userId);
-
-        return user;
     }
 }

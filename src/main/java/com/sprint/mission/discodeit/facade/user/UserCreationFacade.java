@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.facade.user;
 
 
 import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
+import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -23,7 +24,7 @@ public class UserCreationFacade {
     private final UserStatusService userStatusService;
 
     //유저 추가
-    public User createUser(UserCreateReq req) {
+    public void createUser(UserCreateReq req) {
         UUID profileId = null;
 
         if (req.profileImage().data() != null) {
@@ -35,7 +36,5 @@ public class UserCreationFacade {
 
         User user = userService.create(UserFactory.create(req, profileId));
         userStatusService.create(new UserStatus(user.getId()));
-
-        return user;
     }
 }

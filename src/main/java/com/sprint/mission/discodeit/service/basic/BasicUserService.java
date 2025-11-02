@@ -33,32 +33,40 @@ public class BasicUserService implements UserService {
     //유저 아이디로 조회
     @Override
     public User findById(UUID id) {
-        return userRepository.findById(id);
+        return userRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("User not found. id: " + id)
+        );
     }
 
     //이메일 찾기
     @Override
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     //닉네임으로 찾기
     @Override
     public User findByNickname(String nickname) {
-        return userRepository.findByNickname(nickname);
+        return userRepository.findByNickname(nickname).orElse(null);
     }
 
     //삭제
     @Override
-    public User delete(UUID id) {
-        return userRepository.delete(id);
+    public void delete(UUID id) {
+        if(!userRepository.existsById(id)){
+            throw new RuntimeException("User not found. id: "+ id);
+        }
+        userRepository.delete(id);
     }
 
     //업데이트
     @Override
-    public User update(UUID id, UserUpdateReq req) {
+    public void update(UUID id, UserUpdateReq req) {
+        if(!userRepository.existsById(id)){
+            throw new RuntimeException("User not found. id: "+ id);
+        }
         validateDuplicate(req.email(), req.nickname());
-        return userRepository.update(id, req.email(), req.nickname(),req.password());
+        userRepository.update(id, req.email(), req.nickname(),req.password());
     }
 
     // ===== 🔒 Private Logic (내부 사용) =====
