@@ -16,10 +16,7 @@ import com.sprint.mission.discodeit.participation.ParticipationRepository;
 import com.sprint.mission.discodeit.participation.ParticipationRepositoryImpl;
 import com.sprint.mission.discodeit.participation.ParticipationService;
 import com.sprint.mission.discodeit.participation.ParticipationServiceImpl;
-import com.sprint.mission.discodeit.user.UserRepository;
-import com.sprint.mission.discodeit.user.UserRepositoryImpl;
-import com.sprint.mission.discodeit.user.UserService;
-import com.sprint.mission.discodeit.user.UserServiceImpl;
+import com.sprint.mission.discodeit.user.*;
 import lombok.Getter;
 
 @Getter
@@ -43,11 +40,13 @@ public class AppConfigRegacy {
     private final ChannelMessageService channelMessageService;
     private final DirectMessageService directMessageService;
 
+    private final PasswordEncoder passwordEncoder;
+
 
     public AppConfigRegacy() {
 //        this.dataPersistenceManager = DataPersistenceManager
 
-
+        this.passwordEncoder = new PasswordEncoder();
         // 2. Repository 생성
         this.userRepository = new UserRepositoryImpl();
         this.channelRepository = new ChannelRepositoryImpl();
@@ -59,7 +58,7 @@ public class AppConfigRegacy {
 //        loadAllData();
 
         // 4. Service 생성 및 의존성 주입
-        this.userService = new UserServiceImpl(userRepository);
+        this.userService = new UserServiceImpl(userRepository, passwordEncoder);
         this.channelService = new ChannelServiceImpl(channelRepository);
         this.participationService = new ParticipationServiceImpl(participationRepository, userService, channelService);
         this.channelMessageService = new ChannelMessageServiceImpl(channelMessageRepository, participationService);
