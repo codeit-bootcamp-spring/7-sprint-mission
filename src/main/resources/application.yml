@@ -1,0 +1,9 @@
+spring:
+  application:
+    name=discodeit
+
+server:
+  port: 7777
+
+# 심화, 레포지토리 종류로 bin 주입하기.
+# 클래스에서 직접 repository 제거.
