@@ -38,9 +38,9 @@ class UserCreationFacadeTest {
 
     @BeforeEach
     void cleanRepositories() {
-        userRepository.data.clear();
-        binaryContentRepository.data.clear();
-        userStatusRepository.data.clear();
+        userRepository.getData().clear();
+        binaryContentRepository.getData().clear();
+        userStatusRepository.getData().clear();
     }
 
     @BeforeEach

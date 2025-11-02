@@ -56,17 +56,17 @@ class MessageDeleteFacadeTest {
         messageService.create(message);
 
         // 데이터 저장 확인
-        assertEquals(1, messageRepository.data.size());
-        assertEquals(1, binaryContentRepository.data.size());
+        assertEquals(1, messageRepository.getData().size());
+        assertEquals(1, binaryContentRepository.getData().size());
 
         // 3. 메시지 삭제
         messageDeleteFacade.deleteMessage(message.getId());
 
         // 4. 메시지 삭제 확인
-        assertTrue(messageRepository.data.isEmpty());
+        assertTrue(messageRepository.getData().isEmpty());
 
         // 5. 첨부파일 삭제 확인
-        assertTrue(binaryContentRepository.data.isEmpty());
+        assertTrue(binaryContentRepository.getData().isEmpty());
     }
 
     @Test
@@ -76,12 +76,12 @@ class MessageDeleteFacadeTest {
         messageService.create(message);
 
         // 데이터 저장 확인
-        assertEquals(1, messageRepository.data.size());
+        assertEquals(1, messageRepository.getData().size());
 
         // 2. 메시지 삭제
         messageDeleteFacade.deleteMessage(message.getId());
 
         // 3. 메시지 삭제 확인
-        assertTrue(messageRepository.data.isEmpty());
+        assertTrue(messageRepository.getData().isEmpty());
     }
 }

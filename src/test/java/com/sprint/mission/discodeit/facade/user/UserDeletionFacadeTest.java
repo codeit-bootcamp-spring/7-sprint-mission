@@ -39,9 +39,9 @@ class UserDeletionFacadeTest {
 
     @BeforeEach
     void cleanRepositories() {
-        if (userRepository != null) userRepository.data.clear();
-        if (binaryContentRepository != null) binaryContentRepository.data.clear();
-        if (userStatusRepository != null) userStatusRepository.data.clear();
+        if (userRepository != null) userRepository.getData().clear();
+        if (binaryContentRepository != null) binaryContentRepository.getData().clear();
+        if (userStatusRepository != null) userStatusRepository.getData().clear();
     }
 
     @BeforeEach

@@ -50,9 +50,10 @@ class MessageCreationFacadeTest {
 
     @BeforeEach
     void cleanRepositories() {
-        if (messageRepository != null) messageRepository.data.clear();
-        if (binaryContentRepository != null) binaryContentRepository.data.clear();
-        if (userRepository != null) userRepository.data.clear();
+
+        if (messageRepository != null) messageRepository.getData().clear();
+        if (binaryContentRepository != null) binaryContentRepository.getData().clear();
+        if (userRepository != null) userRepository.getData().clear();
     }
 
     @BeforeEach
@@ -93,7 +94,7 @@ class MessageCreationFacadeTest {
                 "Hello world!",
                 List.of()
         );
-        System.out.println(userRepository.data);
+        System.out.println(userRepository.getData());
         MessageViewRes result = messageCreationFacade.createMessage(req);
 
 

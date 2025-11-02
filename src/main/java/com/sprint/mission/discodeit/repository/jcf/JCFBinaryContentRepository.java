@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Getter
 public class JCFBinaryContentRepository implements BinaryContentRepository {
     // 바이너리 컨텐츠 데이터
     private final Map<UUID, BinaryContent> data = new ConcurrentHashMap<>();
