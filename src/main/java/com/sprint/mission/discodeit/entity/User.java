@@ -12,11 +12,11 @@ public class User extends BaseEntity{
     private String nickName;
     private String email;
     private String phoneNum;
-    private final String userId;
+    private final String loginId;
     private String password;
     private UUID profileId;
 
-    public User(String userName, String nickName, String email, String phoneNum, String userId, String password) {
+    public User(String userName, String nickName, String email, String phoneNum, String loginId, String password) {
         UserVaildator.vaildateNickname(nickName);
         UserVaildator.vaildateEmail(email);
         UserVaildator.vaildatePhoneNum(phoneNum);
@@ -26,12 +26,12 @@ public class User extends BaseEntity{
         this.nickName = nickName;
         this.email = email;
         this.phoneNum = formatPhoneNum(phoneNum);
-        this.userId = userId;
+        this.loginId = loginId;
         this.password = password;
     }
 
-    public User(String userName, String nickName, String email, String phoneNum, String userId, String password, UUID profileId) {
-        this(userName, nickName, email, phoneNum, userId, password);
+    public User(String userName, String nickName, String email, String phoneNum, String loginId, String password, UUID profileId) {
+        this(userName, nickName, email, phoneNum, loginId, password);
         this.profileId = profileId;
     }
 
@@ -91,7 +91,7 @@ public class User extends BaseEntity{
                 ", nickName='" + nickName + '\'' +
                 ", email='" + email + '\'' +
                 ", phoneNum='" + phoneNum + '\'' +
-                ", userId='" + userId + '\'' +
+                ", userId='" + loginId + '\'' +
                 ", password='" + password + '\'' +
                 str +
                 '}';

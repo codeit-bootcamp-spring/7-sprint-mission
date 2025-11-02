@@ -17,26 +17,26 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public void createBinaryContent(CreateBinaryContentRequestDto request) {
+    public void create(CreateBinaryContentRequestDto request) {
         BinaryContent bc = new BinaryContent(request.getContent());
         binaryContentRepository.save(bc);
     }
 
     @Override
-    public BinaryContent findBinaryContent(UUID id) {
-        return binaryContentRepository.findById(id)
+    public BinaryContent find(UUID binaryContentId) {
+        return binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new IllegalStateException("이미지 또는 파일이 존재하지 않습니다."));
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> idList) {
+    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
         return binaryContentRepository.findAll().stream().
-                filter(bc -> idList.contains(bc.getId()))
+                filter(bc -> binaryContentIds.contains(bc.getId()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteBinaryContent(UUID id) {
-        binaryContentRepository.delete(id);
+    public void delete(UUID binaryContentId) {
+        binaryContentRepository.delete(binaryContentId);
     }
 }

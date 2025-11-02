@@ -18,7 +18,7 @@ public class BasicAuthService implements AuthService {
 
     @Override
     public UserResponseDto login(LoginUserDto request) {
-        User user = userRepository.findByUserId(request.getUserId())
+        User user = userRepository.findByLoginId(request.getLoginId())
                 .filter(u -> u.getPassword().equals(request.getPassword()))
                 .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호를 잘못 입력하셨습니다."));
 

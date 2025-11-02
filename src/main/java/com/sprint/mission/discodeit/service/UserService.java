@@ -17,47 +17,47 @@ public interface UserService {
     /**
      * 새로운 사용자 생성
      */
-    void createUser(CreateUserRequestDto createUserRequestDto);
+    void create(CreateUserRequestDto createUserRequestDto);
 
-    UserResponseDto getUserById(UUID id);
+    UserResponseDto find(UUID userId);
 
     /**
      * 이메일로 사용자 조회
      */
-    UserResponseDto getUserByEmail(String email);
+    UserResponseDto findByEmail(String email);
 
     /**
      * 전화번호로 사용자 조회
      */
-    UserResponseDto getUserByPhone(String phoneNum);
+    UserResponseDto findByPhoneNum(String phoneNum);
 
     /**
      * 사용자ID로 사용자 조회
      */
-    UserResponseDto getUserByUserId(String userId);
+    UserResponseDto findByLoginId(String loginId);
 
     /**
      * 전체 사용자 목록 조회
      */
-    List<UserResponseDto> getAllUsers();
+    List<UserResponseDto> findAll();
 
     /**
      * UUID로 사용자 닉네임 조회
      */
-    String getUserNickName(UUID id);
+    String findNickNameById(UUID userId);
 
     /**
      * 사용자 정보 업데이트
      */
-    void updateUser(UpdateUserRequestDto request);
+    void update(UpdateUserRequestDto request);
 
     void updatePassword(UpdatePasswordRequestDto request);
 
     /**
      * 사용자 삭제
-     * @param id 삭제할 User UUID
+     * @param userId 삭제할 User UUID
      */
-    void deleteUser(UUID id);
+    void delete(UUID userId);
 
-    boolean isPasswordMatch(UUID id, String password);
+    boolean isPasswordMatch(UUID userId, String password);
 }

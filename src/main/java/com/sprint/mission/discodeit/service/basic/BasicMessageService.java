@@ -34,7 +34,7 @@ public class BasicMessageService implements MessageService {
      * 새로운 메시지를 생성하여 Repository에 저장
      */
     @Override
-    public void createMessage(CreateMessageRequestDto request) {
+    public void create(CreateMessageRequestDto request) {
         Message newMessage = new Message(
                 request.getSenderId(),
                 request.getReceiverId(),
@@ -58,7 +58,7 @@ public class BasicMessageService implements MessageService {
      * 특정 유저/채널과의 최신 메시지를 조회
      */
     @Override
-    public Message getLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType) {
+    public Message findLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType) {
         List<Message> allMessages = messageRepository.findAll();
 
         // 최신순(역순)으로 순회
@@ -88,7 +88,7 @@ public class BasicMessageService implements MessageService {
      * 두 유저 간의 모든 메시지 목록 반환
      */
     @Override
-    public List<Message> getMessagesBetween(UUID userId1, UUID userId2) {
+    public List<Message> findBetweenUsers(UUID userId1, UUID userId2) {
         return messageRepository.findAll().stream()
                 .filter(m -> (userId1.equals(m.getSenderId()) && userId2.equals(m.getReceiverId())) ||
                         (userId2.equals(m.getSenderId()) && userId1.equals(m.getReceiverId())))
@@ -99,7 +99,7 @@ public class BasicMessageService implements MessageService {
      * 특정 채널에 포함된 모든 메시지 조회
      */
     @Override
-    public List<Message> getAllByChannel(UUID channelId) {
+    public List<Message> findAllByChannelId(UUID channelId) {
         return messageRepository.findAll().stream()
                 .filter(m -> channelId.equals(m.getReceiverId()))
                 .toList();
@@ -109,7 +109,7 @@ public class BasicMessageService implements MessageService {
      * 유저가 보낸 메시지 조회
      */
     @Override
-    public List<Message> getAllSentByUser(UUID senderId, UUID receiverId) {
+    public List<Message> findAllSentBetweenUsers(UUID senderId, UUID receiverId) {
         return messageRepository.findAll().stream()
                 .filter(m -> senderId.equals(m.getSenderId()) && receiverId.equals(m.getReceiverId()))
                 .toList();
@@ -119,7 +119,7 @@ public class BasicMessageService implements MessageService {
      * 메시지 내용(content) 수정
      */
     @Override
-    public void updateMessage(UpdateMessageRequestDto request) {
+    public void update(UpdateMessageRequestDto request) {
         Message message = messageRepository.findById(request.getId())
                 .orElseThrow(() -> new IllegalStateException("메시지가 존재하지 않습니다."));
         message.setContent(request.getContent());
@@ -130,10 +130,10 @@ public class BasicMessageService implements MessageService {
      * 특정 메시지(UUID 기반) 삭제
      */
     @Override
-    public void deleteMessage(UUID id) {
-        Message msg = messageRepository.findById(id)
+    public void delete(UUID messageId) {
+        Message msg = messageRepository.findById(messageId)
                 .orElseThrow(() -> new IllegalStateException("메시지가 존재하지 않습니다."));
         binaryContentRepository.deleteByIds(msg.getAttachmentIds()); // 메시지와 관련된 파일들 삭제
-        messageRepository.deleteById(id);
+        messageRepository.deleteById(messageId);
     }
 }

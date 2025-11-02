@@ -8,6 +8,6 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class UpdatePasswordRequestDto {
-    private UUID Id;
+    private UUID userId;
     private String newPassword;
 }

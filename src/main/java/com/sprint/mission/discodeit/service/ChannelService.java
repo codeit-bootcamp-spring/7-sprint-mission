@@ -19,8 +19,8 @@ public interface ChannelService {
     /**
      * 새로운 채널 생성
      */
-    ChannelResponseDto createPublicChannel(CreateChannelRequestDto request);
-    PrivateChannelResponseDto createPrivateChannel(CreateChannelRequestDto request);
+    ChannelResponseDto createPublic(CreateChannelRequestDto request);
+    PrivateChannelResponseDto createPrivate(CreateChannelRequestDto request);
 
     /**
      * 채널에 멤버 추가
@@ -30,22 +30,22 @@ public interface ChannelService {
     /**
      * UUID로 채널 조회
      */
-    ChannelResponseDto getChannel(UUID id);
+    ChannelResponseDto find(UUID channelId);
 
     /**
      * 사용자가 속한 채널 조회
      */
-    List<ChannelResponseDto> getChannelByUser(UUID userId);
+    List<ChannelResponseDto> findPrivateByUserId(UUID userId);
 
     /**
      * 채널 타입으로 조회
      */
-    List<ChannelResponseDto> getChannelByType(ChannelType channelType);
+    List<ChannelResponseDto> findByType(ChannelType channelType);
 
     /**
      * 전체 채널 조회
      */
-    List<ChannelResponseDto> getAllChannels(UUID userId);
+    List<ChannelResponseDto> findAllByUserId(UUID userId);
 
     /**
      * 채널 관리자 변경
@@ -60,7 +60,7 @@ public interface ChannelService {
     /**
      * 채널 삭제 (관리자 권한 필요)
      */
-    void deleteChannel(UUID channelId, UUID userId);
+    void delete(UUID channelId, UUID userId);
 
     /**
      * 채널 멤버 삭제

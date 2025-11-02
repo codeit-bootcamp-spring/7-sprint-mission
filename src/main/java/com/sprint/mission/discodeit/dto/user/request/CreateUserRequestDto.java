@@ -11,7 +11,7 @@ public class CreateUserRequestDto {
     private String nickName;
     private String email;
     private String phoneNum;
-    private String userId;
+    private String loginId;
     private String password;
     private MultipartFile profileImage;
 }

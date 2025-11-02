@@ -40,9 +40,9 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByUserId(String userId) {
+    public Optional<User> findByLoginId(String loginId) {
         return userStore.values().stream()
-                .filter(u -> u.getUserId().equals(userId))
+                .filter(u -> u.getLoginId().equals(loginId))
                 .findFirst();
     }
 

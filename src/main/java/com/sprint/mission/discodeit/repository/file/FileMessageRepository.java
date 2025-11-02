@@ -112,6 +112,6 @@ public class FileMessageRepository implements MessageRepository {
                 .map(m -> m.getUpdatedAt())
                 .sorted(Collections.reverseOrder())
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 }

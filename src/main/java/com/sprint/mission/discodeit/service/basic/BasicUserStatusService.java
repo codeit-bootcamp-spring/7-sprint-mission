@@ -20,7 +20,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public void createUserStatus(CreateUserStatusRequestDto request) {
+    public void create(CreateUserStatusRequestDto request) {
         if (!userRepository.isExist(request.getUserId())) {
             throw new IllegalArgumentException("user status를 생성할 유저가 존재하지 않습니다.");
         } else if (userStatusRepository.isExist(request.getUserId())) {
@@ -32,18 +32,18 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus findUserStatus(UUID id) {
-        return userStatusRepository.findById(id)
+    public UserStatus find(UUID userStatusId) {
+        return userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new IllegalStateException("user status가 존재하지 않습니다."));
     }
 
     @Override
-    public List<UserStatus> findAllUserStatus() {
+    public List<UserStatus> findAll() {
         return new ArrayList<>(userStatusRepository.findAll());
     }
 
     @Override
-    public void updateUserStatus(UpdateUserStatusRequestDto request) {
+    public void update(UpdateUserStatusRequestDto request) {
         UserStatus newUserStatus = userStatusRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalStateException("user status가 존재하지 않습니다."));
         newUserStatus.setUpdatedAt(); // 로그인 시간 변경
@@ -53,7 +53,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public void updateByUserId(UUID userId) {
         userStatusRepository.findAll().stream()
-                .filter(us -> userId.equals(us.getId()))
+                .filter(us -> userId.equals(us.getUserId()))
                 .findFirst()
                 .ifPresentOrElse(us -> {
                     us.setUpdatedAt();
@@ -65,7 +65,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void deleteUserStatus(UUID id) {
-        userStatusRepository.deleteById(id);
+    public void delete(UUID userStatusId) {
+        userStatusRepository.deleteById(userStatusId);
     }
 }

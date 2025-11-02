@@ -5,13 +5,9 @@ import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseD
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReceiveType;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,7 +22,7 @@ public class Printer {
         System.out.printf("닉네임: %s\n", user.getNickName());
         System.out.printf("이메일: %s\n", user.getEmail());
         System.out.printf("전화번호: %s\n", user.getPhoneNum());
-        System.out.printf("아이디: %s\n", user.getUserId());
+        System.out.printf("아이디: %s\n", user.getLoginId());
     }
 
     public static void printChatHistory(UserService userService, UserResponseDto user, List<Message> msgs) {
@@ -46,13 +42,13 @@ public class Printer {
             } else if(!msg.getReceiverId().equals(user.getId()) && msg.getReceiverId().equals(msg.getSenderId())) { // 채널이 보낸 메시지의 경우
                 System.out.printf("%s\n", msg.getContent());
             } else {
-                System.out.printf("%s %s: %s\n", time, userService.getUserNickName(msg.getSenderId()), msg.getContent());
+                System.out.printf("%s %s: %s\n", time, userService.findNickNameById(msg.getSenderId()), msg.getContent());
             }
         }
     }
 
     public static void printChatLatest(MessageService messageService, UserResponseDto user1, UserResponseDto user2){
-        Optional.ofNullable(messageService.getLastestMessage(user1.getId(), user2.getId(), ReceiveType.USER))
+        Optional.ofNullable(messageService.findLastestMessage(user1.getId(), user2.getId(), ReceiveType.USER))
                 .ifPresentOrElse(
                         message -> {
                             String KST = TimeConvert.time(message.getCreatedAt());
@@ -68,17 +64,17 @@ public class Printer {
         Instant lastedMsgAt = channel.getLastedMessageAt();
         Optional.ofNullable(lastedMsgAt).ifPresentOrElse(
                 value -> System.out.printf("   └ 최근 대화: %s\n", TimeConvert.time(value)),
-                () -> System.out.println("   └ 대화가 없습니다. 첫 대화를 시작해보세요.\n")
+                () -> System.out.println("   └ 대화가 없습니다. 첫 대화를 시작해보세요.")
         );
 
     }
 
     public static void printChannelMember(UserService userService, ChannelService channelService, UUID channelId){
-        PrivateChannelResponseDto channel = (PrivateChannelResponseDto) channelService.getChannel(channelId);
+        PrivateChannelResponseDto channel = (PrivateChannelResponseDto) channelService.find(channelId);
 
         System.out.println("채널 멤버 조회");
         List<UserResponseDto> channelMember = channel.getMemberIds().stream()
-                .map(id -> userService.getUserById(id))
+                .map(id -> userService.find(id))
                 .toList();
 
         for (int i = 0; i < channelMember.size(); i++) {

@@ -16,7 +16,7 @@ public class UserResponseDto {
     private String nickName;
     private String email;
     private String phoneNum;
-    private String userId;
+    private String loginId;
     private UUID profileId;
     private boolean active;
 
@@ -27,7 +27,7 @@ public class UserResponseDto {
                 .nickName(user.getNickName())
                 .email(user.getEmail())
                 .phoneNum(user.getPhoneNum())
-                .userId(user.getUserId())
+                .loginId(user.getLoginId())
                 .profileId(user.getProfileId())
                 .active(active)
                 .build();

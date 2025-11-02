@@ -20,23 +20,23 @@ import java.util.UUID;
 public interface MessageService {
 
     /** 새로운 메시지를 생성 */
-    void createMessage(CreateMessageRequestDto request);
+    void create(CreateMessageRequestDto request);
 
     /** 두 유저 또는 채널 간의 최신 메시지(가장 마지막 메시지)를 가져옴 */
-    Message getLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType);
+    Message findLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType);
 
     /** 두 유저 간의 전체 메시지 목록을 조회 */
-    List<Message> getMessagesBetween(UUID userId1, UUID userId2);
+    List<Message> findBetweenUsers(UUID userId1, UUID userId2);
 
     /** 특정 채널에 포함된 모든 메시지 조회 */
-    List<Message> getAllByChannel(UUID channelId);
+    List<Message> findAllByChannelId(UUID channelId);
 
     /** 유저가 특정 유저 또는 채널에게 보낸 모든 메시지 조회 */
-    List<Message> getAllSentByUser(UUID senderId, UUID receiverId);
+    List<Message> findAllSentBetweenUsers(UUID senderId, UUID receiverId);
 
     /** 메시지 내용(content)을 수정 */
-    void updateMessage(UpdateMessageRequestDto request);
+    void update(UpdateMessageRequestDto request);
 
     /** 특정 메시지를 UUID로 삭제 */
-    void deleteMessage(UUID id);
+    void delete(UUID messageId);
 }

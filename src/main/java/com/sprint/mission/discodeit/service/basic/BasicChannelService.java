@@ -27,7 +27,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public ChannelResponseDto createPublicChannel(CreateChannelRequestDto request) {
+    public ChannelResponseDto createPublic(CreateChannelRequestDto request) {
         // 이름 중복 저장 불가
         if(channelRepository.existsByName(request.getChannelName())) {
             throw new IllegalArgumentException("채널 이름이 존재합니다. 다시 입력해주세요.");
@@ -46,7 +46,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public PrivateChannelResponseDto createPrivateChannel(CreateChannelRequestDto request) {
+    public PrivateChannelResponseDto createPrivate(CreateChannelRequestDto request) {
         // 이름 중복 저장 불가
         if(channelRepository.existsByName(request.getChannelName())) {
             throw new IllegalArgumentException("채널 이름이 존재합니다. 다시 입력해주세요.");
@@ -84,17 +84,18 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto getChannel(UUID id){
-        Channel channel = channelRepository.findById(id)
+    public ChannelResponseDto find(UUID channelId){
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다."));
-        Instant lastedMessageAt = messageRepository.searchLastedMessageTime(id);
+        Instant lastedMessageAt = messageRepository.searchLastedMessageTime(channelId);
         return channel.getVisibility() == ChannelVisibility.PRIVATE
                 ? PrivateChannelResponseDto.from(channel, lastedMessageAt)
                 : ChannelResponseDto.from(channel, lastedMessageAt);
     }
 
+    // 유저가 속한 Private 채널만 조회
     @Override
-    public List<ChannelResponseDto> getChannelByUser(UUID userId) {
+    public List<ChannelResponseDto> findPrivateByUserId(UUID userId) {
         return channelRepository.findByUser(userId).stream()
                 .map(c ->
                         (ChannelResponseDto) PrivateChannelResponseDto.from(c, messageRepository.searchLastedMessageTime(c.getId()))
@@ -106,7 +107,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelResponseDto> getChannelByType(ChannelType type) {
+    public List<ChannelResponseDto> findByType(ChannelType type) {
         return channelRepository.findByType(type).stream()
                 .map(c -> c.getVisibility() == ChannelVisibility.PRIVATE
                                 ? PrivateChannelResponseDto.from(c, messageRepository.searchLastedMessageTime(c.getId()))
@@ -118,7 +119,7 @@ public class BasicChannelService implements ChannelService {
 
     // Public 채널 목록은 전체 조회 + Private 채널은 User가 참여한 채널만 조회
     @Override
-    public List<ChannelResponseDto> getAllChannels(UUID userId) {
+    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
         return channelRepository.findAll().stream()
                 .filter(c -> c.getVisibility() == ChannelVisibility.PUBLIC ||
                         (c.getVisibility() == ChannelVisibility.PRIVATE && c.getMemberIds().contains(userId)))
@@ -162,7 +163,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void deleteChannel(UUID channelId, UUID userId) {
+    public void delete(UUID channelId, UUID userId) {
         if(!userRepository.isExist(userId)) {
             throw new IllegalArgumentException("유저가 존재하지 않습니다.");
         }
