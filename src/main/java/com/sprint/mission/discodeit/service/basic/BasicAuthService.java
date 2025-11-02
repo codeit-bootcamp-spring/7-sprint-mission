@@ -31,4 +31,11 @@ public class BasicAuthService implements AuthService {
 
         return UserResponseDto.from(user, true);
     }
+
+    @Override
+    public boolean checkLoginInfo(String loginId, String password) {
+        return userRepository.findByLoginId(loginId)
+                .filter(u -> u.getPassword().equals(password))
+                .isPresent();
+    }
 }

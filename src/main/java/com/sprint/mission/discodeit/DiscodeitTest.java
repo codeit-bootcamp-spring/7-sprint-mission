@@ -778,7 +778,7 @@ public class DiscodeitTest {
         String password = sc.nextLine();
 
         try {
-            if (loginUser.getLoginId().equals(loginId) && userService.isPasswordMatch(loginUser.getId(), password)) {
+            if (authService.checkLoginInfo(loginId, password)) {
                 userService.delete(loginUser.getId());
                 System.out.println("계정이 삭제되었습니다. 처음 메뉴로 돌아갑니다.");
                 login = false;
