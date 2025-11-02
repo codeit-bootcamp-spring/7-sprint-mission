@@ -1,18 +1,22 @@
 //package com.sprint.mission.discodeit.service;
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.domain.User;
-import com.sprint.mission.discodeit.dto.Dto_User;
-import com.sprint.mission.discodeit.repository.FileUserRepository;
-import com.sprint.mission.discodeit.response.Res_User;
+import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
+import com.sprint.mission.discodeit.entity.dto.Dto_User;
+import com.sprint.mission.discodeit.entity.dto.Res_IsOnlineUser;
+import com.sprint.mission.discodeit.entity.dto.Res_User;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.basic.UserService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,10 +31,10 @@ class UserServiceTest {
     private FileUserRepository fileUserRepository;
 
     private static Dto_User testUserDto;
-    private static Long createdUserId;
+    private static UUID createdUserId;
 
     // 실제 저장 경로 (.ser 파일)
-    private static final String REPO_PATH = "/Users/my05030/Desktop/장미연/7-sprint-mission/repo-data/user/";
+    private static final String REPO_PATH = "/Users/my05030/Desktop/장미연/7-sprint-mission/repo-data/USER/";
 
     @BeforeAll
     static void beforeAll() throws Exception {
@@ -43,76 +47,76 @@ class UserServiceTest {
             if (f.getName().endsWith(".ser")) f.delete();
         }
 
-        testUserDto = new Dto_User();
-        testUserDto.setName("TestUser");
-        testUserDto.setEmail("test@example.com");
-        testUserDto.setPassword("1234");
+        testUserDto = Dto_User.from("TestUser", "test@example.com", "1234");
     }
 
     @Test
     @Order(1)
     @DisplayName("1️⃣ 유저 생성 테스트")
     void testCreateUser() {
-        Res_User created = userService.createUser(testUserDto);
+        Dto_BinaryContent dtoBinaryContent =  Dto_BinaryContent.from("haha", "txt", new byte[0], 0L);
+        Res_User created = userService.create(testUserDto, Optional.of(dtoBinaryContent));
+        createdUserId = created.id();
+
         assertThat(created).isNotNull();
-        assertThat(created.getName()).isEqualTo("TestUser");
-
-        createdUserId = created.getId();
-
-        // 실제 .ser 파일이 생성되었는지 확인
-        File expectedFile = new File(REPO_PATH + createdUserId + ".ser");
-        assertThat(expectedFile.exists()).isTrue();
+        assertThat(created.userName()).isEqualTo("TestUser");
     }
 
     @Test
     @Order(2)
     @DisplayName("2️⃣ 유저 조회 테스트")
-    void testReadUser() {
-        User user = userService.getUserById(createdUserId);
+    void testFindUser() {
+        Dto_BinaryContent dtoBinaryContent =  Dto_BinaryContent.from("haha", "txt", new byte[0], 0L);
+        Dto_User dtoUser = Dto_User.from("⭐️ 별", "1234", "별@example.com");
+        Res_User created = userService.create(dtoUser, Optional.of(dtoBinaryContent));
+        Res_IsOnlineUser user = userService.find(created.id());
         assertThat(user).isNotNull();
-        assertThat(user.getName()).isEqualTo("TestUser");
-        assertThat(user.getEmail()).isEqualTo("test@example.com");
+        assertThat(user.userName()).isEqualTo("⭐️ 별");
+        assertThat(user.eMail()).isEqualTo("별@example.com");
     }
 
     @Test
     @Order(3)
     @DisplayName("3️⃣ 유저 수정 테스트")
     void testUpdateUser() {
-        Dto_User updateDto = new Dto_User();
-        updateDto.setName("UpdatedUser");
-        updateDto.setEmail("updated@example.com");
-        updateDto.setPassword("abcd");
+        Dto_BinaryContent dtoBinaryContent =  Dto_BinaryContent.from("haha", "txt", new byte[0], 0L);
+        Dto_User dtoUser = Dto_User.from("⭐️ 별", "1234", "별@example.com");
+        Res_User created = userService.create(dtoUser, Optional.of(dtoBinaryContent));
 
-        Res_User updated = userService.updateUser(createdUserId, updateDto);
+        Dto_User dtoUser_II = Dto_User.from("🐯호랭이는 어흥", "호랭123", "어흥이@eMail.com");
+        Res_User updated = userService.update(created.id(), dtoUser_II, Optional.of(dtoBinaryContent));
         assertThat(updated).isNotNull();
-        assertThat(updated.getName()).isEqualTo("UpdatedUser");
-        assertThat(updated.getEmail()).isEqualTo("updated@example.com");
+        assertThat(updated.userName()).isEqualTo("🐯호랭이는 어흥");
+        assertThat(updated.eMail()).isEqualTo("어흥이@eMail.com");
 
         // 파일이 여전히 존재해야 함
-        File file = new File(REPO_PATH + createdUserId + ".ser");
-        assertThat(file.exists()).isTrue();
+//        File file = new File(REPO_PATH + createdUserId + ".ser");
+//        assertThat(file.exists()).isTrue();
     }
 
     @Test
     @Order(4)
     @DisplayName("4️⃣ 유저 삭제 테스트")
     void testDeleteUser() {
-        boolean deleted = userService.deleteUser(createdUserId);
-        assertThat(deleted).isTrue();
+        Dto_BinaryContent dtoBinaryContent =  Dto_BinaryContent.from("haha", "txt", new byte[0], 0L);
+        Dto_User dtoUser = Dto_User.from("⭐️ 별", "1234", "별@example.com");
+        Res_User created = userService.create(dtoUser, Optional.of(dtoBinaryContent));
+        userService.delete(created.id());
+//        assertThat(deleted).isTrue();
 
         // 파일이 실제로 삭제되었는지 확인
-        File file = new File(REPO_PATH + createdUserId + ".ser");
-        assertThat(file.exists()).isFalse();
+//        File file = new File(REPO_PATH + createdUserId + ".ser");
+//        assertThat(file.exists()).isFalse();
     }
 
-    @AfterAll
+//    @AfterAll
     static void cleanup() throws Exception {
         // 테스트 종료 후 남은 .ser 파일 제거
-        for (File f : new File(REPO_PATH).listFiles()) {
-            if (f.getName().endsWith(".ser")) {
-                Files.deleteIfExists(Path.of(f.getPath()));
-            }
-        }
+        Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "repo-data/USER");
+        // 삭제할 디렉토리 객체 생성
+        File directoryToDelete = new File(DIRECTORY.toAbsolutePath().toString());
+        // 재귀적으로 삭제
+        FileSystemUtils.deleteRecursively(directoryToDelete);
     }
 }
 

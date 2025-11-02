@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.dto;
 
 import lombok.Builder;
 
+
 @Builder
 // 🚫 편의상 변경. CamelCase 위반 -> 추후 수정 할꺼예용~
 public record Dto_User(

@@ -14,7 +14,6 @@ import java.util.Optional;
 
 import static com.sprint.mission.discodeit.entity.ModelType.USER;
 
-
 @SpringBootApplication
 public class DiscodeitApplication {
 

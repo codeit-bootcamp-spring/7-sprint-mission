@@ -72,7 +72,7 @@ public class UserService implements InterfaceUserService {
         //!! for. 먼~~ 미래의 어쩌면~!!
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
-        PrintUtil.okMessage("UserService.create = [" + user.getUserName() + "] 온라인 상태 = [" + userStatus.isOnline() + "]");
+        PrintUtil.okMessage("UserService.create = [" + user.getUserName() + "] 온라인 상태 = [" + userStatus.isOnline() + "]");;
 
         return resUser;
     }
