@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -55,8 +56,8 @@ public class BasicChannelService implements ChannelService {
     //채널명으로 찾기
     @Override
     public Channel findByName(String name) {
-        return channelRepository.findByName(name).orElseThrow(() ->
-                new RuntimeException("Channel not found. name: " + name));
+        Optional<Channel> channel = channelRepository.findByName(name);
+        return channel.orElse(null);
     }
 
     //채널 id 로 조회
