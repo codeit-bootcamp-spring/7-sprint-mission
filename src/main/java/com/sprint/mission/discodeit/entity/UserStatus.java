@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.enums.UserStatusType;
+import lombok.Getter;
 
 import java.io.Serial;
 import java.time.Duration;
@@ -8,28 +9,37 @@ import java.time.Instant;
 import java.util.UUID;
 
 
+@Getter
 public class UserStatus extends Common {
     @Serial
     private static final long serialVersionUID = 1L;
+    private Instant updateAt;
     private final UUID userId;
     private Instant loginAt;
-    private UserStatusType userStatusType;
 
-    public UserStatus(UUID userId) {
+    public UserStatus(UUID userId, Instant loginAt) {
+        this.updateAt = Instant.now();
         this.userId = userId;
-        this.userStatusType = UserStatusType.OFFLINE;
-        this.loginAt = Instant.now();
+        this.loginAt = loginAt;
+    }
+
+    public void update(Instant loginAt) {
+        boolean isUpdate = false;
+        if(this.loginAt != null && this.loginAt.equals(loginAt)) {
+            this.loginAt = loginAt;
+            isUpdate = true;
+        }
+
+        if(isUpdate) updateAt = Instant.now();
     }
 
     public UserStatusType isOnline() {
         Duration duration = Duration.between(loginAt, Instant.now());
         if(duration.toSeconds() <= 300) {
-            return this.userStatusType = UserStatusType.ONLINE;
+            return UserStatusType.ONLINE;
         }
 
-        return this.userStatusType = UserStatusType.OFFLINE;
-
-
+        return UserStatusType.OFFLINE;
     }
 
 

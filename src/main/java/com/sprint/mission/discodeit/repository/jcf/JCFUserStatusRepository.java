@@ -1,36 +1,20 @@
-package com.sprint.mission.discodeit.repository.file;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.global.util.file.FileManager;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.nio.file.Path;
 import java.util.*;
 
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-public class FileUserStatusRepository implements UserStatusRepository {
-    private final Path filePath;
-    private final Map<UUID, UserStatus> userStatuses;
-
-    public FileUserStatusRepository(@Value("${file.path.userStatusPath}") Path userStatusFilePath) {
-        this.filePath = userStatusFilePath;
-        FileManager.init(filePath);
-        userStatuses = FileManager.readFile(filePath);
-    }
+public class JCFUserStatusRepository implements UserStatusRepository {
+    private final Map<UUID, UserStatus> userStatuses = new HashMap<>();
 
     @Override
     public void save(UserStatus userStatus) {
         userStatuses.put(userStatus.getId(), userStatus);
-        FileManager.writeFile(filePath, userStatuses);
-    }
-
-    @Override
-    public Optional<UserStatus> findById(UUID userStatusId) {
-        return Optional.ofNullable(userStatuses.get(userStatusId));
     }
 
     @Override
@@ -41,6 +25,11 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
+    public Optional<UserStatus> findById(UUID userStatusId) {
+        return Optional.ofNullable(userStatuses.get(userStatusId));
+    }
+
+    @Override
     public List<UserStatus> findAll() {
         return new ArrayList<>(userStatuses.values());
     }
@@ -48,7 +37,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public void deleteById(UUID userStatusId) {
         userStatuses.remove(userStatusId);
-        FileManager.writeFile(filePath, userStatuses);
     }
 
     @Override
@@ -58,8 +46,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void deleteByUserId(UUID userId) {
-        this.findByUserId(userId).ifPresent(userStatus -> userStatuses.remove(userId));
-        FileManager.writeFile(filePath, userStatuses);
+        userStatuses.values().removeIf(userStatus -> userStatus.getUserId().equals(userId));
     }
 
     @Override

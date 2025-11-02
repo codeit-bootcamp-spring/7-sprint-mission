@@ -16,5 +16,6 @@ public class UpdateUserDto {
     private String email;
     private String phoneNumber;
     private String pronoun;
+    private UUID profileId;
 
 }

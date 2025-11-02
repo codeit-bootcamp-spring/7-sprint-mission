@@ -6,38 +6,34 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Message extends Common {
+public class ReadStatus extends Common{
     @Serial
     private static final long serialVersionUID = 1L;
     private Instant updateAt;
 
-    private String content;
-    private final UUID channelId;
     private final UUID userId;
-    private final List<UUID> attachmentIds;
+    private final UUID channelId;
+    private Instant lastReadAt;
 
-    public Message(String content, UUID channelId, UUID userId, List<UUID> attachmentIds) {
-        updateAt = Instant.now();
-        this.content = content;
-        this.channelId = channelId;
+    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+        this.updateAt = Instant.now();
         this.userId = userId;
-        this.attachmentIds = attachmentIds;
+        this.channelId = channelId;
+        this.lastReadAt = lastReadAt;
     }
 
-    public void messageUpdate(String content) {
+    public void update(Instant lastReadAt) {
         boolean isUpdate = false;
-        if(this.content != null && !this.content.equals(content)) {
-            this.content = content;
+        if(lastReadAt != null && !this.lastReadAt.equals(lastReadAt)) {
+            this.lastReadAt = lastReadAt;
             isUpdate = true;
         }
 
         if(isUpdate) this.updateAt = Instant.now();
     }
-
 }

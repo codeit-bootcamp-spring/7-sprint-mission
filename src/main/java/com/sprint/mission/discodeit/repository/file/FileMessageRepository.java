@@ -4,17 +4,19 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.global.util.file.FileManager;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
 import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileMessageRepository implements MessageRepository {
     private final Path filePath;
     private final Map<UUID, Message> messages;
 
-    public FileMessageRepository(@Value("${file.path.messagePath}")Path messageFilePath) {
+    public FileMessageRepository(@Value("${file.path.messagePath}") Path messageFilePath) {
         this.filePath = messageFilePath;
         FileManager.init(messageFilePath);
         this.messages = FileManager.readFile(messageFilePath);
@@ -45,5 +47,18 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public boolean existsById(UUID messageId) {
         return messages.containsKey(messageId);
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messages.values().stream().
+                filter(message -> message.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        messages.values().removeIf(message -> message.getChannelId().equals(channelId));
+        FileManager.writeFile(filePath, messages);
     }
 }

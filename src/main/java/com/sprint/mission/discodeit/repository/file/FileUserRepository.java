@@ -4,17 +4,19 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.util.file.FileManager;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
 import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileUserRepository implements UserRepository {
     private final Path filePath;
     private final Map<UUID, User> users;
 
-    public FileUserRepository(@Value("${file.path.userPath}")Path userFilePath) {
+    public FileUserRepository(@Value("${file.path.userPath}") Path userFilePath) {
         this.filePath = userFilePath;
         FileManager.init(filePath);
         this.users = FileManager.readFile(filePath);
