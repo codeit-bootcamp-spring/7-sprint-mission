@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.file.FileIo;
 import com.sprint.mission.discodeit.service.file.Path;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -14,12 +15,25 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "file",
+        matchIfMissing = true
+)
 public class FileUserStatusRepository implements UserStatusRepository {
     private final String filename = "usersStatus";
 
     @Override
+    public UserStatus save(UUID UserUUID) {
+        UserStatus userStatus = new UserStatus(UserUUID);
+        FileIo.save(filename,userStatus);
+        return userStatus;
+    }
+
+    @Override
     public Optional<UserStatus> find(UUID binaryId) {
-        return Optional.empty();
+        return FileIo.read(filename, binaryId, UserStatus.class);
     }
 
     @Override
@@ -33,15 +47,8 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus save(UUID UserUUID) {
-        UserStatus userStatus = new UserStatus(UserUUID);
-        FileIo.save(filename,userStatus);
-        return userStatus;
-    }
-
-    @Override
-    public void deleteByUserId(UUID userId) {
-        String path = Path.RooT_PATH.getPath() + "/" + filename + "/" + userId + ".sav";
+    public void deleteByUserId(UUID binaryId) {
+        String path = Path.RooT_PATH.getPath() + "/" + filename + "/" + binaryId + ".sav";
         File file = new File(path);
         if (file.exists()) {
             boolean delete = file.delete();
@@ -52,8 +59,4 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     }
 
-    @Override
-    public List<UserStatus> findAllByUpdatedAtAfter(Instant since) {
-        return List.of();
-    }
 }

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.response.UserCreateResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserFindResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserUpdateResponse;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.content.BinaryContent;
 import com.sprint.mission.discodeit.entity.content.ContentsType;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryRepository;
@@ -18,6 +19,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 public class BasicUserService implements UserService {
@@ -29,15 +33,6 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryRepository binaryRepository;
-
- /*   public BasicUserService(@Qualifier("JCFuser") UserRepository userRepository
-                            ,@Qualifier("JCFstatus") UserStatusRepository userStatusRepository
-                            ,@Qualifier("JCFBinary") BinaryRepository binaryRepository)
-    {
-        this.userRepository = userRepository;
-        this.userStatusRepository = userStatusRepository;
-        this.binaryRepository = binaryRepository;
-    }*/
 
 
     @Override
@@ -53,17 +48,24 @@ public class BasicUserService implements UserService {
                 .anyMatch(user -> user.getUserNickname().equals(userCreateRequest.userNickname()))){
          throw new IllegalArgumentException("닉네임이 이미 존재합니다");
      }
-
-     //저장을위한 모든 정보
+     
+     //유저정보
         User user = new User(
                 userCreateRequest.username()
                 ,userCreateRequest.email()
                 ,userCreateRequest.rawPassword()
-                ,userCreateRequest.userNickname());
+                ,userCreateRequest.userNickname()
+        ); 
+     
+     
        //혹시이미지가 있니 없니
-        if (userCreateRequest.profileImageUrl() != null) {
-            binaryRepository.save(user.getId(),ContentsType.PROFILE_IMAGE,userCreateRequest.profileImageUrl());
+        if (userCreateRequest.profileImage() != null) {
+            BinaryContent binaryContent = new BinaryContent(ContentsType.PROFILE_IMAGE, userCreateRequest.profileImage());
+            binaryRepository.save(binaryContent);
+
+            user.setProfileID(binaryContent.getId());
         }
+
         //유저정보저장
         userRepository.save(user);
         //유저 상태 저장
@@ -116,7 +118,11 @@ public class BasicUserService implements UserService {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("유저uuid못찾아용"+userId);
         }
-        binaryRepository.deleteByUuid(userId, ContentsType.PROFILE_IMAGE);
+        UUID profileID = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId))
+                .getProfileID();
+         binaryRepository.delete(profileID);
         //이런게 너무번거롭다 싫다
         userStatusRepository.findByUserId(userId);
         userRepository.deleteById(userId);

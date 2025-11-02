@@ -13,9 +13,16 @@ import java.util.function.Consumer;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.file.FileIo;
 import com.sprint.mission.discodeit.service.file.Path;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "file",
+        matchIfMissing = true
+)
 public class FileUserRepository implements UserRepository {
 
     private final String filename = "users";

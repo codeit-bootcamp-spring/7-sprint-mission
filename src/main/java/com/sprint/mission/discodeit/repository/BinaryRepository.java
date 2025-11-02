@@ -13,15 +13,15 @@ import java.util.UUID;
 public interface BinaryRepository {
 
 
-    Optional<BinaryContent> findByUuid(UUID contentId,ContentsType contentsType);
+
+
+    BinaryContent save(BinaryContent binary);
 
     Optional<BinaryContent> find(UUID binaryId);
 
     List<BinaryContent> findAll();
 
-    BinaryContent save(BinaryContent binary);
-
-    void deleteByUuid(UUID contentId, ContentsType contentsType);
+    void delete(UUID contentId);
 
 
   //  List<UserStatus> findAllByUpdatedAtAfter(Instant since);

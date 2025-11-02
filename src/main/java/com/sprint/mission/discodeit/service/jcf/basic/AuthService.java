@@ -6,15 +6,21 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+
+@RequiredArgsConstructor
+@Service
 public class AuthService {
 
     private final UserRepository userRepository;
 
-    public AuthService(UserRepository userRepository) {this.userRepository = userRepository;}
+   // public AuthService(UserRepository userRepository) {this.userRepository = userRepository;}
 
     public User login(LoginRequest loginRequest) {
         //이메일매칭

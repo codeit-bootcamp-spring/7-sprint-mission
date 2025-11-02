@@ -43,15 +43,13 @@ public class BasicMessageService implements MessageService {
         }
         Message message = new Message(request.content(), request.channelId(), request.authorId());
         //첨부파일이 없으면 그냥 저장
-        if(request.attachmentIds() == null || request.attachmentIds().isEmpty()){
+        if(request.attachment() == null || request.attachment().length == 0 ){
             return messageRepository.save(message);
         }
         //첨부파일이 있으면
         //만들고 첨부파일 추가 저장
-
-        request.attachmentIds()
-                .forEach(id->
-                        binaryRepository.save(new BinaryContent(message.getId(), ContentsType.MESSAGE_ATTACHMENT,id)));
+        BinaryContent binaryContent = new BinaryContent(ContentsType.MESSAGE_ATTACHMENT, request.attachment());
+        message.getAttachmentIds().add(binaryContent.getId());
         return messageRepository.save(message);
 
 
@@ -86,7 +84,12 @@ public class BasicMessageService implements MessageService {
         if (!messageRepository.existsById(messageId)) {
             throw new NoSuchElementException("메시지 아이디가 없어" + messageId);
         }
-        binaryRepository.deleteByUuid(messageId, ContentsType.MESSAGE_ATTACHMENT);
+        List<UUID> attachmentIds = messageRepository
+                .findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("메시지UUID가 없어:" + messageId))
+                .getAttachmentIds();
+        attachmentIds.forEach(binaryRepository::delete);
+
         messageRepository.deleteById(messageId);
     }
 }

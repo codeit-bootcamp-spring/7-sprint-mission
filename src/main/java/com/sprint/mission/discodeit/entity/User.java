@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.common.Common;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -18,7 +17,7 @@ public class User extends Common implements Serializable {
     private String password;
     private  String userName;
     private  String userNickname;
-    private UUID profilePicture;
+    private UUID profileID;
 
 
 
@@ -32,7 +31,9 @@ public class User extends Common implements Serializable {
            this.userNickname = userNickname;
     }
 
-
+    public void setProfileID(UUID profileID) {
+        this.profileID = profileID;
+    }
 
     @Override
     public String toString() {
@@ -66,8 +67,8 @@ public class User extends Common implements Serializable {
             this.userNickname = userUpdateRequest.userNickname();
             anyValueUpdated = true;
         }
-        if (userUpdateRequest.profileImageUrl() != null && !userUpdateRequest.profileImageUrl().equals(this.profilePicture)) {
-            this.profilePicture = userUpdateRequest.profileImageUrl();
+        if (userUpdateRequest.profileImageUrl() != null && !userUpdateRequest.profileImageUrl().equals(this.profileID)) {
+            this.profileID = userUpdateRequest.profileImageUrl();
         }
 
         if (anyValueUpdated) {

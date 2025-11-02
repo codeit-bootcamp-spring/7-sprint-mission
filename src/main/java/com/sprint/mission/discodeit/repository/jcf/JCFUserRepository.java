@@ -1,18 +1,25 @@
 package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-//@Repository( value = "JCFuser")
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "jcf"
+)
 public class JCFUserRepository implements UserRepository {
 
     private final Map<UUID, User> data;
 
     public JCFUserRepository() {
-        this.data = new HashMap<>();
+        this.data = new ConcurrentHashMap<>();
     }
 
     @Override

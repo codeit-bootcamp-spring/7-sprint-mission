@@ -9,6 +9,7 @@ public record BinaryContentCreateRequest(
         UUID typeUUID,
         ContentsType contentsType,
         UUID contentsId
+        ,byte[] contentByte
 ) {
 
 }

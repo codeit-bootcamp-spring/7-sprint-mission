@@ -2,12 +2,19 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-//@Repository("JCFstatus")
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "jcf"
+)
 public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public Optional<UserStatus> find(UUID binaryId) {
@@ -18,7 +25,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     private final Map<UUID,UserStatus> data;
 
     public JCFUserStatusRepository() {
-        this.data = new HashMap<>();
+        this.data = new ConcurrentHashMap<>();
     }
 
 
@@ -37,7 +44,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public List<UserStatus> findAll() {
-        return List.of();
+        return this.data.values().stream().toList();
     }
 
     @Override
@@ -45,8 +52,4 @@ public class JCFUserStatusRepository implements UserStatusRepository {
        data.remove(userId);
     }
 
-    @Override
-    public List<UserStatus> findAllByUpdatedAtAfter(Instant since) {
-        return List.of();
-    }
 }

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RepositoryConfig {
 
-    @Bean
+  /*  @Bean
     //이 메서드의 리턴 객체는 조건부로 빈 등록이 된다
     //안에 속성에따라 하겠다
     @ConditionalOnProperty(
@@ -34,5 +34,5 @@ public class RepositoryConfig {
     public UserRepository fileUserRepository(){
         return new JCFUserRepository();
     }
-
+*/
 }

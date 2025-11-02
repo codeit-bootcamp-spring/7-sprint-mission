@@ -10,7 +10,7 @@ public record UserUpdateResponse(
         String newEmail,
         String newPassword,
         String newNickname,
-        String newProfileImage
+        UUID newProfileImage
 
 ){
     public static UserUpdateResponse from(UUID uuid,User user) {
@@ -20,7 +20,7 @@ public record UserUpdateResponse(
                 user.getUserEmail(),
                 user.getPassword(),
                 user.getUserNickname(),
-                user.getProfilePicture()
+                user.getProfileID()
         );
     }
 }

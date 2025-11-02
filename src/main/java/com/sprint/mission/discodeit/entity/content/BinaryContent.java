@@ -14,13 +14,14 @@ public class BinaryContent extends Common {
     // private final UUID userId;
     //  private final  UUID messageId;
     //하나로 묶는것이 좋지않을까
-    private final UUID typeUUID;
-    private final ContentsType contentsType;
-    private final UUID contentsId;
 
-    public BinaryContent(UUID typeUUID,ContentsType contentsType,UUID contentsId) {
-        this.typeUUID = typeUUID;
+    private final ContentsType contentsType;
+    private final byte[] contentByte;
+
+    public BinaryContent(ContentsType contentsType, byte[] contentByte) {
         this.contentsType = contentsType;
-        this.contentsId = contentsId;
+        this.contentByte = contentByte;
+
+
     }
 }

@@ -5,36 +5,40 @@ import com.sprint.mission.discodeit.dto.user.response.BinaryResponse;
 import com.sprint.mission.discodeit.entity.content.BinaryContent;
 import com.sprint.mission.discodeit.entity.content.ContentsType;
 import com.sprint.mission.discodeit.repository.BinaryRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-//@Repository("JCFBinary")
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "jcf"
+)
 public class JCFBinaryContentRepository implements BinaryRepository {
 
 
     private final Map<UUID, BinaryContent> data;
 
     public JCFBinaryContentRepository() {
-        this.data = new HashMap<>();
+        this.data = new ConcurrentHashMap<>();
     }
 
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
 
-        this.data.put(binaryContent.getTypeUUID(),binaryContent);
+        this.data.put(binaryContent.getId(),binaryContent);
         return binaryContent;
 
     }
-    @Override
-    public Optional<BinaryContent> find(UUID binaryId) {
-        return Optional.empty();
-    }
+
 
     @Override
-    public Optional<BinaryContent> findByUuid(UUID contentId,ContentsType contentsType) {
-        return Optional.ofNullable(this.data.get(contentId));
+    public Optional<BinaryContent> find(UUID binaryId) {
+        return Optional.ofNullable(this.data.get(binaryId));
     }
 
     @Override
@@ -43,7 +47,7 @@ public class JCFBinaryContentRepository implements BinaryRepository {
     }
 
     @Override
-    public void deleteByUuid(UUID contentId, ContentsType contentsType) {
-         data.remove(contentId);
+    public void delete(UUID binaryId) {
+         data.remove(binaryId);
     }
 }

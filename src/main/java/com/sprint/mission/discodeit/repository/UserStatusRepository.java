@@ -21,5 +21,4 @@ public interface UserStatusRepository {
     void deleteByUserId(UUID userId);
 
 
-    List<UserStatus> findAllByUpdatedAtAfter(Instant since);
 }
