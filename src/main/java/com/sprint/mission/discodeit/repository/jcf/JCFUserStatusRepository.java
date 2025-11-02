@@ -42,6 +42,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void updateOnlineAt(UUID id) {
+
         data.get(id).updateOnlineAt();
     }
 

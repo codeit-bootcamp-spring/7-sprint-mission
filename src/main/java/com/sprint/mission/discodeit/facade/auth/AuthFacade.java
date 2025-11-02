@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.facade.auth;
 
 import com.sprint.mission.discodeit.dto.user.request.UserLoginReq;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.service.UserService;
@@ -26,13 +27,14 @@ public class AuthFacade {
         if(!user.getPassword().equals(req.password())){
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
-        userStatusService.findByUserId(user.getId());
-        userStatusService.updateOnlineAt(user.getId());
+        UserStatus userStatus= userStatusService.findByUserId(user.getId());
+        userStatusService.updateOnlineAt(userStatus.getId());
     }
 
     //로그아웃
     public void logout(UUID userId){
         userStatusService.findByUserId(userId);
-        userStatusService.updateOfflineAt(userId);
+        UserStatus userStatus= userStatusService.findByUserId(userId);
+        userStatusService.updateOfflineAt(userStatus.getId());
     }
 }
