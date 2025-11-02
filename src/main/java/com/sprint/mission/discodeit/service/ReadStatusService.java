@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusInfoRes;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
 import java.util.List;
