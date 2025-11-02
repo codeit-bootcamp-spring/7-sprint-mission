@@ -13,6 +13,7 @@ public interface UserRepository {
     Optional<User> findByEmail(String email);
     Optional<User> findByNickname(String nickname);
     void update(UUID userId, String email, String nickname, String password);
+    void updateProfileImage(UUID userId, UUID profileId);
     void delete(UUID userId);
     boolean existsByEmail(String email);
     boolean existsByNickname(String nickname);

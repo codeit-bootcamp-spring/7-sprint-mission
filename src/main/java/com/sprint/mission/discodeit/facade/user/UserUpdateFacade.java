@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.facade.user;
 
-import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateReq;
-import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
@@ -25,6 +23,8 @@ public class UserUpdateFacade {
     public void updateUser(UUID userId, UserUpdateReq req){
         User user = userService.findById(userId);
         UUID profileId = null;
+
+
         if(req.profileImage().data() != null){
             //기존 사진이 있으면 삭제
             if(user.getProfileId() != null){
@@ -34,8 +34,10 @@ public class UserUpdateFacade {
                 BinaryContentFactory.create(req.profileImage())
             );
             profileId = profileImg.getId();
+
         }
         userService.update(userId, req);
-        userStatusService.updateOnlineAt(userId);
+        userService.updateProfileImage(userId, profileId);
+        userStatusService.updateByUserId(userId);
     }
 }

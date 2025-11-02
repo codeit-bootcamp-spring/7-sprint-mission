@@ -1,2 +1,2 @@
-# 0-spring-mission
-스프린트 미션 모범 답안 리포지토리입니다.
+# spring-mission-3
+# 스프린트 미션을 보고 계십니다.

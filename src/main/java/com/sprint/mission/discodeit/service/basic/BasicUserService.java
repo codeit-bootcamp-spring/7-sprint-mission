@@ -71,6 +71,12 @@ public class BasicUserService implements UserService {
         userRepository.update(id, req.email(), req.nickname(),req.password());
     }
 
+    @Override
+    public void updateProfileImage(UUID id, UUID profileId) {
+        userRepository.updateProfileImage(id, profileId);
+    }
+
+
     // ===== 🔒 Private Logic (내부 사용) =====
     //중복 검사
     private void validateDuplicate(String email, String nickname){

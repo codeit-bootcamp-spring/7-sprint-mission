@@ -82,9 +82,6 @@ class UserCreationFacadeTest {
 
     @Test
     void createUser_withoutProfile_shouldCreateUserAndStatus() {
-        System.out.println("====================================");
-        System.out.println(reqWithoutProfile);
-        System.out.println("====================================");
         // Facade 호출
         userFacade.createUser(reqWithoutProfile);
 

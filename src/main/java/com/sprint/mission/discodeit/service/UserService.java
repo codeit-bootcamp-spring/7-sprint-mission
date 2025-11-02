@@ -14,4 +14,5 @@ public interface UserService {
     User findById(UUID id);
     void delete(UUID id);
     void update(UUID id, UserUpdateReq req);
+    void updateProfileImage(UUID id, UUID profileId);
 }

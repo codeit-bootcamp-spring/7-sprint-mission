@@ -56,6 +56,14 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
         });
     }
 
+    @Override
+    public void updateProfileImage(UUID userId, UUID profileId) {
+        loadFromFile(userId).ifPresent(user -> {
+           user.updateProfile(profileId);
+            saveToFile(userId, user);
+        });
+    }
+
     //유저 삭제
     @Override
     public void delete(UUID userId) {
