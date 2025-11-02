@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.channel.response.ChannelPrivateInfoRes;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelPublicInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,7 +23,7 @@ public class ChannelMapper {
         return switch (channel.getPublicType()) {
             case PUBLIC -> ChannelPublicInfoRes.from(channel, lastMessage.getCreatedAt());
             case PRIVATE -> ChannelPrivateInfoRes.from(channel, lastMessage.getCreatedAt());
-            default -> throw new IllegalStateException("Unknown ChannelType: " + channel.getPublicType());
+            default -> throw new CustomException(ErrorCode.INVALID_CHANNEL_TYPE);
         };
     }
 }

@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContent findById(UUID id) {
         return binaryContentRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("바이너리 컨텐츠 입력값 잘못된 듯? "+ id));
+                () -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUNT));
     }
 
     @Override
@@ -34,7 +36,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public void delete(UUID id) {
         if(!binaryContentRepository.existsById(id)){
-            throw new RuntimeException("BinaryContent not found. id: "+ id);
+            throw new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUNT);
         }
         binaryContentRepository.delete(id);
     }

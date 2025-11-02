@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message findById(UUID id) {
         return messageRepository.findById(id).orElseThrow(()->
-                new RuntimeException("Message not found. id: " + id));
+                new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
     }
 
     //한 유저가 말한 메세지들을 조회
@@ -59,7 +61,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void update(UUID id, String content, List<UUID> attachmentIds) {
         if(!messageRepository.existsById(id)){
-            throw new RuntimeException("Message not found. id: "+ id);
+            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
         }
         messageRepository.update(id, content, attachmentIds);
     }
@@ -68,7 +70,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(UUID id) {
         if(!messageRepository.existsById(id)){
-            throw new RuntimeException("Message not found. id: "+ id);
+            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
         }
         messageRepository.delete(id);
     }

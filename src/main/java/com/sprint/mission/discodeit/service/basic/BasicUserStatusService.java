@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusViewRes;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus findByUserId(UUID userId) {
         return userStatusRepository.findByUserId(userId).orElseThrow(
-                ()-> new RuntimeException("UserStatus not found. userId:"+userId)
+                ()-> new CustomException(ErrorCode.USER_STATUS_MISSING)
         );
     }
 
@@ -31,7 +33,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusViewRes findById(UUID id) {
         UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(
-                ()-> new RuntimeException("UserStatus not found. id:"+id)
+                ()-> new CustomException(ErrorCode.USERSTATUS_NOT_FOUND)
         );
         return UserStatusViewRes.from(userStatus);
     }

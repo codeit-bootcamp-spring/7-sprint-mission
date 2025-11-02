@@ -17,10 +17,6 @@ public class UserStatusCreateFacade {
     //UserState
     public UserStatus create(UserStatusCreateReq req){
         User user = userService.findById(req.userId());
-        if(user == null){
-            throw new RuntimeException("Invalid user id");
-        }
-
         return userStatusService.create(new UserStatus(user.getId()));
     }
 }

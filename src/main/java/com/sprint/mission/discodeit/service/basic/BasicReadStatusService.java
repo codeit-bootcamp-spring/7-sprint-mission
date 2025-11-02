@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusInfoRes;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus findById(UUID id) {
         return readStatusRepository.findById(id).orElseThrow(() ->
-                new RuntimeException("ReadStatus not found. id: " + id));
+                new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
     }
 
     @Override
@@ -38,18 +40,13 @@ public class BasicReadStatusService implements ReadStatusService {
         readStatusRepository.delete(id);
     }
 
-    // ===== 🎯 Controller Direct (DTO 반환) =====
     @Override
-    public List<ReadStatusInfoRes> findAllByChannelId(UUID channelId){
-        return readStatusRepository.findAllByChannelId(channelId).stream()
-                .map(ReadStatusInfoRes::from)
-                .toList();
+    public List<ReadStatus> findAllByChannelId(UUID channelId){
+        return readStatusRepository.findAllByChannelId(channelId);
     }
 
     @Override
-    public List<ReadStatusInfoRes> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId).stream()
-                .map(ReadStatusInfoRes::from)
-                .toList();
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAllByUserId(userId);
     }
 }

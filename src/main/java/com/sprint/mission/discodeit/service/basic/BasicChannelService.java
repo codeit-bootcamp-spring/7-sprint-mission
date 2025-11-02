@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateSecReq;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateReq;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
 import com.sprint.mission.discodeit.factory.ChannelSecFactory;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -39,7 +41,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void delete(UUID id) {
         if(!channelRepository.existsById(id)){
-            throw new RuntimeException("Channel not found. id: "+ id);
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
         channelRepository.delete(id);
     }
@@ -64,7 +66,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel findById(UUID id) {
         return channelRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Channel not found. id: " + id));
+                () -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND)
+        );
     }
 
     // ===== 🔧 Controller Direct (단일 도메인 / void) =====
@@ -72,10 +75,10 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void update(UUID id, ChannelUpdateReq req) {
         Channel channel = channelRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Channel not found. id: "+ id)
+                () -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND)
         );
         if (channel.getPublicType() == ChannelType.PRIVATE){
-            throw new RuntimeException("Cannot update private channel");
+            throw new CustomException(ErrorCode.CHANNEL_PRIVATE_CANNOT_MODIFY);
         }
         channelRepository.update(id, req.name(), req.description());
     }

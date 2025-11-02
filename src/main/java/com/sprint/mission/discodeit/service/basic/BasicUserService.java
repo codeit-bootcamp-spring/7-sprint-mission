@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateReq;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +36,7 @@ public class BasicUserService implements UserService {
     @Override
     public User findById(UUID id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("User not found. id: " + id)
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
     }
 
@@ -54,7 +56,7 @@ public class BasicUserService implements UserService {
     @Override
     public void delete(UUID id) {
         if(!userRepository.existsById(id)){
-            throw new RuntimeException("User not found. id: "+ id);
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         userRepository.delete(id);
     }
@@ -63,7 +65,7 @@ public class BasicUserService implements UserService {
     @Override
     public void update(UUID id, UserUpdateReq req) {
         if(!userRepository.existsById(id)){
-            throw new RuntimeException("User not found. id: "+ id);
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         validateDuplicate(req.email(), req.nickname());
         userRepository.update(id, req.email(), req.nickname(),req.password());
@@ -73,10 +75,10 @@ public class BasicUserService implements UserService {
     //중복 검사
     private void validateDuplicate(String email, String nickname){
         if(userRepository.existsByEmail(email)){
-            throw new RuntimeException("Email is already registered");
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         if(userRepository.existsByNickname(nickname)){
-            throw new RuntimeException("Nickname is already registered");
+            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         }
     }
 }
