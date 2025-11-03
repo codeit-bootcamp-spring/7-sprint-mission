@@ -22,9 +22,15 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
 
-    // 10MB, 500MB 업로드 제한
+    /* 10MB, 500MB 업로드 제한
     private static final long BASIC_MAX_FILE_SIZE = 10 * 1024 * 1024;
-//    private static final long NITRO_MAX_FILE_SIZE = 500 * 1024 * 1024;
+    private static final long NITRO_MAX_FILE_SIZE = 500 * 1024 * 1024;
+     */
+
+    private static final long BYTES_PER_KB = 1024;
+    private static final long BYTES_PER_MB = BYTES_PER_KB * 1024;
+    private static final long MAX_FILE_SIZE_MB = 10;
+    private static final long BASIC_MAX_FILE_SIZE = MAX_FILE_SIZE_MB * BYTES_PER_MB;
 
     @Override
     public BinaryContentResponseDto createBinaryContent(BinaryContentRequestDto requestDto) {

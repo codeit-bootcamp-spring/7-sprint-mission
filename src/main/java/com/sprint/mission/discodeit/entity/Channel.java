@@ -42,7 +42,7 @@ public class Channel extends BaseEntity {
     // updateMessage (private는 수정불가)
     public void changeChannelName(String channelName) {
         if (channelName == null || channelName.isBlank()) {
-            throw new InvalidInputException("잘못된 입력");
+            throw new InvalidInputException("잘못된 이름입니다.");
         }
         this.channelName = channelName;
         updateTimestamp();
