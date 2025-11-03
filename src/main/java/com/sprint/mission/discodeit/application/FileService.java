@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public final class FileManager {
+public final class FileService {
 
     private final Path rootDir = Paths.get("data/uploads"); // 루트 폴더
 
