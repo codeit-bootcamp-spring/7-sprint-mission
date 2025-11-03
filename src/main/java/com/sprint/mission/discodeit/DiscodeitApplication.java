@@ -39,12 +39,13 @@ public class DiscodeitApplication {
 
 
 
-        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-        BasicUserService userService = context.getBean(BasicUserService.class);
+         SpringApplication.run(DiscodeitApplication.class, args);
+
+     /*   BasicUserService userService = context.getBean(BasicUserService.class);
         BasicChannelService channelService = context.getBean(BasicChannelService.class);
         BasicMessageService messageService = context.getBean(BasicMessageService.class);
-
+*/
         //기본유저
       //  User user = setupUser(userService);
 

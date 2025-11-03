@@ -59,8 +59,8 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusResponse update(UserStatustUpdateRequest request) {
-        UserStatus userStatus = userStatusRepository.findByUserId(request.userStatustId()).stream().findFirst()
-                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + request.userStatustId()));
+        UserStatus userStatus = userStatusRepository.findByUserId(request.userId()).stream().findFirst()
+                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + request.userId()));
         userStatus.setUpdatedAt(Instant.now());
         return UserStatusResponse.from(userStatus);
     }

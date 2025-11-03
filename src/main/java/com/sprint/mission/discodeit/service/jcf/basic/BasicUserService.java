@@ -51,9 +51,9 @@ public class BasicUserService implements UserService {
      
      //유저정보
         User user = new User(
+                userCreateRequest.email(),
+                userCreateRequest.rawPassword(),
                 userCreateRequest.username()
-                ,userCreateRequest.email()
-                ,userCreateRequest.rawPassword()
                 ,userCreateRequest.userNickname()
         ); 
      
@@ -118,11 +118,14 @@ public class BasicUserService implements UserService {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("유저uuid못찾아용"+userId);
         }
+
         UUID profileID = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId))
                 .getProfileID();
-         binaryRepository.delete(profileID);
+        if(profileID != null) {
+            binaryRepository.delete(profileID);
+        }
         //이런게 너무번거롭다 싫다
         userStatusRepository.findByUserId(userId);
         userRepository.deleteById(userId);
