@@ -35,7 +35,6 @@ public class FileMessageRepository implements MessageRepository {
         MESSAGE_DATA_PATH = env.getProperty(DISCODEIT_DIRECTORY)+"messageRepository.ser";
         messageRepositoryFile = new File(MESSAGE_DATA_PATH);
         repositoryCheck();
-        resetMessageRepository();
     }
 
     @Override

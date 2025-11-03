@@ -36,7 +36,6 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         binaryContentRepositoryPath = env.getProperty(DISCODEIT_DIRECTORY)+"binaryContentRepository.ser";
         binaryContentRepositoryFile = new File(binaryContentRepositoryPath);
         repositoryCheck();
-        resetBinaryContentRepository();
     }
 
     @Override

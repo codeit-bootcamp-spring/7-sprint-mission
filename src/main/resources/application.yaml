@@ -4,5 +4,7 @@ spring:
 discodeit:
   repository:
     type: file
-    file-directory:  .discodeit
+    file-directory:  "${user.home}/Documents/discodeit/data"
+server:
+  port: 8080
 

@@ -28,11 +28,18 @@ import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EX
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
+
+    @Override
+    public List<ChannelReadResponseDto> readAllChannel() {
+        channelRepository.getAllChannel().forEach(x-> System.out.println(x.getName()+": "+x.getId()));
+        return channelRepository.getAllChannel().stream().map(x->readChannel(x.getId())).toList();
+    }
+
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
 
     @Override
-    public Channel createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
+    public ChannelReadResponseDto createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
 
         List<User> userList = userRepository.getAllUser();
         HashSet<UUID> userIdList = channelPrivateCreateRequestDto.getUserIdList();
@@ -54,24 +61,42 @@ public class BasicChannelService implements ChannelService {
                     return ReadStatus.builder().userId(x).channelId(channel.getId()).build();
                 }
         ).forEach(readStatusRepository::createReadStatus);
+        Channel saveChannel = channelRepository.saveChannel(channel);
 
-    return channelRepository.saveChannel(channel);
+        return ChannelReadResponseDto.builder()
+                .name(saveChannel.getName())
+                .isTextChannel(saveChannel.isTextChannel())
+                .isPublic(saveChannel.isPublic())
+                .description(saveChannel.getDescription())
+                .userIdList(
+                        saveChannel.isPublic()? new HashSet<>():saveChannel.getJoinUserList())
+                .recentPostTime(lastPostTime(saveChannel))
+                .build();
 
     }
 
     @Override
-    public Channel createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
-
-    return channelRepository.saveChannel(Channel.builder()
+    public ChannelReadResponseDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
+    Channel channel = channelRepository.saveChannel(Channel.builder()
             .name(channelPublicCreateRequestDto.getName())
             .isTextChannel(channelPublicCreateRequestDto.isTextChannel)
             .isPublic(true)
             .description(channelPublicCreateRequestDto.getDescription())
-                    .joinUserList(channelPublicCreateRequestDto.getUserIdList()==null
-                            ? new HashSet<>()
-                            : channelPublicCreateRequestDto.getUserIdList())
-            .build()
-    );
+            .joinUserList(channelPublicCreateRequestDto.getUserIdList()==null
+                    ? new HashSet<>()
+                    : channelPublicCreateRequestDto.getUserIdList())
+            .build());
+
+    return ChannelReadResponseDto.builder()
+            .name(channel.getName())
+            .isTextChannel(channel.isTextChannel())
+            .isPublic(channel.isPublic())
+            .description(channel.getDescription())
+            .userIdList(
+                    channel.isPublic()? new HashSet<>():channel.getJoinUserList())
+            .recentPostTime(lastPostTime(channel))
+            .build();
+
 
     }
 
@@ -87,7 +112,6 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelReadResponseDto readChannel(UUID channelId) {
         Channel expectedChannel = channelRepository.getChannelById(channelId).orElseThrow(()->new IllegalArgumentException("Channel not found"));
-        List<Message> messageList = messageRepository.getAllMessage();
         Instant max = lastPostTime(expectedChannel);
         ChannelReadResponseDto channelReadResponseDto = ChannelReadResponseDto.builder()
                 .name(expectedChannel.getName())
@@ -99,10 +123,7 @@ public class BasicChannelService implements ChannelService {
                 .recentPostTime(max)
                 .build();
 
-
         return channelReadResponseDto;
-
-
     }
 
     private Instant lastPostTime(Channel channel){
@@ -123,7 +144,7 @@ public class BasicChannelService implements ChannelService {
         List<Channel> userContainPrivateChannel = channelList.stream().filter(
                 x->x.getJoinUserList().stream().anyMatch(y->y.equals(userId))&&!x.isPublic()
         ).toList();
-
+        channelRepository.getAllChannel().forEach(x-> System.out.println(x.getName()+": "+x.getId()));
         return Stream.concat(publicChannelList.stream(),userContainPrivateChannel.stream())
                 .map(x->
                         ChannelReadResponseDto.builder()
@@ -169,8 +190,6 @@ public class BasicChannelService implements ChannelService {
         biConsumer.accept(channel, channelUpdateRequestDto.getUpdatedValue());
         channel.updateEntity();
         channelRepository.updateChannel(channel);
-
-
 
     }
 
@@ -232,5 +251,10 @@ public class BasicChannelService implements ChannelService {
                         && x.getChannelId().equals(tempChannel.getId()))
                 .findFirst().orElseThrow().getId());
 
+    }
+
+    @Override
+    public void resetChannelRepository() {
+        channelRepository.getAllChannel().forEach(x->deleteChannel(x.getId()));
     }
 }
