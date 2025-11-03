@@ -35,9 +35,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     public FileReadStatusRepository(Environment env) {
         READ_STATUS_DATA_PATH = env.getProperty(DISCODEIT_DIRECTORY) +"readStatusRepository.ser";
         readStatusRepositoryFile = new File(READ_STATUS_DATA_PATH);
-
         repositoryCheck();
-        resetRepository();
     }
 
     @Override

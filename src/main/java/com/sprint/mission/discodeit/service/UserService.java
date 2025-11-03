@@ -14,8 +14,8 @@ import java.util.UUID;
 
 public interface UserService {
 
-    User createUser(UserCreateRequestDto userCreateRequestDtoDto);
-    User createUser(UserCreateRequestDto userCreateRequestDtoDto, ProfileCreateRequestDto profileCreateRequestDtoDto);
+    UserReadResponseDto createUser(UserCreateRequestDto userCreateRequestDtoDto);
+    UserReadResponseDto createUser(UserCreateRequestDto userCreateRequestDtoDto, ProfileCreateRequestDto profileCreateRequestDtoDto);
     UserReadResponseDto readUser(UUID userId);
     List<UserReadResponseDto> readAllUser();
     void deleteUser(UUID userId);
@@ -26,5 +26,6 @@ public interface UserService {
    // void readDeletedUser();
     void enterChannel(UUID userId, UUID channelId);
     void exitChannel(UUID userId,UUID channelId);
-
+    void updateUserOnlineStatus(UUID userId);
+    void resetUserRepository();
 }

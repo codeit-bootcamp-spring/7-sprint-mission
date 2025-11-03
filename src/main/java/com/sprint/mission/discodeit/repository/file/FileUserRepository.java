@@ -44,7 +44,6 @@ public class FileUserRepository implements UserRepository {
         System.out.println("USER_DATA_ROOT = " + USER_DATA_ROOT);
         userRepositoryFile = new File(USER_DATA_ROOT);
         repositoryFileCheck();
-        resetUserRepository();
     }
 
     @Override
