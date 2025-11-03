@@ -86,7 +86,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public void deleteMember(Channel channel, UUID targetId){
         deleteChannelIdForUser(channel.getId(), targetId); // 강퇴된 유저가 가진 채널 목록에서 채널 UUID 삭제
-        channel.delMember(targetId); // 채널에서 강퇴된 유저 삭제
+        channel.deleteMember(targetId); // 채널에서 강퇴된 유저 삭제
         save(channel); // 변경된 채널 정보 저장
     }
 
