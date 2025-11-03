@@ -92,8 +92,11 @@ public class BasicMessageService implements MessageService {
 
     // Message Read
     @Override
-    public Optional<MessageResponseDto> findMessageById(UUID messageId) {
-        return messageRepository.findById(messageId).map(this::toDto);
+    public MessageResponseDto findMessageById(UUID messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다."));
+
+        return toDto(message);
     }
 
     // update를 해도 순서는 바뀌지않음 생성일자로 정렬

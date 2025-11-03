@@ -12,7 +12,7 @@ import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,8 +25,9 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusResponseDto createUserStatus(UserStatusRequestDto requestDto) {
-        userStatusRepository.findStatusByUserId(requestDto.userId())
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
+
+        userRepository.findById(requestDto.userId())
+                        .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
 
         userStatusRepository.findStatusByUserId(requestDto.userId()).ifPresent(userStatus -> {
             throw new DuplicateRequestException("이미 존재함");
@@ -38,8 +39,11 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public Optional<UserStatusResponseDto> findStatusById(UUID id) {
-        return userStatusRepository.findById(id).map(UserStatusResponseDto::from);
+    public UserStatusResponseDto findStatusById(UUID id) {
+        UserStatus status = userStatusRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
+
+        return UserStatusResponseDto.from(status);
     }
 
     @Override
@@ -49,13 +53,13 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public Optional<UserStatusResponseDto> updateStatus(UserStatusUpdateDto updateDto) {
-        return userStatusRepository.findStatusByUserId(updateDto.userStatusId())
-                .map(userStatus -> {
-                    userStatus.updateLastAccess();
-                    userStatusRepository.save(userStatus);
-                    return UserStatusResponseDto.from(userStatus);
-                });
+    public UserStatusResponseDto updateStatus(UserStatusUpdateDto updateDto) {
+        UserStatus status = userStatusRepository.findById(updateDto.userStatusId())
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
+        status.updateLastAccess();
+        userStatusRepository.save(status);
+        return UserStatusResponseDto.from(status);
+
     }
 
     @Override

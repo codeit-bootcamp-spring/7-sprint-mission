@@ -15,17 +15,16 @@ public interface ChannelService {
     ChannelResponseDto createPublicChannel(PublicChannelRequestDto requestDto);
     ChannelResponseDto createPrivateChannel(PrivateChannelRequestDto requestDto);
 
-    Optional<ChannelResponseDto> findChannelInfoById(UUID id);
-    Optional<Channel> findChannelEntityById(UUID id);
+    ChannelResponseDto findChannelInfoById(UUID id);
+    ChannelResponseDto findChannelInfoByChannelName(String channelName);
 
     // findAll -> findAllByUserId
     List<ChannelResponseDto> findAllByUserId(UUID userId);
 
-    Optional<ChannelResponseDto> findChannelInfoByChannelName(String channelName);
 
-    Optional<ChannelResponseDto> updateChannelName(ChannelUpdateDto channelUpdateDto);
-    Optional<ChannelResponseDto> addMemberToChannel(UUID channelId, UUID userId);
-    Optional<ChannelResponseDto> removeMemberFromChannel(UUID channelId, UUID userId);
+    ChannelResponseDto updateChannelName(ChannelUpdateDto channelUpdateDto);
+    ChannelResponseDto addMemberToChannel(UUID channelId, UUID userId);
+    ChannelResponseDto removeMemberFromChannel(UUID channelId, UUID userId);
 
 
     boolean deleteChannel(UUID id);

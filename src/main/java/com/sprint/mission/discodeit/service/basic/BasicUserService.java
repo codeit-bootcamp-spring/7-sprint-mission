@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.entity.dto.binaryContentDto.UserProfileImageUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserRequestDto;
@@ -37,10 +38,14 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponseDto createUser(UserRequestDto requestDto) {
         userRepository.findByEmail(requestDto.getEmail()).ifPresent(user
-                -> {throw new DuplicateEmailException("이미 존재하는 이메일");});
+                -> {
+            throw new DuplicateEmailException("이미 존재하는 이메일");
+        });
 
         userRepository.findByUserName(requestDto.getUserName()).ifPresent(user
-                -> {throw new DuplicateEmailException("이미 존재하는 닉네임");});
+                -> {
+            throw new DuplicateEmailException("이미 존재하는 닉네임");
+        });
 
         User newUser = User.builder()
                 .email(requestDto.getEmail())
@@ -72,7 +77,7 @@ public class BasicUserService implements UserService {
 
     // User -> UserInfoDto
     private UserResponseDto toDto(User user) {
-        // 반복되는 부분을 헬퍼 메소드로
+
         boolean isOnline = userStatusRepository.findStatusByUserId(user.getId())
                 .map(UserStatus::isOnline).orElse(false);
         return UserResponseDto.from(user, isOnline);
@@ -82,18 +87,19 @@ public class BasicUserService implements UserService {
 
     // ID로 출력
     @Override
-    public Optional<UserResponseDto> findUserInfoById(UUID userId) {
-        // 반복되는 부분
-        return userRepository.findById(userId).map(user -> {
-            boolean isOnline = userStatusRepository.findStatusByUserId(userId)
-                    .map(UserStatus::isOnline).orElse(false);
-            return UserResponseDto.from(user, isOnline);
-        });
+    public UserResponseDto findUserInfoById(UUID userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+        return UserResponseDto.from(user, true);
     }
+
     // 이메일로 출력
     @Override
-    public Optional<UserResponseDto> findUserInfoByEmail(String email) {
-        return userRepository.findByEmail(email).map(this::toDto);
+    public UserResponseDto findUserInfoByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+        return UserResponseDto.from(user, true);
     }
 
     // 전체출력
@@ -102,83 +108,84 @@ public class BasicUserService implements UserService {
         return userRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    // 접근
-    public Optional<User> findUserEntityById(UUID userId) {
-        return userRepository.findById(userId);
-    }
-
     // --- 수정 ---
     @Override
-    public Optional<UserResponseDto> updateUserName(UserNameUpdateDto updateDto) {
+    public UserResponseDto updateUserName(UserNameUpdateDto updateDto) {
 
         userRepository.findByUserName(updateDto.newUserName()).ifPresent(user -> {
             if (!user.getUserName().equals(updateDto.newUserName()))
                 throw new DuplicateEmailException("이미 사용중인 닉네임입니다.");
         });
 
-        return userRepository.findById(updateDto.userId()).map(user -> {
-            user.updateUserName(updateDto.newUserName());
-            userRepository.save(user);
-            return toDto(user);
-        });
+        User user = userRepository.findById(updateDto.userId())
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+
+        user.updateName(updateDto.newUserName());
+        userRepository.save(user);
+        return toDto(user);
     }
 
     @Override
-    public Optional<UserResponseDto> changePassword(UserPasswordUpdateDto updateDto) {
+    public UserResponseDto changePassword(UserPasswordUpdateDto updateDto) {
 
-        return userRepository.findById(updateDto.userId()).map(user -> {
-            user.updatePassword(updateDto.newPassword());
-            userRepository.save(user);
-            return toDto(user);
-        });
+        User user = userRepository.findById(updateDto.userId())
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+
+        user.updatePassword(updateDto.newPassword());
+        userRepository.save(user);
+        return toDto(user);
     }
 
     @Override
-    public Optional<UserResponseDto> updateState(UserStateUpdateDto updateDto) {
+    public UserResponseDto updateState(UserStateUpdateDto updateDto) {
 
-        return userRepository.findById(updateDto.userId()).map(user -> {
-            user.updateState(updateDto.newState());
-            userRepository.save(user);
-            return toDto(user);
-        });
+        User user = userRepository.findById(updateDto.userId())
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+
+        user.updateState(updateDto.newState());
+        userRepository.save(user);
+        return toDto(user);
     }
 
     @Override
-    public Optional<UserResponseDto> updatePhoneNum(UserPhoneNumUpdateDto updateDto) {
-        return userRepository.findById(updateDto.userId()).map(user -> {
-            user.updatePhoneNum(updateDto.phoneNum());
-            userRepository.save(user);
-            return toDto(user);
-        });
+    public UserResponseDto updatePhoneNum(UserPhoneNumUpdateDto updateDto) {
+
+        User user = userRepository.findById(updateDto.userId())
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+
+        user.updatePhoneNum(updateDto.phoneNum());
+        userRepository.save(user);
+        return toDto(user);
     }
 
     @Override
-    public Optional<UserResponseDto> updateProfileImage(UserProfileImageUpdateDto imageUpdateDto) {
+    public UserResponseDto updateProfileImage(UserProfileImageUpdateDto imageUpdateDto) {
 
-        return userRepository.findById(imageUpdateDto.userId()).map(user -> {
-            // 기존 이미지 삭제
-            binaryContentRepository.deleteProfileImageByUserId(user.getId());
-            // 새로운 이미지 업데이트
-            if (imageUpdateDto.image() != null) {
-                BinaryContent newImage = new BinaryContent(
-                        user.getId(),
-                        imageUpdateDto.image(),
-                        imageUpdateDto.imageName(),
-                        imageUpdateDto.imageType()
-                );
-                binaryContentRepository.save(newImage);
-            }
-            return toDto(user);
-        });
+        User user = userRepository.findById(imageUpdateDto.userId())
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+
+        // 기존 이미지 삭제
+        binaryContentRepository.deleteProfileImageByUserId(user.getId());
+        // 새로운 이미지 업데이트
+        if (imageUpdateDto.image() != null) {
+            BinaryContent newImage = new BinaryContent(
+                    user.getId(),
+                    imageUpdateDto.image(),
+                    imageUpdateDto.imageName(),
+                    imageUpdateDto.imageType()
+            );
+            binaryContentRepository.save(newImage);
+        }
+        return toDto(user);
+
     }
-
 
     // 논리 삭제
     @Override
     public boolean deleteUser(UUID userId) {
 
         return userRepository.findById(userId).map(userDelete -> {
-            if(channelRepository.existsByAdminId(userId)) {
+            if (channelRepository.existsByAdminId(userId)) {
                 throw new IllegalStateException("채널관리자는 삭제할 수 없습니다.");
             }
 

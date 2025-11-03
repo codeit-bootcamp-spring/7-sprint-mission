@@ -19,20 +19,19 @@ public interface UserService {
     UserResponseDto createUser(UserRequestDto requestDto);
 
     // 조회
-    Optional<UserResponseDto> findUserInfoById(UUID userId);
-    Optional<User> findUserEntityById(UUID userID);
+    UserResponseDto findUserInfoById(UUID userId);
     List<UserResponseDto> findAllUsers();
 
-    Optional<UserResponseDto> findUserInfoByEmail(String email);
+    UserResponseDto findUserInfoByEmail(String email);
 
     // 수정
-    Optional<UserResponseDto> updateUserName(UserNameUpdateDto updateDto);
-    Optional<UserResponseDto> changePassword(UserPasswordUpdateDto updateDto);
-    Optional<UserResponseDto> updateState(UserStateUpdateDto updateDto);
-    Optional<UserResponseDto> updatePhoneNum(UserPhoneNumUpdateDto updateDto);
+    UserResponseDto updateUserName(UserNameUpdateDto updateDto);
+    UserResponseDto changePassword(UserPasswordUpdateDto updateDto);
+    UserResponseDto updateState(UserStateUpdateDto updateDto);
+    UserResponseDto updatePhoneNum(UserPhoneNumUpdateDto updateDto);
 
     // 프로필 이미지 변경
-    Optional<UserResponseDto> updateProfileImage(UserProfileImageUpdateDto userProfileImageUpdateDto);
+    UserResponseDto updateProfileImage(UserProfileImageUpdateDto userProfileImageUpdateDto);
 
     // 삭제
     boolean deleteUser(UUID userId); // 삭제 메서드 추가 (성공 여부 반환)

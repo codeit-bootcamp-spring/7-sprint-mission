@@ -43,7 +43,7 @@ public class User extends BaseEntity {
     }
 
     // Update
-    public void updateUserName(String userName) {
+    public void updateName(String userName) {
         validateUserName(userName);
         this.userName = userName;
         updateTimestamp();

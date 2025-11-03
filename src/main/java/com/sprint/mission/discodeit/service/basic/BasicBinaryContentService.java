@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,8 +46,10 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public Optional<BinaryContentResponseDto> findBinaryContentByUserId(UUID id) {
-        return binaryContentRepository.findById(id).map(BinaryContentResponseDto::from);
+    public BinaryContentResponseDto findBinaryContentByUserId(UUID id) {
+        BinaryContent content=  binaryContentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
+        return BinaryContentResponseDto.from(content);
     }
 
     @Override
