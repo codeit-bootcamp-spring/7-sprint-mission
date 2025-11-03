@@ -44,6 +44,17 @@ public class MessageController {
         return messageService.findallByChannelId(channelId);
     }
 
+    @RequestMapping("/createChannelMessage")
+    public void createChannelMessage(@RequestParam UUID channelId, @RequestBody MessageCreateRequestDto dto){
+
+        messageService.createMessage(dto);
+    }
+
+    @RequestMapping(value = "/updateChannelMessage", method = RequestMethod.POST)
+    public <T> void  updateChannelMessage(@RequestBody MessageUpdateRequestDto<T> dto){
+        messageService.updateMessage(dto);
+    }
+
     @RequestMapping("/readUserMessage")
     public List<MessageReadResponseDto> readUserMessage(@RequestParam UUID userId){
 
@@ -55,9 +66,5 @@ public class MessageController {
         messageService.resetMessage();
     }
 
-    @RequestMapping("/readAll")
-    public List<MessageReadResponseDto> readAll(){
-        return messageService.readAllMessage();
-    }
 
 }

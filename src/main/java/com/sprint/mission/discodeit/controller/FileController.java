@@ -19,17 +19,7 @@ public class FileController {
 
     private final BinaryContentService binaryContentService;
     @RequestMapping(value = "/read", method = RequestMethod.POST)
-    public List<BinaryContent> read(@RequestBody List<UUID> binaryContentIdList){
+    public List<BinaryContent> uploadFile(@RequestBody List<UUID> binaryContentIdList){
         return binaryContentService.findAllByIdIn(binaryContentIdList);
-    }
-
-    @RequestMapping("/readAll")
-    public List<BinaryContent> readAll(){
-        return binaryContentService.findAll();
-    }
-
-    @RequestMapping("/reset")
-    public void reset(){
-        binaryContentService.resetBinaryContentService();
     }
 }

@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.request.user.UserCreateWithProfileRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.UserReadResponseDto;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,17 +19,9 @@ public class UserController {
     private final UserService userService;
     @RequestMapping(value =  "/register", method = RequestMethod.POST)
     public UserReadResponseDto register(@RequestBody UserCreateRequestDto dto){
+
        return userService.createUser(dto);
     }
-
-    @RequestMapping(value = "/registerWithProfile", method = RequestMethod.POST)
-    public UserReadResponseDto registerWithProfile(@RequestBody UserCreateWithProfileRequestDto dto){
-        UserCreateRequestDto userCreateRequestDto = dto.userInfo();
-        ProfileCreateRequestDto profileCreateRequestDto = dto.profileInfo();
-        return userService.createUser(userCreateRequestDto,profileCreateRequestDto);
-    }
-
-
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public <T>void update(@RequestBody UserUpdateRequestDto<T> dto){

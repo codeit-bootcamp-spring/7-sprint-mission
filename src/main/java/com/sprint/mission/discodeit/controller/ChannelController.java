@@ -4,9 +4,7 @@ import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequ
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.ChannelReadResponseDto;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +17,6 @@ import java.util.UUID;
 public class ChannelController {
 
     private final ChannelService channelService;
-    private final ReadStatusService readStatusService;
 
     @RequestMapping(value = "/createPrivate",method = RequestMethod.POST)
     public ChannelReadResponseDto createPrivateChannel(@RequestBody ChannelPrivateCreateRequestDto dto){

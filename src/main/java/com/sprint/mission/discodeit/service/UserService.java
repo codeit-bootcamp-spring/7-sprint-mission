@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileCreateReque
 import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.dto.response.UserReadResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
@@ -29,6 +28,4 @@ public interface UserService {
     void exitChannel(UUID userId,UUID channelId);
     void updateUserOnlineStatus(UUID userId);
     void resetUserRepository();
-
-    List<UserDto> advanceFindAllUser();
 }
