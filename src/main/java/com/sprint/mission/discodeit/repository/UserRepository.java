@@ -11,4 +11,6 @@ public interface UserRepository extends BaseRepository<User>{
     // 이메일(아이디) 중복 확인용
     Optional<User> findByEmail(String email);
 
+    // 닉네임 중복 확인용
+    Optional<User> findByUserName(String userName);
 }

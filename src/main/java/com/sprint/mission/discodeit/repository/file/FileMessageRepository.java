@@ -1,33 +1,53 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.BaseRepository;
+import com.sprint.mission.discodeit.entity.entityType.MessageType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class FileMessageRepository extends FileBaseRepository<Message> implements MessageRepository {
 
-    public FileMessageRepository(String rootPath) {
-        super(rootPath + "Data.ser");
+    private static final String MESSAGE_DATA_FILE = "messageData.ser";
+
+    public FileMessageRepository(String basePath) {
+        super(basePath + "/" + MESSAGE_DATA_FILE);
     }
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         return data.values().stream()
-                .filter(m -> m.getType() == Message.MessageType.CHANNEL &&
+                .filter(m -> m.getType() == MessageType.CHANNEL &&
                         m.getChannel().getId().equals(channelId)).collect(Collectors.toList());
     }
 
     @Override
     public List<Message> findAllByBetweenUserIds(UUID userId1, UUID userId2) {
         return data.values().stream()
-                .filter(m -> m.getType() == Message.MessageType.DIRECT)
+                .filter(m -> m.getType() == MessageType.DIRECT)
                 .filter(m -> (m.getAuthor().getId().equals(userId1)
                         && m.getReceiver().getId().equals(userId2))
-                        || m.getAuthor().getId().equals(userId2) &&  m.getReceiver().getId().equals(userId1))
+                        || m.getAuthor().getId().equals(userId2) && m.getReceiver().getId().equals(userId1))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        data.values().removeIf(message -> message.getChannel().getId().equals(channelId));
+    }
+
+    @Override
+    public Optional<Message> findTopByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(m ->
+                        m.getType() == MessageType.CHANNEL &&   // DM은 channelId == null
+                                m.getChannel() != null &&
+                                m.getChannel().getId().equals(channelId)
+                )
+                .max(Comparator.comparing(Message::getCreatedAt));
     }
 }

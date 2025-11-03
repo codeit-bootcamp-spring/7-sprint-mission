@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
@@ -22,6 +23,13 @@ public class JCFUserRepository implements UserRepository {
 
     public Optional<User> findByEmail(String email) {
         return data.values().stream().filter(user -> user.getEmail().equals(email)).findFirst();
+    }
+
+    @Override
+    public Optional<User> findByUserName(String userName) {
+        return data.values().stream()
+                .filter(user -> user.getEmail()
+                        .equals(userName)).findFirst();
     }
 
     @Override

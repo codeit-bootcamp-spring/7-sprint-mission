@@ -1,5 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.entityType.MessageType;
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@ToString
 public class Message extends BaseEntity {
     private final User author;
     private String content;
@@ -9,17 +15,8 @@ public class Message extends BaseEntity {
 
     private final MessageType type;
 
-    public enum MessageType {
-        CHANNEL("채널메시지"), DIRECT("개인메시지");
-        private final String desc;
-        MessageType(String description) {
-            this.desc = description;
-        }
-        public String getDesc() {
-            return desc;
-        }
-    }   // CHANNEL, DIRECT
-
+    // 유저나 채널처럼 입력이 필요하지 않은 정보가 있을 땐 빌더 패턴이 좋아보이지만
+    // 전체 입력을 받아야하는 메시지는 안쓰는게 더 좋을지도?
     public Message(User author, User receiver, String content) {
         super();
         this.author = author;
@@ -28,6 +25,7 @@ public class Message extends BaseEntity {
         this.type = MessageType.DIRECT;
         this.channel = null;
     }   // DM
+
     public Message(User author, Channel channel, String content) {
         super();
         this.author = author;
@@ -37,30 +35,9 @@ public class Message extends BaseEntity {
         this.receiver = null;
     }   // CM
 
-    public User getAuthor() {return author;}
-    public User getReceiver() {return receiver;}
-    public String getContent() {return content;}
-    public Channel getChannel() {return channel;}
-    public MessageType getType() {return type;}
-
     public void updateContent(String content) {
         this.content = content;
         updateTimestamp();
-    }
-
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "author=" + author +
-                ", content='" + content + '\'' +
-                ", receiver=" + receiver +
-                ", channel=" + channel +
-                ", type=" + type +
-                ", createdAt=" + createdAt +
-                ", id=" + id +
-                ", updatedAt=" + updatedAt +
-                '}';
     }
 }
 

@@ -6,13 +6,14 @@ import com.sprint.mission.discodeit.repository.BaseRepository;
 import java.io.*;
 import java.util.*;
 
-public class FileBaseRepository<T extends BaseEntity> implements BaseRepository<T> {
+public abstract class FileBaseRepository<T extends BaseEntity> implements BaseRepository<T> {
 
     private final String ROOT_PATH;
+
     protected Map<UUID, T> data = new HashMap<>();
 
-    public FileBaseRepository(String rooPath) {
-        this.ROOT_PATH = "/Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload/" + rooPath;
+    public FileBaseRepository(String path) {
+        this.ROOT_PATH = path;
         File file = new File(ROOT_PATH).getParentFile();
         if (!file.exists()) {
             file.mkdir();       // 생성해야 할 폴더 경로가 하나일 때
@@ -34,7 +35,7 @@ public class FileBaseRepository<T extends BaseEntity> implements BaseRepository<
         }
     }
 
-    private void saveData() {
+    protected void saveData() {
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(ROOT_PATH))){
             oos.writeObject(data);

@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.ChannelInfo;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelResponseDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,17 +12,21 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-    ChannelInfo createChannel(UUID userId, Channel.ChannelType type);
-    ChannelInfo createChannel(UUID userId, String channelName, Channel.ChannelType type);
+    ChannelResponseDto createPublicChannel(PublicChannelRequestDto requestDto);
+    ChannelResponseDto createPrivateChannel(PrivateChannelRequestDto requestDto);
 
-    Optional<ChannelInfo> findChannelInfoById(UUID id);
+    Optional<ChannelResponseDto> findChannelInfoById(UUID id);
     Optional<Channel> findChannelEntityById(UUID id);
-    List<ChannelInfo> findAll();
-    Optional<ChannelInfo> findChannelInfoByChannelName(String channelName);
 
-    Optional<ChannelInfo> updateChannelName(UUID channelId, String channelName);
-    Optional<ChannelInfo> addMemberToChannel(UUID channelId, UUID userId);
-    Optional<ChannelInfo> removeMemberFromChannel(UUID channelId, UUID userId);
+    // findAll -> findAllByUserId
+    List<ChannelResponseDto> findAllByUserId(UUID userId);
+
+    Optional<ChannelResponseDto> findChannelInfoByChannelName(String channelName);
+
+    Optional<ChannelResponseDto> updateChannelName(ChannelUpdateDto channelUpdateDto);
+    Optional<ChannelResponseDto> addMemberToChannel(UUID channelId, UUID userId);
+    Optional<ChannelResponseDto> removeMemberFromChannel(UUID channelId, UUID userId);
+
 
     boolean deleteChannel(UUID id);
 
