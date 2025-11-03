@@ -1,25 +1,33 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
+@Getter
+@ToString
 public class Message extends BaseEntity {
     private String content;
     private String userName;
     private final UUID authorId;
     private final UUID channelId;
+    private final List<UUID> attachmentIds;
     private boolean isDeleted;
 
-    public Message(String content, String userName, UUID authorId, UUID channelId) {
+    @Builder
+    public Message(String content, String userName, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
         this.content = VerifiedUtils.verifyContent(content);
         this.userName = VerifiedUtils.verifyName(userName);
         this.authorId = VerifiedUtils.verifyNull(authorId);
         this.channelId = VerifiedUtils.verifyNull(channelId);
+        this.attachmentIds = VerifiedUtils.verifyNull(attachmentIds);
         this.isDeleted = false;
     }
 
-    public String getUserName() {
-        return userName;
-    }
 
     public void setUserName(String name) {
         if(isDeleted) { throw new IllegalStateException("Cannot set userName on deleted Message"); }
@@ -30,9 +38,6 @@ public class Message extends BaseEntity {
         }
     }
 
-    public String getContent() {
-        return content;
-    }
     public void setContent(String content) {
         if(isDeleted){ throw new IllegalStateException("Cannot set content on deleted Message"); }
         String vn = VerifiedUtils.verifyContent(content);
@@ -42,16 +47,11 @@ public class Message extends BaseEntity {
         }
     }
 
-    public UUID getAuthorId() {
-        return authorId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
+    public void setAttachmentIds(List<UUID> attachmentIds) {
+        Objects.requireNonNull(this.attachmentIds);
+        this.attachmentIds.clear();
+        this.attachmentIds.addAll(attachmentIds);
+        reUpdatedAt();
     }
 
     public boolean delete() {
@@ -69,12 +69,5 @@ public class Message extends BaseEntity {
         } else {
             return content;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "content='" + content + '\'' +
-                '}';
     }
 }

@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.file;
 
 
@@ -41,3 +42,5 @@ public class FileUserService implements UserService {
     // 로그아웃
     @Override public User logout(String email) {return basicUserService.logout(email);}
 }
+
+ */

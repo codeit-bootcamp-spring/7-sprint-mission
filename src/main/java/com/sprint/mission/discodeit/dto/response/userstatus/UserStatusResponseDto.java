@@ -1,0 +1,11 @@
+package com.sprint.mission.discodeit.dto.response.userstatus;
+
+import java.time.Instant;
+import java.util.UUID;
+
+public record UserStatusResponseDto(
+        UUID id,
+        UUID userId,
+        Instant lastReadAt,
+        boolean onlineNow) {
+}

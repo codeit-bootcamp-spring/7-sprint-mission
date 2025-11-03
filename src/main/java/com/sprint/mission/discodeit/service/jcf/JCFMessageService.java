@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
@@ -32,3 +33,5 @@ public class JCFMessageService implements MessageService {
     // 특정 키워드 검색
     @Override public List<Message> searchByKeyword(String keyword) {return basicMessageService.searchByKeyword(keyword);}
 }
+
+ */

@@ -1,22 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.Objects;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.util.Objects;
+import java.util.UUID;
+
+@Getter
+@ToString
 public class User extends BaseEntity {
     private String username; // 유저 이름 ( 별명 x)
     private String password;
     private String email;
     private UserState userState; // 0: 오프라인 , 1: 온라인
+    private UUID profileId;
 
-    public User(String username, String password, String email) {
+    @Builder
+    public User(String username, String password, String email, UUID profileId) {
         this.username = VerifiedUtils.verifyName(username);
         this.password = VerifiedUtils.verifyPassword(password);
         this.email = VerifiedUtils.verifyEmail(email);
         this.userState = UserState.ONLINE;
-    }
-
-    public UserState getUserState() {
-        return userState;
+        this.profileId = profileId;
     }
 
     public void setUserState(UserState userState) {
@@ -25,10 +32,6 @@ public class User extends BaseEntity {
             this.userState = state;
             reUpdatedAt();
         }
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public void setUsername(String username) {
@@ -47,9 +50,6 @@ public class User extends BaseEntity {
         }
     }
 
-    public String getEmail() {
-        return email;
-    }
 
     public void setEmail(String email) {
         String v = VerifiedUtils.verifyEmail(email);
@@ -59,12 +59,11 @@ public class User extends BaseEntity {
         }
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+    public void setProfileId(UUID profileId) {
+        if(profileId != this.profileId) {
+            this.profileId = profileId;
+            reUpdatedAt();
+        }
     }
 
     public void update(String username, String password, String email) {

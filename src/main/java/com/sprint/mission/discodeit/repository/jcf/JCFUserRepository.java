@@ -5,13 +5,11 @@ import com.sprint.mission.discodeit.entity.UserState;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> data;
+    private final Map<UUID, User> data = new ConcurrentHashMap<>();
 
-    public JCFUserRepository() {
-        this.data = new HashMap<>();
-    }
     @Override
     public User save(User user) {
         Objects.requireNonNull(user, "User cannot be null");
@@ -27,7 +25,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(data.values());
+        return data.values().stream().toList();
     }
 
     @Override
@@ -41,7 +39,7 @@ public class JCFUserRepository implements UserRepository {
         String n = Objects.requireNonNull(username, "Username cannot be null").trim();
         return data.values()
                 .stream()
-                .filter(u -> u.getUsername().equals(username))
+                .filter(u -> u.getUsername().equals(n))
                 .toList();
     }
 

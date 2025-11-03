@@ -1,7 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 /*
 memberId :
@@ -24,36 +30,36 @@ memberId :
  */
 
     // 데이터 관리, 실제 변경 부분 구현!!
+@Getter
+@ToString
 public class Channel extends BaseEntity {
     private String channelName; // 채널 명
-    private final ChType type; // 0: 음성채널, 1: 채팅채널
+    private final ChannelType type; // 0: 음성채널, 1: 채팅채널
     private int slowModeSeconds; // 슬로우모드 초(s)
     private final Map<UUID, UserRole> members = new HashMap<>();
+    private String channelDescription;
+    private final boolean privateChannel; // true: PRIVATE, false: PUBLIC
    // private UUID ownerId; // 추후 채널 삭제/멤버 강퇴 등 권한적인 내용 사용시 사용
 
-    public Channel(ChType type, String channelName) {
-        if(type == null) { throw new IllegalArgumentException("type cannot be null"); }
-        this.type = type;
-        this.channelName = VerifiedUtils.verifyName(channelName);
+   @Builder
+    public Channel(ChannelType type, String channelName, boolean privateChannel, int slowModeSeconds, String channelDescription) {
+       this.channelName = channelName;
+       if(type == null) { throw new IllegalArgumentException("type cannot be null"); }
+       this.type = type;
+       this.slowModeSeconds = slowModeSeconds;
+       this.channelDescription = channelDescription;
+       this.privateChannel = privateChannel;
     }
 
-    public ChType getType() {
-        return type;
-    }
-
-    public String getChannelName() {
-        return channelName;
-    }
-
-    public void setChannelName(String channelName) {
-        String v = VerifiedUtils.verifyName(channelName);
-        if(!v.equals(this.channelName)) {
-            this.channelName = v;
+    public void rename(String channelName) {
+       Objects.requireNonNull(channelName);
+        if(!channelName.equals(this.channelName)) {
+            this.channelName = channelName;
             reUpdatedAt();
         }
     }
 
-    public void setSlowModeSeconds(int slowModeSeconds) {
+    public void changeSlowModeSeconds(int slowModeSeconds) {
         if(slowModeSeconds < 0) {
             throw new IllegalArgumentException("slowModeSeconds cannot be negative");
         }
@@ -61,22 +67,6 @@ public class Channel extends BaseEntity {
             this.slowModeSeconds = slowModeSeconds;
             reUpdatedAt();
         }
-    }
-
-    public int getSlowModeSeconds() {
-        return slowModeSeconds;
-    }
-
-    public Map<UUID, UserRole> getMembers() {
-        return members;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() +
-                "{ channelName='" + channelName + '\'' +
-                ", type=" + type + ", slowModeSeconds=" + slowModeSeconds +
-                '}';
     }
 
     public boolean join(UUID memberId) {
@@ -96,5 +86,12 @@ public class Channel extends BaseEntity {
         boolean access = members.remove(memberId) != null;
         if(access) reUpdatedAt();
         return access;
+    }
+
+    public void changeChannelDescription(String channelDescription) {
+        if(!channelDescription.equals(this.channelDescription)) {
+            this.channelDescription = channelDescription;
+            reUpdatedAt();
+        }
     }
 }

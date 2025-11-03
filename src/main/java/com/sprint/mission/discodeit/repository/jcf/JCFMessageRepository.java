@@ -4,13 +4,11 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> data;
+    private final Map<UUID, Message> data = new ConcurrentHashMap<>();
 
-    public JCFMessageRepository() {
-        this.data = new HashMap<>();
-    }
     @Override
     public Message save(Message message) {
         Objects.requireNonNull(message, "message must not be null");
@@ -39,7 +37,7 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findByChannel(UUID channelId) {
+    public List<Message> findByChannelId(UUID channelId) {
         Objects.requireNonNull(channelId, "channelId must not be null");
         return data.values()
                 .stream()
@@ -49,7 +47,7 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findByAuthor(UUID authorId) {
+    public List<Message> findByAuthorId(UUID authorId) {
         Objects.requireNonNull(authorId, "authorId must not be null");
         return data.values()
                 .stream()

@@ -9,11 +9,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileChannelRepository implements ChannelRepository {
     private static final Path DATA_DIR = Paths.get("data");
     private static final Path CHANNELS_FILE = DATA_DIR.resolve("channels.ser");
-    private final Map<UUID, Channel> cache = new HashMap<>();
+    private final Map<UUID, Channel> cache = new ConcurrentHashMap<>();
 
     public FileChannelRepository() {
         try {
@@ -51,15 +52,16 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     private void saveAll() {
-        Path tmp = CHANNELS_FILE.resolveSibling("channels.ser.tmp");
-        try(ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(tmp))) {
-            oos.writeObject(cache);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-
         try {
-            Files.move(tmp, CHANNELS_FILE, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            Path tmp = CHANNELS_FILE.resolveSibling("channels.ser.tmp");
+            try(ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(tmp))) {
+                oos.writeObject(cache);
+            }
+            try {
+                Files.move(tmp, CHANNELS_FILE, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (IOException e) {
+                Files.move(tmp, CHANNELS_FILE, StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch ( IOException e ) {
             throw new UncheckedIOException(e);
         }
@@ -91,6 +93,6 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(cache.values());
+        return cache.values().stream().toList();
     }
 }

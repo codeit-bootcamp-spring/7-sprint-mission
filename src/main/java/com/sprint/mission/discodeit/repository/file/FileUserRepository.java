@@ -10,11 +10,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileUserRepository implements UserRepository {
     private static final Path DATA_DIR = Paths.get("data");
     private static final Path USERS_FILE = DATA_DIR.resolve("users.ser");
-    private final Map<UUID, User> cache = new HashMap<>();
+    private final Map<UUID, User> cache = new ConcurrentHashMap<>();
 
     public FileUserRepository() {
         try {
@@ -52,14 +53,16 @@ public class FileUserRepository implements UserRepository {
     }
 
     private void saveAll() {
-        Path tmp = USERS_FILE.resolveSibling("users.ser.tmp");
-        try(ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(tmp))) {
-            oos.writeObject(cache);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
         try {
-            Files.move(tmp, USERS_FILE, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            Path tmp = USERS_FILE.resolveSibling("users.ser.tmp");
+            try(ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(tmp))) {
+                oos.writeObject(cache);
+            }
+            try {
+                Files.move(tmp, USERS_FILE, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (IOException e) {
+                Files.move(tmp, USERS_FILE, StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -81,7 +84,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(cache.values());
+        return cache.values().stream().toList();
     }
 
     @Override
