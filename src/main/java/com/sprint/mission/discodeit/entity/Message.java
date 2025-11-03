@@ -1,43 +1,36 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.dto.Dto_Message;
+import lombok.Getter;
+
+import java.util.List;
 import java.util.UUID;
 
-public class Message extends CommonModel{
-    private String msg;
-    private UUID userID;
+@Getter
+public class Message extends BaseModel {
+    private UUID channelId;
+    private UUID authorId;
+    private String message;
+    private List<UUID> attachemntIds;
 
-    public Message(String msg) {
+    public Message(Dto_Message dtoMessage, List<UUID> attachemntIds) {
         super();
-        this.msg = msg;
-        this.userID = null;
-    }
-
-    //===========================
-    public String getMsg() {
-        return msg;
-    }
-
-    public void updateMsg(String name) {
-        this.msg = msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg; // 메세지 수정시 호출. so 시간 업데이트 하지 않는다!
-    }
-
-    public UUID getUserID() {
-        return userID;
-    }
-
-    public void setUserID(UUID userID) {
-        this.userID = userID;
+        this.channelId = dtoMessage.channelId();
+        this.authorId = dtoMessage.authorid();
+        this.message = dtoMessage.message();
+        this.attachemntIds = attachemntIds;
     }
 
     @Override
     public String toString() {
-        return "Message{" +
+        return "message {" +
                 super.toString() +
-                "msg='" + msg + '\'' +
-                '}';
+                "\n message = [" + message + "] }";
     }
+
+    public void updateMessage( String message) {
+        this.message = message;
+        super.setUpdatedAt();
+    }
+
 }
