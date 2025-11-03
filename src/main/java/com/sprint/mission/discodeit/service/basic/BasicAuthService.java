@@ -4,12 +4,12 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserResponseDto;
 import com.sprint.mission.discodeit.exception.AuthenticationException;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.AuthSerivce;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.entity.dto.loginDto.LoginRequestDto;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class BasicAuthService implements AuthSerivce {
+public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
 
