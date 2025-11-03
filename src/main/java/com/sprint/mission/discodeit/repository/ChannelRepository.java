@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -28,45 +30,46 @@ public interface ChannelRepository {
     /**
      * 사용자로 채널 조회
      */
-    List<Channel> findByUser(User user);
+    List<Channel> findByUser(UUID userId);
 
     /**
      * 채널 타입으로 조회
      */
-    List<Channel> findByType(Channel.ChannelType type);
+    List<Channel> findByType(ChannelType type);
 
     /**
      * 전체 채널 조회
      */
     List<Channel> findAll();
 
-    /**
-     * 채널 이름 업데이트
-     */
-    void updateName(UUID id, String name);
-
-    /**
-     * 채널 관리자 업데이트
-     */
-    void updateAdmin(UUID id, User admin);
+    void update(Channel channel);
 
     /**
      * 채널 삭제
      */
-    void deleteById(UUID id);
+    void deleteById(UUID channelId);
 
     /**
      * 사용자가 속한 채널 UUID 추가
      */
-    void addChannelIdForUser(UUID channelId, User user);
+    void addChannelIdForUser(UUID channelId, UUID userId);
 
     /**
      * 사용자가 속한 채널 UUID 삭제
      */
-    void deleteChannelIdForUser(UUID channelId, User user);
+    void deleteChannelIdForUser(UUID channelId, UUID userId);
 
     /**
      * 채널에서 멤버 삭제
      */
-    void deleteMember(Channel channel, User target);
+    void deleteMember(Channel channel, UUID targetId);
+
+    /**
+     * 채널 이름 중복 확인
+     */
+    boolean existsByName(String name);
+
+    boolean existsById(UUID channelId);
+
+    boolean isUserJoinedChannel(UUID userId, UUID channelId);
 }

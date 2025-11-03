@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.request.UpdatePasswordRequestDto;
+import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,56 +16,48 @@ public interface UserService {
 
     /**
      * 새로운 사용자 생성
-     * @param userName 사용자 실명
-     * @param nickName 사용자 닉네임
-     * @param email 사용자 이메일
-     * @param phoneNum 사용자 전화번호
-     * @param userId 사용자 아이디
-     * @param password 사용자 비밀번호
      */
-    void createUser(String userName, String nickName, String email, String phoneNum, String userId, String password);
+    void create(CreateUserRequestDto createUserRequestDto);
+
+    UserResponseDto find(UUID userId);
 
     /**
      * 이메일로 사용자 조회
      */
-    User getUserByEmail(String email);
+    UserResponseDto findByEmail(String email);
 
     /**
      * 전화번호로 사용자 조회
      */
-    User getUserByPhone(String phoneNum);
+    UserResponseDto findByPhoneNum(String phoneNum);
 
     /**
      * 사용자ID로 사용자 조회
      */
-    User getUserByUserId(String userId);
+    UserResponseDto findByLoginId(String loginId);
 
     /**
      * 전체 사용자 목록 조회
      */
-    List<User> getAllUsers();
-
-    /**
-     * 로그인
-     * @param userId 사용자ID
-     * @param password 비밀번호
-     * @return 로그인 성공 시 User, 실패 시 null
-     */
-    User login(String userId, String password);
+    List<UserResponseDto> findAll();
 
     /**
      * UUID로 사용자 닉네임 조회
      */
-    String getUserNickName(UUID id);
+    String findNickNameById(UUID userId);
 
     /**
      * 사용자 정보 업데이트
      */
-    void updateUser(User user);
+    void update(UpdateUserRequestDto request);
+
+    void updatePassword(UpdatePasswordRequestDto request);
 
     /**
      * 사용자 삭제
-     * @param id 삭제할 User UUID
+     * @param userId 삭제할 User UUID
      */
-    void deleteUser(UUID id);
+    void delete(UUID userId);
+
+    boolean isPasswordMatch(UUID userId, String password);
 }

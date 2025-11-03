@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -16,26 +20,23 @@ import java.util.UUID;
 public interface MessageService {
 
     /** 새로운 메시지를 생성 */
-    <T> void createMessage(User user, T receiver, String content);
+    void create(CreateMessageRequestDto request);
 
     /** 두 유저 또는 채널 간의 최신 메시지(가장 마지막 메시지)를 가져옴 */
-    <T> Message getLastestMessage(User user, T receiver);
+    Message findLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType);
 
     /** 두 유저 간의 전체 메시지 목록을 조회 */
-    List<Message> getMessagesBetween(User user1, User user2);
-
-    /** 특정 유저가 보낸 또는 받은 모든 메시지 조회 */
-    List<Message> getAllMessagesByUser(User user);
+    List<Message> findBetweenUsers(UUID userId1, UUID userId2);
 
     /** 특정 채널에 포함된 모든 메시지 조회 */
-    List<Message> getAllByChannel(Channel channel);
+    List<Message> findAllByChannelId(UUID channelId);
+
+    /** 유저가 특정 유저 또는 채널에게 보낸 모든 메시지 조회 */
+    List<Message> findAllSentBetweenUsers(UUID senderId, UUID receiverId);
 
     /** 메시지 내용(content)을 수정 */
-    void updateMessage(UUID id, String content);
+    void update(UpdateMessageRequestDto request);
 
     /** 특정 메시지를 UUID로 삭제 */
-    void deleteMessage(UUID id);
-
-    /** 특정 유저가 보낸 모든 메시지를 삭제 */
-    void deleteMessagesByUser(User user);
+    void delete(UUID messageId);
 }

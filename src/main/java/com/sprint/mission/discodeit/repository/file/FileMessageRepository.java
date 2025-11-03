@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * FileMessageRepository
@@ -28,17 +27,17 @@ import java.util.UUID;
  * - messages.sav : 메시지 객체들이 직렬화되어 저장되는 파일
  */
 public class FileMessageRepository implements MessageRepository {
-    private final List<Message> messageStore = new ArrayList<>();
-    private final String MESSAGE_FILE;
+    private final Map<UUID, Message> messageStore = new LinkedHashMap<>();
+    private final String filePath;
 
-    public FileMessageRepository(String MESSAGE_FILE) {
-        this.MESSAGE_FILE = MESSAGE_FILE;
+    public FileMessageRepository(String filePath) {
+        this.filePath = filePath;
         loadMessagesFromFile();
     }
 
     // --- 파일 저장 (직렬화) ---
     private void saveMessagesToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(MESSAGE_FILE))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(messageStore);
             System.out.println("[저장 완료] 메시지 데이터 파일 저장됨");
         } catch (IOException e) {
@@ -48,13 +47,13 @@ public class FileMessageRepository implements MessageRepository {
 
     // --- 파일 불러오기 (역직렬화) ---
     private void loadMessagesFromFile() {
-        File file = new File(MESSAGE_FILE);
+        File file = new File(filePath);
         if (!file.exists()) return;
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(MESSAGE_FILE))) {
-            List<Message> loaded = (List<Message>) ois.readObject();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
+            Map<UUID, Message> loaded = (Map<UUID, Message>) ois.readObject();
             messageStore.clear();
-            messageStore.addAll(loaded);
+            messageStore.putAll(loaded);
             System.out.println("[로드 완료] 메시지 데이터 로드됨");
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("[오류] 메시지 로드 실패: " + e.getMessage());
@@ -63,44 +62,56 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void save(Message message) {
-        messageStore.add(message);
+        messageStore.put(message.getId(), message);
         saveMessagesToFile();
     }
 
     @Override
     public List<Message> findAll() {
         // 외부에서 리스트를 수정하지 못하도록 복사본 반환
-        return new ArrayList<>(messageStore);
+        return new ArrayList<>(messageStore.values());
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
-        return messageStore.stream()
-                .filter(m -> m.getId().equals(id))
-                .findFirst();
+        return Optional.ofNullable(messageStore.get(id));
     }
 
     @Override
     public void update(Message updatedMessage) {
-        for (int i = 0; i < messageStore.size(); i++) {
-            if (messageStore.get(i).getId().equals(updatedMessage.getId())) {
-                messageStore.set(i, updatedMessage);
-                saveMessagesToFile();
-                break;
-            }
-        }
+        messageStore.replace(updatedMessage.getId(), updatedMessage);
+        saveMessagesToFile();
     }
 
     @Override
     public void deleteById(UUID id) {
-        messageStore.removeIf(m -> m.getId().equals(id));
+        messageStore.remove(id);
         saveMessagesToFile();
     }
 
     @Override
-    public void deleteByUser(User user) {
+    public void deleteByUser(UUID userId) {
         // 특정 유저가 보낸 메시지 전부 삭제
-        messageStore.removeIf(m -> m.getSenderId().equals(user.getId()));
+        messageStore.values().removeIf(m -> userId.equals(m.getSenderId()));
         saveMessagesToFile();
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        // 채널 삭제시 채널의 모든 메시지 삭제
+        messageStore.values().removeIf(m -> channelId.equals(m.getReceiverId()));
+        saveMessagesToFile();
+    }
+
+    @Override
+    public Instant searchLastedMessageTime(UUID channelId) {
+        // 채널의 마지막 메시지를 보낸 시간 리턴
+        // 메시지를 저장하지 않은 채널의 경우 null을 리턴 : Printer에서 최근 시간 대신 다른 메시지를 출력
+        return findAll().stream()
+                .filter(m -> channelId.equals(m.getReceiverId()) && m.getReceiveType() == ReceiveType.CHANNEL)
+                .map(m -> m.getUpdatedAt())
+                .sorted(Collections.reverseOrder())
+                .findFirst()
+                .orElse(null);
     }
 }

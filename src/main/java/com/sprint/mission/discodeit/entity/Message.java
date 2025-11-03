@@ -1,46 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Message extends BaseEntity{
-    public final UUID senderId;
-    public final UUID receiverId;
-    public final ReceiveType receiveType;
-    public String content;
-
-    public enum ReceiveType{
-        USER("유저"), CHANNEL("채널");
-
-        private final String desc;
-
-        ReceiveType(String desc) {
-            this.desc = desc;
-        }
-    }
+    private final UUID senderId;
+    private final UUID receiverId;
+    private final ReceiveType receiveType;
+    private String content;
+    private List<UUID> attachmentIds;
 
     public Message(UUID senderId, UUID receiverId, ReceiveType receiveType, String content) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.receiveType = receiveType;
         this.content = content;
+        this.attachmentIds = new ArrayList<>();
     }
 
-    public String getContents() {
-        return content;
-    }
-
-    public void setContents(String content) {
+    public void setContent(String content) {
         this.setUpdatedAt();
         this.content = content;
     }
 
-    public UUID getSenderId() {
-        return senderId;
+    public void addAttachmentId(UUID id) {
+        this.setUpdatedAt();
+        this.attachmentIds.add(id);
     }
 
-    public UUID getReceiverId() {
-        return receiverId;
+    public void deleteAttachmentId(UUID id) {
+        this.setUpdatedAt();
+        this.attachmentIds.remove(id);
     }
+
+
 
     @Override
     public String toString() {

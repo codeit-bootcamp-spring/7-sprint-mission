@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * JCFMessageRepository
@@ -17,44 +15,55 @@ import java.util.UUID;
  * 실제 DB를 사용하지 않고 List<Message>를 저장소로 활용합니다.
  */
 public class JCFMessageRepository implements MessageRepository {
-    private final List<Message> messageStore = new ArrayList<>();
+    private final Map<UUID, Message> messageStore = new LinkedHashMap<>();
 
     @Override
     public void save(Message message) {
-        messageStore.add(message);
+        messageStore.put(message.getId(), message);
     }
 
     @Override
     public List<Message> findAll() {
         // 외부에서 리스트를 수정하지 못하도록 복사본 반환
-        return new ArrayList<>(messageStore);
+        return new ArrayList<>(messageStore.values());
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
-        return messageStore.stream()
-                .filter(m -> m.getId().equals(id))
-                .findFirst();
+        return Optional.ofNullable(messageStore.get(id));
     }
 
     @Override
     public void update(Message updatedMessage) {
-        for (int i = 0; i < messageStore.size(); i++) {
-            if (messageStore.get(i).getId().equals(updatedMessage.getId())) {
-                messageStore.set(i, updatedMessage);
-                break;
-            }
-        }
+        messageStore.replace(updatedMessage.getId(), updatedMessage);
     }
 
     @Override
     public void deleteById(UUID id) {
-        messageStore.removeIf(m -> m.getId().equals(id));
+        messageStore.remove(id);
     }
 
     @Override
-    public void deleteByUser(User user) {
+    public void deleteByUser(UUID userId) {
         // 특정 유저가 보낸 메시지 전부 삭제
-        messageStore.removeIf(m -> m.getSenderId().equals(user.getId()));
+        messageStore.values().removeIf(m -> userId.equals(m.getSenderId()));
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        // 채널 삭제시 채널의 모든 메시지 삭제
+        messageStore.values().removeIf(m -> channelId.equals(m.getReceiverId()));
+    }
+
+    @Override
+    public Instant searchLastedMessageTime(UUID channelId) {
+        // 채널의 마지막 메시지를 보낸 시간 리턴
+        // 메시지를 저장하지 않은 채널의 경우 null을 리턴 : Printer에서 최근 시간 대신 다른 메시지를 출력
+        return findAll().stream()
+                .filter(m -> channelId.equals(m.getReceiverId()) && m.getReceiveType() == ReceiveType.CHANNEL)
+                .map(m -> m.getUpdatedAt())
+                .sorted(Collections.reverseOrder())
+                .findFirst()
+                .get();
     }
 }

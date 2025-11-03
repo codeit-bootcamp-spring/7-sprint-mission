@@ -1,34 +1,26 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+@Getter
 public class Channel extends BaseEntity{
     private String channelName;
     private final ChannelType channelType;
-    private User admin;
-    private List<User> members;
+    private final ChannelVisibility visibility;
+    private UUID adminId;
+    private List<UUID> memberIds;
 
-    public enum ChannelType{
-        MESSAGE("메시지 채널"), VOICE("음성 채널");
-
-        private final String desc;
-
-        ChannelType(String desc){
-            this.desc = desc;
-        }
-    }
-
-    public Channel(ChannelType channelType, String channelName, User admin) {
+    public Channel(ChannelType channelType, ChannelVisibility visibility, String channelName, UUID adminId) {
         this.channelType = channelType;
+        this.visibility = visibility;
         this.channelName = channelName;
-        this.admin = admin;
-        this.members = new ArrayList<>();
-        this.members.add(admin);
-    }
-
-    public String getChannelName() {
-        return channelName;
+        this.adminId = adminId;
+        this.memberIds = new ArrayList<>();
+        this.memberIds.add(adminId);
     }
 
     public void setChannelName(String channelName) {
@@ -36,31 +28,23 @@ public class Channel extends BaseEntity{
         this.channelName = channelName;
     }
 
-    public ChannelType getChannelType() {
-        return channelType;
-    }
-
-    public User getAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(User admin) {
+    public void setAdmin(UUID adminId) {
         this.setUpdatedAt();
-        this.admin = admin;
+        this.adminId = adminId;
     }
 
-    public List<User> getMembers() {
-        return new ArrayList<>(members);
+    public List<UUID> getMemberIds() {
+        return new ArrayList<>(memberIds);
     }
 
-    public void addMember(User user) {
+    public void addMember(UUID userId) {
         this.setUpdatedAt();
-        this.members.add(user);
+        this.memberIds.add(userId);
     }
 
-    public void delMember(User user){
+    public void delMember(UUID userId){
         this.setUpdatedAt();
-        this.members.remove(user);
+        this.memberIds.remove(userId);
     }
 
     @Override
@@ -70,8 +54,9 @@ public class Channel extends BaseEntity{
         return "Channel{" +
                 "channelName='" + channelName + '\'' +
                 ", channelType=" + channelType +
-                ", admin=" + admin.getUserName() +
-                ", members=" + members.stream().map(m -> m.getUserName()).toList() +
+                ", channelVisibility=" + visibility +
+                ", adminId=" + adminId +
+                ", memberIds=" + memberIds +
                 str +
                 '}';
     }

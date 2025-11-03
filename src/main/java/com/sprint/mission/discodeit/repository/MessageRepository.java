@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +29,11 @@ public interface MessageRepository {
     /** ID(UUID)로 메시지를 삭제 */
     void deleteById(UUID id);
 
-    /** 특정 유저가 보낸 메시지들을 모두 삭제 */
-    void deleteByUser(User user);
+    /** 특정 유저가 보낸 메시지 모두 삭제 */
+    void deleteByUser(UUID userId);
+
+    /** 채널 삭제시 채널 메시지 모두 삭제 */
+    void deleteByChannelId(UUID channelId);
+
+    Instant searchLastedMessageTime(UUID channelId);
 }
