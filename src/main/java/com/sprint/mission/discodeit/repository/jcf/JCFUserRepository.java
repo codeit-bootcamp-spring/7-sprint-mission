@@ -26,8 +26,8 @@ public class JCFUserRepository implements UserRepository {
     public User save(User user) {
         this.data.put(user.getId(), user);
         return user;
-    }
 
+    }
     @Override
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(this.data.get(id));
@@ -40,6 +40,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public boolean existsById(UUID id) {
+        System.out.println(id);
         return this.data.containsKey(id);
     }
 

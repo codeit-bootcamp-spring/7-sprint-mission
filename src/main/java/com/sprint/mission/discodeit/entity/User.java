@@ -23,11 +23,11 @@ public class User extends Common implements Serializable {
 
 
 
-    public User(String userId,String password,String userName,String userNickname)
+    public User(String UserEmail,String password,String userName,String userNickname)
     {
-           this.UserEmail = userId;
-           this.userName = userName;
+           this.UserEmail = UserEmail;
            this.password = password;
+           this.userName = userName;
            this.userNickname = userNickname;
     }
 
