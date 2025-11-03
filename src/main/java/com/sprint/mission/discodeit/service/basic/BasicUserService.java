@@ -1,0 +1,127 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.dto.binaryContent.CreateBinaryContentDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class BasicUserService implements UserService {
+    private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final ChannelRepository channelRepository;
+    private final BinaryContentRepository binaryContentRepository;
+
+    @Override
+    public User createUser(CreateUserDto createUserDto) {
+        if (userRepository.findByUsername(createUserDto.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("이미 등록된 유저입니다." + createUserDto.getUsername());
+        }
+        if (userRepository.findByEmail(createUserDto.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("이미 등록된 이메일입니다." + createUserDto.getUsername());
+        }
+
+        UUID profileId = null;
+
+        if(createUserDto.getCreateBinaryContentDto() != null){
+            CreateBinaryContentDto createBinaryContentDto = createUserDto.getCreateBinaryContentDto();
+            BinaryContent binaryContent = new BinaryContent(
+                    createBinaryContentDto.getFileName(),
+                    createBinaryContentDto.getContentType(),
+                    createBinaryContentDto.getBytes()
+            );
+            profileId = binaryContent.getId();
+            binaryContentRepository.save(binaryContent);
+        }
+
+
+        User user = new User(
+                createUserDto.getUsername(), createUserDto.getEmail(), createUserDto.getPassword(),
+                createUserDto.getPhoneNumber(), createUserDto.getPronoun(), profileId);
+
+        UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
+
+        userRepository.save(user);
+        userStatusRepository.save(userStatus);
+
+        return user;
+    }
+
+    @Override
+    public UserResponseDto getUser(UUID userId) { // 단건 검색
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + userId));
+
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + userId));
+
+        return UserResponseDto.from(user, userStatus.isOnline());
+    }
+
+    @Override
+    public List<UserResponseDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+
+        Map<UUID, UserStatus> statusMap = userStatusRepository.findAll().stream()
+                .collect(Collectors.toMap(UserStatus::getUserId, s -> s));
+
+        return users.stream()
+                .map(user -> {
+                    UserStatus status = statusMap.get(user.getId());
+                    return UserResponseDto.from(user, status.isOnline());
+                })
+                .toList();
+
+    }
+
+    @Override
+    public void updateUser(UpdateUserDto updateUserDto) {
+        User user = userRepository.findById(updateUserDto.getUserId())
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + updateUserDto.getUserId()));
+
+        user.updateUser(updateUserDto.getUsername(),
+                updateUserDto.getPassword(),
+                updateUserDto.getEmail(),
+                updateUserDto.getPhoneNumber(),
+                updateUserDto.getPronoun(),
+                updateUserDto.getProfileId()
+        );
+
+        userRepository.save(user);
+    }
+
+    @Override
+    public void deleteUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + userId));
+
+        if (!userStatusRepository.existsByUserId(userId)) {
+            throw new NoSuchElementException("[UserStatus] 찾을 수 없는 유저 : " + userId);
+        }
+        userStatusRepository.deleteByUserId(userId);
+
+        // 유저가 삭제되면, 모든 채널에서 해당 유저 삭제
+        channelRepository.findAll()
+                .forEach(channel -> channel.removeParticipant(user));
+
+        userRepository.deleteById(userId);
+    }
+}

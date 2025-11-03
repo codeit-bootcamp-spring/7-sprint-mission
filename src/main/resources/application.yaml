@@ -1,0 +1,13 @@
+discodeit:
+  repository:
+    type: file   # jcf | file
+    file-directory: .discodeit
+
+file:
+  path:
+    userPath: src/main/resources/Users.ser
+    messagePath: src/main/resources/Messages.ser
+    channelPath: src/main/resources/Channels.ser
+    userStatusPath: src/main/resources/UserStatuses.ser
+    binaryContentPath: src/main/resources/BinaryContent.ser
+    readStatusPath: src/main/resources/ReadStatus.ser
