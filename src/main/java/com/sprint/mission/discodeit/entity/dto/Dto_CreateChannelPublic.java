@@ -25,3 +25,8 @@ public record Dto_CreateChannelPublic(
                 .build();
     }
 }
+//{
+//    "channelType" : "",
+//    "channelName" : "",
+//    "description" : ""
+//}

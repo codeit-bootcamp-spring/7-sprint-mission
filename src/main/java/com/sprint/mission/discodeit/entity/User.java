@@ -1,22 +1,33 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.dto.Dto_User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.UUID;
 
+@AllArgsConstructor
 @Getter
 public class User extends BaseModel {
-    private UUID profileId; // for BinaryContent
     private String userName;
     private String password;
     private String eMail;
+    private UUID profileId; // for BinaryContent
 
-    public User(String name, String password, String eMail, UUID profiledId) {
+//    public User(String name, String password, String eMail, UUID profiledId) {
+//        super();
+//        this.userName = name;
+//        this.password = password;
+//        this.eMail = eMail;
+//        this.profileId = profiledId;
+//    }
+
+    public User(Dto_User dtoUser, UUID profileId) {
         super();
-        this.userName = name;
-        this.password = password;
-        this.eMail = eMail;
-        this.profileId = profiledId;
+        this.userName = dtoUser.userName();
+        this.password = dtoUser.password();
+        this.eMail = dtoUser.eMail();
+        this.profileId = profileId;
     }
 
     @Override

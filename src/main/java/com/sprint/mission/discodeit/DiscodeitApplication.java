@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.common.PrintUtil;
 import com.sprint.mission.discodeit.entity.dto.*;
-import com.sprint.mission.discodeit.repository.file.FileUtil;
 import com.sprint.mission.discodeit.service.basic.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,24 +11,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sprint.mission.discodeit.entity.ModelType.USER;
-
 @SpringBootApplication
 public class DiscodeitApplication {
 
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-        test_UserService(context);
-        test_UserStatusService(context);
-        test_ChannelService(context);
-        test_MessageService(context);
-        test_ReadStatusService(context);
-//        test_BinaryContentService(context);
-        test_AuthService(context);
-
-        //🚨 테스트 후 폴더 삭제!!
-        new FileUtil(USER).cleanup();
+//        test_UserService(context);
+//        test_UserStatusService(context);
+//        test_ChannelService(context);
+//        test_MessageService(context);
+//        test_ReadStatusService(context);
+////        test_BinaryContentService(context);
+//        test_AuthService(context);
+//
+//        //🚨 테스트 후 폴더 삭제!!
+//        new FileUtil(USER).cleanup();
     }
 
     static void test_UserService(ConfigurableApplicationContext context) {
@@ -85,16 +82,14 @@ public class DiscodeitApplication {
             Dto_User dtoUser_5 = Dto_User.from("🐼팬더", "1234", "팬더@eMail.com");
             Res_User user5 = userService.create(dtoUser_5, Optional.empty());
 
-            Dto_UserStatusByID dto_UserStatus = Dto_UserStatusByID.from(user4.id());
-            Res_UserStatus userStatus_Creat = userStatusService.create(dto_UserStatus);
+            Res_UserStatus userStatus_Creat = userStatusService.create(user4.id());
             Res_UserStatus userStatus_Find = userStatusService.find(userStatus_Creat.id());
             userStatusService.findAll();
             Dto_UserStatus dto_UserStatus4 = Dto_UserStatus.from(userStatus_Creat.id());
             userStatusService.update(dto_UserStatus4);
 
-            Dto_UserStatusByID dto_UserStatus5 = Dto_UserStatusByID.from(user5.id());
-            Res_UserStatus userStatus_Creat5 = userStatusService.create(dto_UserStatus5);
-            PrintUtil.okMessage("♣️ dto_UserStatus5 = " + user5.userName());
+            Res_UserStatus userStatus_Creat5 = userStatusService.create(user5.id());
+            PrintUtil.okMessage("♣️ user5.id()= " + user5.userName());
             userStatusService.delete(userStatus_Creat5.id());
             userStatusService.findAll();
 
@@ -133,7 +128,7 @@ public class DiscodeitApplication {
             PrintUtil.okMessage("================");
             List<Res_ChannelFind> allByUserId = channelService.findAllByUserId(user6.id());
 
-            channelService.update(resPublic.id(), Dto_ChannelUpdate.from("퍼블릭 채널이야", null, "desc- 퍼블릭 채널이야"));
+            channelService.update(resPublic.id(), Dto_ChannelUpdate.from(null, "퍼블릭 채널이야", "desc- 퍼블릭 채널이야"));
             channelService.delete(resPublic.id());
         } catch (Exception e) {
             throw new RuntimeException(e);

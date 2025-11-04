@@ -61,17 +61,19 @@ public class UserService implements InterfaceUserService {
             BinaryContent binaryContent = new BinaryContent(dtoBinaryContent);
             binaryContentRepository.save(binaryContent);
 
-            user = new User(dto_user.userName(), dto_user.password(), dto_user.eMail(), binaryContent.getId());
-            resUser = Res_User.from(user, binaryContent.getId());
+            PrintUtil.errMessage("🏀 dto_user = " + dto_user.toString());
+            user = new User(dto_user, binaryContent.getId());
+            PrintUtil.errMessage("🏀 user = " + user.toString());
+            resUser = Res_User.from(user);
+            PrintUtil.errMessage("🏀 resUser = " + resUser.toString());
         }
         else {
-            user = new User(dto_user.userName(), dto_user.password(), dto_user.eMail(), null);
-            resUser = Res_User.from(user, null);
+            user = new User(dto_user, null);
+            resUser = Res_User.from(user);
         }
 
         userRepository.save(user);
 
-//        UserStatusService.create(Dto_UserStatusByID.from(user.getId()));  // 이게 아냐!! 그림에선 레포 사용하라고!!
         //!! for. 먼~~ 미래의 어쩌면~!!
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
@@ -167,7 +169,7 @@ public class UserService implements InterfaceUserService {
         //!! 순서 유의_II
         userRepository.save(user);
         PrintUtil.okMessage("UserService.update = [" + userName + "]를 [" + dto_user.userName() + "]로 변경 완료");
-        return Res_User.from(user, (binaryContent == null) ? null : binaryContent.getId());
+        return Res_User.from(user);
     }
 
     @Override

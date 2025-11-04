@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.common.PrintUtil;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatus;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserStatusByID;
 import com.sprint.mission.discodeit.entity.dto.Res_UserStatus;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserStatusRepository;
@@ -22,12 +21,12 @@ public class UserStatusService implements InterfaceUserStatusService {
     private final InterfaceUserStatusRepository userStatusRepository;
     private final InterfaceUserRepository userRepository;
 
-    public Res_UserStatus create(Dto_UserStatusByID dtoUserStatus) {
+    public Res_UserStatus create(UUID userId) {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //    [ ] 관련된 User가 존재하지 않으면 예외를 발생시킵니다.
 //    [ ] 같은 User와 관련된 객체가 이미 존재하면 예외를 발생시킵니다.
-        User user = userRepository.findById(dtoUserStatus.userId())
-                .orElseThrow(() -> new IllegalArgumentException(("Res_UserStatus.create.userId = [" + dtoUserStatus.userId() + "] err")));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException(("Res_UserStatus.create.userId = [" + userId + "] err")));
         Optional<UserStatus> userStatus = userStatusRepository.findByUserId(user.getId());
         if (userStatus != null && userStatus.isPresent()) {
             userStatusRepository.save(userStatus.get());
@@ -36,7 +35,7 @@ public class UserStatusService implements InterfaceUserStatusService {
             return Res_UserStatus.from(userStatus.get());
         }
         else {
-            throw new IllegalArgumentException("🚨Res_UserStatus.create.userId = [" + dtoUserStatus.userId() + "] err");
+            throw new IllegalArgumentException("🚨Res_UserStatus.create.userId = [" + userId + "] err");
         }
     }
 
@@ -80,16 +79,16 @@ public class UserStatusService implements InterfaceUserStatusService {
         PrintUtil.okMessage("UserStatusService.update = [" + userName + "]");
     }
 
-    public void updateByUserID(Dto_UserStatusByID dto) {
+    public void updateByUserID(UUID userId) {
 //    [ ] userId 로 특정 User의 객체를 업데이트합니다.
-        UserStatus userStatus = userStatusRepository.findByUserId(dto.userId())
-                .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.updateByUserID.userID = [" + dto.userId() + "] err"));
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.updateByUserID.userID = [" + userId + "] err"));
 
 //        boolean isOnline = userStatus.isOnline();
 //        userStatus.setOnlineState(isOnline);
         userStatus.setUpdatedAt();
         userStatusRepository.save(userStatus);
-        PrintUtil.okMessage("UserStatusService.updateByUserID = [" + dto.userId() + "]");
+        PrintUtil.okMessage("UserStatusService.updateByUserID = [" + userId + "]");
     }
 
     public void delete(UUID statusID) {

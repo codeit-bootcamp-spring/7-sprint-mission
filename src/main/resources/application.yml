@@ -1,6 +1,8 @@
 spring:
   application:
     name: discodeit
+server:
+  port: 4444
 
 discodeit:
   repository:

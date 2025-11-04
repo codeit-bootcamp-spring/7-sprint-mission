@@ -18,7 +18,7 @@ public record Res_User(
         String eMail,
         UUID profiledId
 ) {
-    public static Res_User from(User user, UUID profileId) {
+    public static Res_User from(User user) {
         return Res_User.builder()
                         .id(user.getId())
                         .createdAt(user.getCreatedAt())
@@ -26,7 +26,7 @@ public record Res_User(
                         .userName(user.getUserName())
                         .password(user.getPassword())
                         .eMail(user.getEMail())
-                        .profiledId(profileId)
+                        .profiledId(user.getProfileId())
                         .build();
     }
 

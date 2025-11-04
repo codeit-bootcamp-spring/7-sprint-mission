@@ -5,12 +5,14 @@ import lombok.Builder;
 
 @Builder
 public record Dto_ChannelUpdate(
-        String channelName, ChannelType channelType, String description
+        ChannelType channelType,
+        String channelName,
+        String description
 ) {
-    public static Dto_ChannelUpdate from(String channelName, ChannelType channelType, String description) {
+    public static Dto_ChannelUpdate from(ChannelType channelType, String channelName, String description) {
         return Dto_ChannelUpdate.builder()
-                .channelName(channelName)
                 .channelType(channelType)
+                .channelName(channelName)
                 .description(description)
                 .build();
     }
