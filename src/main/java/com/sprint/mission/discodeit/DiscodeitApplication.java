@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.binaryContent.CreateBinaryContentDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelDto;
-import com.sprint.mission.discodeit.dto.channel.PublicChannelDto;
+import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.request.CreatePrivateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.request.CreatePublicChannelDto;
 import com.sprint.mission.discodeit.dto.login.LoginRequestDto;
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.*;
@@ -73,9 +73,9 @@ public class DiscodeitApplication {
             System.out.println("u = " + u.toString());
         });
 
-        Channel channel1 = channelService.createChannel(new PublicChannelDto("공지방1", "공지방1 입니다."));
-        Channel channel2 = channelService.createChannel(new PrivateChannelDto(List.of(user1.getId(), user2.getId())));
-        Channel channel3 = channelService.createChannel(new PrivateChannelDto(List.of(user1.getId(), user3.getId())));
+        Channel channel1 = channelService.createChannel(new CreatePublicChannelDto("공지방1", "공지방1 입니다."));
+        Channel channel2 = channelService.createChannel(new CreatePrivateChannelDto(List.of(user1.getId(), user2.getId())));
+        Channel channel3 = channelService.createChannel(new CreatePrivateChannelDto(List.of(user1.getId(), user3.getId())));
 
         // public은 전체, private은 user2가 참여한 channel2만 조회되어야함
         List<ChannelResponseDto> allChannelByUserId = channelService.getAllChannelByUserId(user2.getId());
@@ -99,7 +99,7 @@ public class DiscodeitApplication {
         System.out.println("=========== 각 유저에 참여 채널리스트 ==================");
         List<UserResponseDto> allUsers2 = userService.getAllUsers();
         allUsers.forEach(u -> {
-            System.out.println("u = " + u.getJoinChannels().toString());
+            System.out.println("u = " + u.joinChannels().toString());
         });
 
         System.out.println("======== BinaryContent 데이터 확인 ===");

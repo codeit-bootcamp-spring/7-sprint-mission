@@ -1,28 +1,23 @@
-package com.sprint.mission.discodeit.dto.user;
+package com.sprint.mission.discodeit.dto.user.response;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.enums.UserStatusType;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
 
 import java.util.List;
 import java.util.UUID;
 
-@Getter
 @Builder
-@ToString
-public class UserResponseDto {
-    private UUID userId;
-    private String username;
-    private String email;
-    private String phoneNumber;
-    private String pronoun;
-    private List<Channel> joinChannels;
-    private UUID profileId;
-    private UserStatusType statusType;
-
+public record UserResponseDto(
+        UUID userId, String username,
+        String email,
+        String phoneNumber,
+        String pronoun,
+        List<Channel> joinChannels,
+        UUID profileId,
+        UserStatusType statusType
+) {
     public static UserResponseDto from(User user, UserStatusType userStatusType) {
         return UserResponseDto.builder()
                 .userId(user.getId())
