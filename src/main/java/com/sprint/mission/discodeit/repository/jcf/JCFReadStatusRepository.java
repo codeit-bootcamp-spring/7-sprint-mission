@@ -27,7 +27,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     @Override
     public ReadStatus save(UUID userId, UUID channelId) {
         // 새로운 ReadStatus 생성 (ReadStatus에 생성자가 있다고 가정)
-        ReadStatus readStatus = new ReadStatus(userId, channelId);
+        ReadStatus readStatus = new ReadStatus(userId,channelId);
         data.put(readStatus.getId(), readStatus);
         return readStatus;
     }
