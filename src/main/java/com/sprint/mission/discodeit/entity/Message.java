@@ -1,35 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message extends DefEntity{
+@Getter
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
-    private UUID senderId;
-    private UUID channelId;
+
+    private final UUID id;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final Instant createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Instant updatedAt;
+    //
     private String content;
+    //
+    private final UUID channelId;
+    private final UUID authorId;
 
-    public Message(UUID senderId, UUID channelId, String content) {
-        this.senderId = senderId;
-        this.channelId = channelId;
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public void updateContent(String newContent) {
-        this.content = newContent;
-        touch(); // 수정 시간 갱신
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
-
-
-    public UUID getSenderId() {
-        return senderId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
 }

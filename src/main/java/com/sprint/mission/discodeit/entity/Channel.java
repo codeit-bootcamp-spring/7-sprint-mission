@@ -1,36 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends DefEntity{
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
+
+@Getter
+public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
-    private  String channelName;
-    private String channelTopic;
+    private final UUID id;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final Instant createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Instant updatedAt;
+    //
+    private final ChannelType type;
+    private String name;
+    private String description;
 
-
-    // getter
-    public String getChannelName() {
-        return channelName;
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
 
-    public String getChannelTopic() {
-        return channelTopic;
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
-
-    // 생성자: 필수 값인 채널 이름만 받음
-    public Channel(String channelName) {
-        super();    // DefEntity의 생성자 호출 (기본 필드 초기화)
-        this.channelName = channelName;
-        this.channelTopic = null; // 토픽은 선택 사항이므로 null로 초기화
-    }
-
-    public void updateChannelName(String newName) {
-        this.channelName = newName;
-        touch();
-    }
-
-    public void updateChannelTopic(String newTopic) {
-        this.channelTopic = newTopic;
-        touch();
-    }
-
-
 }
