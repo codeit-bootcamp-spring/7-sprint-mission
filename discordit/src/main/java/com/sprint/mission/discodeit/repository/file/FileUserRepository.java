@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exceptions.UserAlreadyExistsException;
-import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -17,63 +15,42 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void save(User user) {
-        if (existsByUserId(user.getUserId())) {
-            throw new UserAlreadyExistsException(user.getUserId());
-        }
         data.put(user.getUuid(), user);
         write();
     }
 
     @Override
     public void update(User user) {
-        if (!existsByUserId(user.getUserId())) {
-            throw new UserNotFoundException(user.getUserId());
-        }
-        if (!existsById(user.getUuid())) {
-            throw new UserNotFoundException(user.getUuid());
-        }
         data.put(user.getUuid(), user);
         write();
     }
 
     @Override
     public void delete(User user) {
-        if (!data.containsValue(user)) {
-            throw new UserNotFoundException(user);
-        }
         data.remove(user.getUuid());
         write();
     }
 
     @Override
-    public User findById(UUID uuid) {
-        if (!data.containsKey(uuid)) {
-            throw new UserNotFoundException(uuid);
-        }
-        return data.get(uuid);
+    public Optional<User> findById(UUID uuid) {
+        return Optional.ofNullable(data.get(uuid));
     }
 
     @Override
-    public User findByUserId(String userId) {
+    public Optional<User> findByUserId(String userId) {
         return data.values().stream()
                 .filter(u -> u.getUserId().equals(userId))
-                .findFirst()
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .findFirst();
     }
 
     @Override
     public void deleteByUserId(String userId) {
-        if (!existsByUserId(userId)) {
-            throw new UserNotFoundException(userId);
-        }
+        data.values().removeIf(u -> u.getUserId().equals(userId));
         write();
     }
 
     @Override
     public void deleteById(UUID uuid) {
-        if (!existsById(uuid)) {
-            throw new UserNotFoundException(uuid);
-        }
         data.remove(uuid);
         write();
     }
