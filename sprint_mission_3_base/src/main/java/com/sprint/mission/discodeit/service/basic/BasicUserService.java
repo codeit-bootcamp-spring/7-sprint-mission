@@ -34,23 +34,36 @@ public class BasicUserService implements UserService {
 
     private void ensureUniqueOnCreate(String username, String email) {
         var all = userRepository.findAll();
-        boolean duplName = all.stream().anyMatch(u -> Objects.equals(u.getUsername(), username));
+        if (all == null) all = new ArrayList<>(); // ✅ null 방지
+
+        boolean duplName = all.stream()
+                .filter(Objects::nonNull)
+                .anyMatch(u -> Objects.equals(u.getUsername(), username));
         if (duplName) throw new IllegalArgumentException("username already exists: " + username);
-        boolean duplEmail = all.stream().anyMatch(u -> Objects.equals(u.getEmail(), email));
+
+        boolean duplEmail = all.stream()
+                .filter(Objects::nonNull)
+                .anyMatch(u -> Objects.equals(u.getEmail(), email));
         if (duplEmail) throw new IllegalArgumentException("email already exists: " + email);
     }
 
     private void ensureUniqueOnUpdate(UUID targetId, String username, String email) {
         var all = userRepository.findAll();
+        if (all == null) all = new ArrayList<>();
+
         boolean duplName = all.stream()
+                .filter(Objects::nonNull)
                 .anyMatch(u -> !u.getId().equals(targetId) && Objects.equals(u.getUsername(), username));
         if (duplName) throw new IllegalArgumentException("username already exists: " + username);
+
         boolean duplEmail = all.stream()
+                .filter(Objects::nonNull)
                 .anyMatch(u -> !u.getId().equals(targetId) && Objects.equals(u.getEmail(), email));
         if (duplEmail) throw new IllegalArgumentException("email already exists: " + email);
     }
 
     private boolean isOnline(UUID userId) {
+        if (userId == null) return false;
         return userStatusRepository.findByUserId(userId)
                 .map(UserStatus::getLastSeenAt)
                 .map(last -> !last.isBefore(Instant.now().minus(ONLINE_WINDOW)))
@@ -58,6 +71,7 @@ public class BasicUserService implements UserService {
     }
 
     private UUID findProfileImageId(UUID userId) {
+        if (userId == null) return null;
         return binaryContentRepository.findByUserId(userId)
                 .map(BinaryContent::getId)
                 .orElse(null);
@@ -87,7 +101,6 @@ public class BasicUserService implements UserService {
         // 3) (선택) 프로필 이미지 저장
         if (request.profileImage() != null) {
             var a = request.profileImage();
-            // BinaryContent.forUserProfile(...) 정적 팩토리가 없는 경우엔, 프로젝트의 BinaryContent 생성자에 맞춰 바꿔주세요.
             var bin = BinaryContent.forUserProfile(user.getId(), a.filename(), a.contentType(), a.data());
             binaryContentRepository.save(bin);
         }
@@ -98,22 +111,55 @@ public class BasicUserService implements UserService {
     @Override
     public Optional<UserDto> find(UUID userId) {
         return userRepository.findById(userId)
+                .filter(Objects::nonNull)
                 .map(u -> toDto(u, isOnline(u.getId()), findProfileImageId(u.getId())));
     }
 
     @Override
     public List<UserDto> findAll() {
         var all = userRepository.findAll();
-        var statusByUser = all.stream().collect(Collectors.toMap(
-                User::getId, u -> isOnline(u.getId())
-        ));
-        var profileIdByUser = all.stream().collect(Collectors.toMap(
-                User::getId, u -> findProfileImageId(u.getId())
-        ));
-        return all.stream()
-                .map(u -> toDto(u, statusByUser.get(u.getId()), profileIdByUser.get(u.getId())))
+        if (all == null) all = new ArrayList<>();
+
+        // ✅ null 사용자나 id 없는 사용자 제거
+        var safeUsers = all.stream()
+                .filter(Objects::nonNull)
+                .filter(u -> u.getId() != null)
+                .toList();
+
+        // ✅ 온라인 상태 매핑
+        var statusByUser = new HashMap<UUID, Boolean>();
+        for (User u : safeUsers) {
+            try {
+                boolean status = isOnline(u.getId());
+                statusByUser.put(u.getId(), status);
+            } catch (Exception e) {
+                statusByUser.put(u.getId(), false);
+            }
+        }
+
+        // ✅ 프로필 이미지 매핑
+        var profileIdByUser = new HashMap<UUID, UUID>();
+        for (User u : safeUsers) {
+            try {
+                UUID profileId = findProfileImageId(u.getId());
+                profileIdByUser.put(u.getId(), profileId);
+            } catch (Exception e) {
+                profileIdByUser.put(u.getId(), null);
+            }
+        }
+
+        // ✅ 최종 변환
+        return safeUsers.stream()
+                .map(u -> toDto(
+                        u,
+                        statusByUser.getOrDefault(u.getId(), false),
+                        profileIdByUser.getOrDefault(u.getId(), null)
+                ))
                 .toList();
     }
+
+
+
 
     @Override
     public UserDto update(UserUpdateRequest request) {
@@ -132,7 +178,7 @@ public class BasicUserService implements UserService {
 
         // 2) (선택) 프로필 이미지 교체
         if (request.profileImage() != null) {
-            binaryContentRepository.deleteByUserId(user.getId()); // 기존 이미지 제거
+            binaryContentRepository.deleteByUserId(user.getId());
             var a = request.profileImage();
             var bin = BinaryContent.forUserProfile(user.getId(), a.filename(), a.contentType(), a.data());
             binaryContentRepository.save(bin);
@@ -146,12 +192,15 @@ public class BasicUserService implements UserService {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("User not found: " + userId);
         }
+
         // 1) 관련 리소스 정리
-        binaryContentRepository.deleteByUserId(userId);     // 프로필 이미지 제거
-        userStatusRepository.findByUserId(userId).ifPresent(s -> userStatusRepository.deleteById(s.getId()));
+        binaryContentRepository.deleteByUserId(userId);
+        userStatusRepository.findByUserId(userId)
+                .ifPresent(s -> userStatusRepository.deleteById(s.getId()));
         if (readStatusRepository != null) {
             readStatusRepository.deleteAllByUserId(userId);
         }
+
         // 2) 본체 삭제
         userRepository.deleteById(userId);
     }

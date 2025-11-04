@@ -7,72 +7,59 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Objects;
-import java.util.UUID;
 
 @Repository
 @Primary
 public class JCFUserRepository implements UserRepository {
 
-    private final Map<UUID, User> data = new ConcurrentHashMap<>();
+    // 메모리 기반 저장소
+    private final Map<UUID, User> store = new ConcurrentHashMap<>();
 
-    // 기본 CRUD
     @Override
     public User save(User user) {
-        data.put(user.getId(), user);
+        store.put(user.getId(), user);
         return user;
     }
 
     @Override
     public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(data.values());
+        // ✅ null 방지: 항상 빈 리스트라도 반환
+        return new ArrayList<>(store.values());
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return data.containsKey(id);
+        return store.containsKey(id);
     }
 
     @Override
     public void deleteById(UUID id) {
-        data.remove(id);
+        store.remove(id);
     }
 
-    // 추가 메서드들 (UserRepository에 선언된 것과 정확히 일치해야 함)
     @Override
     public Optional<User> findByUsername(String username) {
-        return data.values().stream()
-                .filter(u -> Objects.equals(u.getUsername(), username))
+        return store.values().stream()
+                .filter(u -> u.getUsername().equals(username))
                 .findFirst();
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return data.values().stream()
-                .filter(u -> Objects.equals(u.getEmail(), email))
+        return store.values().stream()
+                .filter(u -> u.getEmail().equals(email))
                 .findFirst();
     }
 
-    @Override
-    public boolean existsByUsernameOrEmail(String username, String email) {
-        return data.values().stream().anyMatch(u ->
-                Objects.equals(u.getUsername(), username) || Objects.equals(u.getEmail(), email)
-        );
-    }
     @Override
     public Optional<User> findByUsernameAndPassword(String username, String password) {
-        return findAll().stream()
-                .filter(u -> Objects.equals(u.getUsername(), username)
-                        && Objects.equals(u.getPassword(), password))
+        return store.values().stream()
+                .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
                 .findFirst();
     }
-
-
-
-
 }
