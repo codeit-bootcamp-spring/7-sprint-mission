@@ -7,6 +7,5 @@ import java.util.UUID;
 public record UpdateChannelDto (
         String channelName,
         String description, //채널 설명
-        ChannelType channelType, //채널 타입
-        UUID channelId
+        ChannelType channelType //채널 타입
 ) {}

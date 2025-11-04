@@ -32,8 +32,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelResponseDto createPrivateChannel(CreatePrivateChannelDto dto) {
         Channel channel = new Channel(
-                null,
-                null,
+                "",
+                "",
                 ChannelType.PRIVATE
         );
 
@@ -116,8 +116,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto updateChannel(UpdateChannelDto updateChannelDto) {
-        Channel channel = channelRepository.findById(updateChannelDto.channelId())
+    public ChannelResponseDto updateChannel(UUID id, UpdateChannelDto updateChannelDto) {
+        Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
 
         if(channel.getType() == ChannelType.PRIVATE){
