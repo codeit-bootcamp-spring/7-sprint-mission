@@ -53,28 +53,19 @@ public class UserService implements InterfaceUserService {
             throw new IllegalArgumentException("🚨create : 동일한 eMail [" + dto_user.eMail() + "] 사용 중");
         }
 
-        User user = null;
-        Res_User resUser = null;
+        UUID binaryContentId = null;
 
         if (requestDto.isPresent()) {
             Dto_BinaryContent dtoBinaryContent = requestDto.get();
             BinaryContent binaryContent = new BinaryContent(dtoBinaryContent);
+            binaryContentId = binaryContent.getId();
             binaryContentRepository.save(binaryContent);
-
-            PrintUtil.errMessage("🏀 dto_user = " + dto_user.toString());
-            user = new User(dto_user, binaryContent.getId());
-            PrintUtil.errMessage("🏀 user = " + user.toString());
-            resUser = Res_User.from(user);
-            PrintUtil.errMessage("🏀 resUser = " + resUser.toString());
-        }
-        else {
-            user = new User(dto_user, null);
-            resUser = Res_User.from(user);
         }
 
+        User user = new User(dto_user, binaryContentId);
+        Res_User resUser = Res_User.from(user);
         userRepository.save(user);
 
-        //!! for. 먼~~ 미래의 어쩌면~!!
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
         PrintUtil.okMessage("UserService.create = [" + user.getUserName() + "] 온라인 상태 = [" + userStatus.isOnline() + "]");;
