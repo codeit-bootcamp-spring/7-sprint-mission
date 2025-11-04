@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf.basic;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.DeleteMessageRequest;

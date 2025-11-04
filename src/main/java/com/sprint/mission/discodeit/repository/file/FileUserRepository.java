@@ -5,14 +5,9 @@ import com.sprint.mission.discodeit.entity.User;
 
 import java.io.File;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.file.FileIo;
-import com.sprint.mission.discodeit.service.file.Path;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
