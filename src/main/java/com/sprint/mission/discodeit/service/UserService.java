@@ -14,14 +14,15 @@ import java.util.UUID;
  */
 // 생성 , 읽기 , 모두읽기, 수정, 삭제
 public interface UserService {
-    UserResponseDto create(UserCreateRequestDto userCreateRequestDto);
-    UserResponseDto get(UUID uuid);
-    List<UserResponseDto> getAll();
-    UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto);
+    User create(UserCreateRequestDto userCreateRequestDto);
+    User get(UUID uuid);
+    List<User> getAll();
+    User update(UserUpdateRequestDto userUpdateRequestDto);
     boolean delete(UUID userid);
     List<User> getUsersByName(String username);
     Optional<User> getUsersByEmail(String email);
     List<User> getUsersByState(UserState userState);
     void login(UUID userId);
     void logout(UUID userId);
+    boolean isOnline(UUID userId);
 }
