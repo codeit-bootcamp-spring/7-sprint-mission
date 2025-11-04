@@ -75,5 +75,5 @@ public class BasicUserStatusService implements UserStatusService {
         userStatusRepository.deleteById(id);
     }
 
-    //커밋테스트4
+    //커밋테스트5
 }
