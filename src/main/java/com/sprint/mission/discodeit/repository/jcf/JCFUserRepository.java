@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
+
 
 @Repository
 @ConditionalOnProperty(
@@ -35,7 +35,6 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        System.out.println("findAll");
         return this.data.values().stream().toList();
     }
 
