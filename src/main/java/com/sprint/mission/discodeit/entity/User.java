@@ -1,33 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
-
-import lombok.Data;
+import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.UUID;
 
-@Data
-public class User {
-    //Common field
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+@Getter
+@ToString
+@Builder
+@AllArgsConstructor
+public class User extends BaseEntity {
+    private static final long serialVersionUID = 1L;
 
-    //User field
-    private String nickname;
-    private String email;
-    private String password;
+    //Field
+    @Pattern(regexp = "^[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")
+    private String email;         //이메일
+    @Pattern(regexp = "^[\\w가-힣]{2,}$")
+    private String nickname;            //닉네임
+    @Pattern(regexp = "^.{4,}$")
+    private String password;            //비밀번호
+    private UUID profileId;             //프로필 이미지 UUID
 
-    //기본 생성자
-    public User(){
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
+    //Constructor
+    public User(String email, String nickname, String password) {
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
     }
 
-    public User(String nickname, String email, String password){
-        this();
-        this.nickname = nickname;
+    //update
+    public User update(String email, String nickname, String password) {
+        super.update();
         this.email = email;
+        this.nickname = nickname;
         this.password = password;
+        return this;
+    }
+
+    //profile update
+    public void updateProfile(UUID profileId) {
+        super.update();
+        this.profileId = profileId;
     }
 }

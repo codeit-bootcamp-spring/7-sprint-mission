@@ -1,32 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Data
-public class Channel {
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
+@Getter
+@ToString
+@Builder
+@AllArgsConstructor
+public class Channel extends BaseEntity{
+    private static final long serialVersionUID = 1L;
 
-    private String name;
-    private User manager;
-    private List<User> users = new ArrayList<>();
+    //Field
+    private String name;                    //채널명
+    private String description;             //채널 설명
+    private final UUID managerId;           //채널 생성자 UUID
+    private List<UUID> users;               //채널 참가자
+    private ChannelType publicType;         //공개, 비공개 여부
 
-    //기본 생성자
-    public Channel(){
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
+    //Constructor
+    public Channel(UUID managerId, String name, String description) {
+        this.managerId = managerId;
+        this.name = name;
+        this.description = description;
+        this.publicType = ChannelType.PUBLIC;
     }
 
-    //이름
-    public Channel(String name, User manager){
-        this();
+    public Channel(UUID managerId, List<UUID> users) {
+        this.managerId = managerId;
+        this.users = users;
+        this.publicType = ChannelType.PRIVATE;
+    }
+
+    //update name
+    public Channel update(String name, String description){
+        super.update();
         this.name = name;
-        this.manager = manager;
+        this.description = description;
+        return this;
     }
 }
