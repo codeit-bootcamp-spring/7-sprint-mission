@@ -31,7 +31,7 @@ public class UserController {
     // 사용자 등록 (/users)
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<UserResponseDto> userCreate(@RequestBody UserRequestDto userRequestDto) {
-        return ResponseEntity.ok().body(userService.createUser(userRequestDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userRequestDto));
     }
 
     // 사용자 삭제 (/user/delete?id=id)
