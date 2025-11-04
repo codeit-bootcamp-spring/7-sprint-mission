@@ -9,8 +9,6 @@ import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseD
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.user.request.UpdatePasswordRequestDto;
-import com.sprint.mission.discodeit.dto.user.request.UpdateType;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
@@ -155,7 +153,7 @@ public class DiscodeitTest {
             newUserId = sc.nextLine();
             System.out.print("비밀번호: ");
             newPassword = sc.nextLine();
-            userService.create(new CreateUserRequestDto(name, nickName, email, phoneNum, newUserId, newPassword, null));
+            userService.create(new CreateUserRequestDto(name, nickName, email, phoneNum, newUserId, newPassword), null);
             System.out.println("계정이 생성되었습니다. 로그인 해주세요.");
         } catch (IllegalArgumentException e) { // 닉네임, 이메일, 전화번호, 비밀번호 필터링시 발생
             System.out.println(e.getMessage());
@@ -704,54 +702,62 @@ public class DiscodeitTest {
     }
 
     private void updateInfo() {
+        String newUserName = null;
+        String newNickName = null;
+        String newEmail = null;
+        String newPhoneNum = null;
+        String newPassword = null;
+
         try {
             System.out.println("내 정보 수정");
             System.out.println("1. 이름 2. 닉네임 3. 이메일 4. 전화번호 5. 비밀번호 6. 나가기");
             System.out.print("입력: ");
             int choice = sc.nextInt();
-            UpdateType type;
             sc.nextLine();
             switch (choice) {
-                case 1, 2, 3, 4 -> {
+                case 1, 2, 3, 4, 5 -> {
                     if (choice == 1) {
                         System.out.println("현재 이름: " + loginUser.getUserName());
-                        type = UpdateType.USER_NAME;
+                        System.out.print("변경: ");
+                        newUserName = sc.nextLine();
                     } else if(choice == 2){
                         System.out.println("현재 닉네임: " + loginUser.getNickName());
-                        type = UpdateType.NICK_NAME;
+                        System.out.print("변경: ");
+                        newNickName = sc.nextLine();
                     } else if(choice == 3){
                         System.out.println("현재 이메일: " + loginUser.getEmail());
-                        type =  UpdateType.EMAIL;
-                    } else {
+                        System.out.print("변경: ");
+                        newEmail = sc.nextLine();
+                    } else if(choice == 4){
                         System.out.println("현재 전화번호: " + loginUser.getPhoneNum());
-                        type =  UpdateType.PHONE_NUM;
-                    }
-                    System.out.print("변경: ");
-                    userService.update(new UpdateUserRequestDto(loginUser.getId(), sc.nextLine(), type));
-                }
-                case 5 -> {
-                    String nowPassword, newPassword, newPassword2;
-
-                    System.out.print("현재 비밀번호 입력: ");
-                    nowPassword = sc.nextLine();
-
-                    if(userService.isPasswordMatch(loginUser.getId(), nowPassword)){
-                        System.out.print("새로운 비밀번호 입력: ");
-                        newPassword = sc.nextLine();
-
-                        System.out.print("새로운 비밀번호 한번 더 입력: ");
-                        newPassword2 = sc.nextLine();
-
-                        if (newPassword.equals(newPassword2)) {
-                            userService.updatePassword(new UpdatePasswordRequestDto(loginUser.getId(), newPassword));
-                            login = false;
-                            System.out.println("비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
-                        } else {
-                            System.out.println("새로운 비밀번호가 동일하게 입력되지 않았습니다. 이전 메뉴로 돌아갑니다.");
-                        }
+                        System.out.print("변경: ");
+                        newPhoneNum = sc.nextLine();
                     } else {
-                        System.out.println("비밀번호가 틀렸습니다. 이전 메뉴로 돌아갑니다.");
+                        String nowPassword, newPassword2;
+
+                        System.out.print("현재 비밀번호 입력: ");
+                        nowPassword = sc.nextLine();
+
+                        if(userService.isPasswordMatch(loginUser.getId(), nowPassword)){
+                            System.out.print("새로운 비밀번호 입력: ");
+                            newPassword = sc.nextLine();
+
+                            System.out.print("새로운 비밀번호 한번 더 입력: ");
+                            newPassword2 = sc.nextLine();
+
+                            if (newPassword.equals(newPassword2)) {
+                                login = false;
+                                System.out.println("비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
+                            } else {
+                                System.out.println("새로운 비밀번호가 동일하게 입력되지 않았습니다. 이전 메뉴로 돌아갑니다.");
+                                return;
+                            }
+                        } else {
+                            System.out.println("비밀번호가 틀렸습니다. 이전 메뉴로 돌아갑니다.");
+                            return;
+                        }
                     }
+                    userService.update(loginUser.getId(), new UpdateUserRequestDto(newUserName, newNickName, newEmail, newPhoneNum, newPassword), null);
                 }
                 case 6 -> { return; }
                 default -> {

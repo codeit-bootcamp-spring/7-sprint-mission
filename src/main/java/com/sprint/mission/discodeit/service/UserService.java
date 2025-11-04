@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.user.request.UpdatePasswordRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +18,7 @@ public interface UserService {
     /**
      * 새로운 사용자 생성
      */
-    void create(CreateUserRequestDto createUserRequestDto);
+    UserResponseDto create(CreateUserRequestDto userRequest, MultipartFile file);
 
     UserResponseDto find(UUID userId);
 
@@ -49,9 +50,7 @@ public interface UserService {
     /**
      * 사용자 정보 업데이트
      */
-    void update(UpdateUserRequestDto request);
-
-    void updatePassword(UpdatePasswordRequestDto request);
+    void update(UUID userId, UpdateUserRequestDto request, MultipartFile file);
 
     /**
      * 사용자 삭제

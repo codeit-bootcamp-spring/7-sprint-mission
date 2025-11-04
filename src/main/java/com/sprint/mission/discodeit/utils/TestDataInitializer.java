@@ -16,14 +16,14 @@ import com.sprint.mission.discodeit.service.UserService;
 public class TestDataInitializer {
     public static void initialize(UserService userService, ChannelService channelService, MessageService messageService) {
         // 계정 생성하기 -> 메시지 생성 위함
-        userService.create(new CreateUserRequestDto("테스트", "test", "test@naver.com", "010-1234-5678", "test1234", "test1234", null));
-        userService.create(new CreateUserRequestDto("박지훈", "jihun", "jihun01@gmail.com", "010-1234-5678", "idjihun", "securePass1!", null));
-        userService.create(new CreateUserRequestDto("이수빈", "subin", "subin09@naver.com", "010-8765-4321", "idsubin", "myPassword2@", null));
-        userService.create(new CreateUserRequestDto("최하늘", "haneul", "haneul77@kakao.com", "010-3344-5566", "idhaneul", "skyPass123!", null));
-        userService.create(new CreateUserRequestDto("이영희", "younghee", "younghee02@gmail.com", "010-3333-4444", "idyounghee", "pw567890", null));
-        userService.create(new CreateUserRequestDto("박민수", "minsu", "minsu03@daum.net", "010-5555-6666", "idminsu", "securepw1", null));
-        userService.create(new CreateUserRequestDto("최지현", "jihyun", "jihyun04@naver.com", "010-7777-8888", "idjihyun", "mypassword2", null));
-        userService.create(new CreateUserRequestDto("오세훈", "sehun", "sehun05@kakao.com", "010-9999-0000", "idsehun", "hello4321", null));
+        userService.create(new CreateUserRequestDto("테스트", "test", "test@naver.com", "010-1234-5678", "test1234", "test1234"), null);
+        userService.create(new CreateUserRequestDto("박지훈", "jihun", "jihun01@gmail.com", "010-1234-5678", "idjihun", "securePass1!"), null);
+        userService.create(new CreateUserRequestDto("이수빈", "subin", "subin09@naver.com", "010-8765-4321", "idsubin", "myPassword2@"), null);
+        userService.create(new CreateUserRequestDto("최하늘", "haneul", "haneul77@kakao.com", "010-3344-5566", "idhaneul", "skyPass123!"), null);
+        userService.create(new CreateUserRequestDto("이영희", "younghee", "younghee02@gmail.com", "010-3333-4444", "idyounghee", "pw567890"), null);
+        userService.create(new CreateUserRequestDto("박민수", "minsu", "minsu03@daum.net", "010-5555-6666", "idminsu", "securepw1"), null);
+        userService.create(new CreateUserRequestDto("최지현", "jihyun", "jihyun04@naver.com", "010-7777-8888", "idjihyun", "mypassword2"), null);
+        userService.create(new CreateUserRequestDto("오세훈", "sehun", "sehun05@kakao.com", "010-9999-0000", "idsehun", "hello4321"), null);
 
         UserResponseDto discordItUser1 = userService.findByEmail("test@naver.com");
         UserResponseDto discordItUser2 = userService.findByEmail("jihun01@gmail.com");
