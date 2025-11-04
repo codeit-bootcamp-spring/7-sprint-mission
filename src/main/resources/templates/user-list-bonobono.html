@@ -113,29 +113,7 @@
         }
         .status-badge.online { background-color: #81c784; }
         .status-badge.offline { background-color: #e57373; }
-        #jamminContainer {
-            position: fixed;
-            bottom: 100px; /* 화면 하단에서 위쪽으로 올림 */
-            left: 25%;    /* 조금 중앙으로 이동 */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 2; /* 다른 요소 위 */
-            pointer-events: none;
-        }
 
-        #jamminImage {
-            width: 250px; /* 보노보노 이미지 정도 크기 */
-            height: auto;
-        }
-
-        #jamminText {
-            margin-top: 10px;
-            font-size: 2em; /* 텍스트 크게 */
-            font-weight: bold;
-            color: black;   /* 검정색 */
-            text-align: center;
-        }
     </style>
 </head>
 <body>
@@ -166,10 +144,6 @@
 
 <!-- 유저 카드 리스트 -->
 <div id="userList" class="user-list"></div>
-<div id="jamminContainer">
-    <img src="/image/JamMin.png" alt="JamMin" id="jamminImage">
-    <div id="jamminText">스프링이 제일 쉬웠어요</div>
-</div>
 
 <script>
     // 예시 API 엔드포인트
@@ -229,7 +203,6 @@
         }
     }
 </script>
-
 
 </body>
 </html>
