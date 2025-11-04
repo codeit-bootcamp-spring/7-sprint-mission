@@ -133,13 +133,6 @@ public class BasicUserService implements UserService {
         return userRepository.findByEmail(email);
     }
 
-    // 특정 상태만 조회
-    @Override
-    public List<User> getUsersByState(UserState userState) {
-        Objects.requireNonNull(userState);
-        return userRepository.findByState(userState);
-    }
-
     // 로그인
     @Override
     public void login(UUID userId) {

@@ -21,7 +21,6 @@ public interface UserService {
     boolean delete(UUID userid);
     List<User> getUsersByName(String username);
     Optional<User> getUsersByEmail(String email);
-    List<User> getUsersByState(UserState userState);
     void login(UUID userId);
     void logout(UUID userId);
     boolean isOnline(UUID userId);

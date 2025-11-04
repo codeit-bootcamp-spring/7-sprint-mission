@@ -52,13 +52,4 @@ public class JCFUserRepository implements UserRepository {
                 .filter(u -> u.getEmail().equals(e))
                 .findFirst();
     }
-
-    @Override
-    public List<User> findByState(UserState state) {
-        Objects.requireNonNull(state, "State cannot be null");
-        return data.values()
-                .stream()
-                .filter( u -> u.getUserState() == state)
-                .toList();
-    }
 }
