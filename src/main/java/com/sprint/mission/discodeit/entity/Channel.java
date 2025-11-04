@@ -18,8 +18,8 @@ public class Channel extends Common implements Serializable {
      private String channelName;
      private UUID bose;
      private List<UUID> users;
-    private ChannelType type;
-    private String description;
+     private ChannelType type;
+     private String description;
     //카테고리다 channel
  //   private List<Category> category;
  //   private String imageUrl;
@@ -70,7 +70,7 @@ public class Channel extends Common implements Serializable {
                 '}';
     }
 
-    public void update(String newChannelName, UUID newBose, List<UUID> newUsers,String newDescription) {
+    public void update(String newChannelName,String newDescription) {
         boolean anyValueUpdated = false;
 
         if (newChannelName != null && !newChannelName.equals(this.channelName)) {
@@ -78,15 +78,7 @@ public class Channel extends Common implements Serializable {
             anyValueUpdated = true;
         }
 
-        if (newBose != null && !newBose.equals(this.bose)) {
-            this.bose = newBose;
-            anyValueUpdated = true;
-        }
 
-        if (newUsers != null && !newUsers.equals(this.users)) {
-            this.users = newUsers;
-            anyValueUpdated = true;
-        }
         if (newDescription != null && !newDescription.equals(this.description)) {
             this.description = newDescription;
             anyValueUpdated = true;
