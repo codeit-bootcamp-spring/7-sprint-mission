@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class UpdateChannelNameRequestDto {
+public class UpdateChannelAdminRequestDto {
     UUID adminId;
-    String name;
+    UUID newAdminId;
 }

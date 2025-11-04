@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.ChannelVisibility;
 import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -60,59 +61,59 @@ public class TestDataInitializer {
         messageService.create(new CreateMessageRequestDto(discordItUser8.getId(), discordItUser7.getId(), "좋지! 오늘 밤에 접속하자.", ReceiveType.USER, null));
 
         // 채널 생성
-        PrivateChannelResponseDto channel1 = channelService.createPrivate(new CreateChannelRequestDto(ChannelType.VOICE, "스터디 음성 채널", discordItUser1.getId()));
-        PrivateChannelResponseDto channel2 = channelService.createPrivate(new CreateChannelRequestDto(ChannelType.MESSAGE, "프로젝트 토론 메시지 채널", discordItUser2.getId()));
-        PrivateChannelResponseDto channel3 = channelService.createPrivate(new CreateChannelRequestDto(ChannelType.VOICE, "게임 파티 음성 채널", discordItUser3.getId()));
-        PrivateChannelResponseDto channel4 = channelService.createPrivate(new CreateChannelRequestDto(ChannelType.MESSAGE, "공지사항 메시지 채널", discordItUser4.getId()));
-        PrivateChannelResponseDto channel5 = channelService.createPrivate(new CreateChannelRequestDto(ChannelType.VOICE, "음악 감상 음성 채널", discordItUser5.getId()));
-        PrivateChannelResponseDto channel6 = channelService.createPrivate(new CreateChannelRequestDto(ChannelType.MESSAGE, "자유 대화 메시지 채널", discordItUser6.getId()));
-        PrivateChannelResponseDto channel7 = channelService.createPrivate(new CreateChannelRequestDto(ChannelType.VOICE, "코딩 면접 준비 음성 채널", discordItUser7.getId()));
-        PrivateChannelResponseDto channel8 = channelService.createPrivate(new CreateChannelRequestDto(ChannelType.MESSAGE, "Q&A 메시지 채널", discordItUser8.getId()));
+        ChannelResponseDto channel1 = channelService.create(discordItUser1.getId(), new CreateChannelRequestDto(ChannelType.VOICE, ChannelVisibility.PRIVATE, "스터디 음성 채널"));
+        ChannelResponseDto channel2 = channelService.create(discordItUser2.getId(), new CreateChannelRequestDto(ChannelType.MESSAGE, ChannelVisibility.PRIVATE,"프로젝트 토론 메시지 채널"));
+        ChannelResponseDto channel3 = channelService.create(discordItUser3.getId(), new CreateChannelRequestDto(ChannelType.VOICE, ChannelVisibility.PRIVATE, "게임 파티 음성 채널"));
+        ChannelResponseDto channel4 = channelService.create(discordItUser4.getId(), new CreateChannelRequestDto(ChannelType.MESSAGE, ChannelVisibility.PRIVATE, "공지사항 메시지 채널"));
+        ChannelResponseDto channel5 = channelService.create(discordItUser5.getId(), new CreateChannelRequestDto(ChannelType.VOICE, ChannelVisibility.PRIVATE, "음악 감상 음성 채널"));
+        ChannelResponseDto channel6 = channelService.create(discordItUser6.getId(), new CreateChannelRequestDto(ChannelType.MESSAGE, ChannelVisibility.PRIVATE, "자유 대화 메시지 채널"));
+        ChannelResponseDto channel7 = channelService.create(discordItUser7.getId(), new CreateChannelRequestDto(ChannelType.VOICE, ChannelVisibility.PRIVATE, "코딩 면접 준비 음성 채널"));
+        ChannelResponseDto channel8 = channelService.create(discordItUser8.getId(), new CreateChannelRequestDto(ChannelType.MESSAGE, ChannelVisibility.PRIVATE, "Q&A 메시지 채널"));
 
         // 채널에 멤버 추가
         // channel1 (관리자: discordItUser1)
-        channelService.addMember(new UpdateChannelRequestDto(channel1.getId(), discordItUser3.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel1.getId(), discordItUser6.getId()));
+        channelService.addMember(channel1.getId(), new UpdateChannelRequestDto(discordItUser3.getId()));
+        channelService.addMember(channel1.getId(), new UpdateChannelRequestDto(discordItUser6.getId()));
 
         // channel2 (관리자: discordItUser2)
-        channelService.addMember(new UpdateChannelRequestDto(channel2.getId(), discordItUser1.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel2.getId(), discordItUser4.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel2.getId(), discordItUser6.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel2.getId(), discordItUser8.getId()));
+        channelService.addMember(channel2.getId(), new UpdateChannelRequestDto(discordItUser1.getId()));
+        channelService.addMember(channel2.getId(), new UpdateChannelRequestDto(discordItUser4.getId()));
+        channelService.addMember(channel2.getId(), new UpdateChannelRequestDto(discordItUser6.getId()));
+        channelService.addMember(channel2.getId(), new UpdateChannelRequestDto(discordItUser8.getId()));
 
         // channel3 (관리자: discordItUser3)
-        channelService.addMember(new UpdateChannelRequestDto(channel3.getId(), discordItUser2.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel3.getId(), discordItUser5.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel3.getId(), discordItUser7.getId()));
+        channelService.addMember(channel3.getId(), new UpdateChannelRequestDto(discordItUser2.getId()));
+        channelService.addMember(channel3.getId(), new UpdateChannelRequestDto(discordItUser5.getId()));
+        channelService.addMember(channel3.getId(), new UpdateChannelRequestDto(discordItUser7.getId()));
 
         // channel4 (관리자: discordItUser4)
-        channelService.addMember(new UpdateChannelRequestDto(channel4.getId(), discordItUser1.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel4.getId(), discordItUser2.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel4.getId(), discordItUser6.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel4.getId(), discordItUser7.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel4.getId(), discordItUser8.getId()));
+        channelService.addMember(channel4.getId(), new UpdateChannelRequestDto(discordItUser1.getId()));
+        channelService.addMember(channel4.getId(), new UpdateChannelRequestDto(discordItUser2.getId()));
+        channelService.addMember(channel4.getId(), new UpdateChannelRequestDto(discordItUser6.getId()));
+        channelService.addMember(channel4.getId(), new UpdateChannelRequestDto(discordItUser7.getId()));
+        channelService.addMember(channel4.getId(), new UpdateChannelRequestDto(discordItUser8.getId()));
 
         // channel5 (관리자: discordItUser5)
-        channelService.addMember(new UpdateChannelRequestDto(channel5.getId(), discordItUser4.getId()));
+        channelService.addMember(channel5.getId(), new UpdateChannelRequestDto(discordItUser4.getId()));
 
         // channel6 (관리자: discordItUser6)
-        channelService.addMember(new UpdateChannelRequestDto(channel6.getId(), discordItUser2.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel6.getId(), discordItUser3.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel6.getId(), discordItUser5.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel6.getId(), discordItUser7.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel6.getId(), discordItUser8.getId()));
+        channelService.addMember(channel6.getId(), new UpdateChannelRequestDto(discordItUser2.getId()));
+        channelService.addMember(channel6.getId(), new UpdateChannelRequestDto(discordItUser3.getId()));
+        channelService.addMember(channel6.getId(), new UpdateChannelRequestDto(discordItUser5.getId()));
+        channelService.addMember(channel6.getId(), new UpdateChannelRequestDto(discordItUser7.getId()));
+        channelService.addMember(channel6.getId(), new UpdateChannelRequestDto(discordItUser8.getId()));
 
         // channel7 (관리자: discordItUser7)
-        channelService.addMember(new UpdateChannelRequestDto(channel7.getId(), discordItUser3.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel7.getId(), discordItUser6.getId()));
+        channelService.addMember(channel7.getId(), new UpdateChannelRequestDto(discordItUser3.getId()));
+        channelService.addMember(channel7.getId(), new UpdateChannelRequestDto(discordItUser6.getId()));
 
         // channel8 (관리자: discordItUser8)
-        channelService.addMember(new UpdateChannelRequestDto(channel8.getId(), discordItUser1.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel8.getId(), discordItUser2.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel8.getId(), discordItUser3.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel8.getId(), discordItUser4.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel8.getId(), discordItUser5.getId()));
-        channelService.addMember(new UpdateChannelRequestDto(channel8.getId(), discordItUser6.getId()));
+        channelService.addMember(channel8.getId(), new UpdateChannelRequestDto(discordItUser1.getId()));
+        channelService.addMember(channel8.getId(), new UpdateChannelRequestDto(discordItUser2.getId()));
+        channelService.addMember(channel8.getId(), new UpdateChannelRequestDto(discordItUser3.getId()));
+        channelService.addMember(channel8.getId(), new UpdateChannelRequestDto(discordItUser4.getId()));
+        channelService.addMember(channel8.getId(), new UpdateChannelRequestDto(discordItUser5.getId()));
+        channelService.addMember(channel8.getId(), new UpdateChannelRequestDto(discordItUser6.getId()));
 
         // 채널 메시지 추가(메시지 채널에만 추가)
 
@@ -150,10 +151,10 @@ public class TestDataInitializer {
 
 
         // 공개 채널 추가
-        ChannelResponseDto channel9 = channelService.createPublic(new CreateChannelRequestDto(ChannelType.MESSAGE, "잡담 라운지", discordItUser1.getId()));
-        ChannelResponseDto channel10 = channelService.createPublic(new CreateChannelRequestDto(ChannelType.VOICE, "실시간 수다방", discordItUser2.getId()));
-        ChannelResponseDto channel11 = channelService.createPublic(new CreateChannelRequestDto(ChannelType.MESSAGE, "지식 나눔 메시지 채널", discordItUser3.getId()));
-        ChannelResponseDto channel12 = channelService.createPublic(new CreateChannelRequestDto(ChannelType.VOICE, "토론 세션 음성 채널", discordItUser4.getId()));
+        ChannelResponseDto channel9 = channelService.create(discordItUser1.getId(), new CreateChannelRequestDto(ChannelType.MESSAGE, ChannelVisibility.PUBLIC, "잡담 라운지"));
+        ChannelResponseDto channel10 = channelService.create(discordItUser2.getId(), new CreateChannelRequestDto(ChannelType.VOICE, ChannelVisibility.PUBLIC, "실시간 수다방"));
+        ChannelResponseDto channel11 = channelService.create(discordItUser3.getId(), new CreateChannelRequestDto(ChannelType.MESSAGE, ChannelVisibility.PUBLIC, "지식 나눔 메시지 채널"));
+        ChannelResponseDto channel12 = channelService.create(discordItUser4.getId(), new CreateChannelRequestDto(ChannelType.VOICE, ChannelVisibility.PUBLIC, "토론 세션 음성 채널"));
 
         // 채널 9: 잡담 라운지
         messageService.create(new CreateMessageRequestDto(discordItUser1.getId(), channel9.getId(), "오늘 점심 뭐 먹을까요?", ReceiveType.CHANNEL, null));
