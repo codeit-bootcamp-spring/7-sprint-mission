@@ -52,32 +52,32 @@ public class UserController {
 
     // 사용자 단일 조회 (/user/id)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public UserResponseDto findUserById(@PathVariable UUID id) {
+    public UserResponseDto getUserById(@PathVariable UUID id) {
         return userService.findUserInfoById(id);
     }
 
 
     // 사용자 정보 수정 (/user/update/..)
     @RequestMapping(value = "/username", method = RequestMethod.PUT)
-    public UserResponseDto updateUserName(@RequestBody UserNameUpdateDto userNameUpdateDto) {
+    public UserResponseDto usernameUpdate(@RequestBody UserNameUpdateDto userNameUpdateDto) {
         return userService.updateUserName(userNameUpdateDto);
     }
     @RequestMapping(value = "/phonenum", method = RequestMethod.PUT)
-    public UserResponseDto updatePhone(@RequestBody UserPhoneNumUpdateDto userPhoneNumUpdateDto) {
+    public UserResponseDto phoneUpdate(@RequestBody UserPhoneNumUpdateDto userPhoneNumUpdateDto) {
         return userService.updatePhoneNum(userPhoneNumUpdateDto);
     }
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
-    public UserResponseDto updatePassword(@RequestBody UserPasswordUpdateDto userPasswordUpdateDto) {
+    public UserResponseDto passwordUpdate(@RequestBody UserPasswordUpdateDto userPasswordUpdateDto) {
         return userService.updatePassword(userPasswordUpdateDto);
     }
     @RequestMapping(value = "/state", method = RequestMethod.PUT)
-    public UserResponseDto updateState(@RequestBody UserStateUpdateDto userStateUpdateDto) {
+    public UserResponseDto stateUpdate(@RequestBody UserStateUpdateDto userStateUpdateDto) {
         return userService.updateState(userStateUpdateDto);
     }
 
     // 사용자 온라인 상태 업데이트  (/users/userId/online)
     @RequestMapping(value = "/{userId}/online", method = RequestMethod.PUT)
-    public UserStatusResponseDto updateOnline(@PathVariable UUID userId) {
+    public UserStatusResponseDto onlineUpdate(@PathVariable UUID userId) {
         return userStatusService.updateStatusByUserId(userId);
     }
 }

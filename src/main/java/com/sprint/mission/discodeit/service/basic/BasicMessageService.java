@@ -122,22 +122,21 @@ public class BasicMessageService implements MessageService {
             return Optional.empty();
         }
 
-        return messageRepository.findById(updateDto.messageId()).map(message -> {
-            message.updateContent(updateDto.newContent());
-            messageRepository.save(message);
-            return toDto(message);
-        });
+        Message message = messageRepository.findById(updateDto.messageId())
+                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다."));
+
+        message.updateContent(updateDto.newContent());
+        messageRepository.save(message);
+        return Optional.of(toDto(message));
     }
 
     // Message Delete
     @Override
-    public boolean deleteMessage(UUID id) {
+    public void deleteMessage(UUID id) {
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다."));
 
-        return messageRepository.findById(id).map(message -> {
-            binaryContentRepository.deleteAllByMessageId(message.getId());
-            messageRepository.deleteById(id);
-            return true;
-        }).orElse(false);
-
+        binaryContentRepository.deleteAllByMessageId(message.getId());
+        messageRepository.deleteById(id);
     }
 }

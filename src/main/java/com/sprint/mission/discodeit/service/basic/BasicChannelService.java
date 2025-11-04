@@ -174,15 +174,14 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public boolean deleteChannel(UUID id) {
+    public void deleteChannel(UUID id) {
 
-        return channelRepository.findById(id).map(channel -> {
+        channelRepository.findById(id)
+                        .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
 
             readStatusRepository.deleteAllByChannelId(id);
             messageRepository.deleteAllByChannelId(id);
             channelRepository.deleteById(id);
 
-            return true;
-        }).orElse(false);
     }
 }

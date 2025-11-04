@@ -21,5 +21,5 @@ public interface MessageService {
 
     Optional<MessageResponseDto> updateMessage(MessageUpdateDto updateDto);      // 수정
 
-    boolean deleteMessage(UUID id);              // 삭제
+    void deleteMessage(UUID id);              // 삭제
 }

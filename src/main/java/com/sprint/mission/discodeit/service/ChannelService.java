@@ -27,6 +27,6 @@ public interface ChannelService {
     ChannelResponseDto removeMemberFromChannel(UUID channelId, UUID userId);
 
 
-    boolean deleteChannel(UUID id);
+    void deleteChannel(UUID id);
 
 }

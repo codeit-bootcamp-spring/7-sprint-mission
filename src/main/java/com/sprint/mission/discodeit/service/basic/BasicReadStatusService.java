@@ -62,7 +62,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusResponseDto updateReadStatus(ReadStatusUpdateDto updateDto) {
-        ReadStatus status = readStatusRepository.findById(updateDto.readStatusId())
+        ReadStatus status = readStatusRepository.findByUserIdAndChannelId(updateDto.userId(), updateDto.channelId())
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
 
         status.updateReadStatus();
