@@ -126,7 +126,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto changePassword(UserPasswordUpdateDto updateDto) {
+    public UserResponseDto updatePassword(UserPasswordUpdateDto updateDto) {
 
         User user = userRepository.findById(updateDto.userId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
@@ -182,21 +182,21 @@ public class BasicUserService implements UserService {
 
     // 논리 삭제
     @Override
-    public boolean deleteUser(UUID userId) {
+    public void deleteUser(UUID userId) {
 
-        return userRepository.findById(userId).map(userDelete -> {
-            if (channelRepository.existsByAdminId(userId)) {
-                throw new IllegalStateException("채널관리자는 삭제할 수 없습니다.");
-            }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
 
-            // 상태 삭제
-            userStatusRepository.deleteStatusByUserId(userId);
-            // 이미지 삭제
-            binaryContentRepository.deleteProfileImageByUserId(userId);
+        if (channelRepository.existsByAdminId(userId)) {
+            throw new IllegalStateException("채널관리자는 삭제할 수 없습니다.");
+        }
 
-            userDelete.softDelete(); // 논리 삭제
-            userRepository.save(userDelete);    // 유저만 저장해서, 재시작 시 채널이나 메시지에는 적용이 안됨;;
-            return true;
-        }).orElse(false);
+        // 상태 삭제
+        userStatusRepository.deleteStatusByUserId(userId);
+        // 이미지 삭제
+        binaryContentRepository.deleteProfileImageByUserId(userId);
+
+        user.softDelete(); // 논리 삭제
+        userRepository.save(user);    // 유저만 저장해서, 재시작 시 채널이나 메시지에는 적용이 안됨;;
     }
 }

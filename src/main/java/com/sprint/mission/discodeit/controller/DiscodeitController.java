@@ -1,8 +1,0 @@
-package com.sprint.mission.discodeit.controller;
-
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-public class DiscodeitController {
-
-}

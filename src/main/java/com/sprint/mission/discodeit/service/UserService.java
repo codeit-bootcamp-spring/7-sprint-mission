@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.binaryContentDto.UserProfileImageUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserResponseDto;
@@ -10,7 +9,6 @@ import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPhoneNumUp
 import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserStateUpdateDto;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
@@ -26,7 +24,7 @@ public interface UserService {
 
     // 수정
     UserResponseDto updateUserName(UserNameUpdateDto updateDto);
-    UserResponseDto changePassword(UserPasswordUpdateDto updateDto);
+    UserResponseDto updatePassword(UserPasswordUpdateDto updateDto);
     UserResponseDto updateState(UserStateUpdateDto updateDto);
     UserResponseDto updatePhoneNum(UserPhoneNumUpdateDto updateDto);
 
@@ -34,5 +32,5 @@ public interface UserService {
     UserResponseDto updateProfileImage(UserProfileImageUpdateDto userProfileImageUpdateDto);
 
     // 삭제
-    boolean deleteUser(UUID userId); // 삭제 메서드 추가 (성공 여부 반환)
+    void deleteUser(UUID userId); // 삭제 메서드 추가 (성공 여부 반환)
 }

@@ -10,13 +10,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
+@Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
@@ -43,6 +44,16 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus status = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
 
+        return UserStatusResponseDto.from(status);
+    }
+
+    @Override
+    public UserStatusResponseDto updateStatusByUserId(UUID userId) {
+        UserStatus status = userStatusRepository.findStatusByUserId(userId)
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+
+        status.updateLastAccess();
+        userStatusRepository.save(status);
         return UserStatusResponseDto.from(status);
     }
 
