@@ -7,44 +7,49 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 @Primary
 public class FileMessageRepository implements MessageRepository {
 
-    private final List<Message> data = new ArrayList<>();
+    private final Map<UUID, Message> data = new HashMap<>();
 
     @Override
     public void save(Message message) {
-        data.add(message);
+        data.put(message.getUuid(), message);
         write();
     }
 
     @Override
+    public Optional<Message> find(UUID id) {
+        return Optional.ofNullable(data.get(id));
+    }
+
+    @Override
     public List<Message> findAll() {
-        return List.copyOf(data);
+        return data.values().stream()
+                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                .toList();
     }
 
     @Override
     public List<Message> findBySender(User user) {
-        return data.stream()
+        return data.values().stream()
                 .filter(m -> m.getSender().equals(user))
                 .toList();
     }
 
     @Override
     public List<Message> findByReceiver(Receivable receiver) {
-        return data.stream()
+        return data.values().stream()
                 .filter(m -> m.getReceiver().equals(receiver))
                 .toList();
     }
 
     @Override
     public List<Message> findBySenderAndReceiver(User user, Receivable receiver) {
-        return data.stream()
+        return data.values().stream()
                 .filter(m ->
                         m.getSender().equals(user)
                                 && m.getReceiver().equals(receiver))
@@ -53,60 +58,45 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void deleteAllByReceiver(Receivable receiver) {
-        data.removeIf(m -> m.getReceiver().equals(receiver));
+        data.entrySet().removeIf(
+                e -> e.getValue().getReceiver().equals(receiver));
         write();
     }
 
     @Override
     public void delete(Message message) {
-        data.removeIf(m -> m.getUuid().equals(message.getUuid()));
+        data.remove(message.getUuid());
         write();
     }
 
     @Override
-    public Message findLast(Receivable receiver) {
-        List<Message> foundMessages = findByReceiver(receiver);
-        if (foundMessages.isEmpty()) {
-            throw new IllegalStateException("저장된 메시지가 없습니다.");
+    public Optional<Message> update(Message message) {
+        if (!data.containsKey(message.getUuid())) {
+            return Optional.empty();
         }
-
-        return foundMessages.get(foundMessages.size() - 1);
+        data.put(message.getUuid(), message);
+        write();
+        return Optional.of(message);
     }
 
-    /**
-     * 테스트용 임시 메서드
-     */
-    private Message findById(UUID uuid) {
-        return data.stream()
-                .filter(m -> m.getUuid().equals(uuid))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 id: " + uuid));
-    }
-
-    /**
-     * 테스트용 임시 메서드
-     */
-    public void update(Message message) {
-        Message existing = findById(message.getUuid());
-        int index = data.indexOf(existing);
-        if (index != -1) {
-            data.set(index, message);
-            write();
-        }
+    @Override
+    public Optional<Message> findLast(Receivable receiver) {
+        return data.values().stream()
+                .max(Comparator.comparing(Message::getCreatedAt));
     }
 
     /**
      * 테스트용 임시 메서드: 마지막으로 저장된 메시지를 반환합니다.
      */
-    public Message findLast() {
+    public Optional<Message> findLast() {
         if (data.isEmpty()) {
             throw new IllegalStateException("저장된 메시지가 없습니다.");
         }
-        return data.get(data.size() - 1);
+        return Optional.ofNullable(data.get(data.size() - 1));
     }
 
     private void write() {
-        DataWriter.writeMessage(data);
+        DataWriter.writeMessage(List.copyOf(data.values()));
     }
 
 }
