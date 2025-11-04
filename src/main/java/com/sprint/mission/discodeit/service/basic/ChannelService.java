@@ -5,9 +5,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.dto.*;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileReadStatusRepository;
+import com.sprint.mission.discodeit.repository.InterfaceChannelRepository;
+import com.sprint.mission.discodeit.repository.InterfaceMessageRepository;
+import com.sprint.mission.discodeit.repository.InterfaceReadStatusRepository;
 import com.sprint.mission.discodeit.service.InterfaceChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,13 +21,10 @@ import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 @Service
 @RequiredArgsConstructor //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 public class ChannelService implements InterfaceChannelService {
-    private final FileChannelRepository channelRepository;
-    private final FileReadStatusRepository readStatusRepository;
-    private final FileMessageRepository messageRepository;
+    private final InterfaceChannelRepository channelRepository;
+    private final InterfaceReadStatusRepository readStatusRepository;
+    private final InterfaceMessageRepository messageRepository;
 
-//    public ChannelService(FileChannelRepository fileChannelRepository) {
-//        this.fileChannelRepository = fileChannelRepository;
-//    }
 
     @Override
     public Res_Channel createPublic(Dto_CreateChannelPublic dtoCreateChannel) {

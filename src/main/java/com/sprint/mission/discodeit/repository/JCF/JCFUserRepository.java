@@ -3,11 +3,10 @@ package com.sprint.mission.discodeit.repository.JCF;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository
+//@Repository
 public class JCFUserRepository implements InterfaceUserRepository {
     private final Map<UUID, User> data;
 

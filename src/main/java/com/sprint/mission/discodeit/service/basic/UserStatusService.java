@@ -6,8 +6,8 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatusByID;
 import com.sprint.mission.discodeit.entity.dto.Res_UserStatus;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserStatusRepository;
+import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
+import com.sprint.mission.discodeit.repository.InterfaceUserStatusRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,8 +19,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserStatusService implements InterfaceUserStatusService {
-    private final FileUserStatusRepository userStatusRepository;
-    private final FileUserRepository userRepository;
+    private final InterfaceUserStatusRepository userStatusRepository;
+    private final InterfaceUserRepository userRepository;
 
     public Res_UserStatus create(Dto_UserStatusByID dtoUserStatus) {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
@@ -71,14 +71,13 @@ public class UserStatusService implements InterfaceUserStatusService {
         UserStatus userStatus = userStatusRepository.findById(dto.id())
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.update.id = [" + dto.id() + "] err"));
 
-        boolean isOnline = userStatus.isOnline();
-
-        userStatus.setOnlineState(isOnline);
+//        boolean isOnline = userStatus.isOnline();
+//        userStatus.setOnlineState(isOnline);
         userStatus.setUpdatedAt();
         userStatusRepository.save(userStatus);
 
         String userName = userRepository.findById(userStatus.getUserId()).get().getUserName();
-        PrintUtil.okMessage("UserStatusService.update = [" + userName + "] isOnline = [" + isOnline + "]");
+        PrintUtil.okMessage("UserStatusService.update = [" + userName + "]");
     }
 
     public void updateByUserID(Dto_UserStatusByID dto) {
@@ -86,12 +85,11 @@ public class UserStatusService implements InterfaceUserStatusService {
         UserStatus userStatus = userStatusRepository.findByUserId(dto.userId())
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.updateByUserID.userID = [" + dto.userId() + "] err"));
 
-        boolean isOnline = userStatus.isOnline();
-
-        userStatus.setOnlineState(isOnline);
+//        boolean isOnline = userStatus.isOnline();
+//        userStatus.setOnlineState(isOnline);
         userStatus.setUpdatedAt();
         userStatusRepository.save(userStatus);
-        PrintUtil.okMessage("UserStatusService.updateByUserID = [" + dto.userId() + "] isOnline = [" + isOnline + "]");
+        PrintUtil.okMessage("UserStatusService.updateByUserID = [" + dto.userId() + "]");
     }
 
     public void delete(UUID statusID) {

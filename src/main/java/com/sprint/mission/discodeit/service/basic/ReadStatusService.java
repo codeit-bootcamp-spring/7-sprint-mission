@@ -4,12 +4,12 @@ import com.sprint.mission.discodeit.common.PrintUtil;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatusUpdate;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileReadStatusRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
+import com.sprint.mission.discodeit.repository.InterfaceChannelRepository;
+import com.sprint.mission.discodeit.repository.InterfaceReadStatusRepository;
+import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,9 +21,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ReadStatusService implements InterfaceReadStatusService {
-    private final FileReadStatusRepository readStatusRepository;
-    private final FileUserRepository userRepository;
-    private final FileChannelRepository channelRepository;
+    private final InterfaceReadStatusRepository readStatusRepository;
+    private final InterfaceUserRepository userRepository;
+    private final InterfaceChannelRepository channelRepository;
 
     public Res_ReadStatus create(Dto_ReadStatus dtoReadStatus) {
         //create

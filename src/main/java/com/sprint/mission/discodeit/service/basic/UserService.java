@@ -4,10 +4,13 @@ import com.sprint.mission.discodeit.common.PrintUtil;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.dto.*;
-import com.sprint.mission.discodeit.repository.file.FileBinaryContentRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserStatusRepository;
+import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
+import com.sprint.mission.discodeit.entity.dto.Dto_User;
+import com.sprint.mission.discodeit.entity.dto.Res_IsOnlineUser;
+import com.sprint.mission.discodeit.entity.dto.Res_User;
+import com.sprint.mission.discodeit.repository.InterfaceBinaryContentRepository;
+import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
+import com.sprint.mission.discodeit.repository.InterfaceUserStatusRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,9 +24,9 @@ import java.util.UUID;
 //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 @RequiredArgsConstructor //@Repository 있어야 등록시켜 줌!!
 public class UserService implements InterfaceUserService {
-    private final FileUserRepository userRepository;
-    private final FileUserStatusRepository userStatusRepository;
-    private final FileBinaryContentRepository binaryContentRepository;
+    private final InterfaceUserRepository userRepository;
+    private final InterfaceUserStatusRepository userStatusRepository;
+    private final InterfaceBinaryContentRepository binaryContentRepository;
 
 //    public UserService(FileUserRepository fileUserRepository) {
 //        this.fileUserRepository = fileUserRepository;

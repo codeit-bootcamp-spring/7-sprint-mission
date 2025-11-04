@@ -63,6 +63,7 @@ public class FileUserRepository implements InterfaceUserRepository {
     }
 
     @Override
+    //!! 🎓레포지토리에서 로그인 여부를 반환하는데요 레포지토리의 책임일지 고민을 해보실필요가있을거같습니다.
     public Res_UserLogin isLogin(String name, String password) {
         User user1 = fileUtil.findAll().stream()
                             .map(user -> (User) user)

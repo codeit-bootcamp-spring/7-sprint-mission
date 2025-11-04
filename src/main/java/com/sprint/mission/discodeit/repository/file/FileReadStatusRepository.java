@@ -36,7 +36,7 @@ public class FileReadStatusRepository  implements InterfaceReadStatusRepository 
 
     @Override
     public Optional<List<ReadStatus>> findAll() {
-        return Optional.ofNullable(fileUtil.findAll().stream().map(readStatusID -> (ReadStatus)readStatusID).toList());
+        return Optional.of(fileUtil.findAll().stream().map(readStatusID -> (ReadStatus)readStatusID).toList());
     }
 
     @Override

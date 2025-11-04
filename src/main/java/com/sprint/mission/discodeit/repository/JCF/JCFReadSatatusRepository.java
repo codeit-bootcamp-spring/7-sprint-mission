@@ -2,11 +2,10 @@ package com.sprint.mission.discodeit.repository.JCF;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.InterfaceReadStatusRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository
+//@Repository
 public class JCFReadSatatusRepository implements InterfaceReadStatusRepository {
     private final Map<UUID, ReadStatus> data;
 

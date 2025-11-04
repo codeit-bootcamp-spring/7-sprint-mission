@@ -41,7 +41,7 @@ public class FileMessageRepository implements InterfaceMessageRepository {
     public Optional<List<Message>> findAllMessageInChannel(UUID channelID) {
         List<Message> list = fileUtil.findAll().stream().map(model -> (Message)model)
                 .filter(message -> message.getChannelId().equals(channelID)).toList();
-        return Optional.ofNullable(list);
+        return Optional.of(list);
     }
 
     @Override

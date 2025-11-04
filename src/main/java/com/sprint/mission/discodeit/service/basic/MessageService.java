@@ -7,10 +7,10 @@ import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_Message;
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_Message;
-import com.sprint.mission.discodeit.repository.file.FileBinaryContentRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.InterfaceBinaryContentRepository;
+import com.sprint.mission.discodeit.repository.InterfaceChannelRepository;
+import com.sprint.mission.discodeit.repository.InterfaceMessageRepository;
+import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,10 +20,10 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 public class MessageService implements InterfaceMessageService {
-    private final FileMessageRepository messageRepository;
-    private final FileChannelRepository channelRepository;
-    private final FileUserRepository userRepository;
-    private final FileBinaryContentRepository userContentsRepository;
+    private final InterfaceMessageRepository messageRepository;
+    private final InterfaceChannelRepository channelRepository;
+    private final InterfaceUserRepository userRepository;
+    private final InterfaceBinaryContentRepository userContentsRepository;
 
     @Override
     public Res_Message create(Dto_Message dtoMessage, Optional<List<Dto_BinaryContent>> dtoList) {

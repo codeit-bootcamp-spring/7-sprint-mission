@@ -36,7 +36,7 @@ public class FileChannelRepository implements InterfaceChannelRepository {
     @Override
     public Optional<List<Channel>> findAll() {
         List<Channel> channels = fileUtil.findAll().stream().map(model -> (Channel)model).toList();
-        return Optional.ofNullable(channels);
+        return Optional.of(channels);
     }
 
     @Override

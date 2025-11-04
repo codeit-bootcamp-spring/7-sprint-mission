@@ -6,3 +6,6 @@ discodeit:
   repository:
     type: file   # jcf | file
     file-directory: .discodeit
+
+blog:
+  file-directory: /Users/my05030/Desktop/장미연/7-sprint-mission

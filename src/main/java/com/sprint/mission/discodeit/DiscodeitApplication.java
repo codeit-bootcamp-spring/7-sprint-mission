@@ -17,7 +17,7 @@ import static com.sprint.mission.discodeit.entity.ModelType.USER;
 @SpringBootApplication
 public class DiscodeitApplication {
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
         test_UserService(context);
@@ -30,7 +30,7 @@ public class DiscodeitApplication {
 
         //🚨 테스트 후 폴더 삭제!!
         new FileUtil(USER).cleanup();
-	}
+    }
 
     static void test_UserService(ConfigurableApplicationContext context) {
         PrintUtil.okMessage("🔴🔴🔴🔴🔴 test_UserService  🔴🔴🔴🔴🔴");
@@ -47,12 +47,12 @@ public class DiscodeitApplication {
 
 //                File imageFile = new File("/Users/my05030/Desktop/장미연/7-sprint-mission/png/gyul.png");
 //                BufferedImage image = ImageIO.read(imageFile);
-                Dto_User dtoUser_2 = Dto_User.from("🍊gyul", "1234", "gyul@eMail.com");
+            Dto_User dtoUser_2 = Dto_User.from("🍊gyul", "1234", "gyul@eMail.com");
             Res_User user2 = userService.create(dtoUser_2, Optional.empty());
 
 //                File imageFile3 = new File("/Users/my05030/Desktop/장미연/7-sprint-mission/png/tiger.png");
 //                BufferedImage image3 = ImageIO.read(imageFile3);
-                Dto_User dtoUser_3 = Dto_User.from("🐯호랭이", "1234", "호랭이@eMail.com");
+            Dto_User dtoUser_3 = Dto_User.from("🐯호랭이", "1234", "호랭이@eMail.com");
             Res_User user3 = userService.create(dtoUser_3, Optional.empty());
 
             userService.update(user3.id()

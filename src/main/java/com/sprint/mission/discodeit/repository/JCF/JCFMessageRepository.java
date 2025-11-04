@@ -2,11 +2,10 @@ package com.sprint.mission.discodeit.repository.JCF;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.InterfaceMessageRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository
+//@Repository
 public class JCFMessageRepository implements InterfaceMessageRepository {
     private final Map<UUID, Message> data;
 
