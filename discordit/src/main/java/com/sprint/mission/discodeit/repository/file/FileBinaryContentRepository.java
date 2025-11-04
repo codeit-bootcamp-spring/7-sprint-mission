@@ -40,11 +40,11 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent findById(UUID uuid) {
+    public Optional<BinaryContent> findById(UUID uuid) {
         if (!data.containsKey(uuid)) {
             throw new BinaryContentNotFoundException(uuid);
         }
-        return data.get(uuid);
+        return Optional.ofNullable(data.get(uuid));
     }
 
     @Override
