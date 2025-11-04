@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.dto.response;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public record UserResponseDto (
@@ -12,7 +13,8 @@ public record UserResponseDto (
     String nickName, // 유저 닉네임
     String email, // 이메일
     UUID profileId, // 프로필 ID
-    boolean isOnline //온라인 상태
+    boolean isOnline, //온라인 상태
+    Instant createdAt
 ) {
     public static UserResponseDto from(User user, UserStatus status) {
         return new UserResponseDto(
@@ -21,7 +23,8 @@ public record UserResponseDto (
                 user.getNickName(),
                 user.getEmail(),
                 user.getProfileId(),
-                status.isOnline()
+                status.isOnline(),
+                user.getCreatedAt()
         );
     }
 }

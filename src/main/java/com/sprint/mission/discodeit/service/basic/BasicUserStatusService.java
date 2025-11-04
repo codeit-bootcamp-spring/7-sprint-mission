@@ -63,8 +63,9 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResponseDto updateUserStatus(UpdateUserStatusDto updateDto) {
-        UserStatus userStatus = getUserStatus(updateDto.userStatusId());
+    public UserStatusResponseDto updateUserStatus(UUID id) {
+        UserStatus userStatus = userStatusRepository.findByUserId(id)
+                        .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
         userStatus.statusUpdate(Instant.now());
         UserStatus userstatus = userStatusRepository.save(userStatus);
         return UserStatusResponseDto.from(userstatus);

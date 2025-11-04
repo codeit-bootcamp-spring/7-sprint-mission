@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.update.UpdateUserCommand;
 import com.sprint.mission.discodeit.dto.update.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -94,32 +95,28 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto updateUser(UpdateUserDto updateRequest, CreateBinaryContentRequestDto contentRequest) {
+    public UserResponseDto updateUser(UUID userId, UpdateUserCommand request) {
         //유저 찾기
-        User user = userRepository.findById(updateRequest.userId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         // 프로필 이미지 선택적 로직
-        UUID profileId = null;
-        if(contentRequest != null && contentRequest.data() != null){
+        if(request != null && request.data() != null){
             BinaryContent content = new BinaryContent(
-                    contentRequest.data(),
-                    contentRequest.fileName(),
-                    contentRequest.fileType()
+                    request.data(),
+                    request.fileName(),
+                    request.fileType()
             );
 
             BinaryContent saved = binaryContentRepository.save(content);
-
-            profileId = saved.getId();
+            user.updateProfile(saved.getId());
         }
 
         user.updateInfo(
-                updateRequest.username(),
-                updateRequest.nickName(),
-                updateRequest.email()
+                request.username(),
+                request.nickName(),
+                request.email()
         );
-
-        user.updateProfile(profileId);
 
         User updated = userRepository.save(user);
 
