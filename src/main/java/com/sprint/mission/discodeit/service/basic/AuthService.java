@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf.basic;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.user.response.LoginResponse;

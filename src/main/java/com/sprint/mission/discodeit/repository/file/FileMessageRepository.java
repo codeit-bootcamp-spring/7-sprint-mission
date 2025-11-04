@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.file.FileIo;
-import com.sprint.mission.discodeit.service.file.Path;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 

@@ -2,18 +2,13 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.file.FileIo;
-import com.sprint.mission.discodeit.service.file.Path;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 @Repository
 @ConditionalOnProperty(
