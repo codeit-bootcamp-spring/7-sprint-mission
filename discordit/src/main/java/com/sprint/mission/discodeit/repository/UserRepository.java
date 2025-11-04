@@ -14,6 +14,9 @@ public interface UserRepository {
     Optional<User> findByUserId(String userId);
 
     void delete(User user);
+
+    List<User> findAllByUserIds(List<String> userIds);
+
     void deleteByUserId(String id);
     void deleteById(UUID uuid);
 

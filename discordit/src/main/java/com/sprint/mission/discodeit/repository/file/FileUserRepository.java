@@ -44,6 +44,13 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public List<User> findAllByUserIds(List<String> userIds) {
+        return data.values().stream()
+                .filter(u -> userIds.contains(u.getUserId()))
+                .toList();
+    }
+
+    @Override
     public void deleteByUserId(String userId) {
         data.values().removeIf(u -> u.getUserId().equals(userId));
         write();
