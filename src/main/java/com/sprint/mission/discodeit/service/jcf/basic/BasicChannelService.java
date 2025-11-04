@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf.basic;
 
-import com.sprint.mission.discodeit.dto.channel.request.ChannelCreatePrivateRequest;
-import com.sprint.mission.discodeit.dto.channel.request.ChannelCreatePublicRequest;
+
+import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelCreatePrivateResponse;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelCreatePublicResponse;
@@ -14,12 +14,11 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Service
 public class BasicChannelService implements ChannelService {
@@ -32,7 +31,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public ChannelCreatePrivateResponse createPrivateChannel(ChannelCreatePrivateRequest request) {
+    public ChannelCreatePrivateResponse createPrivateChannel(ChannelCreateRequest request) {
         if(request.channelType() != ChannelType.PRIVATE) {
             throw  new IllegalArgumentException("아니 타입이 다르잖아요");
         }
@@ -46,7 +45,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelCreatePublicResponse createPublicChannel(ChannelCreatePublicRequest request) {
+    public ChannelCreatePublicResponse createPublicChannel(ChannelCreateRequest request) {
         if(request.channelType() != ChannelType.PUBLIC) {
             throw  new IllegalArgumentException("아니 타입이 다르잖아요");
         }

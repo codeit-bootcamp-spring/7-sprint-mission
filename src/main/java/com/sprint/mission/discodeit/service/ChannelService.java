@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 
-import com.sprint.mission.discodeit.dto.channel.request.ChannelCreatePrivateRequest;
-import com.sprint.mission.discodeit.dto.channel.request.ChannelCreatePublicRequest;
+import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelCreatePrivateResponse;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelCreatePublicResponse;
@@ -14,8 +13,8 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-    ChannelCreatePrivateResponse createPrivateChannel(ChannelCreatePrivateRequest request);
-    ChannelCreatePublicResponse createPublicChannel(ChannelCreatePublicRequest request);
+    ChannelCreatePrivateResponse createPrivateChannel(ChannelCreateRequest request);
+    ChannelCreatePublicResponse createPublicChannel(ChannelCreateRequest request);
 
     ChannelFindResponse find(UUID channelId);
     List<ChannelFindResponse> findAll();

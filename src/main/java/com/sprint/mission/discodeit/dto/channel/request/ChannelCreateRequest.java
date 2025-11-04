@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.UUID;
 
-public record ChannelCreatePrivateRequest(
+public record ChannelCreateRequest(
           UUID bose
         , String chennalName
         , ChannelType channelType
