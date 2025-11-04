@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>보노보노 스타일 유저 리스트 통합</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            overflow-x: hidden;
+            position: relative;
+            /* 배경: 무지개 + 보노보노 PNG */
+            background:
+                    url('/image/보노보노_PNG.png') no-repeat 70% 70% fixed, /* 70% 70% = 오른쪽 아래 5시 방향 */
+                    linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+            background-size: 250px auto, cover; /* 보노보노 이미지 크기 + 배경 커버 */
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff6f91;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        /* 좌측 글자 */
+        #leftText, #rightText {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            font-size: 3em;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        #leftText { left: 0; align-items: flex-start; }
+        #rightText { right: 0; align-items: flex-end; }
+
+        /* 무지개 글자 */
+        .left-letter:nth-child(1), .right-letter:nth-child(1) { color: #FF0000; }
+        .left-letter:nth-child(2), .right-letter:nth-child(2) { color: #FF7F00; }
+        .left-letter:nth-child(3), .right-letter:nth-child(3) { color: #FFFF00; }
+        .left-letter:nth-child(4), .right-letter:nth-child(4) { color: #00FF00; }
+        .left-letter:nth-child(5), .right-letter:nth-child(5) { color: #0000FF; }
+        .left-letter:nth-child(6), .right-letter:nth-child(6) { color: #4B0082; }
+        .left-letter:nth-child(7), .right-letter:nth-child(7) { color: #8B00FF; }
+
+        /* 중앙 회전 문구 */
+        #centerText1, #centerText2 {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform-origin: center;
+            font-size: 4em;
+            font-weight: bold;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #centerText1 { transform: translate(-50%, -50%) rotate(45deg); }
+        #centerText2 { transform: translate(-50%, -50%) rotate(-45deg); }
+
+        /* 유저 카드 리스트 */
+        .user-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            z-index: 1; /* 중앙 문구 위에 오지 않게 */
+            position: relative;
+        }
+
+        .user-item {
+            background-color: #fff3e0;
+            border-radius: 25px;
+            width: 200px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 3px 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .user-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 5px 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .user-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid #ffcc80;
+            margin-bottom: 10px;
+        }
+
+        .user-info { font-size: 0.9em; color: #6d4c41; }
+        .user-name { font-weight: bold; margin-bottom: 5px; }
+        .user-email { font-style: italic; }
+        .user-created { font-size: 0.8em; margin-top: 3px; color: #8d6e63; }
+
+        .status-badge {
+            margin-top: 10px;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            color: white;
+            display: inline-block;
+        }
+        .status-badge.online { background-color: #81c784; }
+        .status-badge.offline { background-color: #e57373; }
+
+    </style>
+</head>
+<body>
+
+<!-- 좌우 글자 -->
+<div id="leftText">
+    <span class="left-letter">J</span>
+    <span class="left-letter">A</span>
+    <span class="left-letter">V</span>
+    <span class="left-letter">A</span>
+    <span class="left-letter">의</span>
+    <span class="left-letter">정</span>
+    <span class="left-letter">수</span>
+</div>
+<div id="rightText">
+    <span class="right-letter">보</span>
+    <span class="right-letter">노</span>
+    <span class="right-letter">보</span>
+    <span class="right-letter">노</span>
+    <span class="right-letter">의</span>
+    <span class="right-letter">미</span>
+    <span class="right-letter">학</span>
+</div>
+<h1>🐾 유저 목록</h1>
+<!-- 중앙 회전 문구 -->
+<div id="centerText1">즐겁다</div>
+<div id="centerText2">최강열차 스프린티 7기</div>
+
+<!-- 유저 카드 리스트 -->
+<div id="userList" class="user-list"></div>
+
+<script>
+    // 예시 API 엔드포인트
+    const API_BASE_URL = '/api';
+    const ENDPOINTS = {
+        USERS: `${API_BASE_URL}/user/findAll`,
+        BINARY_CONTENT: `${API_BASE_URL}/binaryContent/find`
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchAndRenderUsers();
+    });
+
+    async function fetchUserProfile(profileId) {
+        try {
+            const response = await fetch(`${ENDPOINTS.BINARY_CONTENT}?binaryContentId=${profileId}`);
+            if (!response.ok) throw new Error('프로필 이미지 가져오기 실패');
+            const profile = await response.json();
+            return `data:${profile.binaryContentUsage};base64,${profile.binaryFile}`;
+        } catch (error) {
+            console.error(error);
+            return '/default-avatar.png';
+        }
+    }
+
+    async function fetchAndRenderUsers() {
+        try {
+            const response = await fetch(ENDPOINTS.USERS);
+            if (!response.ok) throw new Error('유저 정보를 가져오는데 실패했습니다.');
+            const users = await response.json();
+            renderUserList(users);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function renderUserList(users) {
+        const container = document.getElementById('userList');
+        container.innerHTML = '';
+
+        for (const user of users) {
+            const profileUrl = user.profileId ? await fetchUserProfile(user.profileId) : '/default-avatar.png';
+            const card = document.createElement('div');
+            card.className = 'user-item';
+            card.innerHTML = `
+            <img src="${profileUrl}" alt="${user.username}" class="user-avatar">
+            <div class="user-info">
+                <div class="user-name">${user.username}</div>
+                <div class="user-email">${user.email}</div>
+                <div class="user-created">가입: ${new Date(user.createdAt).toLocaleDateString()}</div>
+            </div>
+            <div class="status-badge ${user.online ? 'online' : 'offline'}">
+                ${user.online ? '온라인' : '오프라인'}
+            </div>
+        `;
+            container.appendChild(card);
+        }
+    }
+</script>
+
+</body>
+</html>

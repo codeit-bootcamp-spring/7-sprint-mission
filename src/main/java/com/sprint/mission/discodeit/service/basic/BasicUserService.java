@@ -112,8 +112,9 @@ public class BasicUserService implements UserService {
         List<Channel> channelList = channelRepository.getAllChannel();
         List<Message> messageList = messageRepository.getAllMessage();
         List<UserStatus> userStatusList = userStatusRepository.readAllUserStatus();
-        if (binaryContentRepository.isBinaryContentExist(userId)) {
-            binaryContentRepository.deleteBinaryContent(userId);
+        User targetUser = userRepository.getUserById(userId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        if (binaryContentRepository.isBinaryContentExist(targetUser.getProfileId())) {
+            binaryContentRepository.deleteBinaryContent(targetUser.getProfileId());
         }
         UserStatus targetUserStatus = userStatusList.stream().filter(x -> x.getUserId().equals(userId)).findFirst().orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
 
