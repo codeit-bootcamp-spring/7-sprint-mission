@@ -60,6 +60,12 @@ public class BasicMessageService implements MessageService {
         messageRepository.save(newMessage);
     }
 
+    @Override
+    public Message find(UUID messageId) {
+        return messageRepository.findById(messageId).
+                orElseThrow(() -> new IllegalArgumentException("메시지가 존재하지 않습니다."));
+    }
+
     /**
      * 특정 유저/채널과의 최신 메시지를 조회
      */

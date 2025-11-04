@@ -23,6 +23,8 @@ public interface MessageService {
     /** 새로운 메시지를 생성 */
     void create(CreateMessageRequestDto request, List<MultipartFile> fileList);
 
+    Message find(UUID messageId);
+
     /** 두 유저 또는 채널 간의 최신 메시지(가장 마지막 메시지)를 가져옴 */
     Message findLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType);
 
