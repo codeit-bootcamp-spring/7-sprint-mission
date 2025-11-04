@@ -1,84 +1,63 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.file.FileIo;
+import com.sprint.mission.discodeit.service.file.Path;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
-import com.sprint.mission.discodeit.service.file.ReadService;
-import com.sprint.mission.discodeit.service.file.LoadService;
 
-
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "file",
+        matchIfMissing = true
+)
 public class FileChannelRepository implements ChannelRepository {
 
     private static final String filename = "channels";
 
-    private List<Channel> loadAll() {
-        List<Channel> list = ReadService.read(filename, Channel.class);
-        return (list != null) ? list : new LinkedList<>();
-    }
 
-    private void saveAll(List<Channel> list) {
-        LoadService.load(filename, list);
-    }
-
+    //로드 세이브
+    //근데 잘해보면 한번에 할수있겟는데?
     @Override
-    public Channel create(User user, String channelName) {
-        Channel ch = new Channel(user, channelName);
-        List<Channel> channels = loadAll();
-        channels.add(ch);
-        saveAll(channels);
-        System.out.printf("%s가 채널을 만들었습니다\n", user.getUserName());
-        return ch;
-    }
-
-    @Override
-    public Channel read(UUID channelId) {
-        List<Channel> channels = loadAll();
-        Channel channel = channels.stream()
-                .filter(ch -> ch.getId().equals(channelId))
-                .findFirst()
-                .orElse(null);
-
-        if (channel == null) {
-            System.out.println("해당 채널 없습니다: " + channelId);
-        } else {
-            System.out.println(channel);
-        }
+    public Channel save(Channel channel) {
+        FileIo.save(filename, channel);
         return channel;
     }
 
     @Override
-    public List<Channel> readAll() {
-        List<Channel> channels = loadAll();
-        System.out.printf("%d개의 채널@@@\n", channels.size());
-        channels.forEach(System.out::println);
-        return channels;
+    public Optional<Channel> findById(UUID id) {
+        return FileIo.read(filename, id, Channel.class);
     }
 
     @Override
-    public Channel update(UUID channelId, Consumer<Channel> updater) {
-        System.out.println("수정");
-        List<Channel> channels = loadAll();
-        Channel channel = channels.stream()
-                .filter(ch -> ch.getId().equals(channelId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + channelId));
-
-        updater.accept(channel);
-        saveAll(channels);
-        return channel;
+    public List<Channel> findAll() {
+        return FileIo.readAll(filename, Channel.class);
     }
 
     @Override
-    public boolean delete(UUID channelId) {
-        List<Channel> channels = loadAll();
-        boolean removed = channels.removeIf(ch -> ch.getId().equals(channelId));
-        if (removed) {
-            saveAll(channels);
+    public boolean existsById(UUID id) {
+        String path = Path.RooT_PATH.getPath() + "/" + filename + "/" + id + ".sav";
+        File file = new File(path);
+        return file.exists();
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        String path = Path.RooT_PATH.getPath() + "/" + filename + "/" + id + ".sav";
+        File file = new File(path);
+        if (file.exists()) {
+            file.delete();
         }
-        return removed;
     }
 }

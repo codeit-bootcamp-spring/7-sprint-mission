@@ -1,74 +1,50 @@
 package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.entity.User;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.User;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "jcf"
+)
 public class JCFUserRepository implements UserRepository {
 
-    // 메모리에만 저장
-    private final List<User> users = new ArrayList<>();
+    private final Map<UUID, User> data;
 
-
-    private static final JCFUserRepository INSTANCE = new JCFUserRepository();
-    public static JCFUserRepository getInstance() { return INSTANCE; }
-    private JCFUserRepository() {}
+    public JCFUserRepository() {
+        this.data = new ConcurrentHashMap<>();
+    }
 
     @Override
-    public User create(String userId, String password, String userName, String userNickname) {
-        User user = new User(userId, password, userName, userNickname);
-        users.add(user);
+    public User save(User user) {
+        this.data.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User read(UUID userId) {
-        return users.stream()
-                .filter(u -> u.getId().equals(userId))
-                .findFirst()
-                .orElse(null);
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public List<User> readAll() {
-        return new ArrayList<>(users);
+    public List<User> findAll() {
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public boolean delete(UUID userId) {
-        return users.removeIf(u -> u.getId().equals(userId));
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public User updateName(UUID uuid, String userName) {
-        User u = users.stream()
-                .filter(x -> x.getId().equals(uuid))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + uuid));
-        u.setUserName(userName);
-        return u;
-    }
-
-    @Override
-    public User updateNickName(UUID uuid, String userNickname) {
-        User u = users.stream()
-                .filter(x -> x.getId().equals(uuid))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + uuid));
-        u.setUserNickname(userNickname);
-        return u;
-    }
-
-    @Override
-    public User update(UUID uuid, Consumer<User> updater) {
-        User u = users.stream()
-                .filter(x -> x.getId().equals(uuid))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("고유넘버 없다: " + uuid));
-        updater.accept(u);
-        return u;
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }
