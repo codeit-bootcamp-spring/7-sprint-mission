@@ -51,6 +51,7 @@ public class BasicChannelService implements ChannelService {
             .joinUserList(userIdList)
             .description(channelPrivateCreateRequestDto.getDescription())
             .build();
+    userList.forEach(x->x.addChannel(channel.getId()));
 
        channelPrivateCreateRequestDto.getUserIdList().stream().map(
                 x ->

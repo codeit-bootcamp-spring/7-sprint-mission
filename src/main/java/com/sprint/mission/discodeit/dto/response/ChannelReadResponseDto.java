@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.dto.response;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,6 +13,8 @@ import java.util.UUID;
 @Getter
 @Builder
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChannelReadResponseDto {
 
     private Instant recentPostTime;
@@ -34,6 +34,5 @@ public class ChannelReadResponseDto {
                 .recentPostTime(readStatus.getReadLastTime())
                 .build();
     }
-
 
 }

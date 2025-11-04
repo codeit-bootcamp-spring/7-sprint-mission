@@ -66,5 +66,9 @@ public class MessageController {
         messageService.resetMessage();
     }
 
+    @RequestMapping("/readAll")
+    public List<MessageReadResponseDto> readAll(){
+        return messageService.readAllMessage();
+    }
 
 }
