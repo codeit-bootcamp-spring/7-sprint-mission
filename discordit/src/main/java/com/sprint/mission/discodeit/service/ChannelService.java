@@ -21,7 +21,6 @@ public interface ChannelService {
 
     ChannelResponse getById(UUID uuid);
     List<ChannelResponse> getAll();
-    ChannelResponse getNth(int index);
 
     List<ChannelResponse> getAllVisibleByUserId(GetVisibleChannelRequest dto);
 
