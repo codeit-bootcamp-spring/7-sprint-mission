@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.ChannelReadResponseDto;
 import com.sprint.mission.discodeit.dto.response.MessageReadResponseDto;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
@@ -38,8 +39,11 @@ public class BasicMessageService implements MessageService {
     public MessageReadResponseDto createMessage(MessageCreateRequestDto messageCreateRequestDto){
         //todo channel id 랑 sender id 관련 안전성 확인, 일단 지금은 안함
         List<Channel> channelList = channelRepository.getAllChannel();
+        Channel channel2 = channelRepository.getChannelById(messageCreateRequestDto.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
+        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(messageCreateRequestDto.getSenderId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
         Message message;
-        if(messageCreateRequestDto.getAttachmentIdList().size()>0) {
+        if(!messageCreateRequestDto.getAttachmentIdList().isEmpty()) {
+            System.out.println("attachment list");
             message = messageRepository.saveMessage(Message.builder()
                     .content(messageCreateRequestDto.getContent())
                     .channelId(messageCreateRequestDto.getChannelId())
@@ -65,11 +69,11 @@ public class BasicMessageService implements MessageService {
                     .channelId(messageCreateRequestDto.getChannelId())
                             .senderId(messageCreateRequestDto.getSenderId())
                             .isMarkDown(messageCreateRequestDto.isMarkDown())
+                            .attachmentIdList(new HashSet<>())
                     .build()
             );
         }
-        Channel channel2 = channelRepository.getChannelById(message.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
-        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(message.getSenderId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
+
         channel2.getMessageIdList().add(message.getId());
         channelRepository.updateChannel(channel2);
         return MessageReadResponseDto.from(message);
@@ -85,8 +89,10 @@ public class BasicMessageService implements MessageService {
     public void deleteMessage(UUID messageId){
         List<BinaryContent> binaryContentList = binaryContentRepository.readAllBinaryContent();
         Message message = messageRepository.getMessageById(messageId).orElseThrow(()->new IllegalArgumentException("Message not found"));
-        HashSet<UUID> attatchmentIdList = message.getAttachmentIdList();
-        attatchmentIdList.forEach(binaryContentRepository::deleteBinaryContent);
+        if(message.getAttachmentIdList()!=null) {
+            HashSet<UUID> attatchmentIdList = message.getAttachmentIdList();
+            attatchmentIdList.forEach(binaryContentRepository::deleteBinaryContent);
+        }
         Channel channel = channelRepository.getChannelById(message.getChannelId()).orElseThrow(() -> new IllegalArgumentException("Channel not found"));
         channel.getMessageIdList().remove(messageId);
         channelRepository.updateChannel(channel);
@@ -123,4 +129,6 @@ public class BasicMessageService implements MessageService {
     public void resetMessage() {
         messageRepository.getAllMessage().forEach(x-> deleteMessage(x.getId()));
     }
+
+
 }

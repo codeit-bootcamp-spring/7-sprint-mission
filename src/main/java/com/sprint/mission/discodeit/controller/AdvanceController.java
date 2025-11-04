@@ -30,9 +30,4 @@ public class AdvanceController {
     public ResponseEntity<BinaryContent> advanceFindBinaryContent(@RequestParam UUID binaryContentId){
         return ResponseEntity.ok(binaryContentService.find(binaryContentId));
     }
-
-    @RequestMapping(value = "")
-    public String showWebPage(){
-        return "user-list-bonobono";
-    }
 }

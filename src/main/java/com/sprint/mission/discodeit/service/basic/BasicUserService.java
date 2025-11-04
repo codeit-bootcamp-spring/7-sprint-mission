@@ -5,17 +5,16 @@ import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileCreateReque
 import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.dto.response.UserReadResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
-import com.sprint.mission.discodeit.entityElement.UserElement;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -207,5 +206,20 @@ public class BasicUserService implements UserService {
     @Override
     public void resetUserRepository() {
         userRepository.getAllUser().forEach(x->deleteUser(x.getId()));
+    }
+
+    @Override
+    public List<UserDto> advanceFindAllUser(){
+        return userRepository.getAllUser().stream().map(
+        x-> UserDto.builder()
+                .id(x.getId())
+                .createdAt(x.getCreatedAt())
+                .updatedAt(x.getUpdatedAt())
+                .username(x.getUserName())
+                .email(x.getEmail())
+                .profileId(x.getProfileId() == null? null: x.getProfileId())
+                .online(x.isOnline())
+                .build()
+                ).toList();
     }
 }
