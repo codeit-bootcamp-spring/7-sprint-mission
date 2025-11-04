@@ -195,7 +195,7 @@ public class DiscodeitSpringTest {
                     Printer.printChatHistory(userService, loginUser, msgs);
                 } else if (input.equals("-1")) break;
                 else {
-                    messageService.create(new CreateMessageRequestDto(loginUser.getId(), receiver.getId(), input, ReceiveType.USER, null));
+                    messageService.create(new CreateMessageRequestDto(loginUser.getId(), receiver.getId(), input, ReceiveType.USER), null);
                 }
             }
 
@@ -403,7 +403,7 @@ public class DiscodeitSpringTest {
                     Printer.printChatHistory(userService, loginUser, channelMessages);
                 } else if (input.equals("-1")) return;
                 else {
-                    messageService.create(new CreateMessageRequestDto(loginUser.getId(), channel.getId(), input, ReceiveType.CHANNEL, null));
+                    messageService.create(new CreateMessageRequestDto(loginUser.getId(), channel.getId(), input, ReceiveType.CHANNEL), null);
                 }
             }
 
@@ -777,7 +777,7 @@ public class DiscodeitSpringTest {
                     System.out.println("내용을 입력해 수정하세요.");
                     System.out.printf("기존 메시지 : %s\n", choiceMsg.getContent());
                     System.out.printf("입력 : ");
-                    messageService.update(new UpdateMessageRequestDto(choiceMsg.getId(), sc.nextLine()));
+                    messageService.update(choiceMsg.getId(), new UpdateMessageRequestDto(sc.nextLine()));
                     System.out.println("메시지가 수정되었습니다.");
                 }
                 case 2 -> {

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.UUID;
 public interface MessageService {
 
     /** 새로운 메시지를 생성 */
-    void create(CreateMessageRequestDto request);
+    void create(CreateMessageRequestDto request, List<MultipartFile> fileList);
 
     /** 두 유저 또는 채널 간의 최신 메시지(가장 마지막 메시지)를 가져옴 */
     Message findLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType);
@@ -35,7 +36,7 @@ public interface MessageService {
     List<Message> findAllSentBetweenUsers(UUID senderId, UUID receiverId);
 
     /** 메시지 내용(content)을 수정 */
-    void update(UpdateMessageRequestDto request);
+    void update(UUID messageId, UpdateMessageRequestDto request);
 
     /** 특정 메시지를 UUID로 삭제 */
     void delete(UUID messageId);

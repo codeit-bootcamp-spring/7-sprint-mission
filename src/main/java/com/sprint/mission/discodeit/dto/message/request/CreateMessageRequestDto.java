@@ -15,5 +15,4 @@ public class CreateMessageRequestDto {
     UUID receiverId;
     String content;
     ReceiveType receiveType;
-    List<BinaryContent> binaryContents;
 }

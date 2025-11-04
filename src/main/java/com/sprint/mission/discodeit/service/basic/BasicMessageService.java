@@ -8,7 +8,9 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,7 +36,7 @@ public class BasicMessageService implements MessageService {
      * 새로운 메시지를 생성하여 Repository에 저장
      */
     @Override
-    public void create(CreateMessageRequestDto request) {
+    public void create(CreateMessageRequestDto request, List<MultipartFile> fileList) {
         Message newMessage = new Message(
                 request.getSenderId(),
                 request.getReceiverId(),
@@ -43,11 +45,15 @@ public class BasicMessageService implements MessageService {
         );
 
         // 메시지에 첨부된 파일이 있는 경우에만 파일 저장
-        Optional.ofNullable(request.getBinaryContents()).ifPresent(
+        Optional.ofNullable(fileList).ifPresent(
                 files -> files.forEach(file -> {
-                    new BinaryContent(file.getContent());
-                    newMessage.addAttachmentId(file.getId()); // 메시지에 파일 UUID 값 저장
-                    binaryContentRepository.save(file);
+                    try {
+                        BinaryContent fileBytes = new BinaryContent(file.getBytes());
+                        newMessage.addAttachmentId(fileBytes.getId()); // 메시지에 파일 UUID 값 저장
+                        binaryContentRepository.save(fileBytes);
+                    } catch (IOException e) {
+                        throw new RuntimeException("파일 업로드 실패", e);
+                    }
                 })
         );
 
@@ -119,8 +125,8 @@ public class BasicMessageService implements MessageService {
      * 메시지 내용(content) 수정
      */
     @Override
-    public void update(UpdateMessageRequestDto request) {
-        Message message = messageRepository.findById(request.getId())
+    public void update(UUID messageId, UpdateMessageRequestDto request) {
+        Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new IllegalStateException("메시지가 존재하지 않습니다."));
         message.setContent(request.getContent());
         messageRepository.update(message);
