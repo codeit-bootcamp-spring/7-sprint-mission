@@ -78,7 +78,15 @@ public class BasicUserService implements UserService {
     }
 
     private static UserDto toDto(User u, boolean online, UUID profileImageId) {
-        return new UserDto(u.getId(), u.getUsername(), u.getEmail(), online, profileImageId);
+        return new UserDto(
+                u.getId(),
+                u.getCreatedAt(),
+                u.getUpdatedAt(),
+                u.getUsername(),
+                u.getEmail(),
+                profileImageId,
+                online
+        );
     }
 
     /* ---------- 구현 ---------- */

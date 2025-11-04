@@ -1,45 +1,25 @@
 package com.sprint.mission.discodeit.controller;
 
-
-import com.sprint.mission.discodeit.dto.binary.*;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
 
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/binaries")
+@RequestMapping("/api/binaryContent")
+@RequiredArgsConstructor
 public class BinaryContentController {
 
+    private final BinaryContentRepository binaryContentRepository;
 
-    private final BinaryContentService binaryContentService;
-
-
-    public BinaryContentController(BinaryContentService binaryContentService) {
-        this.binaryContentService = binaryContentService;
-    }
-
-
-    @RequestMapping(method = RequestMethod.POST)
-    public BinaryContentDto create(@RequestBody BinaryContentCreateRequest request) {
-        return binaryContentService.create(request);
-    }
-
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public BinaryContentDto find(@PathVariable UUID id) {
-        return binaryContentService.find(id);
-    }
-
-
-    @RequestMapping(value = "/bulk", method = RequestMethod.POST)
-    public List<BinaryContentDto> findAllByIds(@RequestBody List<UUID> ids) {
-        return binaryContentService.findAllByIdIn(ids);
-    }
-
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public void delete(@PathVariable UUID id) {
-        binaryContentService.delete(id);
+    // ✅ BinaryContent 조회 (심화 요구사항)
+    @GetMapping("/find")
+    public ResponseEntity<BinaryContent> find(@RequestParam UUID binaryContentId) {
+        return binaryContentRepository.findById(binaryContentId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
