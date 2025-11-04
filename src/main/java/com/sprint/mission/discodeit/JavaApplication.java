@@ -16,15 +16,15 @@ public class JavaApplication {
 
     public static void main(String[] args) {
 
-//       //JCF 테스트
-//       JCFUserService userService = JCFUserService.getInstance();
-//       JCFChannelService channelService = JCFChannelService.getInstance();
-//       JCFMessageService messageService = JCFMessageService.getInstance();
-
-        // File 테스트
-        FileUserService userService = new FileUserService();
-        FileChannelService channelService = new FileChannelService();
-        FileMessageService messageService = new FileMessageService();
+       //JCF 테스트
+       JCFUserService userService = JCFUserService.getInstance();
+       JCFChannelService channelService = JCFChannelService.getInstance();
+       JCFMessageService messageService = JCFMessageService.getInstance();
+//
+//        // File 테스트
+//        FileUserService userService = new FileUserService();
+//        FileChannelService channelService = new FileChannelService();
+//        FileMessageService messageService = new FileMessageService();
 
         System.out.println("==== User 테스트 ====");
 

@@ -2,22 +2,14 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> channels = new HashMap<>();
-
-    private static JCFChannelRepository instance;
-    private JCFChannelRepository() {}
-
-    public static JCFChannelRepository getInstance(){
-        if(instance == null){
-            instance = new JCFChannelRepository();
-        }
-        return instance;
-    }
 
     @Override
     public Channel save(Channel channel) {
@@ -26,17 +18,17 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID uuid) {
-        return channels.get(uuid);
+    public Optional<Channel> findById(UUID uuid) {
+
+        return Optional.ofNullable(channels.get(uuid));
     }
 
     @Override
-    public Channel findByName(String channelName) {
+    public Optional<Channel> findByName(String channelName) {
         return channels.values()
                 .stream()
-                .filter(c -> c.getChannelName().equals(channelName))
-                .findFirst()
-                .orElse(null);
+                .filter(channel -> channel.getChannelName().equals(channelName))
+                .findFirst();
     }
 
     @Override

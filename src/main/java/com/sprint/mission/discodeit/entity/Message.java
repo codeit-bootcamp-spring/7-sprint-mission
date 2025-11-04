@@ -1,34 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Message extends BasicEntity{
 
-    private final UUID sender; //보내는 사람
-    private final UUID receiver; // 받는 사람
-    private String content; // 메시지 내용
+    private String content; // 메시지
+    private final UUID authorId; // 유저ID
+    private final UUID channelId; // 채널ID
+    private List<UUID> attachmentIds; // 첨부파일
 
-    public Message(UUID sender, UUID receiver, String content) {
+
+    public Message(String content, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
         super();
-        this.sender = sender;
-        this.receiver = receiver;
         this.content = content;
+        this.authorId = authorId;
+        this.channelId = channelId;
+        this.attachmentIds = attachmentIds;
     }
 
-    public UUID getSender() {
-        return sender;
-    }
-
-    public UUID getReceiver() {
-        return receiver;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) { //메시지 보내기
-        this.content = content;
+    public void updateContent(String newContent) {
+        this.content = newContent;
         update();
     }
 }
