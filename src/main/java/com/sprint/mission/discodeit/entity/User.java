@@ -1,17 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.util.UUID;
 
 @Getter
-@ToString
-@Builder
-@AllArgsConstructor
 public class User extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
