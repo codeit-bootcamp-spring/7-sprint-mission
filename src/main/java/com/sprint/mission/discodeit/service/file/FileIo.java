@@ -68,7 +68,7 @@ public class FileIo {
         if (files == null || files.length == 0) {
             return List.of();
         }
-
+        System.out.println("ㅇㅇ");
         return Arrays.stream(files)
                 .map(file -> file.getName().replace(".sav", ""))
                 .map(name -> {

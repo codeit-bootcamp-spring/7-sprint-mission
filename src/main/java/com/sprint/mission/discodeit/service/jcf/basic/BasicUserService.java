@@ -102,15 +102,15 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserUpdateResponse update(UUID uuid, UserUpdateRequest userUpdateRequest) {
+    public UserUpdateResponse update(UserUpdateRequest userUpdateRequest) {
         //id있는지확인
-        User user = userRepository.findById(uuid)
-                .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+uuid));
+        User user = userRepository.findById(userUpdateRequest.userId())
+                .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+userUpdateRequest.userId()));
         //저장용
          user.update(userUpdateRequest);//업데이트했으니 갱신해야지
           userRepository.save(user);
           //폼으로 바로넣고주자
-        return UserUpdateResponse.from(uuid,user);
+        return UserUpdateResponse.from(userUpdateRequest.userId(),user);
     }
 
     @Override

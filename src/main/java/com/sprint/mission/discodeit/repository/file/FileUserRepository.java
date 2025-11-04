@@ -42,7 +42,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return FileIo.readAll(filename, User.class);
+        return FileIo.readAll(filename,User.class);
     }
 
     @Override

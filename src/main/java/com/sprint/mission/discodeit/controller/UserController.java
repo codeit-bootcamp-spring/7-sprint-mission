@@ -26,22 +26,25 @@ public class UserController {
      private final UserStatusService userStatusService;
 
     // [등록]
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping("/create")
     public UserCreateResponse create(@RequestBody UserCreateRequest req) { return userService.create(req); }
 
     // [수정]
-    @RequestMapping(value="/update", method = RequestMethod.PUT)
-    public UserUpdateResponse update(@RequestBody UserUpdateRequest req) { return userService.update(req.userId(),req); }
+    @PutMapping("/update")
+    public UserUpdateResponse update(@RequestBody UserUpdateRequest req) {
+        return userService.update(req);
+    }
 
     // [삭제]
-    @RequestMapping(value="/delete", method = RequestMethod.POST)
+    @PostMapping("/delete")
     public void delete(@RequestBody UserDeleteRequest req) { userService.delete(req.userId()); }
 
     // [전체 조회]
-    @RequestMapping(value="/findAll",method = RequestMethod.POST)
+    @PostMapping("/findAll")
     public List<UserFindResponse> findAll() { return userService.findAll(); }
 
     // [온라인 상태 업데이트]
+    @PatchMapping("/userStatus")
     @RequestMapping(value="/userStatus", method = RequestMethod.PATCH)
     public UserStatusResponse updateStatus(@RequestBody UserStatustUpdateRequest req) {
         return userStatusService.update(req);

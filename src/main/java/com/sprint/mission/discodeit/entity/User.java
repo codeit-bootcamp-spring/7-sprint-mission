@@ -59,8 +59,8 @@ public class User extends Common implements Serializable {
             this.UserEmail = userUpdateRequest.email();
             anyValueUpdated = true;
         }
-        if (userUpdateRequest.Password() != null && !userUpdateRequest.Password().equals(this.password)) {
-            this.password = userUpdateRequest.Password();
+        if (userUpdateRequest.password() != null && !userUpdateRequest.password().equals(this.password)) {
+            this.password = userUpdateRequest.password();
             anyValueUpdated = true;
         }
         if (userUpdateRequest.userNickname() != null && !userUpdateRequest.userNickname().equals(this.userNickname)) {
