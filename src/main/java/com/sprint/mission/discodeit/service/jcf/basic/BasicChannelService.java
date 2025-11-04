@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelCreatePrivateResponse;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelCreatePublicResponse;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelFindResponse;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelUpdateResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -116,19 +117,20 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(ChannelUpdateRequest request) {
+    public ChannelUpdateResponse update(ChannelUpdateRequest request) {
         Channel channel = channelRepository.findById(request.channelId())
                 .orElseThrow(() -> new NoSuchElementException("채널을 찾을수가 없어 " + request.channelId() ));
 
         //채널이 퍼블릭이면 수정해서 넣어주고
         if(channel.getType() != ChannelType.PRIVATE) {
             //수정해서
-            channel.update(request.newChannelName(), request.newBose(),request.newUsers(),request.newDescription());
+            channel.update(request.newChannelName(),request.newDescription());
             //저장동시 리턴값 수정한 채널
-            return channelRepository.save(channel);
+            return ChannelUpdateResponse.from(channelRepository.save(channel));
         }
         //아니야 프라이빗이야 그냥 수정전채널
-        return channel;
+        System.out.println("수정불가 그대로 반환");
+        return ChannelUpdateResponse.from(channel) ;
     }
 
     @Override
