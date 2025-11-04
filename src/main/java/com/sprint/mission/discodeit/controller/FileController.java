@@ -27,4 +27,9 @@ public class FileController {
     public List<BinaryContent> readAll(){
         return binaryContentService.findAll();
     }
+
+    @RequestMapping("/reset")
+    public void reset(){
+        binaryContentService.resetBinaryContentService();
+    }
 }

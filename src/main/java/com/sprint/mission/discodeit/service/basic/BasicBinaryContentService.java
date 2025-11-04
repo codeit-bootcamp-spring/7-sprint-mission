@@ -48,4 +48,9 @@ public class BasicBinaryContentService implements BinaryContentService {
     public List<BinaryContent> findAll() {
         return binaryContentRepository.readAllBinaryContent();
     }
+
+    @Override
+    public void resetBinaryContentService() {
+        binaryContentRepository.resetBinaryContentRepository();
+    }
 }
