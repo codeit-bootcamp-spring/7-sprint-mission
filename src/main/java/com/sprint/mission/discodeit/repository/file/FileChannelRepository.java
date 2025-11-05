@@ -29,7 +29,7 @@ public class FileChannelRepository extends BaseFileRepository<Channel> implement
     @Override
     public List<Channel> findAllByUserId(UUID userId) {
         return findAllFiles().stream()
-                .filter(ch -> ch.getUsers().contains(userId))
+                .filter(ch -> ch.getUserIds().contains(userId))
                 .toList();
     }
     
@@ -67,7 +67,7 @@ public class FileChannelRepository extends BaseFileRepository<Channel> implement
     public boolean isMember(UUID userId, UUID channelId) {
         return findAllFiles().stream()
                 .filter(ch -> ch.getId().equals(channelId))
-                .anyMatch(ch -> ch.getUsers().contains(userId));
+                .anyMatch(ch -> ch.getUserIds().contains(userId));
     }
 
     @Override

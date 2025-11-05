@@ -30,7 +30,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public List<Channel> findAllByUserId(UUID userId) {
         return findAll().stream()
-                .filter(ch -> ch.getUsers().contains(userId))
+                .filter(ch -> ch.getUserIds().contains(userId))
                 .toList();
     }
 
@@ -66,7 +66,7 @@ public class JCFChannelRepository implements ChannelRepository {
     public boolean isMember(UUID userId, UUID channelId) {
         return findAll().stream()
                 .filter(ch -> ch.getId().equals(channelId))
-                .anyMatch(ch -> ch.getUsers().contains(userId));
+                .anyMatch(ch -> ch.getUserIds().contains(userId));
     }
 
     @Override
