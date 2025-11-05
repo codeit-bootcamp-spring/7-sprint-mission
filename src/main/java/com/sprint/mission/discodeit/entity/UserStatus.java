@@ -25,7 +25,7 @@ public class UserStatus extends Common {
 
     public void update(Instant loginAt) {
         boolean isUpdate = false;
-        if(this.loginAt != null && this.loginAt.equals(loginAt)) {
+        if(this.loginAt != null && !this.loginAt.equals(loginAt)) {
             this.loginAt = loginAt;
             isUpdate = true;
         }
@@ -34,11 +34,10 @@ public class UserStatus extends Common {
     }
 
     public UserStatusType isOnline() {
-        Duration duration = Duration.between(loginAt, Instant.now());
-        if(duration.toSeconds() <= 300) {
+        System.out.println("현재 시간은: " + Instant.now());
+        if(Duration.between(loginAt, Instant.now()).toSeconds() <= 300) {
             return UserStatusType.ONLINE;
         }
-
         return UserStatusType.OFFLINE;
     }
 

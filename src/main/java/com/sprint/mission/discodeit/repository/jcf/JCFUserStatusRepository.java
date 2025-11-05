@@ -41,7 +41,8 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public boolean existsByUserId(UUID userId) {
-        return userStatuses.containsKey(userId);
+        return userStatuses.values().stream()
+                .anyMatch(userStatus -> userStatus.getUserId().equals(userId));
     }
 
     @Override
