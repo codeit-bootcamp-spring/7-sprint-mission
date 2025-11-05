@@ -18,7 +18,9 @@ public interface ReadStatusRepository {
     void delete(ReadStatus readStatus);
     void deleteAllByUser(User user);
     void deleteAllByChannel(Channel channel);
-    void deleteById(UUID uuid);
+    void delete(UUID uuid);
 
     List<ReadStatus> findAllByUser(User user);
+
+    void update(ReadStatus readStatus);
 }
