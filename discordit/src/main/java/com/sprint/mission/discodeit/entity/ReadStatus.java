@@ -19,6 +19,7 @@ public class ReadStatus{
     }
 
     public ReadStatus(User user, Channel channel) {
+        id = UUID.randomUUID();
         this.user = user;
         this.channel = channel;
     }

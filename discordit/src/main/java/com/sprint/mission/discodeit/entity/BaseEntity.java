@@ -22,12 +22,9 @@ public class BaseEntity {
     }
 
     public String getFormattedCreationTime() {
-        LocalDateTime dateTime = LocalDateTime.ofInstant(
-                createdAt,
-                ZoneId.systemDefault()
-        );
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        return dateTime.format(formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm")
+                .withZone(ZoneId.systemDefault());
+        return formatter.format(createdAt);
     }
 
     protected void update() {
