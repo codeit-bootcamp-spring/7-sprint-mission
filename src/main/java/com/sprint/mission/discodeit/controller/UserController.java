@@ -34,7 +34,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userRequestDto));
     }
 
-    // 사용자 삭제 (/user/delete?id=id)
+    // 사용자 삭제 (/user/id)
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> userDelete(@PathVariable UUID id) {
         userService.deleteUser(id);
