@@ -1,16 +1,17 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_MessageCreate;
+import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
+import com.sprint.mission.discodeit.entity.dto.Dto_Message;
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_Message;
 import com.sprint.mission.discodeit.service.basic.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
@@ -19,19 +20,38 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/message")
-public class MessageController  extends BaseController {
+public class MessageController extends BaseController {
     private final MessageService messageService;
-//    메시지 관리
+
+    //    메시지 관리
 //    [ ] 메시지를 보낼 수 있다.
 //    [ ] 메시지를 수정할 수 있다.
 //    [ ] 메시지를 삭제할 수 있다.
 //    [ ] 특정 채널의 메시지 목록을 조회할 수 있다.
     @RequestMapping(value = "/create", method = POST)
-    public Res_Message create(@RequestBody Dto_MessageCreate dtoMessageCreate) {
-        return messageService.create(dtoMessageCreate.dtoMessage(), dtoMessageCreate.contentList());
+    public Res_Message create(@RequestPart("message") Dto_Message dtoMessage,
+                              @RequestPart("file") List<MultipartFile> file) {
+
+
+        List<Dto_BinaryContent> collect = file.stream()
+                .map(multipartFile -> {
+                    try {
+                        return Dto_BinaryContent.from(
+                                multipartFile.getOriginalFilename(),
+                                multipartFile.getContentType(),
+                                multipartFile.getBytes(),
+                                multipartFile.getSize()
+                        );
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList(); // 변경가능 list
+
+        return messageService.create(dtoMessage, Optional.of(collect));
     }
 
-    @RequestMapping(value = "/findAllByChannleId/{id}", method = POST)
+    @RequestMapping(value = "/findAllByChannelId/{id}", method = POST)
     public List<Res_Message> findAllByChannleId(@PathVariable("id") UUID channelID) {
         return messageService.findAllByChannleId(channelID);
     }
