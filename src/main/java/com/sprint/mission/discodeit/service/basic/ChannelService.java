@@ -49,7 +49,7 @@ public class ChannelService implements InterfaceChannelService {
         list.forEach(readStatusRepository::save);
 
         for (UUID uuid : dtoCreateChannel.userIDs().stream().toList()) {
-            Util.okMessage("createPrivate 🔰 채널 생성. userIDs = [" + uuid + "]");
+            Util.okMessage("PrivateChannel.userIDs = [" + uuid + "]");
         }
 
         return Res_Channel.from(channel);
@@ -151,8 +151,12 @@ public class ChannelService implements InterfaceChannelService {
 
     @Override
     public void update( Dto_ChannelUpdate dtoChannelUpdate) {
+        Channel channel = channelRepository.findById(dtoChannelUpdate.channelID())
+                .orElseThrow(() -> new IllegalArgumentException("ChannelService.update.dtoChannelUpdate.channelID = [" + dtoChannelUpdate.channelID()+ "] 오류"));
+
+
         //[ ] PRIVATE 채널은 수정할 수 없습니다.
-        if (dtoChannelUpdate.channelType() == PRIVATE) {
+        if (channel.getChannelType() == PRIVATE) {
             Util.errMessage("PRIVATE 채널 수정 불가");
         }
         else {
