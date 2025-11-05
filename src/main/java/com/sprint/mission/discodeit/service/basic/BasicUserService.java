@@ -45,12 +45,12 @@ public class BasicUserService implements UserService {
             profileId = binaryContent.getId();
         }
 
-        User user = User.builder()
-                .username(userCreateRequestDto.username())
-                .password(userCreateRequestDto.password())
-                .email(userCreateRequestDto.email())
-                .profileId(profileId)
-                .build();
+        User user = new User(
+                userCreateRequestDto.username(),
+                userCreateRequestDto.password(),
+                userCreateRequestDto.email(),
+                profileId
+        );
         user = userRepository.save(user);
 
         // 요구사항 - userStatus 같이 생성

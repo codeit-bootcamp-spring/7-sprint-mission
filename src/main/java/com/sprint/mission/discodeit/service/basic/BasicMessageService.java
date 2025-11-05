@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.response.message.MessageResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -26,7 +25,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public MessageResponseDto create(MessageCreateRequestDto messageCreateRequestDto) {
+    public Message create(MessageCreateRequestDto messageCreateRequestDto) {
         UUID channelId = Objects.requireNonNull(messageCreateRequestDto.channelId());
         UUID authorId = Objects.requireNonNull(messageCreateRequestDto.authorId());
         String content = Objects.requireNonNull(messageCreateRequestDto.content());
@@ -36,7 +35,7 @@ public class BasicMessageService implements MessageService {
         userRepository.findById(messageCreateRequestDto.authorId()).orElseThrow(()
                 -> new NoSuchElementException("User not found"));
 
-        if(ch.isPrivateChannel() && !ch.getMembers().containsKey(authorId)) {
+        if(!ch.getMembers().containsKey(authorId)) {
             throw new NoSuchElementException("Member not found");
         }
 
@@ -74,87 +73,67 @@ public class BasicMessageService implements MessageService {
             }
         }
 
-        Message message = messageRepository.save(
-                Message.builder()
-                .attachmentIds(attachmentIds)
-                .channelId(channelId)
-                .userName(messageCreateRequestDto.userName())
-                .authorId(authorId)
-                .content(content)
-                .build()
-                );
-
-        return new MessageResponseDto(
-                message.getContent(),
-                message.getUserName(),
-                message.getAuthorId(),
-                message.getChannelId(),
-                message.getAttachmentIds() == null
-                        ? List.of() : List.copyOf(message.getAttachmentIds()),
-                message.isDeleted()
+        Message message = new Message(
+                content,
+                messageCreateRequestDto.userName(),
+                authorId,
+                channelId,
+                attachmentIds
         );
+
+        return messageRepository.save(message);
     }
 
     @Override
-    public MessageResponseDto get(UUID messageId) {
-        Message message = messageRepository.findById(Objects.requireNonNull(messageId))
+    public Message get(UUID messageId) {
+        return messageRepository.findById(Objects.requireNonNull(messageId))
                 .orElseThrow(() -> new NoSuchElementException("Message not found"));
-
-        return new MessageResponseDto(
-                message.getContent(),
-                message.getUserName(),
-                message.getAuthorId(),
-                message.getChannelId(),
-                message.getAttachmentIds() == null
-                ? List.of() : List.copyOf(message.getAttachmentIds()),
-                message.isDeleted()
-        );
     }
 
     @Override
-    public List<MessageResponseDto> getAll() {
-        List<Message> all = messageRepository.findAll();
-        List<MessageResponseDto> dtos = new ArrayList<>();
-        for (Message message : all) {
-            dtos.add(new MessageResponseDto(
-                    message.getContent(),
-                    message.getUserName(),
-                    message.getAuthorId(),
-                    message.getChannelId(),
-                    message.getAttachmentIds() == null
-                    ? List.of() : List.copyOf(message.getAttachmentIds()),
-                    message.isDeleted()
-            ));
+    public List<Message> getAll() {
+        return messageRepository.findAll();
+    }
+
+    @Override
+    public List<Message> getAllByChannelId(UUID channelId) {
+        List<Message> channel = messageRepository.findByChannelId(Objects.requireNonNull(channelId));
+        channel.removeIf(m -> m.isDeleted());
+        channel.sort(Comparator.comparing(m -> m.getCreatedAt()));
+
+        return channel;
+    }
+
+    @Override
+    public List<Message> getAllByChannelForUser(UUID channelId, UUID userId ) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel not found"));
+
+        if(!channel.getMembers().containsKey(userId)) {
+            throw new NoSuchElementException("User not found");
         }
-        return dtos;
+
+        List<Message> channels = messageRepository.findByChannelId(channelId);
+        channels.removeIf(m -> m.isDeleted());
+        channels.sort(Comparator.comparing(m -> m.getCreatedAt()));
+        return channels;
     }
 
     @Override
-    public List<MessageResponseDto> getAllByChannelId(UUID channelId) {
-        List<Message> channelList = messageRepository.findByChannelId(Objects.requireNonNull(channelId));
-        channelList.removeIf(m -> m.isDeleted());
-        channelList.sort(Comparator.comparing(m -> m.getCreatedAt()));
-
-        List<MessageResponseDto> dtos = new ArrayList<>();
-        for (Message message : channelList) {
-            dtos.add(new MessageResponseDto(
-                    message.getContent(),
-                    message.getUserName(),
-                    message.getAuthorId(),
-                    message.getChannelId(),
-                    message.getAttachmentIds() == null
-                            ? List.of() : List.copyOf(message.getAttachmentIds()),
-                    message.isDeleted()
-            ));
-        }
-        return dtos;
-    }
-
-    @Override
-    public MessageResponseDto update(MessageUpdateRequestDto messageUpdateRequestDto) {
+    public Message update(MessageUpdateRequestDto messageUpdateRequestDto) {
         UUID messageId = Objects.requireNonNull(messageUpdateRequestDto.messageId());
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message not found"));
+
+        if(messageUpdateRequestDto.isDeleted()) {
+            if(message.getAttachmentIds() != null) {
+                for(UUID attachmentId : message.getAttachmentIds()) {
+                    binaryContentRepository.deleteById(attachmentId);
+                }
+            }
+            message.delete();
+            return messageRepository.save(message);
+        }
 
         if(messageUpdateRequestDto.content() != null) {
             message.setContent(messageUpdateRequestDto.content());
@@ -169,16 +148,7 @@ public class BasicMessageService implements MessageService {
             message.setAttachmentIds(messageUpdateRequestDto.attachmentIds());
         }
 
-        Message save = messageRepository.save(message);
-        return new MessageResponseDto(
-                save.getContent(),
-                save.getUserName(),
-                save.getAuthorId(),
-                save.getChannelId(),
-                save.getAttachmentIds() == null
-                ? List.of() : List.copyOf(save.getAttachmentIds()),
-                save.isDeleted()
-        );
+        return messageRepository.save(message);
     }
 
     @Override
@@ -193,16 +163,12 @@ public class BasicMessageService implements MessageService {
         return messageRepository.deleteById(messageId);
     }
 
-    // 특정 채널별 메세지 조회
-    @Override
-    public List<Message> getMessagesByChannel(UUID channelId) {
-        return messageRepository.findByChannelId(Objects.requireNonNull(channelId));
-    }
     // 특정 작성자별 메세지 조회
     @Override
     public List<Message> getMessagesByAuthor(UUID authorId) {
         return messageRepository.findByAuthorId(Objects.requireNonNull(authorId));
     }
+
     // 특정 채널의 특정 작성자 메세지 조회
     @Override
     public List<Message> getMessagesByChannelAndAuthor(UUID channelId, UUID authorId) {
@@ -210,12 +176,6 @@ public class BasicMessageService implements MessageService {
                 Objects.requireNonNull(channelId),
                 Objects.requireNonNull(authorId)
         );
-    }
-
-    // 모든 채널의 메세지 조회
-    @Override
-    public List<Message> getAllMessages() {
-        return messageRepository.findAll();
     }
 
     // 특정 키워드 검색
