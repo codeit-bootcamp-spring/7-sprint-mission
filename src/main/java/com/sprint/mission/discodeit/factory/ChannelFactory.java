@@ -6,9 +6,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 
 public class ChannelFactory {
     private ChannelFactory(){}
-    
+
     public static Channel create(ChannelCreateReq req){
-        return new Channel(
+        return Channel.createPublic(
                 req.managerId(),
                 req.name(),
                 req.description()
@@ -16,7 +16,7 @@ public class ChannelFactory {
     }
 
     public static Channel create(ChannelCreateSecReq req){
-        return new Channel(
+        return Channel.createPrivate(
                 req.managerId(),
                 req.users()
         );
