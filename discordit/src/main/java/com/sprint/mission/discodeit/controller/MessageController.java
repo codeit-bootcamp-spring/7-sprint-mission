@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("/message")
+@RestController("/messages")
 @RequiredArgsConstructor
 public class MessageController {
     private final MessageService messageService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseEntity<MessageResponse> send(MessageSendRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageService.send(request));
     }
@@ -36,7 +36,7 @@ public class MessageController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<List<MessageResponse>> get(MessageGetRequest request) {
         return ResponseEntity.ok(messageService.get(request));
     }
