@@ -57,7 +57,7 @@ public class UserController {
     }
 
 
-    // 사용자 정보 수정 (/user/update/..)
+    // 사용자 정보 수정 (/user/..)
     @RequestMapping(value = "/username", method = RequestMethod.PUT)
     public UserResponseDto usernameUpdate(@RequestBody UserNameUpdateDto userNameUpdateDto) {
         return userService.updateUserName(userNameUpdateDto);

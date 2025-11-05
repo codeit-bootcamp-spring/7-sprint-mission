@@ -91,7 +91,7 @@ public class BasicUserService implements UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
-        return UserResponseDto.from(user, true);
+        return toDto(user);
     }
 
     // 이메일로 출력
@@ -99,7 +99,7 @@ public class BasicUserService implements UserService {
     public UserResponseDto findUserInfoByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
-        return UserResponseDto.from(user, true);
+        return toDto(user);
     }
 
     // 전체출력
@@ -153,7 +153,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(updateDto.userId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
 
-        user.updatePhoneNum(updateDto.phoneNum());
+        user.updatePhoneNum(updateDto.newPhoneNum());
         userRepository.save(user);
         return toDto(user);
     }
