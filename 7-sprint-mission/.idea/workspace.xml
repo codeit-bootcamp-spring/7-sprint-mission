@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="45eecbc6-9b74-4765-b458-3efb9029dfee" name="변경" comment="reset and recreatefile">
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/Channel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/CreateService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/DeleteService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/Entity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/Message.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/ReadService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/UpdateService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/jcfLegacy/JCFCreate.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/jcfLegacy/JCFDb.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/jcfLegacy/JCFDelete.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/jcfLegacy/JCFRead.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Legacy/jcfLegacy/JCFUpdate.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/Main.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/entity/Channel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/entity/Entity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/entity/Message.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/entity/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/service/ChannelService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/service/MessageService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/service/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/service/jcf/JCFChannel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/service/jcf/JCFMessage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/sprint/mission/discodeit/service/jcf/JCFUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/gradle.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="황준영" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;OfficialHwempire&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/OfficialHwempire/7-sprint-mission.git&quot;,
+    &quot;accountId&quot;: &quot;a704d723-8759-42a3-8017-5b6cc29575dd&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="33E8JAU5z91rOTzARf8EOpsZMYP" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;황준영-sprint2&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;프로젝트&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="디폴트 작업">
+      <changelist id="45eecbc6-9b74-4765-b458-3efb9029dfee" name="변경" comment="" />
+      <created>1758870797257</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1758870797257</updated>
+      <workItem from="1758870798198" duration="2964000" />
+      <workItem from="1758873806871" duration="574000" />
+      <workItem from="1759051821441" duration="617000" />
+    </task>
+    <task id="LOCAL-00001" summary="message for pr">
+      <option name="closed" value="true" />
+      <created>1758872416027</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1758872416027</updated>
+    </task>
+    <task id="LOCAL-00002" summary="message that I hate salt">
+      <option name="closed" value="true" />
+      <created>1758872955723</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1758872955723</updated>
+    </task>
+    <task id="LOCAL-00003" summary="reset and recreatefile">
+      <option name="closed" value="true" />
+      <created>1758874018869</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1758874018869</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="황준영-sprint2" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="황준영-sprint2" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="message for pr" />
+    <MESSAGE value="message that I hate salt" />
+    <MESSAGE value="reset and recreatefile" />
+    <option name="LAST_COMMIT_MESSAGE" value="reset and recreatefile" />
+  </component>
+</project>
