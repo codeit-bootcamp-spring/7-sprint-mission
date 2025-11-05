@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -20,7 +19,6 @@ public class BinaryContent implements Serializable {
     private final byte[] data;
     private static final long serialVersionUID = 1L;
 
-    @Builder
     public BinaryContent(String fileName, String contentType, byte[] data) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
