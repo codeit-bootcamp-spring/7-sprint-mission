@@ -15,28 +15,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("/users")
+@RestController("/api/user")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/signIn", method = RequestMethod.POST)
     public ResponseEntity<UserResponse> signIn(UserCreateRequest request) {
         return new ResponseEntity<>(userService.signIn(request), HttpStatus.CREATED);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public ResponseEntity<UserResponse> update(UserUpdateRequest request) {
         return new ResponseEntity<>(userService.update(request), HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public void delete(UserDeleteRequest request) {
         userService.deleteByUserId(request);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     public ResponseEntity<List<UserResponse>> getAll() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }

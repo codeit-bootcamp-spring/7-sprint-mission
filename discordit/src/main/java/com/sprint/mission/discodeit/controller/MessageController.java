@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("/messages")
+@RestController("/api/message")
 @RequiredArgsConstructor
 public class MessageController {
     private final MessageService messageService;

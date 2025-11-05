@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("/channels")
+@RestController("/api/channel")
 @RequiredArgsConstructor
 public class ChannelController {
     private final ChannelService channelService;
