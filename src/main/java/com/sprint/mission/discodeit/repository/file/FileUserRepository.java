@@ -1,124 +1,107 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.deletedCash.DeletedUser;
-import com.sprint.mission.discodeit.dto.ChannelDto;
-import com.sprint.mission.discodeit.dto.DeletedUserDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.Channel;
+
 import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.util.StaticString;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
+import java.util.*;
 
+import static com.sprint.mission.discodeit.service.util.StaticString.*;
+
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "file",
+        matchIfMissing = false
+)
 public class FileUserRepository implements UserRepository {
 
     @Override
-    public void addChannelToUser(UserDto userDto, ChannelDto channelDto) {
-        List<User> userDb = loadAllUser();
-        User targetUser = userDb.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().get();
-        targetUser.addChannel(channelDtoToChannel(channelDto));
-        saveAllUser(userDb);
+    public boolean isUserExit(UUID userId) {
+        return loadAllUser().containsKey(userId);
     }
-
-    @Override
-    public void deleteChannelFromUser(UserDto userDto, ChannelDto channelDto) {
-        if(userDto==null || channelDto==null){
-            return;
-        }
-        List<User> userDb = loadAllUser();
-        User targetUser = userDb.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().orElse(null);
-        targetUser.removeChannel(channelDtoToChannel(channelDto));
-        saveAllUser(userDb);
-    }
-
     @Override
     public void resetUserRepository() {
-        saveAllUser(new ArrayList<>());
-        saveAllDeletedUser(new ArrayList<>());
-
+        saveAllUser(new HashMap<>());
     }
 
-    private final String DATA_ROOT = "C:\\Users\\황준영\\Java-codeit\\7-sprint-mission\\src\\main\\java\\com\\sprint\\mission\\discodeit\\data\\";
-    private final String USER_DATA_ROOT = DATA_ROOT + "userRepository.ser";
-    private final String DELETED_USER_DATA_ROOT = DATA_ROOT + "deletedUserRepository.ser";
-    private File userRepositoryFile = new File(USER_DATA_ROOT);
-    private File deletedUserRepositoryFile = new File(DELETED_USER_DATA_ROOT);
+    @Value("${discodeit.repository.file-directory}")
+    private final String USER_DATA_ROOT ;
+    private final File userRepositoryFile;
 
-    public FileUserRepository() {
+    public FileUserRepository(Environment env) {
+        USER_DATA_ROOT = env.getProperty(DISCODEIT_DIRECTORY)+"userRepository.ser";
+        System.out.println("USER_DATA_ROOT = " + USER_DATA_ROOT);
+        userRepositoryFile = new File(USER_DATA_ROOT);
         repositoryFileCheck();
         resetUserRepository();
     }
 
     @Override
-    public UserDto getUserById(UUID userId) {
-        return loadAllUser().stream().filter(x->x.getId().equals(userId)).map(this::userToUserDto).findFirst().orElse(null);
+    public Optional<User> getUserById(UUID userId) {
+        return Optional.ofNullable(loadAllUser().get(userId));
 
     }
 
     @Override
-    public UserDto getUser(UserDto userDto) {
+    public Optional<User> getUser(User user) {
 
-        return getUserById(userDto.getId());
+        return getUserById(user.getId());
     }
 
     @Override
-    public UserDto getUserByName(String userName) {
-        return loadAllUser().stream().filter(x->x.getName().equals(userName)).map(this::userToUserDto).findFirst().orElse(null);
+    public Optional<User> getUserByName(String userName) {
+        return loadAllUser().values().stream().filter(x->x.getName().equals(userName)).findFirst();
     }
 
     @Override
-    public UserDto[] getAllUser() {
-        return loadAllUser().stream().map(this::userToUserDto).toArray(UserDto[]::new);
+    public List<User> getAllUser() {
+        return
+                loadAllUser().values().stream().toList();
     }
 
     @Override
-    public void saveUser(UserDto userDto) {
-        List<User> userDb = loadAllUser();
-        userDb.add(userDtoToUser(userDto));
+    public User saveUser(User user) {
+        Map<UUID,User> userDb = loadAllUser();
+        userDb.put(user.getId(),user);
         saveAllUser(userDb);
-        return;
+        return user;
 
     }
 
     @Override
-    public void deleteUser(UserDto userDto) {
+    public void deleteUser(UUID userId) {
 
-        List<User> userDb = loadAllUser();
-        userDb.removeIf(x->x.getId().equals(userDto.getId()));
-
-        List<DeletedUser> deletedUserDb = loadAllDeletedUser();
-        deletedUserDb.add(userDtoToDeletedUser(userDto));
-        saveAllDeletedUser(deletedUserDb);
+        Map<UUID,User> userDb = loadAllUser();
+        userDb.remove(userId);
         saveAllUser(userDb);
         return;
     }
 
     @Override
-    public <T> void updateUser(UserDto userDto, User.userElement userElement, T updatedContent) {
-        List<User> users = loadAllUser();
-        User targetUser = users.stream().filter(x->x.getId().equals(userDto.getId())).findFirst().orElse(null);
-        BiConsumer<User, Object> editFunction = userElement.setter;
-        editFunction.accept(targetUser, updatedContent);
-        targetUser.updateEntity();
-        saveAllUser(users);
+    public void updateUser(User user) {
+        deleteUser(user.getId());
+        saveUser(user);
+
 
     }
 
     @Override
-    public UserDto[] getUpdatedUser() {
-        return loadAllUser().stream().filter(x->x.getUpdatedAt()!= Entity.DEFAULT_UPDATED_AT).map(this::userToUserDto).toArray(UserDto[]::new);
+    public List<User> getUpdatedUser() {
+        return loadAllUser().values().stream().filter(x->x.getUpdatedAt()!= x.getCreatedAt()).toList();
     }
 
-    @Override
-    public DeletedUserDto[] getDeletedUser() {
-        return loadAllDeletedUser().stream().map(this::deletedUserToDeletedUserDto).toArray(DeletedUserDto[]::new);
-    }
+
 
     private void repositoryFileCheck(){
         if(!userRepositoryFile.exists()){
@@ -128,45 +111,12 @@ public class FileUserRepository implements UserRepository {
                 e.printStackTrace();
             }
         }
-        if(!deletedUserRepositoryFile.exists()){
-            try{
-                deletedUserRepositoryFile.createNewFile();
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-        }
+
     }
 
 
-    private Channel channelDtoToChannel(ChannelDto channelDto){
-        List<User> userDb = channelDto.getUserDtoList().stream().map(
-                x->new User(x.getId(),x.getName(),x.getNickname(),x.getEmail(),x.isOnline())
-        ).collect(Collectors.toList());
-        return new Channel(channelDto.getId(),channelDto.getName(),channelDto.getDescription(),channelDto.isPublic(),channelDto.isTextChannel(),userDb);
-    }
-    private UserDto userToUserDto(User user){
-        List<ChannelDto> channelDtoList = user.getChannelDb().stream()
-                .map(x->new ChannelDto(x.getId(),x.getName(),x.getDescription(),x.isPublic(),x.isTextChannel())).collect(Collectors.toList());
-        return new UserDto(user.getId(),user.getName(),user.getNickname(),user.getEmail(),user.isOnline(),channelDtoList);
-    }
-    private User userDtoToUser(UserDto userDto){
-        return new User(userDto.getId(),userDto.getName(),userDto.getNickname(),userDto.getEmail(),userDto.isOnline());
-    }
-
-    private DeletedUserDto deletedUserToDeletedUserDto(DeletedUser deletedUser){
-        return new DeletedUserDto(deletedUser.getName());
-    }
-    private DeletedUser deletedUserDtoToDeletedUser(DeletedUserDto deletedUserDto){
-        return new DeletedUser(deletedUserDto.getName());
-    }
-
-    private DeletedUser userDtoToDeletedUser(UserDto userDto){
-        return new DeletedUser(userDto.getName());
-    }
-
-    private void saveAllUser(List<User>userList){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_DATA_ROOT));){
+    private void saveAllUser(Map<UUID,User>userList){
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(userRepositoryFile));){
             oos.writeObject(userList);
             oos.flush();
         }
@@ -174,37 +124,17 @@ public class FileUserRepository implements UserRepository {
             e.printStackTrace();
         }
     }
-    private List<User> loadAllUser(){
+    private Map<UUID,User> loadAllUser(){
         if(!userRepositoryFile.exists() || userRepositoryFile.length() == 0) {
-            return new ArrayList<>();
+            return new HashMap<>();
         }
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_DATA_ROOT));){
-            return (List<User>) ois.readObject();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return new ArrayList<>();
-    }
-
-    private List<DeletedUser> loadAllDeletedUser(){
-        if(!deletedUserRepositoryFile.exists() || deletedUserRepositoryFile.length() == 0) {
-            return new ArrayList<>();
-        }
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DELETED_USER_DATA_ROOT));){
-            return (List<DeletedUser>) ois.readObject();
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(userRepositoryFile));){
+            return ( Map<UUID,User>) ois.readObject();
         }
         catch (Exception e){
             e.printStackTrace();
         }
-        return new ArrayList<>();
+        return new HashMap<>();
     }
 
-    private void saveAllDeletedUser(List<DeletedUser>deletedUserList){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DELETED_USER_DATA_ROOT));){
-            oos.writeObject(deletedUserList);
-            oos.flush();
-        }
-        catch (Exception e){}
-    }
 }

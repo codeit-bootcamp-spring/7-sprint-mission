@@ -1,24 +1,25 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.dto.DeletedMessageDto;
-import com.sprint.mission.discodeit.dto.MessageDto;
+
 import com.sprint.mission.discodeit.entity.Message;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageRepository {
 
-    public MessageDto getMessageById(UUID messageId);
-    public MessageDto getMessageByName(String messageName);
-    public MessageDto getMessage(MessageDto messageDto);
+    public Optional<Message> getMessageById(UUID messageId);
+    public Optional <Message> getMessageByName(String messageName);
+    public Optional <Message> getMessage(Message message);
 
-    public void saveMessage(MessageDto messageDto);
-    public void deleteMessage(MessageDto messageDto);
-    public <T>void updateMessage(MessageDto messageDto, Message.messageElement messageElement, T updatedContent);
-    public MessageDto[] getUpdatedMessage();
-    public DeletedMessageDto[] getDeletedMessage();
-    public MessageDto[] getAllMessage();
-    public void setDefaultSender(MessageDto messageDto);
+    public Message saveMessage(Message message);
+    public void deleteMessage(Message message);
+    public <T>void updateMessage(Message message);
+    public List<Message> getUpdatedMessage();
+//    public DeletedMessage[] getDeletedMessage();
+    public List<Message> getAllMessage();
+//    public void setDefaultSender(Message message);
     public void resetMessageRepository();
 
 }

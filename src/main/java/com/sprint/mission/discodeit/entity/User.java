@@ -1,121 +1,70 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.service.util.StaticString;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+@Builder(toBuilder = true)
+@Getter
+@Setter
 public class User extends Entity implements Serializable {
 
 
     private String name;
-    private String nickname;
+    private String userName;
     private String email;
-    private boolean isOnline;
-    private final ArrayList<Channel> channelDb = new ArrayList<>();
+    private boolean isOnline = true;
+    private String password;
+    private UUID profileId;
 
-    public ArrayList<Channel> getChannelDb() {
-        return channelDb;
-    }
-    public void addChannel(Channel channel){
-        if(channelDb.contains(channel)) {
+    private final HashSet<UUID> joinChannelList = new HashSet<>();
+
+    public void addChannel(UUID channelId){
+        if(joinChannelList.contains(channelId)) {
             throw new IllegalArgumentException(StaticString.CHANNEL_EXIST);
 
         }
-        channelDb.add(channel);
+        joinChannelList.add(channelId);
 
     }
-    public void removeChannel(Channel channel){
-        if(!channelDb.contains(channel)) throw new IllegalArgumentException(StaticString.CHANNEL_NOT_EXIST);
-        channelDb.remove(channel);
+    public void removeChannel(UUID channelId){
+        if(!joinChannelList.contains(channelId)) throw new IllegalArgumentException(StaticString.CHANNEL_NOT_EXIST);
+        joinChannelList.remove(channelId);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof User user)) return false;
-        return isOnline == user.isOnline && Objects.equals(name, user.name) && Objects.equals(nickname, user.nickname) && Objects.equals(email, user.email);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, nickname, email, isOnline);
-    }
+//    public User(String name, String userName, String email,String password) {
+//        super();
+//        init(name, userName,email,password);
+//    }
+//
+//    public User(UUID id, String name, String userName, String email,String password) {
+//        super(id);
+//        init(name, userName,email,password);
+//    }
+//    public void init(String name,String nickname,String email,String password){
+//        this.name = name;
+//        this.userName = nickname;
+//        this.email = email;
+//        this.password = password;
+//
+//    }
 
-    public User(String name, String nickname, String email, boolean isOnline) {
-        super();
-        this.name = name;
-        this.nickname = nickname;
-        this.email = email;
-        this.isOnline = isOnline;
-    }
 
-    public User(UUID id, String name, String nickname, String email, boolean isOnline) {
-        super(id);
-        this.name = name;
-        this.nickname = nickname;
-        this.email = email;
-        this.isOnline = isOnline;
-    }
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public boolean isOnline() {
-        return isOnline;
-    }
-
-    public void setOnline(boolean online) {
-        isOnline = online;
-    }
-
-    public enum userElement
-    {
-        NAME(User::getName,(x,y) -> x.setName( (String) y)),
-        NICKNAME(User::getNickname,(x,y)->x.setNickname( (String) y)),
-        EMAIL(User::getEmail,(x,y)->x.setEmail( (String) y)),
-        ONLINE(User::isOnline,(x,y)->x.setOnline( (boolean) y));
-
-        public BiConsumer<User, Object> setter;
-        public Function<User,Object> getter;
-
-        userElement(Function<User,Object> getter, BiConsumer<User, Object> setter)
-        {
-            this.getter = getter;
-            this.setter = setter;
-        }
-
-    }
 
     @Override
     public String toString() {
         return "User{" +
                 "name='" + name + '\'' +
-                ", nickname='" + nickname + '\'' +
+                ", nickname='" + userName + '\'' +
                 ", email='" + email + '\'' +
                 ", isOnline=" + isOnline +
                 ", channelDb=" + showChannel(this) +
@@ -124,8 +73,8 @@ public class User extends Entity implements Serializable {
 
     public String showChannel(User user){
         StringBuilder out = new StringBuilder();
-        for(Channel channel : user.getChannelDb()){
-            out.append(channel.getName()).append("\n");
+        for(UUID channelId : user.getJoinChannelList()){
+            out.append(channelId).append("\n");
         }
         return out.toString();
     }

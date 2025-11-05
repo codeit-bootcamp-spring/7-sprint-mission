@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.service.util;
 
-public class StaticString {
+import com.sprint.mission.discodeit.entity.User;
+
+import java.util.concurrent.Flow;
+
+public abstract class StaticString {
     public static final String DELETE_USER ="user is deleted : ";
     public static final String DELETE_MESSAGE ="message is deleted : ";
     public static final String DELETE_CHANNEL ="channel is deleted : ";
@@ -30,4 +34,14 @@ public class StaticString {
     public static final String USER_EMPTY ="user is empty create user";
     public static final String MESSAGE_EMPTY ="message is empty create message";
     public static final String VALIDATE_FAIL ="validate test fail";
+
+    public static final String DATA_PATH = "src/main/java/com/sprint/mission/discodeit/data/";
+    public static final String DEFAULT_CHANNEL_NAME = "defaultChannel";
+    public static final String DEFAULT_CHANNEL_DESCRIPTION = "defaultChannel description";
+    public static final User DEFAULT_SENDER = User.builder().name("Default Sender").userName("DefaultSender")
+            .email("")
+            .isOnline(false)
+            .build();
+    public static final String DISCODEIT_DIRECTORY = "discodeit.repository.file-directory";
+
 }

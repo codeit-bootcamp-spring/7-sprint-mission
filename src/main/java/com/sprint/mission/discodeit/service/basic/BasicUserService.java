@@ -1,221 +1,185 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelDto;
-import com.sprint.mission.discodeit.dto.DeletedUserDto;
-import com.sprint.mission.discodeit.dto.MessageDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.service.ValidateService;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.Arrays;
+import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileCreateRequestDto;
+import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.UserReadResponseDto;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
+import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
+import java.util.function.BiConsumer;
 
 import static com.sprint.mission.discodeit.service.util.StaticString.*;
-import static com.sprint.mission.discodeit.service.util.StaticString.CHANNEL_NOT_EXIST;
-import static com.sprint.mission.discodeit.service.util.StaticString.DELETE_USER;
-import static com.sprint.mission.discodeit.service.util.StaticString.NULL_INPUT;
-import static com.sprint.mission.discodeit.service.util.StaticString.USER_EMPTY;
 import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EXIST;
-import static com.sprint.mission.discodeit.service.util.StaticString.WRONG_TYPE;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    private final ValidateService validateService;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
 
-    public BasicUserService(UserRepository userRepository, ValidateService validateService, ChannelRepository channelRepository, MessageRepository messageRepository) {
-        this.userRepository = userRepository;
-        this.validateService = validateService;
-        this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
+    @Override
+    public User createUser(UserCreateRequestDto userCreateRequestDto) {
+        User user = User.builder()
+                .userName(userCreateRequestDto.getUserName())
+                .name(userCreateRequestDto.getName())
+                .email(userCreateRequestDto.getEmail())
+                .password(userCreateRequestDto.getPassword()).build();
+
+        UserStatus userStatus = UserStatus.builder()
+                .userId(user.getId())
+                .lastOnlineTime(Instant.now())
+                .build();
+
+        userNameEmailCheck(user);
+
+        userStatusRepository.createUserStatus(userStatus);
+        return userRepository.saveUser(user);
     }
 
     @Override
-    public void createUser(UserDto userDto) {
-        if(userDto==null){
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(validateService.isValidateUser(userDto)){
-            System.out.println(USER_EXIST + userDto.getName());
-            return;
-        }
+    public User createUser(UserCreateRequestDto userCreateRequestDto, ProfileCreateRequestDto profileCreateRequestDtoDto) {
 
-        userRepository.saveUser(userDto);
-        System.out.println(CREATE_USER + userDto.getName());
+        BinaryContent binaryContent = BinaryContent.builder()
+                .binaryFile(profileCreateRequestDtoDto.getFile())
+                .binaryContentUsage(BinaryContentUsage.PROFILE)
+                .build();
 
+        User user = User.builder()
+                .userName(userCreateRequestDto.getUserName())
+                .name(userCreateRequestDto.getName())
+                .email(userCreateRequestDto.getEmail())
+                .profileId(binaryContent.getId())
+                .password(userCreateRequestDto.getPassword())
+                .build();
 
+        UserStatus userStatus = UserStatus.builder()
+                .userId(user.getId())
+                .lastOnlineTime(Instant.now())
+                .build();
+
+        userNameEmailCheck(user);
+
+        binaryContentRepository.createBinaryContent(binaryContent);
+        userRepository.saveUser(user);
+        userStatusRepository.createUserStatus(userStatus);
+        return user;
     }
 
     @Override
-    public void readUser(UserDto userDto) {
-        if(userDto==null){
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(!validateService.isValidateUser(userDto)){
-            System.out.println(USER_NOT_EXIST + userDto.getName());
-            return;
-        }
-        UserDto result = userRepository.getUser(userDto);
-        System.out.println(result.toString());
+    public UserReadResponseDto readUser(UUID userID) {
+        User user = userRepository.getUserById(userID).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        UserStatus userStatus = userStatusRepository.readAllUserStatus()
+                .stream()
+                .filter(x -> x.getUserId().equals(userID)).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
 
+        return UserReadResponseDto.of(user, userStatus);
     }
 
     @Override
-    public void readAllUser() {
-        if(userRepository.getAllUser().length == 0){
-            System.out.println(USER_EMPTY);
-            return;
-        }
-        for(UserDto userDto : userRepository.getAllUser()){
-            System.out.println(userDto.toString());
-        }
-
+    public List<UserReadResponseDto> readAllUser() {
+        return userRepository.getAllUser().stream().map(x ->
+                readUser(x.getId())).toList();
     }
 
     @Override
-    public void deleteUser(UserDto userDto) {
-        if(userDto==null){
-            System.out.println(NULL_INPUT);
-            return;
+    public void deleteUser(UUID userId) {
+
+        List<Channel> channelList = channelRepository.getAllChannel();
+        List<Message> messageList = messageRepository.getAllMessage();
+        List<UserStatus> userStatusList = userStatusRepository.readAllUserStatus();
+        if (binaryContentRepository.isBinaryContentExist(userId)) {
+            binaryContentRepository.deleteBinaryContent(userId);
         }
-        if(!validateService.isValidateUser(userDto)){
-            System.out.println(USER_NOT_EXIST + userDto.getName());
-            return;
-        }
-        ChannelDto [] channelList = channelRepository.getAllChannel();
-        List<ChannelDto> channelDtoStream = Arrays.stream(channelList).filter(x -> x.getUserDtoList().stream().anyMatch(y -> y.getId().equals(userDto.getId()))).toList();
-        for(ChannelDto channelDto : channelDtoStream) channelRepository.deleteUserFromChannel(userDto,channelDto);
+        UserStatus targetUserStatus = userStatusList.stream().filter(x -> x.getUserId().equals(userId)).findFirst().orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
 
+        userStatusRepository.deleteUserStatus(targetUserStatus.getId());
 
-        MessageDto[] messageList = messageRepository.getAllMessage();
-        List<MessageDto> messageDtoList = Arrays.stream(messageList).filter(x-> x.getSender().getId().equals(userDto.getId())).collect(Collectors.toList());
-
-
-        for(MessageDto temp : messageDtoList)
-        {
-            messageRepository.setDefaultSender(temp);
-
-        }
-
-
-
-
-
-        /// ///// message DB 작성
-        userRepository.deleteUser(userDto);
-
-        System.out.println(DELETE_USER + userDto.getName());
-
-    }
-
-    @Override
-    public <T> void updateUser(UserDto userDto, User.userElement userElement, T updatedContent) {
-        if(userDto == null || updatedContent == null || userElement == null){
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(!validateService.isValidateUser(userDto)){
-            System.out.println(USER_NOT_EXIST + userDto.getName());
-            return;
-        }
-        try {
-            userRepository.updateUser(userDto, userElement, updatedContent);
-            System.out.println("User Updated: " + userDto.getName());
-            System.out.println("Updated field: " + userElement.name() + "Updated Content: " + updatedContent );
-        }
-        catch (ClassCastException e){
-            System.out.println(WRONG_TYPE);
-            return;
-        }
-
-
+        channelList.stream().filter(x ->
+                        x.getJoinUserList()
+                                .removeIf(y -> y.equals(userId))
+                )
+                .forEach(channelRepository::updateChannel);
+        messageList.stream().filter(
+                        x -> x.getSenderId().equals(userId))
+                .forEach
+                        (s -> s.setSenderId(DEFAULT_SENDER.getId()));
+        userRepository.deleteUser(userId);
 
     }
 
     @Override
-    public void readUpdatedUser() {
-        if(userRepository.getUpdatedUser().length == 0){
-            System.out.println("No Updated User");
-            return;
-        }
-        System.out.println("===Updated User=== ");
-        for(UserDto userDto : userRepository.getUpdatedUser()){
-            System.out.println(userDto.toString());
-        }
-        System.out.println("================");
+    public <T> void updateUser(UserUpdateRequestDto<T> userUpdateRequestDto) {
+        User user = userRepository.getUserById(userUpdateRequestDto.getUserId()).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        BiConsumer<User, T> biConsumer = (BiConsumer<User, T>) userUpdateRequestDto.getType().setter;
+        biConsumer.accept(user, userUpdateRequestDto.getUpdateValue());
+        user.updateEntity();
+        userRepository.updateUser(user);
+    }
 
+    @Override
+    public <T> void updateUser(UserUpdateRequestDto<T> userUpdateRequestDto, ProfileUpdateRequestDto profileUpdateRequestDto) {
+        User user = userRepository.getUserById(userUpdateRequestDto.getUserId()).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        BiConsumer<User, T> biConsumer = (BiConsumer<User, T>) userUpdateRequestDto.getType().setter;
+        biConsumer.accept(user, userUpdateRequestDto.getUpdateValue());
+        user.updateEntity();
+        BinaryContent binaryContent = BinaryContent.builder()
+                .binaryContentUsage(BinaryContentUsage.PROFILE)
+                .binaryFile(profileUpdateRequestDto.getFile())
+                .build();
+
+        userRepository.updateUser(user);
+        binaryContentRepository.deleteBinaryContent(
+                binaryContentRepository.readAllBinaryContent().stream().filter(x->
+                        x.getId() == user.getProfileId()).findFirst().orElseThrow(()->new IllegalArgumentException("Profile not found"))
+                        .getId()
+        );
+        binaryContentRepository.createBinaryContent(binaryContent);
 
     }
 
     @Override
-    public void readDeletedUser() {
-        if (userRepository.getDeletedUser().length == 0) {
-            System.out.println("No Deleted User");
-            return;
-        }
-        System.out.println("===Deleted User=== ");
-        for (DeletedUserDto userDto : userRepository.getDeletedUser()) {
-            System.out.println(userDto.toString());
-        }
-        System.out.println("================");
-
+    public List<User> readUpdatedUser() {
+        return userRepository.getUpdatedUser();
     }
 
     @Override
-    public void enterChannel(UserDto userDto, ChannelDto channelDto) {
-        if(userDto==null || channelDto==null){
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(!validateService.isValidateUser(userDto)){
-            System.out.println(USER_NOT_EXIST + userDto.getName());
-            return;
-        }
-        if(!validateService.isValidateChannel(channelDto)){
-            System.out.println(CHANNEL_NOT_EXIST + channelDto.getName());
-            return;
-        }
-        UserDto tempUserDto = userRepository.getUser(userDto);
-        ChannelDto tempChannelDto = channelRepository.getChannel(channelDto);
-
-        channelRepository.addUserToChannel(tempUserDto,tempChannelDto);
-        userRepository.addChannelToUser(tempUserDto,tempChannelDto);
-        System.out.println(tempUserDto.getName()+" enters "+tempChannelDto.getName()+" channel.");
-
-
-
+    public void enterChannel(UUID userId, UUID channelId) {
+        User user = userRepository.getUserById(userId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        Channel channel = channelRepository.getChannelById(channelId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        user.addChannel(channelId);
+        channel.addUserToChannel(userId);
+        userRepository.updateUser(user);
+        channelRepository.updateChannel(channel);
     }
 
     @Override
-    public void exitChannel(UserDto userDto, ChannelDto channelDto) {
-        if(userDto==null || channelDto==null){
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(!validateService.isValidateUser(userDto)){
-            System.out.println(USER_NOT_EXIST + userDto.getName());
-            return;
-        }
-        if(!validateService.isValidateChannel(channelDto)){
-            System.out.println(CHANNEL_NOT_EXIST + channelDto.getName());
-            return;
-        }
-        UserDto tempUserDto = userRepository.getUser(userDto);
-        ChannelDto tempChannelDto = channelRepository.getChannel(channelDto);
-        if(tempChannelDto.getUserDtoList().stream().noneMatch(x->x.getId().equals(tempUserDto.getId()))){
-            System.out.println("Not in this channel");
-            return;
-        }
-        channelRepository.deleteUserFromChannel(tempUserDto,tempChannelDto);
-        userRepository.deleteChannelFromUser(tempUserDto,tempChannelDto);
-        System.out.println(tempUserDto.getName()+" exits "+tempChannelDto.getName()+" channel.");
+    public void exitChannel(UUID userId, UUID channelId) {
+        User user = userRepository.getUserById(userId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        Channel channel = channelRepository.getChannelById(channelId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        user.removeChannel(channelId);
+        channel.removeUserFromChannel(userId);
+        userRepository.updateUser(user);
+        channelRepository.updateChannel(channel);
+    }
+
+    private void userNameEmailCheck(User user){
+        boolean isUserNameExit = userRepository.getAllUser().stream().anyMatch(x -> x.getUserName().equals(user.getUserName()));
+        boolean isEmailExit = userRepository.getAllUser().stream().anyMatch(x -> x.getEmail().equals(user.getEmail()));
+        if(isUserNameExit) throw new IllegalArgumentException("USERNAME_ALREADY_EXIST");
+        if(isEmailExit) throw new IllegalArgumentException("EMAIL_ALREADY_EXIST");
     }
 }

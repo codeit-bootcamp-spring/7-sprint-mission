@@ -1,84 +1,204 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileCreateRequestDto;
+import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-
-import com.sprint.mission.discodeit.dto.MessageDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.service.ValidateService;
-import com.sprint.mission.discodeit.service.util.ValidateOperator;
-import org.junit.jupiter.api.Assertions;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entityElement.MessageElement;
+import com.sprint.mission.discodeit.repository.*;
+import org.assertj.core.api.Assertions;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class BasicMessageServiceTest {
-    private MessageRepository repository;
-    private ValidateService validateService;
-    private UserRepository userRepository;
-    private ChannelRepository channelRepository;
-    private BasicMessageService basicMessageService;
-    private MessageDto messageDtoSample;
-    private UserDto userDtoSample;
+    private static final Logger log = LoggerFactory.getLogger(BasicMessageServiceTest.class);
+    @Autowired
+    private MessageRepository messageRepository;
 
+    @Autowired
+    private BasicMessageService basicMessageService;
+
+    @Autowired
+    private ChannelRepository channelRepository;
+
+    @Autowired
+    private BinaryContentRepository binaryContentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
-        userDtoSample = new UserDto("황준영","hwang","genius5375@gmail.com",true);
-       messageDtoSample= new MessageDto("Hello", userDtoSample, false);
-        userRepository = new FileUserRepository();
-         channelRepository = new FileChannelRepository();
-        repository = new FileMessageRepository();
-         validateService = new ValidateOperator(channelRepository,userRepository,repository);
-
-         basicMessageService = new BasicMessageService(repository,validateService);
-
+        messageRepository.resetMessageRepository();
+        channelRepository.resetChannelRepository();
+        binaryContentRepository.resetBinaryContentRepository();
     }
 
+
     @Test
-    @DisplayName("createMessage Test")
+    @DisplayName("[정상 케이스] - 메시지 생성")
     void createMessage() {
         //given
-        userRepository.saveUser(userDtoSample);
+        var user = userRepository.saveUser(User.builder().userName("testUser").name("테스트 유저").email("").password("").build());
+        var channel = channelRepository.saveChannel(Channel.builder().name("테스트 채널").description("테스트 채널 설명").build());
+        var profileDto1 = new ProfileCreateRequestDto("test.png".getBytes());
+        var profileDto2 = new ProfileCreateRequestDto("sibal.png".getBytes());
         //when
-        basicMessageService.createMessage(messageDtoSample);
-        Boolean expectedResult= repository.getMessage(messageDtoSample) != null;
+
+        var message = basicMessageService.createMessage
+                (new MessageCreateRequestDto("test message",
+                        user.getId(), false, channel.getId()
+                        ,new HashSet<>(List.of(profileDto1, profileDto2)))
+                );
+        var actualResult = messageRepository.getMessageById(message.getId());
+        var actualChannelResult = channelRepository.getChannelById(channel.getId()).orElseThrow();
         //then
-        assertThat(expectedResult).isTrue();
+        assertThat(message).as("메세지 객체 확인").isEqualTo(actualResult.orElseThrow());
+        assertThat(message.getAttachmentIdList()).size().as("binaryContentRepo 확인").isEqualTo(2);
+        assertThat(actualChannelResult.getMessageIdList().size()).as("channelRepo 확인").isEqualTo(1);
+
     }
 
     @Test
-    @DisplayName("deleteMessage Test")
+    @DisplayName("[정상 케이스] - 메시지 읽기")
+    void readMessage() {
+        //given
+        var user = userRepository.saveUser(User.builder().userName("testUser").name("테스트 유저").email("").password("").build());
+        var channel = channelRepository.saveChannel(Channel.builder().name("테스트 채널").description("테스트 채널 설명").build());
+        var profileDto1 = new ProfileCreateRequestDto("test.png".getBytes());
+        var profileDto2 = new ProfileCreateRequestDto("test2.png".getBytes());
+        var message = basicMessageService.createMessage
+                (new MessageCreateRequestDto("test message",
+                        user.getId(), false, channel.getId()
+                        ,new HashSet<>(List.of(profileDto1, profileDto2)))
+                );
+        //when
+        var actualResult = basicMessageService.readMessage(message);
+
+        //then
+        assertThat(actualResult.getContent()).isEqualTo(message.getContent());
+    }
+
+    @Test
+    @DisplayName("[정상 케이스] - 메시지 삭제")
     void deleteMessage() {
         //given
-        userRepository.saveUser(userDtoSample);
-        basicMessageService.createMessage(messageDtoSample);
+        var user = userRepository.saveUser(User.builder().userName("testUser").name("테스트 유저").email("").password("").build());
+        var channel = channelRepository.saveChannel(Channel.builder().name("테스트 채널").description("테스트 채널 설명").build());
+        var profileDto1 = new ProfileCreateRequestDto("test.png".getBytes());
+        var profileDto2 = new ProfileCreateRequestDto("test2.png".getBytes());
+        var message = basicMessageService.createMessage
+                (new MessageCreateRequestDto("test message",
+                        user.getId(), false, channel.getId()
+                        ,new HashSet<>(List.of(profileDto1, profileDto2)))
+                );
         //when
-        basicMessageService.deleteMessage(messageDtoSample);
-        Boolean expectedResult= repository.getMessage(messageDtoSample) == null;
+        basicMessageService.deleteMessage(message.getId());
+        var actualResultBinaryContent = binaryContentRepository.readAllBinaryContent();
+        var actualResultChannel = channelRepository.getAllChannel().stream().noneMatch(c -> c.getMessageIdList().contains(message.getId()));
+        var actualResultMessage = messageRepository.getAllMessage();
         //then
-        assertThat(expectedResult).isTrue();
+        assertThat(actualResultBinaryContent.size()).as("binaryContent 객체 확인").isEqualTo(0);
+        assertThat(actualResultChannel).as("channel 객체 확인").isTrue();
+        assertThat(actualResultMessage.size()).as("message 객체 확인").isEqualTo(0);
+
     }
 
     @Test
-    @DisplayName("updateMessage Test")
+    @DisplayName("[정상 케이스] - 메시지 업데이트")
     void updateMessage() {
         //given
-        userRepository.saveUser(userDtoSample);
-        basicMessageService.createMessage(messageDtoSample);
+        var user = userRepository.saveUser(User.builder().userName("testUser").name("테스트 유저").email("").password("").build());
+        var channel = channelRepository.saveChannel(Channel.builder().name("테스트 채널").description("테스트 채널 설명").build());
+        var profileDto1 = new ProfileCreateRequestDto("test.png".getBytes());
+        var profileDto2 = new ProfileCreateRequestDto("test2.png".getBytes());
+        var message = basicMessageService.createMessage
+                (new MessageCreateRequestDto("test message",
+                        user.getId(), false, channel.getId()
+                        ,new HashSet<>(List.of(profileDto1, profileDto2)))
+                );
         //when
-        basicMessageService.updateMessage(messageDtoSample, Message.messageElement.CONTENT,"Updated");
-        MessageDto actualResult = repository.getMessage(messageDtoSample);
+
+        basicMessageService.updateMessage(
+                new MessageUpdateRequestDto<>
+                        (message.getId(), MessageElement.CONTENT, "test message update"));
+        var actualResult = messageRepository.getMessageById(message.getId());
+
         //then
-        assertThat(actualResult.getContent()).isEqualTo("Updated");
+        assertThat(actualResult.orElseThrow().getContent()).isEqualTo("test message update");
+    }
+
+    @Test
+    @DisplayName("[정상 케이스] - 채널 메시지 조회")
+    void findallByChannelId() {
+        //given
+        var user = userRepository.saveUser(User.builder().userName("testUser").name("테스트 유저").email("").password("").build());
+        var channel = channelRepository.saveChannel(Channel.builder().name("테스트 채널").description("테스트 채널 설명").build());
+        var profileDto1 = new ProfileCreateRequestDto("test.png".getBytes());
+        var profileDto2 = new ProfileCreateRequestDto("test2.png".getBytes());
+        var message = basicMessageService.createMessage
+                (new MessageCreateRequestDto("test message",
+                        user.getId(), false, channel.getId()
+                        ,new HashSet<>(List.of(profileDto1, profileDto2)))
+                );
+        var message2 = basicMessageService.createMessage(
+                new MessageCreateRequestDto("test message2",
+                        user.getId(), false, channel.getId())
+        );
+        //when
+        var actualResult = basicMessageService.findallByChannelId(channel.getId());
+
+        //then
+        assertThat(actualResult.size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("[예외 케이스] - 없는 채널 id로 조회")
+    void findallByChannelIdNotExistChannel(){
+        //given
+
+        var message = messageRepository.saveMessage(Instancio.of(Message.class).create());
+        var message2 = messageRepository.saveMessage(Instancio.of(Message.class).create());
+        //when & then
+        assertThatThrownBy(()->basicMessageService.findallByChannelId(UUID.randomUUID()))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("[예외 케이스] - 없는 유저 id,채널 id 설정")
+    void illegal_input_id(){
+        //given
+        var channel = channelRepository.saveChannel(Instancio.of(Channel.class).create());
+
+        //when & then
+        assertThatThrownBy(()->basicMessageService.createMessage(
+                Instancio.of(MessageCreateRequestDto.class)
+                        .set(field(MessageCreateRequestDto::getChannelId), channel.getId())
+                        .create()
+        )).isInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(()->basicMessageService.createMessage(
+                Instancio.create(MessageCreateRequestDto.class)
+                )
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 }

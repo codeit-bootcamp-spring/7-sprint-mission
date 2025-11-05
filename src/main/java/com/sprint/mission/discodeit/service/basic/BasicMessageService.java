@@ -1,118 +1,99 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.DeletedMessageDto;
-import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entityElement.MessageElement;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.ValidateService;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.service.util.StaticString.*;
-import static com.sprint.mission.discodeit.service.util.StaticString.CREATE_MESSAGE;
-import static com.sprint.mission.discodeit.service.util.StaticString.DELETE_MESSAGE;
-import static com.sprint.mission.discodeit.service.util.StaticString.MESSAGE_NOT_EXIST;
-import static com.sprint.mission.discodeit.service.util.StaticString.NULL_INPUT;
-import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EXIST;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
+
     private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
-    private final ValidateService validateService;
 
-    public BasicMessageService(MessageRepository messageRepository, ValidateService validateService) {
-        this.messageRepository = messageRepository;
-                this.validateService = validateService;
+    public Message createMessage(MessageCreateRequestDto messageCreateRequestDto){
+        //todo channel id 랑 sender id 관련 안전성 확인, 일단 지금은 안함
+        List<Channel> channelList = channelRepository.getAllChannel();
+        Message message = messageRepository.saveMessage(Message.builder()
+                .content(messageCreateRequestDto.getContent())
+                .channelId(messageCreateRequestDto.getChannelId())
+                .senderId(messageCreateRequestDto.getSenderId())
+                .isMarkDown(messageCreateRequestDto.isMarkDown())
+                .attachmentIdList(
+                        messageCreateRequestDto.getAttachmentIdList().stream().map(x ->
+                                {
+                                    BinaryContent binaryContent = BinaryContent.builder()
+                                            .binaryContentUsage(BinaryContentUsage.ATTATCHMENT)
+                                            .binaryFile(x.getFile())
+                                            .build();
+                                    return binaryContentRepository.createBinaryContent(binaryContent).getId();
+                                }
+                                ).collect(Collectors.toCollection(HashSet::new))
+                )
+                .build());
+        Channel channel2 = channelRepository.getChannelById(message.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
+        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(message.getSenderId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
+        channel2.getMessageIdList().add(message.getId());
+        channelRepository.updateChannel(channel2);
+        return message;
     }
-
-    public void createMessage(MessageDto messageDto){
-
-        if(messageDto == null){
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(validateService.isValidateMessage(messageDto)){
-            System.out.println(MESSAGE_EXIST+messageDto.getContent() );
-            return;
-        }
-        if(!validateService.isValidateUser(messageDto.getSender())){
-            System.out.println(USER_NOT_EXIST + messageDto.getSender().getName());
-            return;
-        }
-        messageRepository.saveMessage(messageDto);
-        System.out.println(CREATE_MESSAGE+messageDto.getContent());
+    public Message readMessage(Message message){
+        return messageRepository.getMessage(message).orElseThrow(()->new IllegalArgumentException("Message not found"));
     }
-    public void readMessage(MessageDto messageDto){
-        if(messageDto == null){
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(!validateService.isValidateMessage(messageDto)){
-            System.out.println(MESSAGE_NOT_EXIST+messageDto.getContent());
-            return;
-        }
-        MessageDto result =messageRepository.getMessage(messageDto);
-        System.out.println(result.toString());
+    public List<Message> readAllMessage(){
+        return messageRepository.getAllMessage();
     }
-    public void readAllMessage(){
-
-        for(MessageDto messageDto : messageRepository.getAllMessage()){
-            System.out.println(messageDto.toString());
-        }
-    }
-    public void deleteMessage(MessageDto messageDto){
-
-
-        if(messageDto == null){
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(!validateService.isValidateMessage(messageDto)){
-            System.out.println(MESSAGE_NOT_EXIST+messageDto.getContent());
-            return;
-        }
-
-        messageRepository.deleteMessage(messageDto);
-
-        System.out.println(DELETE_MESSAGE+messageDto.getContent());
-    }
-    public void updateMessage(MessageDto messageDto, Message.messageElement messageElement, Object updatedContent){
-
-        if(messageDto == null || updatedContent == null || messageElement == null){
-            System.out.println(NULL_INPUT);
-            return;
-        }
-        if(!validateService.isValidateMessage(messageDto)){
-            System.out.println(MESSAGE_NOT_EXIST+messageDto.getContent());
-            return;
-        }
-        if(!validateService.isValidateUser(messageDto.getSender())){
-            System.out.println(USER_NOT_EXIST + messageDto.getSender().getName());
-        }
-        messageRepository.updateMessage(messageDto,messageElement,updatedContent);
-        System.out.println("Updated field: "+messageElement.name()+"Updated Content: "+updatedContent);
-    }
-    public void readUpdatedMessage(){
-        if(messageRepository.getUpdatedMessage().length == 0){
-            System.out.println("NO_UPDATED_MESSAGE");
-            return;
-        }
-        for(MessageDto messageDto : messageRepository.getUpdatedMessage()){
-            readMessage(messageDto);
-            System.out.println(messageDto.getContent()+" Updated Time: "+messageDto.getUpdatedAt());
-        }
+    public void deleteMessage(UUID messageId){
+        List<BinaryContent> binaryContentList = binaryContentRepository.readAllBinaryContent();
+        Message message = messageRepository.getMessageById(messageId).orElseThrow(()->new IllegalArgumentException("Message not found"));
+        HashSet<UUID> attatchmentIdList = message.getAttachmentIdList();
+        attatchmentIdList.forEach(binaryContentRepository::deleteBinaryContent);
+        Channel channel = channelRepository.getChannelById(message.getChannelId()).orElseThrow(() -> new IllegalArgumentException("Channel not found"));
+        channel.getMessageIdList().remove(messageId);
+        channelRepository.updateChannel(channel);
+        messageRepository.deleteMessage(message);
 
     }
-    public void readDeletedMessage(){
-        if(messageRepository.getDeletedMessage().length == 0){
-            System.out.println("NO_DELETED_MESSAGE");
-            return;
-        }
-        System.out.println("===Deleted Message=== ");
-        for(DeletedMessageDto deletedMessageDto : messageRepository.getDeletedMessage()){
-            ;
-            System.out.println(deletedMessageDto.getContent()+" Deleted Time: "+deletedMessageDto.getDeletedTime());
-        }
-        System.out.println("================");
+    public <T>void updateMessage(MessageUpdateRequestDto<T> messageUpdateRequestDto){
+        MessageElement messageElement = messageUpdateRequestDto.getType();
+        Message message = messageRepository.getMessageById(messageUpdateRequestDto.getMessageId()).orElseThrow(()->new IllegalArgumentException("Message not found"));
+        BiConsumer<Message ,T> biConsumer = (BiConsumer<Message, T>) messageElement.setter;
+        biConsumer.accept(message, messageUpdateRequestDto.getUpdateValue());
+        message.updateEntity();
+        messageRepository.updateMessage(message);
+
     }
+    public List<Message> readUpdatedMessage(){
+        return messageRepository.getUpdatedMessage();
+    }
+    @Override
+    public List<Message> findallByChannelId(UUID channelId) {
+        Channel targetChannel = channelRepository.getChannelById(channelId).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
+        List<Message> messageList = messageRepository.getAllMessage();
+        return messageList.stream().filter(x -> x.getChannelId().equals(channelId)).toList();
+    }
+
+
 }

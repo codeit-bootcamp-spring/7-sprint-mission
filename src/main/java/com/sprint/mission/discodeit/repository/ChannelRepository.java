@@ -1,27 +1,29 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.dto.ChannelDto;
-import com.sprint.mission.discodeit.dto.DeletedChannelDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.Channel;
 
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
+
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelRepository {
 
-    public ChannelDto getChannelById(UUID channelId);
-    public ChannelDto getChannelByName(String channelName);
-    public ChannelDto getChannel(ChannelDto channelDto);
+    public Optional<Channel> getChannelById(UUID channelId);
+    public Optional<Channel> getChannelByName(String channelName);
+    public Optional<Channel> getChannel(Channel channel);
 
-    public void saveChannel(ChannelDto channelDto);
-    public void deleteChannel(ChannelDto channelDto);
-    public <T>void updateChannel(ChannelDto channelDto, Channel.channelElement channelElement, T updatedContent);
+    public Channel saveChannel(Channel channel);
+    public void deleteChannel(Channel channel);
+    public <T>void updateChannel(Channel channel);
 
-    public ChannelDto[] getAllChannel();
-    public ChannelDto[] getUpdatedChannel();
-    public DeletedChannelDto[] getDeletedChannel();
-    public void addUserToChannel(UserDto userDto, ChannelDto channelDto);
-    public void deleteUserFromChannel(UserDto userDto, ChannelDto channelDto);
+    public List<Channel> getAllChannel();
+    public List<Channel> getUpdatedChannel();
+//    public DeletedChannelDto[] getDeletedChannel();
+//    public void addUserToChannel(User userDto, Channel channelDto);
+//    public void deleteUserFromChannel(User userDto, Channel channelDto);
 
     public void resetChannelRepository();
+    public boolean isChannelExit(UUID channelId);
 }

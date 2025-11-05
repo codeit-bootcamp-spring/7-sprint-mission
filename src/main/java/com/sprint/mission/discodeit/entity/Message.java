@@ -1,73 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
+@Getter
+@ToString
+@Setter
+@Builder
 public class Message extends Entity{
 
     private String content;
-    private User sender;
+    private UUID senderId;
     private boolean isMarkDown;
+    private UUID channelId;
+    private HashSet<UUID> attachmentIdList;
 
-    public Message(String content, User sender, boolean isMarkDown) {
-        super();
-        this.content = content;
-        this.sender = sender;
-        this.isMarkDown = isMarkDown;
-    }
+//    public Message(String content, UUID senderId, boolean isMarkDown, UUID channelId) {
+//        super();
+//        this.content = content;
+//        this.senderId = senderId;
+//        this.isMarkDown = isMarkDown;
+//        this.channelId = channelId;
+//    }
+//
+//    public Message(UUID id, String content, UUID senderId, boolean isMarkDown, UUID channelId) {
+//        super(id);
+//        this.content = content;
+//        this.senderId = senderId;
+//        this.isMarkDown = isMarkDown;
+//        this.channelId = channelId;
+//    }
 
-    public Message(UUID id, String content, User sender, boolean isMarkDown) {
-        super(id);
-        this.content = content;
-        this.sender = sender;
-        this.isMarkDown = isMarkDown;
-    }
 
-    public String getContent() {
-        return content;
-    }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
 
-    public User getSender() {
-        return sender;
-    }
 
-    public void setSender(User sender) {
-        this.sender = sender;
-    }
 
-    public boolean isMarkDown() {
-        return isMarkDown;
-    }
-
-    public void setMarkDown(boolean markDown) {
-        isMarkDown = markDown;
-    }
-
-    public enum messageElement
-    {
-        CONTENT(Message::getContent,(x,y) -> x.setContent( (String) y)),
-        IS_MARKDOWN(Message::isMarkDown,(x,y)->x.setMarkDown( (boolean) y));
-
-        public BiConsumer<Message, Object> setter;
-        public Function<Message,Object> getter;
-
-        messageElement(   Function<Message,Object>  getter,BiConsumer<Message, Object> setter)
-        {   this.getter = getter;
-            this.setter = setter;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "content='" + content + '\'' +
-                ", sender=" + sender.getName() +
-                ", isMarkDown=" + isMarkDown +
-                '}';
-    }
 }

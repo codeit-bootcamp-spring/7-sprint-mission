@@ -1,118 +1,82 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.DeletedMessageDto;
-import com.sprint.mission.discodeit.dto.MessageDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.deletedCash.DeletedMessage;
-import com.sprint.mission.discodeit.entity.Entity;
+
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.UUID;
-import java.util.function.BiConsumer;
+import java.util.*;
 
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "jcf",
+        matchIfMissing = true
+)
 public class JCFMessageRepository implements MessageRepository {
-    private final ArrayList<Message> messageRepo ;
-    private final ArrayList<DeletedMessage> deletedMessageRepo ;
-    private final User DEFAULT_SENDER = new User(UUID.randomUUID(), "DeletedUser", "DeletedUser", "codeit.org", true);
+    private final Map<UUID,Message> messageRepo ;
+
 
     public JCFMessageRepository() {
-        this.messageRepo = new ArrayList<>();
-        this.deletedMessageRepo = new ArrayList<>();
+        this.messageRepo = new HashMap<>();
+
         resetMessageRepository();
     }
 
     @Override
-    public MessageDto getMessageById(UUID messageId) {
-        return messageRepo.stream().filter(x->x.getId().equals(messageId)).map(this::messageToMessageDto).findFirst().orElse(null);
+    public Optional<Message> getMessageById(UUID messageId) {
+        return Optional.ofNullable(messageRepo.get(messageId));
     }
 
     @Override
-    public MessageDto getMessageByName(String messageName) {
-        return messageRepo.stream().filter(x->x.getContent().equals(messageName)).map(this::messageToMessageDto).findFirst().orElse(null);
+    public Optional<Message> getMessageByName(String messageName) {
+        return messageRepo.values().stream().filter(x->x.getContent().equals(messageName)).findFirst();
     }
 
     @Override
-    public MessageDto getMessage(MessageDto messageDto) {
-        return getMessageById(messageDto.getId());
+    public Optional<Message> getMessage(Message message) {
+        return getMessageById(message.getId());
     }
 
     @Override
-    public void saveMessage(MessageDto messageDto) {
-
-        messageRepo.add(messageDtoToMessage(messageDto));
-
+    public Message saveMessage(Message message) {
+        messageRepo.put(message.getId(),message);
+        return message;
     }
 
     @Override
-    public void deleteMessage(MessageDto messageDto) {
-        if(messageDto == null){
-            return;
-        }
-        deletedMessageRepo.add(messageDtoToDeletedMessage(messageDto));
-        messageRepo.remove(messageRepo.stream().filter(x->x.getId().equals(messageDto.getId())).findFirst().orElse(null));
-        return;
-
+    public void deleteMessage(Message message) {
+       messageRepo.remove(message.getId());
     }
 
     @Override
-    public <T> void updateMessage(MessageDto messageDto, Message.messageElement messageElement, T updatedContent) {
-        Message updatedMessage = messageRepo.stream().filter(x->x.getId().equals(messageDto.getId())).findFirst().orElse(null);
-        BiConsumer<Message, Object> editFunction = messageElement.setter;
-        editFunction.accept(updatedMessage, updatedContent);
-        updatedMessage.updateEntity();
-
+    public void updateMessage(Message message) {
+        deleteMessage(message);
+        saveMessage(message);
     }
 
     @Override
-    public MessageDto[] getUpdatedMessage() {
-        return messageRepo.stream().filter(x->x.getUpdatedAt()!= Entity.DEFAULT_UPDATED_AT).map(this::messageToMessageDto).toArray(MessageDto[]::new);
+    public List<Message> getUpdatedMessage() {
+        return messageRepo.values().stream().filter(x->x.getUpdatedAt()!= x.getCreatedAt()).toList();
     }
+
+
 
     @Override
-    public DeletedMessageDto[] getDeletedMessage() {
-        return deletedMessageRepo.stream().map(this::deletedMessageToDeletedMessageDto).toArray(DeletedMessageDto[]::new);
+    public List<Message> getAllMessage() {
+        return messageRepo.values().stream().toList();
     }
 
-    @Override
-    public MessageDto[] getAllMessage() {
-        return messageRepo.stream().map(this::messageToMessageDto).toArray(MessageDto[]::new);
-    }
 
-    @Override
-    public void setDefaultSender(MessageDto messageDto) {
-        Message targetMessage = messageRepo.stream().filter(x->x.getId().equals(messageDto.getId())).findFirst().orElse(null);
-        targetMessage.setSender(DEFAULT_SENDER);
-
-    }
 
     @Override
     public void resetMessageRepository() {
         messageRepo.clear();
-        deletedMessageRepo.clear();
 
     }
 
-    private Message messageDtoToMessage(MessageDto messageDto) {
-        User sender = new User(messageDto.getSender().getId(), messageDto.getSender().getName(), messageDto.getSender().getNickname(), messageDto.getSender().getEmail(), messageDto.getSender().isOnline());
-        return new Message(messageDto.getId(), messageDto.getContent(), sender, messageDto.isMarkDown());
 
-    }
-
-    private MessageDto messageToMessageDto(Message message) {
-        UserDto tempSender = new UserDto(message.getSender().getId(), message.getSender().getName(), message.getSender().getNickname(), message.getSender().getEmail(), message.getSender().isOnline());
-        return new MessageDto(message.getId(),message.getContent(), tempSender, message.isMarkDown());
-    }
-
-    private DeletedMessage messageDtoToDeletedMessage(MessageDto messageDto){
-        return new DeletedMessage(messageDto.getSender().getName(),messageDto.getContent());
-    }
-    //    private DeletedMessage deletedMessageDtoToDeletedMessage(DeletedMessageDto deletedMessageDto){
-//        return new DeletedMessage(deletedMessageDto.getName(),deletedMessageDto.getContent());
-//    }
-    private DeletedMessageDto deletedMessageToDeletedMessageDto(DeletedMessage deletedMessage){
-        return new DeletedMessageDto(deletedMessage.getSenderName(),deletedMessage.getContent());
-    }
 }
