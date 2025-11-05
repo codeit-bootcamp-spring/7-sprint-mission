@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelRequestDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelRequestDto;
 import com.sprint.mission.discodeit.entity.entityType.ChannelType;
 import com.sprint.mission.discodeit.exception.NotFoundChannelException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -29,41 +28,28 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
 
     private ChannelResponseDto toDto(Channel channel) {
-//        Optional<Message> lastMessage = messageRepository.findAllByChannelId(channel.getId())
-//                .stream().findFirst();
 
-        // 맨 위 메시지 찾기 -> createAt에서 max를 사용해서 찾는걸로
         Optional<Message> lastMessage = messageRepository.findTopByChannelId(channel.getId());
         return ChannelResponseDto.from(channel, lastMessage.orElse(null));
     }
 
 
     @Override
-    public ChannelResponseDto createPublicChannel(PublicChannelRequestDto requestDto) {
+    public ChannelResponseDto createChannel(ChannelRequestDto requestDto) {
         User admin = userRepository.findById(requestDto.adminId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
 
-        Channel newChannel = new Channel(admin, requestDto.channelName(), ChannelType.PUBLIC);
-        readStatusRepository.save(new ReadStatus(admin.getId(), newChannel.getId()));
-        channelRepository.save(newChannel);
-        return toDto(newChannel);
-    }
+        Channel newChannel = new Channel(admin, requestDto.channelName(), requestDto.channelType());
 
-    @Override
-    public ChannelResponseDto createPrivateChannel(PrivateChannelRequestDto requestDto) {
-        User admin = userRepository.findById(requestDto.adminId())
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
-
-        Channel newChannel = new Channel(admin, null, ChannelType.PRIVATE);
-
-        Set<UUID> privateMemberIds = new HashSet<>(requestDto.memberIds());
-        for (UUID memberIds : privateMemberIds) {
-            User member = userRepository.findById(memberIds)
+        Set<UUID> memberIds = new HashSet<>(requestDto.memberIds());
+        for (UUID ids : memberIds) {
+            User member = userRepository.findById(ids)
                     .orElseThrow(() -> new NotFoundUserException("멤버를 찾을 수 없음"));
             newChannel.addMember(member);
+
+            readStatusRepository.save(new ReadStatus(ids, newChannel.getId()));
         }
 
-        readStatusRepository.save(new ReadStatus(admin.getId(), newChannel.getId()));
         channelRepository.save(newChannel);
         return toDto(newChannel);
     }

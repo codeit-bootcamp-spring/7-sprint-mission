@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelRequestDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelRequestDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,20 +19,14 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    @RequestMapping(value = "/public", method = RequestMethod.POST)
-    public ResponseEntity<ChannelResponseDto> channelCreate(@RequestBody PublicChannelRequestDto publicChannelRequestDto) {
-        ChannelResponseDto channel = channelService.createPublicChannel(publicChannelRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(channel);
-    }
-
-    @RequestMapping(value = "/private", method = RequestMethod.POST)
-    public ResponseEntity<ChannelResponseDto> channelCreate(@RequestBody PrivateChannelRequestDto privateChannelRequestDto) {
-        ChannelResponseDto channel = channelService.createPrivateChannel(privateChannelRequestDto);
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<ChannelResponseDto> channelCreate(@RequestBody ChannelRequestDto channelRequestDto) {
+        ChannelResponseDto channel = channelService.createChannel(channelRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @RequestMapping(value = "/channelname", method = RequestMethod.PUT)
-    public ChannelResponseDto channelNameUpdate(ChannelUpdateDto channelUpdateDto) {
+    public ChannelResponseDto channelNameUpdate(@RequestBody ChannelUpdateDto channelUpdateDto) {
         return channelService.updateChannelName(channelUpdateDto);
     }
 
