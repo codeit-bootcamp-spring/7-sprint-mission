@@ -24,13 +24,13 @@ public class RepositoryConfig {
 
     @PostConstruct
     public void init() {
-        userPath = baseDirectory + "\\user.sav";
-        channelPath = baseDirectory + "\\channel.sav";
-        joinedPath = baseDirectory + "\\joined.sav";
-        messagePath = baseDirectory + "\\message.sav";
-        readstatusPath = baseDirectory + "\\readstatus.sav";
-        userstatusPath = baseDirectory + "\\userstatus.sav";
-        binarycontentPath = baseDirectory + "\\content.sav";
+        userPath = baseDirectory + "/user.sav";
+        channelPath = baseDirectory + "/channel.sav";
+        joinedPath = baseDirectory + "/joined.sav";
+        messagePath = baseDirectory + "/message.sav";
+        readstatusPath = baseDirectory + "/readstatus.sav";
+        userstatusPath = baseDirectory + "/userstatus.sav";
+        binarycontentPath = baseDirectory + "/content.sav";
     }
 
     // UserRepository

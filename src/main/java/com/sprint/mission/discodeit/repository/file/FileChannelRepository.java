@@ -4,11 +4,12 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ChannelVisibility;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.sprint.mission.discodeit.utils.FileIOHandler.*;
 
 public class FileChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channelStore = new HashMap<>();
@@ -19,52 +20,8 @@ public class FileChannelRepository implements ChannelRepository {
     public FileChannelRepository(String channelPath, String joinedPath) {
         this.channelPath = channelPath;
         this.joinedPath = joinedPath;
-        loadChannels();
-        loadJoinedChannels();
-    }
-
-    // --- 채널 정보 저장 ---
-    private void saveChannels() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(channelPath))) {
-            oos.writeObject(channelStore);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // --- 유저-채널 관계 저장 ---
-    private void saveJoinedChannels() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(joinedPath))) {
-            oos.writeObject(joinedChannels);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadChannels() {
-        File file = new File(channelPath);
-        if (!file.exists()) return;
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(channelPath))) {
-            Map<UUID, Channel> loaded = (Map<UUID, Channel>) ois.readObject();
-            channelStore.clear();
-            channelStore.putAll(loaded);
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadJoinedChannels() {
-        File file = new File(joinedPath);
-        if (!file.exists()) return;
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(joinedPath))) {
-            Map<UUID, Set<UUID>> loaded = (Map<UUID, Set<UUID>>) ois.readObject();
-            joinedChannels.clear();
-            joinedChannels.putAll(loaded);
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        loadFromFile(channelPath, channelStore);
+        loadFromFile(joinedPath, joinedChannels);
     }
 
     // 유저가 속한 채널 id 목록을 joinedChannels Map에 저장
@@ -96,11 +53,11 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void save(Channel channel) {
         channelStore.put(channel.getId(), channel);
-        saveChannels();
+        saveToFile(channelPath, channelStore);
 
         // 비공개 채널의 경우에만 참여한 채널 정보 저장
         if(channel.getVisibility() == ChannelVisibility.PRIVATE) {
-            saveJoinedChannels();
+            saveToFile(joinedPath, joinedChannels);
         }
     }
 
@@ -131,7 +88,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void update(Channel channel) {
         channelStore.replace(channel.getId(), channel);
-        saveChannels();
+        saveToFile(channelPath, channelStore);
     }
 
     @Override
@@ -144,8 +101,8 @@ public class FileChannelRepository implements ChannelRepository {
         channelStore.remove(channelId);
 
         // 삭제된 후 목록 저장
-        saveChannels();
-        saveJoinedChannels();
+        saveToFile(channelPath, channelStore);
+        saveToFile(joinedPath, joinedChannels);
     }
 
     @Override
@@ -155,8 +112,8 @@ public class FileChannelRepository implements ChannelRepository {
         save(channel); // 변경된 채널 정보 저장
 
         // 삭제된 후 목록 저장
-        saveChannels();
-        saveJoinedChannels();
+        saveToFile(channelPath, channelStore);
+        saveToFile(joinedPath, joinedChannels);
     }
 
     @Override
