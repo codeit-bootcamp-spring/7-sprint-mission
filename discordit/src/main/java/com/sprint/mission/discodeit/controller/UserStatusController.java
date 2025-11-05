@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("/api/userStatus")
+@RestController
+@RequestMapping("/api/userStatus")
 @RequiredArgsConstructor
 public class UserStatusController {
     private final UserStatusService userStatusService;

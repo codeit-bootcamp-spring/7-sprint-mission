@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("/api/readStatus")
+@RestController
+@RequestMapping("/api/readStatus")
 @RequiredArgsConstructor
 public class ReadStatusController {
     private final ReadStatusService readStatusService;
@@ -33,6 +34,11 @@ public class ReadStatusController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<List<ReadStatusResponse>> getByUserId(@PathVariable String id) {
         return ResponseEntity.ok(readStatusService.getAllByUserId(id));
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<List<ReadStatusResponse>> getAll() {
+        return ResponseEntity.ok(readStatusService.getAll());
     }
 
 
