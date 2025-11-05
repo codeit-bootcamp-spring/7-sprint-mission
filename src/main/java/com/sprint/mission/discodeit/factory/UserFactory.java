@@ -9,7 +9,7 @@ public class UserFactory {
     private UserFactory() {}
 
     public static User create(UserCreateReq req, UUID profileId){
-        return new User(
+        return User.createWithProfile(
                 req.email(),
                 req.nickname(),
                 req.password(),

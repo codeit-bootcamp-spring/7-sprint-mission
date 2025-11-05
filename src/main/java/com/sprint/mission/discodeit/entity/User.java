@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.validation.constraints.Pattern;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
@@ -19,18 +22,20 @@ public class User extends BaseEntity {
     private UUID profileId;             //프로필 이미지 UUID
 
     //Constructor
-    public User(String email, String nickname, String password, UUID profileId) {
+    private User(String email, String nickname, String password, UUID profileId) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
         this.profileId = profileId;
     }
 
-    public User(String email, String nickname, String password) {
-        this.email = email;
-        this.nickname = nickname;
-        this.password = password;
-        this.profileId = null;
+    //Factory Method
+    public static User createWithProfile(String email, String nickname, String password, UUID profileId) {
+        return new User(email, nickname, password, profileId);
+    }
+
+    public static User createWithoutProfile(String email, String nickname, String password) {
+        return new User(email, nickname, password, null);
     }
 
     //update

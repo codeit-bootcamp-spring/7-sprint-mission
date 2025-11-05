@@ -6,7 +6,7 @@ public class ReadStatusFactory {
     private ReadStatusFactory(){}
 
     public static ReadStatus create(ReadStatus readStatus){
-        return new ReadStatus(
+        return ReadStatus.create(
                 readStatus.getUserId(),
                 readStatus.getChannelId()
         );

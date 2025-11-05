@@ -10,7 +10,7 @@ public class MessageFactory {
     private MessageFactory(){}
 
     public static Message create(MessageCreateReq req, List<UUID> attachmentIds){
-        return new Message(
+        return Message.createWithAttachment(
                 req.channelId(),
                 req.speakerId(),
                 req.content(),

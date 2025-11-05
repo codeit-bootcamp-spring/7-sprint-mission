@@ -27,7 +27,8 @@ public class ChannelCreationFacade {
     public ChannelInfoRes createPrivateChannel(ChannelCreateSecReq req){
         Channel channel = channelService.create(req);
         req.userIds().forEach(userId -> readStatusService.create(
-                            new ReadStatus(userId, channel.getId())));
+                            ReadStatus.create(userId, channel.getId())
+        ));
         return channelMapper.toInfoRes(channel);
     }
 }
