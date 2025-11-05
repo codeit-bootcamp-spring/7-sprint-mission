@@ -11,12 +11,20 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserDetailViewFacade {
     private final UserService userService;
     private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
+
+    //유저 단일 조회 : 유저 목록에서 유저를 클릭했을 때
+    public UserDetailInfoRes findById(@NonNull UUID userId){
+        User user = userService.findById(userId);
+        return toDetailInfo(user);
+    }
 
     //유저 단일 조회 : 닉네임
     public UserDetailInfoRes findByNickname(@NonNull String nickname){
