@@ -27,7 +27,7 @@ import java.util.UUID;
 public class BaseModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-//    private final UUID id; //!! for test
+//    private final UUID readStatusID; //!! for test
     private UUID id; //!! for test
     private final Instant createdAt;
     private Instant updatedAt; // 유닉스 타임스탬프

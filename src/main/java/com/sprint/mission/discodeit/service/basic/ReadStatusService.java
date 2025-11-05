@@ -66,8 +66,8 @@ public class ReadStatusService implements InterfaceReadStatusService {
     public void update(Dto_ReadStatusUpdate requestDto) {
         //update
         //[ ] DTO를 활용해 파라미터를 그룹화합니다.
-        //수정 대상 객체의 id 파라미터, 수정할 값 파라미터
-        ReadStatus readStatus = readStatusRepository.findById(requestDto.id())
+        //수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
+        ReadStatus readStatus = readStatusRepository.findById(requestDto.readStatusID())
                 .orElseThrow(() -> new IllegalArgumentException("🚨readStatusRepository.update.requestDto = [" + requestDto.toString() + "] 오류"));
         readStatus.updateLastReadAt();
         readStatusRepository.save(readStatus);

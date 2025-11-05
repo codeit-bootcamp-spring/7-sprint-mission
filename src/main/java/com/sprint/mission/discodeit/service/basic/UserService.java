@@ -80,7 +80,7 @@ public class UserService implements InterfaceUserService {
         String message = "find.userID = [" + userID.toString() + "] 오류";
         User user = userRepository.findById(userID).orElseThrow(() -> new IllegalArgumentException(message));
 
-//        Util.okMessage("♣️user.id() = [" + user.getId() + "]");
+//        Util.okMessage("♣️user.readStatusID() = [" + user.getId() + "]");
         UserStatus userStatus = userStatusRepository.findByUserId(userID).orElseThrow(() -> new IllegalArgumentException(message));
 
         Util.okMessage("UserService.findAllByChannleId = [" + user.getUserName() + "] isOnline = [" + userStatus.isOnline() + "]");
@@ -128,7 +128,7 @@ public class UserService implements InterfaceUserService {
     public Res_User update(UUID userId, Dto_User dto_user, Optional<Dto_BinaryContent> requestDto_Content) {
 //        [ ] 선택적으로 프로필 이미지를 대체할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
-//        수정 대상 객체의 id 파라미터, 수정할 값 파라미터
+//        수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
 
         Util.okMessage("UserService.update.userId = [" + userId + "]");
 

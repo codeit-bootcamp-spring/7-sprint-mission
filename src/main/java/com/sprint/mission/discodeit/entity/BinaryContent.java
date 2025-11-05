@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class BinaryContent extends BaseModel {
 //    이미지, 파일 등 바이너리 데이터를 표현하는 도메인 모델입니다. 사용자의 프로필 이미지, 메시지에 첨부된 파일을 저장하기 위해 활용합니다.
-//[ ] User, Message 도메인 모델과의 의존 관계 방향성을 잘 고려하여 id 참조 필드를 추가하세요.
+//[ ] User, Message 도메인 모델과의 의존 관계 방향성을 잘 고려하여 readStatusID 참조 필드를 추가하세요.
 
     //!! BufferedImage는 직렬화할 수 없으므로 ✅ transient(직렬화 대상에서 제외) 로 선언
 //    private transient BufferedImage profileImage;

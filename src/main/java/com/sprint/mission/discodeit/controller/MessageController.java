@@ -20,7 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/message")
-public class MessageController extends BaseController {
+public class MessageController {
     private final MessageService messageService;
 
     //    메시지 관리

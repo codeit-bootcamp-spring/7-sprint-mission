@@ -18,7 +18,7 @@ public record Res_ChannelFind(
         ChannelType channelType,
 
 //        [ ] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
-//        [ ] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
+//        [ ] PRIVATE 채널인 경우 참여한 User의 readStatusID 정보를 포함합니다.
         Instant lastMessageAt,
         List<UUID> privateChannelUserIDs
 ) {

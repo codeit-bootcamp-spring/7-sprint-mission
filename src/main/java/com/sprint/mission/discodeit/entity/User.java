@@ -38,7 +38,7 @@ public class User extends BaseModel {
             case "🦁사자" : setIdForTest(UUID.fromString("496859e7-1536-4ad7-bb64-ba895f756288")); break;
             default : break;
         }
-        Util.okMessage(dtoUser.userName() + ".id = [" + this.getId() + "]");
+        Util.okMessage(dtoUser.userName() + ".readStatusID = [" + this.getId() + "]");
     }
 
     @Override

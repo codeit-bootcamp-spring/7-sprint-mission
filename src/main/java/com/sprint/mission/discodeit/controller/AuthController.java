@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthController  extends BaseController {
+public class AuthController {
     private final AuthService authService;
 //    권한 관리
 //    [ ] 사용자는 로그인할 수 있다.

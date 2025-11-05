@@ -56,7 +56,7 @@ public class DiscodeitApplication {
                     , Dto_User.from("🐯호랭이는 어흥", "호랭123", "어흥이@eMail.com")
                     , null);
             userService.findAll();
-//            Util.okMessage("♣️user3.id() = [" + user3.id() + "]");
+//            Util.okMessage("♣️user3.readStatusID() = [" + user3.readStatusID() + "]");
             userService.find(user3.id());
             userService.delete(user2.id());
             userService.findAll();
@@ -89,7 +89,7 @@ public class DiscodeitApplication {
             userStatusService.update(dto_UserStatus4);
 
             Res_UserStatus userStatus_Creat5 = userStatusService.create(user5.id());
-            Util.okMessage("♣️ user5.id()= " + user5.userName());
+            Util.okMessage("♣️ user5.readStatusID()= " + user5.userName());
             userStatusService.delete(userStatus_Creat5.id());
             userStatusService.findAll();
 

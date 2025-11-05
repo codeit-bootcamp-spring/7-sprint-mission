@@ -22,7 +22,7 @@ public record Res_BinaryContent(
 ) {
 //    public static Res_BinaryContent from(String fileName, String contentType, byte[] data, Long size) {
 //        return Res_BinaryContent.builder()
-////                                .id(UUID.randomUUID())
+////                                .readStatusID(UUID.randomUUID())
 ////                                .createdAt(Instant.now())
 ////                                .updatedAt(Instant.now())
 //                .fileName(fileName)
@@ -34,7 +34,7 @@ public record Res_BinaryContent(
 
     public static Res_BinaryContent from(BinaryContent binaryContent) {
         return Res_BinaryContent.builder()
-//                                .id(UUID.randomUUID())
+//                                .readStatusID(UUID.randomUUID())
 //                                .createdAt(Instant.now())
 //                                .updatedAt(Instant.now())
 //                .fileName(binaryContent.getFileName())

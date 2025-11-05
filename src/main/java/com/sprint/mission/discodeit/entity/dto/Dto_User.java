@@ -20,7 +20,7 @@ public record Dto_User(
 
 //    public static Dto_User fromUser(User user) {
 //        return Dto_User.builder()
-////                .id(user.getId())
+////                .readStatusID(user.getId())
 ////                .createdAt(user.getCreatedAt())
 ////                .updatedAt(user.getUpdatedAt())
 //                .userName(user.getUserName())

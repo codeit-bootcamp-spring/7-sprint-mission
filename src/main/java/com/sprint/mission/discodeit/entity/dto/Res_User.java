@@ -32,7 +32,7 @@ public record Res_User(
 
 //    public static Res_User from(Dto_User dto_User, UUID profileId) {
 //        return Res_User.builder()
-//                .id(dto_User.id())
+//                .readStatusID(dto_User.readStatusID())
 //                .createdAt(dto_User.createdAt())
 //                .updatedAt(dto_User.updatedAt())
 //                .userName(dto_User.userName())
@@ -44,7 +44,7 @@ public record Res_User(
 //
 //    public static Res_User from(String userName, String password, String eMail, UUID profiledId) {
 //        return Res_User.builder()
-//                .id(UUID.randomUUID())
+//                .readStatusID(UUID.randomUUID())
 //                .createdAt(Instant.now())
 //                .updatedAt(Instant.now())
 //                .userName(userName)

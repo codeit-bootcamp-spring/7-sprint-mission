@@ -18,7 +18,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/channel")
 @RequiredArgsConstructor
 // http://localhost:8080/user-list.html
-public class ChannelController  extends BaseController {
+public class ChannelController {
     private final ChannelService channelService;
 //    채널 관리
 //    [ ] 공개 채널을 생성할 수 있다.

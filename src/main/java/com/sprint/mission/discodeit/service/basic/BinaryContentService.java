@@ -34,7 +34,7 @@ public class BinaryContentService implements InterfaceBinaryContentService {
     }
 
     public List<Res_BinaryContent> findAllByIdIn() {
-//    [ ] id 목록으로 조회합니다.
+//    [ ] readStatusID 목록으로 조회합니다.
         Optional<List<BinaryContent>> contents = binaryContentRepository.findAll();
         if (contents.isEmpty()) {
             throw new IllegalArgumentException("🚨BinaryContentService.findAllByIdIn.isEmpty");
@@ -48,6 +48,6 @@ public class BinaryContentService implements InterfaceBinaryContentService {
     public void delete(UUID binaryContentId) {
 //    [ ] id로 삭제합니다.
         binaryContentRepository.deleteById(binaryContentId);
-        Util.okMessage("BinaryContentService.delete.id = [" + binaryContentId + "]");
+        Util.okMessage("BinaryContentService.delete.readStatusID = [" + binaryContentId + "]");
     }
 }

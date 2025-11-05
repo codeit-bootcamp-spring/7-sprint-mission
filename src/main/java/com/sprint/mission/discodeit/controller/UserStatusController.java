@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class UserStatusController extends BaseController {
+public class UserStatusController {
     private final UserStatusService userStatusService;
 
 }

@@ -72,7 +72,7 @@ public class MessageService implements InterfaceMessageService {
     @Override
     public Res_Message updateMessage(Dto_MessageUpdate requestDto) {
         // [ ] DTO를 활용해 파라미터를 그룹화합니다.
-        // 수정 대상 객체의 id 파라미터, 수정할 값 파라미터
+        // 수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
         Message message = messageRepository.findById(requestDto.messageID()).stream().findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("🚨updateMessage.messageID() = [" + requestDto.messageID() + "] 에러"));
         message.updateMessage(requestDto.message());
@@ -86,7 +86,7 @@ public class MessageService implements InterfaceMessageService {
     public void deleteMessage(UUID messageID) {
 //        [ ] 관련된 도메인도 같이 삭제합니다.
 //        첨부파일(BinaryContent)
-        Message message = messageRepository.findById(messageID).map(model -> (Message)model).orElseThrow(() -> new IllegalArgumentException("🚨deleteMessage id = [" + messageID.toString() + "] 없는 메세지"));
+        Message message = messageRepository.findById(messageID).map(model -> (Message)model).orElseThrow(() -> new IllegalArgumentException("🚨deleteMessage readStatusID = [" + messageID.toString() + "] 없는 메세지"));
         messageRepository.deleteById(messageID);
         Util.okMessage("deleteMessage = [" + message.getMessage() + "]");
     }

@@ -58,7 +58,7 @@ public class ChannelService implements InterfaceChannelService {
     @Override
     public Res_ChannelFind find(Dto_Channel dtoChannel) {
 //        [ ] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
-//        [ ] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
+//        [ ] PRIVATE 채널인 경우 참여한 User의 readStatusID 정보를 포함합니다.
 
         Channel channel = channelRepository.findById(dtoChannel.id())
                 .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다."));
@@ -69,7 +69,7 @@ public class ChannelService implements InterfaceChannelService {
         Instant lastMessageAt = (message != null) ? message.getCreatedAt() : null;
 
         //!!⭐️ ReadStatus = Private Channel 만 가능??
-        //!! PRIVATE 채널인 경우 참여한 User의 id 정보
+        //!! PRIVATE 채널인 경우 참여한 User의 readStatusID 정보
         if (dtoChannel.channelType() == PRIVATE) {
             List<ReadStatus> readStatuses = readStatusRepository.findAll().orElseThrow(() -> new NullPointerException("hannel.find.readStatusRepository.findAll() 에러"));
             List<UUID> userIdList = readStatuses.stream().map(readStatus -> readStatus.getUserId()).distinct().toList();
@@ -86,7 +86,7 @@ public class ChannelService implements InterfaceChannelService {
     @Override
     public List<Res_ChannelFind> findAllByUserId(UUID userID) {
 //        [ ] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
-//        [ ] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
+//        [ ] PRIVATE 채널인 경우 참여한 User의 readStatusID 정보를 포함합니다.
 //        [ ] 특정 User가 볼 수 있는 Channel 목록을(readStatus에는 Private 채널만 있음) 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
 
 //        [ ] PUBLIC 채널 목록은 전체 조회합니다.
@@ -171,7 +171,7 @@ public class ChannelService implements InterfaceChannelService {
     public void delete(UUID channelID) {
 //        [ ] 관련된 도메인도 같이 삭제합니다.
 //        Message, ReadStatus
-        Channel findedChannel = channelRepository.findById(channelID).orElseThrow(() -> new IllegalArgumentException("🚨delete. id = [" + channelID.toString() + "] 오류"));
+        Channel findedChannel = channelRepository.findById(channelID).orElseThrow(() -> new IllegalArgumentException("🚨delete. readStatusID = [" + channelID.toString() + "] 오류"));
         channelRepository.deleteById(findedChannel.getId());
 
         List<ReadStatus> allResdStatus = readStatusRepository.findAll().orElseThrow(() -> new NoSuchElementException("🚨findAllByChannleId() 오류"));

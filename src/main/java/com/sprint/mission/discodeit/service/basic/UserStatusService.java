@@ -52,7 +52,7 @@ public class UserStatusService implements InterfaceUserStatusService {
 
     public List<Res_UserStatus> findAll() {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
-//    수정 대상 객체의 id 파라미터, 수정할 값 파라미터
+//    수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
         List<UserStatus> userStatuses = userStatusRepository.findAll()
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.findAll() err"));
         List<Res_UserStatus> list = userStatuses.stream().map(Res_UserStatus::from).toList();
@@ -66,9 +66,9 @@ public class UserStatusService implements InterfaceUserStatusService {
 
     public void update(Dto_UserStatus dto) {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
-//    수정 대상 객체의 id 파라미터, 수정할 값 파라미터
+//    수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
         UserStatus userStatus = userStatusRepository.findById(dto.id())
-                .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.update.id = [" + dto.id() + "] err"));
+                .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.update.readStatusID = [" + dto.id() + "] err"));
 
 //        boolean isOnline = userStatus.isOnline();
 //        userStatus.setOnlineState(isOnline);

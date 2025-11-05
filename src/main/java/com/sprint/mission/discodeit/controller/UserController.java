@@ -22,7 +22,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 // http://localhost:8080/user-list.html
-public class UserController  extends BaseController {
+public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 

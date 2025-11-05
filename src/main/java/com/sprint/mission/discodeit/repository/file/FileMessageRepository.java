@@ -27,7 +27,7 @@ public class FileMessageRepository implements InterfaceMessageRepository {
 
     @Override
     public Optional<Message> findById(UUID id) {
-        Optional<Message> message = fileUtil.findModel(id).map(model -> (Message)model); //.orElseThrow(() -> new NoSuchElementException("🚨MESSAGE id = [" + id + "] 오류"));
+        Optional<Message> message = fileUtil.findModel(id).map(model -> (Message)model); //.orElseThrow(() -> new NoSuchElementException("🚨MESSAGE readStatusID = [" + readStatusID + "] 오류"));
         return message;
     }
 

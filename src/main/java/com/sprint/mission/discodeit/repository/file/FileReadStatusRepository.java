@@ -29,7 +29,7 @@ public class FileReadStatusRepository  implements InterfaceReadStatusRepository 
 
     @Override
     public Optional<ReadStatus> findById(UUID readStatusID) {
-        ReadStatus readStatus = (ReadStatus) fileUtil.findModel(readStatusID).orElseThrow(() -> new IllegalArgumentException("🚨channel id = [" + readStatusID.toString()+ "] 오류"));
+        ReadStatus readStatus = (ReadStatus) fileUtil.findModel(readStatusID).orElseThrow(() -> new IllegalArgumentException("🚨channel readStatusID = [" + readStatusID.toString()+ "] 오류"));
         return Optional.of(readStatus);
     }
 

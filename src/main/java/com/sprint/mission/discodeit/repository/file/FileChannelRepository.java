@@ -29,7 +29,7 @@ public class FileChannelRepository implements InterfaceChannelRepository {
 
     @Override
     public Optional<Channel> findById(UUID channelID) {
-        Channel channel = (Channel) fileUtil.findModel(channelID).orElseThrow(() -> new IllegalArgumentException("🚨channel id = [" + channelID.toString()+ "] 오류"));
+        Channel channel = (Channel) fileUtil.findModel(channelID).orElseThrow(() -> new IllegalArgumentException("🚨channel readStatusID = [" + channelID.toString()+ "] 오류"));
         return Optional.ofNullable(channel);
     }
 
