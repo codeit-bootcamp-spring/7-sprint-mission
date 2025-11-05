@@ -24,6 +24,7 @@ public class FileUserStatusRepository extends FileBaseRepository<UserStatus> imp
 
     @Override
     public void deleteStatusByUserId(UUID userId) {
-        data.values().removeIf(status -> status.getUserId().equals(userId) );
+        data.values().removeIf(status -> status.getUserId() != null
+                && userId.equals(status.getUserId()));
     }
 }

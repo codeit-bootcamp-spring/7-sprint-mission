@@ -63,6 +63,7 @@ public class BasicUserService implements UserService {
         if (requestDto.getProfileImage() != null) {
             BinaryContent newImage = new BinaryContent(
                     newUser.getId(),
+                    null,
                     requestDto.getProfileImage(),
                     requestDto.getProfileName(),
                     requestDto.getProfileType()
