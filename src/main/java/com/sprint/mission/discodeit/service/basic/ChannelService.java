@@ -99,7 +99,7 @@ public class ChannelService implements InterfaceChannelService {
 
         for (Channel publicChannel : publicChannels) {
             resChannelFinds.add(this.find(Dto_Channel.from(publicChannel)));
-            Util.okMessage("✅ ChannelService.findAllByUserId.[PUBLIC].channelName = [" + publicChannel.getChannelName() + "]");
+            Util.okMessage("ChannelService.findAllByUserId.[PUBLIC].channelName = [" + publicChannel.getChannelName() + "]");
         }
 
         //!!⭐️ ReadStatus = Private Channel 만 가능??
@@ -111,7 +111,7 @@ public class ChannelService implements InterfaceChannelService {
 
         for (Channel privateChannel : privateChannels) {
             resChannelFinds.add(this.find(Dto_Channel.from(privateChannel)));
-            Util.okMessage("✅ ChannelService.findAllByUserId.[PRIVATE]");
+            Util.okMessage("ChannelService.findAllByUserId.[PRIVATE]");
         }
 
 //        Util.okMessage("ChannelService.findAllByUserId.userID = [" + userID + "]");

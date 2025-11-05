@@ -42,12 +42,12 @@ public class ChannelController  extends BaseController {
     }
 
     @RequestMapping(value = "/delete/{id}", method = DELETE)
-    public void delete(@PathVariable("id") UUID uuid) {
-        channelService.delete(uuid);
+    public void delete(@PathVariable("id") UUID channelId) {
+        channelService.delete(channelId);
     }
 
     @RequestMapping(value = "/findAllByUserId/{id}", method = POST)
-    public List<Res_ChannelFind> findAllByUserId(@PathVariable("id") UUID userID) {
-        return channelService.findAllByUserId(userID);
+    public List<Res_ChannelFind> findAllByUserId(@PathVariable("id") UUID userId) {
+        return channelService.findAllByUserId(userId);
     }
 }
