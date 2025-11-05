@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_User;
-import com.sprint.mission.discodeit.entity.dto.Res_UserWithIsOnline;
+import com.sprint.mission.discodeit.entity.dto.UserDto;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
 import com.sprint.mission.discodeit.repository.InterfaceBinaryContentRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
@@ -38,7 +38,7 @@ public class UserService implements InterfaceUserService {
 
     @Override
     public Res_User create(Dto_User dto_user, Optional<Dto_BinaryContent> requestDto) {
-//    public User create(String userName, Optional<BufferedImage> profileImageBytes) {
+//    public User create(String username, Optional<BufferedImage> profileImageBytes) {
 //        [ ] 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //                유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
@@ -49,7 +49,7 @@ public class UserService implements InterfaceUserService {
         }
 
         if(userRepository.isUsingEmail(dto_user.eMail())) {
-            throw new IllegalArgumentException("🚨create : 동일한 eMail [" + dto_user.eMail() + "] 사용 중");
+            throw new IllegalArgumentException("🚨create : 동일한 email [" + dto_user.eMail() + "] 사용 중");
         }
 
         UUID binaryContentId = null;
@@ -73,7 +73,7 @@ public class UserService implements InterfaceUserService {
     }
 
     @Override
-    public Res_UserWithIsOnline find(UUID userID) {
+    public UserDto find(UUID userID) {
 //        DTO를 활용하여:
 //        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
 //        [ ] 패스워드 정보는 제외하세요.
@@ -83,17 +83,17 @@ public class UserService implements InterfaceUserService {
 //        Util.okMessage("♣️user.readStatusID() = [" + user.getId() + "]");
         UserStatus userStatus = userStatusRepository.findByUserId(userID).orElseThrow(() -> new IllegalArgumentException(message));
 
-        Util.okMessage("UserService.findAllByChannleId = [" + user.getUserName() + "] isOnline = [" + userStatus.isOnline() + "]");
+        Util.okMessage("UserService.findAllByChannleId = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
 
-        return Res_UserWithIsOnline.from(user, userStatus.isOnline());
+        return UserDto.from(user, userStatus.isOnline());
     }
 
     @Override
-    public List<Res_UserWithIsOnline> findAll() {
+    public List<UserDto> findAll() {
 //        DTO를 활용하여:
 //        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
 //        [ ] 패스워드 정보는 제외하세요.
-        List<Res_UserWithIsOnline> dtoList = new ArrayList<>(){};
+        List<UserDto> dtoList = new ArrayList<>(){};
         Optional<List<User>> optionalUsers = userRepository.findAll();
 
         if (optionalUsers.isEmpty()) {
@@ -109,11 +109,11 @@ public class UserService implements InterfaceUserService {
                 Optional<UserStatus> userStatus = userStatusList.stream().filter(status -> status.getUserId() != null &&
                         status.getUserId().equals(user.getId())).findFirst();
                 if (userStatus.isPresent()) {
-                    Res_UserWithIsOnline dto = Res_UserWithIsOnline.from(user, userStatus.get().isOnline());
+                    UserDto dto = UserDto.from(user, userStatus.get().isOnline());
                     dtoList.add(dto);
-                    Util.okMessage("UserService.findAll = [" + user.getUserName() + "] isOnline = [" + userStatus.get().isOnline() + "]");
+                    Util.okMessage("UserService.findAll = [" + user.getUserName() + "] online = [" + userStatus.get().isOnline() + "]");
                 } else {
-                    Res_UserWithIsOnline dto = Res_UserWithIsOnline.from(user, false);
+                    UserDto dto = UserDto.from(user, false);
                     dtoList.add(dto);
                     // optionUserStatus 없는 경우 기본값(offline)으로 처리
                     Util.errMessage("UserService.findAll: User [" + user.getUserName() + "]의 UserStatus가 없습니다. 기본값(offline)으로 처리합니다.");
@@ -142,7 +142,7 @@ public class UserService implements InterfaceUserService {
 
         if (!userId.equals(user.getId())
                 && userRepository.isUsingEmail(dto_user.eMail())) {
-            throw new IllegalArgumentException("🚨 UserService.update = [" + dto_user.eMail() + "]은 이미 사용중인 eMail 입니다");
+            throw new IllegalArgumentException("🚨 UserService.update = [" + dto_user.eMail() + "]은 이미 사용중인 email 입니다");
         }
 
         //!! 선택적으로 프로필 이미지를 대체할 수 있습니다.

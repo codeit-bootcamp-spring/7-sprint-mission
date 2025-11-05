@@ -7,28 +7,28 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-public record Res_UserWithIsOnline(
+public record UserDto(
         UUID id,
         Instant createdAt,
         Instant updatedAt,
 
-        String userName,
+        String username,
 //        String password,
-        String eMail,
-        UUID profiledId,
+        String email,
+        UUID profileId,
 
-        boolean isOnline
+        Boolean online
 ){
-    public static Res_UserWithIsOnline from(User user, boolean isOnline) {
-        return Res_UserWithIsOnline.builder()
+    public static UserDto from(User user, boolean isOnline) {
+        return UserDto.builder()
                 .id(user.getId())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
-                .userName(user.getUserName())
+                .username(user.getUserName())
 //                .password(user.getPassword()) // 패스워드 정보는 제외하세요.
-                .eMail(user.getEMail())
-                .profiledId(user.getProfileId())
-                .isOnline(isOnline)
+                .email(user.getEMail())
+                .profileId(user.getProfileId())
+                .online(isOnline)
                 .build();
     }
 }

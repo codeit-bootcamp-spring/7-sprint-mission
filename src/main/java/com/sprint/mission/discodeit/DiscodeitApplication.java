@@ -44,16 +44,16 @@ public class DiscodeitApplication {
 
 //                File imageFile = new File("/Users/my05030/Desktop/장미연/7-sprint-mission/png/gyul.png");
 //                BufferedImage image = ImageIO.read(imageFile);
-            Dto_User dtoUser_2 = Dto_User.from("🍊gyul", "1234", "gyul@eMail.com");
+            Dto_User dtoUser_2 = Dto_User.from("🍊gyul", "1234", "gyul@email.com");
             Res_User user2 = userService.create(dtoUser_2, Optional.empty());
 
 //                File imageFile3 = new File("/Users/my05030/Desktop/장미연/7-sprint-mission/png/tiger.png");
 //                BufferedImage image3 = ImageIO.read(imageFile3);
-            Dto_User dtoUser_3 = Dto_User.from("🐯호랭이", "1234", "호랭이@eMail.com");
+            Dto_User dtoUser_3 = Dto_User.from("🐯호랭이", "1234", "호랭이@email.com");
             Res_User user3 = userService.create(dtoUser_3, Optional.empty());
 
             userService.update(user3.id()
-                    , Dto_User.from("🐯호랭이는 어흥", "호랭123", "어흥이@eMail.com")
+                    , Dto_User.from("🐯호랭이는 어흥", "호랭123", "어흥이@email.com")
                     , null);
             userService.findAll();
 //            Util.okMessage("♣️user3.readStatusID() = [" + user3.readStatusID() + "]");
@@ -76,10 +76,10 @@ public class DiscodeitApplication {
             BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
             AuthService authService = context.getBean(AuthService.class);
 
-            Dto_User dtoUser_4 = Dto_User.from("🦊여우", "1234", "여우@eMail.com");
+            Dto_User dtoUser_4 = Dto_User.from("🦊여우", "1234", "여우@email.com");
             Res_User user4 = userService.create(dtoUser_4, Optional.empty());
 
-            Dto_User dtoUser_5 = Dto_User.from("🐼팬더", "1234", "팬더@eMail.com");
+            Dto_User dtoUser_5 = Dto_User.from("🐼팬더", "1234", "팬더@email.com");
             Res_User user5 = userService.create(dtoUser_5, Optional.empty());
 
             Res_UserStatus userStatus_Creat = userStatusService.create(user4.id());
@@ -111,10 +111,10 @@ public class DiscodeitApplication {
             BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
             AuthService authService = context.getBean(AuthService.class);
 
-            Dto_User dtoUser_6 = Dto_User.from("🐶바둑이", "1234", "바둑이@eMail.com");
+            Dto_User dtoUser_6 = Dto_User.from("🐶바둑이", "1234", "바둑이@email.com");
             Res_User user6 = userService.create(dtoUser_6, Optional.empty());
 
-            Dto_User dtoUser_7 = Dto_User.from("🐽꿀꿀", "1234", "꿀꿀@eMail.com");
+            Dto_User dtoUser_7 = Dto_User.from("🐽꿀꿀", "1234", "꿀꿀@email.com");
             Res_User user7 = userService.create(dtoUser_7, Optional.empty());
 
             Res_Channel resPublic = channelService.createPublic(Dto_CreateChannelPublic.from("🔰동물농장", "동물농장 채널이양 🐾"));
@@ -146,7 +146,7 @@ public class DiscodeitApplication {
             BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
             AuthService authService = context.getBean(AuthService.class);
 
-            Dto_User dtoUser_8 = Dto_User.from("🐸개굴", "1234", "개굴@eMail.com");
+            Dto_User dtoUser_8 = Dto_User.from("🐸개굴", "1234", "개굴@email.com");
             Res_User user8 = userService.create(dtoUser_8, Optional.empty());
 
             Res_Channel resPublic = channelService.createPublic(Dto_CreateChannelPublic.from("🔰메세지 테스트 채널", "메세지 테스트 채널 이야!!"));
@@ -179,7 +179,7 @@ public class DiscodeitApplication {
             BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
             AuthService authService = context.getBean(AuthService.class);
 
-            Dto_User dtoUser_9 = Dto_User.from("🦄유니콘", "1234", "유니콘@eMail.com");
+            Dto_User dtoUser_9 = Dto_User.from("🦄유니콘", "1234", "유니콘@email.com");
             Res_User user9 = userService.create(dtoUser_9, Optional.empty());
 
             Res_ReadStatus resReadStatus = readStatusService.create(Dto_ReadStatus.from(user9.id(), channelService.findAllByUserId(user9.id()).get(0).id()));
@@ -204,7 +204,7 @@ public class DiscodeitApplication {
             AuthService authService = context.getBean(AuthService.class);
 
 
-            Dto_User dtoUser_1 = Dto_User.from("🐶바둑이", "1234", "바둑이@eMail.com");
+            Dto_User dtoUser_1 = Dto_User.from("🐶바둑이", "1234", "바둑이@email.com");
             Res_User user1 = userService.create(dtoUser_1, Optional.empty());
         } catch (Exception e) {
             throw new RuntimeException(e);

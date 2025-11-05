@@ -15,12 +15,12 @@ public class User extends BaseModel {
     private String eMail;
     private UUID profileId; // for BinaryContent
 
-//    public User(String name, String password, String eMail, UUID profiledId) {
+//    public User(String name, String password, String email, UUID profileId) {
 //        super();
-//        this.userName = name;
+//        this.username = name;
 //        this.password = password;
-//        this.eMail = eMail;
-//        this.profileId = profiledId;
+//        this.email = email;
+//        this.profileId = profileId;
 //    }
 
     public User(Dto_User dtoUser, UUID profileId) {
@@ -48,14 +48,14 @@ public class User extends BaseModel {
                 super.toString() +
                 "\n name = [" + userName + "] " +
                 "\n password = [" + password + "]"   +
-                "\n eMail = [" + eMail + "]"   +
-                "\n profiledId = [" + strProfileId + "]" + //❌ 생성자에서 제외
+                "\n email = [" + eMail + "]"   +
+                "\n profileId = [" + strProfileId + "]" + //❌ 생성자에서 제외
                 "}";
     }
 
     public void updateUser(String reName, String password, String reEmail, UUID profiledId) {
-//        reName.isPresent(strName -> this.userName = reName);
-//        reEmail.ifPresent(strEmail -> this.eMail = reEmail);
+//        reName.isPresent(strName -> this.username = reName);
+//        reEmail.ifPresent(strEmail -> this.email = reEmail);
         if (reName != null) this.userName = reName;
         if (password != null) this.password = password;
         if (reEmail != null) this.eMail = reEmail;

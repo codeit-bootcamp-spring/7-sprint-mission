@@ -35,22 +35,22 @@ public record Res_User(
 //                .readStatusID(dto_User.readStatusID())
 //                .createdAt(dto_User.createdAt())
 //                .updatedAt(dto_User.updatedAt())
-//                .userName(dto_User.userName())
+//                .username(dto_User.username())
 //                .password(dto_User.password())
-//                .eMail(dto_User.eMail())
-//                .profiledId(profileId)
+//                .email(dto_User.email())
+//                .profileId(profileId)
 //                .build();
 //    }
 //
-//    public static Res_User from(String userName, String password, String eMail, UUID profiledId) {
+//    public static Res_User from(String username, String password, String email, UUID profileId) {
 //        return Res_User.builder()
 //                .readStatusID(UUID.randomUUID())
 //                .createdAt(Instant.now())
 //                .updatedAt(Instant.now())
-//                .userName(userName)
+//                .username(username)
 //                .password(password)
-//                .eMail(eMail)
-//                .profiledId(profiledId)
+//                .email(email)
+//                .profileId(profileId)
 //                .build();
 //    }
 }

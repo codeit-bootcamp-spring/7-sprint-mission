@@ -51,7 +51,7 @@ public class JCFUserRepository implements InterfaceUserRepository {
 
     @Override
     public boolean isUsingEmail(String eMail) {
-//        return findAll().stream().anyMatch(user -> user.getEMail().equals(eMail));
+//        return findAll().stream().anyMatch(user -> user.getEMail().equals(email));
         return false;
     }
 

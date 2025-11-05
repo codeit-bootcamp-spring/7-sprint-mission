@@ -70,8 +70,8 @@ public class UserStatusService implements InterfaceUserStatusService {
         UserStatus userStatus = userStatusRepository.findById(dto.id())
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.update.readStatusID = [" + dto.id() + "] err"));
 
-//        boolean isOnline = userStatus.isOnline();
-//        userStatus.setOnlineState(isOnline);
+//        boolean online = userStatus.online();
+//        userStatus.setOnlineState(online);
         userStatus.setUpdatedAt();
         userStatusRepository.save(userStatus);
 
@@ -84,8 +84,8 @@ public class UserStatusService implements InterfaceUserStatusService {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.updateByUserID.userID = [" + userId + "] err"));
 
-//        boolean isOnline = userStatus.isOnline();
-//        userStatus.setOnlineState(isOnline);
+//        boolean online = userStatus.online();
+//        userStatus.setOnlineState(online);
         userStatus.setUpdatedAt();
         userStatusRepository.save(userStatus);
         Util.okMessage("UserStatusService.userStatus = [" + userStatus + "]");

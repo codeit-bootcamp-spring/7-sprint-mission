@@ -23,10 +23,10 @@ public record Dto_User(
 ////                .readStatusID(user.getId())
 ////                .createdAt(user.getCreatedAt())
 ////                .updatedAt(user.getUpdatedAt())
-//                .userName(user.getUserName())
+//                .username(user.getUserName())
 //                .password(user.getPassword())
-//                .eMail(user.getEMail())
-//                .profiledId(user.getProfileId())
+//                .email(user.getEMail())
+//                .profileId(user.getProfileId())
 //                .build();
 //    }
 }

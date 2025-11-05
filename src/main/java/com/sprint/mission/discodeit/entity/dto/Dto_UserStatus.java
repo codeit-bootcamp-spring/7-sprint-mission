@@ -12,12 +12,12 @@ public record Dto_UserStatus(
 //        Instant updatedAt, // 유닉스 타임스탬프
 
 //        UUID userId,
-//        boolean isOnline
+//        boolean online
 ) {
     public static Dto_UserStatus from(UUID userStatusID) {
         return Dto_UserStatus.builder()
                 .id(userStatusID)
-//                .isOnline(isOnline)
+//                .online(online)
                 .build();
     }
 }
