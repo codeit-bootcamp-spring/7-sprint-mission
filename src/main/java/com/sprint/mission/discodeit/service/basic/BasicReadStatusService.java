@@ -27,15 +27,9 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
 
-    // 중복 메서드 만들기
-    private ReadStatus getReadStatus(UUID readStatusId) {
-        return readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new IllegalArgumentException("ReadStatus를 찾을 수 없습니다."));
-    }
-
     @Override
-    public ReadStatusResponseDto createReadStatus(CreateReadStatusRequestDto request) {
-        channelRepository.findById(request.channelId())
+    public ReadStatusResponseDto createReadStatus(UUID channelId, CreateReadStatusRequestDto request) {
+        channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
 
         userRepository.findById(request.userId())
@@ -43,7 +37,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
         Optional<ReadStatus> exist = readStatusRepository.findByUserIdAndChannelId(
                 request.userId(),
-                request.channelId());
+                channelId
+        );
 
         if(exist.isPresent()) {
             throw new IllegalArgumentException("이미 존재합니다.");
@@ -51,7 +46,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
         ReadStatus readStatus = new ReadStatus(
                 request.userId(),
-                request.channelId()
+                channelId
         );
 
         ReadStatus save = readStatusRepository.save(readStatus);
@@ -59,8 +54,8 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResponseDto find(UUID readStatusId) {
-        ReadStatus readStatus = getReadStatus(readStatusId);
+    public ReadStatusResponseDto find(UUID userId) {
+        ReadStatus readStatus = getReadStatus(userId);
         return ReadStatusResponseDto.from(readStatus);
     }
 
@@ -75,8 +70,9 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResponseDto updateReadStatus(UpdateReadStatusDto updateReadStatus) {
-        ReadStatus readStatus = getReadStatus(updateReadStatus.readStatusId());
+    public ReadStatusResponseDto updateReadStatus(UUID channelId, UpdateReadStatusDto updateReadStatus) {
+        ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(updateReadStatus.userId(), channelId)
+                .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
 
         readStatus.updateReadTime();
 
@@ -89,5 +85,11 @@ public class BasicReadStatusService implements ReadStatusService {
         getReadStatus(readStatusId);
 
         readStatusRepository.delete(readStatusId);
+    }
+
+    // 중복 메서드 만들기
+    private ReadStatus getReadStatus(UUID readStatusId) {
+        return readStatusRepository.findById(readStatusId)
+                .orElseThrow(() -> new IllegalArgumentException("ReadStatus를 찾을 수 없습니다."));
     }
 }
