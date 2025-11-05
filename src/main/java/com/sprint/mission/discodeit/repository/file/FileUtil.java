@@ -114,10 +114,11 @@ public class FileUtil {
         }
     }
 
-    public void deleteRepository(UUID id) {
+    public boolean deleteRepository(UUID id) {
         Path path = resolvePath(id);
         try {
             Files.delete(path);
+            return true;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

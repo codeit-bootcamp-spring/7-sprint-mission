@@ -12,5 +12,5 @@ public interface InterfaceUserStatusRepository extends BaseInterfaceRepository<U
     Optional<UserStatus> findById(UUID id);
     Optional<UserStatus> findByUserId(UUID userID);
     Optional<List<UserStatus>> findAll();
-    void deleteById(UUID id);
+    boolean deleteById(UUID id);
 }

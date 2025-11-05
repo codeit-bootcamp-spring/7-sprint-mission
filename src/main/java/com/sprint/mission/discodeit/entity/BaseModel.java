@@ -27,7 +27,8 @@ import java.util.UUID;
 public class BaseModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private final UUID id;
+//    private final UUID id; //!! for test
+    private UUID id; //!! for test
     private final Instant createdAt;
     private Instant updatedAt; // 유닉스 타임스탬프
 
@@ -37,9 +38,9 @@ public class BaseModel implements Serializable {
         this.updatedAt = Instant.now();
     }
 
-//    public void setId(UUID id) {
-//        this.id = id;
-//    }
+    public void setIdForTest(UUID id) { //!! for test
+        this.id = id;
+    }
 
 //    public void setCreatedAt(Long createdAt) {
 //        this.createdAt = createdAt;

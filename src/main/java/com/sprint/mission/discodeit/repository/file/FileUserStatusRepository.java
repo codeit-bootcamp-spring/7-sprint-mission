@@ -41,8 +41,8 @@ public class FileUserStatusRepository  implements InterfaceUserStatusRepository 
     }
 
     @Override
-    public void deleteById(UUID id) {
-        fileUtil.deleteRepository(id);
+    public boolean deleteById(UUID id) {
+        return fileUtil.deleteRepository(id);
     }
 
     @Override

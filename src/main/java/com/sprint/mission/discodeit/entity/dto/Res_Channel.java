@@ -28,15 +28,4 @@ public record Res_Channel(
                 .description(channel.getDescription())
                 .build();
     }
-
-//    public static Res_Channel from(Channel channel, Dto_ChannelUpdate dtoChannelUpdate) {
-//        return Res_Channel.builder()
-//                .id(channel.getId())
-//                .createdAt(channel.getCreatedAt())
-//                .updatedAt(channel.getUpdatedAt())
-//                .channelName(dtoChannelUpdate.channelName())
-//                .channelType(dtoChannelUpdate.channelType())
-//                .description(dtoChannelUpdate.descriptio())
-//                .build();
-//    }
 }

@@ -1,16 +1,13 @@
 package com.sprint.mission.discodeit.entity.dto;
 
-import com.sprint.mission.discodeit.entity.ChannelType;
 import lombok.Builder;
-
-import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 
 @Builder
 public record Dto_CreateChannelPublic(
 //        UUID userId,
 //        Instant createdAt,
 //        Instant updatedAt, // 유닉스 타임스탬프
-        ChannelType channelType,
+//        ChannelType channelType,
         String channelName,
         String description
 ) {
@@ -21,12 +18,7 @@ public record Dto_CreateChannelPublic(
 //                .updatedAt(Instant.now())
                 .channelName(channelName)
                 .description(description)
-                .channelType(PUBLIC)
+//                .channelType(PUBLIC)
                 .build();
     }
 }
-//{
-//    "channelType" : "",
-//    "channelName" : "",
-//    "description" : ""
-//}

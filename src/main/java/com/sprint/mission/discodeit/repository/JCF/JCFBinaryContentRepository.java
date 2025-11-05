@@ -20,8 +20,8 @@ public class JCFBinaryContentRepository implements BaseInterfaceRepository<Binar
     }
 
     @Override
-    public void deleteById(UUID id) {
-
+    public boolean deleteById(UUID id) {
+        return false;
     }
 
     @Override

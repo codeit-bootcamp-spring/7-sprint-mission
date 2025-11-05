@@ -23,8 +23,8 @@ public class FileReadStatusRepository  implements InterfaceReadStatusRepository 
     }
 
     @Override
-    public void deleteById(UUID readStatusID) {
-        fileUtil.deleteRepository(readStatusID);
+    public boolean deleteById(UUID readStatusID) {
+        return fileUtil.deleteRepository(readStatusID);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.PrintUtil;
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -35,7 +35,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
 
         ReadStatus readStatus = new ReadStatus(user.getId(), channel.getId());
         readStatusRepository.save(readStatus);
-        PrintUtil.okMessage("ReadStatusService.create = [" + readStatus + "]");
+        Util.okMessage("ReadStatusService.create = [" + readStatus + "]");
 
         return Res_ReadStatus.from(readStatus);
     }
@@ -45,7 +45,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         //[ ] id로 조회합니다.
         ReadStatus readStatus = readStatusRepository.findById(statusID).stream().findFirst().orElseThrow(() -> new IllegalArgumentException("🚨statusID = [" + statusID.toString() + "] 오류"));
         Res_ReadStatus dto = Res_ReadStatus.from(readStatus);
-        PrintUtil.okMessage("ReadStatusService.find = [" + dto + "]");
+        Util.okMessage("ReadStatusService.find = [" + dto + "]");
         return dto;
     }
 
@@ -58,7 +58,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         List<Res_ReadStatus> dtoList = new ArrayList<Res_ReadStatus>();
         for (ReadStatus readStatus : list) {
             dtoList.add(Res_ReadStatus.from(readStatus));
-            PrintUtil.okMessage("ReadStatusService.findAllByUserId = [" + readStatus + "]");
+            Util.okMessage("ReadStatusService.findAllByUserId = [" + readStatus + "]");
         }
         return dtoList;
     }
@@ -71,13 +71,13 @@ public class ReadStatusService implements InterfaceReadStatusService {
                 .orElseThrow(() -> new IllegalArgumentException("🚨readStatusRepository.update.requestDto = [" + requestDto.toString() + "] 오류"));
         readStatus.updateLastReadAt();
         readStatusRepository.save(readStatus);
-        PrintUtil.okMessage("readStatusRepository.update = [" + readStatus + "]");
+        Util.okMessage("readStatusRepository.update = [" + readStatus + "]");
     }
 
     public void delete(UUID statusID) {
         //delete
         //[ ] id로 삭제합니다.
         readStatusRepository.deleteById(statusID);
-        PrintUtil.okMessage("readStatusRepository.deleteById = [" + statusID + "] 삭제 완료");
+        Util.okMessage("readStatusRepository.deleteById = [" + statusID + "] 삭제 완료");
     }
 }

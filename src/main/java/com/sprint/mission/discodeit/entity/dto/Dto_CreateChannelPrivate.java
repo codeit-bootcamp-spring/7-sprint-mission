@@ -1,16 +1,13 @@
 package com.sprint.mission.discodeit.entity.dto;
 
-import com.sprint.mission.discodeit.entity.ChannelType;
 import lombok.Builder;
 
 import java.util.List;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.entity.ChannelType.PRIVATE;
-
 @Builder
 public record Dto_CreateChannelPrivate(
-        ChannelType channelType,
+//        ChannelType channelType,
         List<UUID> userIDs // PRIVATE 일 경우 사용
 ) {
     public static Dto_CreateChannelPrivate from(List<UUID> userIDs) {
@@ -21,7 +18,7 @@ public record Dto_CreateChannelPrivate(
 //                .updatedAt(Instant.now())
 //                .channelName(channelName)
 //                .description(description)
-                .channelType(PRIVATE)
+//                .channelType(PRIVATE)
                 .userIDs(userIDs)
                 .build();
     }

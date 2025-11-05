@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.dto.Dto_User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +29,16 @@ public class User extends BaseModel {
         this.password = dtoUser.password();
         this.eMail = dtoUser.eMail();
         this.profileId = profileId;
+
+        switch (dtoUser.userName()) { //!! for test
+            case "여우" : setIdForTest(UUID.fromString("ae3d209c-b2be-41d7-895e-30bb4192498c")); break;
+            case "🐶강아지" : setIdForTest(UUID.fromString("abc5103d-d916-4ea2-8b45-22be27f66b2f")); break;
+            case "🐼팬더" : setIdForTest(UUID.fromString("ceb51b81-cb4a-41b1-b8f8-3dd15bdbedd9")); break;
+            case "🐯호랑이" : setIdForTest(UUID.fromString("f84daca8-d311-4858-bd01-7693adf65c02")); break;
+            case "🦁사자" : setIdForTest(UUID.fromString("496859e7-1536-4ad7-bb64-ba895f756288")); break;
+            default : break;
+        }
+        Util.okMessage(dtoUser.userName() + ".id = [" + this.getId() + "]");
     }
 
     @Override

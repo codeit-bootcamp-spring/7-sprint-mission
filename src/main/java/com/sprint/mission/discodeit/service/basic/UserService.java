@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.PrintUtil;
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -44,7 +44,6 @@ public class UserService implements InterfaceUserService {
 //                유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
 //        [ ] username과 email은 다른 유저와 같으면 안됩니다.
 //        [ ] UserStatus를 같이 생성합니다.
-
         if (userRepository.isUsingName(dto_user.userName())) {
             throw new IllegalArgumentException("🚨create : 동일한 username [" + dto_user.userName() + "] 사용 중");
         }
@@ -68,7 +67,7 @@ public class UserService implements InterfaceUserService {
 
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
-        PrintUtil.okMessage("UserService.create = [" + user.getUserName() + "] 온라인 상태 = [" + userStatus.isOnline() + "]");;
+        Util.okMessage("UserService.create = [" + user.getUserName() + "] 온라인 상태 = [" + userStatus.isOnline() + "]");;
 
         return resUser;
     }
@@ -81,10 +80,10 @@ public class UserService implements InterfaceUserService {
         String message = "find.userID = [" + userID.toString() + "] 오류";
         User user = userRepository.findById(userID).orElseThrow(() -> new IllegalArgumentException(message));
 
-//        PrintUtil.okMessage("♣️user.id() = [" + user.getId() + "]");
+//        Util.okMessage("♣️user.id() = [" + user.getId() + "]");
         UserStatus userStatus = userStatusRepository.findByUserId(userID).orElseThrow(() -> new IllegalArgumentException(message));
 
-        PrintUtil.okMessage("UserService.findallByChannleId = [" + user.getUserName() + "] isOnline = [" + userStatus.isOnline() + "]");
+        Util.okMessage("UserService.findallByChannleId = [" + user.getUserName() + "] isOnline = [" + userStatus.isOnline() + "]");
 
         return Res_IsOnlineUser.from(user, userStatus.isOnline());
     }
@@ -112,12 +111,12 @@ public class UserService implements InterfaceUserService {
                 if (userStatus.isPresent()) {
                     Res_IsOnlineUser dto = Res_IsOnlineUser.from(user, userStatus.get().isOnline());
                     dtoList.add(dto);
-                    PrintUtil.okMessage("UserService.findAll = [" + user.getUserName() + "] isOnline = [" + userStatus.get().isOnline() + "]");
+                    Util.okMessage("UserService.findAll = [" + user.getUserName() + "] isOnline = [" + userStatus.get().isOnline() + "]");
                 } else {
                     Res_IsOnlineUser dto = Res_IsOnlineUser.from(user, false);
                     dtoList.add(dto);
                     // optionUserStatus 없는 경우 기본값(offline)으로 처리
-                    PrintUtil.errMessage("UserService.findAll: User [" + user.getUserName() + "]의 UserStatus가 없습니다. 기본값(offline)으로 처리합니다.");
+                    Util.errMessage("UserService.findAll: User [" + user.getUserName() + "]의 UserStatus가 없습니다. 기본값(offline)으로 처리합니다.");
                 }
             }
         }
@@ -131,27 +130,27 @@ public class UserService implements InterfaceUserService {
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //        수정 대상 객체의 id 파라미터, 수정할 값 파라미터
 
+        Util.okMessage("UserService.update.userId = [" + userId + "]");
+
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("🚨UserService.update.userId = [" + userId + "] 오류"));
         String userName = user.getUserName();
 
-        if (userRepository.isUsingName(dto_user.userName())) {
+        if (!userId.equals(user.getId())
+                && userRepository.isUsingName(dto_user.userName())) {
             throw new IllegalArgumentException("🚨 UserService.update = [" + dto_user.userName() + "]은 이미 사용중인 user name 입니다");
         }
 
-        if (userRepository.isUsingEmail(dto_user.eMail())) {
+        if (!userId.equals(user.getId())
+                && userRepository.isUsingEmail(dto_user.eMail())) {
             throw new IllegalArgumentException("🚨 UserService.update = [" + dto_user.eMail() + "]은 이미 사용중인 eMail 입니다");
         }
 
-        UUID profiledId = null;
-        BinaryContent binaryContent = null;
         //!! 선택적으로 프로필 이미지를 대체할 수 있습니다.
         if (requestDto_Content != null && requestDto_Content.isPresent()) {
-            BinaryContent neoBinaryContent = new BinaryContent(requestDto_Content.get());
-            binaryContent = binaryContentRepository.findById(userId).orElse(neoBinaryContent);
-            //deleteById
-            binaryContentRepository.save(binaryContent);
+            BinaryContent neoBinaryContent = binaryContentRepository.findById(userId).orElse(new BinaryContent(requestDto_Content.get()));
+            binaryContentRepository.save(neoBinaryContent);
             //!! 순서 유의_I
-            user.updateUser(dto_user.userName(), dto_user.password(), dto_user.eMail(), binaryContent.getId());
+            user.updateUser(dto_user.userName(), dto_user.password(), dto_user.eMail(), neoBinaryContent.getId());
         }
         else {
             user.updateUser(dto_user.userName(), dto_user.password(), dto_user.eMail(), null);
@@ -159,7 +158,7 @@ public class UserService implements InterfaceUserService {
 
         //!! 순서 유의_II
         userRepository.save(user);
-        PrintUtil.okMessage("UserService.update = [" + userName + "]를 [" + dto_user.userName() + "]로 변경 완료");
+        Util.okMessage("UserService.update = [" + userName + "]를 [" + dto_user.userName() + "]로 변경 완료");
         return Res_User.from(user);
     }
 
@@ -172,24 +171,24 @@ public class UserService implements InterfaceUserService {
         Optional<UserStatus> optionalStatus = userStatusRepository.findByUserId(user.getId());
         if (optionalStatus.isPresent()) {
             userStatusRepository.deleteById(optionalStatus.get().getId());
-            PrintUtil.okMessage("UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
+            Util.okMessage("UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
         }
 //        else {
-//            PrintUtil.errMessage("UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
+//            Util.errMessage("UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
 //        }
 
         if (user.getProfileId() != null) {
             Optional<BinaryContent> optionalContents = binaryContentRepository.findById(user.getProfileId());
             if (optionalContents.isPresent()) {
                 binaryContentRepository.deleteById(optionalContents.get().getId());
-                PrintUtil.okMessage("UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
+                Util.okMessage("UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
             }
 //            else {
-//                PrintUtil.errMessage("UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
+//                Util.errMessage("UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
 //            }
         }
 
         userRepository.deleteById(userID);
-        PrintUtil.okMessage("⛔️ UserService.userRepository.deleteById [" + user.getUserName() + "] 완료 ️⛔️");
+        Util.okMessage("⛔️ UserService.userRepository.deleteById [" + user.getUserName() + "] 완료 ️⛔️");
     }
 }

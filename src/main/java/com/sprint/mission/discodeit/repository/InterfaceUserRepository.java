@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
 
 public interface InterfaceUserRepository extends BaseInterfaceRepository<User> {
 //    void save(User user);
-//    void deleteById(UUID id);
+//    boolean deleteById(UUID id);
 //    Optional<User> findById(UUID id);
 //    Optional<List<User>> findAll();
 //    boolean existsById(UUID id);

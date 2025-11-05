@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.PrintUtil;
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
@@ -42,14 +42,14 @@ public class MessageService implements InterfaceMessageService {
         Message newMessage = new Message(dtoMessage, attachemntIds);
         messageRepository.save(newMessage);
 
-        PrintUtil.okMessage("💌 MessageService.create.message = [" + newMessage.getMessage() + "] 💬");
+        Util.okMessage("💌 MessageService.create.message = [" + newMessage.getMessage() + "] 💬");
         return Res_Message.from(newMessage);
     }
 
     @Override
     public Res_Message find(UUID messageID) {
         Message message = messageRepository.findById(messageID).orElseThrow(() -> new IllegalArgumentException("🚨MessageService.find.messageID = [" + messageID + "] 오류"));
-        PrintUtil.okMessage("MessageService.find = [" + message.getMessage() + "]");
+        Util.okMessage("MessageService.find = [" + message.getMessage() + "]");
         return Res_Message.from(message);
     }
 
@@ -58,13 +58,13 @@ public class MessageService implements InterfaceMessageService {
 //        [ ] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
         List<Message> messages = messageRepository.findAll().orElseThrow(() -> new NoSuchElementException("🚨findallByChannleId 오류"));
 //        for (Message message : messages) {
-//            PrintUtil.okMessage("findallByChannleId.channelID = [" + channelID + "][" + message.getMessage() + "]");
+//            Util.okMessage("findallByChannleId.channelID = [" + channelID + "][" + message.getMessage() + "]");
 //        }
 
         List<Res_Message> resMessage = messages.stream().filter(msg -> msg.getChannelId().equals(channelID)).map(Res_Message::from).toList();
-        resMessage.stream().forEach(message -> PrintUtil.okMessage("findallByChannleId = [" + channelID + "][" + message.message() + "]"));
+        resMessage.stream().forEach(message -> Util.okMessage("findallByChannleId = [" + channelID + "][" + message.message() + "]"));
 //        for (Res_Message message : resMessage) {
-//            PrintUtil.okMessage("findallByChannleId = [" + channelID + "][" + message.message() + "]");
+//            Util.okMessage("findallByChannleId = [" + channelID + "][" + message.message() + "]");
 //        }
         return resMessage;
     }
@@ -77,7 +77,7 @@ public class MessageService implements InterfaceMessageService {
                 .orElseThrow(() -> new IllegalArgumentException("🚨updateMessage.messageID() = [" + requestDto.messageID() + "] 에러"));
         message.updateMessage(requestDto.message());
         messageRepository.save(message);
-        PrintUtil.okMessage("updateMessage = [" + message.getMessage() + "]");
+        Util.okMessage("updateMessage = [" + message.getMessage() + "]");
 
         return Res_Message.from(message);
     }
@@ -88,6 +88,6 @@ public class MessageService implements InterfaceMessageService {
 //        첨부파일(BinaryContent)
         Message message = messageRepository.findById(messageID).map(model -> (Message)model).orElseThrow(() -> new IllegalArgumentException("🚨deleteMessage id = [" + messageID.toString() + "] 없는 메세지"));
         messageRepository.deleteById(messageID);
-        PrintUtil.okMessage("deleteMessage = [" + message.getMessage() + "]");
+        Util.okMessage("deleteMessage = [" + message.getMessage() + "]");
     }
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.common.PrintUtil;
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.dto.*;
 import com.sprint.mission.discodeit.service.basic.*;
 import org.springframework.boot.SpringApplication;
@@ -30,7 +30,7 @@ public class DiscodeitApplication {
     }
 
     static void test_UserService(ConfigurableApplicationContext context) {
-        PrintUtil.okMessage("🔴🔴🔴🔴🔴 test_UserService  🔴🔴🔴🔴🔴");
+        Util.okMessage("🔴🔴🔴🔴🔴 test_UserService  🔴🔴🔴🔴🔴");
         try {
             UserService userService = context.getBean(UserService.class);
             UserStatusService userStatusService = context.getBean(UserStatusService.class);
@@ -56,7 +56,7 @@ public class DiscodeitApplication {
                     , Dto_User.from("🐯호랭이는 어흥", "호랭123", "어흥이@eMail.com")
                     , null);
             userService.findAll();
-//            PrintUtil.okMessage("♣️user3.id() = [" + user3.id() + "]");
+//            Util.okMessage("♣️user3.id() = [" + user3.id() + "]");
             userService.find(user3.id());
             userService.delete(user2.id());
             userService.findAll();
@@ -66,7 +66,7 @@ public class DiscodeitApplication {
     }
 
     static void test_UserStatusService(ConfigurableApplicationContext context) {
-        PrintUtil.okMessage("🔴🔴🔴🔴🔴 test_UserStatusService 🟠🟠🟠🟠🟠");
+        Util.okMessage("🔴🔴🔴🔴🔴 test_UserStatusService 🟠🟠🟠🟠🟠");
         try {
             UserService userService = context.getBean(UserService.class);
             UserStatusService userStatusService = context.getBean(UserStatusService.class);
@@ -89,7 +89,7 @@ public class DiscodeitApplication {
             userStatusService.update(dto_UserStatus4);
 
             Res_UserStatus userStatus_Creat5 = userStatusService.create(user5.id());
-            PrintUtil.okMessage("♣️ user5.id()= " + user5.userName());
+            Util.okMessage("♣️ user5.id()= " + user5.userName());
             userStatusService.delete(userStatus_Creat5.id());
             userStatusService.findAll();
 
@@ -101,7 +101,7 @@ public class DiscodeitApplication {
     }
 
     static void test_ChannelService(ConfigurableApplicationContext context) {
-        PrintUtil.okMessage("🔴🔴🔴🔴🔴 test_ChannelService  🟡️🟡️🟡️🟡️🟡️️");
+        Util.okMessage("🔴🔴🔴🔴🔴 test_ChannelService  🟡️🟡️🟡️🟡️🟡️️");
         try {
             UserService userService = context.getBean(UserService.class);
             UserStatusService userStatusService = context.getBean(UserStatusService.class);
@@ -125,10 +125,10 @@ public class DiscodeitApplication {
             Dto_Channel channelPrivate = Dto_Channel.fromPrivate(resPrivate);
             Res_ChannelFind resChannelFind_II = channelService.find(channelPrivate);
 
-            PrintUtil.okMessage("================");
+            Util.okMessage("================");
             List<Res_ChannelFind> allByUserId = channelService.findAllByUserId(user6.id());
 
-            channelService.update(resPublic.id(), Dto_ChannelUpdate.from(null, "퍼블릭 채널이야", "desc- 퍼블릭 채널이야"));
+            channelService.update(Dto_ChannelUpdate.from(resPublic.id(), null, "퍼블릭 채널이야", "desc- 퍼블릭 채널이야"));
             channelService.delete(resPublic.id());
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -136,7 +136,7 @@ public class DiscodeitApplication {
     }
 
     static void test_MessageService(ConfigurableApplicationContext context) {
-        PrintUtil.okMessage("🔴🔴🔴🔴🔴 test_MessageService  🟢🟢🟢🟢🟢️");
+        Util.okMessage("🔴🔴🔴🔴🔴 test_MessageService  🟢🟢🟢🟢🟢️");
         try {
             UserService userService = context.getBean(UserService.class);
             UserStatusService userStatusService = context.getBean(UserStatusService.class);
@@ -169,7 +169,7 @@ public class DiscodeitApplication {
     }
 
     static void test_ReadStatusService(ConfigurableApplicationContext context) {
-        PrintUtil.okMessage("🔴🔴🔴🔴🔴 test_ReadStatusService  🔵🔵🔵🔵🔵");
+        Util.okMessage("🔴🔴🔴🔴🔴 test_ReadStatusService  🔵🔵🔵🔵🔵");
         try {
             UserService userService = context.getBean(UserService.class);
             UserStatusService userStatusService = context.getBean(UserStatusService.class);
@@ -193,7 +193,7 @@ public class DiscodeitApplication {
     }
 
     static void test_BinaryContentService(ConfigurableApplicationContext context) {
-        PrintUtil.okMessage("🔴🔴🔴🔴🔴 test_BinaryContentService  🟣🟣🟣🟣🟣");
+        Util.okMessage("🔴🔴🔴🔴🔴 test_BinaryContentService  🟣🟣🟣🟣🟣");
         try {
             UserService userService = context.getBean(UserService.class);
             UserStatusService userStatusService = context.getBean(UserStatusService.class);
@@ -212,7 +212,7 @@ public class DiscodeitApplication {
     }
 
     static void test_AuthService(ConfigurableApplicationContext context) {
-        PrintUtil.okMessage("🔴🔴🔴🔴🔴 test_AuthService  🟤🟤🟤🟤🟤");
+        Util.okMessage("🔴🔴🔴🔴🔴 test_AuthService  🟤🟤🟤🟤🟤");
         try {
             UserService userService = context.getBean(UserService.class);
             UserStatusService userStatusService = context.getBean(UserStatusService.class);

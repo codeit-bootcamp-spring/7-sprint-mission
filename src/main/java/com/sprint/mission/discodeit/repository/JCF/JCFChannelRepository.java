@@ -19,8 +19,9 @@ public class JCFChannelRepository implements InterfaceChannelRepository { //Inte
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public boolean deleteById(UUID id) {
         this.data.remove(id);
+        return false;
     }
 
     @Override

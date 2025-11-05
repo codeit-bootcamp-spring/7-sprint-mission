@@ -19,8 +19,8 @@ public class JCFReadSatatusRepository implements InterfaceReadStatusRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
-
+    public boolean deleteById(UUID id) {
+        return false;
     }
 
     @Override

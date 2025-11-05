@@ -39,7 +39,7 @@ public class FileBinaryContentRepository implements InterfaceBinaryContentReposi
         return false;
     }
 
-    public void deleteById(UUID binaryContentId) {
-        fileUtil.deleteRepository(binaryContentId);
+    public boolean deleteById(UUID binaryContentId) {
+        return fileUtil.deleteRepository(binaryContentId);
     }
 }

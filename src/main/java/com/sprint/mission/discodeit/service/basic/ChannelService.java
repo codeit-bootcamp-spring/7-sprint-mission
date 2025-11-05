@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.PrintUtil;
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -30,7 +30,7 @@ public class ChannelService implements InterfaceChannelService {
     public Res_Channel createPublic(Dto_CreateChannelPublic dtoCreateChannel) {
         Channel channel = new Channel(dtoCreateChannel);
         channelRepository.save(channel);
-        PrintUtil.okMessage("createPublic = [" + dtoCreateChannel.channelName() + "] 채널 생성");
+        Util.okMessage("createPublic = [" + dtoCreateChannel.channelName() + "] 채널 생성");
         return Res_Channel.from(channel);
     }
 
@@ -45,12 +45,12 @@ public class ChannelService implements InterfaceChannelService {
         Channel channel = new Channel(dtoCreateChannel);
         channelRepository.save(channel);
 
-        for (UUID uuid : dtoCreateChannel.userIDs()) {
-            PrintUtil.okMessage("createPrivate 🔰 채널 생성. userIDs = [" + uuid + "]");
-        }
-
         List<ReadStatus> list = dtoCreateChannel.userIDs().stream().map(userId -> new ReadStatus(userId, channel.getId())).toList();
         list.forEach(readStatusRepository::save);
+
+        for (UUID uuid : dtoCreateChannel.userIDs().stream().toList()) {
+            Util.okMessage("createPrivate 🔰 채널 생성. userIDs = [" + uuid + "]");
+        }
 
         return Res_Channel.from(channel);
     }
@@ -74,11 +74,11 @@ public class ChannelService implements InterfaceChannelService {
             List<ReadStatus> readStatuses = readStatusRepository.findAll().orElseThrow(() -> new NullPointerException("hannel.find.readStatusRepository.findAll() 에러"));
             List<UUID> userIdList = readStatuses.stream().map(readStatus -> readStatus.getUserId()).distinct().toList();
 
-            userIdList.forEach(userId -> PrintUtil.okMessage("ChannelService.find <PRIVATE> 🔰.userids = [" + userId + "]"));
+            userIdList.forEach(userId -> Util.okMessage("ChannelService.find <PRIVATE> 🔰.userids = [" + userId + "]"));
             return Res_ChannelFind.from(dtoChannel, lastMessageAt, userIdList);
         }
         else {
-            PrintUtil.okMessage("ChannelService.find <PUBLIC> = [" + channel.getChannelName() + "]");
+            Util.okMessage("ChannelService.find <PUBLIC> = [" + channel.getChannelName() + "]");
             return Res_ChannelFind.from(dtoChannel, lastMessageAt, null);
         }
     }
@@ -99,7 +99,7 @@ public class ChannelService implements InterfaceChannelService {
 
         for (Channel publicChannel : publicChannels) {
             resChannelFinds.add(this.find(Dto_Channel.from(publicChannel)));
-            PrintUtil.okMessage("✅ ChannelService.findAllByUserId.[PUBLIC].channelName = [" + publicChannel.getChannelName() + "]");
+            Util.okMessage("✅ ChannelService.findAllByUserId.[PUBLIC].channelName = [" + publicChannel.getChannelName() + "]");
         }
 
         //!!⭐️ ReadStatus = Private Channel 만 가능??
@@ -111,16 +111,16 @@ public class ChannelService implements InterfaceChannelService {
 
         for (Channel privateChannel : privateChannels) {
             resChannelFinds.add(this.find(Dto_Channel.from(privateChannel)));
-            PrintUtil.okMessage("✅ ChannelService.findAllByUserId.[PRIVATE]");
+            Util.okMessage("✅ ChannelService.findAllByUserId.[PRIVATE]");
         }
 
-//        PrintUtil.okMessage("ChannelService.findAllByUserId.userID = [" + userID + "]");
+//        Util.okMessage("ChannelService.findAllByUserId.userID = [" + userID + "]");
 //        for (Res_ChannelFind resChannelFind : resChannelFinds) {
 //            if (resChannelFind.channelType() == PRIVATE) {
-//                PrintUtil.okMessage("ChannelService.findAllByUserId.[PRIVATE].userID = [" + resChannelFind.privateChannelUserIDs() + "]");
+//                Util.okMessage("ChannelService.findAllByUserId.[PRIVATE].userID = [" + resChannelFind.privateChannelUserIDs() + "]");
 //            }
 //            else {
-//                PrintUtil.okMessage("ChannelService.findAllByUserId.[PUBLIC].channelName = [" + resChannelFind.channelName() + "]");
+//                Util.okMessage("ChannelService.findAllByUserId.[PUBLIC].channelName = [" + resChannelFind.channelName() + "]");
 //            }
 //        }
 
@@ -132,12 +132,12 @@ public class ChannelService implements InterfaceChannelService {
 //        String message = "updateChannelName = 채널이름을 [" + channel.getChannelName() + "] 에서 [" + reName + "] 로 변경";
 //        Channel findedChannel = channelRepository.findById(channel.getId()).orElseThrow(() -> new IllegalArgumentException("🚨updateChannelName. channel = [" + channel.getChannelName() + "] 없음 오류"));
 //        if (!channelRepository.existsByName(reName)) {
-//            PrintUtil.errMessage(message + " 오류");
+//            Util.errMessage(message + " 오류");
 //        }
 //        else {
 //            findedChannel.updateChannelName(reName);
 //            channelRepository.save(findedChannel);
-//            PrintUtil.okMessage(message);
+//            Util.okMessage(message);
 //        }
 //    }
 //
@@ -146,20 +146,20 @@ public class ChannelService implements InterfaceChannelService {
 //        Channel findedChannel = channelRepository.findById(channel.getId()).orElseThrow(() -> new IllegalArgumentException("🚨updateChannelType 오류"));
 //        findedChannel.updateChannelType(channelType);
 //        channelRepository.save(findedChannel);
-//        PrintUtil.okMessage("updateChannelType = [" + channel.getChannelName() + "] 채널 타입이 [" + channelType.name() + "] 으로 변경");
+//        Util.okMessage("updateChannelType = [" + channel.getChannelName() + "] 채널 타입이 [" + channelType.name() + "] 으로 변경");
 //    }
 
     @Override
-    public void update( UUID channelID, Dto_ChannelUpdate dtoChannelUpdate) {
+    public void update( Dto_ChannelUpdate dtoChannelUpdate) {
         //[ ] PRIVATE 채널은 수정할 수 없습니다.
         if (dtoChannelUpdate.channelType() == PRIVATE) {
-            PrintUtil.errMessage("PRIVATE 채널 수정 불가");
+            Util.errMessage("PRIVATE 채널 수정 불가");
         }
         else {
-            Channel findedChannel = channelRepository.findById(channelID).orElseThrow(() -> new IllegalArgumentException("🚨update 오류"));
+            Channel findedChannel = channelRepository.findById(dtoChannelUpdate.channelID()).orElseThrow(() -> new IllegalArgumentException("🚨update 오류"));
             findedChannel.update(dtoChannelUpdate);
             channelRepository.save(findedChannel);
-            PrintUtil.okMessage("ChannelService.update = [" + dtoChannelUpdate.channelName() + "] [" + dtoChannelUpdate.description() + "]");
+            Util.okMessage("ChannelService.update = [" + dtoChannelUpdate.channelName() + "] [" + dtoChannelUpdate.description() + "]");
         }
     }
 
@@ -184,6 +184,6 @@ public class ChannelService implements InterfaceChannelService {
             messageRepository.deleteById(message.getId());
         }
 
-        PrintUtil.okMessage("ChannelService.delete = [" + findedChannel.getChannelName() + "] 채널 삭제");
+        Util.okMessage("ChannelService.delete = [" + findedChannel.getChannelName() + "] 채널 삭제");
     }
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.PrintUtil;
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatus;
@@ -31,7 +31,7 @@ public class UserStatusService implements InterfaceUserStatusService {
         if (userStatus != null && userStatus.isPresent()) {
             userStatusRepository.save(userStatus.get());
 
-            PrintUtil.okMessage("UserStatusService.create = [" + user.getUserName() + "]");
+            Util.okMessage("UserStatusService.create = [" + user.getUserName() + "]");
             return Res_UserStatus.from(userStatus.get());
         }
         else {
@@ -45,7 +45,7 @@ public class UserStatusService implements InterfaceUserStatusService {
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.find.statusID = [" + statusID + "] err"));
 
         Optional<User> user = userRepository.findById(userStatus.getUserId());
-        PrintUtil.okMessage("UserStatusService.find = [" + user.get().getUserName() + "]");
+        Util.okMessage("UserStatusService.find = [" + user.get().getUserName() + "]");
 
         return Res_UserStatus.from(userStatus);
     }
@@ -58,7 +58,7 @@ public class UserStatusService implements InterfaceUserStatusService {
         List<Res_UserStatus> list = userStatuses.stream().map(Res_UserStatus::from).toList();
 
         for (Res_UserStatus resUserStatus : list) {
-            PrintUtil.okMessage("UserStatusService.findAll = [" + userRepository.findById(resUserStatus.userId()).get().getUserName() + "]");
+            Util.okMessage("UserStatusService.findAll = [" + userRepository.findById(resUserStatus.userId()).get().getUserName() + "]");
         }
 
         return list;
@@ -76,7 +76,7 @@ public class UserStatusService implements InterfaceUserStatusService {
         userStatusRepository.save(userStatus);
 
         String userName = userRepository.findById(userStatus.getUserId()).get().getUserName();
-        PrintUtil.okMessage("UserStatusService.update = [" + userName + "]");
+        Util.okMessage("UserStatusService.update = [" + userName + "]");
     }
 
     public void updateByUserID(UUID userId) {
@@ -88,13 +88,12 @@ public class UserStatusService implements InterfaceUserStatusService {
 //        userStatus.setOnlineState(isOnline);
         userStatus.setUpdatedAt();
         userStatusRepository.save(userStatus);
-        PrintUtil.okMessage("UserStatusService.updateByUserID = [" + userId + "]");
+        Util.okMessage("UserStatusService.userStatus = [" + userStatus + "]");
     }
 
     public void delete(UUID statusID) {
 //    [ ] id로 삭제합니다.
         userStatusRepository.deleteById(statusID);
-        PrintUtil.okMessage("UserStatusService.delete = [" + statusID + "]");
+        Util.okMessage("UserStatusService.delete = [" + statusID + "]");
     }
-
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.common.PrintUtil;
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
@@ -26,8 +26,8 @@ public class FileUserRepository implements InterfaceUserRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
-        fileUtil.deleteRepository(id);
+    public boolean deleteById(UUID id) {
+        return fileUtil.deleteRepository(id);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class FileUserRepository implements InterfaceUserRepository {
                             .filter(user -> user.getUserName().equals(name) && user.getPassword().equals(password))
                             .findFirst()
                             .orElseThrow(() -> new FindException("AuthService.login.name = [" + name + "] 또는 password 오류"));
-        PrintUtil.okMessage("AuthService.isLogin = [" + user1.getUserName() + "]");
+        Util.okMessage("AuthService.isLogin = [" + user1.getUserName() + "]");
         return Res_UserLogin.from(user1);
     }
 }
