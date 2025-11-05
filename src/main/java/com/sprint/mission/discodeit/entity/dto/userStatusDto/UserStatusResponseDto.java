@@ -7,13 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-public class UserStatusResponseDto {
-
-    private final UUID id;
-    private final UUID userId;
-    private final Instant createdAt;
-    private final Instant lastAccessAt;
-    boolean isOnline;
+public record UserStatusResponseDto(UUID id, UUID userId, Instant createdAt, Instant lastAccessAt, boolean isOnline) {
 
     public static UserStatusResponseDto from(UserStatus userStatus) {
         return UserStatusResponseDto.builder()
