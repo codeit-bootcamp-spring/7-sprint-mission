@@ -1,14 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.message.request.MessageDeleteRequest;
+import com.sprint.mission.discodeit.dto.message.request.MessageEditRequest;
 import com.sprint.mission.discodeit.dto.message.request.MessageGetRequest;
 import com.sprint.mission.discodeit.dto.message.request.MessageSendRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.Receivable;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.enums.ReceiverType;
+import com.sprint.mission.discodeit.exceptions.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exceptions.MessageNotFoundException;
 import com.sprint.mission.discodeit.exceptions.ReceiverNotFoundException;
+import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -31,16 +33,17 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public void send(MessageSendRequest dto) {
-        User sender = userRepository.findByUserId(dto.senderUserId());
-
+    public MessageResponse send(MessageSendRequest dto) {
+        User sender = getUserAndHandleException(dto.senderUserId());
         Receivable receiver;
         ReceiverType type = dto.type();
 
         if (type == ReceiverType.USER) {
-            receiver = userRepository.findByUserId(dto.receiverId());
+            receiver = getUserAndHandleException(dto.receiverId());
         } else if (type == ReceiverType.CHANNEL) {
-            receiver = channelRepository.findById(UUID.fromString(dto.receiverId()));
+            UUID channelId = UUID.fromString(dto.receiverId());
+            receiver = channelRepository.findById(channelId)
+                    .orElseThrow(() -> new ChannelNotFoundException(channelId));
         } else {
             throw new ReceiverNotFoundException(dto.receiverId());
         }
@@ -61,23 +64,30 @@ public class BasicMessageService implements MessageService {
         }
 
         messageRepository.save(message);
+        return MessageResponse.toDto(message);
     }
 
+    private User getUserAndHandleException(String userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    // 이거 너무 어지러운데 한 메서드에서 너무 많은걸 하고 있는걸까요
     @Override
     public List<MessageResponse> get(MessageGetRequest dto) {
         List<Message> messages;
         if (dto.senderId() != null && dto.receiverId() != null) {
-            messages = messageRepository.findBySenderAndReceiver(userRepository.findByUserId(dto.senderId()),
-                    dto.type() == ReceiverType.USER?
-                            userRepository.findByUserId(dto.receiverId()) :
-                            channelRepository.findById(UUID.fromString(dto.receiverId())));
+            messages = messageRepository.findBySenderAndReceiver(
+                    findUser(dto.senderId()),
+                    dto.type() == ReceiverType.USER ?
+                            findUser(dto.receiverId()) : findChannel(UUID.fromString(dto.receiverId())));
         } else if (dto.senderId() != null) {
-            messages = messageRepository.findBySender(userRepository.findByUserId(dto.senderId()));
+            messages = messageRepository.findBySender(findUser(dto.senderId()));
         } else {
             if (dto.type() == ReceiverType.USER) {
-                messages = messageRepository.findByReceiver(userRepository.findByUserId(dto.receiverId()));
+                messages = messageRepository.findByReceiver(findUser(dto.receiverId()));
             } else {
-                messages = messageRepository.findByReceiver(channelRepository.findById(UUID.fromString(dto.receiverId())));
+                messages = messageRepository.findByReceiver(findChannel(UUID.fromString(dto.receiverId())));
             }
         }
         return messages.stream()
@@ -85,9 +95,23 @@ public class BasicMessageService implements MessageService {
                 .toList();
     }
 
+    private Channel findChannel(UUID channelId) {
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
+    }
+
+    private User findUser(String userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
     @Override
-    public void delete(Message message) {
-        binaryContentRepository.deleteAll(message.getAttachments());
+    public void delete(MessageDeleteRequest dto) {
+        Message message = messageRepository.find(dto.id())
+                .orElseThrow(() -> new MessageNotFoundException(dto.id()));
+        if (!message.getAttachments().isEmpty()) {
+            binaryContentRepository.deleteAll(message.getAttachments());
+        }
         messageRepository.delete(message);
     }
 
@@ -98,6 +122,15 @@ public class BasicMessageService implements MessageService {
      */
     @Override
     public Message getLastMessage() {
-        return messageRepository.findLast();
+        return messageRepository.findLast().orElseThrow(() -> new MessageNotFoundException("메세지 데이터가 존재하지 않습니다."));
+    }
+
+    @Override
+    public MessageResponse editMessage(MessageEditRequest dto) {
+        Message message = messageRepository.find(dto.uuid())
+                .orElseThrow(() -> new MessageNotFoundException(dto.uuid()));
+        message.setContent(dto.content());
+        messageRepository.update(message);
+        return MessageResponse.toDto(message);
     }
 }
