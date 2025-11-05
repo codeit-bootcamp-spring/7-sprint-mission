@@ -32,7 +32,14 @@ public class BasicBinaryContentService implements BinaryContentService {
         return BinaryContentResponse.toDto(content);
     }
 
-    public List<BinaryContentResponse> get(BinaryContentGetRequest dto) {
+    @Override
+    public BinaryContentResponse get(UUID id) {
+        return BinaryContentResponse.toDto(
+                contentRepository.findById(id)
+                        .orElseThrow(() -> new ContentNotFoundException(id)));
+    }
+
+    public List<BinaryContentResponse> getAllById(BinaryContentGetRequest dto) {
         return dto.ids().stream()
                 .map(id -> contentRepository.findById(id)
                         .orElseThrow(() -> new ContentNotFoundException(id)))
@@ -40,7 +47,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .toList();
     }
 
-    public List<BinaryContentResponse> getAllByUserID(String userId) {
+    public List<BinaryContentResponse> getAllByUserId(String userId) {
         return contentRepository.findAllByUser(userRepository.findByUserId(userId)
                         .orElseThrow(() -> new UserNotFoundException(userId))).stream()
                 .map(BinaryContentResponse::toDto)
