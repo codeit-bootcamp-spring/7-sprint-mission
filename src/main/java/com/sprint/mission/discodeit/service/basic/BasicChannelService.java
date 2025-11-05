@@ -91,7 +91,16 @@ public class BasicChannelService implements ChannelService {
         List<Channel> channels = channelRepository.findAll();
         List<ChannelResponseDto> dtoList = new ArrayList<>();
 
+        List<Channel> needChannels = new ArrayList<>();
         for(Channel channel : channels){
+            if(channel.getType() == ChannelType.PUBLIC){
+                needChannels.add(channel);
+            } else if (channel.getType() == ChannelType.PRIVATE && channel.getMembers().contains(userId)){
+                needChannels.add(channel);
+            }
+        }
+
+        for(Channel channel : needChannels){
             List<Message> messages = messageRepository.findByChannelId(channel.getId());
 
             Instant readMassage = messages.stream()
@@ -100,18 +109,12 @@ public class BasicChannelService implements ChannelService {
                     .orElse(null);
 
             List<UUID> members = null;
-
-            if(channel.getType() == ChannelType.PUBLIC){
-                ChannelResponseDto response = ChannelResponseDto.from(channel, readMassage, null);
-                dtoList.add(response);
-
-            } else if(channel.getType() == ChannelType.PRIVATE &&
-                    channel.getMembers().contains(userId)){
+            if(channel.getType() == ChannelType.PRIVATE) {
                 members = channel.getMembers();
+            }
                 ChannelResponseDto response = ChannelResponseDto.from(channel, readMassage, members);
                 dtoList.add(response);
             }
-        }
         return dtoList;
     }
 

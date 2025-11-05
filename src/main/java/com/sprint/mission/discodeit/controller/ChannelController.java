@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.update.UpdateChannelDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,14 +23,14 @@ public class ChannelController {
 
     //공개 채널을 만들 수 있다.
     @RequestMapping(value = "/public", method = RequestMethod.POST)
-    public ResponseEntity<ChannelResponseDto> createPublicChannel(@RequestBody CreatePublicChannelDto request) {
+    public ResponseEntity<ChannelResponseDto> createPublicChannel(@Valid @RequestBody CreatePublicChannelDto request) {
         ChannelResponseDto publicChannel = channelService.createPublicChannel(request);
         return ResponseEntity.ok(publicChannel);
     }
 
     //비공개 채널을 만들 수 있다.
     @RequestMapping(value = "/private", method = RequestMethod.POST)
-    public ResponseEntity<ChannelResponseDto> createPrivateChannel(@RequestBody CreatePrivateChannelDto request) {
+    public ResponseEntity<ChannelResponseDto> createPrivateChannel(@Valid @RequestBody CreatePrivateChannelDto request) {
         ChannelResponseDto privateChannel = channelService.createPrivateChannel(request);
         return ResponseEntity.ok(privateChannel);
     }
@@ -56,8 +57,9 @@ public class ChannelController {
     }
 
     // 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
-    @RequestMapping(value = "by-user/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<List<ChannelResponseDto>> findUserAllChannels(@PathVariable UUID userId) {
+    // api/channels?userId=...
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<List<ChannelResponseDto>> findUserAllChannels(@RequestParam UUID userId) {
         List<ChannelResponseDto> response = channelService.findAllByUserId(userId);
         return ResponseEntity.ok(response);
     }
