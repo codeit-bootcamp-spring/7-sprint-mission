@@ -19,6 +19,7 @@ import java.util.List;
 public class UserStatusController {
     private final UserStatusService userStatusService;
 
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<UserStatusResponse> createOnlineStatus(UserStatusCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userStatusService.create(request));
     }
