@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.update.UpdateUserCommand;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class UserController {
 
     //사용자를 등록할 수 있다.
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody CreateUserCommand request) {
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody CreateUserCommand request) {
         UserResponseDto user = userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
@@ -46,7 +47,7 @@ public class UserController {
 
     //사용자 정보를 수정할 수 있다.
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable UUID id, @RequestBody UpdateUserCommand request) {
+    public ResponseEntity<UserResponseDto> updateUser(@Valid @PathVariable UUID id, @RequestBody UpdateUserCommand request) {
         UserResponseDto user = userService.updateUser(id, request);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
