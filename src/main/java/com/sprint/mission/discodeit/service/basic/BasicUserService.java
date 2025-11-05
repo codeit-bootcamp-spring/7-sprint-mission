@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.CreateBinaryContentDto;
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
-import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
+import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -31,38 +31,37 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User createUser(CreateUserDto createUserDto) {
-        if (userRepository.findByUsername(createUserDto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("이미 등록된 유저입니다." + createUserDto.getUsername());
+    public UserResponseDto createUser(CreateUserDto createUserDto) {
+        if (userRepository.findByUsername(createUserDto.username()).isPresent()) {
+            throw new IllegalArgumentException("이미 등록된 유저입니다." + createUserDto.username());
         }
-        if (userRepository.findByEmail(createUserDto.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("이미 등록된 이메일입니다." + createUserDto.getUsername());
+        if (userRepository.findByEmail(createUserDto.email()).isPresent()) {
+            throw new IllegalArgumentException("이미 등록된 이메일입니다." + createUserDto.username());
         }
 
         UUID profileId = null;
 
-        if(createUserDto.getCreateBinaryContentDto() != null){
-            CreateBinaryContentDto createBinaryContentDto = createUserDto.getCreateBinaryContentDto();
+        if(createUserDto.createBinaryContentDto() != null){
+            CreateBinaryContentDto createBinaryContentDto = createUserDto.createBinaryContentDto();
             BinaryContent binaryContent = new BinaryContent(
-                    createBinaryContentDto.getFileName(),
-                    createBinaryContentDto.getContentType(),
-                    createBinaryContentDto.getBytes()
+                    createBinaryContentDto.fileName(),
+                    createBinaryContentDto.contentType(),
+                    createBinaryContentDto.bytes()
             );
             profileId = binaryContent.getId();
             binaryContentRepository.save(binaryContent);
         }
 
-
         User user = new User(
-                createUserDto.getUsername(), createUserDto.getEmail(), createUserDto.getPassword(),
-                createUserDto.getPhoneNumber(), createUserDto.getPronoun(), profileId);
+                createUserDto.username(), createUserDto.email(), createUserDto.password(),
+                createUserDto.phoneNumber(), createUserDto.pronoun(), profileId);
 
         UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
 
         userRepository.save(user);
         userStatusRepository.save(userStatus);
 
-        return user;
+        return UserResponseDto.from(user, userStatus.isOnline());
     }
 
     @Override
@@ -93,19 +92,22 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateUser(UpdateUserDto updateUserDto) {
-        User user = userRepository.findById(updateUserDto.getUserId())
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + updateUserDto.getUserId()));
+    public UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + updateUserDto.username()));
 
-        user.updateUser(updateUserDto.getUsername(),
-                updateUserDto.getPassword(),
-                updateUserDto.getEmail(),
-                updateUserDto.getPhoneNumber(),
-                updateUserDto.getPronoun(),
-                updateUserDto.getProfileId()
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + updateUserDto.username()));
+
+        user.updateUser(updateUserDto.username(),
+                updateUserDto.password(),
+                updateUserDto.email(),
+                updateUserDto.phoneNumber(),
+                updateUserDto.pronoun(),
+                updateUserDto.profileId()
         );
-
         userRepository.save(user);
+        return UserResponseDto.from(user, userStatus.isOnline());
     }
 
     @Override
