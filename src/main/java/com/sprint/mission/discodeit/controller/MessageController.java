@@ -28,10 +28,10 @@ public class MessageController {
 //    [ ] 특정 채널의 메시지 목록을 조회할 수 있다.
     @RequestMapping(value = "/create", method = POST)
     public Res_Message create(@RequestPart("message") Dto_Message dtoMessage,
-                              @RequestPart("file") List<MultipartFile> file) {
+                              @RequestPart("file") List<MultipartFile> fileList) {
 
 
-        List<Dto_BinaryContent> collect = file.stream()
+        List<Dto_BinaryContent> collect = fileList.stream()
                 .map(multipartFile -> {
                     try {
                         return Dto_BinaryContent.from(
