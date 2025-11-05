@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.time.Instant;
@@ -18,7 +16,6 @@ public class ReadStatus extends BaseEntity {
     private final UUID channelId;
     private Instant lastReadAt;
 
-    @Builder
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
         this.userId = VerifiedUtils.verifyNull(userId);
         this.channelId = VerifiedUtils.verifyNull(channelId);

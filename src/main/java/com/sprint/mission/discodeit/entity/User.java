@@ -16,7 +16,6 @@ public class User extends BaseEntity {
     private String email;
     private UUID profileId;
 
-    @Builder
     public User(String username, String password, String email, UUID profileId) {
         this.username = VerifiedUtils.verifyName(username);
         this.password = VerifiedUtils.verifyPassword(password);
