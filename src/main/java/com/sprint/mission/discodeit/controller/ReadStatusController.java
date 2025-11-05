@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,12 +29,12 @@ public class ReadStatusController {
         return readStatusService.create(dtoReadStatus);
     }
     
-    @RequestMapping(value = "/update", method = POST)
+    @RequestMapping(value = "/update", method = PUT)
     public void update(@RequestBody Dto_ReadStatusUpdate requestDto) {
         readStatusService.update(requestDto);
     }
 
-    @RequestMapping(value = "/findAllByUserId/{id}", method = POST)
+    @RequestMapping(value = "/findAllByUserId/{id}", method = GET)
     public List<Res_ReadStatus> findAllByUserId(@PathVariable("id") UUID userID) {
         return readStatusService.findAllByUserId(userID);
     }
@@ -42,6 +42,6 @@ public class ReadStatusController {
 //    @RequestMapping(value = "/delete/{id}", method = DELETE)
 //    public void delete(@PathVariable("id") UUID statusID) {}
 //
-//    @RequestMapping(value = "/find/{id}", method = POST)
+//    @RequestMapping(value = "/find/{id}", method = GET)
 //    public Res_ReadStatus find(@PathVariable("id") UUID statusID) {}
 }

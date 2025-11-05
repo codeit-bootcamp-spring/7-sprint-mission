@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 @RequestMapping("/user")
@@ -39,7 +38,7 @@ public class UserController {
         return userService.create(dto.dtoUser(), dto.binaryContent());
     }
 
-    @RequestMapping(value = "/update", method = POST)
+    @RequestMapping(value = "/update", method = PUT)
     public Res_User update(@RequestBody Dto_UserWithIDAndContent dto) {
         return userService.update(dto.userId(), dto.dtoUser(), dto.binaryContent());
     }
@@ -49,12 +48,12 @@ public class UserController {
         userService.delete(userID);
     }
 
-    @RequestMapping(value = "/findAll", method = POST)
+    @RequestMapping(value = "/findAll", method = GET)
     public List<Res_IsOnlineUser> findAll() {
         return userService.findAll();
     }
 
-    @RequestMapping(value = "/updateOnlineStatus/{id}", method = POST)
+    @RequestMapping(value = "/updateOnlineStatus/{id}", method = PUT)
     public void updateOnlineStatus(@PathVariable("id") UUID userId) {
         userStatusService.updateByUserID(userId);
     }

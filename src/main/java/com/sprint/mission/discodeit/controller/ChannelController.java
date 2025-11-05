@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 @RequestMapping("/channel")
@@ -36,7 +35,7 @@ public class ChannelController {
         return channelService.createPrivate(dtoCreateChannel);
     }
 
-    @RequestMapping(value = "/update", method = POST)
+    @RequestMapping(value = "/update", method = PUT)
     public void update(@RequestBody Dto_ChannelUpdate dtoChannelUpdate) {
         channelService.update(dtoChannelUpdate);
     }
@@ -46,7 +45,7 @@ public class ChannelController {
         channelService.delete(channelId);
     }
 
-    @RequestMapping(value = "/findAllByUserId/{id}", method = POST)
+    @RequestMapping(value = "/findAllByUserId/{id}", method = GET)
     public List<Res_ChannelFind> findAllByUserId(@PathVariable("id") UUID userId) {
         return channelService.findAllByUserId(userId);
     }

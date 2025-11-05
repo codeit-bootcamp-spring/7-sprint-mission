@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,17 +50,17 @@ public class MessageController {
         return messageService.create(dtoMessage, Optional.of(collect));
     }
 
-    @RequestMapping(value = "/findAllByChannelId/{id}", method = POST)
+    @RequestMapping(value = "/findAllByChannelId/{id}", method = GET)
     public List<Res_Message> findAllByChannleId(@PathVariable("id") UUID channelID) {
         return messageService.findAllByChannleId(channelID);
     }
 
-    @RequestMapping(value = "/find/{id}", method = POST)
+    @RequestMapping(value = "/find/{id}", method = GET)
     public Res_Message find(@PathVariable("id") UUID messageID) {
         return messageService.find(messageID);
     }
 
-    @RequestMapping(value = "/update", method = POST)
+    @RequestMapping(value = "/update", method = PUT)
     public Res_Message updateMessage(@RequestBody Dto_MessageUpdate requestDto) {
         return messageService.updateMessage(requestDto);
     }
