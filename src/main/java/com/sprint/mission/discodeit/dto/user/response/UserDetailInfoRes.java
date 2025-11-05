@@ -9,7 +9,8 @@ public record UserDetailInfoRes(
         String email,           //이메일
         BinaryContentInfoRes profileImg,    //프로필 이미지
         boolean isOnline,       //온라인 상태    
-        String createAt         //가입일
+        String createAt,         //가입일
+        String updateAt         //수정일
 ) {
     public static UserDetailInfoRes from(User user, BinaryContentInfoRes profileImg, boolean isOnline){
         return new UserDetailInfoRes(
@@ -17,7 +18,8 @@ public record UserDetailInfoRes(
                 user.getEmail(),
                 profileImg,
                 isOnline,
-                DateTimeUtil.format(user.getCreatedAt())
+                DateTimeUtil.format(user.getCreatedAt()),
+                DateTimeUtil.format(user.getUpdatedAt())
         );
     }
 }
