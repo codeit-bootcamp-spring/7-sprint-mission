@@ -6,4 +6,9 @@ public record UserCreateReq(String email,
                             String nickname,
                             String password,
                             BinaryContentCreateReq profileImage) {
+    public UserCreateReq {
+        if (profileImage == null) {
+            profileImage = new BinaryContentCreateReq(null, null, null);
+        }
+    }
 }

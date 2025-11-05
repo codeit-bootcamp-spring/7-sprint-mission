@@ -8,4 +8,9 @@ public record UserUpdateReq (
         String password,
         BinaryContentCreateReq profileImage
 ){
+    public UserUpdateReq {
+        if (profileImage == null) {
+            profileImage = new BinaryContentCreateReq(null, null, null);
+        }
+    }
 }
