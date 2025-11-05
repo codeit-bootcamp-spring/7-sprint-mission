@@ -4,6 +4,5 @@ import java.util.UUID;
 
 public record UpdateMessageDto (
 
-    String newContent,
-    UUID messageId
+    String newContent
 ) {}

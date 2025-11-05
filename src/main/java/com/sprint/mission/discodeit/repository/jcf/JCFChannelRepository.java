@@ -27,7 +27,7 @@ public class JCFChannelRepository implements ChannelRepository {
     public Optional<Channel> findByName(String channelName) {
         return channels.values()
                 .stream()
-                .filter(channel -> channel.getChannelName().equals(channelName))
+                .filter(channel -> channelName.equals(channel.getChannelName()))
                 .findFirst();
     }
 

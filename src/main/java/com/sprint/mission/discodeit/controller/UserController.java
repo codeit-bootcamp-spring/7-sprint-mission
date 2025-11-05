@@ -1,12 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.request.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.dto.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.update.UpdateUserCommand;
-import com.sprint.mission.discodeit.dto.update.UpdateUserDto;
-import com.sprint.mission.discodeit.dto.update.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Member;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,7 +50,6 @@ public class UserController {
         UserResponseDto user = userService.updateUser(id, request);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
-
 
     //사용자를 삭제할 수 있다.
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

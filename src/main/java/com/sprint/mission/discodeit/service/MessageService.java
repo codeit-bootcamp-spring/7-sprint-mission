@@ -12,6 +12,6 @@ public interface MessageService {
 
     MessageResponseDto createMessage(CreateMessageRequestDto request); // 메시지 생성
     List<MessageResponseDto> findAllByChannelId(UUID channelId); // 특정 채널 메시지 조회
-    MessageResponseDto updateMessage(UpdateMessageDto newContents); //메시지 수정(업데이트)
+    MessageResponseDto updateMessage(UUID id, UpdateMessageDto newContents); //메시지 수정(업데이트)
     void deleteMessage(UUID messageId); // 메시지 삭제
 }
