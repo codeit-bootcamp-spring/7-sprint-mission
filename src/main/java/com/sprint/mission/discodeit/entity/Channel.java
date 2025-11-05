@@ -25,6 +25,7 @@ public class Channel extends BaseEntity{
     }
 
     public Channel(UUID managerId, List<UUID> users) {
+        this.name = "비밀방"+UUID.randomUUID().toString().replace("-","");
         this.managerId = managerId;
         this.users = users;
         this.publicType = ChannelType.PRIVATE;

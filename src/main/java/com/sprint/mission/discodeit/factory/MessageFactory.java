@@ -10,11 +10,11 @@ public class MessageFactory {
     private MessageFactory(){}
 
     public static Message create(MessageCreateReq req, List<UUID> attachmentIds){
-        return Message.builder()
-                .channelId(req.channelId())
-                .speakerId(req.speakerId())
-                .content(req.content())
-                .attachmentIds(attachmentIds)
-                .build();
+        return new Message(
+                req.channelId(),
+                req.speakerId(),
+                req.content(),
+                attachmentIds
+        );
     }
 }

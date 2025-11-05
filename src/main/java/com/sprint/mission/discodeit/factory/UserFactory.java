@@ -9,11 +9,11 @@ public class UserFactory {
     private UserFactory() {}
 
     public static User create(UserCreateReq req, UUID profileId){
-        return User.builder()
-                .email(req.email())
-                .nickname(req.nickname())
-                .password(req.password())
-                .profileId(profileId)
-                .build();
+        return new User(
+                req.email(),
+                req.nickname(),
+                req.password(),
+                profileId
+        );
     }
 }

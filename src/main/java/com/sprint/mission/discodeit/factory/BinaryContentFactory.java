@@ -17,12 +17,7 @@ public class BinaryContentFactory {
         return create(req.data(), req.fileName(), req.fileType());
     }
 
-    public static BinaryContent create(byte[] data, String fileName, String fileType) {
-        return BinaryContent.builder()
-                .id(UUID.randomUUID())
-                .data(data)
-                .fileName(fileName)
-                .fileType(fileType)
-                .build();
+    public static BinaryContent create(byte[] data, String fileName, String fileType){
+        return new BinaryContent(data, fileName, fileType);
     }
 }

@@ -19,10 +19,18 @@ public class User extends BaseEntity {
     private UUID profileId;             //프로필 이미지 UUID
 
     //Constructor
+    public User(String email, String nickname, String password, UUID profileId) {
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
+        this.profileId = profileId;
+    }
+
     public User(String email, String nickname, String password) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
+        this.profileId = null;
     }
 
     //update
