@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +39,7 @@ public class DataLoader {
     private final ReadStatusRepository readStatusRepository;
     private final UserStatusRepository userStatusRepository;
 
+    @PostConstruct
     public void loadAll() {
         loadBinaryContent();
         loadUser();
@@ -62,7 +64,7 @@ public class DataLoader {
             @SuppressWarnings("unchecked")
             List<BinaryContentIoDTO> list = (List<BinaryContentIoDTO>) ois.readObject();
             List<BinaryContent> objects = list.stream()
-                    .map(dto -> Mapper.toBinaryContent(dto, userRepository))
+                    .map(Mapper::toBinaryContent)
                     .toList();
             binaryContentRepository.saveAll(objects);
         } catch (FileNotFoundException e) {
