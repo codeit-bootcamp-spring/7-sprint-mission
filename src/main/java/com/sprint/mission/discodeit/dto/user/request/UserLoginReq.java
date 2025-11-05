@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.dto.user.request;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record UserLoginReq(
-        String nickname,
-        String password
+        @NotBlank String nickname,
+        @NotBlank String password
 ){}

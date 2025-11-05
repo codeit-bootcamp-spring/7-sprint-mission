@@ -47,6 +47,7 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> createUser(@Valid @RequestBody UserCreateReq req){
         User user = userCreationFacade.createUser(req);
+        log.info("유저 가입: {}", req.nickname());
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -66,6 +67,8 @@ public class UserController {
     // 회원 삭제
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId){
+        log.info("유저 탈퇴: {}", userId.toString());
+
         userDeletionFacade.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
