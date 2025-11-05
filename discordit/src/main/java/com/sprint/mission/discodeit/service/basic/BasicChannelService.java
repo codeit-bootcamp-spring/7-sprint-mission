@@ -104,9 +104,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelResponse> getAllVisibleByUserId(GetVisibleChannelRequest dto) {
-        User user = userRepository.findByUserId(dto.userId())
-                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
+    public List<ChannelResponse> getAllVisibleByUserId(String userId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
         return Stream.concat(channelRepository.findAllPublic().stream(), channelRepository.findAllPrivateByUser(user).stream())
                 .map(this::toDto)
                 .toList();

@@ -22,7 +22,7 @@ public interface ChannelService {
     ChannelResponse getById(UUID uuid);
     List<ChannelResponse> getAll();
 
-    List<ChannelResponse> getAllVisibleByUserId(GetVisibleChannelRequest dto);
+    List<ChannelResponse> getAllVisibleByUserId(String userId);
 
     // 멤버 수정 (userId 기반)
     void addMember(ChannelMemberRequest dto);
