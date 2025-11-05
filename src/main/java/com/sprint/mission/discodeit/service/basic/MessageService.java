@@ -54,17 +54,17 @@ public class MessageService implements InterfaceMessageService {
     }
 
     @Override
-    public List<Res_Message> findallByChannleId(UUID channelID) {
+    public List<Res_Message> findAllByChannleId(UUID channelID) {
 //        [ ] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
-        List<Message> messages = messageRepository.findAll().orElseThrow(() -> new NoSuchElementException("🚨findallByChannleId 오류"));
+        List<Message> messages = messageRepository.findAll().orElseThrow(() -> new NoSuchElementException("🚨findAllByChannleId 오류"));
 //        for (Message message : messages) {
-//            Util.okMessage("findallByChannleId.channelID = [" + channelID + "][" + message.getMessage() + "]");
+//            Util.okMessage("findAllByChannleId.channelID = [" + channelID + "][" + message.getMessage() + "]");
 //        }
 
         List<Res_Message> resMessage = messages.stream().filter(msg -> msg.getChannelId().equals(channelID)).map(Res_Message::from).toList();
-        resMessage.stream().forEach(message -> Util.okMessage("findallByChannleId = [" + channelID + "][" + message.message() + "]"));
+        resMessage.stream().forEach(message -> Util.okMessage("findAllByChannleId = [" + channelID + "][" + message.message() + "]"));
 //        for (Res_Message message : resMessage) {
-//            Util.okMessage("findallByChannleId = [" + channelID + "][" + message.message() + "]");
+//            Util.okMessage("findAllByChannleId = [" + channelID + "][" + message.message() + "]");
 //        }
         return resMessage;
     }

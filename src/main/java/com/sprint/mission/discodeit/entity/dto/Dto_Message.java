@@ -19,4 +19,3 @@ public record Dto_Message(
                 .build();
     }
 }
-

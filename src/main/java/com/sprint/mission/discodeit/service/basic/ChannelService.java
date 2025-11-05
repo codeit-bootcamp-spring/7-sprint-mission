@@ -94,7 +94,7 @@ public class ChannelService implements InterfaceChannelService {
 
         List<Res_ChannelFind> resChannelFinds = new ArrayList<>();
 
-        List<Channel> allChannel = channelRepository.findAll().orElseThrow(() -> new NoSuchElementException("🚨findallByChannleId.channelRepository.findAll() 오류"));
+        List<Channel> allChannel = channelRepository.findAll().orElseThrow(() -> new NoSuchElementException("🚨findAllByChannleId.channelRepository.findAll() 오류"));
         List<Channel> publicChannels = allChannel.stream().filter(channel -> channel.getChannelType() == PUBLIC).toList();
 
         for (Channel publicChannel : publicChannels) {
@@ -104,7 +104,7 @@ public class ChannelService implements InterfaceChannelService {
 
         //!!⭐️ ReadStatus = Private Channel 만 가능??
         //[ ] 특정 User가 볼 수 있는 Channel 목록 조회
-        List<ReadStatus> readStatuses = readStatusRepository.findAll().orElseThrow(() -> new NullPointerException("🚨findallByChannleId.readStatusRepository.findAl() 오류"));
+        List<ReadStatus> readStatuses = readStatusRepository.findAll().orElseThrow(() -> new NullPointerException("🚨findAllByChannleId.readStatusRepository.findAl() 오류"));
         List<ReadStatus> readStatusWithUserID = readStatuses.stream().filter(readStatus -> userID.equals(readStatus.getUserId())).toList();
         List<UUID> privateChannelIdsInReadStatus = readStatusWithUserID.stream().map(readStatus -> readStatus.getChannelId()).toList(); // distinct().
         List<Channel> privateChannels = allChannel.stream().filter(channel -> privateChannelIdsInReadStatus.contains(channel.getId())).toList();
@@ -174,14 +174,14 @@ public class ChannelService implements InterfaceChannelService {
         Channel findedChannel = channelRepository.findById(channelID).orElseThrow(() -> new IllegalArgumentException("🚨delete. id = [" + channelID.toString() + "] 오류"));
         channelRepository.deleteById(findedChannel.getId());
 
-        List<ReadStatus> allResdStatus = readStatusRepository.findAll().orElseThrow(() -> new NoSuchElementException("🚨findallByChannleId() 오류"));
+        List<ReadStatus> allResdStatus = readStatusRepository.findAll().orElseThrow(() -> new NoSuchElementException("🚨findAllByChannleId() 오류"));
         List<ReadStatus> filteredReadStatuses = allResdStatus.stream().filter(ReadStatus -> ReadStatus.getChannelId() == channelID).toList();
 
         for (ReadStatus readStatus : filteredReadStatuses) {
             readStatusRepository.deleteById(readStatus.getId());
         }
 
-        List<Message> allMessage = messageRepository.findAll().orElseThrow(() -> new NoSuchElementException("🚨findallByChannleId() 오류"));
+        List<Message> allMessage = messageRepository.findAll().orElseThrow(() -> new NoSuchElementException("🚨findAllByChannleId() 오류"));
         List<Message> messageList = allMessage.stream().filter(Message -> Message.getChannelId() == channelID).toList();
 
         for (Message message : messageList) {

@@ -159,9 +159,9 @@ public class DiscodeitApplication {
 
             messageService.find(resMessage.id());
             messageService.updateMessage(Dto_MessageUpdate.from(resMessage.id(), "1st 메세지 테스트로 변경"));
-            messageService.findallByChannleId(resPublic.id());
+            messageService.findAllByChannleId(resPublic.id());
             messageService.deleteMessage(resMessage_II.id());
-            messageService.findallByChannleId(resPublic.id());
+            messageService.findAllByChannleId(resPublic.id());
 
         } catch (Exception e) {
             throw new RuntimeException(e);

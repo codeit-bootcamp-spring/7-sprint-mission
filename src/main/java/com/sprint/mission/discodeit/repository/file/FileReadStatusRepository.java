@@ -50,8 +50,8 @@ public class FileReadStatusRepository  implements InterfaceReadStatusRepository 
     }
 
     //    @Override
-//    public Optional<List<Channel>> findallByChannleId() {
-//        List<Channel> channels = fileUtil.findallByChannleId().stream().map(model -> (Channel)model).toList();
+//    public Optional<List<Channel>> findAllByChannleId() {
+//        List<Channel> channels = fileUtil.findAllByChannleId().stream().map(model -> (Channel)model).toList();
 //        return Optional.ofNullable(channels);
 //    }
 //
@@ -62,6 +62,6 @@ public class FileReadStatusRepository  implements InterfaceReadStatusRepository 
 //
 //    @Override
 //    public boolean existsByName(String name) {
-//        return fileUtil.findallByChannleId().stream().map(channel -> (Channel)channel).anyMatch(channel -> channel.getChannelName().equals(name));
+//        return fileUtil.findAllByChannleId().stream().map(channel -> (Channel)channel).anyMatch(channel -> channel.getChannelName().equals(name));
 //    }
 }

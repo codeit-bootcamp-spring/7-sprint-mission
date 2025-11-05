@@ -83,7 +83,7 @@ public class UserService implements InterfaceUserService {
 //        Util.okMessage("♣️user.id() = [" + user.getId() + "]");
         UserStatus userStatus = userStatusRepository.findByUserId(userID).orElseThrow(() -> new IllegalArgumentException(message));
 
-        Util.okMessage("UserService.findallByChannleId = [" + user.getUserName() + "] isOnline = [" + userStatus.isOnline() + "]");
+        Util.okMessage("UserService.findAllByChannleId = [" + user.getUserName() + "] isOnline = [" + userStatus.isOnline() + "]");
 
         return Res_IsOnlineUser.from(user, userStatus.isOnline());
     }

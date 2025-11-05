@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface InterfaceMessageService  extends BaseInterfaceService {
     Res_Message create(Dto_Message dtoMessage, Optional<List<Dto_BinaryContent>> requestDto);
-    List<Res_Message> findallByChannleId(UUID channelID);
+    List<Res_Message> findAllByChannleId(UUID channelID);
 //    List<Message> getAllMessageInChannel(UUID channelID);
 //    List<Message> getAllMessageOfUser(UUID userID);
     Res_Message find(UUID messageID);   // 모두 읽기수정
