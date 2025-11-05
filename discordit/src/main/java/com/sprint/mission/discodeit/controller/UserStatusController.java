@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusDeleteByUserIdRequest;
-import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusGetByChannelRequest;
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponse;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -28,14 +26,5 @@ public class UserStatusController {
     @RequestMapping(method = RequestMethod.PUT)
     public ResponseEntity<UserStatusResponse> updateOnlineStatus(UserStatusUpdateByUserIdRequest request) {
         return ResponseEntity.ok(userStatusService.updateByUserId(request));
-    }
-
-    public ResponseEntity<Void> deleteOnlineStatus(UserStatusDeleteByUserIdRequest request) {
-        userStatusService.delete(request);
-        return ResponseEntity.noContent().build();
-    }
-
-    public ResponseEntity<List<UserStatusResponse>> getByChannel(UserStatusGetByChannelRequest request) {
-        userStatusService.getByChannelId(request);
     }
 }
