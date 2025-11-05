@@ -4,7 +4,10 @@ import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfo
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.util.DateTimeUtil;
 
+import java.util.UUID;
+
 public record UserDetailInfoRes(
+        UUID userId,            //유저 UUID
         String nickname,        //닉네임
         String email,           //이메일
         BinaryContentInfoRes profileImg,    //프로필 이미지
@@ -14,6 +17,7 @@ public record UserDetailInfoRes(
 ) {
     public static UserDetailInfoRes from(User user, BinaryContentInfoRes profileImg, boolean isOnline){
         return new UserDetailInfoRes(
+                user.getId(),
                 user.getNickname(),
                 user.getEmail(),
                 profileImg,
