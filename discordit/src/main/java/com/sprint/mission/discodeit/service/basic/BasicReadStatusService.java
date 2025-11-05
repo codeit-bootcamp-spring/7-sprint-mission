@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +49,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()));
         ReadStatus readStatus = readStatusRepository.find(user, channel)
                 .orElseThrow(() -> new ReadStatusNotFoundException(user, channel));
-        readStatus.setLastReadAt(Instant.from(dto.readTime()));
+        readStatus.setLastReadAt(dto.readTime().atZone(ZoneId.of("UTC")).toInstant());
         readStatusRepository.update(readStatus);
         return ReadStatusResponse.toDto(readStatus);
     }
@@ -61,6 +62,13 @@ public class BasicReadStatusService implements ReadStatusService {
     public List<ReadStatusResponse> getAllByUserId(String userId) {
         User user = userRepository.findByUserId(userId).orElseThrow(() -> new UserNotFoundException(userId));
         return readStatusRepository.findAllByUser(user).stream()
+                .map(ReadStatusResponse::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<ReadStatusResponse> getAll() {
+        return readStatusRepository.findAll().stream()
                 .map(ReadStatusResponse::toDto)
                 .toList();
     }

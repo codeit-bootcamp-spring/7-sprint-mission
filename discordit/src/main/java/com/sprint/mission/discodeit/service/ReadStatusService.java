@@ -16,4 +16,6 @@ public interface ReadStatusService {
     ReadStatusResponse get(UUID uuid);
 
     List<ReadStatusResponse> getAllByUserId(String userId);
+
+    List<ReadStatusResponse> getAll();
 }

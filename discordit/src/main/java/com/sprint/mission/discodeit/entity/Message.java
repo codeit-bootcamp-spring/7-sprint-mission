@@ -30,6 +30,12 @@ public class Message extends BaseEntity {
         this.content = content;
     }
 
+    // 더미 데이터 타임스탬프 조정을 허용 (테스트/시드용)
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+        this.updatedAt = createdAt;
+    }
+
     public void addAttachment(BinaryContent attachment) {
         this.attachments.add(attachment);
     }

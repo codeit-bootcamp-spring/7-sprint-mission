@@ -57,7 +57,7 @@ public class BasicMessageService implements MessageService {
 
         if (dto.fileUrls() != null) {
             List<BinaryContent> contents = dto.fileUrls().stream()
-                    .map(url -> new BinaryContent(sender, url))
+                    .map(BinaryContent::new)
                     .toList();
             binaryContentRepository.saveAll(contents);
             message.addAttachments(contents);

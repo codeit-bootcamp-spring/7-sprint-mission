@@ -86,13 +86,12 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     /**
-     * 테스트용 임시 메서드: 마지막으로 저장된 메시지를 반환합니다.
+     * 테스트용 임시 메서드: 마지막으로 저장된(가장 최근 생성된) 메시지를 반환합니다.
      */
+    @Override
     public Optional<Message> findLast() {
-        if (data.isEmpty()) {
-            throw new IllegalStateException("저장된 메시지가 없습니다.");
-        }
-        return Optional.ofNullable(data.get(data.size() - 1));
+        return data.values().stream()
+                .max(Comparator.comparing(Message::getCreatedAt));
     }
 
     private void write() {
