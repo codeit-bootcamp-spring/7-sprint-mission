@@ -3,9 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.channel.request.*;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.enums.ChannelScope;
 import com.sprint.mission.discodeit.exceptions.ChannelAlreadyExistsException;
 import com.sprint.mission.discodeit.exceptions.ChannelNotFoundException;
@@ -20,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -169,9 +168,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     private ChannelResponse toDto(Channel channel) {
-        return ChannelResponse.toDto(channel, messageRepository.findLast(channel)
-                .orElseThrow(() -> new MessageNotFoundException("메세지 데이터가 존재하지 않습니다."))
-                .getCreatedAt());
+        return ChannelResponse.toDto(channel,
+                messageRepository.findLast(channel)
+                        .map(BaseEntity::getCreatedAt)
+                        .orElse(null));
     }
 
     /*
