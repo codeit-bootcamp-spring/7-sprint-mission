@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.Binarycontent.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserCreateResponse;
+import com.sprint.mission.discodeit.dto.user.response.UserDto;
 import com.sprint.mission.discodeit.dto.user.response.UserFindResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserUpdateResponse;
 import com.sprint.mission.discodeit.entity.User;
@@ -35,8 +37,9 @@ public class BasicUserService implements UserService {
     private final BinaryRepository binaryRepository;
 
 
+
     @Override
-    public UserCreateResponse create(UserCreateRequest userCreateRequest) {
+    public UserCreateResponse create(UserCreateRequest userCreateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
 
      //이메일매칭
      if(userRepository.findAll().stream()
@@ -49,22 +52,33 @@ public class BasicUserService implements UserService {
          throw new IllegalArgumentException("닉네임이 이미 존재합니다");
      }
      
-     //유저정보
+
+        UUID nullableProfileId = optionalProfileCreateRequest
+                .map(profileRequest -> {
+
+                    byte[] bytes = profileRequest.contentByte();
+                    BinaryContent binaryContent = new BinaryContent(ContentsType.PROFILE_IMAGE, bytes, "null");
+                    return binaryRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+
+        //유저정보
         User user = new User(
                 userCreateRequest.email(),
                 userCreateRequest.rawPassword(),
-                userCreateRequest.username()
-                ,userCreateRequest.userNickname()
-        ); 
-     
-     
+                userCreateRequest.username(),
+                userCreateRequest.userNickname(),
+                nullableProfileId
+
+        );
+     //   user.setProfileID(nullableProfileId);
        //혹시이미지가 있니 없니
-        if (userCreateRequest.profileImage() != null) {
+    /*    if (optionalProfileCreateRequest. != null) {
             BinaryContent binaryContent = new BinaryContent(ContentsType.PROFILE_IMAGE, userCreateRequest.profileImage());
             binaryRepository.save(binaryContent);
 
             user.setProfileID(binaryContent.getId());
-        }
+        }*/
 
         //유저정보저장
         userRepository.save(user);
@@ -88,24 +102,35 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserFindResponse> findAll() {
-        List<UserFindResponse>  userList = new ArrayList<>(List.of());
+    public List<UserDto> findAll() {
+        List<UserDto>  userList = new ArrayList<>(List.of());
         for(User user:userRepository.findAll()){
 
             UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                     .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + user.getId()));
 
-            userList.add(UserFindResponse.from(user,userStatus));
+            userList.add(UserDto.from(user,userStatus));
         }
 
         return userList;
     }
 
     @Override
-    public UserUpdateResponse update(UserUpdateRequest userUpdateRequest) {
+    public UserUpdateResponse update(UserUpdateRequest userUpdateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         //id있는지확인
         User user = userRepository.findById(userUpdateRequest.userId())
                 .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+userUpdateRequest.userId()));
+        UUID nullableProfileId = optionalProfileCreateRequest
+                .map(profileRequest -> {
+                    Optional.ofNullable(user.getId())
+                            .ifPresent(binaryRepository::delete);
+
+                    byte[] bytes = profileRequest.contentByte();
+                    BinaryContent binaryContent = new BinaryContent(ContentsType.PROFILE_IMAGE, bytes,"null");
+                    return binaryRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+
         //저장용
          user.update(userUpdateRequest);//업데이트했으니 갱신해야지
           userRepository.save(user);

@@ -8,7 +8,7 @@ public record UserCreateRequest(
         String rawPassword,
         String userNickname
         //예상하고 만들어둔거다  이해가 안간다
-       ,byte[] profileImage //
+     //  ,byte[] profileImage //
 
 ) {
 }

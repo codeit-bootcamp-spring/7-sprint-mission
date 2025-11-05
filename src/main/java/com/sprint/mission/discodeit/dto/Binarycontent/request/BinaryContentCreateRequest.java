@@ -6,10 +6,8 @@ import com.sprint.mission.discodeit.entity.content.ContentsType;
 import java.util.UUID;
 
 public record BinaryContentCreateRequest(
-        UUID typeUUID,
         ContentsType contentsType,
-        UUID contentsId
-        ,byte[] contentByte
+        byte[] contentByte
 ) {
 
 }

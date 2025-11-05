@@ -31,19 +31,23 @@ public class FileIo {
 
     public static <T extends Common & Serializable> Optional<T> read(String folder, UUID uuid, Class<T> clazz) {
         String path = Path.RooT_PATH.getPath() + "/" + folder + "/" + uuid + ".sav";
+        System.out.println(path);
         File file = new File(path);
 
         if (!file.exists()) {
+            System.out.println("directory or file not fount");
             return Optional.empty();
         }
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             Object obj = ois.readObject();
+            System.out.println("result of readObject: " + obj);
 
 
             //제네릭으로 받아오면 장확히 모른다
             //클래스로 구분을 지을수있는지 판단해야한다
             if (clazz.isInstance(obj)) {
+                System.out.println("can cast to class.case()");
                 return Optional.of(clazz.cast(obj));
             } else {
                 System.out.println("타입 불일치: 기대=" + clazz.getName() + ", 실제=" + obj.getClass().getName());

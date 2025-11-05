@@ -19,10 +19,10 @@ public class MessageController {
     private final MessageService messageService;
 
                //[ ] 메시지를 보낼 수 있다.
-         @PostMapping("/create")
+    /*     @PostMapping("/create")
          public MessageResponse createMessage(@RequestBody CreateMessageRequest request){
                return   messageService.create(request);
-          }
+          }*/
            // [ ] 메시지를 수정할 수 있다.
          @PostMapping("/update")
          public MessageResponse updateMessage(@RequestBody UpdateMessageRequest request){
@@ -33,6 +33,7 @@ public class MessageController {
            public void deleteMessage(@RequestBody DeleteMessageRequest request){
                messageService.delete(request);
            }
+
           // [ ] 특정 채널의 메시지 목록을 조회할 수 있다.
        @PostMapping("/findallbychannelid")
        public List<MessageResponse> findAllByChannelId(@RequestBody FindAllByChannelIdMessageRequest request){

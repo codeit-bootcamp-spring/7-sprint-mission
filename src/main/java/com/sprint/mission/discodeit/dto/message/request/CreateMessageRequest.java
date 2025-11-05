@@ -7,7 +7,7 @@ public record CreateMessageRequest(
         UUID authorId,
         UUID channelId,
         String content,
-        byte[] attachment
+       List<byte[]> attachment
 
 ) {
 }
