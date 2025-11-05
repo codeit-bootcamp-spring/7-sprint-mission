@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.user.response;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Common;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.enums.UserStatusType;
 import lombok.Builder;
@@ -15,11 +15,15 @@ public record UserResponseDto(
         String email,
         String phoneNumber,
         String pronoun,
-        List<Channel> joinChannels,
+        List<UUID> joinChannelIds,
         UUID profileId,
         UserStatusType statusType
 ) {
     public static UserResponseDto from(User user, UserStatusType userStatusType) {
+        List<UUID> joinChannelIds = user.getJoinChannels().stream()
+                .map(Common::getId)
+                .toList();
+
         return UserResponseDto.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
@@ -28,7 +32,7 @@ public record UserResponseDto(
                 .pronoun(user.getPronoun())
                 .profileId(user.getProfileId())
                 .statusType(userStatusType)
-                .joinChannels(user.getJoinChannels())
+                .joinChannelIds(joinChannelIds)
                 .build();
     }
 }
