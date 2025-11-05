@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entityElement.ReadStatusElement;
@@ -32,7 +33,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus createReadStatus(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
+    public ReadStatusResponseDto createReadStatus(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
         UUID channelId = readStatusCreateRequestDto.getChannelId();
         UUID userId = readStatusCreateRequestDto.getUserId();
         if(!(channelRepository.isChannelExit(channelId)
@@ -50,7 +51,9 @@ public class BasicReadStatusService implements ReadStatusService {
                 .channelId(readStatusCreateRequestDto.getChannelId())
                 .readLastTime(readStatusCreateRequestDto.getReadLastTime())
                 .build();
-        return readStatusRepository.createReadStatus(readStatus);
+        return ReadStatusResponseDto.from(
+                readStatusRepository.createReadStatus(readStatus)
+        );
     }
 
     @Override
@@ -70,16 +73,27 @@ public class BasicReadStatusService implements ReadStatusService {
         Channel channel = channelRepository.getChannelById(readStatus.getChannelId()).orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
         ReadStatusElement readStatusElement = readStatusUpdateRequestDto.getType();
         BiConsumer<ReadStatus ,T> biConsumer = (BiConsumer<ReadStatus, T>) readStatusElement.setter;
-        biConsumer.accept(readStatus, readStatusUpdateRequestDto.getUpdateValue());
+        biConsumer.accept(readStatus, readStatusUpdateRequestDto.getSafeUpdateValue());
         readStatus.updateEntity();
         readStatusRepository.updateReadStatus(readStatus);
     }
     @Override
-    public ReadStatus readReadStatus(UUID readStatusID) {
-        return readStatusRepository.readReadStatus(readStatusID).orElseThrow(()->new IllegalArgumentException("존재하지 않는 readStatus 입니다.")) ;
+    public ReadStatusResponseDto readReadStatus(UUID readStatusID) {
+        return ReadStatusResponseDto.from(
+                readStatusRepository.readReadStatus(readStatusID).orElseThrow(()->new IllegalArgumentException("존재하지 않는 readStatus 입니다."))
+        );
     }
     @Override
-    public List<ReadStatus> findAllyByUserId(UUID userID) {
-        return readStatusRepository.readAllReadStatus().stream().filter(x->x.getUserId().equals(userID)).toList();
+    public List<ReadStatusResponseDto> findAllyByUserId(UUID userID) {
+        return
+                readStatusRepository.readAllReadStatus().stream()
+                        .filter(x->x.getUserId().equals(userID))
+                        .map(ReadStatusResponseDto::from).toList();
+    }
+
+    @Override
+    public List<ReadStatusResponseDto> readAllReadStatus() {
+        readStatusRepository.readAllReadStatus().forEach(x-> System.out.println(x.getId()+": "+x.getUserId()+": "+x.getChannelId()));
+        return readStatusRepository.readAllReadStatus().stream().map(ReadStatusResponseDto::from).toList();
     }
 }
