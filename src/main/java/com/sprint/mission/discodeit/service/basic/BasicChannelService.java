@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelDto;
-import com.sprint.mission.discodeit.dto.channel.PublicChannelDto;
-import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.request.CreatePrivateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.request.CreatePublicChannelDto;
+import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -29,20 +29,22 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
 
     @Override
-    public Channel createChannel(PublicChannelDto publicChannelDto) {
+    public ChannelResponseDto createChannel(CreatePublicChannelDto createPublicChannelDto) {
         Channel channel = new Channel(
                 ChannelType.PUBLIC,
-                publicChannelDto.getChannelName(),
-                publicChannelDto.getDesc()
+                createPublicChannelDto.channelName(),
+                createPublicChannelDto.desc()
         );
         channelRepository.save(channel);
-        return channel;
+
+        // 채널 생성 시, 해당 채널에 대한 메세지가 없으므로, 가장 최근 메세지의 시간은 Instant.MIN으로 정의한다.
+        return ChannelResponseDto.from(channel, Instant.MIN);
     }
 
     @Override
-    public Channel createChannel(PrivateChannelDto privateChannelDto) {
+    public ChannelResponseDto createChannel(CreatePrivateChannelDto createPrivateChannelDto) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
-        privateChannelDto.getParticipants().forEach(userId -> {
+        createPrivateChannelDto.participantsIds().forEach(userId -> {
             User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저입니다." + userId));
             ReadStatus readStatus = new ReadStatus(userId, channel.getId(), Instant.now());
             channel.addParticipant(user);
@@ -50,7 +52,9 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.save(readStatus);
         });
         channelRepository.save(channel);
-        return channel;
+
+        // 채널 생성 시, 해당 채널에 대한 메세지가 없으므로, 가장 최근 메세지의 시간은 Instant.MIN으로 정의한다.
+        return ChannelResponseDto.from(channel, Instant.MIN);
     }
 
     @Override
@@ -89,15 +93,24 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UpdateChannelDto updateChannelDto) {
-        Channel channel = channelRepository.findById(updateChannelDto.getChannelId())
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다." + updateChannelDto.getChannelId()));
+    public ChannelResponseDto updateChannel(UUID channelId, UpdateChannelDto updateChannelDto) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다." + channelId));
 
-        if (updateChannelDto.getChannelType().equals(ChannelType.PUBLIC)) {
+        if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
             throw new IllegalArgumentException("Private Channel은 수정할 수 없습니다." + channel.getId());
         }
 
-        channel.updateChannel(updateChannelDto.getChannelType(), updateChannelDto.getChannelName(), updateChannelDto.getDesc());
+
+        Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
+                .map(Message::getCreateAt)
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+
+
+        channel.updateChannel(channel.getChannelType(), updateChannelDto.channelName(), updateChannelDto.desc());
+
+        return ChannelResponseDto.from(channel, lastMessageAt);
     }
 
     @Override
@@ -112,7 +125,6 @@ public class BasicChannelService implements ChannelService {
         channelRepository.deleteById(channelId);
         readStatusRepository.deleteAllByChannelId(channelId);
         messageRepository.deleteAllByChannelId(channelId);
-
 
     }
 }
