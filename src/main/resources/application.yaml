@@ -1,10 +1,8 @@
-server:
-  port: 8080
-
 spring:
   application:
     name: discodeit
 
 discodeit:
   repository:
-    file-directory: "./data"
+    type: file   # jcf | file
+    file-directory: .discodeit

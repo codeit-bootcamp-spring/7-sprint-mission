@@ -2,20 +2,16 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
-import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface ReadStatusRepository {
-    ReadStatus save(ReadStatus status);
-
+    ReadStatus save(ReadStatus readStatus);
     Optional<ReadStatus> findById(UUID id);
-
-    /** 사용자-채널 쌍은 보통 하나의 ReadStatus */
-    Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
-
-    /** 마지막 읽음 시간 갱신 */
-    void updateLastReadAt(UUID userId, UUID channelId, Instant lastReadAt);
-
+    List<ReadStatus> findAllByUserId(UUID userId);
+    List<ReadStatus> findAllByChannelId(UUID channelId);
+    boolean existsById(UUID id);
     void deleteById(UUID id);
+    void deleteAllByChannelId(UUID channelId);
 }
