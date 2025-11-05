@@ -16,7 +16,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 @RestController
 @RequestMapping("/channel")
 @RequiredArgsConstructor
-// http://localhost:8080/user-list.html
 public class ChannelController {
     private final ChannelService channelService;
 //    채널 관리
