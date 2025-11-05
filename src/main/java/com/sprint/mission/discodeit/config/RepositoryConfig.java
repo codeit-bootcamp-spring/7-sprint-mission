@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.File;
+
 @Configuration
 public class RepositoryConfig {
     @Value("${discodeit.repository.file-directory}")
@@ -24,6 +26,9 @@ public class RepositoryConfig {
 
     @PostConstruct
     public void init() {
+        File directory = new File(baseDirectory);
+        if(!directory.exists()) directory.mkdirs(); //폴더가 없으면 생성
+
         userPath = baseDirectory + "/user.sav";
         channelPath = baseDirectory + "/channel.sav";
         joinedPath = baseDirectory + "/joined.sav";
