@@ -1,33 +1,24 @@
 package com.sprint.mission.discodeit.view;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Participation;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFParticipationService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.utils.AppConfig;
+import com.sprint.mission.discodeit.channel.Channel;
+import com.sprint.mission.discodeit.participation.dto.ParticipationResponseDTO;
+import com.sprint.mission.discodeit.user.User;
+import com.sprint.mission.discodeit.channel.ChannelService;
+import com.sprint.mission.discodeit.participation.ParticipationService;
+import com.sprint.mission.discodeit.user.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
-/**
- * 여러 View 클래스에서 공통적으로 사용되는 UI 헬퍼 메서드를 모아놓은 클래스입니다.
- * (예: 사용자 목록 출력 및 선택, 채널 목록 출력 및 선택 등)
- */
+@Component
+@RequiredArgsConstructor
 public class SharedView {
-    private final JCFUserService userService;
-    private final JCFChannelService channelService;
-    private final JCFParticipationService participationService;
+    private final UserService userService;
+    private final ChannelService channelService;
+    private final ParticipationService participationService;
     private final Scanner sc;
-
-    public SharedView(AppConfig appConfig, Scanner scanner) {
-        this.userService = appConfig.getUserService();
-        this.channelService = appConfig.getChannelService();
-        this.participationService = appConfig.getParticipationService();
-        this.sc = scanner;
-    }
 
     /**
      * 사용자 목록을 출력하고 사용자로부터 한 명을 선택받습니다.
@@ -88,8 +79,8 @@ public class SharedView {
      * @param user 참여 정보를 조회할 User 객체
      * @return 선택된 Participation 객체, 취소 시 null을 반환합니다.
      */
-    public Participation selectParticipationFromUser(User user) {
-        List<Participation> participations = participationService.findParticipationsByUserId(user.getId());
+    public ParticipationResponseDTO selectParticipationFromUser(User user) {
+        List<ParticipationResponseDTO> participations = participationService.findParticipationsByUserId(user.getId());
 
         if (participations.isEmpty()) {
             System.out.println("해당 유저가 참여중인 채널 정보가 없습니다.");
@@ -98,12 +89,12 @@ public class SharedView {
 
         System.out.println("--- 채널 참여 정보 선택 ---");
         for (int i = 0; i < participations.size(); i++) {
-            Participation p = participations.get(i);
+            ParticipationResponseDTO p = participations.get(i);
             try {
-                Channel c = channelService.findById(p.getChannelId());
-                System.out.printf("%d. 채널: %s (닉네임: %s)\n", i + 1, c.getChannelName(), p.getNickname());
+                Channel c = channelService.findById(p.participationDualKey().channelId());
+                System.out.printf("%d. 채널: %s (닉네임: %s)\n", i + 1, c.getChannelName(), p.nickname());
             } catch (Exception e) {
-                System.out.printf("%d. 알 수 없는 채널 (ID: %s)\n", i + 1, p.getChannelId());
+                System.out.printf("%d. 알 수 없는 채널 (ID: %s)\n", i + 1, p.participationDualKey().channelId());
             }
         }
         System.out.println("0. 취소");

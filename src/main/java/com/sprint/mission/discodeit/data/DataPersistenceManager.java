@@ -1,43 +1,64 @@
 package com.sprint.mission.discodeit.data;
 
+import com.sprint.mission.discodeit.channel.ChannelRepositoryImpl;
+import com.sprint.mission.discodeit.message.channel.ChannelMessageRepositoryImpl;
+import com.sprint.mission.discodeit.message.direct.DirectMessageRepositoryImpl;
+import com.sprint.mission.discodeit.participation.ParticipationRepositoryImpl;
+import com.sprint.mission.discodeit.user.UserRepositoryImpl;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 데이터의 영속성(Persistence)을 관리하는 클래스입니다.
- * 자바 직렬화(Serialization)를 사용하여 Map 객체를 파일에 직접 저장하고 불러옵니다.
- * 이 클래스는 싱글톤(Singleton) 패턴으로 구현되어 프로그램 전체에서 단 하나의 인스턴스만 사용됩니다.
- */
+@Component
+@RequiredArgsConstructor
 public class DataPersistenceManager {
-
     /**
      * 데이터가 저장될 기본 폴더 경로입니다.
      */
     public static final String ROOT_PATH = "data/";
 
-    // private static final로 유일한 인스턴스를 클래스 로딩 시점에 생성합니다.
-    private static final DataPersistenceManager INSTANCE = new DataPersistenceManager();
+    private final UserRepositoryImpl userRepository;
+    private final ChannelRepositoryImpl channelRepository;
+    private final ParticipationRepositoryImpl participationRepository;
+    private final ChannelMessageRepositoryImpl channelMessageRepository;
+    private final DirectMessageRepositoryImpl directMessageRepository;
 
-    /**
-     * private 생성자로 외부에서의 직접적인 인스턴스 생성을 막습니다.
-     * 프로그램 시작 시 data 폴더가 없으면 자동으로 생성합니다.
-     */
-    private DataPersistenceManager() {
+
+    @PostConstruct
+    public void loadAllData() {
         File dataDir = new File(ROOT_PATH);
         if (!dataDir.exists()) {
-            dataDir.mkdirs(); // mkdirs()는 상위 폴더까지 모두 생성해줘서 더 안정적입니다.
+            dataDir.mkdirs();
         }
+        userRepository.loadDataMap(this.loadData(DataKey.USER));
+        channelRepository.loadDataMap(this.loadData(DataKey.CHANNEL));
+        participationRepository.loadDataMap(this.loadData(DataKey.PARTICIPATION));
+        channelMessageRepository.loadDataMap(this.loadData(DataKey.CHANNEL_MESSAGE));
+        directMessageRepository.loadDataMap(this.loadData(DataKey.DIRECT_MESSAGE));
+
+        System.out.println("==================================================");
+        System.out.println("✅ [DataPersistenceManager] @PostConstruct: 모든 데이터를 로드했습니다.");
+        System.out.println("✅ 유저 수 : " + userRepository.getDataMap().size());
+        System.out.println("==================================================");
+    }
+    @PreDestroy
+    public void saveAllData() {
+        this.saveData(DataKey.USER, userRepository.getDataMap());
+        this.saveData(DataKey.CHANNEL, channelRepository.getDataMap());
+        this.saveData(DataKey.PARTICIPATION, participationRepository.getDataMap());
+        this.saveData(DataKey.CHANNEL_MESSAGE, channelMessageRepository.getDataMap());
+        this.saveData(DataKey.DIRECT_MESSAGE, directMessageRepository.getDataMap());
+
+        System.out.println("\n==================================================");
+        System.out.println("✅ [DataPersistenceManager] @PreDestroy: 모든 데이터를 파일에 저장했습니다.");
+        System.out.println("==================================================");
     }
 
-    /**
-     * 프로그램 전체에서 사용될 유일한 DataPersistenceManager 인스턴스를 반환합니다.
-     * @return DataPersistenceManager의 싱글톤 인스턴스
-     */
-    public static DataPersistenceManager getInstance() {
-        // 이미 만들어진 유일한 인스턴스를 반환합니다.
-        return INSTANCE;
-    }
 
     /**
      * 파일로부터 Map 데이터를 불러옵니다. (역직렬화)
@@ -94,4 +115,6 @@ public class DataPersistenceManager {
             throw new RuntimeException("데이터를 저장하는 데 실패했습니다.", e);
         }
     }
+
+
 }
