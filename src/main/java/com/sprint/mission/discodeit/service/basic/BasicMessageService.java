@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
+import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
+import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -28,58 +29,67 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public void createMessage(CreateMessageDto createMessageDto) {
-        User user = userRepository.findById(createMessageDto.getUserId())
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저입니다." + createMessageDto.getUserId()));
-        Channel channel = channelRepository.findById(createMessageDto.getChannelid())
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 채널입니다." + createMessageDto.getChannelid()));
+    public MessageResponseDto createMessage(CreateMessageDto createMessageDto) {
+        User user = userRepository.findById(createMessageDto.userId())
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저입니다." + createMessageDto.userId()));
+        Channel channel = channelRepository.findById(createMessageDto.channelId())
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 채널입니다." + createMessageDto.channelId()));
 
         List<UUID> binaryContentIds;
-        if (createMessageDto.getCreateBinaryContentDtos() == null) {
+        if (createMessageDto.createBinaryContentDtos() == null) {
             binaryContentIds = new ArrayList<>();
         } else {
-            binaryContentIds = createMessageDto.getCreateBinaryContentDtos().stream().map(
+            binaryContentIds = createMessageDto.createBinaryContentDtos().stream().map(
                     createBinaryContentDto -> {
                         BinaryContent binaryContent = new BinaryContent(
-                                createBinaryContentDto.getFileName(),
-                                createBinaryContentDto.getContentType(),
-                                createBinaryContentDto.getBytes());
+                                createBinaryContentDto.fileName(),
+                                createBinaryContentDto.contentType(),
+                                createBinaryContentDto.bytes());
                         binaryContentRepository.save(binaryContent);
                         return binaryContent.getId();
                     }
             ).toList();
         }
 
-        Message message = new Message(createMessageDto.getContent(), createMessageDto.getChannelid(), createMessageDto.getUserId(), binaryContentIds);
+        Message message = new Message(createMessageDto.content(), createMessageDto.channelId(), createMessageDto.userId(), binaryContentIds);
         messageRepository.save(message);
 
         channel.addParticipant(user);
         user.joinChannel(channel);
 
+        return MessageResponseDto.from(message);
     }
 
     @Override
-    public Message getMessage(UUID messageId) {
-        return messageRepository.findById(messageId)
+    public MessageResponseDto getMessage(UUID messageId) {
+        Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 메시지: " + messageId));
+
+        return MessageResponseDto.from(message);
     }
 
     @Override
-    public List<Message> getAllMessages() {
-        return messageRepository.findAll();
+    public List<MessageResponseDto> getAllMessages() {
+        return messageRepository.findAll().stream()
+                .map(MessageResponseDto::from)
+                .toList();
     }
 
     @Override
-    public List<Message> getAllMessageByChannelId(UUID channelID) {
-        return messageRepository.findAllByChannelId(channelID);
+    public List<MessageResponseDto> getAllMessageByChannelId(UUID channelID) {
+        return messageRepository.findAllByChannelId(channelID).stream()
+                .map(MessageResponseDto::from)
+                .toList();
     }
 
     @Override
-    public void updateMessage(UpdateMessageDto updateMessageDto) {
-        Message message = messageRepository.findById(updateMessageDto.getMessageId())
-                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다: " + updateMessageDto.getMessageId()));
-        message.messageUpdate(updateMessageDto.getContent());
+    public MessageResponseDto updateMessage(UUID messageId, UpdateMessageDto updateMessageDto) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다: " + messageId));
+        message.messageUpdate(updateMessageDto.content());
         messageRepository.save(message);
+
+        return MessageResponseDto.from(message);
     }
 
     @Override
