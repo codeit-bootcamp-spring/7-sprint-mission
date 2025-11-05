@@ -14,7 +14,6 @@ public interface MessageService {
     List<Message> getAll();
     List<Message> getAllByChannelId(UUID channelId);
     List<Message> getAllByChannelForUser(UUID channelId, UUID userId);
-    List<Message> getAllByUserId(UUID userId);
     Message update(MessageUpdateRequestDto messageUpdateRequestDto);
     boolean delete(UUID uuid);
     List<Message> getMessagesByAuthor(UUID authorId);
