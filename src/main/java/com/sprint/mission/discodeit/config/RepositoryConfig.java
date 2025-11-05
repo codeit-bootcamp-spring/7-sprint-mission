@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.config;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
 import com.sprint.mission.discodeit.repository.jcf.*;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -10,27 +11,27 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RepositoryConfig {
-    @Value("${discodeit.repository.file-directory}\\user.sav")
+    @Value("${discodeit.repository.file-directory}")
+    private String baseDirectory;
+
     private String userPath;
-
-    @Value("${discodeit.repository.file-directory}\\channel.sav")
     private String channelPath;
-
-    @Value("${discodeit.repository.file-directory}\\joined.sav")
     private String joinedPath;
-
-    @Value("${discodeit.repository.file-directory}\\message.sav")
     private String messagePath;
-
-    @Value("${discodeit.repository.file-directory}\\readstatus.sav")
     private String readstatusPath;
-
-    @Value("${discodeit.repository.file-directory}\\userstatus.sav")
     private String userstatusPath;
-
-    @Value("${discodeit.repository.file-directory}\\content.sav")
     private String binarycontentPath;
 
+    @PostConstruct
+    public void init() {
+        userPath = baseDirectory + "\\user.sav";
+        channelPath = baseDirectory + "\\channel.sav";
+        joinedPath = baseDirectory + "\\joined.sav";
+        messagePath = baseDirectory + "\\message.sav";
+        readstatusPath = baseDirectory + "\\readstatus.sav";
+        userstatusPath = baseDirectory + "\\userstatus.sav";
+        binarycontentPath = baseDirectory + "\\content.sav";
+    }
 
     // UserRepository
     @Bean
