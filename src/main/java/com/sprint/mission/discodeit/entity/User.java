@@ -25,12 +25,12 @@ public class User extends BaseModel {
 
     public User(Dto_User dtoUser, UUID profileId) {
         super();
-        this.userName = dtoUser.userName();
+        this.userName = dtoUser.username();
         this.password = dtoUser.password();
-        this.eMail = dtoUser.eMail();
+        this.eMail = dtoUser.email();
         this.profileId = profileId;
 
-        switch (dtoUser.userName()) { //!! for test
+        switch (dtoUser.username()) { //!! for test
             case "여우" : setIdForTest(UUID.fromString("ae3d209c-b2be-41d7-895e-30bb4192498c")); break;
             case "🐶강아지" : setIdForTest(UUID.fromString("abc5103d-d916-4ea2-8b45-22be27f66b2f")); break;
             case "🐼팬더" : setIdForTest(UUID.fromString("ceb51b81-cb4a-41b1-b8f8-3dd15bdbedd9")); break;
@@ -38,7 +38,7 @@ public class User extends BaseModel {
             case "🦁사자" : setIdForTest(UUID.fromString("496859e7-1536-4ad7-bb64-ba895f756288")); break;
             default : break;
         }
-        Util.okMessage(dtoUser.userName() + ".readStatusID = [" + this.getId() + "]");
+        Util.okMessage(dtoUser.username() + ".readStatusID = [" + this.getId() + "]");
     }
 
     @Override

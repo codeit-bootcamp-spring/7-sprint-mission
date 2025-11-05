@@ -6,15 +6,15 @@ import lombok.Builder;
 @Builder
 // 🚫 편의상 변경. CamelCase 위반 -> 추후 수정 할꺼예용~
 public record Dto_User(
-        String userName,
+        String username,
         String password,
-        String eMail
+        String email
         ) {
     public static Dto_User from(String userName, String password, String eMail) {
         return Dto_User.builder()
-                                .userName(userName)
+                                .username(userName)
                                 .password(password)
-                                .eMail(eMail)
+                                .email(eMail)
                                 .build();
     }
 

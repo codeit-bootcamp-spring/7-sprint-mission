@@ -44,12 +44,12 @@ public class UserService implements InterfaceUserService {
 //                유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
 //        [ ] username과 email은 다른 유저와 같으면 안됩니다.
 //        [ ] UserStatus를 같이 생성합니다.
-        if (userRepository.isUsingName(dto_user.userName())) {
-            throw new IllegalArgumentException("🚨create : 동일한 username [" + dto_user.userName() + "] 사용 중");
+        if (userRepository.isUsingName(dto_user.username())) {
+            throw new IllegalArgumentException("🚨create : 동일한 username [" + dto_user.username() + "] 사용 중");
         }
 
-        if(userRepository.isUsingEmail(dto_user.eMail())) {
-            throw new IllegalArgumentException("🚨create : 동일한 email [" + dto_user.eMail() + "] 사용 중");
+        if(userRepository.isUsingEmail(dto_user.email())) {
+            throw new IllegalArgumentException("🚨create : 동일한 email [" + dto_user.email() + "] 사용 중");
         }
 
         UUID binaryContentId = null;
@@ -136,13 +136,13 @@ public class UserService implements InterfaceUserService {
         String userName = user.getUserName();
 
         if (!userId.equals(user.getId())
-                && userRepository.isUsingName(dto_user.userName())) {
-            throw new IllegalArgumentException("🚨 UserService.update = [" + dto_user.userName() + "]은 이미 사용중인 user name 입니다");
+                && userRepository.isUsingName(dto_user.username())) {
+            throw new IllegalArgumentException("🚨 UserService.update = [" + dto_user.username() + "]은 이미 사용중인 user name 입니다");
         }
 
         if (!userId.equals(user.getId())
-                && userRepository.isUsingEmail(dto_user.eMail())) {
-            throw new IllegalArgumentException("🚨 UserService.update = [" + dto_user.eMail() + "]은 이미 사용중인 email 입니다");
+                && userRepository.isUsingEmail(dto_user.email())) {
+            throw new IllegalArgumentException("🚨 UserService.update = [" + dto_user.email() + "]은 이미 사용중인 email 입니다");
         }
 
         //!! 선택적으로 프로필 이미지를 대체할 수 있습니다.
@@ -150,15 +150,15 @@ public class UserService implements InterfaceUserService {
             BinaryContent neoBinaryContent = binaryContentRepository.findById(userId).orElse(new BinaryContent(requestDto_Content.get()));
             binaryContentRepository.save(neoBinaryContent);
             //!! 순서 유의_I
-            user.updateUser(dto_user.userName(), dto_user.password(), dto_user.eMail(), neoBinaryContent.getId());
+            user.updateUser(dto_user.username(), dto_user.password(), dto_user.email(), neoBinaryContent.getId());
         }
         else {
-            user.updateUser(dto_user.userName(), dto_user.password(), dto_user.eMail(), null);
+            user.updateUser(dto_user.username(), dto_user.password(), dto_user.email(), null);
         }
 
         //!! 순서 유의_II
         userRepository.save(user);
-        Util.okMessage("UserService.update = [" + userName + "]를 [" + dto_user.userName() + "]로 변경 완료");
+        Util.okMessage("UserService.update = [" + userName + "]를 [" + dto_user.username() + "]로 변경 완료");
         return Res_User.from(user);
     }
 

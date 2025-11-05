@@ -1,26 +1,24 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_UserWithContent;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserWithIDAndContent;
-import com.sprint.mission.discodeit.entity.dto.Res_User;
-import com.sprint.mission.discodeit.entity.dto.UserDto;
+import com.sprint.mission.discodeit.common.Util;
+import com.sprint.mission.discodeit.entity.dto.*;
 import com.sprint.mission.discodeit.service.basic.UserService;
 import com.sprint.mission.discodeit.service.basic.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping("/api/user")
 @RequiredArgsConstructor
+@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
@@ -33,9 +31,28 @@ public class UserController {
 
     //!! @Valid 검증 == dependencies 'spring-boot-starter-validation'
     @RequestMapping(value = "/create", method = POST)
-    public Res_User create(@RequestBody Dto_UserWithContent dto) {
-        return userService.create(dto.dtoUser(), dto.binaryContent());
+    public Res_User create(@RequestPart("dtouser") Dto_User dtoUser,
+                           @RequestPart("file") MultipartFile file) {
+
+        Dto_BinaryContent dtoFile = null;
+        try {
+            dtoFile = Dto_BinaryContent.from(
+                                                file.getOriginalFilename(),
+                                                file.getContentType(),
+                                                file.getBytes(),
+                                                file.getSize());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Util.okMessage("file.getOriginalFilename() = [" + file.getOriginalFilename() + "]");
+        return userService.create(dtoUser, Optional.ofNullable(dtoFile));
     }
+
+//    //!! @Valid 검증 == dependencies 'spring-boot-starter-validation'
+//    @RequestMapping(value = "/create", method = POST)
+//    public Res_User create(@RequestBody Dto_UserWithContent dto) {
+//        return userService.create(dto.dtoUser(), dto.binaryContent());
+//    }
 
     @RequestMapping(value = "/update", method = PUT)
     public Res_User update(@RequestBody Dto_UserWithIDAndContent dto) {
