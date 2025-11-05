@@ -26,7 +26,7 @@ public class ChannelCreationFacade {
     //비밀 채널 추가
     public ChannelInfoRes createPrivateChannel(ChannelCreateSecReq req){
         Channel channel = channelService.create(req);
-        req.users().forEach(userId -> readStatusService.create(
+        req.userIds().forEach(userId -> readStatusService.create(
                             new ReadStatus(userId, channel.getId())));
         return channelMapper.toInfoRes(channel);
     }

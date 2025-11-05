@@ -13,15 +13,15 @@ public class Channel extends BaseEntity{
     private String name;                    //채널명
     private String description;             //채널 설명
     private final UUID managerId;           //채널 생성자 UUID
-    private List<UUID> users;               //채널 참가자
+    private List<UUID> userIds;               //채널 참가자
     private ChannelType publicType;         //공개, 비공개 여부
 
     //Constructor
-    private Channel(UUID managerId, String name, String description, List<UUID> users, ChannelType publicType) {
+    private Channel(UUID managerId, String name, String description, List<UUID> userIds, ChannelType publicType) {
         this.managerId = managerId;
         this.name = name;
         this.description = description;
-        this.users = users;
+        this.userIds = userIds;
         this.publicType = publicType;
     }
 
@@ -35,13 +35,13 @@ public class Channel extends BaseEntity{
         );
     }
 
-    public static Channel createPrivate(UUID managerId, List<UUID> users) {
+    public static Channel createPrivate(UUID managerId, List<UUID> userIds) {
         String privateName = "비밀방" + UUID.randomUUID().toString().replace("-", "");
         return new Channel(
                 managerId,
                 privateName,
                 null,
-                users,
+                userIds,
                 ChannelType.PRIVATE
         );
     }

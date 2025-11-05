@@ -5,5 +5,5 @@ import java.util.UUID;
 
 public record ChannelCreateSecReq(
         UUID managerId,
-        List<UUID> users
+        List<UUID> userIds
 ) {}

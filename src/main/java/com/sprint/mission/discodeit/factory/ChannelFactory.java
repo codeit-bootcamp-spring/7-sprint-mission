@@ -18,7 +18,7 @@ public class ChannelFactory {
     public static Channel create(ChannelCreateSecReq req){
         return Channel.createPrivate(
                 req.managerId(),
-                req.users()
+                req.userIds()
         );
     }
 }
