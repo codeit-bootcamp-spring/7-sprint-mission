@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -32,20 +33,18 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus find(User user, Channel channel) {
+    public Optional<ReadStatus> find(User user, Channel channel) {
         return data.stream()
                 .filter(r -> r.getUser().equals(user))
                 .filter(r -> r.getChannel().equals(channel))
-                .findFirst() // 1개 이하가 보장됨
-                .orElseThrow(() -> new ReadStatusNotFoundException(user, channel));
+                .findFirst(); // 1개 이하가 보장됨
     }
 
     @Override
-    public ReadStatus findById(UUID uuid) {
+    public Optional<ReadStatus> findById(UUID uuid) {
         return data.stream()
                 .filter(r -> r.getId().equals(uuid))
-                .findFirst()
-                .orElseThrow(() -> new ReadStatusNotFoundException(uuid));
+                .findFirst();
     }
 
     @Override

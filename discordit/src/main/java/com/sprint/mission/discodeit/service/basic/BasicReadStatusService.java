@@ -1,8 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exceptions.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exceptions.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -23,26 +29,36 @@ public class BasicReadStatusService implements ReadStatusService {
 
     public ReadStatusResponse create(ReadStatusCreateRequest dto) {
         ReadStatus readStatus = new ReadStatus(
-                userRepository.findByUserId(dto.userId()),
+                userRepository.findByUserId(dto.userId())
+                        .orElseThrow(() -> new UserNotFoundException(dto.userId())),
                 channelRepository.findById(dto.ChannelId())
+                        .orElseThrow(() -> new ChannelNotFoundException(dto.ChannelId()))
         );
         readStatusRepository.save(readStatus);
         return ReadStatusResponse.toDto(readStatus);
     }
 
+    @Override
+    public ReadStatusResponse update(ReadStatusUpdateRequest dto) {
+        User user = userRepository.findByUserId(dto.userId())
+                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
+        Channel channel = channelRepository.findById(dto.channelId())
+                .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()));
+        return ReadStatusResponse.toDto(
+                readStatusRepository.find(user, channel)
+                        .orElseThrow(() -> new ReadStatusNotFoundException(user, channel)));
+    }
+
     public ReadStatusResponse get(UUID uuid) {
-        return ReadStatusResponse.toDto(readStatusRepository.findById(uuid));
+        return ReadStatusResponse.toDto(readStatusRepository.findById(uuid)
+                .orElseThrow(() -> new ReadStatusNotFoundException(uuid)));
     }
 
     public List<ReadStatusResponse> getAllByUserId(String userId) {
-        return readStatusRepository.findAllByUser(userRepository.findByUserId(userId)).stream()
+        User user = userRepository.findByUserId(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        return readStatusRepository.findAllByUser(user).stream()
                 .map(ReadStatusResponse::toDto)
                 .toList();
-    }
-
-
-    public void read(UUID uuid) {
-        readStatusRepository.findById(uuid).read();
     }
 
     public void delete(UUID uuid) {
