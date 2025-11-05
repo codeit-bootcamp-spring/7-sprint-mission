@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentGetRequest;
 import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exceptions.ContentNotFoundException;
+import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -21,19 +24,25 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     public BinaryContentResponse create(BinaryContentCreateRequest dto) {
         BinaryContent content = new BinaryContent(
-                userRepository.findByUserId(dto.userId()),
+                userRepository.findByUserId(dto.userId())
+                        .orElseThrow(() -> new UserNotFoundException(dto.userId())),
                 dto.fileUrl()
         );
         contentRepository.save(content);
         return BinaryContentResponse.toDto(content);
     }
 
-    public BinaryContentResponse get(UUID uuid) {
-        return BinaryContentResponse.toDto(contentRepository.findById(uuid));
+    public List<BinaryContentResponse> get(BinaryContentGetRequest dto) {
+        return dto.ids().stream()
+                .map(id -> contentRepository.findById(id)
+                        .orElseThrow(() -> new ContentNotFoundException(id)))
+                .map(BinaryContentResponse::toDto)
+                .toList();
     }
 
     public List<BinaryContentResponse> getAllByUserID(String userId) {
-        return contentRepository.findAllByUser(userRepository.findByUserId(userId)).stream()
+        return contentRepository.findAllByUser(userRepository.findByUserId(userId)
+                        .orElseThrow(() -> new UserNotFoundException(userId))).stream()
                 .map(BinaryContentResponse::toDto)
                 .toList();
     }
