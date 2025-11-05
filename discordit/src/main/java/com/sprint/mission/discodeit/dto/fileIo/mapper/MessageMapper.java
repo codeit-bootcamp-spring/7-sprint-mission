@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.Receivable;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.ReceiverType;
+import com.sprint.mission.discodeit.exceptions.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.exceptions.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -16,7 +18,8 @@ import java.util.List;
 import java.util.UUID;
 
 final class MessageMapper {
-    private MessageMapper() {}
+    private MessageMapper() {
+    }
 
     public static MessageIoDTO toDto(Message message) {
         ReceiverType receiverType;
@@ -51,11 +54,13 @@ final class MessageMapper {
                                     UserRepository userRepository,
                                     ChannelRepository channelRepository,
                                     BinaryContentRepository contentRepository) {
-        User sender = userRepository.findById(dto.getSenderUuid());
+        User sender = userRepository.findById(dto.getSenderUuid())
+                .orElseThrow(() -> new UserNotFoundException(dto.getSenderUuid()));
 
         Receivable receiver;
         switch (dto.getReceiverType()) {
-            case CHANNEL -> receiver = channelRepository.findById(dto.getReceiverUuid());
+            case CHANNEL -> receiver = channelRepository.findById(dto.getReceiverUuid())
+                    .orElseThrow(() -> new ChannelNotFoundException(dto.getReceiverUuid()));
             case USER -> receiver = userRepository.findAll().stream()
                     .filter(u -> u.getUuid().equals(dto.getReceiverUuid()))
                     .findFirst()
@@ -72,7 +77,8 @@ final class MessageMapper {
                 receiver,
                 dto.getMessage(),
                 dto.getAttachmentIds().stream()
-                        .map(contentRepository::findById)
+                        .map(id -> contentRepository.findById(id)
+                                .orElseThrow(() -> new BinaryContentNotFoundException(id)))
                         .toList()
         );
     }

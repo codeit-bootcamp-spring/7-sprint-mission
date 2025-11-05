@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.fileIo.mapper;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.fileIo.UserIoDTO;
+import com.sprint.mission.discodeit.exceptions.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
 final class UserMapper {
@@ -19,7 +20,10 @@ final class UserMapper {
                 dto.getDisplayName(),
                 dto.getBio(),
                 dto.getOnlineStatus(),
-                dto.getProfileImageId() == null? null : contentRepository.findById(dto.getProfileImageId())
+                dto.getProfileImageId() == null?
+                        null :
+                        contentRepository.findById(dto.getProfileImageId())
+                                .orElseThrow(() -> new BinaryContentNotFoundException(dto.getProfileImageId()))
         );
     }
 
