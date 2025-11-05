@@ -109,7 +109,9 @@ public class BasicUserService implements UserService {
         User user = findUserAndHandleConflict(dto.userId());
         userRepository.delete(user);
         readStatusRepository.deleteAllByUser(user);
-        binaryContentRepository.delete(user.getProfileImage());
+        if (user.getProfileImage() != null) {
+            binaryContentRepository.delete(user.getProfileImage());
+        }
     }
 
     @Override
@@ -117,7 +119,9 @@ public class BasicUserService implements UserService {
         User user = findUserAndHandleConflict(uuid);
         userRepository.delete(user);
         readStatusRepository.deleteAllByUser(user);
-        binaryContentRepository.delete(user.getProfileImage());
+        if (user.getProfileImage() != null) {
+            binaryContentRepository.delete(user.getProfileImage());
+        }
     }
 
     private User findUserAndHandleConflict(UUID uuid) {
