@@ -8,10 +8,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,12 +19,12 @@ public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ReadStatusResponse> create(ReadStatusCreateRequest request) {
+    public ResponseEntity<ReadStatusResponse> create(@RequestBody ReadStatusCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(readStatusService.create(request));
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<ReadStatusResponse> read(ReadStatusUpdateRequest request) {
+    public ResponseEntity<ReadStatusResponse> read(@RequestBody ReadStatusUpdateRequest request) {
         return ResponseEntity.ok(readStatusService.update(request));
     }
 

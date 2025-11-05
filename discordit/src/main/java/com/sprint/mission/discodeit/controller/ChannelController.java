@@ -6,10 +6,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,22 +17,22 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @RequestMapping(value = "/public", method = RequestMethod.POST)
-    private ResponseEntity<ChannelResponse> createPublic(PublicChannelCreateRequest request) {
+    private ResponseEntity<ChannelResponse> createPublic(@RequestBody PublicChannelCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPublicChannel(request));
     }
 
     @RequestMapping(value = "/private", method = RequestMethod.POST)
-    private ResponseEntity<ChannelResponse> createPrivate(PrivateChannelCreateRequest request) {
+    private ResponseEntity<ChannelResponse> createPrivate(@RequestBody PrivateChannelCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPrivateChannel(request));
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    private ResponseEntity<ChannelResponse> updatePublic(ChannelUpdateRequest request) {
+    private ResponseEntity<ChannelResponse> updatePublic(@RequestBody ChannelUpdateRequest request) {
         return ResponseEntity.ok().body(channelService.update(request));
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
-    private ResponseEntity<Void> deleteChannel(ChannelDeleteRequest request) {
+    private ResponseEntity<Void> deleteChannel(@RequestBody ChannelDeleteRequest request) {
         channelService.delete(request);
         return ResponseEntity.noContent().build();
     }

@@ -8,10 +8,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,17 +20,17 @@ public class UserController {
 
 
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
-    public ResponseEntity<UserResponse> signIn(UserCreateRequest request) {
+    public ResponseEntity<UserResponse> signIn(@RequestBody UserCreateRequest request) {
         return new ResponseEntity<>(userService.signIn(request), HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public ResponseEntity<UserResponse> update(UserUpdateRequest request) {
+    public ResponseEntity<UserResponse> update(@RequestBody UserUpdateRequest request) {
         return new ResponseEntity<>(userService.update(request), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public void delete(UserDeleteRequest request) {
+    public void delete(@RequestBody UserDeleteRequest request) {
         userService.deleteByUserId(request);
     }
 
