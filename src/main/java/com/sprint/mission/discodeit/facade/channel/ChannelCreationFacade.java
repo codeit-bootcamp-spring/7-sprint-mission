@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.facade.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +20,12 @@ public class ChannelCreationFacade {
     private final ChannelMapper channelMapper;
 
     //공개 채널 추가
-    public ChannelInfoRes createPublicChannel(ChannelCreateReq req){
+    public ChannelInfoRes createPublicChannel(@NonNull ChannelCreateReq req){
         return channelMapper.toInfoRes(channelService.create(req));
     }
 
     //비밀 채널 추가
-    public ChannelInfoRes createPrivateChannel(ChannelCreateSecReq req){
+    public ChannelInfoRes createPrivateChannel(@NonNull ChannelCreateSecReq req){
         Channel channel = channelService.create(req);
         req.userIds().forEach(userId -> readStatusService.create(
                             ReadStatus.create(userId, channel.getId())

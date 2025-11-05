@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -72,7 +73,7 @@ public class BasicChannelService implements ChannelService {
     // ===== 🔧 Controller Direct (단일 도메인 / void) =====
     //채널 수정
     @Override
-    public void update(UUID id, ChannelUpdateReq req) {
+    public void update(@NonNull UUID id, @NonNull ChannelUpdateReq req) {
         Channel channel = channelRepository.findById(id).orElseThrow(
                 () -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND)
         );

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.factory.ReadStatusFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class ReadStatusCreateFacade {
     private final UserService userService;
 
     //유저 채널 읽음 상태 추가
-    public ReadStatusInfoRes create(ReadStatusCreateReq req){
+    public ReadStatusInfoRes create(@NonNull ReadStatusCreateReq req){
         if(channelService.findById(req.channelId()) == null){
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }

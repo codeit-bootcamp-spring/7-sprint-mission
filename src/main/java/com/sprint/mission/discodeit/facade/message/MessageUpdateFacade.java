@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class MessageUpdateFacade {
     private final MessageMapper messageMapper;
 
     //메세지 수정
-    public MessageViewRes updateMessage(UUID messageId, MessageUpdateReq req){
+    public MessageViewRes updateMessage(@NonNull UUID messageId, @NonNull MessageUpdateReq req){
         List<UUID> updatedAttachmentIds = new ArrayList<>();
         List<BinaryContentUpdateReq> attachmentUpdateReqs = req.attachmentReqs();
 

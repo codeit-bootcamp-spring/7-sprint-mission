@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ public class MessageMapper {
     private final UserService userService;
 
     //변환 메소드
-    public MessageViewRes mapToView(Message message){
+    public MessageViewRes mapToView(@NonNull Message message){
         List<BinaryContentInfoRes> imgs = message.getAttachmentIds().stream()
                 .map(binaryId -> BinaryContentInfoRes.from(
                         binaryContentService.findById(binaryId))

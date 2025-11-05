@@ -5,11 +5,13 @@ import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.facade.userstatus.UserStatusCreateFacade;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.factory.UserFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,7 @@ public class UserCreationFacade {
     private final UserStatusService userStatusService;
 
     //유저 추가
-    public User createUser(UserCreateReq req) {
+    public User createUser(@NonNull UserCreateReq req) {
         UUID profileId = null;
 
         if (req.profileImage().data() != null) {
@@ -36,7 +38,7 @@ public class UserCreationFacade {
         }
 
         User user = userService.create(UserFactory.create(req, profileId));
-        userStatusService.create(new UserStatus(user.getId()));
+        userStatusService.create(UserStatus.create(user.getId()));
         return user;
     }
 }

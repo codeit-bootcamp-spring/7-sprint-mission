@@ -8,11 +8,11 @@ public record UserSimpleInfoRes(
         BinaryContentInfoRes profileImg,        //프로필 이미지
         boolean isOnline            //온라인 상태
 ) {
-    public static UserSimpleInfoRes from(User user, BinaryContentInfoRes profileImg){
+    public static UserSimpleInfoRes from(User user, BinaryContentInfoRes profileImg, boolean isOnline){
         return new UserSimpleInfoRes(
                 user.getNickname(),
                 profileImg,
-                false
+                isOnline
         );
     }
 }

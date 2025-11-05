@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class MessageCreationFacade {
     private final MessageMapper messageMapper;
 
     //메세지 추가
-    public MessageViewRes createMessage(MessageCreateReq req){
+    public MessageViewRes createMessage(@NonNull MessageCreateReq req){
         List<UUID> attachments = new ArrayList<>();
         
         if(!req.attachmentIds().isEmpty()){

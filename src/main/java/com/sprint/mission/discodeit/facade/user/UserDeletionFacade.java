@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class UserDeletionFacade {
     private final UserStatusService userStatusService;
 
     //유저 삭제
-    public void deleteUser(UUID userId){
+    public void deleteUser(@NonNull UUID userId){
         User user =userService.findById(userId);
         UserStatus userStatus = userStatusService.findByUserId(userId);
 

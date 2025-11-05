@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +19,13 @@ public class UserDetailViewFacade {
     private final UserStatusService userStatusService;
 
     //유저 단일 조회 : 닉네임
-    public UserDetailInfoRes findByNickname(String nickname){
+    public UserDetailInfoRes findByNickname(@NonNull String nickname){
         User user = userService.findByNickname(nickname);
         return toDetailInfo(user);
     }
     
     //유저 단일 조회 : 이메일
-    public UserDetailInfoRes findByEmail(String email){
+    public UserDetailInfoRes findByEmail(@NonNull String email){
         User user = userService.findByEmail(email);
         return toDetailInfo(user);
     }
