@@ -73,7 +73,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void deleteById(UUID uuid) {
+    public void delete(UUID uuid) {
         data.removeIf(d -> d.getId().equals(uuid));
         write();
     }
@@ -83,6 +83,13 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         return data.stream()
                 .filter(d -> d.getUser().equals(user))
                 .toList();
+    }
+
+    @Override
+    public void update(ReadStatus readStatus) {
+        data.removeIf(r -> r.equals(readStatus));
+        data.add(readStatus);
+        write();
     }
 
     private void write() {

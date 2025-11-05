@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusGetByUserRequest;
 import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -16,6 +17,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,9 +46,11 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(() -> new UserNotFoundException(dto.userId()));
         Channel channel = channelRepository.findById(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()));
-        return ReadStatusResponse.toDto(
-                readStatusRepository.find(user, channel)
-                        .orElseThrow(() -> new ReadStatusNotFoundException(user, channel)));
+        ReadStatus readStatus = readStatusRepository.find(user, channel)
+                .orElseThrow(() -> new ReadStatusNotFoundException(user, channel));
+        readStatus.setLastReadAt(Instant.from(dto.readTime()));
+        readStatusRepository.update(readStatus);
+        return ReadStatusResponse.toDto(readStatus);
     }
 
     public ReadStatusResponse get(UUID uuid) {
@@ -62,7 +66,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     public void delete(UUID uuid) {
-        readStatusRepository.deleteById(uuid);
+        readStatusRepository.delete(uuid);
     }
 
 
