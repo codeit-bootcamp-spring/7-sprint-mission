@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.message.direct;
 
 import com.sprint.mission.discodeit.common.repository.impl.BaseRepositoryImpl;
+import com.sprint.mission.discodeit.config.enums.DataKey;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -59,5 +60,8 @@ public class DirectMessageRepositoryImpl extends BaseRepositoryImpl<DirectMessag
     }
 
 
-
+    @Override
+    public DataKey getDataKey() {
+        return DataKey.DIRECT_MESSAGE;
+    }
 }

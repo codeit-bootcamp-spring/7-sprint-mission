@@ -64,9 +64,6 @@ public class DirectMessageServiceImpl extends BaseServiceImpl<DirectMessage, UUI
 
     @Override
     public void delAllBySenderId(UUID senderId) {
-        if(repository.findBySenderId(senderId).isEmpty()){
-            throw new NoSuchElementException("사용자가 보낸 개인 메새지가 없습니다.");
-        }
         repository.deleteAllBySenderId(senderId);
     }
 

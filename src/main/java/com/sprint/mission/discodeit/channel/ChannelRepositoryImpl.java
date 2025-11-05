@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.channel;
 
 import com.sprint.mission.discodeit.common.repository.impl.BaseRepositoryImpl;
 import com.sprint.mission.discodeit.config.enums.ChannelType;
+import com.sprint.mission.discodeit.config.enums.DataKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -149,5 +150,10 @@ public class ChannelRepositoryImpl extends BaseRepositoryImpl<Channel, UUID> imp
 
         // 5. 모든 필터링을 거친 최종 결과를 List 형태로 수집하여 반환합니다.
         return channelStream.collect(Collectors.toList());
+    }
+
+    @Override
+    public DataKey getDataKey() {
+        return DataKey.CHANNEL;
     }
 }

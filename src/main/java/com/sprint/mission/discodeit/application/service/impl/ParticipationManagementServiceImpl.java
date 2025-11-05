@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.application.service.impl;
 
+import com.sprint.mission.discodeit.application.dto.SimpleChannelDTO;
 import com.sprint.mission.discodeit.application.service.ParticipationManagementService;
 import com.sprint.mission.discodeit.message.channel.ChannelMessageService;
 import com.sprint.mission.discodeit.message.channel.dto.ChannelMSGResponseDTO;

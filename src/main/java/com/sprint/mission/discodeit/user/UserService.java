@@ -17,6 +17,7 @@ public interface UserService extends BaseService<User, UUID> {
 
     UserResponseDTO updateProfile(UUID userId, UserProfileUpdateDTO requestDTO);
 
+    UserResponseDTO changeUserName(UUID userId, String newUserName);
 
     /**
      * 사용자의 비밀번호를 변경합니다.

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.application.service.impl;
 
 import com.sprint.mission.discodeit.application.dto.ChannelSummaryDTO;
+import com.sprint.mission.discodeit.application.dto.SimpleChannelDTO;
 import com.sprint.mission.discodeit.application.dto.UserDetailInfoDTO;
 import com.sprint.mission.discodeit.application.service.UserManagementService;
 import com.sprint.mission.discodeit.channel.Channel;
@@ -12,6 +13,7 @@ import com.sprint.mission.discodeit.content.binary.BinaryContentService;
 import com.sprint.mission.discodeit.message.channel.ChannelMessageService;
 import com.sprint.mission.discodeit.message.direct.DirectMessageService;
 import com.sprint.mission.discodeit.participation.ParticipationService;
+import com.sprint.mission.discodeit.participation.dto.ParticipationResponseDTO;
 import com.sprint.mission.discodeit.user.User;
 import com.sprint.mission.discodeit.user.UserService;
 import com.sprint.mission.discodeit.user.dto.UserRequestDTO;
@@ -110,5 +112,18 @@ public class UserManagementServiceImpl implements UserManagementService {
                 unreadDirectMessageCount,
                 userProfileImagePath
         );
+    }
+
+    @Override
+    public List<SimpleChannelDTO> getSimpleChannels(UUID userId) {
+        List<ParticipationResponseDTO> participations = participationService.findParticipationsByUserId(userId);
+        List<UUID> channelIds = participations.stream()
+                .map(p -> p.participationDualKey().channelId())
+                .toList();
+
+
+        return channelService.findAllByIdNonDel(channelIds).stream()
+                .map(SimpleChannelDTO::from)
+                .toList();
     }
 }

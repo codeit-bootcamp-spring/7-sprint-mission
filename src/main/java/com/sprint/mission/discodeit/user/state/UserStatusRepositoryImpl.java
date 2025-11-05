@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.user.state;
 
 import com.sprint.mission.discodeit.common.repository.impl.BaseRepositoryImpl;
+import com.sprint.mission.discodeit.config.enums.DataKey;
 import com.sprint.mission.discodeit.config.enums.Status;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,9 +14,11 @@ import java.util.UUID;
 public class UserStatusRepositoryImpl extends BaseRepositoryImpl<UserStatus, UUID> implements UserStatusRepository {
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-        return dataMap.values().stream()
+         Optional<UserStatus> check = dataMap.values().stream()
                 .filter(us -> us.getUserId().equals(userId))
                 .findFirst();
+        System.out.println(dataMap);
+        return check;
     }
 
     @Override
@@ -43,5 +47,10 @@ public class UserStatusRepositoryImpl extends BaseRepositoryImpl<UserStatus, UUI
         return dataMap.values().stream()
                 .filter(us -> us.getCurrentStatus().equals(currentStatus))
                 .toList();
+    }
+
+    @Override
+    public DataKey getDataKey() {
+        return DataKey.USER_STATUS;
     }
 }

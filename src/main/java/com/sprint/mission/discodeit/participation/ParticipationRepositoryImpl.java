@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.participation;
 
 import com.sprint.mission.discodeit.common.repository.impl.BaseRepositoryImpl;
+import com.sprint.mission.discodeit.config.enums.DataKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -35,5 +36,10 @@ public class ParticipationRepositoryImpl extends BaseRepositoryImpl<Participatio
         return dataMap.values().stream()
                 .filter(p -> p.isDeleted() && p.getUserId().equals(userId))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public DataKey getDataKey() {
+        return DataKey.PARTICIPATION;
     }
 }

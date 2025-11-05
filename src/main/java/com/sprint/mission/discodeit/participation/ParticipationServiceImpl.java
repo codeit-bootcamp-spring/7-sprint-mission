@@ -28,9 +28,8 @@ public class ParticipationServiceImpl extends BaseServiceImpl<Participation, Par
     }
 
     @Override
-    public ParticipationResponseDTO joinChannel(ParticipationRequestDTO requestDTO) {
+    public ParticipationResponseDTO joinChannel(ParticipationRequestDTO requestDTO, UUID userId) {
         UUID channelId = requestDTO.channelId();
-        UUID userId = requestDTO.userId();
         String nickname = requestDTO.nickname();
         // 1. 사용자 및 채널의 존재 여부를 먼저 확인합니다.
         validateUserAndChannelExist(userId, channelId);

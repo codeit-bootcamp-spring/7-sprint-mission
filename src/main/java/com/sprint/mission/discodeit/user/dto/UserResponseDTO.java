@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.user.dto;
 
 import com.sprint.mission.discodeit.user.User;
-import com.sprint.mission.discodeit.user.state.UserStatus;
-import com.sprint.mission.discodeit.user.state.UserStatusDTO;
 
 import java.time.Instant;
 import java.util.UUID;
 
 public record UserResponseDTO(
         UUID userId,
+
+        String username,
 
         String email,
 
@@ -23,6 +23,7 @@ public record UserResponseDTO(
     public static UserResponseDTO fromEntity(User User) {
         return new UserResponseDTO(
                 User.getId(),
+                User.getUsername(),
                 User.getEmail(),
                 User.getNickname(),
                 User.getPhoneNum(),

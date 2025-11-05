@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.user;
 
 import com.sprint.mission.discodeit.common.repository.impl.BaseRepositoryImpl;
+import com.sprint.mission.discodeit.config.enums.DataKey;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -64,5 +65,10 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User, UUID> implement
     public boolean existsByUserNickName(String nickName) {
         return dataMap.values().stream()
                 .anyMatch(user -> user.getNickname().equals(nickName));
+    }
+
+    @Override
+    public DataKey getDataKey() {
+        return DataKey.USER;
     }
 }
