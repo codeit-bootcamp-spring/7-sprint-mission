@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_User;
-import com.sprint.mission.discodeit.entity.dto.Res_IsOnlineUser;
+import com.sprint.mission.discodeit.entity.dto.Res_UserWithIsOnline;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
 import com.sprint.mission.discodeit.repository.InterfaceBinaryContentRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
@@ -73,7 +73,7 @@ public class UserService implements InterfaceUserService {
     }
 
     @Override
-    public Res_IsOnlineUser find(UUID userID) {
+    public Res_UserWithIsOnline find(UUID userID) {
 //        DTO를 활용하여:
 //        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
 //        [ ] 패스워드 정보는 제외하세요.
@@ -85,15 +85,15 @@ public class UserService implements InterfaceUserService {
 
         Util.okMessage("UserService.findAllByChannleId = [" + user.getUserName() + "] isOnline = [" + userStatus.isOnline() + "]");
 
-        return Res_IsOnlineUser.from(user, userStatus.isOnline());
+        return Res_UserWithIsOnline.from(user, userStatus.isOnline());
     }
 
     @Override
-    public List<Res_IsOnlineUser> findAll() {
+    public List<Res_UserWithIsOnline> findAll() {
 //        DTO를 활용하여:
 //        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
 //        [ ] 패스워드 정보는 제외하세요.
-        List<Res_IsOnlineUser> dtoList = new ArrayList<>(){};
+        List<Res_UserWithIsOnline> dtoList = new ArrayList<>(){};
         Optional<List<User>> optionalUsers = userRepository.findAll();
 
         if (optionalUsers.isEmpty()) {
@@ -109,11 +109,11 @@ public class UserService implements InterfaceUserService {
                 Optional<UserStatus> userStatus = userStatusList.stream().filter(status -> status.getUserId() != null &&
                         status.getUserId().equals(user.getId())).findFirst();
                 if (userStatus.isPresent()) {
-                    Res_IsOnlineUser dto = Res_IsOnlineUser.from(user, userStatus.get().isOnline());
+                    Res_UserWithIsOnline dto = Res_UserWithIsOnline.from(user, userStatus.get().isOnline());
                     dtoList.add(dto);
                     Util.okMessage("UserService.findAll = [" + user.getUserName() + "] isOnline = [" + userStatus.get().isOnline() + "]");
                 } else {
-                    Res_IsOnlineUser dto = Res_IsOnlineUser.from(user, false);
+                    Res_UserWithIsOnline dto = Res_UserWithIsOnline.from(user, false);
                     dtoList.add(dto);
                     // optionUserStatus 없는 경우 기본값(offline)으로 처리
                     Util.errMessage("UserService.findAll: User [" + user.getUserName() + "]의 UserStatus가 없습니다. 기본값(offline)으로 처리합니다.");

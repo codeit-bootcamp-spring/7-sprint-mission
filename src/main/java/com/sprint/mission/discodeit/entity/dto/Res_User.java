@@ -14,7 +14,7 @@ public record Res_User(
         Instant updatedAt,
 
         String userName,
-        String password,
+//        String password,
         String eMail,
         UUID profiledId
 ) {
@@ -24,7 +24,7 @@ public record Res_User(
                         .createdAt(user.getCreatedAt())
                         .updatedAt(user.getUpdatedAt())
                         .userName(user.getUserName())
-                        .password(user.getPassword())
+//                        .password(user.getPassword())
                         .eMail(user.getEMail())
                         .profiledId(user.getProfileId())
                         .build();

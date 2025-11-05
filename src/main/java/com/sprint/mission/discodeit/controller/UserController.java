@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.dto.Dto_UserWithContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserWithIDAndContent;
-import com.sprint.mission.discodeit.entity.dto.Res_IsOnlineUser;
+import com.sprint.mission.discodeit.entity.dto.Res_UserWithIsOnline;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
 import com.sprint.mission.discodeit.service.basic.UserService;
 import com.sprint.mission.discodeit.service.basic.UserStatusService;
@@ -18,7 +18,7 @@ import java.util.UUID;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 // http://localhost:8080/user-list.html
 public class UserController {
@@ -49,7 +49,11 @@ public class UserController {
     }
 
     @RequestMapping(value = "/findAll", method = GET)
-    public List<Res_IsOnlineUser> findAll() {
+    public List<Res_UserWithIsOnline> findAll() {
+        //[ ]  사용자 목록 조회
+        //url - /api/user/findAll
+        //요청 - 파라미터, 바디 없음
+        //응답 - ResponseEntity<List<UserDto>>
         return userService.findAll();
     }
 

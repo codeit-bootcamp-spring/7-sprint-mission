@@ -7,21 +7,20 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-public record Res_IsOnlineUser(
+public record Res_UserWithIsOnline(
         UUID id,
         Instant createdAt,
         Instant updatedAt,
 
         String userName,
-        String password,
+//        String password,
         String eMail,
         UUID profiledId,
 
         boolean isOnline
 ){
-    public static Res_IsOnlineUser from(User user, boolean isOnline) {
-//         Res_User.from(user, user.getProfileId());
-        return Res_IsOnlineUser.builder()
+    public static Res_UserWithIsOnline from(User user, boolean isOnline) {
+        return Res_UserWithIsOnline.builder()
                 .id(user.getId())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())

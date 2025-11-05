@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_User;
-import com.sprint.mission.discodeit.entity.dto.Res_IsOnlineUser;
+import com.sprint.mission.discodeit.entity.dto.Res_UserWithIsOnline;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.basic.UserService;
@@ -69,7 +69,7 @@ class UserServiceTest {
         Dto_BinaryContent dtoBinaryContent =  Dto_BinaryContent.from("haha", "txt", new byte[0], 0L);
         Dto_User dtoUser = Dto_User.from("⭐️ 별", "1234", "별@example.com");
         Res_User created = userService.create(dtoUser, Optional.of(dtoBinaryContent));
-        Res_IsOnlineUser user = userService.find(created.id());
+        Res_UserWithIsOnline user = userService.find(created.id());
         assertThat(user).isNotNull();
         assertThat(user.userName()).isEqualTo("⭐️ 별");
         assertThat(user.eMail()).isEqualTo("별@example.com");
