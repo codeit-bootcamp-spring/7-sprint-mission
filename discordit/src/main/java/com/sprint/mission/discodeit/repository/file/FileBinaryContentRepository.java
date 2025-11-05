@@ -53,13 +53,6 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public List<BinaryContent> findAllByUser(User user) {
-        return data.values().stream()
-                .filter(b -> b.getUploadUser().equals(user))
-                .toList();
-    }
-
-    @Override
     public void deleteByID(UUID uuid) {
         data.remove(uuid);
         write();

@@ -15,13 +15,11 @@ public class BinaryContentIoDTO implements Serializable {
 
     private UUID uuid;
     private Instant uploadedAt;
-    private UUID uploadUserUuid;
     private String fileUrl;
 
-    public BinaryContentIoDTO(UUID uuid, Instant uploadedAt, UUID uploadUserUuid, String fileUrl) {
+    public BinaryContentIoDTO(UUID uuid, Instant uploadedAt, String fileUrl) {
         this.uuid = uuid;
         this.uploadedAt = uploadedAt;
-        this.uploadUserUuid = uploadUserUuid;
         this.fileUrl = fileUrl;
     }
 }
