@@ -35,7 +35,7 @@ public record MessageResponse(
                 type,
                 receiverId,
                 receiverDisplayName,
-                message.getMessage(),
+                message.getContent(),
                 message.getAttachments().stream()
                         .map(BinaryContent::getFileUrl)
                         .toList()

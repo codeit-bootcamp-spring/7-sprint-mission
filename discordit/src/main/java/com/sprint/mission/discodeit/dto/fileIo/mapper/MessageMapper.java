@@ -42,7 +42,7 @@ final class MessageMapper {
                 message.getSender().getUuid(),
                 receiverUuid,
                 receiverType,
-                message.getMessage(),
+                message.getContent(),
                 attachmentIds
         );
     }
