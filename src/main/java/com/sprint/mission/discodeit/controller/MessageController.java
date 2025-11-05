@@ -21,7 +21,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 @RequestMapping("/message")
 public class MessageController {
     private final MessageService messageService;
-
     //    메시지 관리
 //    [ ] 메시지를 보낼 수 있다.
 //    [ ] 메시지를 수정할 수 있다.

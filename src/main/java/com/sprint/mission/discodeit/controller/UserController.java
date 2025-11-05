@@ -21,11 +21,9 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
-// http://localhost:8080/user-list.html
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
-
 //    사용자 관리
 //    [ ] 사용자를 등록할 수 있다.
 //    [ ] 사용자 정보를 수정할 수 있다.
