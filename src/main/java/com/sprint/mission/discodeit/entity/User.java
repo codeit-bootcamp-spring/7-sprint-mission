@@ -23,12 +23,13 @@ public class User extends Common implements Serializable {
 
 
 
-    public User(String UserEmail,String password,String userName,String userNickname)
+    public User(String UserEmail,String password,String userName,String userNickname,UUID profileID)
     {
            this.UserEmail = UserEmail;
            this.password = password;
            this.userName = userName;
            this.userNickname = userNickname;
+           this.profileID = profileID;
     }
 
     public void setProfileID(UUID profileID) {
@@ -67,8 +68,8 @@ public class User extends Common implements Serializable {
             this.userNickname = userUpdateRequest.userNickname();
             anyValueUpdated = true;
         }
-        if (userUpdateRequest.profileImageUrl() != null && !userUpdateRequest.profileImageUrl().equals(this.profileID)) {
-            this.profileID = userUpdateRequest.profileImageUrl();
+        if (userUpdateRequest.profileImageId() != null && !userUpdateRequest.profileImageId().equals(this.profileID)) {
+            this.profileID = userUpdateRequest.profileImageId();
         }
 
         if (anyValueUpdated) {

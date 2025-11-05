@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.Binarycontent.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.DeleteMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.FindAllByChannelIdMessageRequest;
@@ -36,7 +37,7 @@ public class BasicMessageService implements MessageService {
     }*/
 
     @Override
-    public MessageResponse create(CreateMessageRequest request) {
+    public MessageResponse create(CreateMessageRequest request,List<BinaryContentCreateRequest> binaryContentCreateRequests) {
         //둘의 uuid가 존재유무판단
         System.out.println(request.channelId());
         if (!channelRepository.existsById(request.channelId())) {
@@ -47,14 +48,17 @@ public class BasicMessageService implements MessageService {
         }
         Message message = new Message(request.content(), request.channelId(), request.authorId());
         //첨부파일이 없으면 그냥 저장
-        if(request.attachment() == null || request.attachment().length == 0 ){
+        if(binaryContentCreateRequests.isEmpty()){
             Message noFile = messageRepository.save(message);
             return MessageResponse.from(noFile);
         }
         //첨부파일이 있으면
         //만들고 첨부파일 추가 저장
-        BinaryContent binaryContent = new BinaryContent(ContentsType.MESSAGE_ATTACHMENT, request.attachment());
-        message.getAttachmentIds().add(binaryContent.getId());
+        binaryContentCreateRequests.forEach(attachment -> {
+            BinaryContent binaryContent = new BinaryContent(ContentsType.MESSAGE_ATTACHMENT, attachment.contentByte(),"null");
+            message.getAttachmentIds().add(binaryContent.getId());
+        });
+
             Message isFile = messageRepository.save(message);
             return MessageResponse.from(isFile);
 

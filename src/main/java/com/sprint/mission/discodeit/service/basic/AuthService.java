@@ -38,7 +38,8 @@ public class AuthService {
                                 "패스워드 :" + loginRequest.password() + "\n"));
         UserStatus userStatus = userstatusRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NoSuchElementException("맞는유저ID가 없어"));
-        userStatus.setUpdatedAt(Instant.now());
+
+        userstatusRepository.save(userStatus.getUserId());
         LoginResponse.from(user,userStatus.isOnline());
         return user;
 
