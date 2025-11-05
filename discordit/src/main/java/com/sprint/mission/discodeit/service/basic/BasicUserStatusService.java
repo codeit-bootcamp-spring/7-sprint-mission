@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusUpdateByUserIdRequest;
+import com.sprint.mission.discodeit.dto.userStatus.request.*;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponse;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exceptions.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
     public UserStatusResponse create(UserStatusCreateRequest dto) {
@@ -59,10 +61,5 @@ public class BasicUserStatusService implements UserStatusService {
         userStatus.setOnlineStatus(dto.onlineStatus());
         userStatusRepository.update(userStatus);
         return UserStatusResponse.toDto(userStatus);
-    }
-
-    @Override
-    public void delete(UUID id) {
-        userStatusRepository.deleteById(id);
     }
 }
