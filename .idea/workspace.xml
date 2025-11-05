@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1af6ad21-85ac-4aac-a310-f091e8a04784" name="변경" comment=":: mission3 &#10;- 메시지 수정 테스트">
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/mapper/UserMapper.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +104,7 @@
     "Spring Boot.DiscodeitApplication.executor": "Run",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
-    "git-widget-placeholder": "강유현",
+    "git-widget-placeholder": "강유현-sprint4",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -388,7 +385,8 @@
     <MESSAGE value=":: mission3 &#10;- Bean 선언&#10;- Lombok 적용" />
     <MESSAGE value=":: mission3 &#10;*추가가능요구사항&#10;-시간 타입 변경하기 Long &gt; java.time.Instant&#10;-@Slf4j 적용 // Log 확인" />
     <MESSAGE value=":: mission3 &#10;- 메시지 수정 테스트" />
-    <option name="LAST_COMMIT_MESSAGE" value=":: mission3 &#10;- 메시지 수정 테스트" />
+    <MESSAGE value="test: 저장소 연동 테스트&#10;- Github 저장소 연동 확인을 위한 테스트 입니다." />
+    <option name="LAST_COMMIT_MESSAGE" value="test: 저장소 연동 테스트&#10;- Github 저장소 연동 확인을 위한 테스트 입니다." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
