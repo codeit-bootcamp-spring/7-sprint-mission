@@ -16,10 +16,10 @@ public class BasicAuthService implements AuthService {
 
     @Override
     public User login(LoginRequestDto loginRequestDto) {
-        User user = userRepository.findByUsername(loginRequestDto.getUsername())
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저입니다." +  loginRequestDto.getUsername()));
+        User user = userRepository.findByUsername(loginRequestDto.username())
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저입니다." +  loginRequestDto.username()));
 
-        if(!loginRequestDto.getPassword().equals(user.getPassword())) {
+        if(!loginRequestDto.password().equals(user.getPassword())) {
             throw new NoSuchElementException("잘못된 패스워드입니다." + user.getUsername());
         }
         return user;
