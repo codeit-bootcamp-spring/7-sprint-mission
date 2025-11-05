@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.CreateBinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -14,30 +15,34 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
-    BinaryContentRepository binaryContentRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public BinaryContent createBinaryContent(CreateBinaryContentDto createBinaryContentDto) {
+    public BinaryContentResponseDto createBinaryContent(CreateBinaryContentDto createBinaryContentDto) {
         BinaryContent binaryContent = new BinaryContent(
-                createBinaryContentDto.getFileName(),
-                createBinaryContentDto.getContentType(),
-                createBinaryContentDto.getBytes()
+                createBinaryContentDto.fileName(),
+                createBinaryContentDto.contentType(),
+                createBinaryContentDto.bytes()
         );
 
         binaryContentRepository.save(binaryContent);
 
-        return binaryContent;
+        return BinaryContentResponseDto.from(binaryContent);
     }
 
     @Override
-    public BinaryContent getBinaryContent(UUID binaryContentId) {
-        return binaryContentRepository.findById(binaryContentId)
+    public BinaryContentResponseDto getBinaryContent(UUID binaryContentId) {
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 BinaryContent입니다." + binaryContentId));
+
+        return BinaryContentResponseDto.from(binaryContent);
     }
 
     @Override
-    public List<BinaryContent> getAllBinaryContentByIdIn(List<UUID> binaryContentIds) {
-        return binaryContentRepository.findAllByIdIn(binaryContentIds);
+    public List<BinaryContentResponseDto> getAllBinaryContentByIdIn(List<UUID> binaryContentIds) {
+        return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
+                .map(BinaryContentResponseDto::from)
+                .toList();
     }
 
     @Override
