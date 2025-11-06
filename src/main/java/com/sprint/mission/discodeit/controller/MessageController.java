@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.response.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDto;
@@ -8,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,8 +25,27 @@ public class MessageController {
 
     // 메시지를 보낼 수 있다.
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<MessageResponseDto> sendMessage(@RequestBody CreateMessageRequestDto request) {
-        MessageResponseDto message = messageService.createMessage(request);
+    public ResponseEntity<MessageResponseDto> sendMessage(
+            @RequestPart("message") CreateMessageRequestDto request,
+            @RequestPart(value = "fileList", required = false) List<MultipartFile> fileList)
+    {
+        List<CreateBinaryContentRequestDto> fileRequests = null;
+        if(fileList != null){
+            fileRequests = fileList.stream()
+                    .map(file ->
+                    {
+                        try {
+                            return new CreateBinaryContentRequestDto(
+                                    file.getBytes(),
+                                    file.getOriginalFilename(),
+                                    file.getContentType()
+                            );
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).toList();
+        }
+        MessageResponseDto message = messageService.createMessage(request, fileRequests);
         return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 //    메시지를 수정할 수 있다.

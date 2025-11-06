@@ -17,10 +17,10 @@ public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
-    //바이너리 파일 1개 조회
-    @RequestMapping(value = "{BinaryContentId}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContentResponseDto> findByBinaryContent(@PathVariable UUID BinaryContentId) {
-        BinaryContentResponseDto response = binaryContentService.find(BinaryContentId);
+    //심화. 바이너리 파일 1개 조회
+    @RequestMapping(value = "/find", method = RequestMethod.GET)
+    public ResponseEntity<BinaryContentResponseDto> findByBinaryContent(@RequestParam UUID binaryContentId) {
+        BinaryContentResponseDto response = binaryContentService.find(binaryContentId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

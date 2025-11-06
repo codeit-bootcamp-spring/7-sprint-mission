@@ -20,7 +20,7 @@ public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
    //특정 채널의 메시지 수신 정보를 생성할 수 있다.
-    @RequestMapping(value = "/channels/{channelId}/read-status", method = RequestMethod.POST)
+    @RequestMapping(value = "/channel/{channelId}/read-status", method = RequestMethod.POST)
     public ResponseEntity<ReadStatusResponseDto> ChannelByCreateReadStatus(
             @PathVariable UUID channelId,
             @RequestBody CreateReadStatusRequestDto request) {
@@ -28,10 +28,9 @@ public class ReadStatusController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
    //특정 채널의 메시지 수신 정보를 수정할 수 있다.
     //channels/.../read-status
-    @RequestMapping(value = "/channels/{channelId}/read-status", method = RequestMethod.PUT)
+    @RequestMapping(value = "/channel/{channelId}/read-status", method = RequestMethod.PUT)
     public ResponseEntity<ReadStatusResponseDto> ChannelByUpdateReadStatus(
             @PathVariable UUID channelId,
             @RequestBody UpdateReadStatusDto request) {
@@ -40,7 +39,7 @@ public class ReadStatusController {
     }
 
    //특정 사용자의 메시지 수신 정보를 조회할 수 있다.
-    @RequestMapping(value = "/users/{userId}/read-status", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/{userId}/read-status", method = RequestMethod.GET)
     public ResponseEntity<List<ReadStatusResponseDto>> UserByFindMessage(@PathVariable UUID userId) {
         List<ReadStatusResponseDto> response = readStatusService.findAllByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
