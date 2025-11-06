@@ -21,7 +21,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class DiscodeitApplication {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+        SpringApplication.run(DiscodeitApplication.class, args);
 
     }
 }
