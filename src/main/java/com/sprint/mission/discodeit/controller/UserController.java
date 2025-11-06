@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreateReq;
 import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
+import com.sprint.mission.discodeit.dto.user.request.UserInfoReq;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateReq;
 import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.dto.user.response.UserSimpleInfoRes;
@@ -13,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
@@ -45,10 +49,14 @@ public class UserController {
 
     //회원 등록
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Void> createUser(@Valid @RequestBody UserCreateReq req){
-        User user = userCreationFacade.createUser(req);
-        log.info("유저 가입: {}", req.nickname());
+    public ResponseEntity<Void> createUser(
+            @Valid @RequestPart("user") UserInfoReq userInfoReq,
+            @RequestPart("profile") MultipartFile profileFile) throws IOException {
 
+        log.info("회원 가입 요청: nickname={}, email={}", userInfoReq.nickname(), userInfoReq.email());
+
+        BinaryContentCreateReq binaryContentCreateReq = BinaryContentCreateReq.from(profileFile);
+        User user = userCreationFacade.createUser(UserCreateReq.from(userInfoReq, binaryContentCreateReq));
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
                 .path("/{id}")
