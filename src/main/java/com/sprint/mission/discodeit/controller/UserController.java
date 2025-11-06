@@ -32,13 +32,13 @@ public class UserController {
     private final UserStatusUpdateFacade userStatusUpdateFacade;
 
     //사용자 목록 조회
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, value="/list")
     public ResponseEntity<List<UserSimpleInfoRes>> getAllUsers(){
         return ResponseEntity.ok(userOverviewFacade.findAll());
     }
 
     //사용자 단일 조회
-    @RequestMapping(value = "/{userId}",method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, value = "/{userId}")
     public ResponseEntity<UserDetailInfoRes> getUserByNickname(@PathVariable UUID userId){
         return ResponseEntity.ok(userDetailViewFacade.findById(userId));
     }
@@ -58,14 +58,14 @@ public class UserController {
     }
 
     // 회원 수정
-    @RequestMapping(value="/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT, value="/{userId}")
     public ResponseEntity<Void> updateUser(@PathVariable UUID userId, @Valid @RequestBody UserUpdateReq req){
         userUpdateFacade.updateUser(userId, req);
         return ResponseEntity.noContent().build();
     }
 
     // 회원 삭제
-    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId){
         log.info("유저 탈퇴: {}", userId.toString());
 
@@ -74,7 +74,7 @@ public class UserController {
     }
 
     // 유저 온라인 상태 업그레이드
-    @RequestMapping(value = "/{userId}/status", method = RequestMethod.PATCH)
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{userId}/status")
     public ResponseEntity<UserStatusSimpleViewRes> updateUserStatus(@PathVariable UUID userId){
         return ResponseEntity.ok(userStatusUpdateFacade.update(userId));
     }

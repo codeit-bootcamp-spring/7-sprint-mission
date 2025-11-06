@@ -20,16 +20,16 @@ public class ChannelCreationFacade {
     private final ChannelMapper channelMapper;
 
     //공개 채널 추가
-    public ChannelInfoRes createPublicChannel(@NonNull ChannelCreateReq req){
-        return channelMapper.toInfoRes(channelService.create(req));
+    public Channel createPublicChannel(@NonNull ChannelCreateReq req){
+        return channelService.create(req);
     }
 
     //비밀 채널 추가
-    public ChannelInfoRes createPrivateChannel(@NonNull ChannelCreateSecReq req){
+    public Channel createPrivateChannel(@NonNull ChannelCreateSecReq req){
         Channel channel = channelService.create(req);
         req.userIds().forEach(userId -> readStatusService.create(
                             ReadStatus.create(userId, channel.getId())
         ));
-        return channelMapper.toInfoRes(channel);
+        return channel;
     }
 }

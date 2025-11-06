@@ -50,6 +50,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public List<Channel> findAllByUserId(UUID userId){
         return channelRepository.findAll().stream().filter(channel ->
+                channel.getManagerId().equals(userId) ||
                 channel.getPublicType() == ChannelType.PUBLIC ||
                 (channel.getPublicType() == ChannelType.PRIVATE &&
                 channelRepository.isMember(userId, channel.getId()))).toList();
