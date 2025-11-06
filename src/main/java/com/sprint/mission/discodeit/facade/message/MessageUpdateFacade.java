@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.facade.message;
 
+import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreateReq;
 import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentUpdateReq;
 import com.sprint.mission.discodeit.dto.message.request.MessageUpdateReq;
 import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
@@ -23,38 +24,19 @@ public class MessageUpdateFacade {
     private final BinaryContentService binaryContentService;
     private final MessageMapper messageMapper;
 
-    //메세지 수정
     public MessageViewRes updateMessage(@NonNull UUID messageId, @NonNull MessageUpdateReq req){
-        List<UUID> updatedAttachmentIds = new ArrayList<>();
-        List<BinaryContentUpdateReq> attachmentUpdateReqs = req.attachmentReqs();
+        List<UUID> oldIds = messageService.findById(messageId).getAttachmentIds();
+        List<UUID> updatedIds = new ArrayList<>(req.keepAttachmentIds());
 
-        attachmentUpdateReqs.forEach(binaryContentUpdateReq -> {
-            if(binaryContentUpdateReq.binaryContentId() != null){
-                handleExistingFile(binaryContentUpdateReq, updatedAttachmentIds);
-            }else{
-                handleNewFile(binaryContentUpdateReq, updatedAttachmentIds);
-            }
-        });
+        req.newAttachmentReqs().forEach(r ->
+                updatedIds.add(binaryContentService.create(BinaryContentFactory.create(r)).getId()));
 
-        messageService.update(messageId, req.content(), updatedAttachmentIds);
+        oldIds.stream()
+                .filter(id -> !req.keepAttachmentIds().contains(id))
+                .forEach(binaryContentService::delete);
+
+        messageService.update(messageId, req.content(), updatedIds);
         return messageMapper.mapToView(messageService.findById(messageId));
-    }
-
-    //기존 파일(데이터 없으면 삭제, 있으면 유지)
-    private void handleExistingFile(BinaryContentUpdateReq req, List<UUID> attachmentIds){
-        if(req.data() == null){
-            binaryContentService.delete(req.binaryContentId());
-        }else{
-            attachmentIds.add(req.binaryContentId());
-        }
-    }
-
-    //새로 업로드 된 파일
-    private void handleNewFile(BinaryContentUpdateReq req, List<UUID> attachmentIds){
-        BinaryContent newFile = binaryContentService.create(
-            BinaryContentFactory.create(req)
-        );
-        attachmentIds.add(newFile.getId());
     }
 }
 

@@ -1,16 +1,30 @@
 package com.sprint.mission.discodeit.dto.message.request;
 
-import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentUpdateReq;
+import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreateReq;
 
 import java.util.List;
+import java.util.UUID;
 
 public record MessageUpdateReq(
         String content,
-        List<BinaryContentUpdateReq> attachmentReqs
+        List<UUID> keepAttachmentIds,
+        List<BinaryContentCreateReq> newAttachmentReqs
 ){
     public MessageUpdateReq {
-        if (attachmentReqs == null) {
-            attachmentReqs = List.of();
+        if (newAttachmentReqs == null) {
+            newAttachmentReqs = List.of();
         }
+        if(keepAttachmentIds == null){
+            keepAttachmentIds = List.of();
+        }
+    }
+
+    public static MessageUpdateReq from(MessageInfoReq infoReq,
+                                        List<UUID> keepAttachmentIds,
+                                        List<BinaryContentCreateReq> newAttachmentReqs){
+        return new MessageUpdateReq(
+                infoReq.content(),
+                keepAttachmentIds,
+                newAttachmentReqs);
     }
 }

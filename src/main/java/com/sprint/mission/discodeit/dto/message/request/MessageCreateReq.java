@@ -13,4 +13,8 @@ public record MessageCreateReq (
             attachmentIds = List.of();
         }
     }
+
+    public static MessageCreateReq from(MessageInfoReq infoReq, List<BinaryContentCreateReq> attachmentIds) {
+        return new MessageCreateReq(infoReq.content(), attachmentIds);
+    }
 }
