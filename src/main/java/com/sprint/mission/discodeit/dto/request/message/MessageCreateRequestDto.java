@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -16,6 +17,6 @@ public class MessageCreateRequestDto {
     private UUID senderId;
     private boolean isMarkDown;
     private UUID channelId;
-    private HashSet<ProfileCreateRequestDto> attachmentIdList  = new HashSet<>();
+    private Set<ProfileCreateRequestDto> attachmentIdList  = new HashSet<>();
 
 }

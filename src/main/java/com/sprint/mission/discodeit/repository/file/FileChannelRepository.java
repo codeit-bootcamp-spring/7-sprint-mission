@@ -61,7 +61,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public <T>void updateChannel(Channel channel) {
+    public void updateChannel(Channel channel) {
         deleteChannel(channel);
         saveChannel(channel);
     }

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Entity;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.util.StaticString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
@@ -16,7 +17,7 @@ import java.io.*;
 import java.util.*;
 
 import static com.sprint.mission.discodeit.service.util.StaticString.*;
-
+@Slf4j
 @Repository
 @ConditionalOnProperty(
         prefix = "discodeit.repository",
@@ -41,7 +42,7 @@ public class FileUserRepository implements UserRepository {
 
     public FileUserRepository(Environment env) {
         USER_DATA_ROOT = env.getProperty(DISCODEIT_DIRECTORY)+"userRepository.ser";
-        System.out.println("USER_DATA_ROOT = " + USER_DATA_ROOT);
+        log.info("파일 저장 경로 : {}", USER_DATA_ROOT);
         userRepositoryFile = new File(USER_DATA_ROOT);
         repositoryFileCheck();
     }
