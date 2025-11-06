@@ -3,10 +3,9 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.io.*;
 import java.util.*;
 
-import static com.sprint.mission.discodeit.utils.FileIOHandler.*;
+import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
 /**
  * FileUserRepository

@@ -3,10 +3,9 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
-import java.io.*;
 import java.util.*;
 
-import static com.sprint.mission.discodeit.utils.FileIOHandler.*;
+import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
 public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Map<UUID, BinaryContent> contentStore = new HashMap<>();

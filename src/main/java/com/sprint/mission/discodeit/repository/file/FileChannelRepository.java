@@ -5,11 +5,10 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ChannelVisibility;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
-import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.sprint.mission.discodeit.utils.FileIOHandler.*;
+import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
 public class FileChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channelStore = new HashMap<>();

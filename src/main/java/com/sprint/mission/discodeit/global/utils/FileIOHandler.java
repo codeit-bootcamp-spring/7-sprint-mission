@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.utils;
+package com.sprint.mission.discodeit.global.utils;
 
 import java.io.*;
 import java.util.Map;

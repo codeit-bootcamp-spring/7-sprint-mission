@@ -3,10 +3,9 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
-import java.io.*;
 import java.util.*;
 
-import static com.sprint.mission.discodeit.utils.FileIOHandler.*;
+import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
 public class FileReadStatusRepository implements ReadStatusRepository {
     Map<UUID, ReadStatus> readStatusStore = new HashMap<>();

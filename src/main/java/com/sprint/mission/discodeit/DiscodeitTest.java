@@ -21,9 +21,9 @@ import com.sprint.mission.discodeit.service.basic.BasicAuthService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.utils.Printer;
-import com.sprint.mission.discodeit.utils.TestDataInitializer;
-import com.sprint.mission.discodeit.utils.TimeConvert;
+import com.sprint.mission.discodeit.global.utils.Printer;
+import com.sprint.mission.discodeit.global.utils.TestDataInitializer;
+import com.sprint.mission.discodeit.global.utils.TimeConvert;
 
 import java.io.File;
 import java.util.*;

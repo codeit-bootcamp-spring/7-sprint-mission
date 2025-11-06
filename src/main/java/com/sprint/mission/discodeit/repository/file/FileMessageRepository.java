@@ -4,11 +4,10 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.io.*;
 import java.time.Instant;
 import java.util.*;
 
-import static com.sprint.mission.discodeit.utils.FileIOHandler.*;
+import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
 /**
  * FileMessageRepository

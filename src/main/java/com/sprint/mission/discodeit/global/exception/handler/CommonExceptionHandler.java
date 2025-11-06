@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.exception.handler;
+package com.sprint.mission.discodeit.global.exception.handler;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

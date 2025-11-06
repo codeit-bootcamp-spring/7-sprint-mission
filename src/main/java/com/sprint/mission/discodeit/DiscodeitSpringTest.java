@@ -14,9 +14,9 @@ import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.utils.Printer;
-import com.sprint.mission.discodeit.utils.TestDataInitializer;
-import com.sprint.mission.discodeit.utils.TimeConvert;
+import com.sprint.mission.discodeit.global.utils.Printer;
+import com.sprint.mission.discodeit.global.utils.TestDataInitializer;
+import com.sprint.mission.discodeit.global.utils.TimeConvert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

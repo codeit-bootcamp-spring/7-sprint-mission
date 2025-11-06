@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.utils;
+package com.sprint.mission.discodeit.global.utils;
 
 import com.sprint.mission.discodeit.dto.channel.request.CreateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequestDto;
