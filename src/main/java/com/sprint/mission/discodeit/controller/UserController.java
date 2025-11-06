@@ -53,7 +53,7 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> createUser(
             @Valid @RequestPart("user") UserInfoReq userInfoReq,
-            @RequestPart("profile") MultipartFile profileFile) throws IOException {
+            @RequestPart(value = "profile", required = false) MultipartFile profileFile) throws IOException {
 
         log.info("회원 가입 요청: nickname={}, email={}", userInfoReq.nickname(), userInfoReq.email());
 
@@ -72,7 +72,7 @@ public class UserController {
     public ResponseEntity<Void> updateUser(
             @PathVariable UUID userId,
             @Valid @RequestPart("user") UserInfoReq userInfoReq,
-            @RequestPart("profile") MultipartFile profileFile) throws IOException {
+            @RequestPart(value = "profile", required = false) MultipartFile profileFile) throws IOException {
 
         log.info("회원 정보 수정 요청: nickname={}, email={}", userInfoReq.nickname(), userInfoReq.email());
         
