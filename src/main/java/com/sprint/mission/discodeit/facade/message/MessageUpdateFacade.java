@@ -27,10 +27,10 @@ public class MessageUpdateFacade {
     public MessageViewRes updateMessage(@NonNull UUID messageId, @NonNull MessageUpdateReq req){
         List<UUID> oldIds = messageService.findById(messageId).getAttachmentIds();
         List<UUID> updatedIds = new ArrayList<>(req.keepAttachmentIds());
-
+        //새로운 첨부파일 파일 생성 : 파일 생성 및 updateIds 에 id 넣기
         req.newAttachmentReqs().forEach(r ->
                 updatedIds.add(binaryContentService.create(BinaryContentFactory.create(r)).getId()));
-
+        //파일 유지 UUID 에 없으면, 파일 삭제. 있으면 유지이므로, updateIds 에 id 넣기
         oldIds.stream()
                 .filter(id -> !req.keepAttachmentIds().contains(id))
                 .forEach(binaryContentService::delete);
