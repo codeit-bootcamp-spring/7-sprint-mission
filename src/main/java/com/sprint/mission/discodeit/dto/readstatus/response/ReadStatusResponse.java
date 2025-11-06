@@ -8,7 +8,7 @@ public record ReadStatusResponse(
         UUID readStatusId,
         UUID userId,
         UUID channelId
-       // boolean isRead
+
 ) {
     public static ReadStatusResponse from(ReadStatus readStatus) {
         return new ReadStatusResponse(

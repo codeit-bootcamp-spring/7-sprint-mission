@@ -71,14 +71,7 @@ public class BasicUserService implements UserService {
                 nullableProfileId
 
         );
-     //   user.setProfileID(nullableProfileId);
-       //혹시이미지가 있니 없니
-    /*    if (optionalProfileCreateRequest. != null) {
-            BinaryContent binaryContent = new BinaryContent(ContentsType.PROFILE_IMAGE, userCreateRequest.profileImage());
-            binaryRepository.save(binaryContent);
 
-            user.setProfileID(binaryContent.getId());
-        }*/
 
         //유저정보저장
         userRepository.save(user);

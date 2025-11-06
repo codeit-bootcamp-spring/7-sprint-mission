@@ -28,13 +28,7 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final BinaryRepository binaryRepository;
 
-    //의존성 주입이긴한데 이거 일커지면 더 늘어나는데
-  /*  public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
-        this.userRepository = userRepository;
-        this.messageRepository = messageRepository;
-        this.channelRepository = channelRepository;
 
-    }*/
 
     @Override
     public MessageResponse create(CreateMessageRequest request,List<BinaryContentCreateRequest> binaryContentCreateRequests) {
@@ -46,23 +40,26 @@ public class BasicMessageService implements MessageService {
         if (!userRepository.existsById(request.authorId())) {
             throw new NoSuchElementException("매시지UUID가 없어 :" + request.authorId());
         }
-        Message message = new Message(request.content(), request.channelId(), request.authorId());
-        //첨부파일이 없으면 그냥 저장
-        if(binaryContentCreateRequests.isEmpty()){
-            Message noFile = messageRepository.save(message);
-            return MessageResponse.from(noFile);
-        }
-        //첨부파일이 있으면
-        //만들고 첨부파일 추가 저장
-        binaryContentCreateRequests.forEach(attachment -> {
-            BinaryContent binaryContent = new BinaryContent(ContentsType.MESSAGE_ATTACHMENT, attachment.contentByte(),"null");
-            message.getAttachmentIds().add(binaryContent.getId());
-        });
 
-            Message isFile = messageRepository.save(message);
-            return MessageResponse.from(isFile);
+        List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+                .map(attachmentRequest -> {
 
+                    byte[] bytes = attachmentRequest.contentByte();
 
+                    BinaryContent binaryContent = new BinaryContent(ContentsType.MESSAGE_ATTACHMENT, attachmentRequest.contentByte(),"null");
+                    BinaryContent createdBinaryContent = binaryRepository.save(binaryContent);
+                    return createdBinaryContent.getId();
+                })
+                .toList();
+
+        Message message = new Message(
+                request.content(),
+                request.channelId(),
+                request.authorId(),
+                attachmentIds
+        );
+
+            return MessageResponse.from(messageRepository.save(message));
     }
 
     @Override

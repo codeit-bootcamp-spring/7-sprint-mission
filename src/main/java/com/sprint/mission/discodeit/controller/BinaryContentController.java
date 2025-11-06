@@ -28,8 +28,9 @@ public class BinaryContentController {
 
         byte[] bytes = binaryContentService.find(binaryContentId).contentByte();
 
+        //이건 화면에 보이게 하려고 억지로 넣었다
         String encodedString = Base64.getEncoder().encodeToString(bytes);
-        //??
+        //
         BinaryContent binaryContent = new BinaryContent(findBinary.contentsType(),bytes, encodedString );
 
         return ResponseEntity.ok(binaryContent);
