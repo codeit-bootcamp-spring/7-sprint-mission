@@ -39,8 +39,8 @@ public class ChannelController {
 
     // 공개 채널 생성
     @RequestMapping(method = RequestMethod.POST, value = "/public")
-    public ResponseEntity<Void> createPublicChannel(@RequestBody ChannelCreateReq req){
-        Channel channel = channelCreationFacade.createPublicChannel(req);
+    public ResponseEntity<Void> createPublicChannel(UUID managerId, @RequestBody ChannelCreateReq req){
+        Channel channel = channelCreationFacade.createPublicChannel(managerId, req);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
                 .path("/{id}")
@@ -51,8 +51,8 @@ public class ChannelController {
     
     //비밀 채널 생성
     @RequestMapping(method = RequestMethod.POST, value="/private")
-    public ResponseEntity<Void> createPrivateChannel(@RequestBody ChannelCreateSecReq req){
-        Channel channel = channelCreationFacade.createPrivateChannel(req);
+    public ResponseEntity<Void> createPrivateChannel(UUID managerId, @RequestBody ChannelCreateSecReq req){
+        Channel channel = channelCreationFacade.createPrivateChannel(managerId, req);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
                 .path("/{id}")

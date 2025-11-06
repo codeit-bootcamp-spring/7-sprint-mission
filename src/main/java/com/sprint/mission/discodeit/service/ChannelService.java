@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    Channel create(ChannelCreateReq req);
-    Channel create(ChannelCreateSecReq req);
+    Channel create(UUID managerId, ChannelCreateReq req);
+    Channel create(UUID managerId, ChannelCreateSecReq req);
     void update(UUID id,
                    ChannelUpdateReq req);
     void delete(UUID id);

@@ -12,6 +12,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 public class ChannelCreationFacade {
@@ -20,13 +22,13 @@ public class ChannelCreationFacade {
     private final ChannelMapper channelMapper;
 
     //공개 채널 추가
-    public Channel createPublicChannel(@NonNull ChannelCreateReq req){
-        return channelService.create(req);
+    public Channel createPublicChannel(@NonNull UUID managerId, @NonNull ChannelCreateReq req){
+        return channelService.create(managerId, req);
     }
 
     //비밀 채널 추가
-    public Channel createPrivateChannel(@NonNull ChannelCreateSecReq req){
-        Channel channel = channelService.create(req);
+    public Channel createPrivateChannel(@NonNull UUID managerId, @NonNull ChannelCreateSecReq req){
+        Channel channel = channelService.create(managerId, req);
         req.userIds().forEach(userId -> readStatusService.create(
                             ReadStatus.create(userId, channel.getId())
         ));
