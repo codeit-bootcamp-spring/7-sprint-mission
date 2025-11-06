@@ -8,25 +8,22 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/binarycontent")
+@RequestMapping("/api")
 public class BinaryContentController {
     private final UserService userService;
     private final MessageService messageService;
     private final BinaryContentService binaryContentService;
 
     // 유저 프로필 이미지 조회
-    @RequestMapping(value = "/search/profile/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<?> searchProfile(@PathVariable UUID userId) {
+    @RequestMapping(value = "/binarycontent/profile", method = RequestMethod.GET)
+    public ResponseEntity<?> searchProfile(@RequestParam UUID userId) {
         BinaryContent content;
 
         try {
@@ -40,8 +37,8 @@ public class BinaryContentController {
     }
 
     // 메시지 파일 조회
-    @RequestMapping(value = "/search/file/{messageId}", method = RequestMethod.GET)
-    public ResponseEntity<?> searchFile(@PathVariable UUID messageId) {
+    @RequestMapping(value = "/binarycontent/file", method = RequestMethod.GET)
+    public ResponseEntity<?> searchFile(@RequestParam UUID messageId) {
         List<BinaryContent> content;
 
         try {

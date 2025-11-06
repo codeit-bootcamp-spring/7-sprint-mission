@@ -16,13 +16,14 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/api")
 public class UserController {
 
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    // 사용자 등록
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@RequestPart("request") CreateUserRequestDto requestDto,
                                         @RequestPart(value = "file", required = false) MultipartFile file) {
         UserResponseDto newUser;
@@ -37,7 +38,8 @@ public class UserController {
                 .body(newUser);
     }
 
-    @RequestMapping(value = "/update/{userId}", method = RequestMethod.POST)
+    // 사용자 정보 수정
+    @RequestMapping(value = "/users/{userId}", method = RequestMethod.PATCH)
     public ResponseEntity<String> updateUser(@PathVariable UUID userId,
                                              @RequestPart(name = "request", required = false) UpdateUserRequestDto requestDto,
                                              @RequestPart(name = "file", required = false) MultipartFile file) {
@@ -51,7 +53,8 @@ public class UserController {
         return ResponseEntity.ok().body("User Updated Successfully");
     }
 
-    @RequestMapping(value = "/delete/{userId}", method = RequestMethod.POST)
+    // 사용자 삭제
+    @RequestMapping(value = "/users/{userId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteUser(@PathVariable UUID userId) {
         try {
             userService.delete(userId);
@@ -61,12 +64,14 @@ public class UserController {
         return ResponseEntity.ok().body("User Deleted Successfully");
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    // 모든 사용자 조회
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
     public ResponseEntity<List<UserResponseDto>> searchUsers() {
         return ResponseEntity.ok().body(userService.findAll());
     }
 
-    @RequestMapping(value = "/online/{userId}", method = RequestMethod.POST)
+    // 사용자 온라인 업데이트
+    @RequestMapping(value = "/users/{userId}/online", method = RequestMethod.POST)
     public ResponseEntity<String> onlineUser(@PathVariable UUID userId) {
         try {
             userStatusService.updateByUserId(userId);
@@ -75,5 +80,4 @@ public class UserController {
         }
         return ResponseEntity.ok().body("User Online Successfully");
     }
-
 }

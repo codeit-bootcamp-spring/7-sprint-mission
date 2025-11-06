@@ -14,12 +14,12 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/message")
+@RequestMapping("/api")
 public class MessageController {
     private final MessageService messageService;
 
     // 메시지 생성
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/messages", method = RequestMethod.POST)
     public ResponseEntity<String> createMessage(@RequestPart("request") CreateMessageRequestDto requestDto,
                                                  @RequestPart(value = "file", required = false) List<MultipartFile> file) {
         try {
@@ -32,7 +32,7 @@ public class MessageController {
     }
 
     // 메시지 수정
-    @RequestMapping(value = "/update/{messageId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/messages/{messageId}", method = RequestMethod.PATCH)
     public ResponseEntity<String> updateMessage(@PathVariable UUID messageId,
                                                 @RequestBody UpdateMessageRequestDto requestDto) {
         try {
@@ -45,7 +45,7 @@ public class MessageController {
     }
 
     // 메시지 삭제
-    @RequestMapping(value = "/delete/{messageId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/messages/{messageId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteMessage(@PathVariable UUID messageId) {
         try {
             messageService.delete(messageId);
@@ -57,8 +57,8 @@ public class MessageController {
     }
 
     // 특정 채널 메시지 목록 조회
-    @RequestMapping(value = "/search/{channelId}", method = RequestMethod.GET)
-    public ResponseEntity<List<Message>> searchMessage(@PathVariable UUID channelId) {
+    @RequestMapping(value = "/messages", method = RequestMethod.GET)
+    public ResponseEntity<List<Message>> searchMessage(@RequestParam UUID channelId) {
         List<Message> messageList = messageService.findAllByChannelId(channelId);
         return ResponseEntity.ok().body(messageList);
     }

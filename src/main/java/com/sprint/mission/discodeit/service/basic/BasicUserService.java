@@ -73,7 +73,7 @@ public class BasicUserService implements UserService{
         userStatusRepository.save(new UserStatus(newUser.getId()));
         userRepository.save(newUser);
 
-        return UserResponseDto.from(newUser, false);
+        return UserResponseDto.from(newUser, true);
     }
 
     @Override
