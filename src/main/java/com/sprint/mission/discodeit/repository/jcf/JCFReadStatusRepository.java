@@ -40,7 +40,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void update(UUID statusId) {
-        data.get(statusId).update();
+        data.get(statusId).updateReadAt();
     }
 
     @Override

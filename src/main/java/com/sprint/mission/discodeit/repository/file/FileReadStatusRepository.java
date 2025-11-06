@@ -43,7 +43,7 @@ implements ReadStatusRepository {
     @Override
     public void update(UUID statusId) {
         loadFromFile(statusId).ifPresent(readStatus ->{
-            readStatus.update();
+            readStatus.updateReadAt();
             saveToFile(statusId, readStatus);
         });
     }
