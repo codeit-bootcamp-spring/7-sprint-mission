@@ -5,11 +5,12 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class JCFUserStatusRepository implements UserStatusRepository {
 
-    private final Map<UUID, UserStatus> userStatuses = new HashMap<>();
+    private final Map<UUID, UserStatus> userStatuses = new ConcurrentHashMap<>();
 
     @Override
     public UserStatus save(UserStatus userStatus) {

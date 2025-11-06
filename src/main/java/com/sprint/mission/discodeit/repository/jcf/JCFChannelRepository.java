@@ -5,11 +5,12 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class JCFChannelRepository implements ChannelRepository {
 
-    private final Map<UUID, Channel> channels = new HashMap<>();
+    private final Map<UUID, Channel> channels = new ConcurrentHashMap<>();
 
     @Override
     public Channel save(Channel channel) {
