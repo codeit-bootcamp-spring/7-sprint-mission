@@ -125,6 +125,7 @@ public class BasicUserService implements UserService {
                 .orElse(null);
 
         //저장용
+          user.setProfileID(nullableProfileId);
          user.update(userUpdateRequest);//업데이트했으니 갱신해야지
           userRepository.save(user);
           //폼으로 바로넣고주자

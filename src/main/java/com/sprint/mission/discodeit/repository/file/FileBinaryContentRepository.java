@@ -30,9 +30,8 @@ public class FileBinaryContentRepository implements BinaryRepository {
     @Override
     public Optional<BinaryContent> find(UUID binaryId) {
 
-        Optional<BinaryContent> read = FileIo.read(filename, binaryId, BinaryContent.class);
+        return  FileIo.read(filename, binaryId, BinaryContent.class);
 
-        return read;
     }
 
     @Override
