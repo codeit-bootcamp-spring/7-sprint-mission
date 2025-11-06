@@ -9,10 +9,10 @@ import java.util.UUID;
 public class MessageFactory {
     private MessageFactory(){}
 
-    public static Message create(MessageCreateReq req, List<UUID> attachmentIds){
+    public static Message create(UUID speakerId, UUID channelId, MessageCreateReq req, List<UUID> attachmentIds){
         return Message.createWithAttachment(
-                req.channelId(),
-                req.speakerId(),
+                channelId,
+                speakerId,
                 req.content(),
                 attachmentIds
         );

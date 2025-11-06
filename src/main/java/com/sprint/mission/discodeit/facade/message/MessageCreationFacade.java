@@ -22,10 +22,9 @@ import java.util.UUID;
 public class MessageCreationFacade {
     private final MessageService messageService;
     private final BinaryContentService binaryContentService;
-    private final MessageMapper messageMapper;
 
     //메세지 추가
-    public MessageViewRes createMessage(@NonNull MessageCreateReq req){
+    public Message createMessage(@NonNull UUID speakerId, @NonNull UUID channelId, @NonNull MessageCreateReq req){
         List<UUID> attachments = new ArrayList<>();
         
         if(!req.attachmentIds().isEmpty()){
@@ -37,8 +36,7 @@ public class MessageCreationFacade {
             });
         }
 
-        Message newMessage = messageService.create(MessageFactory.create(req, attachments));
-        return messageMapper.mapToView(newMessage);
+        return messageService.create(MessageFactory.create(speakerId, channelId, req, attachments));
     }
 }
 
