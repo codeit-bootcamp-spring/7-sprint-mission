@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.message.request.MessageGetRequest;
 import com.sprint.mission.discodeit.dto.message.request.MessageSendRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,23 +24,23 @@ public class MessageController {
     private final MessageService messageService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public ResponseEntity<MessageResponse> send(@RequestBody MessageSendRequest request) {
+    public ResponseEntity<MessageResponse> send(@Valid @RequestBody MessageSendRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageService.send(request));
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<MessageResponse> edit(@RequestBody MessageEditRequest request) {
+    public ResponseEntity<MessageResponse> edit(@Valid @RequestBody MessageEditRequest request) {
         return ResponseEntity.ok(messageService.editMessage(request));
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity<Void> delete(@RequestBody MessageDeleteRequest request) {
+    public ResponseEntity<Void> delete(@Valid @RequestBody MessageDeleteRequest request) {
         messageService.delete(request);
         return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<List<MessageResponse>> get(@RequestBody MessageGetRequest request) {
+    public ResponseEntity<List<MessageResponse>> get(@Valid @RequestBody MessageGetRequest request) {
         return ResponseEntity.ok(messageService.get(request));
     }
 

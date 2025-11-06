@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.request.UserDeleteRequest;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +21,17 @@ public class UserController {
 
 
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
-    public ResponseEntity<UserResponse> signIn(@RequestBody UserCreateRequest request) {
+    public ResponseEntity<UserResponse> signIn(@Valid @RequestBody UserCreateRequest request) {
         return new ResponseEntity<>(userService.signIn(request), HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public ResponseEntity<UserResponse> update(@RequestBody UserUpdateRequest request) {
+    public ResponseEntity<UserResponse> update(@Valid @RequestBody UserUpdateRequest request) {
         return new ResponseEntity<>(userService.update(request), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public void delete(@RequestBody UserDeleteRequest request) {
+    public void delete(@Valid @RequestBody UserDeleteRequest request) {
         userService.deleteByUserId(request);
     }
 
