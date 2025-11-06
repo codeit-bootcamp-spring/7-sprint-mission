@@ -1,6 +1,9 @@
 spring:
   application:
     name=discodeit
+  servlet:
+    multipart:
+      enabled: true
 
 server:
   port: 7777
