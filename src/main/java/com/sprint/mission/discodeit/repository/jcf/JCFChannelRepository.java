@@ -60,7 +60,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public <T> void updateChannel(Channel channel) {
+    public void updateChannel(Channel channel) {
 
         channelRepo.remove(channel.getId());
         channelRepo.put(channel.getId(),channel);
