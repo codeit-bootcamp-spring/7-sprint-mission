@@ -25,6 +25,8 @@ public enum ErrorCode {
     // BinaryContent
     BINARYCONTENT_NOT_FOUNT("BINARYCONTENT_001", HttpStatus.NOT_FOUND,
             "해당 UUID를 가진 바이너리 컨텐츠가 존재하지 않습니다."),
+    FILE_CONVERSION_FAILED("BINARYCONTENT_002", HttpStatus.INTERNAL_SERVER_ERROR, "파일 변환 중 오류가 발생했습니다."),
+    INVALID_FILE_REQUEST("BINARYCONTENT_003", HttpStatus.BAD_REQUEST, "잘못된 파일 요청입니다."),
 
     // Channel
     CHANNEL_NOT_FOUND("CHANNEL_001", HttpStatus.NOT_FOUND,
