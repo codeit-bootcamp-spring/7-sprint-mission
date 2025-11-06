@@ -32,8 +32,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelResponseDto createPrivateChannel(CreatePrivateChannelDto dto) {
         Channel channel = new Channel(
-                "",
-                "",
+                null,
+                null,
                 ChannelType.PRIVATE
         );
 
