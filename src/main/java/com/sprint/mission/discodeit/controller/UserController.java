@@ -29,6 +29,8 @@ public class UserController {
 //    [ ] 모든 사용자를 조회할 수 있다.
 //    [ ] 사용자의 온라인 상태를 업데이트할 수 있다.
 
+
+
     //!! @Valid 검증 == dependencies 'spring-boot-starter-validation'
     @RequestMapping(value = "/create", method = POST)
     public Res_User create(@RequestPart("dtouser") Dto_User dtoUser,
@@ -48,15 +50,23 @@ public class UserController {
         return userService.create(dtoUser, Optional.ofNullable(dtoFile));
     }
 
-//    //!! @Valid 검증 == dependencies 'spring-boot-starter-validation'
-//    @RequestMapping(value = "/create", method = POST)
-//    public Res_User create(@RequestBody Dto_UserWithContent dto) {
-//        return userService.create(dto.dtoUser(), dto.binaryContent());
-//    }
-
     @RequestMapping(value = "/update", method = PUT)
-    public Res_User update(@RequestBody Dto_UserWithIDAndContent dto) {
-        return userService.update(dto.userId(), dto.dtoUser(), dto.binaryContent());
+    public Res_User update(@RequestPart("dtouser") Dto_UserWithIDAndContent dtoUser,
+                           @RequestPart("file") MultipartFile file) {
+
+        Dto_BinaryContent dtoFile = null;
+        try {
+            dtoFile = Dto_BinaryContent.from(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes(),
+                    file.getSize());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Util.okMessage("file.getOriginalFilename() = [" + file.getOriginalFilename() + "]");
+
+        return userService.update(dtoUser.userId(), dtoUser.dtoUser(), Optional.ofNullable(dtoFile));
     }
 
     @RequestMapping(value = "/delete/{id}", method = DELETE)

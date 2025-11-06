@@ -37,7 +37,7 @@ public class UserService implements InterfaceUserService {
 //    3. 수정자 주입(Setter Injection) : 간단하지만 테스트 어려워서 지양
 
     @Override
-    public Res_User create(Dto_User dto_user, Optional<Dto_BinaryContent> requestDto) {
+    public Res_User create(Dto_User dto_user, Optional<Dto_BinaryContent> dto_binaryContent) {
 //    public User create(String username, Optional<BufferedImage> profileImageBytes) {
 //        [ ] 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
@@ -54,11 +54,11 @@ public class UserService implements InterfaceUserService {
 
         UUID binaryContentId = null;
 
-        if (requestDto.isPresent()) {
-            Dto_BinaryContent dtoBinaryContent = requestDto.get();
-            BinaryContent binaryContent = new BinaryContent(dtoBinaryContent);
-            binaryContentId = binaryContent.getId();
-            binaryContentRepository.save(binaryContent);
+        if (dto_binaryContent.isPresent()) {
+            Dto_BinaryContent dtoBinaryContent = dto_binaryContent.get();
+            BinaryContent binaryContent_I = new BinaryContent(dtoBinaryContent);
+            binaryContentId = binaryContent_I.getId();
+            binaryContentRepository.save(binaryContent_I);
         }
 
         User user = new User(dto_user, binaryContentId);
@@ -125,12 +125,13 @@ public class UserService implements InterfaceUserService {
     }
 
     @Override
-    public Res_User update(UUID userId, Dto_User dto_user, Optional<Dto_BinaryContent> requestDto_Content) {
+    public Res_User update(UUID userId, Dto_User dto_user, Optional<Dto_BinaryContent> dtoBinaryContent) {
 //        [ ] 선택적으로 프로필 이미지를 대체할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //        수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
 
         Util.okMessage("UserService.update.userId = [" + userId + "]");
+        Util.okMessage("dto_user = [" + dto_user.toString() + "]");
 
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("🚨UserService.update.userId = [" + userId + "] 오류"));
         String userName = user.getUserName();
@@ -146,8 +147,8 @@ public class UserService implements InterfaceUserService {
         }
 
         //!! 선택적으로 프로필 이미지를 대체할 수 있습니다.
-        if (requestDto_Content != null && requestDto_Content.isPresent()) {
-            BinaryContent neoBinaryContent = binaryContentRepository.findById(userId).orElse(new BinaryContent(requestDto_Content.get()));
+        if (dtoBinaryContent != null && dtoBinaryContent.isPresent()) {
+            BinaryContent neoBinaryContent = binaryContentRepository.findById(userId).orElse(new BinaryContent(dtoBinaryContent.get()));
             binaryContentRepository.save(neoBinaryContent);
             //!! 순서 유의_I
             user.updateUser(dto_user.username(), dto_user.password(), dto_user.email(), neoBinaryContent.getId());
