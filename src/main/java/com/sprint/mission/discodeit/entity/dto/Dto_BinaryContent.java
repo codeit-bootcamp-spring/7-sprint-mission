@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.entity.dto;
 import lombok.Builder;
 
 @Builder
-public record Dto_BinaryContent(
+public record Dto_BinaryContent( //all private final
         String fileName,
         String contentType,
         byte[] bytes,

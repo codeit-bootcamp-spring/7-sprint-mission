@@ -39,9 +39,9 @@ public class ReadStatusController {
         return readStatusService.findAllByUserId(userID);
     }
     
-//    @RequestMapping(value = "/delete/{id}", method = DELETE)
-//    public void delete(@PathVariable("id") UUID statusID) {}
+//    @RequestMapping(value = "/delete/{userStatusId}", method = DELETE)
+//    public void delete(@PathVariable("userStatusId") UUID statusID) {}
 //
-//    @RequestMapping(value = "/find/{id}", method = GET)
-//    public Res_ReadStatus find(@PathVariable("id") UUID statusID) {}
+//    @RequestMapping(value = "/find/{userStatusId}", method = GET)
+//    public Res_ReadStatus find(@PathVariable("userStatusId") UUID statusID) {}
 }

@@ -1,13 +1,19 @@
 package com.sprint.mission.discodeit.entity.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 
 @Builder
-// 🚫 편의상 변경. CamelCase 위반 -> 추후 수정 할꺼예용~
-public record Dto_User(
+public record Dto_User( //all private final
+        @NotBlank(message = "Username is mandatory")
         String username,
+        @NotBlank(message = "Password is mandatory")
         String password,
+        @NotBlank(message = "Email is mandatory")
+        @Email(message = "Email is invalid")
+//        @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$", message = "Email is invalid")
         String email
         ) {
     public static Dto_User from(String userName, String password, String eMail) {
@@ -17,16 +23,4 @@ public record Dto_User(
                                 .email(eMail)
                                 .build();
     }
-
-//    public static Dto_User fromUser(User user) {
-//        return Dto_User.builder()
-////                .readStatusID(user.getId())
-////                .createdAt(user.getCreatedAt())
-////                .updatedAt(user.getUpdatedAt())
-//                .username(user.getUserName())
-//                .password(user.getPassword())
-//                .email(user.getEMail())
-//                .profileId(user.getProfileId())
-//                .build();
-//    }
 }

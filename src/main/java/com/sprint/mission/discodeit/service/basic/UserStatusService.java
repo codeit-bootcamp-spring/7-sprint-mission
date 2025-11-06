@@ -67,8 +67,8 @@ public class UserStatusService implements InterfaceUserStatusService {
     public void update(Dto_UserStatus dto) {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //    수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
-        UserStatus userStatus = userStatusRepository.findById(dto.id())
-                .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.update.readStatusID = [" + dto.id() + "] err"));
+        UserStatus userStatus = userStatusRepository.findById(dto.userStatusId())
+                .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.update.readStatusID = [" + dto.userStatusId() + "] err"));
 
 //        boolean online = userStatus.online();
 //        userStatus.setOnlineState(online);

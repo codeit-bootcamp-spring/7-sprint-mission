@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.entity.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 @Builder
-public record Dto_CreateChannelPublic(
+public record Dto_CreateChannelPublic( //all private final
 //        UUID userId,
 //        Instant createdAt,
 //        Instant updatedAt, // 유닉스 타임스탬프
 //        ChannelType channelType,
+        @NotBlank(message = "channelName is mandatory")
         String channelName,
         String description
 ) {

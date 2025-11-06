@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity.dto;
 
 import com.sprint.mission.discodeit.entity.Message;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -9,9 +10,9 @@ import java.util.UUID;
 
 
 @Builder
-// 🚫 편의상 변경. CamelCase 위반 -> 추후 수정 할꺼예용~
-public record Res_Message(
-    UUID id,
+public record Res_Message( //all private final
+    @NotBlank(message = "messageId is mandatory")
+    UUID messageId,
     Instant createdAt,
     Instant updatedAt,
 
@@ -22,7 +23,7 @@ public record Res_Message(
 ) {
     public static Res_Message from(Message message) {
         return Res_Message.builder()
-                .id(message.getId())
+                .messageId(message.getId())
                 .createdAt(message.getCreatedAt())
                 .updatedAt(message.getUpdatedAt())
                 .channelId(message.getChannelId())
