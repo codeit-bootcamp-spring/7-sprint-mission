@@ -32,14 +32,14 @@ public class ChannelController {
     private final ChannelService channelService;
 
     //채널 목록 조회 : 공개방은 전부, 비밀방은 내 기준 참여되어있는 것 기준
-    @RequestMapping(method = RequestMethod.GET, value ="/{userId}/list")
-    public ResponseEntity<List<ChannelInfoRes>> getAllChannels(@PathVariable UUID userId){
+    @RequestMapping(method = RequestMethod.GET, value ="/list")
+    public ResponseEntity<List<ChannelInfoRes>> getAllChannels(@RequestHeader("X-LOGINUSER-ID") UUID userId){
         return ResponseEntity.ok(channelOverViewFacade.findAllMyChannels(userId));
     }
 
     // 공개 채널 생성
     @RequestMapping(method = RequestMethod.POST, value = "/public")
-    public ResponseEntity<Void> createPublicChannel(UUID managerId, @RequestBody ChannelCreateReq req){
+    public ResponseEntity<Void> createPublicChannel(@RequestHeader("X-LOGINUSER-ID") UUID managerId, @RequestBody ChannelCreateReq req){
         Channel channel = channelCreationFacade.createPublicChannel(managerId, req);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -51,7 +51,7 @@ public class ChannelController {
     
     //비밀 채널 생성
     @RequestMapping(method = RequestMethod.POST, value="/private")
-    public ResponseEntity<Void> createPrivateChannel(UUID managerId, @RequestBody ChannelCreateSecReq req){
+    public ResponseEntity<Void> createPrivateChannel(@RequestHeader("X-LOGINUSER-ID") UUID managerId, @RequestBody ChannelCreateSecReq req){
         Channel channel = channelCreationFacade.createPrivateChannel(managerId, req);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
