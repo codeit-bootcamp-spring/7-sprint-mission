@@ -78,7 +78,7 @@ public class BasicUserService implements UserService {
 
 
     // ===== 🔒 Private Logic (내부 사용) =====
-    //중복 검사
+    // 신규 유저 중복 검사
     private void validateDuplicate(String email, String nickname){
         if(userRepository.existsByEmail(email)){
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
@@ -88,6 +88,7 @@ public class BasicUserService implements UserService {
         }
     }
 
+    //기존 유저 회원 정보 수정 시 중복 검사
     private void validateDuplicate(UUID userId, String email, String nickname){
         if(userRepository.existsByEmailAndIdNot(email, userId)){
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
