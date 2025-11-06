@@ -12,10 +12,6 @@ import java.util.UUID;
 @Getter
 public class BinaryContent extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
-    //관련된 유저
-    // private final UUID userId;
-    //  private final  UUID messageId;
-    //하나로 묶는것이 좋지않을까
 
     private final ContentsType contentsType;
     private final byte[] contentByte;
@@ -27,10 +23,4 @@ public class BinaryContent extends Common implements Serializable {
         this.bytes = bytes;
     }
 
- /*   public BinaryContent(ContentsType contentsType, byte[] contentByte) {
-        this.contentsType = contentsType;
-        this.contentByte = contentByte;
-
-    }
-*/
 }

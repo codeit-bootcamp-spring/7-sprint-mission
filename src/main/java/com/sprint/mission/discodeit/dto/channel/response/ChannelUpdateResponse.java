@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.UUID;
 
 public record ChannelUpdateResponse(
-        UUID channelId
-        , String newChannelName
-        ,String newDescription
-       ,String update
+        UUID channelId,
+        String newChannelName,
+        String newDescription,
+        String update
 ) {
     public static ChannelUpdateResponse from(Channel channel) {
         String status = (channel.getType() == ChannelType.PUBLIC)

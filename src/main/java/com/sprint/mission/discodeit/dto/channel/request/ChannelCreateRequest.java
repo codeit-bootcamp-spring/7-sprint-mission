@@ -5,10 +5,10 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import java.util.UUID;
 
 public record ChannelCreateRequest(
-          UUID bose
-        , String chennalName
-        , ChannelType channelType
-        ,String description
+        UUID bose,
+        String chennalName,
+        ChannelType channelType,
+        String description
 ) {
 
 }
