@@ -20,7 +20,7 @@ public class UserStatusController {
     private final UserStatusService userStatusService;
 
     // [온라인 상태 업데이트]
-    @PatchMapping("/update")
+    @RequestMapping(value = "/update", method = RequestMethod.PATCH)
     public UserStatusResponse updateStatus(@RequestBody UserStatustUpdateRequest req) {
         return userStatusService.update(req);
     }
