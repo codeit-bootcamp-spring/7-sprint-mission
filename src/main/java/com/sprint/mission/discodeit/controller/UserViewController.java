@@ -26,12 +26,7 @@ public class UserViewController {
     // binaryContentId로 파일 찾기
     @RequestMapping(value = "/api/binaryContent/find", method = RequestMethod.GET)
     public ResponseEntity<?> searchProfileById(@RequestParam UUID binaryContentId) {
-        BinaryContent content;
-        try {
-            content = binaryContentService.find(binaryContentId);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        BinaryContent content = binaryContentService.find(binaryContentId);
         return ResponseEntity.ok(content);
     }
 }

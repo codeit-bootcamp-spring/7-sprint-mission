@@ -20,22 +20,14 @@ public class ReadStatusController {
     // 특정 채널의 메시지 수신 정보 생성
     @RequestMapping(value = "/readstatus", method = RequestMethod.POST)
     public ResponseEntity<String> createReadStatus(@RequestBody CreateReadStatusRequestDto requestDto) {
-        try {
-            readStatusService.create(requestDto);
-        } catch (Exception e) {
-            return  ResponseEntity.badRequest().body(e.getMessage());
-        }
+        readStatusService.create(requestDto);
         return ResponseEntity.ok().body("Read Status Created");
     }
 
     // 특정 채널의 메시지 수신 정보 수정
     @RequestMapping(value = "/readstatus", method = RequestMethod.PATCH)
     public ResponseEntity<String> createReadStatus(@RequestBody UpdateReadStatusRequestDto requestDto) {
-        try {
-            readStatusService.update(requestDto);
-        } catch (Exception e) {
-            return  ResponseEntity.badRequest().body(e.getMessage());
-        }
+        readStatusService.update(requestDto);
         return ResponseEntity.ok().body("Read Status Updated");
     }
 
@@ -43,7 +35,6 @@ public class ReadStatusController {
     @RequestMapping(value = "/readstatus", method = RequestMethod.GET)
     public ResponseEntity<List<ReadStatus>> search(@RequestParam UUID userId) {
         List<ReadStatus> readStatusList = readStatusService.findAllByUserId(userId);
-
         return ResponseEntity.ok(readStatusList);
     }
 }

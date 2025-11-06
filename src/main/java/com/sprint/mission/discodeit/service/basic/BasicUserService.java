@@ -79,10 +79,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto find(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
         boolean active = userStatusRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new IllegalArgumentException("userstatus가 존재하지 않습니다."))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -91,10 +91,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
         boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalStateException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new IllegalArgumentException("userstatus가 존재하지 않습니다."))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -103,10 +103,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto findByPhoneNum(String phoneNum) {
         User user = userRepository.findByPhone(phoneNum)
-                .orElseThrow(() -> new IllegalStateException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
         boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalStateException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new IllegalArgumentException("userstatus가 존재하지 않습니다."))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -118,7 +118,7 @@ public class BasicUserService implements UserService{
                 .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
         boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalStateException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new IllegalArgumentException("userstatus가 존재하지 않습니다."))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -130,7 +130,7 @@ public class BasicUserService implements UserService{
                 .map(u -> UserResponseDto.from(
                         u,
                         userStatusRepository.findById(u.getId())
-                                .orElseThrow(() -> new IllegalStateException("userstatus가 존재하지 않습니다."))
+                                .orElseThrow(() -> new IllegalArgumentException("userstatus가 존재하지 않습니다."))
                                 .isActiveUser()))
                 .collect(Collectors.toList());
     }
@@ -138,7 +138,7 @@ public class BasicUserService implements UserService{
     @Override
     public String findNickNameById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("유저가 존재하지 않습니다."))
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."))
                 .getNickName();
     }
 

@@ -35,7 +35,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContent find(UUID binaryContentId) {
         return binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new IllegalStateException("이미지 또는 파일이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("이미지 또는 파일이 존재하지 않습니다."));
     }
 
     @Override

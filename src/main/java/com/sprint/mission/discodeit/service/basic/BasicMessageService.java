@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
 
     /**
@@ -37,6 +40,16 @@ public class BasicMessageService implements MessageService {
      */
     @Override
     public void create(CreateMessageRequestDto request, List<MultipartFile> fileList) {
+
+        // 채널에 메시지를 생성하면 채널 존재 여부와 유저가 채널에 속해 있는지 검증
+        if (request.getReceiveType() == ReceiveType.CHANNEL) {
+            Channel channel = channelRepository.findById(request.getReceiverId())
+                    .orElseThrow(() -> new IllegalArgumentException("메시지를 생성할 채널이 존재하지 않습니다."));
+            if (!channel.getMemberIds().contains(request.getSenderId())) {
+                throw new IllegalArgumentException("당신은 해당 채널에 속해 있지 않아 메시지를 생성할 수 없습니다.");
+            }
+        }
+
         Message newMessage = new Message(
                 request.getSenderId(),
                 request.getReceiverId(),
@@ -133,7 +146,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void update(UUID messageId, UpdateMessageRequestDto request) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new IllegalStateException("메시지가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("메시지가 존재하지 않습니다."));
         message.setContent(request.getContent());
         messageRepository.update(message);
     }
@@ -144,7 +157,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(UUID messageId) {
         Message msg = messageRepository.findById(messageId)
-                .orElseThrow(() -> new IllegalStateException("메시지가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("메시지가 존재하지 않습니다."));
         binaryContentRepository.deleteByIds(msg.getAttachmentIds()); // 메시지와 관련된 파일들 삭제
         messageRepository.deleteById(messageId);
     }

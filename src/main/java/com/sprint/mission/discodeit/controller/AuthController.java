@@ -18,12 +18,7 @@ public class AuthController {
 
     @RequestMapping(value ="/login",method = RequestMethod.POST)
     public ResponseEntity<String> login(@RequestBody LoginUserDto loginUserDto){
-        try {
-            authService.login(loginUserDto);
-        } catch (Exception e) {
-            return  ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        authService.login(loginUserDto);
         return ResponseEntity.status(HttpStatus.OK).body("login success");
     }
 }

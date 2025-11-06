@@ -21,12 +21,7 @@ public class ChannelController {
     @RequestMapping(value = "/channels", method = RequestMethod.POST)
     public ResponseEntity<String> createChannel(@RequestParam UUID userId,
                                                 @RequestBody CreateChannelRequestDto requestDto) {
-        try {
-            channelService.create(userId, requestDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        channelService.create(userId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("channel created");
     }
 
@@ -34,12 +29,7 @@ public class ChannelController {
     @RequestMapping(value = "/channels/{channelId}/members", method = RequestMethod.PATCH)
     public ResponseEntity<String> updateChannelMember(@PathVariable UUID channelId,
                                                       @RequestBody UpdateChannelRequestDto requestDto) {
-        try {
-            channelService.addMember(channelId, requestDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        channelService.addMember(channelId, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body("channel member updated");
     }
 
@@ -47,12 +37,7 @@ public class ChannelController {
     @RequestMapping(value = "/channels/{channelId}/admin", method = RequestMethod.PATCH)
     public ResponseEntity<String> updateChannelAdmin(@PathVariable UUID channelId,
                                                      @RequestBody UpdateChannelAdminRequestDto requestDto) {
-        try {
-            channelService.updateAdmin(channelId, requestDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        channelService.updateAdmin(channelId, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body("channel admin updated");
     }
 
@@ -60,12 +45,7 @@ public class ChannelController {
     @RequestMapping(value = "/channels/{channelId}/name", method = RequestMethod.PATCH)
     public ResponseEntity<String> updateChannelName(@PathVariable UUID channelId,
                                                     @RequestBody UpdateChannelNameRequestDto requestDto) {
-        try {
-            channelService.updateName(channelId, requestDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        channelService.updateName(channelId, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body("channel name updated");
     }
 
@@ -73,12 +53,7 @@ public class ChannelController {
     @RequestMapping(value = "/channels/{channelId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteChannel(@PathVariable UUID channelId,
                                                 @RequestBody DeleteChannelRequestDto requestDto) {
-        try {
-            channelService.delete(channelId, requestDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        channelService.delete(channelId, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body("channel deleted");
     }
 

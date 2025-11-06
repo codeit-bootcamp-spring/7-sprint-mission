@@ -24,30 +24,16 @@ public class BinaryContentController {
     // 유저 프로필 이미지 조회
     @RequestMapping(value = "/binarycontent/profile", method = RequestMethod.GET)
     public ResponseEntity<?> searchProfile(@RequestParam UUID userId) {
-        BinaryContent content;
-
-        try {
-            UserResponseDto user = userService.find(userId);
-            content = binaryContentService.find(user.getProfileId());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        UserResponseDto user = userService.find(userId);
+        BinaryContent content = binaryContentService.find(user.getProfileId());
         return ResponseEntity.ok(content);
     }
 
     // 메시지 파일 조회
     @RequestMapping(value = "/binarycontent/file", method = RequestMethod.GET)
     public ResponseEntity<?> searchFile(@RequestParam UUID messageId) {
-        List<BinaryContent> content;
-
-        try {
-            Message message = messageService.find(messageId);
-            content = binaryContentService.findAllByIdIn(message.getAttachmentIds());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        Message message = messageService.find(messageId);
+        List<BinaryContent> content = binaryContentService.findAllByIdIn(message.getAttachmentIds());
         return ResponseEntity.ok(content);
     }
 }

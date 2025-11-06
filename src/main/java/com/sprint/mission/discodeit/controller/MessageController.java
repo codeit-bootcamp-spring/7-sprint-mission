@@ -22,12 +22,7 @@ public class MessageController {
     @RequestMapping(value = "/messages", method = RequestMethod.POST)
     public ResponseEntity<String> createMessage(@RequestPart("request") CreateMessageRequestDto requestDto,
                                                  @RequestPart(value = "file", required = false) List<MultipartFile> file) {
-        try {
-            messageService.create(requestDto, file);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        messageService.create(requestDto, file);
         return ResponseEntity.ok().body("message created");
     }
 
@@ -35,24 +30,14 @@ public class MessageController {
     @RequestMapping(value = "/messages/{messageId}", method = RequestMethod.PATCH)
     public ResponseEntity<String> updateMessage(@PathVariable UUID messageId,
                                                 @RequestBody UpdateMessageRequestDto requestDto) {
-        try {
-            messageService.update(messageId, requestDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        messageService.update(messageId, requestDto);
         return ResponseEntity.ok().body("message updated");
     }
 
     // 메시지 삭제
     @RequestMapping(value = "/messages/{messageId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteMessage(@PathVariable UUID messageId) {
-        try {
-            messageService.delete(messageId);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        messageService.delete(messageId);
         return ResponseEntity.ok().body("message deleted");
     }
 

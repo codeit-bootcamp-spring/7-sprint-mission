@@ -41,7 +41,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus find(UUID readStatusId) {
         return readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new IllegalStateException("readstatus를 저장할 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("readstatus를 저장할 유저가 존재하지 않습니다."));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public void update(UpdateReadStatusRequestDto request) {
         ReadStatus rs = readStatusRepository.findByUserIdAndChannelId(request.getUserId(),request.getChannelId())
-                .orElseThrow(() -> new IllegalStateException("readstatus를 저장할 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("readstatus를 저장할 유저가 존재하지 않습니다."));
         rs.setUpdatedAt(); // 유저가 채널 메시지를 읽을 경우 읽은 시간 변경
         readStatusRepository.update(rs);
     }

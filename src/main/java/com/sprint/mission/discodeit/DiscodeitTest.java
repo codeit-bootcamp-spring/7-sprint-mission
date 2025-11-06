@@ -45,7 +45,7 @@ public class DiscodeitTest {
                           UserStatusRepository userStatusRepository, BinaryContentRepository binaryContentRepository, ReadStatusRepository readStatusRepository) {
         userService = new BasicUserService(userRepository, messageRepository, userStatusRepository, binaryContentRepository);
         channelService = new BasicChannelService(userRepository, channelRepository, messageRepository, readStatusRepository);
-        messageService = new BasicMessageService(messageRepository, binaryContentRepository);
+        messageService = new BasicMessageService(messageRepository, channelRepository, binaryContentRepository);
         authService = new BasicAuthService(userRepository, userStatusRepository);
 
         //테스트를 위한 유저, 채널, 메시지 데이터 생성

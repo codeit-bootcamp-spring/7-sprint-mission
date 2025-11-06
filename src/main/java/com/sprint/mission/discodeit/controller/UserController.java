@@ -26,16 +26,8 @@ public class UserController {
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@RequestPart("request") CreateUserRequestDto requestDto,
                                         @RequestPart(value = "file", required = false) MultipartFile file) {
-        UserResponseDto newUser;
-        try {
-            newUser = userService.create(requestDto, file);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(newUser);
+        UserResponseDto newUser = userService.create(requestDto, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
     // 사용자 정보 수정
@@ -43,24 +35,14 @@ public class UserController {
     public ResponseEntity<String> updateUser(@PathVariable UUID userId,
                                              @RequestPart(name = "request", required = false) UpdateUserRequestDto requestDto,
                                              @RequestPart(name = "file", required = false) MultipartFile file) {
-
-        try {
-            userService.update(userId, requestDto, file);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
+        userService.update(userId, requestDto, file);
         return ResponseEntity.ok().body("User Updated Successfully");
     }
 
     // 사용자 삭제
     @RequestMapping(value = "/users/{userId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteUser(@PathVariable UUID userId) {
-        try {
-            userService.delete(userId);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userService.delete(userId);
         return ResponseEntity.ok().body("User Deleted Successfully");
     }
 
@@ -73,11 +55,7 @@ public class UserController {
     // 사용자 온라인 업데이트
     @RequestMapping(value = "/users/{userId}/online", method = RequestMethod.POST)
     public ResponseEntity<String> onlineUser(@PathVariable UUID userId) {
-        try {
-            userStatusService.updateByUserId(userId);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        userStatusService.updateByUserId(userId);
         return ResponseEntity.ok().body("User Online Successfully");
     }
 }
