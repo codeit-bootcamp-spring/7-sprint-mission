@@ -7,5 +7,5 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @AllArgsConstructor
 public class CreateBinaryContentRequestDto {
-    private MultipartFile file;
+    private final MultipartFile file;
 }

@@ -14,12 +14,12 @@ import java.util.UUID;
 @SuperBuilder
 @ToString
 public class ChannelResponseDto {
-    private UUID id;
-    private String channelName;
-    private ChannelType channelType;
-    private ChannelVisibility visibility;
-    private UUID adminId;
-    private Instant lastedMessageAt;
+    private final UUID id;
+    private final String channelName;
+    private final ChannelType channelType;
+    private final ChannelVisibility visibility;
+    private final UUID adminId;
+    private final Instant lastedMessageAt;
 
     public static ChannelResponseDto from(Channel channel, Instant lastedMessageAt) {
         return ChannelResponseDto.builder()

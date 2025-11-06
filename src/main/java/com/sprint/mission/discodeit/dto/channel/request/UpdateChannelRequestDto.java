@@ -8,5 +8,5 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class UpdateChannelRequestDto {
-    UUID userId;
+    private final UUID userId;
 }

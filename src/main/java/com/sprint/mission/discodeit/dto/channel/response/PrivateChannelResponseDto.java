@@ -13,7 +13,7 @@ import java.util.UUID;
 @SuperBuilder
 @ToString
 public class PrivateChannelResponseDto extends ChannelResponseDto {
-    private List<UUID> memberIds;
+    private final List<UUID> memberIds;
 
     public static PrivateChannelResponseDto from(Channel channel, Instant lastedMessageAt) {
         return PrivateChannelResponseDto.builder()

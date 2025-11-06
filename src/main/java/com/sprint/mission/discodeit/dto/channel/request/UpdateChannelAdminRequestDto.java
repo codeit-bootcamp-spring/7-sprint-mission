@@ -8,6 +8,6 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class UpdateChannelAdminRequestDto {
-    UUID adminId;
-    UUID newAdminId;
+    private final UUID adminId;
+    private final UUID newAdminId;
 }

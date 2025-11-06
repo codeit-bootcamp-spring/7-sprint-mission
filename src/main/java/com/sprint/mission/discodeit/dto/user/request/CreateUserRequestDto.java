@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CreateUserRequestDto {
-    private String userName;
-    private String nickName;
-    private String email;
-    private String phoneNum;
-    private String loginId;
-    private String password;
+    private final String userName;
+    private final String nickName;
+    private final String email;
+    private final String phoneNum;
+    private final String loginId;
+    private final String password;
 }
