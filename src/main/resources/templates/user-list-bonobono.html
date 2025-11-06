@@ -191,7 +191,7 @@
             return `data:${profile.binaryContentUsage};base64,${profile.binaryFile}`;
         } catch (error) {
             console.error(error);
-            return '/default-avatar.png';
+            return '/image/보노보노_PNG.png';
         }
     }
 
@@ -211,7 +211,7 @@
         container.innerHTML = '';
 
         for (const user of users) {
-            const profileUrl = user.profileId ? await fetchUserProfile(user.profileId) : '/default-avatar.png';
+            const profileUrl = user.profileId ? await fetchUserProfile(user.profileId) : '/image/보노보노_PNG.png';
             const card = document.createElement('div');
             card.className = 'user-item';
             card.innerHTML = `
