@@ -33,7 +33,7 @@ async function fetchUserProfile(profileId) {
         return `data:${profile.binaryContentUsage};base64,${profile.binaryFile}`;
     } catch (error) {
         console.error('Error fetching profile:', error);
-        return '/default-avatar.png'; // Fallback to default avatar
+        return '/image/보노보노_PNG.png'; // Fallback to default avatar
     }
 }
 
@@ -49,7 +49,7 @@ async function renderUserList(users) {
         // Get profile image URL
         const profileUrl = user.profileId ?
             await fetchUserProfile(user.profileId) :
-            '/default-avatar.png';
+            '/image/보노보노_PNG.png';
 
         userElement.innerHTML = `
             <img src="${profileUrl}" alt="${user.username}" class="user-avatar">
