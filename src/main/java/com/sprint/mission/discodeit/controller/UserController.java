@@ -35,7 +35,8 @@ public class UserController {
 
 
     // [등록]
-    @PostMapping(value = "/create")
+
+    @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserCreateResponse> create(
             @RequestPart("user") UserCreateRequest request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
@@ -63,7 +64,8 @@ public class UserController {
 
 
 // [수정]
-    @PostMapping(value = "/update")
+
+    @RequestMapping(value = "/update", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserUpdateResponse> update(
             @RequestPart("user") UserUpdateRequest request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
@@ -84,13 +86,15 @@ public class UserController {
     }
 
     // [삭제]
-    @PostMapping("/delete")
+
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public void delete(@RequestBody UserDeleteRequest req) { userService.delete(req.userId()); }
 
 
 
     // [전체 조회]
-    @GetMapping("/findAll")
+
+    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> findAll() {
 
        return ResponseEntity.ok(userService.findAll());
