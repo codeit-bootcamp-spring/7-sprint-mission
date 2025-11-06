@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.readStatus.request.CreateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.request.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.global.util.exception.CustomException;
+import com.sprint.mission.discodeit.global.util.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -12,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -25,16 +26,16 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusResponseDto createReadStatus(CreateReadStatusDto createReadStatusDto) {
         if (!userRepository.existsById(createReadStatusDto.userId())) {
-            throw new NoSuchElementException("존재하지 않는 유저입니다. " + createReadStatusDto.userId());
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
         if (!channelRepository.existsById(createReadStatusDto.channelId())) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다. " + createReadStatusDto.channelId());
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
 
         if (readStatusRepository.findAllByUserId(createReadStatusDto.userId())
                 .stream().anyMatch(readStatus -> readStatus.getChannelId().equals(createReadStatusDto.channelId()))) {
-            throw new NoSuchElementException("존재하는 ReadStatus입니다. + " + createReadStatusDto.userId() + " " + createReadStatusDto.channelId());
+            throw new CustomException(ErrorCode.READ_STATUS_ALREADY_EXIST);
         }
 
         ReadStatus readStatus = new ReadStatus(createReadStatusDto.userId(), createReadStatusDto.channelId(), createReadStatusDto.lastReadAt());
@@ -46,7 +47,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusResponseDto getReadStatus(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 ReadStatus입니다." + readStatusId));
+                .orElseThrow(() -> new CustomException(ErrorCode.READ_STATUS_NOT_FOUND));
 
         return ReadStatusResponseDto.from(readStatus);
     }
@@ -61,7 +62,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusResponseDto updateReadStatus(UUID readStatusId, UpdateReadStatusDto updateReadStatusDto) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 ReadStatus입니다." + readStatusId));
+                .orElseThrow(() -> new CustomException(ErrorCode.READ_STATUS_NOT_FOUND));
         readStatus.update(updateReadStatusDto.lastReadAt());
 
         return ReadStatusResponseDto.from(readStatus);
@@ -70,7 +71,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public void deleteReadStatus(UUID readStatusId) {
         if(!userRepository.existsById(readStatusId)) {
-            throw new NoSuchElementException("삭제할 readStatus를 찾을 수 없습니다: " + readStatusId);
+            throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
         }
         readStatusRepository.deleteById(readStatusId);
     }

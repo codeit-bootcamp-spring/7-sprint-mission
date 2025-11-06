@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.enums.ChannelType;
+import com.sprint.mission.discodeit.global.util.exception.CustomException;
+import com.sprint.mission.discodeit.global.util.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -20,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -48,7 +49,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponseDto createChannel(CreatePrivateChannelDto createPrivateChannelDto) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         createPrivateChannelDto.participantsIds().forEach(userId -> {
-            User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저입니다." + userId));
+            User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             ReadStatus readStatus = new ReadStatus(userId, channel.getId(), Instant.now());
             channel.addParticipant(user);
             user.joinChannel(channel);
@@ -63,13 +64,13 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelResponseDto getChannel(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다." + channelId));
+                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
         Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
                 .sorted(Comparator.comparing(Message::getCreateAt).reversed())
                 .map(Message::getCreateAt)
                 .findFirst()
-                .orElse(null);
+                .orElse(Instant.MIN);
 
         return ChannelResponseDto.from(channel, lastMessageAt);
     }
@@ -88,7 +89,7 @@ public class BasicChannelService implements ChannelService {
                     Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
                             .map(Message::getCreateAt)
                             .max(Comparator.naturalOrder())
-                            .orElse(null);
+                            .orElse(Instant.MIN);
 
                     return ChannelResponseDto.from(channel, lastMessageAt);
                 })
@@ -98,17 +99,17 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelResponseDto updateChannel(UUID channelId, UpdateChannelDto updateChannelDto) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다." + channelId));
+                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
         if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
-            throw new IllegalArgumentException("Private Channel은 수정할 수 없습니다." + channel.getId());
+            throw new CustomException(ErrorCode.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED);
         }
 
 
         Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
                 .map(Message::getCreateAt)
                 .max(Comparator.naturalOrder())
-                .orElse(null);
+                .orElse(Instant.MIN);
 
 
         channel.updateChannel(channel.getChannelType(), updateChannelDto.channelName(), updateChannelDto.desc());
@@ -119,7 +120,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 채널입니다." + channelId));
+                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
         // 채널 삭제되면, 유저가 해당 채널에서 이탈
         userRepository.findAll().forEach(user -> user.leaveChannel(channel));

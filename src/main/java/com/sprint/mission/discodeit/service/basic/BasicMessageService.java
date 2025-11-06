@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.global.util.exception.CustomException;
+import com.sprint.mission.discodeit.global.util.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -17,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -31,9 +32,9 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageResponseDto createMessage(CreateMessageDto createMessageDto) {
         User user = userRepository.findById(createMessageDto.userId())
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저입니다." + createMessageDto.userId()));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Channel channel = channelRepository.findById(createMessageDto.channelId())
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 채널입니다." + createMessageDto.channelId()));
+                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
         List<UUID> binaryContentIds;
         if (createMessageDto.createBinaryContentDtos() == null) {
@@ -63,7 +64,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageResponseDto getMessage(UUID messageId) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 메시지: " + messageId));
+                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
 
         return MessageResponseDto.from(message);
     }
@@ -85,7 +86,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageResponseDto updateMessage(UUID messageId, UpdateMessageDto updateMessageDto) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다: " + messageId));
+                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
         message.messageUpdate(updateMessageDto.content());
         messageRepository.save(message);
 
@@ -95,7 +96,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void deleteMessage(UUID messageId) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("삭제할 메시지를 찾을 수 없습니다: " + messageId));
+                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
         message.getAttachmentIds().
                 forEach(binaryContentRepository::deleteById);
 

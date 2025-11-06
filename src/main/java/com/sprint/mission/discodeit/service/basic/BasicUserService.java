@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.global.util.exception.CustomException;
+import com.sprint.mission.discodeit.global.util.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -33,10 +35,10 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponseDto createUser(CreateUserDto createUserDto) {
         if (userRepository.findByUsername(createUserDto.username()).isPresent()) {
-            throw new IllegalArgumentException("이미 등록된 유저입니다." + createUserDto.username());
+            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXIST);
         }
         if (userRepository.findByEmail(createUserDto.email()).isPresent()) {
-            throw new IllegalArgumentException("이미 등록된 이메일입니다." + createUserDto.username());
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXIST);
         }
 
         UUID profileId = null;
@@ -67,7 +69,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponseDto getUser(UUID userId) { // 단건 검색
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + userId));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + userId));
