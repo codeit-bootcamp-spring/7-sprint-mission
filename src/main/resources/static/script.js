@@ -1,7 +1,7 @@
 // API endpoint
 const API_BASE_URL = '/api';
 const ENDPOINTS = {
-    USERS: `${API_BASE_URL}/user/list`
+    USERS: `${API_BASE_URL}/users/list`
 };
 
 // Initialize when DOM is ready

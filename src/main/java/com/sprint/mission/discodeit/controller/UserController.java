@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserCreationFacade userCreationFacade;

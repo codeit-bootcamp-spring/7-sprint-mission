@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/channel")
+@RequestMapping("/api/channels")
 @RequiredArgsConstructor
 public class ChannelController {
     private final ChannelCreationFacade channelCreationFacade;

@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/message")
+@RequestMapping("/api/messages")
 @RequiredArgsConstructor
 public class MessageController {
     private final MessageCreationFacade messageCreationFacade;

@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/read-status")
+@RequestMapping("/api/read-statuses")
 @RequiredArgsConstructor
 public class ReadStatusController {
     private final ReadStatusCreateFacade readStatusCreateFacade;

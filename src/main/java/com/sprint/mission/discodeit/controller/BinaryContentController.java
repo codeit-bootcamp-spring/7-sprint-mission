@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/binary-content")
+@RequestMapping("/api/binary-contents")
 @RequiredArgsConstructor
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
