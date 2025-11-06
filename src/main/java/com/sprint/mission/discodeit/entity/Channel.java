@@ -25,6 +25,14 @@ public class Channel extends BasicEntity{
         this.members = new ArrayList<>();
     }
 
+    public Channel(String channelName, String description, ChannelType type, List<UUID> members) {
+        super();
+        this.channelName = channelName;
+        this.description = description;
+        this.type = type;
+        this.members = new ArrayList<>(members);
+    }
+
     public void updateInfo(String channelName, String description, ChannelType type) {
         this.channelName = channelName;
         this.description = description;

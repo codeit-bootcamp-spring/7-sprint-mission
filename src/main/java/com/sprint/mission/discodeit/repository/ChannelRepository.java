@@ -12,4 +12,5 @@ public interface ChannelRepository extends Repository<Channel, UUID> {
 
 
     Optional<Channel> findByName(String channelName);
+    List<Channel> findChannelsByUserId(UUID userId);
 }

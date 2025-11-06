@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.enum_.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.File;
@@ -25,5 +26,13 @@ public class FileChannelRepository extends AbstractFileRepository<Channel, UUID>
         return findAll().stream()
                 .filter(channel -> channel.getChannelName().equals(channelName))
                 .findFirst();
+    }
+    @Override
+    public List<Channel> findChannelsByUserId(UUID userId) {
+        return findAll().stream()
+                .filter(channel ->
+                        channel.getType() == ChannelType.PUBLIC ||
+                                (channel.getType() == ChannelType.PRIVATE && channel.getMembers().contains(userId)))
+                .toList();
     }
 }
