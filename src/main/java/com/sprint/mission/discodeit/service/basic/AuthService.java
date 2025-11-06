@@ -24,7 +24,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final UserStatusRepository userstatusRepository;
-   // public AuthService(UserRepository userRepository) {this.userRepository = userRepository;}
+
 
     public User login(LoginRequest loginRequest) {
         //이메일매칭
@@ -39,6 +39,7 @@ public class AuthService {
         UserStatus userStatus = userstatusRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NoSuchElementException("맞는유저ID가 없어"));
 
+        //로그인하면 상태는 최신화 아닐까 생각해서 넣어봤다
         userstatusRepository.save(userStatus.getUserId());
         LoginResponse.from(user,userStatus.isOnline());
         return user;

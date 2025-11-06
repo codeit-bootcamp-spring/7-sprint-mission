@@ -32,7 +32,7 @@ import java.util.UUID;
 public class UserController {
 
      private final UserService userService;
-     private final UserStatusService userStatusService;
+
 
     // [등록]
     @PostMapping(value = "/create")
@@ -64,8 +64,8 @@ public class UserController {
 
 // [수정]
     @PostMapping(value = "/update")
-    public UserUpdateResponse update(
-            @RequestBody UserUpdateRequest request,
+    public ResponseEntity<UserUpdateResponse> update(
+            @RequestPart("user") UserUpdateRequest request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
 
@@ -79,7 +79,8 @@ public class UserController {
             );
         }
 
-        return userService.update(request, optionalProfile);
+        UserUpdateResponse update = userService.update(request, optionalProfile);
+        return   ResponseEntity.ok(update);
     }
 
     // [삭제]
@@ -97,10 +98,5 @@ public class UserController {
 
 
 
-    // [온라인 상태 업데이트]
-    @PatchMapping("/userStatus")
-    public UserStatusResponse updateStatus(@RequestBody UserStatustUpdateRequest req) {
-        return userStatusService.update(req);
-    }
 
 }

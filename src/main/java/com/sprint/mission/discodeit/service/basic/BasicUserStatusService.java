@@ -62,6 +62,8 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = userStatusRepository.findByUserId(request.userId()).stream().findFirst()
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + request.userId()));
         userStatus.setUpdatedAt(Instant.now());
+        userStatusRepository.deleteByUserId(userStatus.getUserId());
+         userStatusRepository.save(userStatus.getUserId());
         return UserStatusResponse.from(userStatus);
     }
 
@@ -70,6 +72,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus byUserId = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
         byUserId.setUpdatedAt(Instant.now());
+        userStatusRepository.save(byUserId.getUserId());
         return UserStatusResponse.from(byUserId);
     }
 
