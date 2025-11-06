@@ -67,7 +67,15 @@ public class UserController {
 
     // 회원 수정
     @RequestMapping(method = RequestMethod.PUT, value="/{userId}")
-    public ResponseEntity<Void> updateUser(@PathVariable UUID userId, @Valid @RequestBody UserUpdateReq req){
+    public ResponseEntity<Void> updateUser(
+            @PathVariable UUID userId,
+            @Valid @RequestPart("user") UserInfoReq userInfoReq,
+            @RequestPart("profile") MultipartFile profileFile) throws IOException {
+
+        log.info("회원 정보 수정 요청: nickname={}, email={}", userInfoReq.nickname(), userInfoReq.email());
+        
+        BinaryContentCreateReq binaryContentCreateReq = BinaryContentCreateReq.from(profileFile);
+        UserUpdateReq req = UserUpdateReq.from(userInfoReq, binaryContentCreateReq);
         userUpdateFacade.updateUser(userId, req);
         return ResponseEntity.noContent().build();
     }
