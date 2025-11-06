@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusSimpleView
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.facade.user.*;
 import com.sprint.mission.discodeit.facade.userstatus.UserStatusUpdateFacade;
+import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class UserController {
     private final UserUpdateFacade userUpdateFacade;
     private final UserDeletionFacade userDeletionFacade;
     private final UserStatusUpdateFacade userStatusUpdateFacade;
+    private final UserService userService;
 
     //사용자 목록 조회
     @RequestMapping(method = RequestMethod.GET, value="/list")
@@ -83,7 +85,8 @@ public class UserController {
     // 회원 삭제
     @RequestMapping(method = RequestMethod.DELETE, value = "/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId){
-        log.info("유저 탈퇴: {}", userId.toString());
+        User user = userService.findById(userId);
+        log.info("유저 탈퇴: user.nickname = {}, user.email = {} ", user.getNickname(), user.getEmail());
 
         userDeletionFacade.deleteUser(userId);
         return ResponseEntity.noContent().build();
