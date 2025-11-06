@@ -22,7 +22,7 @@ public class BasicUserService implements UserService {
     //유저 추가
     @Override
     public User create(User user){
-        validateDuplicate(user.getId(), user.getEmail(), user.getNickname());
+        validateDuplicate(user.getEmail(), user.getNickname());
         return userRepository.save(user);
     }
 
@@ -79,14 +79,20 @@ public class BasicUserService implements UserService {
 
     // ===== 🔒 Private Logic (내부 사용) =====
     //중복 검사
-    private void validateDuplicate(UUID userId, String email, String nickname){
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
-        if(!user.getEmail().equals(email) && userRepository.existsByEmail(email)){
+    private void validateDuplicate(String email, String nickname){
+        if(userRepository.existsByEmail(email)){
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
-        if(!user.getNickname().equals(nickname) && userRepository.existsByNickname(nickname)){
+        if(userRepository.existsByNickname(nickname)){
+            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
+        }
+    }
+
+    private void validateDuplicate(UUID userId, String email, String nickname){
+        if(userRepository.existsByEmailAndIdNot(email, userId)){
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+        if(userRepository.existsByNicknameAndIdNot(nickname, userId)){
             throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         }
     }

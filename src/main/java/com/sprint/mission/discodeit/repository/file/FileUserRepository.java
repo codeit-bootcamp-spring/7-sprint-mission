@@ -88,4 +88,19 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
     public boolean existsById(UUID id) {
         return fileExistsById(id);
     }
+
+    @Override
+    public boolean existsByEmailAndIdNot(String email, UUID id) {
+        return findAllFiles().stream().anyMatch(
+                user -> user.getEmail().equals(email) &&
+                        !user.getId().equals(id));
+    }
+
+    @Override
+    public boolean existsByNicknameAndIdNot(String nickname, UUID id) {
+        return findAllFiles().stream().anyMatch(
+                user -> user.getNickname().equals(nickname) &&
+                        !user.getId().equals(id)
+        );
+    }
 }
