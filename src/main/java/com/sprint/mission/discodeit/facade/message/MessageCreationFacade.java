@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.facade.message;
 
 import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
-import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;

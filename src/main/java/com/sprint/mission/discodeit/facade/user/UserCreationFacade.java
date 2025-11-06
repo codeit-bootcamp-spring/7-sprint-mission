@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.facade.userstatus.UserStatusCreateFacade;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.factory.UserFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;

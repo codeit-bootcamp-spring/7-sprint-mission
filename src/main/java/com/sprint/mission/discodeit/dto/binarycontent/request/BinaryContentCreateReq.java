@@ -12,7 +12,7 @@ public record BinaryContentCreateReq(
         String fileType
 ){
     public static BinaryContentCreateReq from(MultipartFile file){
-        if(file.isEmpty()) throw  new CustomException(ErrorCode.INVALID_FILE_REQUEST);
+        if(file.isEmpty()) throw new CustomException(ErrorCode.INVALID_FILE_REQUEST);
         try {
             return new BinaryContentCreateReq(
                     file.getBytes(),
