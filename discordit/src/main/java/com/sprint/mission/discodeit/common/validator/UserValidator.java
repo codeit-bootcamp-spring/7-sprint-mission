@@ -1,25 +1,12 @@
-package com.sprint.mission.discodeit.validator;
+package com.sprint.mission.discodeit.common.validator;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import static com.sprint.mission.discodeit.common.config.ValidationProperties.*;
+
 @Component
 public class UserValidator {
-
-    @Value("${validation.user.id.min-length}")
-    private static int ID_MIN_LENGTH;
-    @Value("${validation.user.id.max-length}")
-    private static int ID_MAX_LENGTH;
-    @Value("${validation.user.password.min-length}")
-    private static int PASSWD_MIN_LENGTH;
-    @Value("${validation.user.password.max-length}")
-    private static int PASSWD_MAX_LENGTH;
-    @Value("${validation.user.display-name.min-length}")
-    private static int DISPLAY_NAME_MIN_LENGTH;
-    @Value("${validation.user.display-name.max-length}")
-    private static int DISPLAY_NAME_MAX_LENGTH;
-    @Value("${validation.user.email-regex}")
-    private static String EMAIL_REGEX;
 
     public static void validateEmail(String email) {
         if (email == null || email.isBlank()) {

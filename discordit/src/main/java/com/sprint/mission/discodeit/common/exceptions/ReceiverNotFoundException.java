@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.exceptions;
+package com.sprint.mission.discodeit.common.exceptions;
 
 import jakarta.validation.constraints.NotNull;
 
