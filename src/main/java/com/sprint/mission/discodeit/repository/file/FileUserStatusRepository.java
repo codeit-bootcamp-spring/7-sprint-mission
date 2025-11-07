@@ -9,11 +9,15 @@ import java.util.UUID;
 
 public class FileUserStatusRepository extends AbstractFileRepository<UserStatus, UUID> implements UserStatusRepository {
 
-    private static final String FILE_PATH = "data" + File.separator + "userStatus.ser";
+    private final String filePath;
+
+    public FileUserStatusRepository(String fileDirectory) {
+        this.filePath = fileDirectory + File.separator + "userStatus.ser";
+    }
 
     @Override
     protected String getFilePath() {
-        return FILE_PATH;
+        return filePath;
     }
 
     @Override

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Repository
 public class JCFReadStatusRepository implements ReadStatusRepository {
 
     private final Map<UUID, ReadStatus> readStatuses = new ConcurrentHashMap<>();

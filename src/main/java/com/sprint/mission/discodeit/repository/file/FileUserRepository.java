@@ -8,11 +8,14 @@ import java.util.*;
 
 public class FileUserRepository extends AbstractFileRepository<User, UUID> implements UserRepository {
 
-    private static final String FILE_PATH = "data" + File.separator + "users.ser";
+    private final String filePath;
 
+    public FileUserRepository(String fileDirectory) {
+        this.filePath = fileDirectory + File.separator + "users.ser";
+    }
     @Override
     protected String getFilePath() {
-        return FILE_PATH;
+        return filePath;
     }
 
     @Override

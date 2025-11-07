@@ -9,11 +9,16 @@ import java.util.*;
 
 public class FileChannelRepository extends AbstractFileRepository<Channel, UUID> implements ChannelRepository {
 
-    private static final String FILE_PATH = "data" + File.separator + "channels.ser";
+
+    private final String filePath;
+
+    public FileChannelRepository(String fileDirectory) {
+        this.filePath = fileDirectory + File.separator + "channels.ser";
+    }
 
     @Override
     protected String getFilePath() {
-        return FILE_PATH;
+        return filePath;
     }
 
     @Override

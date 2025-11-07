@@ -11,11 +11,16 @@ import java.util.UUID;
 
 public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus, UUID> implements ReadStatusRepository {
 
-    private static final String FILE_PATH = "data" + File.separator + "readStatus.ser";
+    private final String filePath;
+
+
+    public FileReadStatusRepository(String fileDirectory) {
+        this.filePath = fileDirectory + File.separator + "readStatus.ser";
+    }
 
     @Override
     protected String getFilePath() {
-        return FILE_PATH;
+        return filePath;
     }
 
     @Override

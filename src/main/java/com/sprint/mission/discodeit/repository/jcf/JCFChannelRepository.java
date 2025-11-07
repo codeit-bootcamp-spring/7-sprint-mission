@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Repository
 public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> channels = new ConcurrentHashMap<>();
