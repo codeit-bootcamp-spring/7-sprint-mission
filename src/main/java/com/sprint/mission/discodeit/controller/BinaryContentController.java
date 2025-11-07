@@ -27,6 +27,8 @@ public class BinaryContentController {
         BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
         ByteArrayResource resource = new ByteArrayResource(binaryContent.getData());
 
+        log.info("파일 다운로드: {}", binaryContentId);
+
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(binaryContent.getFileType()))
                 .header("Content-Disposition", "attachment; filename=\""

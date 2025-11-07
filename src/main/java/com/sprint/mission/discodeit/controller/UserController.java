@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.common.response.ApiResponse;
 import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreateReq;
 import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
 import com.sprint.mission.discodeit.dto.user.request.UserInfoReq;
@@ -38,19 +39,19 @@ public class UserController {
 
     //사용자 목록 조회
     @RequestMapping(method = RequestMethod.GET, value="/list")
-    public ResponseEntity<List<UserSimpleInfoRes>> getAllUsers(){
-        return ResponseEntity.ok(userOverviewFacade.findAll());
+    public ResponseEntity<ApiResponse<List<UserSimpleInfoRes>>> getAllUsers(){
+        return ResponseEntity.ok(ApiResponse.success(userOverviewFacade.findAll()));
     }
 
     //사용자 단일 조회
     @RequestMapping(method = RequestMethod.GET, value = "/{userId}")
-    public ResponseEntity<UserDetailInfoRes> getUserByNickname(@PathVariable UUID userId){
-        return ResponseEntity.ok(userDetailViewFacade.findById(userId));
+    public ResponseEntity<ApiResponse<UserDetailInfoRes>> getUserByNickname(@PathVariable UUID userId){
+        return ResponseEntity.ok(ApiResponse.success(userDetailViewFacade.findById(userId)));
     }
 
     //회원 등록
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Void> createUser(
+    public ResponseEntity<ApiResponse<Void>> createUser(
             @Valid @RequestPart("userInfoReq") UserInfoReq userInfoReq,
             @RequestPart(value = "profile", required = false) MultipartFile profileFile){
 
@@ -63,12 +64,12 @@ public class UserController {
                 .path("/{id}")
                 .buildAndExpand(user.getId())
                 .toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(ApiResponse.success());
     }
 
     // 회원 수정
     @RequestMapping(method = RequestMethod.PUT, value="/{userId}")
-    public ResponseEntity<Void> updateUser(
+    public ResponseEntity<ApiResponse<Void>> updateUser(
             @PathVariable UUID userId,
             @Valid @RequestPart("userInfoReq") UserInfoReq userInfoReq,
             @RequestPart(value = "profile", required = false) MultipartFile profileFile){
@@ -78,22 +79,22 @@ public class UserController {
         BinaryContentCreateReq binaryContentCreateReq = BinaryContentCreateReq.from(profileFile);
         UserUpdateReq req = UserUpdateReq.from(userInfoReq, binaryContentCreateReq);
         userUpdateFacade.updateUser(userId, req);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     // 회원 삭제
     @RequestMapping(method = RequestMethod.DELETE, value = "/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId){
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable UUID userId){
         User user = userService.findById(userId);
         log.info("유저 탈퇴: user.nickname = {}, user.email = {} ", user.getNickname(), user.getEmail());
 
         userDeletionFacade.deleteUser(userId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     // 유저 온라인 상태 업그레이드
     @RequestMapping(method = RequestMethod.PATCH, value = "/{userId}/status")
-    public ResponseEntity<UserStatusSimpleViewRes> updateUserStatus(@PathVariable UUID userId){
-        return ResponseEntity.ok(userStatusUpdateFacade.update(userId));
+    public ResponseEntity<ApiResponse<UserStatusSimpleViewRes>> updateUserStatus(@PathVariable UUID userId){
+        return ResponseEntity.ok(ApiResponse.success(userStatusUpdateFacade.update(userId)));
     }
 }

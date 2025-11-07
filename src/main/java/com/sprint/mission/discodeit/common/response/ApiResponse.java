@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ApiResponse <T>{
+public class ApiResponse<T>{
     //Fields
     private final String code;
     private final String message;

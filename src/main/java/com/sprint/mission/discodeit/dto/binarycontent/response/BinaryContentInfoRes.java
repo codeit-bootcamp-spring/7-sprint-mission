@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.util.DateTimeUtil;
 import java.util.UUID;
 
 public record BinaryContentInfoRes(
-        UUID BinaryContentId,
+        UUID binaryContentId,
         byte[] data,
         String fileName,
         String fileType,
