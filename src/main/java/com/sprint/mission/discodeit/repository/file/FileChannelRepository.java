@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
@@ -8,8 +9,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileChannelRepository extends BaseFileRepository<Channel> implements ChannelRepository {
-    public FileChannelRepository() {
-        super(Channel.class);
+    public FileChannelRepository(RepositoryProperties repositoryProperties) {
+        super(Channel.class, repositoryProperties);
     }
 
     //저장

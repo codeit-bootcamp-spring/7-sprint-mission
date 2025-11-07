@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
@@ -9,8 +10,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageRepository extends BaseFileRepository<Message> implements MessageRepository {
-    public FileMessageRepository() {
-        super(Message.class);
+    public FileMessageRepository(RepositoryProperties repositoryProperties) {
+        super(Message.class, repositoryProperties);
     }
 
     //메세지 모두 찾기

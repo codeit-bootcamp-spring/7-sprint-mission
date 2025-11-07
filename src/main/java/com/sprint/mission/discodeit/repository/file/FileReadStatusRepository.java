@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
@@ -9,8 +10,8 @@ import java.util.UUID;
 
 public class FileReadStatusRepository extends BaseFileRepository<ReadStatus>
 implements ReadStatusRepository {
-    public FileReadStatusRepository() {
-        super(ReadStatus.class);
+    public FileReadStatusRepository(RepositoryProperties repositoryProperties) {
+        super(ReadStatus.class, repositoryProperties);
     }
 
     //저장

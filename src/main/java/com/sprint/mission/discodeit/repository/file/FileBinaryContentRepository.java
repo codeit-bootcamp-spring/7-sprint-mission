@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
@@ -8,13 +9,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileBinaryContentRepository extends BaseFileRepository<BinaryContent> implements BinaryContentRepository {
-    public FileBinaryContentRepository() {
-        super(BinaryContent.class);
+    public FileBinaryContentRepository(RepositoryProperties repositoryProperties){
+        super(BinaryContent.class, repositoryProperties);
     }
 
     //저장
     @Override
-    public BinaryContent save(BinaryContent binaryContent) {
+    public BinaryContent save(BinaryContent binaryContent){
         saveToFile(binaryContent.getId(), binaryContent);
         return binaryContent;
     }

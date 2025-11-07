@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.*;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -14,8 +17,9 @@ public abstract class BaseFileRepository<T extends Serializable> {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    protected BaseFileRepository(Class<T> type) {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", type.getSimpleName());
+    protected BaseFileRepository(Class<T> type, RepositoryProperties properties) {
+        String basePath = properties.getFileDirectory();
+        this.DIRECTORY = Paths.get(basePath, type.getSimpleName());
         ensureDirectoryExists();
     }
 
