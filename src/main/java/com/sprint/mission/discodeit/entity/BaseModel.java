@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @Getter @ToString
 public class BaseModel implements Serializable {
-    @Serial
+    @Serial //!! 연속적인, 일련의
     private static final long serialVersionUID = 1L;
 //    private final UUID readStatusID; //!! for test
     private UUID id; //!! for test

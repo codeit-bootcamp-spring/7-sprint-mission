@@ -16,8 +16,8 @@ public record Res_UserLogin( //all private final
 
     @NotBlank(message = "userName is mandatory")
     String userName,
-    @NotBlank(message = "password is mandatory")
-    String password,
+//    @NotBlank(message = "password is mandatory")
+//    String password,
     @NotBlank(message = "eMail is mandatory")
     String eMail,
     UUID profiledId) {
@@ -28,7 +28,7 @@ public record Res_UserLogin( //all private final
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .userName(user.getUserName())
-                .password(user.getPassword())
+//                .password(user.getPassword())
                 .eMail(user.getEMail())
                 .profiledId(user.getProfileId())
                 .build();

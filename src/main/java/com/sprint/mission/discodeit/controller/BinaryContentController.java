@@ -16,7 +16,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequiredArgsConstructor
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
-
     //[ ]  BinaryContentModel 파일 조회
     //    url: /api/binaryContent/find
     //    파라미터: binaryContentId
