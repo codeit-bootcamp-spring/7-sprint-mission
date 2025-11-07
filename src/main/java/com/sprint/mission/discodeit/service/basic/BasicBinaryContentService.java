@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.global.exception.custom.CustomException;
+import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 BinaryContent bc = new BinaryContent(file.getBytes());
                 binaryContentRepository.save(bc);
             } catch (IOException e) {
-                throw new RuntimeException("프로필 이미지 업로드 실패", e);
+                throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
             }
         }
     }
@@ -35,7 +37,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContent find(UUID binaryContentId) {
         return binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new IllegalArgumentException("이미지 또는 파일이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND));
     }
 
     @Override

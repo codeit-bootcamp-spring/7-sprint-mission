@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.auth.request.LoginUserDto;
+import com.sprint.mission.discodeit.global.dto.ApiResponse;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,8 +18,8 @@ public class AuthController {
     private final AuthService authService;
 
     @RequestMapping(value ="/login",method = RequestMethod.POST)
-    public ResponseEntity<String> login(@RequestBody LoginUserDto loginUserDto){
+    public ResponseEntity<ApiResponse<Object>> login(@RequestBody LoginUserDto loginUserDto){
         authService.login(loginUserDto);
-        return ResponseEntity.status(HttpStatus.OK).body("login success");
+        return ApiResponse.success(HttpStatus.OK, "로그인에 성공했습니다.");
     }
 }

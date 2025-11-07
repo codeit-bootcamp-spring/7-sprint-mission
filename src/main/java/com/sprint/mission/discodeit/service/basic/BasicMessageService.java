@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.global.exception.custom.CustomException;
+import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -44,9 +46,9 @@ public class BasicMessageService implements MessageService {
         // 채널에 메시지를 생성하면 채널 존재 여부와 유저가 채널에 속해 있는지 검증
         if (request.getReceiveType() == ReceiveType.CHANNEL) {
             Channel channel = channelRepository.findById(request.getReceiverId())
-                    .orElseThrow(() -> new IllegalArgumentException("메시지를 생성할 채널이 존재하지 않습니다."));
+                    .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
             if (!channel.getMemberIds().contains(request.getSenderId())) {
-                throw new IllegalArgumentException("당신은 해당 채널에 속해 있지 않아 메시지를 생성할 수 없습니다.");
+                throw new CustomException(ErrorCode.NOT_CHANNEL_MEMBER);
             }
         }
 
@@ -65,7 +67,7 @@ public class BasicMessageService implements MessageService {
                         newMessage.addAttachmentId(fileBytes.getId()); // 메시지에 파일 UUID 값 저장
                         binaryContentRepository.save(fileBytes);
                     } catch (IOException e) {
-                        throw new RuntimeException("파일 업로드 실패", e);
+                        throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
                     }
                 })
         );
@@ -76,7 +78,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message find(UUID messageId) {
         return messageRepository.findById(messageId).
-                orElseThrow(() -> new IllegalArgumentException("메시지가 존재하지 않습니다."));
+                orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
     }
 
     /**
@@ -146,7 +148,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void update(UUID messageId, UpdateMessageRequestDto request) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new IllegalArgumentException("메시지가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
         message.setContent(request.getContent());
         messageRepository.update(message);
     }
@@ -157,7 +159,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(UUID messageId) {
         Message msg = messageRepository.findById(messageId)
-                .orElseThrow(() -> new IllegalArgumentException("메시지가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
         binaryContentRepository.deleteByIds(msg.getAttachmentIds()); // 메시지와 관련된 파일들 삭제
         messageRepository.deleteById(messageId);
     }

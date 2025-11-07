@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.vaildator.UserVaildator;
+import com.sprint.mission.discodeit.global.exception.custom.CustomException;
+import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -35,9 +37,9 @@ public class BasicUserService implements UserService{
     public UserResponseDto create(CreateUserRequestDto userRequest, MultipartFile file) {
         // 1. nickname/email 중복 검사
         if(userRepository.existsByNickName(userRequest.getNickName())){
-            throw new IllegalArgumentException("이미 존재하는 닉네임 입니다.");
+            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         } else if (userRepository.existsByEmail(userRequest.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         // 2. 입력된 정보 형태 검증
@@ -56,7 +58,7 @@ public class BasicUserService implements UserService{
                 binaryContentRepository.save(profileImage);
                 profileImageId = profileImage.getId();
             } catch (IOException e){
-                throw new RuntimeException("프로필 이미지 업로드 실패", e);
+                throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
             }
         }
 
@@ -79,10 +81,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto find(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean active = userStatusRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -91,10 +93,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -103,10 +105,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto findByPhoneNum(String phoneNum) {
         User user = userRepository.findByPhone(phoneNum)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -115,10 +117,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto findByLoginId(String loginId) {
         User user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -130,7 +132,7 @@ public class BasicUserService implements UserService{
                 .map(u -> UserResponseDto.from(
                         u,
                         userStatusRepository.findById(u.getId())
-                                .orElseThrow(() -> new IllegalArgumentException("userstatus가 존재하지 않습니다."))
+                                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                                 .isActiveUser()))
                 .collect(Collectors.toList());
     }
@@ -138,14 +140,14 @@ public class BasicUserService implements UserService{
     @Override
     public String findNickNameById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
                 .getNickName();
     }
 
     @Override
     public void update(UUID userId, UpdateUserRequestDto request, MultipartFile file) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String userName = null;
         String nickName = null;
@@ -163,12 +165,12 @@ public class BasicUserService implements UserService{
 
             // 닉네임 중복 확인
             if (userRepository.existsByNickName(nickName)) {
-                throw new IllegalArgumentException("이미 존재하는 닉네임 입니다.");
+                throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
             }
 
             // 이메일 중복 확인
             if (userRepository.existsByEmail(email)) {
-                throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
+                throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
             }
 
             // 입력된 정보 형태 검증
@@ -186,7 +188,7 @@ public class BasicUserService implements UserService{
                 binaryContentRepository.save(profileImage);
                 profileImageId = profileImage.getId();
             } catch (IOException e) {
-                throw new RuntimeException("프로필 이미지를 저장하는데 실패했습니다.");
+                throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
             }
             binaryContentRepository.delete(user.getProfileId()); // 기존 프로필 이미지 삭제
         }
@@ -198,7 +200,7 @@ public class BasicUserService implements UserService{
     @Override
     public void delete(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         messageRepository.deleteByUser(id);
         userStatusRepository.deleteById(user.getId());
         binaryContentRepository.delete(user.getProfileId());
@@ -208,7 +210,7 @@ public class BasicUserService implements UserService{
     @Override
     public boolean isPasswordMatch(UUID userId, String password) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
                 .getPassword().equals(password);
     }
 }
