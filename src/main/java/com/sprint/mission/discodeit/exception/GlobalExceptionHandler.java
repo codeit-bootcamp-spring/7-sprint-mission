@@ -69,8 +69,8 @@ public class GlobalExceptionHandler {
                 e.getMessage(),
                 request.getRequestURI(),
                 request.getMethod(),
-                request.getRemoteAddr(),
-                e  // stack trace 포함
+                request.getRemoteAddr()
+                //e  // stack trace 포함
         );
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         return ResponseEntity
