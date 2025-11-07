@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.dto.fileIo.mapper;
 import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.HashSet;

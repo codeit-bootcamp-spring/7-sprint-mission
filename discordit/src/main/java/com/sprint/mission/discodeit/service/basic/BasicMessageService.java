@@ -7,10 +7,10 @@ import com.sprint.mission.discodeit.dto.message.request.MessageSendRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.enums.ReceiverType;
-import com.sprint.mission.discodeit.exceptions.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exceptions.MessageNotFoundException;
-import com.sprint.mission.discodeit.exceptions.ReceiverNotFoundException;
-import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.MessageNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.ReceiverNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -132,5 +132,12 @@ public class BasicMessageService implements MessageService {
         message.setContent(dto.content());
         messageRepository.update(message);
         return MessageResponse.toDto(message);
+    }
+
+    @Override
+    public List<MessageResponse> getAll() {
+        return messageRepository.findAll().stream()
+                .map(MessageResponse::toDto)
+                .toList();
     }
 }

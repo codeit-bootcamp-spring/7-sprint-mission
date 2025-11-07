@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.dto.fileIo.mapper;
 import com.sprint.mission.discodeit.dto.fileIo.UserStatusIoDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 final class UserStatusMapper {

@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.common.constants.DataPath;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.dto.fileIo.BinaryContentIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.dto.fileIo.MessageIoDTO;
@@ -26,8 +23,6 @@ import java.io.*;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.sprint.mission.discodeit.config.DataPath.*;
-
 @Component
 @RequiredArgsConstructor
 public class DataLoader {
@@ -38,6 +33,7 @@ public class DataLoader {
     private final BinaryContentRepository binaryContentRepository;
     private final ReadStatusRepository readStatusRepository;
     private final UserStatusRepository userStatusRepository;
+    private final DataPath dataPath;
 
     @PostConstruct
     public void loadAll() {
@@ -50,7 +46,7 @@ public class DataLoader {
     }
 
     private void loadBinaryContent() {
-        File file = new File(BINARY_CONTENT_PATH);
+        File file = new File(dataPath.BINARY_CONTENT_FILE_PATH());
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             return;
@@ -60,7 +56,7 @@ public class DataLoader {
             return;
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(BINARY_CONTENT_PATH))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataPath.BINARY_CONTENT_FILE_PATH()))) {
             @SuppressWarnings("unchecked")
             List<BinaryContentIoDTO> list = (List<BinaryContentIoDTO>) ois.readObject();
             List<BinaryContent> objects = list.stream()
@@ -75,7 +71,7 @@ public class DataLoader {
     }
 
     private void loadMessage() {
-        File file = new File(MESSAGE_FILE_PATH);
+        File file = new File(dataPath.MESSAGE_FILE_PATH());
 
         if (!file.exists()) {
             file.getParentFile().mkdirs();
@@ -86,7 +82,7 @@ public class DataLoader {
             return;
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(MESSAGE_FILE_PATH))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataPath.MESSAGE_FILE_PATH()))) {
             List<Message> objects = ((List<MessageIoDTO>) ois.readObject()).stream()
                     .map(m -> Mapper.toMessage(m, userRepository, channelRepository, binaryContentRepository))
                     .sorted(Comparator.comparing(Message::getCreatedAt))
@@ -102,7 +98,7 @@ public class DataLoader {
     }
 
     private void loadUser() {
-        File file = new File(USER_FILE_PATH);
+        File file = new File(dataPath.USER_FILE_PATH());
 
         if (!file.exists()) {
             file.getParentFile().mkdirs();
@@ -112,7 +108,7 @@ public class DataLoader {
             return;
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_FILE_PATH))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataPath.USER_FILE_PATH()))) {
             List<User> objects = ((List<UserIoDTO>) ois.readObject()).stream()
                     .map(dto -> Mapper.toUser(dto, binaryContentRepository))
                     .toList();
@@ -127,7 +123,7 @@ public class DataLoader {
     }
 
     private void loadChannel() {
-        File file = new File(CHANNEL_FILE_PATH);
+        File file = new File(dataPath.CHANNEL_FILE_PATH());
 
         if (!file.exists()) {
             file.getParentFile().mkdirs();
@@ -137,7 +133,7 @@ public class DataLoader {
         if (!channelRepository.findAll().isEmpty()) {
             return;
         }
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(CHANNEL_FILE_PATH))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataPath.CHANNEL_FILE_PATH()))) {
             List<Channel> objects = ((List<ChannelIoDTO>) ois.readObject()).stream()
                     .map(c -> Mapper.toChannel(c, userRepository))
                     .toList();
@@ -152,7 +148,7 @@ public class DataLoader {
     }
 
     private void loadReadStatus() {
-        File file = new File(READ_STATUS_FILE_PATH);
+        File file = new File(dataPath.READ_STATUS_FILE_PATH());
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             return;
@@ -162,13 +158,13 @@ public class DataLoader {
             return;
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(READ_STATUS_FILE_PATH))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataPath.READ_STATUS_FILE_PATH()))) {
             @SuppressWarnings("unchecked")
             List<ReadStatusIoDTO> list = (List<ReadStatusIoDTO>) ois.readObject();
-            List<com.sprint.mission.discodeit.entity.ReadStatus> objects = list.stream()
+            List<ReadStatus> objects = list.stream()
                     .map(dto -> Mapper.toReadStatus(dto, userRepository, channelRepository))
                     .toList();
-            for (com.sprint.mission.discodeit.entity.ReadStatus rs : objects) {
+            for (ReadStatus rs : objects) {
                 readStatusRepository.save(rs);
             }
         } catch (FileNotFoundException e) {
@@ -179,7 +175,7 @@ public class DataLoader {
     }
 
     private void loadUserStatus() {
-        File file = new File(USER_STATUS_FILE_PATH);
+        File file = new File(dataPath.USER_STATUS_FILE_PATH());
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             return;
@@ -189,7 +185,7 @@ public class DataLoader {
             return;
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_STATUS_FILE_PATH))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataPath.USER_STATUS_FILE_PATH()))) {
             @SuppressWarnings("unchecked")
             List<UserStatusIoDTO> list = (List<UserStatusIoDTO>) ois.readObject();
             List<UserStatus> objects = list.stream()

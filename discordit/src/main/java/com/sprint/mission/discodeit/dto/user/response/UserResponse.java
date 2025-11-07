@@ -14,6 +14,7 @@ public record UserResponse(
         String displayName,
         String bio,
         UUID profileId,
+        OnlineStatus onlineStatus,
         Boolean online
 ) {
     public static UserResponse toDto(User user) {
@@ -25,6 +26,7 @@ public record UserResponse(
                 user.getDisplayName(),
                 user.getBio(),
                 profileId,
+                user.getOnlineStatus(),
                 user.getOnlineStatus() == OnlineStatus.ONLINE
         );
     }

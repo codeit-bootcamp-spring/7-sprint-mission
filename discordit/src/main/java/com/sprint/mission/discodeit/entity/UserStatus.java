@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.config.OnlineThreshold;
+import com.sprint.mission.discodeit.common.config.OnlineThreshold;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

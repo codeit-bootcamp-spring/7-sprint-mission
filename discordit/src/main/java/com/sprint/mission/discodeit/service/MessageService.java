@@ -19,4 +19,6 @@ public interface MessageService {
     Message getLastMessage();
 
     MessageResponse editMessage(MessageEditRequest request);
+
+    List<MessageResponse> getAll();
 }

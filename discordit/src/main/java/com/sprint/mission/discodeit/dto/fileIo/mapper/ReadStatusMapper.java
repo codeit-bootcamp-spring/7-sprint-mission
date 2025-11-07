@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.dto.fileIo.ReadStatusIoDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exceptions.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 

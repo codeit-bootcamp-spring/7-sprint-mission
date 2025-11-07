@@ -4,8 +4,7 @@ import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentCreat
 import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentGetRequest;
 import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.exceptions.ContentNotFoundException;
-import com.sprint.mission.discodeit.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.ContentNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;

@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exceptions.UserStatusAlreadyExistException;
-import com.sprint.mission.discodeit.exceptions.UserStatusNotExistException;
+import com.sprint.mission.discodeit.common.exceptions.UserStatusAlreadyExistException;
+import com.sprint.mission.discodeit.common.exceptions.UserStatusNotExistException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;

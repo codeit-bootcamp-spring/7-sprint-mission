@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.common.constants.DataPath;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -15,11 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.config.DataPath.*;
-
 class DataWriter {
+    private final DataPath dataPath;
+
     public static void writeChannel(Map<UUID, Channel> data) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(CHANNEL_FILE_PATH))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataPath.CHANNEL_FILE_PATH()))) {
             oos.writeObject(data.values().stream()
                     .map(Mapper::toChannelDTO)
                     .toList());
