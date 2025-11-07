@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.response.ApiResponse;
+import com.sprint.mission.discodeit.common.response.CustomApiResponse;
 import com.sprint.mission.discodeit.dto.user.request.UserLoginReq;
 import com.sprint.mission.discodeit.facade.auth.AuthFacade;
 import jakarta.validation.Valid;
@@ -21,9 +21,9 @@ public class AuthController {
 
     // 로그인
     @RequestMapping(value ="/login", method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<Void>> login(@Valid @RequestBody UserLoginReq req){
+    public ResponseEntity<CustomApiResponse<Void>> login(@Valid @RequestBody UserLoginReq req){
         log.info("로그인 시도: {}", req.nickname());
         authFacade.login(req);
-        return ResponseEntity.ok(ApiResponse.success());
+        return ResponseEntity.ok(CustomApiResponse.success());
     }
 }

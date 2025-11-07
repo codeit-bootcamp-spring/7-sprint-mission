@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ApiResponse<T>{
+public class CustomApiResponse<T>{
     //Fields
     private final String code;
     private final String message;
@@ -15,18 +15,18 @@ public class ApiResponse<T>{
 
     //Static Factory Method
     //성공 응답(데이터 포함
-    public static <T> ApiResponse<T> success(T data){
-        return new ApiResponse<>("SUCCESS", "요청에 성공했습니다.", data);
+    public static <T> CustomApiResponse<T> success(T data){
+        return new CustomApiResponse<>("SUCCESS", "요청에 성공했습니다.", data);
     }
     
     //성공 응답(데이터 없음)
-    public static <T> ApiResponse<T> success(){
-        return new ApiResponse<>("SUCCESS", "요청에 성공했습니다.(반환 데이터 없음)", null);
+    public static <T> CustomApiResponse<T> success(){
+        return new CustomApiResponse<>("SUCCESS", "요청에 성공했습니다.(반환 데이터 없음)", null);
     }
 
     //실패 응답
-    public static ApiResponse<String> fail(ErrorCode errorCode){
-        return new ApiResponse<>(
+    public static CustomApiResponse<String> fail(ErrorCode errorCode){
+        return new CustomApiResponse<>(
                 errorCode.getCode(),
                 errorCode.getMessage(),
                 "HttpStatus - " + errorCode.getStatus().value()
