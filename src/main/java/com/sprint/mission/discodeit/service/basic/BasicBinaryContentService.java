@@ -26,7 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         if(file != null && !file.isEmpty()){
             try {
-                BinaryContent bc = new BinaryContent(file.getBytes());
+                BinaryContent bc = new BinaryContent(file.getName(), file.getBytes());
                 binaryContentRepository.save(bc);
             } catch (IOException e) {
                 throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);

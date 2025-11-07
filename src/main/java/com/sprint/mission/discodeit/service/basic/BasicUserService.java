@@ -53,8 +53,7 @@ public class BasicUserService implements UserService{
 
         if(file != null && !file.isEmpty()) {
             try {
-                byte[] imageBytes = file.getBytes();
-                BinaryContent profileImage = new BinaryContent(imageBytes);
+                BinaryContent profileImage = new BinaryContent(file.getName(), file.getBytes());
                 binaryContentRepository.save(profileImage);
                 profileImageId = profileImage.getId();
             } catch (IOException e){
@@ -183,8 +182,7 @@ public class BasicUserService implements UserService{
         UUID profileImageId = null;
         if (file != null && !file.isEmpty()) {
             try {
-                byte[] imageBytes = file.getBytes();
-                BinaryContent profileImage = new BinaryContent(imageBytes);
+                BinaryContent profileImage = new BinaryContent(file.getName(), file.getBytes());
                 binaryContentRepository.save(profileImage);
                 profileImageId = profileImage.getId();
             } catch (IOException e) {

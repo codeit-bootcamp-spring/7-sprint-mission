@@ -63,7 +63,7 @@ public class BasicMessageService implements MessageService {
         Optional.ofNullable(fileList).ifPresent(
                 files -> files.forEach(file -> {
                     try {
-                        BinaryContent fileBytes = new BinaryContent(file.getBytes());
+                        BinaryContent fileBytes = new BinaryContent(file.getName(), file.getBytes());
                         newMessage.addAttachmentId(fileBytes.getId()); // 메시지에 파일 UUID 값 저장
                         binaryContentRepository.save(fileBytes);
                     } catch (IOException e) {
