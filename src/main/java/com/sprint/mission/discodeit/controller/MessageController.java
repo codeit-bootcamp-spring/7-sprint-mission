@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_Message;
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,20 +30,8 @@ public class MessageController {
     public Res_Message create(@RequestPart("message") Dto_Message dtoMessage,
                               @RequestPart("file") List<MultipartFile> fileList) {
 
-
         List<Dto_BinaryContent> collect = fileList.stream()
-                .map(multipartFile -> {
-                    try {
-                        return Dto_BinaryContent.from(
-                                multipartFile.getOriginalFilename(),
-                                multipartFile.getContentType(),
-                                multipartFile.getBytes(),
-                                multipartFile.getSize()
-                        );
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+                .map(Util::parsingMultipartFile)
                 .toList(); // 변경가능 list
 
         return messageService.create(dtoMessage, Optional.of(collect));

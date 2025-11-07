@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.common;
 
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public class Util {
     public static void okMessage(String message) {
@@ -12,4 +15,19 @@ public class Util {
 //    public static UUID uuidTest_3 = UUID.fromString("ceb51b81-cb4a-41b1-b8f8-3dd15bdbedd9");
 //    public static UUID uuidTest_4 = UUID.fromString("f84daca8-d311-4858-bd01-7693adf65c02");
 //    public static UUID uuidTest_5 = UUID.fromString("496859e7-1536-4ad7-bb64-ba895f756288");
+
+    public static Dto_BinaryContent parsingMultipartFile(MultipartFile file) {
+        Dto_BinaryContent dtoFile = null;
+        try {
+            dtoFile = Dto_BinaryContent.from(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes(),
+                    file.getSize());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Util.okMessage("file.getOriginalFilename() = [" + file.getOriginalFilename() + "]");
+        return dtoFile;
+    }
 }
