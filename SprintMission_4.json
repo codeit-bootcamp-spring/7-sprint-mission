@@ -1,0 +1,60 @@
+{
+	"info": {
+		"_postman_id": "083fa5e6-630a-4de3-be09-acc1cdbb0a08",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49391923",
+		"_collection_link": "https://tehon79-2399532.postman.co/workspace/%EC%B5%9C%ED%83%9C%ED%9B%88's-Workspace~16fc9518-e6db-4521-843b-88912e18bd1a/collection/49391923-083fa5e6-630a-4de3-be09-acc1cdbb0a08?action=share&source=collection_link&creator=49391923"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/api/users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/api/users",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"TH\",\r\n  \"email\": \"TH@test.com\",\r\n  \"password\": \"abcdef\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
