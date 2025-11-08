@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.transactional.CustomTransactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class MessageCreationFacade {
     private final BinaryContentService binaryContentService;
 
     //메세지 추가
+    @CustomTransactional
     public Message createMessage(@NonNull UUID speakerId, @NonNull UUID channelId, @NonNull MessageCreateReq req){
         List<UUID> attachments = new ArrayList<>();
         

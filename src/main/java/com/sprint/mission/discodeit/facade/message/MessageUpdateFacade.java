@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.transactional.CustomTransactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class MessageUpdateFacade {
     private final BinaryContentService binaryContentService;
     private final MessageMapper messageMapper;
 
+    @CustomTransactional
     public MessageViewRes updateMessage(@NonNull UUID messageId, @NonNull MessageUpdateReq req){
         List<UUID> oldIds = messageService.findById(messageId).getAttachmentIds();
         List<UUID> updatedIds = new ArrayList<>(req.keepAttachmentIds());

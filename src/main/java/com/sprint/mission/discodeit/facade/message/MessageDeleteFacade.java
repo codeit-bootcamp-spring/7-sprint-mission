@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.facade.message;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.transactional.CustomTransactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ public class MessageDeleteFacade {
     private final BinaryContentService binaryContentService;
 
     //메세지 삭제
+    @CustomTransactional
     public void deleteMessage(@NonNull UUID messageId){
         Message message = messageService.findById(messageId);
         message.getAttachmentIds().forEach(binaryContentService::delete);
