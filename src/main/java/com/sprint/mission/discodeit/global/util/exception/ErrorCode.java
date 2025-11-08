@@ -31,9 +31,10 @@ public enum ErrorCode {
 
     //USER_STATUS
     USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "UserStatus를 찾을 수 없습니다."),
-    USER_STATUS_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 존재하는 UserStatus입니다.");
+    USER_STATUS_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 존재하는 UserStatus입니다."),
 
-    //
+    //INTERNAL
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "뭐야 이거");
 
     private final HttpStatus status;
     private final String message;
