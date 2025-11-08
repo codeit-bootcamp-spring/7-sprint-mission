@@ -8,18 +8,30 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-@Slf4j
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<?> handleCustomException(CustomException e) {
+    public ResponseEntity<ApiResponse<Object>> handleCustomException(CustomException e) {
         ErrorCode errorCode = e.getErrorCode();
-        ApiResponse<Object> error = ApiResponse.error(errorCode.getStatus().toString(), errorCode.getMessage());
-        return ResponseEntity.status(errorCode.getStatus()).body(error);
+
+        ApiResponse<Object> response = ApiResponse.error(
+                errorCode.getStatus(),
+                errorCode.getCode(),   // 비즈니스 코드
+                errorCode.getMessage() // 사용자 메시지
+        );
+
+        return ResponseEntity.status(errorCode.getStatus()).body(response);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception e) {
-        ApiResponse<Object> error = ApiResponse.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    public ResponseEntity<ApiResponse<Object>> handleException(Exception e) {
+
+        ApiResponse<Object> response = ApiResponse.error(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "INTERNAL_SERVER_ERROR",
+                e.getMessage()
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
