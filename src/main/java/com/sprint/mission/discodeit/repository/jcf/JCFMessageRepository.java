@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class JCFMessageRepository extends JCFBaseRepository<Message> implements MessageRepository {
+public class JCFMessageRepository extends BaseJCFRepository<Message> implements MessageRepository {
     //메세지 전부 조회
     @Override
     public List<Message> findAll() {

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class JCFReadStatusRepository extends JCFBaseRepository<ReadStatus> implements ReadStatusRepository {
+public class JCFReadStatusRepository extends BaseJCFRepository<ReadStatus> implements ReadStatusRepository {
     @Override
     public ReadStatus save(ReadStatus readStatus) {
         beforeModify();

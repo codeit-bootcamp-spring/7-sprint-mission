@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class JCFBaseRepository<V> implements Rollbackable {
+public abstract class BaseJCFRepository<V> implements Rollbackable {
     // 수정 전 상태를 백업하기 위한 Map
     protected final Map<UUID, V> data = new ConcurrentHashMap<>();
     private Map<UUID, V> snapshot;

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class JCFChannelRepository extends JCFBaseRepository<Channel> implements ChannelRepository {
+public class JCFChannelRepository extends BaseJCFRepository<Channel> implements ChannelRepository {
     //저장
     @Override
     public Channel save(Channel channel) {

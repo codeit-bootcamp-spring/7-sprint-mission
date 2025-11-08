@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class JCFUserRepository extends JCFBaseRepository<User> implements UserRepository{
+public class JCFUserRepository extends BaseJCFRepository<User> implements UserRepository{
     // 저장
     @Override
     public User save(User user) {

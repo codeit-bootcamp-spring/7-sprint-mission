@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class JCFBinaryContentRepository extends JCFBaseRepository<BinaryContent> implements BinaryContentRepository {
+public class JCFBinaryContentRepository extends BaseJCFRepository<BinaryContent> implements BinaryContentRepository {
     //저장
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
