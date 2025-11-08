@@ -41,4 +41,8 @@ public class Channel implements Serializable {
             this.updatedAt = Instant.now();
         }
     }
+
+    public Instant getLastMessageAt() {
+         return this.updatedAt;
+    }
 }
