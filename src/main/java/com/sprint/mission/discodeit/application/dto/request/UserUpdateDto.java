@@ -5,7 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 public record UserUpdateDto(
-        UUID id,
         String email,
         String username,
         String phoneNumber,

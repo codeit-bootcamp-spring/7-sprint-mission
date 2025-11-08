@@ -1,0 +1,42 @@
+package com.sprint.mission.discodeit.controller;
+
+import com.sprint.mission.discodeit.application.BasicReadStatusService;
+import com.sprint.mission.discodeit.application.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.application.dto.request.ReadStatusRequest;
+import com.sprint.mission.discodeit.application.dto.response.ReadStatusResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/read-status")
+public class ReadStatusController {
+
+    private final BasicReadStatusService readStatusService;
+
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    public String makeReadStatus(@ModelAttribute ReadStatusCreateRequest request){
+        readStatusService.createReadStatus(request.userId(),request.channelId());
+        return "메시지 수신 정보 생성 성공";
+    }
+
+    @RequestMapping(value = "/{id}",method = RequestMethod.GET)
+    public long checkLastTime(@PathVariable UUID id){
+        return readStatusService.getTimeSinceLastRead(id);
+    }
+
+    @RequestMapping(value ="/read/{id}", method = RequestMethod.GET)
+    public String readChannel(@PathVariable UUID id) {
+        readStatusService.updateReadStatus(id);
+        return "읽음";
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public ReadStatusResponse getReadStatusByIds(@RequestBody ReadStatusRequest request){
+        return readStatusService.findReadStatusByIds(request);
+    }
+}

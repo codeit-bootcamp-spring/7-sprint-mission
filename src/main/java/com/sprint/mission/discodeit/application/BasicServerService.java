@@ -6,12 +6,15 @@ import com.sprint.mission.discodeit.application.dto.request.ServerRequestDto;
 import com.sprint.mission.discodeit.application.dto.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.application.dto.response.ServerResponseDto;
 import com.sprint.mission.discodeit.domain.Channel;
+import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.domain.Server;
 import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.domain.repository.ChannelRepository;
+import com.sprint.mission.discodeit.domain.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.domain.repository.ServerRepository;
 import com.sprint.mission.discodeit.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +24,7 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.application.dto.ChannelDtoMapper.channelToResponseDto;
 import static com.sprint.mission.discodeit.application.dto.ServerDtoMapper.serverToResponseDto;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicServerService {
@@ -29,12 +32,13 @@ public class BasicServerService {
 
     private final ServerRepository serverRepository;
     private final UserRepository userRepository;
+    private final ReadStatusRepository readStatusRepository;
     private final ChannelRepository channelRepository;
 
-    public ServerResponseDto createServer(ServerCreateRequestDto requestDto, boolean isPrivate) {
+    public ServerResponseDto createServer(ServerCreateRequestDto requestDto) {
         Server server = new Server(
                 requestDto.serverName(),
-                isPrivate,
+                requestDto.isPrivate(),
                 requestDto.serverLevel(),
                 requestDto.members());
         serverRepository.save(server);
@@ -57,7 +61,8 @@ public class BasicServerService {
 
 
     public void deleteServer(ServerRequestDto requestDto) {
-        serverRepository.remove(findById(requestDto.serverId()));
+        findById(requestDto.serverId());
+        serverRepository.remove(requestDto.serverId());
     }
 
     public ServerResponseDto getServer(ServerRequestDto requestDto) {
@@ -66,14 +71,15 @@ public class BasicServerService {
     }
 
     public Server findById(UUID id) {
+        log.info("Server FindById 로직 실행 시작");
         return serverRepository.findById(id).orElseThrow(() -> new NoSuchElementException("서버를 찾을 수 없습니다"));
     }
 
-    public List<UUID> findAllByUserId(UUID userId) {
+    public List<String> findAllByUserId(UUID userId) {
         return serverRepository.findAll()
                 .stream()
                 .filter(server -> server.getMembers().contains(userId))
-                .map(server->server.getId())
+                .map(server->server.getServerName())
                 .toList();
     }
 
@@ -95,6 +101,10 @@ public class BasicServerService {
         channelRepository.save(channel);
         server.makeChannel(channel);
         serverRepository.save(server);
+        for (UUID userId : requestDto.membersId()) {
+            ReadStatus readStatus = new ReadStatus(userId, channel.getId());
+            readStatusRepository.save(readStatus);
+        }
         return channelToResponseDto(channel);
     }
 

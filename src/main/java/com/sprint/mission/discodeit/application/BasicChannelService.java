@@ -10,7 +10,10 @@ import com.sprint.mission.discodeit.application.dto.request.ChannelCreateRequest
 import com.sprint.mission.discodeit.application.dto.request.ChannelRequestDto;
 import com.sprint.mission.discodeit.application.dto.response.ChannelResponseDto;
 
+import com.sprint.mission.discodeit.domain.repository.MessageRepository;
+import com.sprint.mission.discodeit.domain.repository.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,11 +27,21 @@ import static com.sprint.mission.discodeit.application.dto.ChannelDtoMapper.chan
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicChannelService {
 
     private final ChannelRepository channelRepository;
-    private final FileService fileService;
+    private final MessageRepository messageRepository;
+    private final ReadStatusRepository readStatusRepository;
 
+
+
+    public List<String> getAllMessage(UUID channelId){
+        Channel channel = findById(channelId);
+        return channel.getHistory().stream()
+                .map(id-> messageRepository.findById(id).orElse(null).getContent())
+                .toList();
+    }
 
     public List<ChannelResponseDto> findAllByServer(UUID serverId) {
         return findByServer(serverId)
@@ -79,27 +92,7 @@ public class BasicChannelService {
         Channel channel = findById( channelId);
         channel.addChannelMember(userId);
         channelRepository.save(channel);
-    }
-
-    public long getMemberReadStatus(UUID channelId,UUID memberId){
-        Channel channel = findById(channelId);
-        ChannelMember channelMember = channel.getMembers().stream().filter(cm -> cm.getMemberId().equals(memberId))
-                .findAny().orElseThrow(() -> new NoSuchElementException("해당 유저가 채널에 없습니다. "));
-        ReadStatus readStatus = channelMember.getReadStatus();
-        Instant lastReadAt = readStatus.getLastReadAt();
-        return Duration.between(lastReadAt, Instant.now()).toMinutes();
-    }
-
-    public void sendMessage(MessageForm form) throws IOException {
-        Message message;
-        if(form.image().isEmpty()){
-            message = new Message(form.userId(), form.content(), form.channelId(), null);
-        } else {
-            BinaryContent content = fileService.saveMessageFile(form.userId(), form.image());
-            message = new Message(form.userId(), form.content(), form.channelId(), content);
-        }
-        Channel channel = findById(form.channelId());
-        channel.sendMessage(message);
-        channelRepository.save(channel);
+        ReadStatus readStatus = new ReadStatus(userId, channelId);
+        readStatusRepository.save(readStatus);
     }
 }

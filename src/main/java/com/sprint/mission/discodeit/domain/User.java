@@ -30,7 +30,7 @@ public class User implements Serializable {
     private final List<UUID> receivedInvitations = new ArrayList<>();
     private final List<UUID> friends = new ArrayList<>();
     private final List<UUID> servers =new ArrayList<>();
-    private BinaryContent profile;
+    private UUID profile;
 
 
     public User(String email, String password, String username, String phoneNumber) {
@@ -49,7 +49,7 @@ public class User implements Serializable {
         this.profile = null;
     }
 
-    public void setProfile(BinaryContent content){
+    public void setProfile(UUID profile){
         this.profile =profile;
     }
 
@@ -103,6 +103,9 @@ public class User implements Serializable {
     }
 
     public void markOnline(){
+        if(this.checkOnline()){
+            return;
+        }
         this.userStatus=new UserStatus(OnlineStatus.ONLINE);
     }
 

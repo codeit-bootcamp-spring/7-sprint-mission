@@ -53,10 +53,9 @@ public class FileServerRepository implements ServerRepository {
         saveToFile(store);
     }
 
-    public void remove(Server server) {
+    public void remove(UUID id) {
         Map<UUID, Server> store = load();
-        UUID findChannelId = server.getId();
-        store.remove(findChannelId);
+        store.remove(id);
         saveToFile(store);
     }
 

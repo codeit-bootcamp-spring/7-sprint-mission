@@ -20,9 +20,10 @@ public class Channel implements Serializable {
     private final UUID serverId;
     private String channelName;
 
-    private final List<ChannelMember> members;
+    private final List<UUID> members;
     private final boolean isPrivate;
-    private final List<Message> history = new ArrayList<>();
+    private final List<UUID> history = new ArrayList<>();
+
 
     public Channel(String channelName,UUID serverId, List<UUID> membersId, boolean isPrivate) {
         validateChannelName(channelName);
@@ -34,7 +35,7 @@ public class Channel implements Serializable {
         this.isPrivate=isPrivate;
         if (this.isPrivate){
             this.members=new ArrayList<>();
-            membersId.forEach(id-> members.add(new ChannelMember(id)));
+            membersId.forEach(id-> members.add(id));
         } else {
             this.members=null;
         }
@@ -51,25 +52,30 @@ public class Channel implements Serializable {
         }
     }
 
-    public List<Message> getHistory() {
+    public List<UUID> getHistory() {
         return List.copyOf(history);
     }
 
-    public List<ChannelMember> getChannelMember(){
+    public List<UUID> getChannelMember(){
         return List.copyOf(members);
     }
 
 
-    public void sendMessage(Message message){
-        history.add(message);
+    public void sendMessage(UUID messageId){
+        history.add(messageId);
+    }
+
+    public void deleteMessage(UUID messageId){
+        history.remove(messageId);
     }
 
     public void addChannelMember(UUID userId){
         if (members
                 .stream()
-                .anyMatch(channelMember -> channelMember.getMemberId().equals(userId))){
+                .anyMatch(uuid -> uuid.equals(userId))){
             throw new IllegalArgumentException("해당 유저는 이미 채널에 있습니다.");
         }
-        members.add(new ChannelMember(userId));
+        members.add(userId);
+
     }
 }
