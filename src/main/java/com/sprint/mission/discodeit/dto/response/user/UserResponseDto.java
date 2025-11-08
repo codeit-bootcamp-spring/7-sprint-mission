@@ -10,7 +10,7 @@ public record UserResponseDto(
         String username,
         String email,
         UUID profileId,
-        boolean online,
+        Boolean online,
         Instant createdAt,
         Instant updatedAt) {
 
