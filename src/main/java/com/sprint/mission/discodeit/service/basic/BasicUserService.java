@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 /*
- controller가 없으니 Response를 서비스에서 대신 반환한다!
- 반환 종류는 임의로 선정함!
  TODO: 프로필 삭제
  */
 @Service
@@ -22,10 +19,9 @@ import java.util.*;
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
-    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreateRequestDto userCreateRequestDto) {
+    public User create(UserCreateRequestDto userCreateRequestDto, UUID profileId) {
         // 요구사항 - 유저 이름과 이메일은 다른 유저와 같으면 안된다.
         if (!userRepository.findByName(userCreateRequestDto.username()).isEmpty()) {
             throw new IllegalArgumentException("존재하는 유저입니다!");
@@ -33,16 +29,6 @@ public class BasicUserService implements UserService {
 
         if (userRepository.findByEmail(userCreateRequestDto.email()).isPresent()) {
             throw new IllegalArgumentException("존재하는 이메일입니다!");
-        }
-
-        // 요구사항 - 프로밀 이미지를 등록할 수 있다!
-        UUID profileId = null;
-        if(userCreateRequestDto.profileData() != null){
-            BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(
-                    userCreateRequestDto.profileFileName(),
-                    userCreateRequestDto.profileContentType(),
-                    userCreateRequestDto.profileData()));
-            profileId = binaryContent.getId();
         }
 
         User user = new User(
@@ -70,7 +56,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateRequestDto userUpdateRequestDto) {
+    public User update(UserUpdateRequestDto userUpdateRequestDto, UUID profileId) {
         User user = userRepository.findById(userUpdateRequestDto.id())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
@@ -94,26 +80,17 @@ public class BasicUserService implements UserService {
             user.setPassword(userUpdateRequestDto.password());
         }
 
-        if(userUpdateRequestDto.profileData() != null){
-            if(user.getProfileId() != null){
-                binaryContentRepository.deleteById(user.getProfileId());
+            if(profileId != null && !profileId.equals(user.getProfileId())){
+                user.setProfileId(profileId);
             }
-            BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(
-                    userUpdateRequestDto.profileFileName(),
-                    userUpdateRequestDto.profileContentType(),
-                    userUpdateRequestDto.profileData()
-            ));
-            user.setProfileId(binaryContent.getId());
-        }
         return userRepository.save(user);
     }
 
     @Override
     public boolean delete(UUID userid) {
-        User user = userRepository.findById(userid).orElseThrow(() -> new NoSuchElementException("User not found"));
-        if(user.getProfileId() != null){
-            binaryContentRepository.deleteById(user.getProfileId());
-        }
+        User user = userRepository.findById(userid)
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
         userStatusRepository.findByUserId(userid)
                 .ifPresent(u -> userStatusRepository.deleteById(u.getId()));
         return userRepository.deleteById(userid);
