@@ -4,18 +4,14 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class JCFUserStatusRepository implements UserStatusRepository {
-    // 스테이터스 데이터
-    private final Map<UUID, UserStatus> data = new ConcurrentHashMap<>();
-    
+public class JCFUserStatusRepository extends JCFBaseRepository<UserStatus> implements UserStatusRepository {
     // 저장
     @Override
     public UserStatus save(UserStatus userStatus) {
+        beforeModify();
         data.put(userStatus.getId(), userStatus);
         return userStatus;
     }
@@ -42,24 +38,28 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void updateOnlineAt(UUID id) {
+        beforeModify();
         data.get(id).updateOnlineAt();
         save(data.get(id));
     }
 
     @Override
     public void updateOfflineAt(UUID id) {
+        beforeModify();
         data.get(id).updateOfflineAt();
         save(data.get(id));
     }
 
     @Override
     public void update(UUID id) {
+        beforeModify();
         data.get(id).updateOnline();
         save(data.get(id));
     }
 
     @Override
     public void updateByUserId(UUID userId) {
+        beforeModify();
         data.values().stream().filter(userStatus ->userStatus.getUserId().equals(userId))
         .findFirst().ifPresent(userStatus -> {
             userStatus.updateOnline();
@@ -69,6 +69,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void delete(UUID userId) {
+        beforeModify();
         data.remove(userId);
     }
 

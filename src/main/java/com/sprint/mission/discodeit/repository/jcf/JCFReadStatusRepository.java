@@ -4,17 +4,13 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class JCFReadStatusRepository implements ReadStatusRepository {
-    //Status 데이터
-    private final Map<UUID, ReadStatus> data = new ConcurrentHashMap<>();
-
+public class JCFReadStatusRepository extends JCFBaseRepository<ReadStatus> implements ReadStatusRepository {
     @Override
     public ReadStatus save(ReadStatus readStatus) {
+        beforeModify();
         data.put(readStatus.getId(), readStatus);
         return readStatus;
     }
@@ -40,11 +36,13 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void update(UUID statusId) {
+        beforeModify();
         data.get(statusId).updateReadAt();
     }
 
     @Override
     public void delete(UUID statusId) {
+        beforeModify();
         data.remove(statusId);
     }
 

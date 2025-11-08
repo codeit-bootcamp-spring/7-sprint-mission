@@ -8,7 +8,33 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
     // Common
-    INTERNAL_SERVER_ERROR("COMMON_001", HttpStatus.INTERNAL_SERVER_ERROR,  "서버 내부 오류가 발생했습니다."),
+    INTERNAL_SERVER_ERROR("COMMON_001", HttpStatus.INTERNAL_SERVER_ERROR,
+            "서버 내부 오류가 발생했습니다."),
+
+    // File
+    DATA_DIRECTORY_CREATE_FAILED("FILE_001", HttpStatus.INTERNAL_SERVER_ERROR,
+            "데이터 저장용 디렉토리 생성에 실패하였습니다."),
+
+    BACKUP_DIRECTORY_CREATE_FAILED("FILE_002", HttpStatus.INTERNAL_SERVER_ERROR,
+            "백업용 디렉토리 생성에 실패하였습니다."),
+
+    FILE_BACKUP_CREATE_FAILED("FILE_003", HttpStatus.INTERNAL_SERVER_ERROR,
+            "백업 파일 생성 중 오류가 발생하였습니다."),
+
+    FILE_BACKUP_RESTORE_FAILED("FILE_004", HttpStatus.INTERNAL_SERVER_ERROR,
+            "백업 파일을 복원하는 중 오류가 발생하였습니다."),
+
+    FILE_SAVE_FAILED("FILE_005", HttpStatus.INTERNAL_SERVER_ERROR,
+            "데이터 파일 저장에 실패하였습니다."),
+
+    FILE_READ_FAILED("FILE_006", HttpStatus.INTERNAL_SERVER_ERROR,
+            "데이터 파일을 읽어오는 중 오류가 발생하였습니다."),
+
+    FILE_DELETE_FAILED("FILE_007", HttpStatus.INTERNAL_SERVER_ERROR,
+            "데이터 파일 삭제에 실패하였습니다."),
+
+    FILE_READ_ALL_FAILED("FILE_008", HttpStatus.INTERNAL_SERVER_ERROR,
+            "모든 데이터 파일을 읽어오는 중 오류가 발생하였습니다."),
 
     // Auth
     INVALID_NICKNAME("AUTH_001", HttpStatus.NOT_FOUND,
@@ -25,8 +51,10 @@ public enum ErrorCode {
     // BinaryContent
     BINARYCONTENT_NOT_FOUNT("BINARYCONTENT_001", HttpStatus.NOT_FOUND,
             "해당 UUID를 가진 바이너리 컨텐츠가 존재하지 않습니다."),
-    FILE_CONVERSION_FAILED("BINARYCONTENT_002", HttpStatus.INTERNAL_SERVER_ERROR, "파일 변환 중 오류가 발생했습니다."),
-    INVALID_FILE_REQUEST("BINARYCONTENT_003", HttpStatus.BAD_REQUEST, "잘못된 파일 요청입니다."),
+    FILE_CONVERSION_FAILED("BINARYCONTENT_002", HttpStatus.INTERNAL_SERVER_ERROR,
+            "파일 변환 중 오류가 발생했습니다."),
+    INVALID_FILE_REQUEST("BINARYCONTENT_003", HttpStatus.BAD_REQUEST,
+            "잘못된 파일 요청입니다."),
 
     // Channel
     CHANNEL_NOT_FOUND("CHANNEL_001", HttpStatus.NOT_FOUND,

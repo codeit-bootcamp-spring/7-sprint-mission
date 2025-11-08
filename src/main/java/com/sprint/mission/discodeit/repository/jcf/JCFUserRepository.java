@@ -4,18 +4,14 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class JCFUserRepository implements UserRepository {
-    // 유저 데이터
-    private final Map<UUID, User> data = new ConcurrentHashMap<>();
-
+public class JCFUserRepository extends JCFBaseRepository<User> implements UserRepository{
     // 저장
     @Override
     public User save(User user) {
+        beforeModify();
         data.put(user.getId(), user);
         return user;
     }
@@ -50,16 +46,19 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void update(UUID userId, String email, String nickname, String password){
+        beforeModify();
         data.get(userId).update(email, nickname, password);
     }
 
     @Override
     public void updateProfileImage(UUID userId, UUID profileId) {
+        beforeModify();
         data.get(userId).updateProfile(profileId);
     }
 
     @Override
     public void delete(UUID userId) {
+        beforeModify();
         data.remove(userId);
     }
 

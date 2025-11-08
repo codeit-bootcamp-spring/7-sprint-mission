@@ -4,18 +4,14 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class JCFBinaryContentRepository implements BinaryContentRepository {
-    // 바이너리 컨텐츠 데이터
-    private final Map<UUID, BinaryContent> data = new ConcurrentHashMap<>();
-    
+public class JCFBinaryContentRepository extends JCFBaseRepository<BinaryContent> implements BinaryContentRepository {
     //저장
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
+        beforeModify();
         data.put(binaryContent.getId(), binaryContent);
         return binaryContent;
     }
@@ -34,7 +30,10 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     //삭제
     @Override
-    public void delete(UUID id) {data.remove(id);}
+    public void delete(UUID id) {
+        beforeModify();
+        data.remove(id);
+    }
 
     @Override
     public boolean existsById(UUID id) {
