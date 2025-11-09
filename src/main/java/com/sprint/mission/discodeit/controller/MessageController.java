@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
@@ -10,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,8 +30,24 @@ public class MessageController {
     private final MessageService messageService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<MessageResponseDto>> createMessage(@Valid  @RequestBody CreateMessageDto createMessageDto) {
-        MessageResponseDto messageResponseDto = messageService.createMessage(createMessageDto);
+    public ResponseEntity<ApiResponse<MessageResponseDto>> createMessage(
+            @Valid @RequestPart CreateMessageDto createMessageDto,
+            @RequestPart(value = "attachments") List<MultipartFile> attachments) {
+        List<CreateBinaryContentDto> createBinaryContentDtos = attachments.stream()
+                .map(attachment -> {
+                    CreateBinaryContentDto createBinaryContentDto = null;
+                    try {
+                        createBinaryContentDto = new CreateBinaryContentDto(
+                                attachment.getOriginalFilename(),
+                                attachment.getContentType(),
+                                attachment.getBytes());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return createBinaryContentDto;
+                }).toList();
+
+        MessageResponseDto messageResponseDto = messageService.createMessage(createMessageDto, createBinaryContentDtos);
         ApiResponse<MessageResponseDto> responseBody = ApiResponse.success(messageResponseDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }

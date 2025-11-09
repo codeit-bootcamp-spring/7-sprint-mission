@@ -11,3 +11,13 @@ file:
     userStatusPath: src/main/resources/UserStatuses.ser
     binaryContentPath: src/main/resources/BinaryContent.ser
     readStatusPath: src/main/resources/ReadStatus.ser
+
+spring:
+  application:
+    name: discodeit
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 30MB
+
+

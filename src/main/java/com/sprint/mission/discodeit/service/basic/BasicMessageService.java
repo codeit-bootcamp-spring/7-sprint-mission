@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
@@ -30,17 +31,17 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public MessageResponseDto createMessage(CreateMessageDto createMessageDto) {
+    public MessageResponseDto createMessage(CreateMessageDto createMessageDto, List<CreateBinaryContentDto> createBinaryContentDtos) {
         User user = userRepository.findById(createMessageDto.userId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Channel channel = channelRepository.findById(createMessageDto.channelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
         List<UUID> binaryContentIds;
-        if (createMessageDto.createBinaryContentDtos() == null) {
+        if (createBinaryContentDtos == null) {
             binaryContentIds = new ArrayList<>();
         } else {
-            binaryContentIds = createMessageDto.createBinaryContentDtos().stream().map(
+            binaryContentIds = createBinaryContentDtos.stream().map(
                     createBinaryContentDto -> {
                         BinaryContent binaryContent = new BinaryContent(
                                 createBinaryContentDto.fileName(),

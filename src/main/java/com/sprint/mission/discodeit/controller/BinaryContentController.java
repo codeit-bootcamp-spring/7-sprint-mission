@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * [ ] 바이너리 파일을 1개 또는 여러 개 조회할 수 있다. "api/binaryContents/{binaryContentIds}, POST
+ * [ ] 바이너리 파일을 1개 또는 여러 개 조회할 수 있다. "api/binaryContent/{binaryContentIds}, POST
  */
 @RestController
 @RequestMapping("api/binaryContent")
@@ -21,8 +21,8 @@ public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
-    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContentResponseDto> getAllBinaryContent(@RequestParam UUID binaryContentId) {
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<BinaryContentResponseDto> getBinaryContent(@RequestParam UUID binaryContentId) {
         BinaryContentResponseDto binaryContent = binaryContentService.getBinaryContent(binaryContentId);
         return ResponseEntity.status(HttpStatus.OK).body(binaryContent);
     }

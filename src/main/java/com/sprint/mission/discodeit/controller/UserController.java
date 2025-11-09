@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
@@ -12,9 +13,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,9 +38,21 @@ public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid  @RequestBody CreateUserDto userDto) {
-        UserResponseDto userResponseDto = userService.createUser(userDto);
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<UserResponseDto>> createUser(
+            @Valid @RequestPart(value = "userDto") CreateUserDto userDto,
+            @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+        CreateBinaryContentDto createBinaryContentDto = null;
+
+        if (profile != null && !profile.isEmpty()) {
+            createBinaryContentDto = new CreateBinaryContentDto(
+                    profile.getOriginalFilename(),  // ✅ 실제 업로드된 파일 이름
+                    profile.getContentType(),       // ✅ Content-Type (예: image/jpeg)
+                    profile.getBytes()               // ✅ 파일 데이터
+            );
+        }
+
+        UserResponseDto userResponseDto = userService.createUser(userDto, createBinaryContentDto);
         ApiResponse<UserResponseDto> responseBody = ApiResponse.success(userResponseDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }

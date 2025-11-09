@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public UserResponseDto createUser(CreateUserDto createUserDto) {
+    public UserResponseDto createUser(CreateUserDto createUserDto, CreateBinaryContentDto createBinaryContentDto) {
         if (userRepository.findByUsername(createUserDto.username()).isPresent()) {
             throw new CustomException(ErrorCode.USERNAME_ALREADY_EXIST);
         }
@@ -43,8 +42,7 @@ public class BasicUserService implements UserService {
 
         UUID profileId = null;
 
-        if(createUserDto.createBinaryContentDto() != null){
-            CreateBinaryContentDto createBinaryContentDto = createUserDto.createBinaryContentDto();
+        if(createBinaryContentDto != null){
             BinaryContent binaryContent = new BinaryContent(
                     createBinaryContentDto.fileName(),
                     createBinaryContentDto.contentType(),
@@ -72,7 +70,7 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + userId));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
 
         return UserResponseDto.from(user, userStatus.isOnline());
     }
@@ -95,10 +93,10 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + updateUserDto.username()));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + updateUserDto.username()));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
 
         user.updateUser(updateUserDto.username(),
                 updateUserDto.password(),
@@ -114,10 +112,10 @@ public class BasicUserService implements UserService {
     @Override
     public void deleteUser(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없는 유저: " + userId));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (!userStatusRepository.existsByUserId(userId)) {
-            throw new NoSuchElementException("[UserStatus] 찾을 수 없는 유저 : " + userId);
+            throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);
         }
         userStatusRepository.deleteByUserId(userId);
 
