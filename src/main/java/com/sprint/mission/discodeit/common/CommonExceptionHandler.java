@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice // @RestController 있어야 동작!!
+@Slf4j
 public class CommonExceptionHandler {
 
     // ❤️ Controller 단에서 발생하는 모든 예외를 일괄 처리하는 클래스
@@ -20,8 +22,13 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> illegalArgsHandler(IllegalArgumentException e) {
-        e.printStackTrace();
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//        e.printStackTrace();
+        log.error(e.getMessage(), e);
+//        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+        // 예외의 원인을 http 상태 코드와 메세지를 통해 알려주고 싶다. -> ResponseEntity
+        ApiResponse<Object> response = ApiResponse.error("ILLEGAL_ARGS", e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalStateException.class)
