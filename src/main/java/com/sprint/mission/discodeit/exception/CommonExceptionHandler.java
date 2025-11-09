@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.common.exception;
+package com.sprint.mission.discodeit.exception;
 
 
 import com.sprint.mission.discodeit.entity.common.Common;
@@ -30,7 +30,6 @@ public class CommonExceptionHandler {
         e.printStackTrace();
 
         //가공이 필요하다
-        //1. 오류 결과를 담을 map을 생성합니다 (KEY: 필드명 VALUE: 에러 메세지)
         Map<String,String> errors= new HashMap<>();
 
         BindingResult bindingResult = e.getBindingResult();
@@ -49,7 +48,7 @@ public class CommonExceptionHandler {
 
 
 
-    //미처 준비하지 못한 타입의 예외가 있을수가 있다
+    //모르는 예외
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> exceptionHandler(Exception e){
         e.printStackTrace();
