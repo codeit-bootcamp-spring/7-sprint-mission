@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
+import com.sprint.mission.discodeit.global.util.ApiResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,39 +14,42 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * [ ] 메시지를 보낼 수 있다.  /api/message, POST
- * [ ] 메시지를 수정할 수 있다. /api/message/{messageId}, PUT
- * [ ] 메시지를 삭제할 수 있다. /api/message/{messageId}, DELETE
- * [ ] 특정 채널의 메시지 목록을 조회할 수 있다. /api/message?channelId=, GET
+ * [ ] 메시지를 보낼 수 있다.  /api/messages, POST
+ * [ ] 메시지를 수정할 수 있다. /api/messages/{messageId}, PUT
+ * [ ] 메시지를 삭제할 수 있다. /api/messages/{messageId}, DELETE
+ * [ ] 특정 채널의 메시지 목록을 조회할 수 있다. /api/messages?channelId=, GET
  */
 @RestController
-@RequestMapping("/api/message")
+@RequestMapping("/api/messages")
 @RequiredArgsConstructor
 public class MessageController {
     private final MessageService messageService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> createMessage(@RequestBody CreateMessageDto createMessageDto) {
-        MessageResponseDto message = messageService.createMessage(createMessageDto);
-        return ResponseEntity.ok(message);
+    public ResponseEntity<ApiResponse<MessageResponseDto>> createMessage(@RequestBody CreateMessageDto createMessageDto) {
+        MessageResponseDto messageResponseDto = messageService.createMessage(createMessageDto);
+        ApiResponse<MessageResponseDto> responseBody = ApiResponse.success(messageResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateMessage(@PathVariable UUID messageId, @RequestBody UpdateMessageDto updateMessageDto) {
+    public ResponseEntity<ApiResponse<MessageResponseDto>> updateMessage(@PathVariable UUID messageId, @RequestBody UpdateMessageDto updateMessageDto) {
         MessageResponseDto messageResponseDto = messageService.updateMessage(messageId, updateMessageDto);
-        return ResponseEntity.ok(messageResponseDto);
+        ApiResponse<MessageResponseDto> responseBody = ApiResponse.success(messageResponseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteMessage(@PathVariable UUID messageId) {
+    public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
         messageService.deleteMessage(messageId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> getMessages(@RequestParam UUID channelId) {
+    public ResponseEntity<ApiResponse<List<MessageResponseDto>>> getMessages(@RequestParam UUID channelId) {
         List<MessageResponseDto> allMessageByChannelId = messageService.getAllMessageByChannelId(channelId);
-        return ResponseEntity.ok(allMessageByChannelId);
+        ApiResponse<List<MessageResponseDto>> responseBody = ApiResponse.success(allMessageByChannelId);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
 

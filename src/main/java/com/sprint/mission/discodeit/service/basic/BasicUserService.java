@@ -90,7 +90,6 @@ public class BasicUserService implements UserService {
                     return UserResponseDto.from(user, status.isOnline());
                 })
                 .toList();
-
     }
 
     @Override

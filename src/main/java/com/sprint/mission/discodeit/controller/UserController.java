@@ -4,10 +4,13 @@ import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusDto;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponseDto;
+import com.sprint.mission.discodeit.global.util.ApiResponse;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,48 +19,53 @@ import java.util.UUID;
 
 /**
  * 사용자 관리
- * [ ] 사용자를 등록할 수 있다.                      api/user, Post
- * [ ] 사용자 정보를 수정할 수 있다.                 api/user/{userId}, Put
- * [ ] 사용자를 삭제할 수 있다.                      api/user, Delete
- * [ ] 모든 사용자를 조회할 수 있다.                 api/user, Get
- * [ ] 사용자의 온라인 상태를 업데이트할 수 있다.    api/user/status/{userId}, Put
+ * [ ] 사용자를 등록할 수 있다.                      api/users, Post
+ * [ ] 사용자 정보를 수정할 수 있다.                 api/users/{userId}, Put
+ * [ ] 사용자를 삭제할 수 있다.                      api/users, Delete
+ * [ ] 모든 사용자를 조회할 수 있다.                 api/users, Get
+ * [ ] 사용자의 온라인 상태를 업데이트할 수 있다.    api/users/status/{userId}, Put
  */
+@Slf4j
 @RestController
-@RequestMapping(value = "/api/user")
+@RequestMapping(value = "/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> createUser(@RequestBody CreateUserDto userDto) {
+    public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@RequestBody CreateUserDto userDto) {
         UserResponseDto userResponseDto = userService.createUser(userDto);
-        return ResponseEntity.ok(userResponseDto);
+        ApiResponse<UserResponseDto> responseBody = ApiResponse.success(userResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> getAllUser() {
+    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUser() {
         List<UserResponseDto> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        ApiResponse<List<UserResponseDto>> response = ApiResponse.success(users);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateUser(@PathVariable UUID userId, @RequestBody UpdateUserDto updateUserDto) {
+    public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(@PathVariable UUID userId, @RequestBody UpdateUserDto updateUserDto) {
         UserResponseDto userResponseDto = userService.updateUser(userId, updateUserDto);
-        return ResponseEntity.ok(userResponseDto);
+        ApiResponse<UserResponseDto> responseBody = ApiResponse.success(userResponseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
     @RequestMapping(value = "/status/{userId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateUserState(@PathVariable UUID userId,
                                              @RequestBody UpdateUserStatusDto updateUserDto) {
-        UserStatus userStatus = userStatusService.updateStatusByUserId(userId, updateUserDto);
-        return ResponseEntity.ok(userStatus);
+        UserStatusResponseDto userStatusResponseDto = userStatusService.updateStatusByUserId(userId, updateUserDto);
+        ApiResponse<UserStatusResponseDto> responseBody = ApiResponse.success(userStatusResponseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
 

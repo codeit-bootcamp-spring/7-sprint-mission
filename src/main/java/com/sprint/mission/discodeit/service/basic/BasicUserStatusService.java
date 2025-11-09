@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userStatus.request.CreateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.util.exception.CustomException;
 import com.sprint.mission.discodeit.global.util.exception.ErrorCode;
@@ -21,7 +22,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
     @Override
-    public UserStatus createUserStatus(CreateUserStatusDto createUserStatusDto) {
+    public UserStatusResponseDto createUserStatus(CreateUserStatusDto createUserStatusDto) {
         if(!userRepository.existsById(createUserStatusDto.userId())) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
@@ -32,38 +33,45 @@ public class BasicUserStatusService implements UserStatusService {
 
         UserStatus userstatus = new UserStatus(createUserStatusDto.userId(), createUserStatusDto.loginAt());
         userStatusRepository.save(userstatus);
-        return userstatus;
+
+        return UserStatusResponseDto.from(userstatus);
     }
 
     @Override
-    public UserStatus getUserStatus(UUID userStatusId) {
-        return userStatusRepository.findById(userStatusId)
+    public UserStatusResponseDto getUserStatus(UUID userStatusId) {
+        UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+
+        return UserStatusResponseDto.from(userStatus);
     }
 
     @Override
-    public List<UserStatus> getAllUserStatuses() {
-        return userStatusRepository.findAll();
+    public List<UserStatusResponseDto> getAllUserStatuses() {
+        return userStatusRepository.findAll().stream()
+                .map(UserStatusResponseDto::from)
+                .toList();
     }
 
     @Override
-    public void updateUserStatus(UUID userStatusId, UpdateUserStatusDto updateUserStatusDto) {
+    public UserStatusResponseDto updateUserStatus(UUID userStatusId, UpdateUserStatusDto updateUserStatusDto) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
 
         userStatus.update(updateUserStatusDto.loginAt());
         userStatusRepository.save(userStatus);
+
+        return UserStatusResponseDto.from(userStatus);
     }
 
     @Override
-    public UserStatus updateStatusByUserId(UUID userId, UpdateUserStatusDto updateUserStatusDto) {
+    public UserStatusResponseDto updateStatusByUserId(UUID userId, UpdateUserStatusDto updateUserStatusDto) {
         Instant lastActiveAt = updateUserStatusDto.loginAt();
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
         userStatus.update(lastActiveAt);
         userStatusRepository.save(userStatus);
 
-        return userStatus;
+        return UserStatusResponseDto.from(userStatus);
     }
 
     @Override
