@@ -38,3 +38,4 @@ bin/
 ### Mac OS ###
 .DS_Store*.zip
 *.zip
+.DS_Store
