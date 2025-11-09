@@ -34,7 +34,6 @@ public class UserStatus extends Common {
     }
 
     public UserStatusType isOnline() {
-        System.out.println("현재 시간은: " + Instant.now());
         if(Duration.between(loginAt, Instant.now()).toSeconds() <= 300) {
             return UserStatusType.ONLINE;
         }
