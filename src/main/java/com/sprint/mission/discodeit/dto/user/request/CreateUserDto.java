@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto.user.request;
 
-import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -20,7 +19,7 @@ public record CreateUserDto(
 
         // 대명사(한줄 자기소개)는 필수가 아님
         // createBinaryContentDto는 필수가 아님.
-        String pronoun,
-        CreateBinaryContentDto createBinaryContentDto
+        String pronoun
+
 ) {
 }
