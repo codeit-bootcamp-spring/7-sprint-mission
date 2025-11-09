@@ -7,9 +7,9 @@ import com.sprint.mission.discodeit.entity.Receivable;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.ReceiverType;
-import com.sprint.mission.discodeit.common.exceptions.BinaryContentNotFoundException;
-import com.sprint.mission.discodeit.common.exceptions.ChannelNotFoundException;
-import com.sprint.mission.discodeit.common.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -54,7 +54,7 @@ final class MessageMapper {
                                     UserRepository userRepository,
                                     ChannelRepository channelRepository,
                                     BinaryContentRepository contentRepository) {
-        User sender = userRepository.findById(dto.getSenderUuid())
+        User sender = userRepository.find(dto.getSenderUuid())
                 .orElseThrow(() -> new UserNotFoundException(dto.getSenderUuid()));
 
         Receivable receiver;

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponse getByUserId(String userId);
     UserResponse get(UUID uuid);
     List<UserResponse> getAllUsers();
     List<UserResponse> getOnlineUsers();
@@ -17,8 +16,7 @@ public interface UserService {
     UserResponse signIn(UserCreateRequest dto);
     UserResponse update(UserUpdateRequest dto);
 
-    void deleteByUserId(UserDeleteRequest dto);
-    void deleteById(UUID uuid);
+    void delete(UserDeleteRequest dto);
 
     // TODO: Auth로 분리
     UserResponse login(String id, String passwd);

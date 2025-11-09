@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.dto.fileIo.mapper;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.fileIo.UserIoDTO;
-import com.sprint.mission.discodeit.common.exceptions.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
 final class UserMapper {

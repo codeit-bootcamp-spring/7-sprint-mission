@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.common.exceptions.ReadStatusAlreadyExistsException;
-import com.sprint.mission.discodeit.common.exceptions.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.readStatus.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.common.exceptions.readStatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -18,6 +18,11 @@ import java.util.UUID;
 @Primary
 public class FileReadStatusRepository implements ReadStatusRepository {
     private static final List<ReadStatus> data = new ArrayList<>();
+    private final DataWriter dataWriter;
+
+    public FileReadStatusRepository(DataWriter dataWriter) {
+        this.dataWriter = dataWriter;
+    }
 
     @Override
     public void save(ReadStatus readStatus) {
@@ -93,6 +98,6 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     private void write() {
-        DataWriter.writeReadStatus(data);
+        dataWriter.writeReadStatus(data);
     }
 }

@@ -6,6 +6,6 @@ import java.util.UUID;
 
 public record ChannelMemberRequest(
         UUID channelId,
-        List<String> userIds
+        List<UUID> userUuids
 ) {
 }

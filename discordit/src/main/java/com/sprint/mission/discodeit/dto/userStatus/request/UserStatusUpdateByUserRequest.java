@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public record UserStatusUpdateByUserIdRequest(
+public record UserStatusUpdateByUserRequest(
         @NotNull(message = "유저 id는 필수입니다.")
-        String userId,
+        UUID userUuid,
         @NotNull(message = "상태는 필수입니다.")
         OnlineStatus onlineStatus
 ) {

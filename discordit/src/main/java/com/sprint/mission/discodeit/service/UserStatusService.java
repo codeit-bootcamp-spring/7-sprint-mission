@@ -13,5 +13,7 @@ public interface UserStatusService {
     List<UserStatusResponse> getAll();
 
     UserStatusResponse update(UserStatusUpdateRequest dto);
-    UserStatusResponse updateByUserId(UserStatusUpdateByUserIdRequest dto);
+    UserStatusResponse updateByUser(UserStatusUpdateByUserRequest dto);
+
+    UserStatusResponse getByUser(UUID userUuid);
 }

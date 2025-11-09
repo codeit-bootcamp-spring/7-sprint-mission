@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.common.validator;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import static com.sprint.mission.discodeit.common.config.ValidationProperties.*;
+import static com.sprint.mission.discodeit.common.constants.ValidationProperties.*;
 
 @Component
 public class UserValidator {
@@ -23,6 +22,9 @@ public class UserValidator {
         }
         if (id.length() < ID_MIN_LENGTH || id.length() > ID_MAX_LENGTH) {
             throw new IllegalArgumentException(String.format("아이디는 %d에서 %d자 사이로 입력해주세요.", ID_MIN_LENGTH, ID_MAX_LENGTH));
+        }
+        if (!id.matches("^[a-zA-Z0-9_]+$")) {
+            throw new IllegalArgumentException("아이디는 영문자, 숫자, 언더바(_)만 사용할 수 있습니다.");
         }
     }
 

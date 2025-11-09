@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.exceptions;
+package com.sprint.mission.discodeit.common.exceptions.readStatus;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.Channel;

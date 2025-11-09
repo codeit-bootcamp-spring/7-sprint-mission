@@ -12,6 +12,11 @@ import java.util.*;
 public class FileUserRepository implements UserRepository {
 
     private final Map<UUID, User> data = new HashMap<>();
+    private final DataWriter dataWriter;
+
+    public FileUserRepository(DataWriter dataWriter) {
+        this.dataWriter = dataWriter;
+    }
 
     @Override
     public void save(User user) {
@@ -32,7 +37,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(UUID uuid) {
+    public Optional<User> find(UUID uuid) {
         return Optional.ofNullable(data.get(uuid));
     }
 
@@ -44,26 +49,21 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findAllByUserIds(List<String> userIds) {
+    public List<User> findAllByUuids(List<UUID> userUuids) {
         return data.values().stream()
-                .filter(u -> userIds.contains(u.getUserId()))
+                .filter(u -> userUuids.contains(u.getUuid()))
                 .toList();
     }
 
-    @Override
-    public void deleteByUserId(String userId) {
-        data.values().removeIf(u -> u.getUserId().equals(userId));
-        write();
-    }
 
     @Override
-    public void deleteById(UUID uuid) {
+    public void delete(UUID uuid) {
         data.remove(uuid);
         write();
     }
 
     @Override
-    public boolean existsById(UUID uuid) {
+    public boolean exists(UUID uuid) {
         return data.containsKey(uuid);
     }
 
@@ -81,7 +81,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     private void write() {
-        DataWriter.writeUser(data);
+        dataWriter.writeUser(data);
     }
 }
 

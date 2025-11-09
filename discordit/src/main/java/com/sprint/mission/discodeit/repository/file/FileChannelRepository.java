@@ -14,6 +14,11 @@ import java.util.*;
 public class FileChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> data = new HashMap<>();
+    private final DataWriter dataWriter;
+
+    public FileChannelRepository(DataWriter dataWriter) {
+        this.dataWriter = dataWriter;
+    }
 
 
     @Override
@@ -68,7 +73,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     private void write() {
-        DataWriter.writeChannel(data);
+        dataWriter.writeChannel(data);
     }
 
 }

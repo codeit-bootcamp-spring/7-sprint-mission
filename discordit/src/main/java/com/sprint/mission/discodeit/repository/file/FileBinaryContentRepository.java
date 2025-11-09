@@ -12,6 +12,11 @@ import java.util.*;
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
     private final Map<UUID, BinaryContent> data = new HashMap<>();
+    private final DataWriter dataWriter;
+
+    public FileBinaryContentRepository(DataWriter dataWriter) {
+        this.dataWriter = dataWriter;
+    }
 
     @Override
     public void save(BinaryContent content) {
@@ -54,6 +59,6 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     private void write() {
-        DataWriter.writeBinaryContent(List.copyOf(data.values()));
+        dataWriter.writeBinaryContent(List.copyOf(data.values()));
     }
 }

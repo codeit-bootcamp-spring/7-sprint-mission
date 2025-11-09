@@ -11,6 +11,8 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.common.config.OnlineThreshold.ONLINE_THRESHOLD;
+
 @Getter
 public class User extends BaseEntity implements Receivable {
 
@@ -23,8 +25,6 @@ public class User extends BaseEntity implements Receivable {
     private String bio;
     private OnlineStatus onlineStatus;
     private BinaryContent profileImage;
-
-    private static final Duration ONLINE_THRESHOLD = OnlineThreshold.ONLINE_THRESHOLD;
 
     public User(String userId, String passwd, String email, String displayName) {
         UserValidator.validateId(userId);
@@ -113,7 +113,7 @@ public class User extends BaseEntity implements Receivable {
     @Override
     public String toString() {
         return "User{" +
-                "userId='" + userId + '\'' +
+                "userUuid='" + userId + '\'' +
                 ", Passwd='" + passwd + '\'' +
                 ", displayName='" + displayName + '\'' +
                 ", bio='" + bio + '\'' +

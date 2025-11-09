@@ -7,9 +7,11 @@ import com.sprint.mission.discodeit.enums.ChannelType;
 
 import java.time.Instant;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public record ChannelResponse(
+        UUID id,
         String channelName,
         ChannelScope scope,
         ChannelType type,
@@ -21,6 +23,7 @@ public record ChannelResponse(
 ) {
     public static ChannelResponse toDto(Channel channel, Instant recentTime) {
         return new ChannelResponse(
+                channel.getUuid(),
                 channel.getChannelName(),
                 channel.getScope(),
                 channel.getType(),

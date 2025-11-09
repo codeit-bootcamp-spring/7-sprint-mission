@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public record UserUpdateRequest(
         @NotNull(message = "id는 필수입니다.")
-        String userId,
+        UUID id,
 
         @Nullable String passwd,
         @Nullable String displayName,

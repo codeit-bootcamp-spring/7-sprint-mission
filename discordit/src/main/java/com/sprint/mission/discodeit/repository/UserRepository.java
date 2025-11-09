@@ -10,17 +10,16 @@ public interface UserRepository {
     void save(User user);
     void update(User user);
 
-    Optional<User> findById(UUID uuid);
+    Optional<User> find(UUID uuid);
     Optional<User> findByUserId(String userId);
 
     void delete(User user);
 
-    List<User> findAllByUserIds(List<String> userIds);
+    List<User> findAllByUuids(List<UUID> userUuids);
 
-    void deleteByUserId(String id);
-    void deleteById(UUID uuid);
+    void delete(UUID uuid);
 
-    boolean existsById(UUID uuid);
+    boolean exists(UUID uuid);
     boolean existsByUserId(String userId);
 
     List<User> findAll();

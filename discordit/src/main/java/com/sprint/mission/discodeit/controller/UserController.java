@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/user")
@@ -30,19 +31,20 @@ public class UserController {
         return new ResponseEntity<>(userService.update(request), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public void delete(@Valid @RequestBody UserDeleteRequest request) {
-        userService.deleteByUserId(request);
+    @RequestMapping(value = "/remove", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> delete(@Valid @RequestBody UserDeleteRequest request) {
+        userService.delete(request);
+        return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
+    @RequestMapping(value = "/getAll", method = RequestMethod.GET)
     public ResponseEntity<List<UserResponse>> getAll() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<UserResponse> get(@PathVariable String userId) {
-        return new ResponseEntity<>(userService.getByUserId(userId), HttpStatus.OK);
+    @RequestMapping(value = "/get", method = RequestMethod.GET)
+    public ResponseEntity<UserResponse> get(@RequestParam UUID id) {
+        return new ResponseEntity<>(userService.get(id), HttpStatus.OK);
     }
 
 

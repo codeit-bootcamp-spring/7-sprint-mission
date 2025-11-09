@@ -14,6 +14,11 @@ import java.util.*;
 public class FileMessageRepository implements MessageRepository {
 
     private final Map<UUID, Message> data = new HashMap<>();
+    private final DataWriter dataWriter;
+
+    public FileMessageRepository(DataWriter dataWriter) {
+        this.dataWriter = dataWriter;
+    }
 
     @Override
     public void save(Message message) {
@@ -95,7 +100,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     private void write() {
-        DataWriter.writeMessage(List.copyOf(data.values()));
+        dataWriter.writeMessage(List.copyOf(data.values()));
     }
 
 }

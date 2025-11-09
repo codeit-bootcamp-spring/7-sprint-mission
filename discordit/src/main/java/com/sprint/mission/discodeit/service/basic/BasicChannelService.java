@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.dto.channel.response.ChannelResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.enums.ChannelScope;
-import com.sprint.mission.discodeit.common.exceptions.ChannelNotFoundException;
-import com.sprint.mission.discodeit.common.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -85,7 +85,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void delete(ChannelDeleteRequest dto) {
+    public void delete(ChannelRemoveRequest dto) {
         Channel channel = channelRepository.findById(dto.id())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.id()));
         channelRepository.deleteById(dto.id());
@@ -101,9 +101,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelResponse> getAllVisibleByUserId(String userId) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+    public List<ChannelResponse> getAllVisibleByUser(UUID userUuid) {
+        User user = userRepository.find(userUuid)
+                .orElseThrow(() -> new UserNotFoundException(userUuid));
         return Stream.concat(channelRepository.findAllPublic().stream(), channelRepository.findAllPrivateByUser(user).stream())
                 .map(this::toDto)
                 .toList();
@@ -133,7 +133,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void addMember(ChannelMemberRequest dto) {
-        List<User> users = userRepository.findAllByUserIds(dto.userIds());
+        List<User> users = userRepository.findAllByUuids(dto.userUuids());
         Channel channel = channelRepository.findById(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()));
         channel.addMembers(new HashSet<>(users));
@@ -142,7 +142,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void addModerator(ChannelMemberRequest dto) {
-        List<User> users = userRepository.findAllByUserIds(dto.userIds());
+        List<User> users = userRepository.findAllByUuids(dto.userUuids());
         channelRepository.findById(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
                 .addModerators(new HashSet<>(users));
@@ -150,7 +150,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteMember(ChannelMemberRequest dto) {
-        List<User> users = userRepository.findAllByUserIds(dto.userIds());
+        List<User> users = userRepository.findAllByUuids(dto.userUuids());
         channelRepository.findById(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
                 .deleteMember(new HashSet<>(users));
@@ -158,7 +158,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteModerator(ChannelMemberRequest dto) {
-        List<User> users = userRepository.findAllByUserIds(dto.userIds());
+        List<User> users = userRepository.findAllByUuids(dto.userUuids());
         channelRepository.findById(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
                 .deleteModerator(new HashSet<>(users));
@@ -173,9 +173,9 @@ public class BasicChannelService implements ChannelService {
 
     /*
     TODO: 예외처리 물어보기
-    private User findUserAndHandleConflict(String userId) {
-        return userRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+    private User findUserAndHandleConflict(String userUuid) {
+        return userRepository.findByUserId(userUuid)
+                .orElseThrow(() -> new UserNotFoundException(userUuid));
     }
 
     private Channel findAndHandleConflict(UUID id) {

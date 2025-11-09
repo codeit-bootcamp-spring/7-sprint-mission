@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/channel")
@@ -17,30 +18,34 @@ import java.util.List;
 public class ChannelController {
     private final ChannelService channelService;
 
-    @RequestMapping(value = "/public", method = RequestMethod.POST)
+    @RequestMapping(value = "/create/public", method = RequestMethod.POST)
     public ResponseEntity<ChannelResponse> createPublic(@Valid @RequestBody PublicChannelCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPublicChannel(request));
     }
 
-    @RequestMapping(value = "/private", method = RequestMethod.POST)
+    @RequestMapping(value = "/create/private", method = RequestMethod.POST)
     public ResponseEntity<ChannelResponse> createPrivate(@Valid @RequestBody PrivateChannelCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPrivateChannel(request));
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = "/update/public", method = RequestMethod.PUT)
     public ResponseEntity<ChannelResponse> updatePublic(@Valid @RequestBody ChannelUpdateRequest request) {
         return ResponseEntity.ok().body(channelService.update(request));
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteChannel(@Valid @RequestBody ChannelDeleteRequest request) {
+    @RequestMapping(value = "/remove", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> removeChannel(@Valid @RequestBody ChannelRemoveRequest request) {
         channelService.delete(request);
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "{userId}", method = RequestMethod.GET)
-    public ResponseEntity<List<ChannelResponse>> getVisibleChannel(@PathVariable String userId) {
-        return ResponseEntity.ok(channelService.getAllVisibleByUserId(userId));
+    @RequestMapping(value = "/get", method = RequestMethod.GET)
+    public ResponseEntity<List<ChannelResponse>> getVisibleChannel(@RequestParam UUID userId) {
+        return ResponseEntity.ok(channelService.getAllVisibleByUser(userId));
     }
 
+    @RequestMapping(value = "/getAll", method = RequestMethod.GET)
+    public ResponseEntity<List<ChannelResponse>> getAll() {
+        return ResponseEntity.ok(channelService.getAll());
+    }
 }

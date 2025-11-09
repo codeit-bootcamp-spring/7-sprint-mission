@@ -15,6 +15,8 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    // TODO: ApiStatus를 이용해 더 구체적인 에러 띄우기
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {

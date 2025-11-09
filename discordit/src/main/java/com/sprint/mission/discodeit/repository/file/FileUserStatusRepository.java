@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.common.exceptions.UserStatusAlreadyExistException;
-import com.sprint.mission.discodeit.common.exceptions.UserStatusNotExistException;
+import com.sprint.mission.discodeit.common.exceptions.user.UserStatusAlreadyExistException;
+import com.sprint.mission.discodeit.common.exceptions.user.UserStatusNotExistException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -17,6 +17,11 @@ import java.util.UUID;
 @Primary
 public class FileUserStatusRepository implements UserStatusRepository {
     private static final Map<UUID, UserStatus> data = new HashMap<>();
+    private final DataWriter dataWriter;
+
+    public FileUserStatusRepository(DataWriter dataWriter) {
+        this.dataWriter = dataWriter;
+    }
 
     @Override
     public void save(UserStatus userStatus) {
@@ -79,6 +84,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     private void write() {
-        DataWriter.writeUserStatus(data);
+        dataWriter.writeUserStatus(data);
     }
 }

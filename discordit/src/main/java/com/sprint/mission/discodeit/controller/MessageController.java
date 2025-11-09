@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.message.request.MessageEditRequest;
-import com.sprint.mission.discodeit.dto.message.request.MessageDeleteRequest;
+import com.sprint.mission.discodeit.dto.message.request.MessageRemoveRequest;
 import com.sprint.mission.discodeit.dto.message.request.MessageGetRequest;
 import com.sprint.mission.discodeit.dto.message.request.MessageSendRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
@@ -10,10 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,23 +25,23 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageService.send(request));
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = "/edit", method = RequestMethod.PUT)
     public ResponseEntity<MessageResponse> edit(@Valid @RequestBody MessageEditRequest request) {
         return ResponseEntity.ok(messageService.editMessage(request));
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity<Void> delete(@Valid @RequestBody MessageDeleteRequest request) {
+    @RequestMapping(value = "/remove", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> remove(@Valid @RequestBody MessageRemoveRequest request) {
         messageService.delete(request);
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<List<MessageResponse>> get(@Valid @RequestBody MessageGetRequest request) {
+    @RequestMapping(value = "/get", method = RequestMethod.POST)
+    public ResponseEntity<List<MessageResponse>> get(@Valid @RequestParam MessageGetRequest request) {
         return ResponseEntity.ok(messageService.get(request));
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/getAll", method = RequestMethod.GET)
     public ResponseEntity<List<MessageResponse>> getAll() {
         return ResponseEntity.ok(messageService.getAll());
     }

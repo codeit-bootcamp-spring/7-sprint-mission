@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.exceptions;
+package com.sprint.mission.discodeit.common.exceptions.user;
 
 public class UserAlreadyExistsException extends RuntimeException {
     public UserAlreadyExistsException(String id) {

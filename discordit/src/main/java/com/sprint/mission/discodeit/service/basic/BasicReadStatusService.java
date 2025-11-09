@@ -6,9 +6,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.common.exceptions.ChannelNotFoundException;
-import com.sprint.mission.discodeit.common.exceptions.ReadStatusNotFoundException;
-import com.sprint.mission.discodeit.common.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.readStatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -57,8 +57,8 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(() -> new ReadStatusNotFoundException(uuid)));
     }
 
-    public List<ReadStatusResponse> getAllByUserId(String userId) {
-        User user = userRepository.findByUserId(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    public List<ReadStatusResponse> getAllByUserId(UUID id) {
+        User user = userRepository.find(id).orElseThrow(() -> new UserNotFoundException(id));
         return readStatusRepository.findAllByUser(user).stream()
                 .map(ReadStatusResponse::toDto)
                 .toList();

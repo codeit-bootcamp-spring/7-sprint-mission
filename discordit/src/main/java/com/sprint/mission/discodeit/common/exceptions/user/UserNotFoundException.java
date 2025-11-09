@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.exceptions;
+package com.sprint.mission.discodeit.common.exceptions.user;
 
 import com.sprint.mission.discodeit.entity.User;
 

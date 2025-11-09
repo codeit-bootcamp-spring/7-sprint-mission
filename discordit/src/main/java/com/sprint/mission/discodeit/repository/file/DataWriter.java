@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.fileIo.mapper.Mapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,10 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Component
+@RequiredArgsConstructor
 class DataWriter {
     private final DataPath dataPath;
 
-    public static void writeChannel(Map<UUID, Channel> data) {
+    public void writeChannel(Map<UUID, Channel> data) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataPath.CHANNEL_FILE_PATH()))) {
             oos.writeObject(data.values().stream()
                     .map(Mapper::toChannelDTO)
@@ -29,8 +33,8 @@ class DataWriter {
         }
     }
 
-    public static void writeUser(Map<UUID, User> data) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_FILE_PATH))) {
+    public void writeUser(Map<UUID, User> data) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataPath.USER_FILE_PATH()))) {
             oos.writeObject(data.values().stream()
                     .map(Mapper::toUserDto)
                     .toList());
@@ -39,8 +43,8 @@ class DataWriter {
         }
     }
 
-    public static void writeMessage(List<Message> data) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(MESSAGE_FILE_PATH))) {
+    public void writeMessage(List<Message> data) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataPath.MESSAGE_FILE_PATH()))) {
             oos.writeObject(data.stream()
                     .map(Mapper::toMessageDto)
                     .toList());
@@ -49,8 +53,8 @@ class DataWriter {
         }
     }
 
-    public static void writeBinaryContent(List<BinaryContent> data) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(BINARY_CONTENT_PATH))) {
+    public void writeBinaryContent(List<BinaryContent> data) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataPath.BINARY_CONTENT_FILE_PATH()))) {
             oos.writeObject(data.stream()
                     .map(Mapper::toDto)
                     .toList());
@@ -59,8 +63,8 @@ class DataWriter {
         }
     }
 
-    public static void writeReadStatus(List<ReadStatus> data) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(READ_STATUS_FILE_PATH))) {
+    public void writeReadStatus(List<ReadStatus> data) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataPath.READ_STATUS_FILE_PATH()))) {
             oos.writeObject(data.stream()
                     .map(Mapper::toDto)
                     .toList());
@@ -69,8 +73,8 @@ class DataWriter {
         }
     }
 
-    public static void writeUserStatus(Map<UUID, UserStatus> data) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_STATUS_FILE_PATH))) {
+    public void writeUserStatus(Map<UUID, UserStatus> data) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataPath.USER_STATUS_FILE_PATH()))) {
             oos.writeObject(data.values().stream()
                     .map(Mapper::toDto)
                     .toList());

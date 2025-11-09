@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.request.MessageDeleteRequest;
+import com.sprint.mission.discodeit.dto.message.request.MessageRemoveRequest;
 import com.sprint.mission.discodeit.dto.message.request.MessageEditRequest;
 import com.sprint.mission.discodeit.dto.message.request.MessageGetRequest;
 import com.sprint.mission.discodeit.dto.message.request.MessageSendRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.enums.ReceiverType;
-import com.sprint.mission.discodeit.common.exceptions.ChannelNotFoundException;
-import com.sprint.mission.discodeit.common.exceptions.MessageNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.common.exceptions.ReceiverNotFoundException;
-import com.sprint.mission.discodeit.common.exceptions.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -106,7 +106,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void delete(MessageDeleteRequest dto) {
+    public void delete(MessageRemoveRequest dto) {
         Message message = messageRepository.find(dto.id())
                 .orElseThrow(() -> new MessageNotFoundException(dto.id()));
         if (!message.getAttachments().isEmpty()) {
