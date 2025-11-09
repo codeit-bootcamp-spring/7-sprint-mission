@@ -38,7 +38,7 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("채널UUID가없어 :" + request.channelId());
         }
         if (!userRepository.existsById(request.authorId())) {
-            throw new NoSuchElementException("매시지UUID가 없어 :" + request.authorId());
+            throw new NoSuchElementException("유저UUID가 없어 :" + request.authorId());
         }
 
         List<UUID> attachmentIds = binaryContentCreateRequests.stream()

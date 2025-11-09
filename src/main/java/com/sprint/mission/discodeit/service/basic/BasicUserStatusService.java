@@ -61,8 +61,7 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatusResponse update(UserStatustUpdateRequest request) {
         UserStatus userStatus = userStatusRepository.findByUserId(request.userId()).stream().findFirst()
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + request.userId()));
-        userStatus.setUpdatedAt(Instant.now());
-        userStatusRepository.deleteByUserId(userStatus.getUserId());
+     //   userStatusRepository.deleteByUserId(userStatus.getId());
          userStatusRepository.save(userStatus.getUserId());
         return UserStatusResponse.from(userStatus);
     }

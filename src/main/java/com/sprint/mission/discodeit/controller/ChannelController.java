@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/channel")
+@RequestMapping("/channels")
 @RequiredArgsConstructor
 public class ChannelController {
 

@@ -97,7 +97,7 @@ public class BasicChannelService implements ChannelService {
                 //일단public은전체 private는 user만조회한거니 유저id에맞거나 public이거나
                 //둘중하나보여주니 필터로 (유저가속한채널,퍼블릭채널)->전부다
                 .filter(channel ->
-                        channel.getType() == ChannelType.PUBLIC || channel.getUsers().contains(userId)
+                        channel.getType() == ChannelType.PUBLIC && channel.getUsers().contains(userId)
                 )
                 .map(channel -> {
                     //채널달 최근메시지 시간은 각각해주고

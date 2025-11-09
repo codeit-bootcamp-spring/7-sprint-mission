@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/message")
+@RequestMapping("/messages")
 @RequiredArgsConstructor
 public class MessageController {
 
@@ -28,12 +28,12 @@ public class MessageController {
                //[ ] 메시지를 보낼 수 있다.
                @RequestMapping(value = "/create", method = RequestMethod.POST)
                public MessageResponse createMessage(
-                       @RequestParam("message") CreateMessageRequest request,
-                       @RequestParam(value = "profiles", required = false) List<MultipartFile> profiles
+                       @RequestPart("message") CreateMessageRequest request,
+                       @RequestPart(value = "profiles", required = false) List<MultipartFile> profiles
                ) {
                    List<BinaryContentCreateRequest> binarys = new ArrayList<>();
 
-                   // 여러 개의 파일이 존재한다면 각각 변환
+
                    if (profiles != null && !profiles.isEmpty()) {
                        for (MultipartFile profile : profiles) {
                            try {
@@ -47,7 +47,6 @@ public class MessageController {
                        }
                    }
 
-                   // 여러 개면 optional이 아니라 List로 넘기는 게 자연스럽겠죠
                    return messageService.create(request, binarys);
                }
 
