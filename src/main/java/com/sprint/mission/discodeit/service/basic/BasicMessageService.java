@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
+    private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
@@ -43,11 +44,20 @@ public class BasicMessageService implements MessageService {
     @Override
     public void create(CreateMessageRequestDto request, List<MultipartFile> fileList) {
 
-        // 채널에 메시지를 생성하면 채널 존재 여부와 유저가 채널에 속해 있는지 검증
-        if (request.getReceiveType() == ReceiveType.CHANNEL) {
+        // 유저에게 메시지를 보내면 수신자 존재 여부 확인
+        if (request.getReceiveType() == ReceiveType.USER) {
+            if(!userRepository.isExist(request.getReceiverId())) {
+                throw new CustomException(ErrorCode.USER_NOT_FOUND);
+            }
+        }
+        // 채널에 메시지를 생성하면 채널 존재 여부 확인
+        else if (request.getReceiveType() == ReceiveType.CHANNEL) {
             Channel channel = channelRepository.findById(request.getReceiverId())
                     .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
-            if (!channel.getMemberIds().contains(request.getSenderId())) {
+
+            // 비공개 채널의 경우 유저가 채널에 속해 있는지 검증
+            if (channel.getVisibility() == ChannelVisibility.PRIVATE &&
+                    !channel.getMemberIds().contains(request.getSenderId())) {
                 throw new CustomException(ErrorCode.NOT_CHANNEL_MEMBER);
             }
         }
@@ -86,6 +96,11 @@ public class BasicMessageService implements MessageService {
      */
     @Override
     public Message findLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType) {
+        // 송신자 존재 여부 확인
+        if(!userRepository.isExist(senderId)){
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
         List<Message> allMessages = messageRepository.findAll();
 
         // 최신순(역순)으로 순회
@@ -96,12 +111,22 @@ public class BasicMessageService implements MessageService {
         // 최근 메시지는 Printer 클래스의 printChatLatest 메서드에서
         // Optional의 ifPresentOrElse를 통해 null을 저장할 경우 닉네임만 출력하기 때문에 null을 반환
         if (receiverType == ReceiveType.USER) {
+            // 수신자 존재 여부 확인
+            if(!userRepository.isExist(receiverId)){
+                throw new CustomException(ErrorCode.USER_NOT_FOUND);
+            }
+
             // 유저 간의 대화 중 가장 마지막 메시지
             return reversed.filter(m ->
                             (senderId.equals(m.getSenderId()) && receiverId.equals(m.getReceiverId())) ||
                                     (receiverId.equals(m.getSenderId()) && senderId.equals(m.getReceiverId())))
                     .findFirst().orElse(null);
         } else if (receiverType == ReceiveType.CHANNEL) {
+            // 채널 존재 여부 확인
+            if(channelRepository.isExist(receiverId)){
+                throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+            }
+
             // 특정 채널에 보낸 마지막 메시지
             return reversed.filter(m ->
                             senderId.equals(m.getSenderId()) && receiverId.equals(m.getReceiverId()))
@@ -146,9 +171,19 @@ public class BasicMessageService implements MessageService {
      * 메시지 내용(content) 수정
      */
     @Override
-    public void update(UUID messageId, UpdateMessageRequestDto request) {
+    public void update(UUID userId, UUID messageId, UpdateMessageRequestDto request) {
+        // 요청자 존재 여부 확인
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
+
+        // 요청자와 메시지 발신자의 UUID 비교
+        if(!user.getId().equals(message.getSenderId())) {
+            throw new CustomException(ErrorCode.MESSAGE_EDIT_FORBIDDEN);
+        }
+
         message.setContent(request.getContent());
         messageRepository.update(message);
     }
@@ -157,9 +192,15 @@ public class BasicMessageService implements MessageService {
      * 특정 메시지(UUID 기반) 삭제
      */
     @Override
-    public void delete(UUID messageId) {
+    public void delete(UUID userId, UUID messageId) {
         Message msg = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
+
+        // 요청자와 메시지 발신자의 UUID 비교
+        if(!userId.equals(msg.getSenderId())) {
+            throw new CustomException(ErrorCode.MESSAGE_EDIT_FORBIDDEN);
+        }
+
         binaryContentRepository.deleteByIds(msg.getAttachmentIds()); // 메시지와 관련된 파일들 삭제
         messageRepository.deleteById(messageId);
     }

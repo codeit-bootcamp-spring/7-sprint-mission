@@ -37,6 +37,9 @@ public enum ErrorCode {
     ALREADY_CHANNEL_ADMIN(HttpStatus.CONFLICT, "당신은 이미 이 채널의 관리자입니다."),
 
     //===== MESSAGE =====//
+    // 403 FORBIDDEN
+    MESSAGE_EDIT_FORBIDDEN(HttpStatus.FORBIDDEN, "본인이 작성한 메시지만 수정할 수 있습니다."),
+
     // 404 NOT FOUND
     MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "메시지가 존재하지 않습니다."),
 

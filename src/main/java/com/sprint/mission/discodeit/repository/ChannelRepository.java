@@ -72,4 +72,6 @@ public interface ChannelRepository {
     boolean existsById(UUID channelId);
 
     boolean isUserJoinedChannel(UUID userId, UUID channelId);
+
+    boolean isExist(UUID receiverId);
 }

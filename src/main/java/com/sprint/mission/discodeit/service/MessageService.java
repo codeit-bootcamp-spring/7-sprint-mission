@@ -38,8 +38,8 @@ public interface MessageService {
     List<Message> findAllSentBetweenUsers(UUID senderId, UUID receiverId);
 
     /** 메시지 내용(content)을 수정 */
-    void update(UUID messageId, UpdateMessageRequestDto request);
+    void update(UUID userId, UUID messageId, UpdateMessageRequestDto request);
 
     /** 특정 메시지를 UUID로 삭제 */
-    void delete(UUID messageId);
+    void delete(UUID userId, UUID messageId);
 }

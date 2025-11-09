@@ -31,15 +31,17 @@ public class MessageController {
     // 메시지 수정
     @RequestMapping(value = "/messages/{messageId}", method = RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<Object>> updateMessage(@PathVariable UUID messageId,
+                                                @RequestParam UUID userId,
                                                 @RequestBody UpdateMessageRequestDto requestDto) {
-        messageService.update(messageId, requestDto);
+        messageService.update(userId, messageId, requestDto);
         return ApiResponse.success(HttpStatus.OK,"메시지가 수정되었습니다.");
     }
 
     // 메시지 삭제
     @RequestMapping(value = "/messages/{messageId}", method = RequestMethod.DELETE)
-    public ResponseEntity<ApiResponse<Object>> deleteMessage(@PathVariable UUID messageId) {
-        messageService.delete(messageId);
+    public ResponseEntity<ApiResponse<Object>> deleteMessage(@PathVariable UUID messageId,
+                                                             @RequestParam UUID userId) {
+        messageService.delete(userId, messageId);
         return ApiResponse.success(HttpStatus.OK,"메시지가 삭제되었습니다.");
     }
 

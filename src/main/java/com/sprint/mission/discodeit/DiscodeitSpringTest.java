@@ -777,11 +777,11 @@ public class DiscodeitSpringTest {
                     System.out.println("내용을 입력해 수정하세요.");
                     System.out.printf("기존 메시지 : %s\n", choiceMsg.getContent());
                     System.out.printf("입력 : ");
-                    messageService.update(choiceMsg.getId(), new UpdateMessageRequestDto(sc.nextLine()));
+                    messageService.update(loginUser.getId(), choiceMsg.getId(), new UpdateMessageRequestDto(sc.nextLine()));
                     System.out.println("메시지가 수정되었습니다.");
                 }
                 case 2 -> {
-                    messageService.delete(choiceMsg.getId());
+                    messageService.delete(loginUser.getId(), choiceMsg.getId());
                     System.out.println("메시지가 삭제되었습니다.");
                 }
                 default -> System.out.println("수정/삭제를 선택하지 않아 채팅방으로 이동합니다.");

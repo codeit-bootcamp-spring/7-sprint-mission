@@ -55,4 +55,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
         return readStatusStore.values().stream()
                 .anyMatch(r -> userId.equals(r.getUserId()) && channelId.equals(r.getChannelId()));
     }
+
+    @Override
+    public boolean isExist(UUID readStatusId) {
+        return readStatusStore.containsKey(readStatusId);
+    }
 }

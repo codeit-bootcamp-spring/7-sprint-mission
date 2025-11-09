@@ -6,10 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseD
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +22,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public ChannelResponseDto create(UUID adminId, CreateChannelRequestDto request) {
@@ -59,10 +57,12 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
+        // 요청된 사용자가 이미 채널에 속해 있는 경우 예외 발생
         if(channel.getMemberIds().contains(request.getUserId())){
             throw new CustomException(ErrorCode.CHANNEL_MEMBER_ALREADY_EXISTS);
         }
 
+        // 공개 채널의 경우 예외 발생 (비공개 채널만 멤버 추가 가능)
         if(channel.getVisibility() == ChannelVisibility.PUBLIC){
             throw new CustomException(ErrorCode.PUBLIC_CHANNEL_MEMBER_ADD_FORBIDDEN);
         }
@@ -136,9 +136,11 @@ public class BasicChannelService implements ChannelService {
         // 관리자만 채널의 관리자 변경 가능
         if(channel.getAdminId().equals(request.getAdminId())){
             if(channel.getVisibility() == ChannelVisibility.PRIVATE){
+                // 새로운 관리자가 채널에 속하지 않은 경우 예외 발생
                 if (!channel.getMemberIds().contains(request.getNewAdminId())) {
                     throw new CustomException(ErrorCode.NOT_CHANNEL_MEMBER);
                 }
+            // 관리자가 본인을 관리자를 변경하려 하는 경우 예외 발생
             } else if (channel.getAdminId().equals(request.getNewAdminId())) {
                 throw new CustomException(ErrorCode.ALREADY_CHANNEL_ADMIN);
             }
@@ -181,7 +183,8 @@ public class BasicChannelService implements ChannelService {
         }
 
         readStatusRepository.deleteByChannelId(channelId);
-        messageRepository.deleteByChannelId(channelId);
+        List<UUID> binaryContentIds = messageRepository.deleteByChannelId(channelId); // 채널 메시지 삭제 및 연관 파일 UUID 저장
+        binaryContentRepository.deleteByIds(binaryContentIds); // 채널 메시지 연관 파일들 삭제
         channelRepository.deleteById(channelId); // 채널 삭제
     }
 
@@ -195,11 +198,14 @@ public class BasicChannelService implements ChannelService {
 
         //삭제 요청 유저와 삭제될 유저가 동일하지 않으면
         if(!requesterId.equals(targetId)){
-            if(!requesterId.equals(channel.getAdminId())) { //삭제 요청 유저가 관리자가 아니라면 삭제 거부
+            //삭제 요청 유저가 관리자가 아니라면 예외 발생
+            if(!requesterId.equals(channel.getAdminId())) {
                 throw new CustomException(ErrorCode.NOT_CHANNEL_ADMIN);
+            // 삭제될 유저가 채널에 속해있지 않으면 예외 발생
             } else if(!channel.getMemberIds().contains(targetId)) {
                 throw new CustomException(ErrorCode.NOT_CHANNEL_MEMBER);
             }
+        // 삭제될 유저가 관리자인 경우 예외 발생
         } else if(channel.getAdminId().equals(targetId)) {
             throw new CustomException(ErrorCode.CANNOT_LEAVE_AS_CHANNEL_ADMIN);
         }

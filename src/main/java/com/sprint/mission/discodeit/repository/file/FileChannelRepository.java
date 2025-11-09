@@ -131,9 +131,8 @@ public class FileChannelRepository implements ChannelRepository {
                 .anyMatch(id -> channelId.equals(id));
     }
 
-
-
-
-
-
+    @Override
+    public boolean isExist(UUID channelId) {
+        return channelStore.containsKey(channelId);
+    }
 }

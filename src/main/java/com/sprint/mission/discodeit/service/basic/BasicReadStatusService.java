@@ -63,6 +63,9 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void delete(UUID readStatusId) {
+        if(!readStatusRepository.isExist(readStatusId)){
+            throw new CustomException(ErrorCode.READSTATUS_NOT_FOUND);
+        }
         readStatusRepository.deleteById(readStatusId);
     }
 }

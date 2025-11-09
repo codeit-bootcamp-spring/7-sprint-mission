@@ -44,8 +44,8 @@ public class DiscodeitTest {
     private DiscodeitTest(UserRepository userRepository, ChannelRepository channelRepository, MessageRepository messageRepository,
                           UserStatusRepository userStatusRepository, BinaryContentRepository binaryContentRepository, ReadStatusRepository readStatusRepository) {
         userService = new BasicUserService(userRepository, messageRepository, userStatusRepository, binaryContentRepository);
-        channelService = new BasicChannelService(userRepository, channelRepository, messageRepository, readStatusRepository);
-        messageService = new BasicMessageService(messageRepository, channelRepository, binaryContentRepository);
+        channelService = new BasicChannelService(userRepository, channelRepository, messageRepository, readStatusRepository, binaryContentRepository);
+        messageService = new BasicMessageService(userRepository, messageRepository, channelRepository, binaryContentRepository);
         authService = new BasicAuthService(userRepository, userStatusRepository);
 
         //테스트를 위한 유저, 채널, 메시지 데이터 생성
@@ -838,11 +838,11 @@ public class DiscodeitTest {
                     System.out.println("내용을 입력해 수정하세요.");
                     System.out.printf("기존 메시지 : %s\n", choiceMsg.getContent());
                     System.out.printf("입력 : ");
-                    messageService.update(choiceMsg.getId(), new UpdateMessageRequestDto(sc.nextLine()));
+                    messageService.update(loginUser.getId(), choiceMsg.getId(), new UpdateMessageRequestDto(sc.nextLine()));
                     System.out.println("메시지가 수정되었습니다.");
                 }
                 case 2 -> {
-                    messageService.delete(choiceMsg.getId());
+                    messageService.delete(loginUser.getId(), choiceMsg.getId());
                     System.out.println("메시지가 삭제되었습니다.");
                 }
                 default -> System.out.println("수정/삭제를 선택하지 않아 채팅방으로 이동합니다.");

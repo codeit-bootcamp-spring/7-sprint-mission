@@ -105,4 +105,9 @@ public class JCFChannelRepository implements ChannelRepository {
         return joinedChannels.get(userId).stream()
                 .anyMatch(id -> channelId.equals(id));
     }
+
+    @Override
+    public boolean isExist(UUID channelId) {
+        return channelStore.containsKey(channelId);
+    }
 }

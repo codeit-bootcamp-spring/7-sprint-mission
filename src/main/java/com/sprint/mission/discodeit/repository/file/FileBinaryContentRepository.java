@@ -46,4 +46,9 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
         saveToFile(filePath, contentStore);
     }
+
+    @Override
+    public boolean isExist(UUID binaryContentId) {
+        return contentStore.containsKey(binaryContentId);
+    }
 }

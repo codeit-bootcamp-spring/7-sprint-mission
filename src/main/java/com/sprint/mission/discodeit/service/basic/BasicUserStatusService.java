@@ -68,6 +68,9 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void delete(UUID userStatusId) {
+        if(!userStatusRepository.isExist(userStatusId)){
+            throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);
+        };
         userStatusRepository.deleteById(userStatusId);
     }
 }

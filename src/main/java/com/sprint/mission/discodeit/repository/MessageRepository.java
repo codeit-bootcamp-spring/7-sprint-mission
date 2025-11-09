@@ -33,7 +33,7 @@ public interface MessageRepository {
     void deleteByUser(UUID userId);
 
     /** 채널 삭제시 채널 메시지 모두 삭제 */
-    void deleteByChannelId(UUID channelId);
+    List<UUID> deleteByChannelId(UUID channelId);
 
     Instant searchLastedMessageTime(UUID channelId);
 }

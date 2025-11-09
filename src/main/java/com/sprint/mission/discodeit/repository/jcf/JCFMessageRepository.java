@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * JCFMessageRepository
@@ -50,9 +51,15 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void deleteByChannelId(UUID channelId) {
+    public List<UUID> deleteByChannelId(UUID channelId) {
+        List<UUID> contentIds = messageStore.values().stream()
+                .filter(m -> channelId.equals(m.getReceiverId()))
+                .flatMap(m -> m.getAttachmentIds().stream())
+                .collect(Collectors.toList());
+
         // 채널 삭제시 채널의 모든 메시지 삭제
         messageStore.values().removeIf(m -> channelId.equals(m.getReceiverId()));
+        return contentIds;
     }
 
     @Override
