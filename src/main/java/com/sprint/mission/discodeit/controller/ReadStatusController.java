@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.readStatus.request.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.global.util.ApiResponse;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<ReadStatusResponseDto>> createReadStatus(@RequestBody CreateReadStatusDto createReadStatusDto) {
+    public ResponseEntity<ApiResponse<ReadStatusResponseDto>> createReadStatus(@Valid  @RequestBody CreateReadStatusDto createReadStatusDto) {
         ReadStatusResponseDto readStatusResponseDto = readStatusService.createReadStatus(createReadStatusDto);
         ApiResponse<ReadStatusResponseDto> responseBody = ApiResponse.success(readStatusResponseDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);

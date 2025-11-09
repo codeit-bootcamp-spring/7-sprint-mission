@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponseDt
 import com.sprint.mission.discodeit.global.util.ApiResponse;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@RequestBody CreateUserDto userDto) {
+    public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid  @RequestBody CreateUserDto userDto) {
         UserResponseDto userResponseDto = userService.createUser(userDto);
         ApiResponse<UserResponseDto> responseBody = ApiResponse.success(userResponseDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
@@ -43,8 +44,8 @@ public class UserController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUser() {
         List<UserResponseDto> users = userService.getAllUsers();
-        ApiResponse<List<UserResponseDto>> response = ApiResponse.success(users);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        ApiResponse<List<UserResponseDto>> responseBody = ApiResponse.success(users);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)

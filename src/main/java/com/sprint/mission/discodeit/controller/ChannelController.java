@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.global.util.ApiResponse;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +29,14 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @RequestMapping(value = "/public", method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<ChannelResponseDto>> createChannel(@RequestBody CreatePublicChannelDto createPublicChannelDto) {
+    public ResponseEntity<ApiResponse<ChannelResponseDto>> createChannel(@Valid @RequestBody CreatePublicChannelDto createPublicChannelDto) {
         ChannelResponseDto channelResponseDto = channelService.createChannel(createPublicChannelDto);
         ApiResponse<ChannelResponseDto> responseBody = ApiResponse.success(channelResponseDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
     @RequestMapping(value = "/private", method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<ChannelResponseDto>> createChannel(@RequestBody CreatePrivateChannelDto createPrivateChannelDto) {
+    public ResponseEntity<ApiResponse<ChannelResponseDto>> createChannel(@Valid @RequestBody CreatePrivateChannelDto createPrivateChannelDto) {
         ChannelResponseDto channelResponseDto = channelService.createChannel(createPrivateChannelDto);
         ApiResponse<ChannelResponseDto> responseBody = ApiResponse.success(channelResponseDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);

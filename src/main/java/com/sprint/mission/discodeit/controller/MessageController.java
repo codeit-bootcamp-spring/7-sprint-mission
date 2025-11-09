@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.global.util.ApiResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<MessageResponseDto>> createMessage(@RequestBody CreateMessageDto createMessageDto) {
+    public ResponseEntity<ApiResponse<MessageResponseDto>> createMessage(@Valid  @RequestBody CreateMessageDto createMessageDto) {
         MessageResponseDto messageResponseDto = messageService.createMessage(createMessageDto);
         ApiResponse<MessageResponseDto> responseBody = ApiResponse.success(messageResponseDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
