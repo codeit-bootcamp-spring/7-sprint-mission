@@ -32,7 +32,7 @@ function renderUserList(users) {
 
         // 프로필 이미지 생성
         let profileUrl = '/default-avatar.png'; // 기본 이미지
-        if (user.profileImg && user.profileImg.data && user.profileImg.fileType) {
+        if (user.profileImg != null && user.profileImg.data && user.profileImg.fileType) {
             profileUrl = `data:${user.profileImg.fileType};base64,${user.profileImg.data}`;
         }
 
