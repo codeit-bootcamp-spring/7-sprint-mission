@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.FileUtilConfig;
 import com.sprint.mission.discodeit.entity.dto.*;
 import com.sprint.mission.discodeit.service.basic.UserService;
 import com.sprint.mission.discodeit.service.basic.UserStatusService;
@@ -17,6 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.common.Util.parsingMultipartFile;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
@@ -37,7 +37,7 @@ public class UserController {
     public Res_User create(@RequestPart("dtouser") Dto_User dtoUser,
                            @RequestPart("file") MultipartFile file) {
 
-        Dto_BinaryContent dtoFile = FileUtilConfig.parsingMultipartFile(file);
+        Dto_BinaryContent dtoFile = parsingMultipartFile(file);
         return userService.create(dtoUser, Optional.ofNullable(dtoFile));
     }
 
@@ -45,7 +45,7 @@ public class UserController {
     public Res_User update(@RequestPart("dtouser") Dto_UserWithIDAndContent dtoUser,
                            @RequestPart("file") MultipartFile file) {
 
-        Dto_BinaryContent dtoFile = FileUtilConfig.parsingMultipartFile(file);
+        Dto_BinaryContent dtoFile = parsingMultipartFile(file);
         return userService.update(dtoUser.userId(), dtoUser.dtoUser(), Optional.ofNullable(dtoFile));
     }
 

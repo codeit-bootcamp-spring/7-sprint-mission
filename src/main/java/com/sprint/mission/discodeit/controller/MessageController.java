@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.FileUtilConfig;
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_Message;
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
@@ -31,7 +31,7 @@ public class MessageController {
                               @RequestPart("file") List<MultipartFile> fileList) {
 
         List<Dto_BinaryContent> collect = fileList.stream()
-                .map(FileUtilConfig::parsingMultipartFile)
+                .map(Util::parsingMultipartFile)
                 .toList(); // 변경가능 list
 
         return messageService.create(dtoMessage, Optional.of(collect));
