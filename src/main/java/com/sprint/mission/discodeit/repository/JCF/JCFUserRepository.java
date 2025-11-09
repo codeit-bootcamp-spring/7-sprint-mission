@@ -3,11 +3,10 @@ package com.sprint.mission.discodeit.repository.JCF;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository
+//@Repository
 public class JCFUserRepository implements InterfaceUserRepository {
     private final Map<UUID, User> data;
 
@@ -38,8 +37,10 @@ public class JCFUserRepository implements InterfaceUserRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public boolean deleteById(UUID id) {
+
         this.data.remove(id);
+        return false;
     }
 
     @Override
@@ -50,7 +51,7 @@ public class JCFUserRepository implements InterfaceUserRepository {
 
     @Override
     public boolean isUsingEmail(String eMail) {
-//        return findAll().stream().anyMatch(user -> user.getEMail().equals(eMail));
+//        return findAll().stream().anyMatch(user -> user.getEMail().equals(email));
         return false;
     }
 

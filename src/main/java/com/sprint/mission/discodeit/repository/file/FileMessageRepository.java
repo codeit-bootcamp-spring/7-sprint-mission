@@ -21,13 +21,13 @@ public class FileMessageRepository implements InterfaceMessageRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
-        fileUtil.deleteRepository(id);
+    public boolean deleteById(UUID id) {
+        return fileUtil.deleteRepository(id);
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
-        Optional<Message> message = fileUtil.findModel(id).map(model -> (Message)model); //.orElseThrow(() -> new NoSuchElementException("🚨MESSAGE id = [" + id + "] 오류"));
+        Optional<Message> message = fileUtil.findModel(id).map(model -> (Message)model); //.orElseThrow(() -> new NoSuchElementException("🚨MESSAGE readStatusID = [" + readStatusID + "] 오류"));
         return message;
     }
 
@@ -41,7 +41,7 @@ public class FileMessageRepository implements InterfaceMessageRepository {
     public Optional<List<Message>> findAllMessageInChannel(UUID channelID) {
         List<Message> list = fileUtil.findAll().stream().map(model -> (Message)model)
                 .filter(message -> message.getChannelId().equals(channelID)).toList();
-        return Optional.ofNullable(list);
+        return Optional.of(list);
     }
 
     @Override

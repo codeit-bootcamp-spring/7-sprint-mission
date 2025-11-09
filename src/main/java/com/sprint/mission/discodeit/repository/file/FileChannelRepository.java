@@ -23,20 +23,20 @@ public class FileChannelRepository implements InterfaceChannelRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
-        fileUtil.deleteRepository(id);
+    public boolean deleteById(UUID id) {
+        return fileUtil.deleteRepository(id);
     }
 
     @Override
     public Optional<Channel> findById(UUID channelID) {
-        Channel channel = (Channel) fileUtil.findModel(channelID).orElseThrow(() -> new IllegalArgumentException("🚨channel id = [" + channelID.toString()+ "] 오류"));
+        Channel channel = (Channel) fileUtil.findModel(channelID).orElseThrow(() -> new IllegalArgumentException("🚨channel readStatusID = [" + channelID.toString()+ "] 오류"));
         return Optional.ofNullable(channel);
     }
 
     @Override
     public Optional<List<Channel>> findAll() {
         List<Channel> channels = fileUtil.findAll().stream().map(model -> (Channel)model).toList();
-        return Optional.ofNullable(channels);
+        return Optional.of(channels);
     }
 
     @Override

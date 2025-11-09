@@ -12,6 +12,6 @@ public interface InterfaceChannelService extends BaseInterfaceService {
     List<Res_ChannelFind> findAllByUserId(UUID userID);                                 // 모두 읽기
 //    void updateChannelName(Channel channel, String name);
 //    void updateChannelType(Channel channel, ChannelType channelType);// 수정
-    void update( UUID channelID, Dto_ChannelUpdate dtoChannelUpdate);
+    void update(Dto_ChannelUpdate dtoChannelUpdate);
     void delete(UUID uuid);                              // 삭제
 }

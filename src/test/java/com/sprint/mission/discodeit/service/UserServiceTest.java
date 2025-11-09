@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_User;
-import com.sprint.mission.discodeit.entity.dto.Res_IsOnlineUser;
+import com.sprint.mission.discodeit.entity.dto.UserDto;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.basic.UserService;
@@ -56,7 +56,7 @@ class UserServiceTest {
     void testCreateUser() {
         Dto_BinaryContent dtoBinaryContent =  Dto_BinaryContent.from("haha", "txt", new byte[0], 0L);
         Res_User created = userService.create(testUserDto, Optional.of(dtoBinaryContent));
-        createdUserId = created.id();
+        createdUserId = created.userId();
 
         assertThat(created).isNotNull();
         assertThat(created.userName()).isEqualTo("TestUser");
@@ -69,10 +69,10 @@ class UserServiceTest {
         Dto_BinaryContent dtoBinaryContent =  Dto_BinaryContent.from("haha", "txt", new byte[0], 0L);
         Dto_User dtoUser = Dto_User.from("⭐️ 별", "1234", "별@example.com");
         Res_User created = userService.create(dtoUser, Optional.of(dtoBinaryContent));
-        Res_IsOnlineUser user = userService.find(created.id());
+        UserDto user = userService.find(created.userId());
         assertThat(user).isNotNull();
-        assertThat(user.userName()).isEqualTo("⭐️ 별");
-        assertThat(user.eMail()).isEqualTo("별@example.com");
+        assertThat(user.username()).isEqualTo("⭐️ 별");
+        assertThat(user.email()).isEqualTo("별@example.com");
     }
 
     @Test
@@ -83,11 +83,11 @@ class UserServiceTest {
         Dto_User dtoUser = Dto_User.from("⭐️ 별", "1234", "별@example.com");
         Res_User created = userService.create(dtoUser, Optional.of(dtoBinaryContent));
 
-        Dto_User dtoUser_II = Dto_User.from("🐯호랭이는 어흥", "호랭123", "어흥이@eMail.com");
-        Res_User updated = userService.update(created.id(), dtoUser_II, Optional.of(dtoBinaryContent));
+        Dto_User dtoUser_II = Dto_User.from("🐯호랭이는 어흥", "호랭123", "어흥이@email.com");
+        Res_User updated = userService.update(created.userId(), dtoUser_II, Optional.of(dtoBinaryContent));
         assertThat(updated).isNotNull();
         assertThat(updated.userName()).isEqualTo("🐯호랭이는 어흥");
-        assertThat(updated.eMail()).isEqualTo("어흥이@eMail.com");
+        assertThat(updated.eMail()).isEqualTo("어흥이@email.com");
 
         // 파일이 여전히 존재해야 함
 //        File file = new File(REPO_PATH + createdUserId + ".ser");
@@ -101,7 +101,7 @@ class UserServiceTest {
         Dto_BinaryContent dtoBinaryContent =  Dto_BinaryContent.from("haha", "txt", new byte[0], 0L);
         Dto_User dtoUser = Dto_User.from("⭐️ 별", "1234", "별@example.com");
         Res_User created = userService.create(dtoUser, Optional.of(dtoBinaryContent));
-        userService.delete(created.id());
+        userService.delete(created.userId());
 //        assertThat(deleted).isTrue();
 
         // 파일이 실제로 삭제되었는지 확인

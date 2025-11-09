@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.PrintUtil;
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Res_BinaryContent;
@@ -22,25 +22,25 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
         BinaryContent binaryContent = new BinaryContent(dtoBinaryContent);
         binaryContentRepository.save(binaryContent);
-        PrintUtil.okMessage("BinaryContentService.create = [" + binaryContent.getId() + "]");
+        Util.okMessage("BinaryContentService.create = [" + binaryContent.getId() + "]");
         return Res_BinaryContent.from(binaryContent);
     }
 
     public  Res_BinaryContent find(UUID binaryContentId) {
 //    [ ] id로 조회합니다.
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new IllegalArgumentException("🚨BinaryContentService.find.binaryContentId = [" + binaryContentId + "] 오류"));
-        PrintUtil.okMessage("BinaryContentService.find.binaryContentId = [" + binaryContentId + "]");
+        Util.okMessage("BinaryContentService.find.binaryContentId = [" + binaryContentId + "]");
         return Res_BinaryContent.from(binaryContent);
     }
 
     public List<Res_BinaryContent> findAllByIdIn() {
-//    [ ] id 목록으로 조회합니다.
+//    [ ] readStatusID 목록으로 조회합니다.
         Optional<List<BinaryContent>> contents = binaryContentRepository.findAll();
         if (contents.isEmpty()) {
             throw new IllegalArgumentException("🚨BinaryContentService.findAllByIdIn.isEmpty");
         }
         else {
-            PrintUtil.okMessage("BinaryContentService.findAllByIdIn");
+            Util.okMessage("BinaryContentService.findAllByIdIn");
             return contents.get().stream().map(Res_BinaryContent::from).toList();
         }
     }
@@ -48,6 +48,6 @@ public class BinaryContentService implements InterfaceBinaryContentService {
     public void delete(UUID binaryContentId) {
 //    [ ] id로 삭제합니다.
         binaryContentRepository.deleteById(binaryContentId);
-        PrintUtil.okMessage("BinaryContentService.delete.id = [" + binaryContentId + "]");
+        Util.okMessage("BinaryContentService.delete.readStatusID = [" + binaryContentId + "]");
     }
 }

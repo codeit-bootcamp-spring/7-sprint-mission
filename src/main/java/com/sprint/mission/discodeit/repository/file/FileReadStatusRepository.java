@@ -23,20 +23,20 @@ public class FileReadStatusRepository  implements InterfaceReadStatusRepository 
     }
 
     @Override
-    public void deleteById(UUID readStatusID) {
-        fileUtil.deleteRepository(readStatusID);
+    public boolean deleteById(UUID readStatusID) {
+        return fileUtil.deleteRepository(readStatusID);
     }
 
     @Override
     public Optional<ReadStatus> findById(UUID readStatusID) {
-        ReadStatus readStatus = (ReadStatus) fileUtil.findModel(readStatusID).orElseThrow(() -> new IllegalArgumentException("🚨channel id = [" + readStatusID.toString()+ "] 오류"));
+        ReadStatus readStatus = (ReadStatus) fileUtil.findModel(readStatusID).orElseThrow(() -> new IllegalArgumentException("🚨channel readStatusID = [" + readStatusID.toString()+ "] 오류"));
         return Optional.of(readStatus);
     }
 
 
     @Override
     public Optional<List<ReadStatus>> findAll() {
-        return Optional.ofNullable(fileUtil.findAll().stream().map(readStatusID -> (ReadStatus)readStatusID).toList());
+        return Optional.of(fileUtil.findAll().stream().map(readStatusID -> (ReadStatus)readStatusID).toList());
     }
 
     @Override
@@ -50,8 +50,8 @@ public class FileReadStatusRepository  implements InterfaceReadStatusRepository 
     }
 
     //    @Override
-//    public Optional<List<Channel>> findallByChannleId() {
-//        List<Channel> channels = fileUtil.findallByChannleId().stream().map(model -> (Channel)model).toList();
+//    public Optional<List<Channel>> findAllByChannleId() {
+//        List<Channel> channels = fileUtil.findAllByChannleId().stream().map(model -> (Channel)model).toList();
 //        return Optional.ofNullable(channels);
 //    }
 //
@@ -62,6 +62,6 @@ public class FileReadStatusRepository  implements InterfaceReadStatusRepository 
 //
 //    @Override
 //    public boolean existsByName(String name) {
-//        return fileUtil.findallByChannleId().stream().map(channel -> (Channel)channel).anyMatch(channel -> channel.getChannelName().equals(name));
+//        return fileUtil.findAllByChannleId().stream().map(channel -> (Channel)channel).anyMatch(channel -> channel.getChannelName().equals(name));
 //    }
 }

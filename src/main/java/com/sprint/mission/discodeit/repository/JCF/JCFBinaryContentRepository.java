@@ -2,13 +2,12 @@ package com.sprint.mission.discodeit.repository.JCF;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.InterfaceBinaryContentRepository;
-import org.springframework.stereotype.Repository;
+import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 
 import java.util.*;
 
-@Repository
-public class JCFBinaryContentRepository  implements InterfaceBinaryContentRepository {
+//@Repository
+public class JCFBinaryContentRepository implements BaseInterfaceRepository<BinaryContent> {
     private final Map<UUID, UserStatus> data;
 
     public JCFBinaryContentRepository()  {
@@ -21,8 +20,8 @@ public class JCFBinaryContentRepository  implements InterfaceBinaryContentReposi
     }
 
     @Override
-    public void deleteById(UUID id) {
-
+    public boolean deleteById(UUID id) {
+        return false;
     }
 
     @Override

@@ -70,22 +70,15 @@ public class FileUtil {
                     FileInputStream fis = new FileInputStream(path.toFile());
                     ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-                switch (modelType) {
-                    case USER: model = (User) ois.readObject();
-                        break;
-                    case CHANNEL: model = (Channel) ois.readObject();
-                        break;
-                    case MESSAGE: model = (Message) ois.readObject();
-                        break;
-                    case USERSTATUS: model = (UserStatus) ois.readObject();
-                        break;
-                    case READSTATUS: model = (ReadStatus) ois.readObject();
-                        break;
-                    case BINARYCONTENT: model = (BinaryContent) ois.readObject();
-                        break;
-                    default:
-                        throw new RuntimeException("🚨Unknown");
-                }
+                model = switch (modelType) {
+                    case USER -> (User) ois.readObject();
+                    case CHANNEL -> (Channel) ois.readObject();
+                    case MESSAGE -> (Message) ois.readObject();
+                    case USERSTATUS -> (UserStatus) ois.readObject();
+                    case READSTATUS -> (ReadStatus) ois.readObject();
+                    case BINARYCONTENT -> (BinaryContent) ois.readObject();
+                    default -> throw new RuntimeException("🚨Unknown");
+                };
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -102,22 +95,15 @@ public class FileUtil {
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
                         ) {
-                            switch (modelType) {
-                                case USER:
-                                    return (User) ois.readObject();
-                                case CHANNEL:
-                                    return (Channel) ois.readObject();
-                                case MESSAGE:
-                                    return (Message) ois.readObject();
-                                case USERSTATUS:
-                                    return (UserStatus) ois.readObject();
-                                case READSTATUS:
-                                    return (ReadStatus) ois.readObject();
-                                case BINARYCONTENT:
-                                    return (BinaryContent) ois.readObject();
-                                default:
-                                    throw new RuntimeException("🚨Unknown");
-                            }
+                            return switch (modelType) {
+                                case USER -> (User) ois.readObject();
+                                case CHANNEL -> (Channel) ois.readObject();
+                                case MESSAGE -> (Message) ois.readObject();
+                                case USERSTATUS -> (UserStatus) ois.readObject();
+                                case READSTATUS -> (ReadStatus) ois.readObject();
+                                case BINARYCONTENT -> (BinaryContent) ois.readObject();
+                                default -> throw new RuntimeException("🚨Unknown");
+                            };
                         } catch (IOException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }
@@ -128,10 +114,11 @@ public class FileUtil {
         }
     }
 
-    public void deleteRepository(UUID id) {
+    public boolean deleteRepository(UUID id) {
         Path path = resolvePath(id);
         try {
             Files.delete(path);
+            return true;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
