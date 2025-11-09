@@ -48,8 +48,8 @@ public class MessageController {
             @Valid @RequestPart("messageInfoReq")MessageInfoReq messageInfoReq,
             @RequestPart(value = "attachmentFiles", required = false) List<MultipartFile> attachmentFiles){
 
-        List<BinaryContentCreateReq> binaryContentCreateReqs = attachmentFiles.stream()
-                .map(BinaryContentCreateReq::from).toList();
+        List<BinaryContentCreateReq> binaryContentCreateReqs = attachmentFiles.isEmpty() ?
+                List.of() : attachmentFiles.stream().map(BinaryContentCreateReq::from).toList();
         MessageCreateReq req = MessageCreateReq.from(messageInfoReq, binaryContentCreateReqs);
         Message message =  messageCreationFacade.createMessage(speakerId, channelId, req);
 
@@ -72,8 +72,8 @@ public class MessageController {
             @RequestPart(value = "attachmentIds", required = false) List<UUID> keepAttachmentIds,
             @RequestPart(value = "attachmentFiles", required = false) List<MultipartFile> newAttachmentReqs){
 
-        List<BinaryContentCreateReq> binaryContentCreateReqs = newAttachmentReqs.stream()
-                .map(BinaryContentCreateReq::from).toList();
+        List<BinaryContentCreateReq> binaryContentCreateReqs = newAttachmentReqs.isEmpty() ?
+                List.of() : newAttachmentReqs.stream().map(BinaryContentCreateReq::from).toList();
         MessageUpdateReq req = new MessageUpdateReq(
                 messageInfoReq.content(), keepAttachmentIds, binaryContentCreateReqs);
         MessageViewRes message = messageUpdateFacade.updateMessage(messageId, req);
