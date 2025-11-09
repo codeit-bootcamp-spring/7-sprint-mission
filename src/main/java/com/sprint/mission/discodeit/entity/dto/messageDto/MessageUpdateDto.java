@@ -6,5 +6,5 @@ import lombok.NonNull;
 import java.util.UUID;
 
 @Builder
-public record MessageUpdateDto(@NonNull UUID messageId, String newContent) {
+public record MessageUpdateDto(UUID messageId, String newContent) {
 }

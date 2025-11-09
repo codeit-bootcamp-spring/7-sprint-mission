@@ -41,7 +41,7 @@ public abstract class FileBaseRepository<T extends BaseEntity> implements BaseRe
             oos.writeObject(data);
             System.out.println("데이터 저장 성공");
         } catch (Exception e) {
-            throw new RuntimeException("데이터 저장 실패");
+            throw new RuntimeException("데이터 저장 실패", e);
         }
     }
 

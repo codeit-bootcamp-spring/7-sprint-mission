@@ -89,7 +89,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public List<BinaryContent> findAllByMessageId(UUID messageId) {
         return data.values().stream()
-                .filter(content -> content.getMessageId().equals(messageId))
+                .filter(content -> messageId.equals(content.getMessageId()))
                 .collect(Collectors.toList());
     }
 

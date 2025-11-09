@@ -139,4 +139,10 @@ public class BasicMessageService implements MessageService {
         binaryContentRepository.deleteAllByMessageId(message.getId());
         messageRepository.deleteById(id);
     }
+
+    @Override
+    public List<MessageResponseDto> findAll() {
+        return messageRepository.findAll().stream()
+                .map(this::toDto).collect(Collectors.toList());
+    }
 }

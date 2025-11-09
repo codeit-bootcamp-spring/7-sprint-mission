@@ -33,14 +33,13 @@ public class MessageController {
     @RequestMapping(method = RequestMethod.PUT)
     public ResponseEntity<MessageResponseDto> channelMessageUpdate(@RequestBody MessageUpdateDto updateDto) {
         Optional<MessageResponseDto> messageOp = messageService.updateMessage(updateDto);
-
         return messageOp.map(messageResponseDto
                         -> ResponseEntity.status(HttpStatus.OK).body(messageResponseDto))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NO_CONTENT).build());
     }
 
     // 메시지 삭제
-    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> channelMessageDelete(@PathVariable UUID id) {
         messageService.deleteMessage(id);
         return ResponseEntity.noContent().build();
@@ -50,6 +49,12 @@ public class MessageController {
     @RequestMapping(value = "/{channelId}", method = RequestMethod.GET)
     public List<MessageResponseDto> getAllByChannelId(@PathVariable UUID channelId) {
         return messageService.findAllByChannelId(channelId);
+    }
+
+    // 테스트용 모든메시지 조회
+    @RequestMapping(method = RequestMethod.GET)
+    public List<MessageResponseDto> getAll() {
+        return messageService.findAll();
     }
 }
 

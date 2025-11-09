@@ -22,4 +22,6 @@ public interface MessageService {
     Optional<MessageResponseDto> updateMessage(MessageUpdateDto updateDto);      // 수정
 
     void deleteMessage(UUID id);              // 삭제
+
+    List<MessageResponseDto> findAll();
 }
