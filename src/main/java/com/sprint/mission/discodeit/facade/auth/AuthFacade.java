@@ -30,6 +30,7 @@ public class AuthFacade {
         }
         UserStatus userStatus= userStatusService.findByUserId(user.getId());
         userStatusService.updateOnlineAt(userStatus.getId());
+        userStatusService.updateOfflineAt(userStatus.getId());
     }
 
     //로그아웃

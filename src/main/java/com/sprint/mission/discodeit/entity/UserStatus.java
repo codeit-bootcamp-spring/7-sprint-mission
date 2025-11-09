@@ -17,7 +17,7 @@ public class UserStatus extends BaseEntity{
     private Instant offlineAt;      //로그아웃 한 시간
     private Instant onlineAt;       //로그인 한 시간
     private boolean isOnline;
-    public static final int OFFLINE_THRESHOLD_SECONDS = 300;       //오프라인 기준 타임
+    public static final int OFFLINE_THRESHOLD_SECONDS = 60;       //오프라인 기준 타임
 
     //Constructor
     private UserStatus(UUID userId) {
