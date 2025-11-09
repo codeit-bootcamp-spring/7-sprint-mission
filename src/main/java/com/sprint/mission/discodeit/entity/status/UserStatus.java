@@ -5,13 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class UserStatus extends Common {
+public class UserStatus extends Common implements Serializable {
+    private static final long serialVersionUID = 1L;
    private  UUID userId;
 
 

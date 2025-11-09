@@ -15,7 +15,7 @@ import java.util.Base64;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/binaryContent")
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
 public class BinaryContentController {
 
@@ -35,4 +35,33 @@ public class BinaryContentController {
 
         return ResponseEntity.ok(binaryContent);
     }
+
+    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+    public ResponseEntity<BinaryContent> findBinaryConten(
+            @PathVariable UUID binaryContentId){
+        System.out.println(binaryContentId);
+        BinaryContentResponse findBinary = binaryContentService.find(binaryContentId);
+
+        byte[] bytes = binaryContentService.find(binaryContentId).contentByte();
+
+        //이건 화면에 보이게 하려고 억지로 넣었다
+        String encodedString = Base64.getEncoder().encodeToString(bytes);
+        //
+        BinaryContent binaryContent = new BinaryContent(findBinary.contentsType(),bytes, encodedString );
+
+        return ResponseEntity.ok(binaryContent);
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
