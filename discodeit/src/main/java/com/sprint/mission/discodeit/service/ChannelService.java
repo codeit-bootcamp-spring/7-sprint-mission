@@ -11,11 +11,20 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    Channel create(PublicChannelCreateRequest request);
-    Channel create(PrivateChannelCreateRequest request);
+    com.sprint.mission.discodeit.entity.Channel create(
+            com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest request
+    );
+
+    com.sprint.mission.discodeit.entity.Channel create(
+            com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest request
+    );
+
     ChannelDto find(UUID channelId);
     List<ChannelDto> findAllByUserId(UUID userId);
-    Channel update(UUID channelId, PublicChannelUpdateRequest request);
+    com.sprint.mission.discodeit.entity.Channel update(
+            java.util.UUID channelId,
+            com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest request
+    );
     void delete(UUID channelId);
 
 }
