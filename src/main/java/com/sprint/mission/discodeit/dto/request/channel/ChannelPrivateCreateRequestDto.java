@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.dto.request.channel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +13,8 @@ import static com.sprint.mission.discodeit.service.util.StaticString.*;
 
 
 @Getter
+@Builder
+@NoArgsConstructor
 public class ChannelPrivateCreateRequestDto {
     private HashSet<UUID> userIdList;
     private String name = DEFAULT_CHANNEL_NAME;

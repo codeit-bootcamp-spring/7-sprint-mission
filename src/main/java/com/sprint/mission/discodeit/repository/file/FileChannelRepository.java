@@ -32,10 +32,8 @@ public class FileChannelRepository implements ChannelRepository {
 
     public FileChannelRepository(Environment env) {
         channelRepositoryDataPath = env.getProperty(DISCODEIT_DIRECTORY)+"channelRepository.ser";
-        System.out.println(channelRepositoryDataPath);
         channelRepositoryFile = new File(channelRepositoryDataPath);
         repositoryCheck();
-        resetChannelRepository();
     }
     @Override
     public Optional<Channel> getChannelById(UUID channelId) {
@@ -63,7 +61,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public <T>void updateChannel(Channel channel) {
+    public void updateChannel(Channel channel) {
         deleteChannel(channel);
         saveChannel(channel);
     }

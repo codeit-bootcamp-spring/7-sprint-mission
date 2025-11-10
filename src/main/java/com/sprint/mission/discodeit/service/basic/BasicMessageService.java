@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.ChannelReadResponseDto;
+import com.sprint.mission.discodeit.dto.response.MessageReadResponseDto;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
@@ -33,43 +36,63 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
 
-    public Message createMessage(MessageCreateRequestDto messageCreateRequestDto){
+    public MessageReadResponseDto createMessage(MessageCreateRequestDto messageCreateRequestDto){
         //todo channel id 랑 sender id 관련 안전성 확인, 일단 지금은 안함
         List<Channel> channelList = channelRepository.getAllChannel();
-        Message message = messageRepository.saveMessage(Message.builder()
-                .content(messageCreateRequestDto.getContent())
-                .channelId(messageCreateRequestDto.getChannelId())
-                .senderId(messageCreateRequestDto.getSenderId())
-                .isMarkDown(messageCreateRequestDto.isMarkDown())
-                .attachmentIdList(
-                        messageCreateRequestDto.getAttachmentIdList().stream().map(x ->
-                                {
-                                    BinaryContent binaryContent = BinaryContent.builder()
-                                            .binaryContentUsage(BinaryContentUsage.ATTATCHMENT)
-                                            .binaryFile(x.getFile())
-                                            .build();
-                                    return binaryContentRepository.createBinaryContent(binaryContent).getId();
-                                }
-                                ).collect(Collectors.toCollection(HashSet::new))
-                )
-                .build());
-        Channel channel2 = channelRepository.getChannelById(message.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
-        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(message.getSenderId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
+        Channel channel2 = channelRepository.getChannelById(messageCreateRequestDto.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
+        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(messageCreateRequestDto.getSenderId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
+        Message message;
+        if(!messageCreateRequestDto.getAttachmentIdList().isEmpty()) {
+            System.out.println("attachment list");
+            message = messageRepository.saveMessage(Message.builder()
+                    .content(messageCreateRequestDto.getContent())
+                    .channelId(messageCreateRequestDto.getChannelId())
+                    .senderId(messageCreateRequestDto.getSenderId())
+                    .isMarkDown(messageCreateRequestDto.isMarkDown())
+                    .attachmentIdList(
+                            messageCreateRequestDto.getAttachmentIdList().stream().map(x ->
+                                    {
+                                        BinaryContent binaryContent = BinaryContent.builder()
+                                                .binaryContentUsage(BinaryContentUsage.ATTATCHMENT)
+                                                .binaryFile(x.getFile())
+                                                .build();
+                                        return binaryContentRepository.createBinaryContent(binaryContent).getId();
+                                    }
+                            ).collect(Collectors.toCollection(HashSet::new))
+                    )
+                    .build());
+        }
+        else {
+            message = messageRepository.saveMessage(
+                    Message.builder()
+                            .content(messageCreateRequestDto.getContent())
+                    .channelId(messageCreateRequestDto.getChannelId())
+                            .senderId(messageCreateRequestDto.getSenderId())
+                            .isMarkDown(messageCreateRequestDto.isMarkDown())
+                            .attachmentIdList(new HashSet<>())
+                    .build()
+            );
+        }
+
         channel2.getMessageIdList().add(message.getId());
         channelRepository.updateChannel(channel2);
-        return message;
+        return MessageReadResponseDto.from(message);
     }
-    public Message readMessage(Message message){
-        return messageRepository.getMessage(message).orElseThrow(()->new IllegalArgumentException("Message not found"));
+    public MessageReadResponseDto readMessage(Message message){
+        Message message1 = messageRepository.getMessage(message).orElseThrow(()->new IllegalArgumentException("Message not found"));
+        return MessageReadResponseDto.from(message1);
     }
-    public List<Message> readAllMessage(){
-        return messageRepository.getAllMessage();
+    public List<MessageReadResponseDto> readAllMessage(){
+        messageRepository.getAllMessage().forEach(x-> System.out.println(x.getContent()+": "+x.getId()));
+        return messageRepository.getAllMessage().stream().map(MessageReadResponseDto::from).toList();
     }
     public void deleteMessage(UUID messageId){
         List<BinaryContent> binaryContentList = binaryContentRepository.readAllBinaryContent();
         Message message = messageRepository.getMessageById(messageId).orElseThrow(()->new IllegalArgumentException("Message not found"));
-        HashSet<UUID> attatchmentIdList = message.getAttachmentIdList();
-        attatchmentIdList.forEach(binaryContentRepository::deleteBinaryContent);
+        if(message.getAttachmentIdList()!=null) {
+            HashSet<UUID> attatchmentIdList = message.getAttachmentIdList();
+            attatchmentIdList.forEach(binaryContentRepository::deleteBinaryContent);
+        }
         Channel channel = channelRepository.getChannelById(message.getChannelId()).orElseThrow(() -> new IllegalArgumentException("Channel not found"));
         channel.getMessageIdList().remove(messageId);
         channelRepository.updateChannel(channel);
@@ -85,14 +108,26 @@ public class BasicMessageService implements MessageService {
         messageRepository.updateMessage(message);
 
     }
-    public List<Message> readUpdatedMessage(){
-        return messageRepository.getUpdatedMessage();
+    public List<MessageReadResponseDto> readUpdatedMessage(){
+
+        return messageRepository.getUpdatedMessage().stream().map(MessageReadResponseDto::from).toList();
     }
     @Override
-    public List<Message> findallByChannelId(UUID channelId) {
+    public List<MessageReadResponseDto> findallByChannelId(UUID channelId) {
         Channel targetChannel = channelRepository.getChannelById(channelId).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
         List<Message> messageList = messageRepository.getAllMessage();
-        return messageList.stream().filter(x -> x.getChannelId().equals(channelId)).toList();
+        return messageList.stream().filter(x -> x.getChannelId().equals(channelId)).map(MessageReadResponseDto::from).toList();
+    }
+
+    @Override
+    public List<MessageReadResponseDto> readAllMessageByUserId(UUID userId) {
+        messageRepository.getAllMessage().forEach(x-> System.out.println(x.getContent()+": "+x.getId()));
+        return messageRepository.getAllMessage().stream().filter(x->x.getSenderId().equals(userId)).map(MessageReadResponseDto::from).toList();
+    }
+
+    @Override
+    public void resetMessage() {
+        messageRepository.getAllMessage().forEach(x-> deleteMessage(x.getId()));
     }
 
 

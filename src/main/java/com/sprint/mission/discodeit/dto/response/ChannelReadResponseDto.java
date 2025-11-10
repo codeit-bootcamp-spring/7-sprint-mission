@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -13,6 +13,8 @@ import java.util.UUID;
 @Getter
 @Builder
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChannelReadResponseDto {
 
     private Instant recentPostTime;
@@ -23,5 +25,14 @@ public class ChannelReadResponseDto {
     @Builder.Default
     private HashSet<UUID> userIdList  = new HashSet<>();
 
+    public static ChannelReadResponseDto from(Channel channel, ReadStatus readStatus) {
+        return ChannelReadResponseDto.builder()
+                .name(channel.getName())
+                .description(channel.getDescription())
+                .isTextChannel(channel.isTextChannel())
+                .isPublic(channel.isPublic())
+                .recentPostTime(readStatus.getReadLastTime())
+                .build();
+    }
 
 }

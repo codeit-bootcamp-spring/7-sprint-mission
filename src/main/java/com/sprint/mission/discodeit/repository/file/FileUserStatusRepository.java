@@ -34,7 +34,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
         USER_STATUS_DATA_PATH =env.getProperty(DISCODEIT_DIRECTORY)+"userStatusRepository.ser";
         userStatusRepositoryFile = new File(USER_STATUS_DATA_PATH);
         repositoryCheck();
-        resetRepository();
     }
 
     @Override

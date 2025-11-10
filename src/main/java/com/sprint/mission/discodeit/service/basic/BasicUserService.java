@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileCreateReque
 import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.dto.response.UserReadResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
@@ -29,9 +30,17 @@ public class BasicUserService implements UserService {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
+//    private final HashMap<String, UserElement> userElementHashMap = new HashMap<>(){
+//        {
+//            put("NAME", UserElement.NAME);
+//            put("NICKNAME", UserElement.NICKNAME);
+//            put("EMAIL", UserElement.EMAIL);
+//            put("ONLINE", UserElement.ONLINE);
+//        }
+//    }
 
     @Override
-    public User createUser(UserCreateRequestDto userCreateRequestDto) {
+    public UserReadResponseDto createUser(UserCreateRequestDto userCreateRequestDto) {
         User user = User.builder()
                 .userName(userCreateRequestDto.getUserName())
                 .name(userCreateRequestDto.getName())
@@ -46,11 +55,12 @@ public class BasicUserService implements UserService {
         userNameEmailCheck(user);
 
         userStatusRepository.createUserStatus(userStatus);
-        return userRepository.saveUser(user);
+        userRepository.saveUser(user);
+        return UserReadResponseDto.of(user, userStatus);
     }
 
     @Override
-    public User createUser(UserCreateRequestDto userCreateRequestDto, ProfileCreateRequestDto profileCreateRequestDtoDto) {
+    public UserReadResponseDto createUser(UserCreateRequestDto userCreateRequestDto, ProfileCreateRequestDto profileCreateRequestDtoDto) {
 
         BinaryContent binaryContent = BinaryContent.builder()
                 .binaryFile(profileCreateRequestDtoDto.getFile())
@@ -75,7 +85,7 @@ public class BasicUserService implements UserService {
         binaryContentRepository.createBinaryContent(binaryContent);
         userRepository.saveUser(user);
         userStatusRepository.createUserStatus(userStatus);
-        return user;
+        return UserReadResponseDto.of(user, userStatus);
     }
 
     @Override
@@ -91,6 +101,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<UserReadResponseDto> readAllUser() {
+        userRepository.getAllUser().forEach(x-> System.out.println(x.getName()+": "+x.getId()));
         return userRepository.getAllUser().stream().map(x ->
                 readUser(x.getId())).toList();
     }
@@ -101,8 +112,9 @@ public class BasicUserService implements UserService {
         List<Channel> channelList = channelRepository.getAllChannel();
         List<Message> messageList = messageRepository.getAllMessage();
         List<UserStatus> userStatusList = userStatusRepository.readAllUserStatus();
-        if (binaryContentRepository.isBinaryContentExist(userId)) {
-            binaryContentRepository.deleteBinaryContent(userId);
+        User targetUser = userRepository.getUserById(userId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        if (binaryContentRepository.isBinaryContentExist(targetUser.getProfileId())) {
+            binaryContentRepository.deleteBinaryContent(targetUser.getProfileId());
         }
         UserStatus targetUserStatus = userStatusList.stream().filter(x -> x.getUserId().equals(userId)).findFirst().orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
 
@@ -124,6 +136,7 @@ public class BasicUserService implements UserService {
     @Override
     public <T> void updateUser(UserUpdateRequestDto<T> userUpdateRequestDto) {
         User user = userRepository.getUserById(userUpdateRequestDto.getUserId()).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+
         BiConsumer<User, T> biConsumer = (BiConsumer<User, T>) userUpdateRequestDto.getType().setter;
         biConsumer.accept(user, userUpdateRequestDto.getUpdateValue());
         user.updateEntity();
@@ -181,5 +194,33 @@ public class BasicUserService implements UserService {
         boolean isEmailExit = userRepository.getAllUser().stream().anyMatch(x -> x.getEmail().equals(user.getEmail()));
         if(isUserNameExit) throw new IllegalArgumentException("USERNAME_ALREADY_EXIST");
         if(isEmailExit) throw new IllegalArgumentException("EMAIL_ALREADY_EXIST");
+    }
+
+    @Override
+    public void updateUserOnlineStatus(UUID userId) {
+        User targetUser = userRepository.getUserById(userId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        UserStatus targetUserStatus = userStatusRepository.readAllUserStatus().stream().filter(x -> x.getUserId().equals(userId)).findFirst().orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        targetUser.setOnline(targetUserStatus.isUserOnline());
+        userRepository.updateUser(targetUser);
+    }
+
+    @Override
+    public void resetUserRepository() {
+        userRepository.getAllUser().forEach(x->deleteUser(x.getId()));
+    }
+
+    @Override
+    public List<UserDto> advanceFindAllUser(){
+        return userRepository.getAllUser().stream().map(
+        x-> UserDto.builder()
+                .id(x.getId())
+                .createdAt(x.getCreatedAt())
+                .updatedAt(x.getUpdatedAt())
+                .username(x.getUserName())
+                .email(x.getEmail())
+                .profileId(x.getProfileId() == null? null: x.getProfileId())
+                .online(x.isOnline())
+                .build()
+                ).toList();
     }
 }

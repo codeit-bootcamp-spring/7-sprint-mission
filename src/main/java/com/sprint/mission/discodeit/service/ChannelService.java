@@ -15,8 +15,8 @@ public interface ChannelService {
 
 
     void createChannel(Channel channel);
-    Channel createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto);
-    Channel createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto);
+    ChannelReadResponseDto createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto);
+    ChannelReadResponseDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto);
 
     ChannelReadResponseDto readChannel(UUID channelId);
 
@@ -28,4 +28,6 @@ public interface ChannelService {
     void inviteUserToChannel(UUID userId, UUID channelId);
 
     void deleteUserFromChannel(UUID userId, UUID channelId);
+    void resetChannelRepository();
+    List<ChannelReadResponseDto> readAllChannel();
 }

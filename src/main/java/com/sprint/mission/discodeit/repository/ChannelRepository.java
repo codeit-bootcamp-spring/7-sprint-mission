@@ -16,7 +16,7 @@ public interface ChannelRepository {
 
     public Channel saveChannel(Channel channel);
     public void deleteChannel(Channel channel);
-    public <T>void updateChannel(Channel channel);
+    public void updateChannel(Channel channel);
 
     public List<Channel> getAllChannel();
     public List<Channel> getUpdatedChannel();
