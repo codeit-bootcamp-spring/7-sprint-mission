@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.application.BasicUserService;
 import com.sprint.mission.discodeit.application.dto.login.LoginForm;
-import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.application.dto.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ public class LoginController {
     private final BasicUserService userService;
 
     @PostMapping
-    public UserResponseDto login(@Valid @RequestBody LoginForm loginForm) {
+    public UserResponse login(@Valid @RequestBody LoginForm loginForm) {
         return userService.login(loginForm.getLoginId(), loginForm.getPassword());
     }
 }

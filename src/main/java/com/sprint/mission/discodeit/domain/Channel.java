@@ -17,7 +17,7 @@ public class Channel implements Serializable {
     private final Instant createdAt;
     private Instant updatedAt;
 
-    private final UUID serverId;
+
     private String channelName;
 
     private final List<UUID> members;
@@ -30,7 +30,6 @@ public class Channel implements Serializable {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt=Instant.now();
-        this.serverId=serverId;
         this.channelName=channelName;
         this.isPrivate=isPrivate;
         if (this.isPrivate){

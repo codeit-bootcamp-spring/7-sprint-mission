@@ -29,7 +29,6 @@ public class User implements Serializable {
 
     private final List<UUID> receivedInvitations = new ArrayList<>();
     private final List<UUID> friends = new ArrayList<>();
-    private final List<UUID> servers =new ArrayList<>();
     private UUID profile;
 
 

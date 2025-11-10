@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.application;
 
 
-import com.sprint.mission.discodeit.application.dto.UserDtoMapper;
 import com.sprint.mission.discodeit.application.dto.request.UserCreateRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.UserRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.UserUpdateDto;
-import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.application.dto.response.UserResponse;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.domain.exception.DuplicateUserException;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.application.dto.UserDtoMapper.userToResponseDto;
+
 
 @Slf4j
 @Service
@@ -33,7 +32,7 @@ public class BasicUserService {
     private final FileService fileService;
 
 
-    public UserResponseDto createUser(UserCreateRequestDto requestDto) throws IOException {
+    public UserResponse createUser(UserCreateRequestDto requestDto) throws IOException {
         validateDuplicateEmail(requestDto.email());
         validateDuplicateUsername(requestDto.username());
 
@@ -49,10 +48,10 @@ public class BasicUserService {
             BinaryContent content = fileService.saveUserProfile(user.getId(), requestDto.profileImage());
             user.setProfile(content.getId());
         }
-        return userToResponseDto(user);
+        return UserResponse.from(user);
     }
 
-    public UserResponseDto updateUserInfo(UUID id,UserUpdateDto updateDto) throws IOException {
+    public UserResponse updateUserInfo(UUID id, UserUpdateDto updateDto) throws IOException {
 
         User user = getById(id);
 
@@ -71,7 +70,7 @@ public class BasicUserService {
         }
         userRepository.save(user);
 
-        return userToResponseDto(user);
+        return UserResponse.from(user);
     }
 
 
@@ -81,22 +80,22 @@ public class BasicUserService {
         fileService.deleteUserFolder(user.getId());
     }
 
-    public UserResponseDto getUser(UserRequestDto requestDto) {
+    public UserResponse getUser(UserRequestDto requestDto) {
         User user;
         if (requestDto.id() == null) {
             user = getByUsername(requestDto.username());
         } else {
             user = getById(requestDto.id());
         }
-        return userToResponseDto(user);
+        return UserResponse.from(user);
     }
 
-    public List<UserResponseDto> getAllUsers() {
-        return getAll().stream().map(user -> UserDtoMapper.userToResponseDto(user)).toList();
+    public List<UserResponse> getAllUsers() {
+        return getAll().stream().map(user -> UserResponse.from(user)).toList();
     }
 
 
-    public UserResponseDto login(String loginId, String password) {
+    public UserResponse login(String loginId, String password) {
         User user = getByUsername(loginId);
         if (!user.getPassword().equals(password)) {
             throw new IllegalArgumentException("비밀번호가 틀립니다");
@@ -105,7 +104,7 @@ public class BasicUserService {
             user.markOnline(Instant.now());
             userRepository.save(user);
         }
-        return userToResponseDto(user);
+        return UserResponse.from(user);
 
     }
 

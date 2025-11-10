@@ -2,10 +2,8 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.application.BasicUserService;
 import com.sprint.mission.discodeit.application.dto.request.UserCreateRequestDto;
-import com.sprint.mission.discodeit.application.dto.request.UserRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.UserUpdateDto;
-import com.sprint.mission.discodeit.application.dto.response.UserDto;
-import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.application.dto.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -24,22 +22,20 @@ public class UserController {
     private final BasicUserService userService;
 
     @GetMapping("/findAll")
-    public List<UserResponseDto> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @PostMapping
-    public UserResponseDto createUser(@ModelAttribute UserCreateRequestDto requestDto) throws IOException {
-        UserResponseDto responseDto = userService.createUser(requestDto);
-        log.info("회원가입 성공: {}", responseDto.username());
+    public UserResponse createUser(@ModelAttribute UserCreateRequestDto requestDto) throws IOException {
+        UserResponse responseDto = userService.createUser(requestDto);
         return responseDto;
     }
 
     @PatchMapping("/{userId}")
-    public UserResponseDto updateUser(@PathVariable UUID id,@ModelAttribute UserUpdateDto updateDto) throws IOException {
-        UserResponseDto userResponseDto = userService.updateUserInfo(id, updateDto);
-        log.info("회원 수정 성공: {}", userResponseDto.username());
-        return userResponseDto;
+    public UserResponse updateUser(@PathVariable UUID id, @ModelAttribute UserUpdateDto updateDto) throws IOException {
+        UserResponse userResponse = userService.updateUserInfo(id, updateDto);
+        return userResponse;
     }
 
 
@@ -58,7 +54,7 @@ public class UserController {
 
 
     @GetMapping
-    public List<UserResponseDto> getAllUSer(){
+    public List<UserResponse> getAllUSer(){
        return userService.getAllUsers();
     }
 
