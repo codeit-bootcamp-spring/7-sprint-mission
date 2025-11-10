@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateByUserIdRequestDto;
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.userstatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -20,7 +21,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatus create(UserStatusCreateRequestDto userStatusCreateRequestDto) {
+    public UserStatusResponseDto create(UserStatusCreateRequestDto userStatusCreateRequestDto) {
         UUID userId = Objects.requireNonNull(userStatusCreateRequestDto.userId());
 
         if(userRepository.findById(userId).isEmpty()) {
@@ -38,11 +39,13 @@ public class BasicUserStatusService implements UserStatusService {
         );
         userStatus.setLastReadAt(statusAt);
 
-        return userStatusRepository.save(userStatus);
+        UserStatus save = userStatusRepository.save(userStatus);
+
+        return UserStatusResponseDto.from(save);
     }
 
     @Override
-    public UserStatus update(UserStatusUpdateRequestDto userStatusUpdateRequestDto) {
+    public UserStatusResponseDto update(UserStatusUpdateRequestDto userStatusUpdateRequestDto) {
         UUID id = Objects.requireNonNull(userStatusUpdateRequestDto.id());
         UserStatus userStatus = userStatusRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
@@ -52,11 +55,13 @@ public class BasicUserStatusService implements UserStatusService {
             userStatus.setLastReadAt(userStatusUpdateRequestDto.lastReadAt());
         }
 
-        return userStatusRepository.save(userStatus);
+        UserStatus save = userStatusRepository.save(userStatus);
+
+        return UserStatusResponseDto.from(save);
     }
 
     @Override
-    public UserStatus updateByUserId(UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
+    public UserStatusResponseDto updateByUserId(UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
         UUID userId = Objects.requireNonNull(userStatusUpdateByUserIdRequestDto.userId());
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
@@ -65,18 +70,25 @@ public class BasicUserStatusService implements UserStatusService {
                 && (userStatus.getLastReadAt() == null || userStatusUpdateByUserIdRequestDto.lastReadAt().isAfter(userStatus.getLastReadAt()))) {
             userStatus.setLastReadAt(userStatusUpdateByUserIdRequestDto.lastReadAt());
         }
-        return userStatusRepository.save(userStatus);
+        UserStatus save = userStatusRepository.save(userStatus);
+
+        return UserStatusResponseDto.from(save);
     }
 
     @Override
-    public UserStatus get(UUID id) {
-        return userStatusRepository.findById(Objects.requireNonNull(id))
+    public UserStatusResponseDto get(UUID id) {
+        UserStatus userStatus = userStatusRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
+
+        return UserStatusResponseDto.from(userStatus);
     }
 
     @Override
-    public List<UserStatus> getAll() {
-        return  userStatusRepository.findAll();
+    public List<UserStatusResponseDto> getAll() {
+        List<UserStatus> all = userStatusRepository.findAll();
+
+        return all.stream().map(userStatus -> UserStatusResponseDto.from(userStatus))
+                .toList();
     }
 
     @Override

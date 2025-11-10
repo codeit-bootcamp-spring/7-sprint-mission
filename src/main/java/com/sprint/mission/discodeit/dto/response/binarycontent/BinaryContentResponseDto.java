@@ -11,7 +11,8 @@ public record BinaryContentResponseDto(
         Instant createdAt,
         String fileName,
         String contentType,
-        String bytes
+        String bytes,
+        long size
         /*byte[] data */) {
 
     public static BinaryContentResponseDto from(BinaryContent bc) {
@@ -21,7 +22,8 @@ public record BinaryContentResponseDto(
                 bc.getCreatedAt(),
                 bc.getFileName(),
                 bc.getContentType(),
-                encodedString
+                encodedString,
+                bc.getSize()
         );
     }
 }

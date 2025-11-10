@@ -21,8 +21,7 @@ public class UserStatusController {
 
     @RequestMapping(method = RequestMethod.POST)
     public UserStatusResponseDto create(@Valid @RequestBody UserStatusCreateRequestDto userStatusCreateRequestDto) {
-        UserStatus userStatus = userStatusService.create(userStatusCreateRequestDto);
-        return  UserStatusResponseDto.from(userStatus);
+        return userStatusService.create(userStatusCreateRequestDto);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
@@ -31,28 +30,23 @@ public class UserStatusController {
         if(userStatusUpdateRequestDto.id() == null || !id.equals(userStatusUpdateRequestDto.id())) {
             throw new IllegalArgumentException("Invalid ID");
         }
-        UserStatus userStatus = userStatusService.update(userStatusUpdateRequestDto);
-        return  UserStatusResponseDto.from(userStatus);
+        return userStatusService.update(userStatusUpdateRequestDto);
     }
 
     @RequestMapping(value = "/by-user-id", method = RequestMethod.PUT)
-    public UserStatusResponseDto updateByUserId(@Valid @RequestBody UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
-        UserStatus userStatus = userStatusService.updateByUserId(userStatusUpdateByUserIdRequestDto);
-        return UserStatusResponseDto.from(userStatus);
+    public UserStatusResponseDto updateByUserId(
+            @Valid @RequestBody UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
+        return userStatusService.updateByUserId(userStatusUpdateByUserIdRequestDto);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public UserStatusResponseDto get(@PathVariable UUID id) {
-        UserStatus userStatus = userStatusService.get(id);
-        return  UserStatusResponseDto.from(userStatus);
+        return userStatusService.get(id);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public List<UserStatusResponseDto> getAll() {
-        List<UserStatus> userStatusList = userStatusService.getAll();
-        return userStatusList.stream()
-                .map(userStatus -> UserStatusResponseDto.from(userStatus))
-                .toList();
+        return userStatusService.getAll();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

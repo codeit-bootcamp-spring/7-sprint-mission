@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/binaryContent")
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
@@ -36,16 +36,16 @@ public class BinaryContentController {
         return BinaryContentResponseDto.from(binaryContent);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public BinaryContentResponseDto get(@PathVariable("id") UUID id) {
-        BinaryContent binaryContent = binaryContentService.findById(id)
+    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+    public BinaryContentResponseDto get(@PathVariable("binaryContentId") UUID binaryContentId) {
+        BinaryContent binaryContent = binaryContentService.findById(binaryContentId)
                 .orElseThrow(() -> new IllegalArgumentException("binaryContent not found"));
         return BinaryContentResponseDto.from(binaryContent);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<BinaryContentResponseDto> getAllById(@RequestParam("ids") List<UUID> ids) {
-        List<BinaryContent> list = binaryContentService.findAllByIdIn(ids);
+    public List<BinaryContentResponseDto> getAllById(@RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+        List<BinaryContent> list = binaryContentService.findAllByIdIn(binaryContentIds);
         return list.stream()
                 .map(bc -> BinaryContentResponseDto.from(bc))
                 .toList();
@@ -56,6 +56,7 @@ public class BinaryContentController {
         binaryContentService.delete(id);
     }
 
+    /*
     @RequestMapping(value = "/find", method = RequestMethod.GET)
     public ResponseEntity<BinaryContentResponseDto> find(
             @RequestParam("binaryContentId") UUID binaryContentId) {
@@ -63,4 +64,6 @@ public class BinaryContentController {
                 .orElseThrow(() -> new NoSuchElementException("BinaryContent not found"));
         return ResponseEntity.ok(BinaryContentResponseDto.from(binaryContent));
     }
+
+     */
 }

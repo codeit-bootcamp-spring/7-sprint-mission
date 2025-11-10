@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -21,7 +22,7 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User create(UserCreateRequestDto userCreateRequestDto, UUID profileId) {
+    public UserResponseDto create(UserCreateRequestDto userCreateRequestDto, UUID profileId) {
         // 요구사항 - 유저 이름과 이메일은 다른 유저와 같으면 안된다.
         if (!userRepository.findByName(userCreateRequestDto.username()).isEmpty()) {
             throw new IllegalArgumentException("존재하는 유저입니다!");
@@ -41,18 +42,21 @@ public class BasicUserService implements UserService {
 
         // 요구사항 - userStatus 같이 생성
         userStatusRepository.save(new UserStatus(user.getId()));
+        boolean online = isOnline(user.getId());
 
-        return user;
+        return UserResponseDto.from(user, online);
     }
 
     @Override
-    public User get(UUID userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
+    public UserResponseDto get(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
+        boolean online = isOnline(user.getId());
+        return UserResponseDto.from(user, online);
     }
 
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public List<UserResponseDto> getAll() {
+        userRepository.findAll();
     }
 
     @Override

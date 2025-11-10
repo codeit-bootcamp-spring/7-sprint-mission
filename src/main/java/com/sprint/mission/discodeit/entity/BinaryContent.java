@@ -17,6 +17,7 @@ public class BinaryContent implements Serializable {
     private final String fileName;
     private final String contentType;
     private final byte[] data;
+    private final long size;
     private static final long serialVersionUID = 1L;
 
     public BinaryContent(String fileName, String contentType, byte[] data) {
@@ -28,5 +29,6 @@ public class BinaryContent implements Serializable {
         }
         this.contentType = Objects.requireNonNull(contentType);
         this.data = Objects.requireNonNull(data);
+        this.size = data.length;
     }
 }
