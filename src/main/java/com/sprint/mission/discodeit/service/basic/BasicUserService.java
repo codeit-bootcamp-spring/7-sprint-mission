@@ -36,9 +36,9 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto create(CreateUserRequestDto userRequest, MultipartFile file) {
         // 1. nickname/email 중복 검사
-        if(userRepository.existsByNickName(userRequest.getNickName())){
+        if(existsByNickName(userRequest.getNickName())) {
             throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
-        } else if (userRepository.existsByEmail(userRequest.getEmail())) {
+        } else if (existsByEmail(userRequest.getEmail())) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
@@ -162,13 +162,10 @@ public class BasicUserService implements UserService{
             phoneNum = request.getNewPhoneNum();
             password = request.getNewPassword();
 
-            // 닉네임 중복 확인
-            if (userRepository.existsByNickName(nickName)) {
+            // 닉네임과 이메일 중복 확인
+            if (existsByNickName(nickName)) {
                 throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
-            }
-
-            // 이메일 중복 확인
-            if (userRepository.existsByEmail(email)) {
+            } else if (existsByEmail(email)) {
                 throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
             }
 
@@ -210,5 +207,15 @@ public class BasicUserService implements UserService{
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
                 .getPassword().equals(password);
+    }
+
+    private boolean existsByNickName(String NickName) {
+        return userRepository.findAll().stream().
+                anyMatch(u -> u.getNickName().equals(NickName));
+    }
+
+    private boolean existsByEmail(String email) {
+        return userRepository.findAll().stream().
+                anyMatch(u -> u.getEmail().equals(email));
     }
 }

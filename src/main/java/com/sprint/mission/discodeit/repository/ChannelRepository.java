@@ -64,14 +64,5 @@ public interface ChannelRepository {
      */
     void deleteMember(Channel channel, UUID targetId);
 
-    /**
-     * 채널 이름 중복 확인
-     */
-    boolean existsByName(String name);
-
-    boolean existsById(UUID channelId);
-
-    boolean isUserJoinedChannel(UUID userId, UUID channelId);
-
-    boolean isExist(UUID receiverId);
+    List<UUID> findAllJoinedByUserId(UUID userId);
 }

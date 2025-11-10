@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,7 +28,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelResponseDto create(UUID adminId, CreateChannelRequestDto request) {
         // 이름 중복 저장 불가
-        if(channelRepository.existsByName(request.getChannelName())) {
+        if(existsByName(request.getChannelName())) {
             throw new CustomException(ErrorCode.CHANNEL_NAME_ALREADY_EXISTS);
         }
 
@@ -50,9 +51,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void addMember(UUID channelId, UpdateChannelRequestDto request){
-        if(!userRepository.isExist(request.getUserId())) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
+        userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new  CustomException(ErrorCode.USER_NOT_FOUND));
 
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
@@ -126,9 +126,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void updateAdmin(UUID channelId, UpdateChannelAdminRequestDto request) {
-        if(!userRepository.isExist(request.getNewAdminId())) {
-            throw new CustomException(ErrorCode.NEW_ADMIN_USER_NOT_FOUND);
-        }
+        userRepository.findById(request.getNewAdminId())
+                .orElseThrow(() -> new  CustomException(ErrorCode.NEW_ADMIN_USER_NOT_FOUND));
 
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
@@ -159,7 +158,7 @@ public class BasicChannelService implements ChannelService {
 
         // 관리자만 채널 이름 변경 가능
         if(channel.getAdminId().equals(request.getAdminId())){
-            if (channelRepository.existsByName(request.getName())) {
+            if (existsByName(request.getName())) {
                 throw new CustomException(ErrorCode.CHANNEL_NAME_ALREADY_EXISTS);
             }
 
@@ -172,9 +171,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void delete(UUID channelId, DeleteChannelRequestDto request) {
-        if(!userRepository.isExist(request.getUserId())) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
+        userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
@@ -190,9 +189,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteChannelMember(UUID channelId, UUID requesterId, UUID targetId) {
-        if(!userRepository.isExist(targetId)) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
+        userRepository.findById(targetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
@@ -217,12 +216,16 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public boolean isChannelUnavailableForUser(UUID userId, UUID channelId) {
+        boolean channelExists = channelRepository.findById(channelId).isPresent();
+        boolean userJoined = channelRepository.findAllJoinedbyUserId(userId).stream()
+                .anyMatch(id -> channelId.equals(id));
+
         // 채널이 존재하거나 유저가 채널에 속해있다면 false를 반환
-        if(channelRepository.existsById(channelId) || channelRepository.isUserJoinedChannel(userId, channelId)) {
-            return false;
-        }
-        return true;
+        return !(channelExists || userJoined);
     }
 
-
+    private boolean existsByName(String name) {
+        return channelRepository.findAll().stream()
+                .anyMatch(c -> c.getChannelName().equals(name));
+    }
 }

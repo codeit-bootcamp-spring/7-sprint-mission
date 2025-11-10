@@ -33,7 +33,7 @@ public class BasicReadStatusService implements ReadStatusService {
         channelRepository.findById(request.getChannelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
-        if(!readStatusRepository.existsByUserIdAndChannelId(request.getUserId(),request.getChannelId())) {
+        if(!existsByUserIdAndChannelId(request.getUserId(),request.getChannelId())) {
             readStatusRepository.save(new ReadStatus(request.getUserId(),request.getChannelId()));
         } else {
             throw new CustomException(ErrorCode.CHANNEL_MEMBER_ALREADY_EXISTS);
@@ -63,9 +63,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void delete(UUID readStatusId) {
-        if(!readStatusRepository.isExist(readStatusId)){
-            throw new CustomException(ErrorCode.READSTATUS_NOT_FOUND);
-        }
+        readStatusRepository.findById(readStatusId)
+                .orElseThrow(() -> new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
         readStatusRepository.deleteById(readStatusId);
+    }
+
+    private boolean existsByUserIdAndChannelId(UUID userId, UUID channelId) {
+        return readStatusRepository.findAll().stream()
+                .anyMatch(r -> userId.equals(r.getUserId()) && channelId.equals(r.getChannelId()));
     }
 }

@@ -37,12 +37,4 @@ public interface UserRepository {
 
     /** ID(UUID)로 유저를 삭제 */
     void deleteById(UUID userId);
-
-    /** ID(UUID)로 유저 존재 여부 확인*/
-    boolean isExist(UUID userId);
-
-    boolean existsByNickName(String NickName);
-
-    boolean existsByEmail(String email);
-
 }

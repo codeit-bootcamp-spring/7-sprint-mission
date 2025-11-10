@@ -91,23 +91,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return findAll().stream().anyMatch(c -> c.getChannelName().equals(name));
-    }
-
-    @Override
-    public boolean existsById(UUID channelId) {
-        return channelStore.containsKey(channelId);
-    }
-
-    @Override
-    public boolean isUserJoinedChannel(UUID userId, UUID channelId){
-        return joinedChannels.get(userId).stream()
-                .anyMatch(id -> channelId.equals(id));
-    }
-
-    @Override
-    public boolean isExist(UUID channelId) {
-        return channelStore.containsKey(channelId);
+    public List<UUID> findAllJoinedByUserId(UUID userId) {
+        return new ArrayList<>(joinedChannels.get(userId));
     }
 }

@@ -45,9 +45,4 @@ public class FileUserStatusRepository implements UserStatusRepository {
         userStatusStore.remove(id);
         saveToFile(filePath, userStatusStore);
     }
-
-    @Override
-    public boolean isExist(UUID userId) {
-        return userStatusStore.containsKey(userId);
-    }
 }

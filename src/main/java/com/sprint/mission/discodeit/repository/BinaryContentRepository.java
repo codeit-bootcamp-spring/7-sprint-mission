@@ -20,6 +20,4 @@ public interface BinaryContentRepository {
 
     /** 메시지 삭제 시 관련 파일들 삭제 */
     void deleteByIds(List<UUID> idList);
-
-    boolean isExist(UUID binaryContentId);
 }

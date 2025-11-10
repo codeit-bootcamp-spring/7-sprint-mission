@@ -34,9 +34,4 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
             contentStore.remove(id);
         });
     }
-
-    @Override
-    public boolean isExist(UUID binaryContentId) {
-        return contentStore.containsKey(binaryContentId);
-    }
 }

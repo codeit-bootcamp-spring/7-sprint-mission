@@ -23,11 +23,11 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void create(CreateUserStatusRequestDto request) {
-        if (!userRepository.isExist(request.getUserId())) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND_FOR_STATUS);
-        } else if (userStatusRepository.isExist(request.getUserId())) {
-            throw new CustomException(ErrorCode.USER_STATUS_ALREADY_EXISTS);
-        }
+        userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND_FOR_STATUS));
+
+        userStatusRepository.findById(request.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_ALREADY_EXISTS));
 
         UserStatus newUserStatus = new UserStatus(request.getUserId());
         userStatusRepository.save(newUserStatus);
@@ -68,9 +68,9 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void delete(UUID userStatusId) {
-        if(!userStatusRepository.isExist(userStatusId)){
-            throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);
-        };
+        userStatusRepository.findById(userStatusId)
+                .orElseThrow(() ->  new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+
         userStatusRepository.deleteById(userStatusId);
     }
 }

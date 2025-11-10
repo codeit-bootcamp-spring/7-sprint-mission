@@ -20,6 +20,4 @@ public interface UserStatusRepository {
     void update(UserStatus status);
 
     void deleteById(UUID id);
-
-    boolean isExist(UUID userId);
 }

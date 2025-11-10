@@ -46,9 +46,8 @@ public class BasicMessageService implements MessageService {
 
         // 유저에게 메시지를 보내면 수신자 존재 여부 확인
         if (request.getReceiveType() == ReceiveType.USER) {
-            if(!userRepository.isExist(request.getReceiverId())) {
-                throw new CustomException(ErrorCode.USER_NOT_FOUND);
-            }
+            userRepository.findById(request.getReceiverId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         }
         // 채널에 메시지를 생성하면 채널 존재 여부 확인
         else if (request.getReceiveType() == ReceiveType.CHANNEL) {
@@ -97,9 +96,9 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message findLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType) {
         // 송신자 존재 여부 확인
-        if(!userRepository.isExist(senderId)){
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
+        userRepository.findById(senderId).
+                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
 
         List<Message> allMessages = messageRepository.findAll();
 
@@ -112,9 +111,8 @@ public class BasicMessageService implements MessageService {
         // Optional의 ifPresentOrElse를 통해 null을 저장할 경우 닉네임만 출력하기 때문에 null을 반환
         if (receiverType == ReceiveType.USER) {
             // 수신자 존재 여부 확인
-            if(!userRepository.isExist(receiverId)){
-                throw new CustomException(ErrorCode.USER_NOT_FOUND);
-            }
+            userRepository.findById(receiverId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
             // 유저 간의 대화 중 가장 마지막 메시지
             return reversed.filter(m ->
@@ -123,9 +121,8 @@ public class BasicMessageService implements MessageService {
                     .findFirst().orElse(null);
         } else if (receiverType == ReceiveType.CHANNEL) {
             // 채널 존재 여부 확인
-            if(channelRepository.isExist(receiverId)){
-                throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
-            }
+            channelRepository.findById(receiverId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
             // 특정 채널에 보낸 마지막 메시지
             return reversed.filter(m ->
