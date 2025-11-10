@@ -12,11 +12,11 @@ public interface ReadStatusService {
 
     ReadStatusResponseDto createReadStatus(ReadStatusRequestDto requestDto);
 
-    Optional<ReadStatusResponseDto> findReadStatusById(UUID id);
+    ReadStatusResponseDto findReadStatusById(UUID id);
 
     List<ReadStatusResponseDto> findAllByUserId(UUID userId);
 
-    Optional<ReadStatusResponseDto> updateReadStatus(ReadStatusUpdateDto updateDto);
+    ReadStatusResponseDto updateReadStatus(ReadStatusUpdateDto updateDto);
 
     void deleteReadStatus(UUID id);
 

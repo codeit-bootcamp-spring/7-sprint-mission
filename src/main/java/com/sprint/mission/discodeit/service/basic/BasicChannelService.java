@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelRequestDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelRequestDto;
 import com.sprint.mission.discodeit.entity.entityType.ChannelType;
+import com.sprint.mission.discodeit.exception.NotFoundChannelException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -28,37 +28,26 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
 
     private ChannelResponseDto toDto(Channel channel) {
-//        Optional<Message> lastMessage = messageRepository.findAllByChannelId(channel.getId())
-//                .stream().findFirst();
 
-        // 맨 위 메시지 찾기 -> createAt에서 max를 사용해서 찾는걸로
         Optional<Message> lastMessage = messageRepository.findTopByChannelId(channel.getId());
         return ChannelResponseDto.from(channel, lastMessage.orElse(null));
     }
 
 
     @Override
-    public ChannelResponseDto createPublicChannel(PublicChannelRequestDto requestDto) {
+    public ChannelResponseDto createChannel(ChannelRequestDto requestDto) {
         User admin = userRepository.findById(requestDto.adminId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
 
-        Channel newChannel = new Channel(admin, requestDto.channelName(), ChannelType.PUBLIC);
-        channelRepository.save(newChannel);
-        return toDto(newChannel);
-    }
+        Channel newChannel = new Channel(admin, requestDto.channelName(), requestDto.channelType());
 
-    @Override
-    public ChannelResponseDto createPrivateChannel(PrivateChannelRequestDto requestDto) {
-        User admin = userRepository.findById(requestDto.adminId())
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
-
-        Channel newChannel = new Channel(admin, null, ChannelType.PRIVATE);
-
-        Set<UUID> privateMemberIds = new HashSet<>(requestDto.memberIds());
-        for (UUID memberIds : privateMemberIds) {
-            User member = userRepository.findById(memberIds)
+        Set<UUID> memberIds = new HashSet<>(requestDto.memberIds());
+        for (UUID ids : memberIds) {
+            User member = userRepository.findById(ids)
                     .orElseThrow(() -> new NotFoundUserException("멤버를 찾을 수 없음"));
             newChannel.addMember(member);
+
+            readStatusRepository.save(new ReadStatus(ids, newChannel.getId()));
         }
 
         channelRepository.save(newChannel);
@@ -66,80 +55,73 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<ChannelResponseDto> findChannelInfoById(UUID id) {
-        return channelRepository.findById(id).map(this::toDto);
+    public ChannelResponseDto findChannelInfoById(UUID id) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
+
+        return toDto(channel);
     }
 
-    // message에 채널을 주기위해
-    public Optional<Channel> findChannelEntityById(UUID id) {
-        return channelRepository.findById(id);
-    }
+    @Override
+    public ChannelResponseDto findChannelInfoByChannelName(String channelName) {
+        Channel channel = channelRepository.findByChannelName(channelName)
+                .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
 
+        return toDto(channel);
+    }
 
     @Override
     public List<ChannelResponseDto> findAllByUserId(UUID userId) {
         List<Channel> allChannels = channelRepository.findAll();
 
         return allChannels.stream().filter(channel -> {
-            if (channel.getType() == ChannelType.PUBLIC) {
-                return true;
-            }
-            else {
-                return channel.getMembers().stream()
-                        .anyMatch(member -> member.getId().equals(userId));
-            }
-        })
+                    if (channel.getType() == ChannelType.PUBLIC) {
+                        return true;
+                    } else {
+                        return channel.getMembers().stream()
+                                .anyMatch(member -> member.getId().equals(userId));
+                    }
+                })
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<ChannelResponseDto> findChannelInfoByChannelName(String channelName) {
-        return channelRepository.findByChannelName(channelName).map(this::toDto);
-    }
+    public ChannelResponseDto updateChannelName(ChannelUpdateDto updateDto) {
 
-    public Optional<ChannelResponseDto> findChannelByName(String channelName) {
-        return channelRepository.findByChannelName(channelName).map(this::toDto);
-    }
+        Channel channel = channelRepository.findById(updateDto.channelId())
+                .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
 
-    @Override
-    public Optional<ChannelResponseDto> updateChannelName(ChannelUpdateDto updateDto) {
-
-        return channelRepository.findById(updateDto.channelId()).map(channel -> {
-            if (channel.getType() == ChannelType.PRIVATE) {
-                throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
-            }
-            channel.changeChannelName(updateDto.newChannelName());
-
-            channelRepository.save(channel);
-            return toDto(channel);
-        });
-    }
-
-    @Override
-    public Optional<ChannelResponseDto> addMemberToChannel(UUID channelId, UUID userId) {
-
-        Optional<Channel> channelOp = channelRepository.findById(channelId);
-        Optional<User> userOp = userRepository.findById(userId);
-
-        if (channelOp.isEmpty() || userOp.isEmpty()){
-            System.out.println("채널 또는 사용자를 찾을 수 없음");
-            return Optional.empty();
-        }
-
-        Channel channel = channelOp.get();
         if (channel.getType() == ChannelType.PRIVATE) {
-            System.out.println("Private 채널은 수정이 불가능합니다.");
-            return Optional.empty();
+            throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
         }
-
-        User user = userOp.get();
-        if (channel.addMember(user)) {
-            System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에 참가");
-        } else System.out.println("이미 참여하고 있는 유저");
+        channel.changeChannelName(updateDto.newChannelName());
 
         channelRepository.save(channel);
-        return Optional.of(toDto(channel));
+        return toDto(channel);
+
+    }
+
+    @Override
+    public ChannelResponseDto addMemberToChannel(UUID channelId, UUID userId) {
+
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+
+        if (channel.getType() == ChannelType.PRIVATE) {
+            throw new IllegalStateException("Private 채널은 수정이 불가능합니다.");
+        }
+
+        if (channel.addMember(user)) {
+            readStatusRepository.save(new ReadStatus(userId, channelId));
+            System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에 참가");
+            channelRepository.save(channel);
+
+        } else System.out.println("이미 참여하고 있는 유저");
+
+        return toDto(channel);
 
 
         /* flatMap으로 구현
@@ -157,36 +139,35 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<ChannelResponseDto> removeMemberFromChannel(UUID channelId, UUID userId) {
-        Optional<Channel> channelOp = channelRepository.findById(channelId);
-        Optional<User> userOptional = userRepository.findById(userId);
+    public ChannelResponseDto removeMemberFromChannel(UUID channelId, UUID userId) {
 
-        if (channelOp.isEmpty() || userOptional.isEmpty()) {
-            System.out.println("잘못된 입력");
-            return Optional.empty();
-        }
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
 
-        Channel channel = channelOp.get();
         if (channel.getType() == ChannelType.PRIVATE) {
-            System.out.println("Private 채널은 수정이 불가능합니다.");
-            return Optional.empty();
+            throw new IllegalStateException("Private 채널은 수정이 불가능합니다.");
         }
 
-        User user = userOptional.get();
         if (channel.removeMember(user)) {
+            readStatusRepository.deleteAllByUserIdAndChannelId(userId, channelId);
             System.out.println(user.getUserName() + " 님이 " + channel.getChannelName() + " 에서 삭제됨");
+            channelRepository.save(channel);
         } else System.out.println("채널에 없는 유저");
 
-        channelRepository.save(channel);
-        return Optional.of(toDto(channel));
+        return toDto(channel);
     }
 
     @Override
-    public boolean deleteChannel(UUID id) {
+    public void deleteChannel(UUID id) {
 
-        return channelRepository.findById(id).map(channel -> {
+        channelRepository.findById(id)
+                        .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
+
+            readStatusRepository.deleteAllByChannelId(id);
+            messageRepository.deleteAllByChannelId(id);
             channelRepository.deleteById(id);
-            return true;
-        }).orElse(false);
+
     }
 }

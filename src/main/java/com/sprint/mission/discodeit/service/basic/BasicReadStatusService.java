@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -47,8 +48,10 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public Optional<ReadStatusResponseDto> findReadStatusById(UUID id) {
-        return readStatusRepository.findById(id).map(ReadStatusResponseDto::from);
+    public ReadStatusResponseDto findReadStatusById(UUID id) {
+        ReadStatus status = readStatusRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
+        return ReadStatusResponseDto.from(status);
     }
 
     @Override
@@ -58,12 +61,13 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public Optional<ReadStatusResponseDto> updateReadStatus(ReadStatusUpdateDto updateDto) {
-        return readStatusRepository.findById(updateDto.readStatusId()).map(readStatus -> {
-            readStatus.updateReadStatus();
-            readStatusRepository.save(readStatus);
-            return ReadStatusResponseDto.from(readStatus);
-        });
+    public ReadStatusResponseDto updateReadStatus(ReadStatusUpdateDto updateDto) {
+        ReadStatus status = readStatusRepository.findByUserIdAndChannelId(updateDto.userId(), updateDto.channelId())
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
+
+        status.updateReadStatus();
+        readStatusRepository.save(status);
+        return ReadStatusResponseDto.from(status);
     }
 
     @Override

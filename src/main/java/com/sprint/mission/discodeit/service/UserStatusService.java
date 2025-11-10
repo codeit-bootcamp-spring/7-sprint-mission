@@ -12,11 +12,13 @@ public interface UserStatusService {
 
     UserStatusResponseDto createUserStatus(UserStatusRequestDto requestDto);
 
-    Optional<UserStatusResponseDto> findStatusById(UUID id);
+    UserStatusResponseDto findStatusById(UUID id);
+
+    UserStatusResponseDto updateStatusByUserId(UUID userId);
 
     List<UserStatusResponseDto> findAllStatus();
 
-    Optional<UserStatusResponseDto> updateStatus(UserStatusUpdateDto updateDto);
+    UserStatusResponseDto updateStatus(UserStatusUpdateDto updateDto);
 
     void deleteUserStatusById(UUID id);
 }

@@ -30,10 +30,10 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         data.remove(id);
     }
 
-    @Override
     public Optional<UserStatus> findStatusByUserId(UUID userId) {
         return data.values().stream()
-                .filter(status -> status.getUserId().equals(userId))
+                .filter(status -> status.getUserId() != null
+                        && userId.equals(status.getUserId()))
                 .findFirst();
     }
 

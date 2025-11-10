@@ -6,11 +6,16 @@ import lombok.Getter;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
 public class ReadStatus extends BaseEntity {
 
-    private UUID userId;
-    private UUID channelId;
+    private final UUID userId;
+    private final UUID channelId;
+
+    public ReadStatus(UUID userId, UUID channelId) {
+        super();
+        this.userId = userId;
+        this.channelId = channelId;
+    }
 
     public void updateReadStatus() {
         updateTimestamp();

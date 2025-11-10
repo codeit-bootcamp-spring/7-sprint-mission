@@ -26,5 +26,4 @@ public class FileUserRepository extends FileBaseRepository<User> implements User
                 .filter(user -> user.getEmail()
                         .equals(userName)).findFirst();
     }
-
 }

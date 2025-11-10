@@ -14,12 +14,14 @@ public interface MessageService {
     MessageResponseDto createDirectMessage(DirectMessageRequestDto requestDto); // 생성
     MessageResponseDto createChannelMessage(ChannelMessageRequestDto requestDto);
 
-    Optional<MessageResponseDto> findMessageById(UUID messageId);
+    MessageResponseDto findMessageById(UUID messageId);
 
     List<MessageResponseDto> findMessageBetweenUsers(UUID userId1, UUID userId2);     // 유저 둘의 메시지 전체 조회
     List<MessageResponseDto> findAllByChannelId(UUID channelId);     // 한 채널의 메시지 전체 조회
 
     Optional<MessageResponseDto> updateMessage(MessageUpdateDto updateDto);      // 수정
 
-    boolean deleteMessage(UUID id);              // 삭제
+    void deleteMessage(UUID id);              // 삭제
+
+    List<MessageResponseDto> findAll();
 }

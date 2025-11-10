@@ -43,7 +43,7 @@ public class User extends BaseEntity {
     }
 
     // Update
-    public void updateUserName(String userName) {
+    public void updateName(String userName) {
         validateUserName(userName);
         this.userName = userName;
         updateTimestamp();
@@ -57,8 +57,10 @@ public class User extends BaseEntity {
 
     public void updatePhoneNum(String phoneNum) {
         validatePhoneNum(phoneNum);
-        if (phoneNum.isBlank()) this.phoneNum = "비어있음";
-        else this.phoneNum = phoneNum;
+        if (phoneNum == null || phoneNum.isBlank())
+            this.phoneNum = "비어있음";
+        else
+            this.phoneNum = phoneNum;
         updateTimestamp();
     }
 

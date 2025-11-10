@@ -23,9 +23,8 @@ public record ChannelResponseDto(UUID id,
     public static ChannelResponseDto from(Channel channel, Message lastMessage) {
 
         List<UUID> ids = null;
-        if (channel.getType() == ChannelType.PRIVATE) {
-            ids = channel.getMembers().stream().map(User::getId).toList();
-        }
+        ids = channel.getMembers().stream().map(User::getId).toList();
+
         Instant last = lastMessage != null ? lastMessage.getCreatedAt() : null;
 
         return ChannelResponseDto.builder()

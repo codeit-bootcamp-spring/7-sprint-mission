@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,9 +22,15 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
 
-    // 10MB, 500MB 업로드 제한
+    /* 10MB, 500MB 업로드 제한
     private static final long BASIC_MAX_FILE_SIZE = 10 * 1024 * 1024;
-//    private static final long NITRO_MAX_FILE_SIZE = 500 * 1024 * 1024;
+    private static final long NITRO_MAX_FILE_SIZE = 500 * 1024 * 1024;
+     */
+
+    private static final long BYTES_PER_KB = 1024;
+    private static final long BYTES_PER_MB = BYTES_PER_KB * 1024;
+    private static final long MAX_FILE_SIZE_MB = 10;
+    private static final long BASIC_MAX_FILE_SIZE = MAX_FILE_SIZE_MB * BYTES_PER_MB;
 
     @Override
     public BinaryContentResponseDto createBinaryContent(BinaryContentRequestDto requestDto) {
@@ -45,8 +52,10 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public Optional<BinaryContentResponseDto> findBinaryContentByUserId(UUID id) {
-        return binaryContentRepository.findById(id).map(BinaryContentResponseDto::from);
+    public BinaryContentResponseDto findBinaryContentById(UUID id) {
+        BinaryContent content=  binaryContentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
+        return BinaryContentResponseDto.from(content);
     }
 
     @Override
