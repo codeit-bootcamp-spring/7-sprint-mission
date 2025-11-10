@@ -14,7 +14,7 @@ public record UserFindResponse(
     public static UserFindResponse from(User user, UserStatus status) {
         return new UserFindResponse(
                 user.getId(),
-                user.getUserName(),
+                user.getUsername(),
                 user.getUserNickname(),
                 status
         );

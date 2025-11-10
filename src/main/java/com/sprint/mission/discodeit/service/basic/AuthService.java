@@ -2,20 +2,15 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.user.response.LoginResponse;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
-import java.time.Instant;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 
 @RequiredArgsConstructor
@@ -29,7 +24,7 @@ public class AuthService {
     public User login(LoginRequest loginRequest) {
         //이메일매칭
         User user = userRepository.findAll().stream()
-                .filter(u -> u.getUserName().equals(loginRequest.username()))
+                .filter(u -> u.getUsername().equals(loginRequest.username()))
                 .filter(u -> u.getPassword().equals(loginRequest.password()))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException(

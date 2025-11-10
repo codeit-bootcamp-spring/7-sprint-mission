@@ -9,6 +9,6 @@ public record LoginResponse(
         boolean isOnline
 ) {
     public static LoginResponse from(User user, boolean isOnline) {
-        return new LoginResponse(user.getId(), user.getUserName(), user.getUserNickname(), isOnline);
+        return new LoginResponse(user.getId(), user.getUsername(), user.getUserNickname(), isOnline);
     }
 }
