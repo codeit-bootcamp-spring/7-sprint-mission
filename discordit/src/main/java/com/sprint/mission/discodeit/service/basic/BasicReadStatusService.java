@@ -1,8 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.common.exceptions.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.readStatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -10,6 +16,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,30 +30,49 @@ public class BasicReadStatusService implements ReadStatusService {
 
     public ReadStatusResponse create(ReadStatusCreateRequest dto) {
         ReadStatus readStatus = new ReadStatus(
-                userRepository.findByUserId(dto.userId()),
+                userRepository.findByUserId(dto.userId())
+                        .orElseThrow(() -> new UserNotFoundException(dto.userId())),
                 channelRepository.findById(dto.ChannelId())
+                        .orElseThrow(() -> new ChannelNotFoundException(dto.ChannelId()))
         );
         readStatusRepository.save(readStatus);
         return ReadStatusResponse.toDto(readStatus);
     }
 
-    public ReadStatusResponse get(UUID uuid) {
-        return ReadStatusResponse.toDto(readStatusRepository.findById(uuid));
+    @Override
+    public ReadStatusResponse update(ReadStatusUpdateRequest dto) {
+        User user = userRepository.findByUserId(dto.userId())
+                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
+        Channel channel = channelRepository.findById(dto.channelId())
+                .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()));
+        ReadStatus readStatus = readStatusRepository.find(user, channel)
+                .orElseThrow(() -> new ReadStatusNotFoundException(user, channel));
+        readStatus.setLastReadAt(dto.readTime().atZone(ZoneId.of("UTC")).toInstant());
+        readStatusRepository.update(readStatus);
+        return ReadStatusResponse.toDto(readStatus);
     }
 
-    public List<ReadStatusResponse> getAllByUserId(String userId) {
-        return readStatusRepository.findAllByUser(userRepository.findByUserId(userId)).stream()
+    public ReadStatusResponse get(UUID uuid) {
+        return ReadStatusResponse.toDto(readStatusRepository.findById(uuid)
+                .orElseThrow(() -> new ReadStatusNotFoundException(uuid)));
+    }
+
+    public List<ReadStatusResponse> getAllByUserId(UUID id) {
+        User user = userRepository.find(id).orElseThrow(() -> new UserNotFoundException(id));
+        return readStatusRepository.findAllByUser(user).stream()
                 .map(ReadStatusResponse::toDto)
                 .toList();
     }
 
-
-    public void read(UUID uuid) {
-        readStatusRepository.findById(uuid).read();
+    @Override
+    public List<ReadStatusResponse> getAll() {
+        return readStatusRepository.findAll().stream()
+                .map(ReadStatusResponse::toDto)
+                .toList();
     }
 
     public void delete(UUID uuid) {
-        readStatusRepository.deleteById(uuid);
+        readStatusRepository.delete(uuid);
     }
 
 

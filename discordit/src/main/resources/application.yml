@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: discordit
+
+validation:
+  user:
+    id:
+      min-length: 4
+      max-length: 10
+    password:
+      min-length: 6
+      max-length: 12
+    display-name:
+      min-length: 3
+      max-length: 10
+    email-regex: "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+user-status:
+  online-threshold-minutes: 5
+data:
+  path:
+    project-dir: "C:\\Users\\hyo37\\Documents\\7-sprint-mission\\discordit\\src\\main\\java\\com\\sprint\\mission\\discodeit"
+    base-dir: "/repository/file/data"
+    file:
+      channel: "${data.path.project-dir}${data.path.base-dir}/channel.sav"
+      user: "${data.path.project-dir}${data.path.base-dir}/user.sav"
+      message: "${data.path.project-dir}${data.path.base-dir}/message.sav"
+      binary-content: "${data.path.project-dir}${data.path.base-dir}/binary-content.sav"
+      read-status: "${data.path.project-dir}${data.path.base-dir}/read-status.sav"
+      user-status: "${data.path.project-dir}${data.path.base-dir}/user-status.sav"

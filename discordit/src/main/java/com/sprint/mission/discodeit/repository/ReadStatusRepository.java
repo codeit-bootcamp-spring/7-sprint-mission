@@ -5,19 +5,22 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ReadStatusRepository {
     void save(ReadStatus readStatus);
 
-    ReadStatus find(User user, Channel channel);
-    ReadStatus findById(UUID uuid);
+    Optional<ReadStatus> find(User user, Channel channel);
+    Optional<ReadStatus> findById(UUID uuid);
     List<ReadStatus> findAll();
 
     void delete(ReadStatus readStatus);
     void deleteAllByUser(User user);
     void deleteAllByChannel(Channel channel);
-    void deleteById(UUID uuid);
+    void delete(UUID uuid);
 
     List<ReadStatus> findAllByUser(User user);
+
+    void update(ReadStatus readStatus);
 }

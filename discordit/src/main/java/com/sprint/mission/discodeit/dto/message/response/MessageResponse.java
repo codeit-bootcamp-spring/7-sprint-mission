@@ -7,8 +7,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.enums.ReceiverType;
 
 import java.util.List;
+import java.util.UUID;
 
 public record MessageResponse(
+        UUID id,
         String senderId,
         ReceiverType type,
         String receiverId,
@@ -31,11 +33,12 @@ public record MessageResponse(
         }
 
         return new MessageResponse(
+                message.getUuid(),
                 message.getSender().getUserId(),
                 type,
                 receiverId,
                 receiverDisplayName,
-                message.getMessage(),
+                message.getContent(),
                 message.getAttachments().stream()
                         .map(BinaryContent::getFileUrl)
                         .toList()

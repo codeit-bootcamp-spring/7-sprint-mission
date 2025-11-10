@@ -56,6 +56,11 @@ public class Channel extends BaseEntity implements Receivable {
         update();
     }
 
+    public void deleteMember(Set<User> users) {
+        this.members.removeAll(users);
+        update();
+    }
+
     public void addModerators(Set<User> moderators) {
         this.moderators.addAll(moderators);
         this.members.addAll(moderators);
@@ -70,6 +75,11 @@ public class Channel extends BaseEntity implements Receivable {
 
     public void deleteModerator(User user) {
         this.moderators.remove(user);
+        update();
+    }
+
+    public void deleteModerator(Set<User> users) {
+        this.moderators.removeAll(users);
         update();
     }
 

@@ -38,3 +38,4 @@ out/
 /.agents/
 /.github/
 /docs/
+/src/main/java/com/sprint/mission/discodeit/config/DataMaker.java

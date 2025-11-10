@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.config.OnlineThreshold;
+import com.sprint.mission.discodeit.common.config.OnlineThreshold;
 import com.sprint.mission.discodeit.enums.OnlineStatus;
+import com.sprint.mission.discodeit.common.validator.UserValidator;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
 
@@ -9,6 +10,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
+
+import static com.sprint.mission.discodeit.common.config.OnlineThreshold.ONLINE_THRESHOLD;
 
 @Getter
 public class User extends BaseEntity implements Receivable {
@@ -23,12 +26,11 @@ public class User extends BaseEntity implements Receivable {
     private OnlineStatus onlineStatus;
     private BinaryContent profileImage;
 
-    private static final Duration ONLINE_THRESHOLD = OnlineThreshold.ONLINE_THRESHOLD;
-
     public User(String userId, String passwd, String email, String displayName) {
-        validateId(userId);
-        validatePasswd(passwd);
-        validateDisplayName(displayName);
+        UserValidator.validateId(userId);
+        UserValidator.validatePassword(passwd);
+        UserValidator.validateDisplayName(displayName);
+        UserValidator.validateEmail(email);
 
         this.userId = userId;
         this.passwd = passwd;
@@ -48,14 +50,14 @@ public class User extends BaseEntity implements Receivable {
         return onlineStatus;
     }
 
-    public void setPasswd(String passwd) {
-        validatePasswd(passwd);
-        this.passwd = passwd;
+    public void setPasswd(String password) {
+        UserValidator.validatePassword(password);
+        this.passwd = password;
         update();
     }
 
     public void setDisplayName(String displayName) {
-        validateDisplayName(displayName);
+        UserValidator.validateDisplayName(displayName);
         this.displayName = displayName;
         update();
     }
@@ -78,25 +80,6 @@ public class User extends BaseEntity implements Receivable {
     public void setEmail(String email) {
         this.email = email;
         update();
-    }
-
-    private static void validateId(String id){
-        if (id.length() < 4 || id.length() > 10){
-            throw new IllegalArgumentException("아이디는 4에서 10자 사이로 입력해주세요.");
-        }
-    }
-
-    private static void validatePasswd(String passwd) {
-        // 지금은 아이디와 제약사항이 같지만 나중에 변경될 수 있어 분리함
-        if (passwd.length() < 4 || passwd.length() > 10){
-            throw new IllegalArgumentException("비밀번호는 4에서 10자 사이로 입력해주세요.");
-        }
-    }
-
-    private static void validateDisplayName(String displayName) {
-        if (displayName.length() > 10){
-            throw new IllegalArgumentException("닉네임은 10자 이하로 입력되어야 합니다. 입력 글자 수 :" + displayName.length());
-        }
     }
 
     // 파일 IO시 필드 복원을 위한 메서드
@@ -130,7 +113,7 @@ public class User extends BaseEntity implements Receivable {
     @Override
     public String toString() {
         return "User{" +
-                "userId='" + userId + '\'' +
+                "userUuid='" + userId + '\'' +
                 ", Passwd='" + passwd + '\'' +
                 ", displayName='" + displayName + '\'' +
                 ", bio='" + bio + '\'' +

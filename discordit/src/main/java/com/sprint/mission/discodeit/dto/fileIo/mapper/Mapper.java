@@ -51,9 +51,8 @@ public final class Mapper {
         return BinaryContentMapper.toDto(binaryContent);
     }
 
-    public static BinaryContent toBinaryContent(BinaryContentIoDTO dto,
-                                                UserRepository userRepository) {
-        return BinaryContentMapper.toBinaryContent(dto, userRepository);
+    public static BinaryContent toBinaryContent(BinaryContentIoDTO dto) {
+        return BinaryContentMapper.toBinaryContent(dto);
     }
 
     public static ReadStatusIoDTO toDto(ReadStatus readStatus) {

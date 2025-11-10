@@ -5,6 +5,8 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.UUID;
+
 public record UserCreateRequest(
         @NotNull(message = "id는 필수입니다.")
         String id,
@@ -20,5 +22,5 @@ public record UserCreateRequest(
         String displayName,
 
         @Nullable
-        BinaryContent profileImage) {
+        UUID profileImageId) {
 }

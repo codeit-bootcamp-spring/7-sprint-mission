@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentGetRequest;
 import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -21,24 +23,35 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     public BinaryContentResponse create(BinaryContentCreateRequest dto) {
         BinaryContent content = new BinaryContent(
-                userRepository.findByUserId(dto.userId()),
                 dto.fileUrl()
         );
         contentRepository.save(content);
         return BinaryContentResponse.toDto(content);
     }
 
-    public BinaryContentResponse get(UUID uuid) {
-        return BinaryContentResponse.toDto(contentRepository.findById(uuid));
+    @Override
+    public BinaryContentResponse get(UUID id) {
+        return BinaryContentResponse.toDto(
+                contentRepository.findById(id)
+                        .orElseThrow(() -> new BinaryContentNotFoundException(id)));
     }
 
-    public List<BinaryContentResponse> getAllByUserID(String userId) {
-        return contentRepository.findAllByUser(userRepository.findByUserId(userId)).stream()
+    public List<BinaryContentResponse> getAllById(BinaryContentGetRequest dto) {
+        return dto.ids().stream()
+                .map(id -> contentRepository.findById(id)
+                        .orElseThrow(() -> new BinaryContentNotFoundException(id)))
                 .map(BinaryContentResponse::toDto)
                 .toList();
     }
 
     public void delete(UUID uuid) {
         contentRepository.deleteByID(uuid);
+    }
+
+    @Override
+    public List<BinaryContentResponse> getAll() {
+        return contentRepository.findAll().stream()
+                .map(BinaryContentResponse::toDto)
+                .toList();
     }
 }

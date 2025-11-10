@@ -3,14 +3,16 @@ package com.sprint.mission.discodeit.dto.fileIo.mapper;
 import com.sprint.mission.discodeit.dto.fileIo.ChannelIoDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.HashSet;
 
 final class ChannelMapper {
-    private ChannelMapper() {}
+    private ChannelMapper() {
+    }
 
-    public static Channel toChannel(ChannelIoDTO dto, UserRepository userRepository){
+    public static Channel toChannel(ChannelIoDTO dto, UserRepository userRepository) {
         return Channel.fromDto(
                 dto.getUuid(),
                 dto.getCreatedAt(),
@@ -20,10 +22,12 @@ final class ChannelMapper {
                 dto.getScope(),
                 dto.getType(),
                 new HashSet<>(dto.getModeratorUuids().stream()
-                        .map(userRepository::findById)
+                        .map(id -> userRepository.find(id)
+                                .orElseThrow(() -> new UserNotFoundException(id)))
                         .toList()),
                 new HashSet<>(dto.getMemberUuids().stream()
-                        .map(userRepository::findById)
+                        .map(id -> userRepository.find(id)
+                                .orElseThrow(() -> new UserNotFoundException(id)))
                         .toList())
         );
     }

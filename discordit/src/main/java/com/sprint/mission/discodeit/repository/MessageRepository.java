@@ -5,20 +5,21 @@ import com.sprint.mission.discodeit.entity.Receivable;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface MessageRepository {
     void save(Message message);
+    Optional<Message> find(UUID id);
     List<Message> findAll();
     List<Message> findBySender(User user);
     List<Message> findByReceiver(Receivable receiver);
     List<Message> findBySenderAndReceiver(User user, Receivable receiver);
-
-    // 더미 데이터 세팅용
-    Message findLast();
-
-    Message findLast(Receivable receivable);
-
-    void deleteAllByReceiver(Receivable receiver);
+    Optional<Message> findLast();
+    Optional<Message> findLast(Receivable receivable);
 
     void delete(Message message);
+    void deleteAllByReceiver(Receivable receiver);
+
+    Optional<Message> update(Message message);
 }

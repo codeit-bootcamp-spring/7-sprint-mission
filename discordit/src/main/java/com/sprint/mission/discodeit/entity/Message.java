@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.enums.ReceiverType;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -17,15 +18,22 @@ public class Message extends BaseEntity {
     private final User sender;
     private final ReceiverType type;
     private final Receivable receiver;
-    private final String message;
+    @Setter
+    private String content;
     private final List<BinaryContent> attachments = new ArrayList<>();
 
     public Message(User sender, ReceiverType type, Receivable receiver,
-                   String message) {
+                   String content) {
         this.sender = sender;
         this.type = type;
         this.receiver = receiver;
-        this.message = message;
+        this.content = content;
+    }
+
+    // 더미 데이터 타임스탬프 조정을 허용 (테스트/시드용)
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+        this.updatedAt = createdAt;
     }
 
     public void addAttachment(BinaryContent attachment) {

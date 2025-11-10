@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusUpdateByIdRequest;
-import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusUpdateByUserIdRequest;
+import com.sprint.mission.discodeit.dto.userStatus.request.*;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -20,10 +20,12 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
     public UserStatusResponse create(UserStatusCreateRequest dto) {
-        User byUserId = userRepository.findByUserId(dto.userId());
+        User byUserId = userRepository.findByUserId(dto.userId())
+                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
         UserStatus userStatus = new UserStatus(byUserId);
         userStatusRepository.save(userStatus);
         return UserStatusResponse.toDto(userStatus);
@@ -42,22 +44,27 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void update(UserStatusUpdateByIdRequest dto) {
+    public UserStatusResponse update(UserStatusUpdateRequest dto) {
         UserStatus userStatus = userStatusRepository.findById(dto.id());
         userStatus.setOnlineStatus(dto.onlineStatus());
         userStatusRepository.update(userStatus);
+        return UserStatusResponse.toDto(userStatus);
     }
 
     @Override
-    public void updateById(UserStatusUpdateByUserIdRequest dto) {
+    public UserStatusResponse updateByUser(UserStatusUpdateByUserRequest dto) {
         UserStatus userStatus = userStatusRepository.findByUser(
-                userRepository.findByUserId(dto.userId()));
+                userRepository.find(dto.userUuid())
+                        .orElseThrow(() -> new UserNotFoundException(dto.userUuid())));
         userStatus.setOnlineStatus(dto.onlineStatus());
         userStatusRepository.update(userStatus);
+        return UserStatusResponse.toDto(userStatus);
     }
 
     @Override
-    public void delete(UUID id) {
-        userStatusRepository.deleteById(id);
+    public UserStatusResponse getByUser(UUID userUuid) {
+        User user = userRepository.find(userUuid)
+                .orElseThrow(() -> new UserNotFoundException(userUuid));
+        return UserStatusResponse.toDto(userStatusRepository.findByUser(user));
     }
 }
