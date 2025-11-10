@@ -3,17 +3,21 @@ package com.sprint.mission.discodeit.application;
 import com.sprint.mission.discodeit.domain.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public final class FileManager {
+public final class FileService {
 
     private final Path rootDir = Paths.get("data/uploads"); // 루트 폴더
 
@@ -28,23 +32,30 @@ public final class FileManager {
     }
     
     public BinaryContent saveMessageFile(UUID userId, MultipartFile file) throws IOException {
+        createUserFolder(userId);
         Path userFolder = rootDir.resolve("user_" + userId.toString());
         String fileName= makeFileName(file.getOriginalFilename());
         Path filePath = userFolder.resolve(fileName);
         file.transferTo(filePath);
-        return new BinaryContent(
+
+        BinaryContent content = new BinaryContent(
                 fileName,
                 file.getContentType(),
                 filePath.toString(),
                 file.getSize()
         );
+        binaryContentRepository.save(content);
+
+        return content;
+    }
+
+    public void deleteMessageImage(BinaryContent binaryContent) throws IOException {
+        Path filePath = Paths.get(binaryContent.getFilePath());
+        Files.deleteIfExists(filePath);
     }
 
 
     public BinaryContent saveUserProfile(UUID userId, MultipartFile profile) throws IOException {
-        if ( profile.isEmpty()) {
-            throw new IllegalArgumentException("파일이 비어있습니다.");
-        }
         String contentType = profile.getContentType();
         validateContentType(contentType);
 
@@ -58,11 +69,15 @@ public final class FileManager {
         
         profile.transferTo(profilePath);
 
-        return new BinaryContent("profile",
+        BinaryContent content = new BinaryContent("profile",
                 profile.getContentType(),
                 profilePath.toString(),
                 profile.getSize()
         );
+
+        binaryContentRepository.save(content);
+
+        return content;
     }
 
     private String makeProfileName(String originalName){
@@ -108,6 +123,16 @@ public final class FileManager {
         }
     }
 
+    public BinaryContent findById(UUID binaryId){
+        return binaryContentRepository.findById(binaryId).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+    }
+
+    public Resource findImageFile(UUID binaryId) throws MalformedURLException {
+        BinaryContent content = findById(binaryId);
+        Path path = Paths.get(content.getFilePath());
+        return new UrlResource(path.toUri());
+    }
+
     private void validateContentType(String contentType) {
         if (contentType == null ||
                 !(contentType.equals("image/png")
@@ -116,6 +141,8 @@ public final class FileManager {
             throw new IllegalArgumentException("허용되지 않는 파일 형식입니다: " + contentType);
         }
     }
+
+
 
 }
 

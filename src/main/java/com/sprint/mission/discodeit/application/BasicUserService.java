@@ -1,23 +1,27 @@
 package com.sprint.mission.discodeit.application;
 
 
+import com.sprint.mission.discodeit.application.dto.UserDtoMapper;
 import com.sprint.mission.discodeit.application.dto.request.UserCreateRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.UserRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.UserUpdateDto;
 import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
-import com.sprint.mission.discodeit.domain.UserStatus;
 import com.sprint.mission.discodeit.domain.repository.UserRepository;
 import com.sprint.mission.discodeit.domain.exception.DuplicateUserException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-import static com.sprint.mission.discodeit.application.UserFindHelper.findById;
+
 import static com.sprint.mission.discodeit.application.dto.UserDtoMapper.userToResponseDto;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService{
@@ -25,7 +29,7 @@ public class BasicUserService{
 
     private final UserRepository userRepository;
 
-    private final FileManager fileManager;
+    private final FileService fileService;
 
 
 
@@ -40,21 +44,16 @@ public class BasicUserService{
                 requestDto.username(),
                 requestDto.phoneNumber());
         userRepository.save(user);
-        fileManager.createUserFolder(user.getId());
-        if (requestDto.profileImage() != null) {
-            BinaryContent content = fileManager.saveUserProfile(user.getId(), requestDto.profileImage());
-            user.setProfile(content);
-
+        fileService.createUserFolder(user.getId());
+        if (requestDto.profileImage() != null && !requestDto.profileImage().isEmpty()) {
+            BinaryContent content = fileService.saveUserProfile(user.getId(), requestDto.profileImage());
+            user.setProfile(content.getId());
         }
-
-        //유저 전용 폴더 생성 & 파일 저장
-
-
         return userToResponseDto(user);
     }
 
     public UserResponseDto updateUserInfo(UserUpdateDto updateDto) throws IOException {
-        User user = findById(userRepository, updateDto.id());
+        User user = findByUsername(updateDto.username());
         if (updateDto.username() != null) {
             user.updateUsername(updateDto.username());
         }
@@ -65,24 +64,79 @@ public class BasicUserService{
             user.updatePhoneNumber(updateDto.phoneNumber());
         }
         if (updateDto.updateFile() != null) {
-            BinaryContent content = fileManager.saveUserProfile(user.getId(), updateDto.updateFile());
-            user.setProfile(content);
+            BinaryContent content = fileService.saveUserProfile(user.getId(), updateDto.updateFile());
+            user.setProfile(content.getId());
         }
         userRepository.save(user);
+
         return userToResponseDto(user);
     }
 
 
     public void delete(UserRequestDto requestDto) {
-        userRepository.remove(findById(userRepository,requestDto.id()));
-        fileManager.deleteUserFolder(requestDto.id());
+        User user;
+        if(requestDto.id()==null){
+            user = findByUsername(requestDto.username());
+        } else {
+            user = findById(requestDto.id());
+        }
+        userRepository.remove(user);
+        fileService.deleteUserFolder(user.getId());
     }
 
-    public UserResponseDto getUser(UserRequestDto userRequestDto){
-        User user = findById(userRepository, userRequestDto.id());
+    public UserResponseDto getUser(UserRequestDto requestDto){
+        User user;
+        if(requestDto.id()==null){
+            user = findByUsername(requestDto.username());
+        } else {
+            user = findById(requestDto.id());
+        }
         return userToResponseDto(user);
     }
 
+    public List<UserResponseDto> getAllUsers(){
+       return findAll().stream().map(user -> UserDtoMapper.userToResponseDto(user)).toList();
+    }
+
+
+    public User findById( UUID userId) {
+        log.info("findUser");
+        return userRepository.findById(userId).orElseThrow(()->new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+    }
+
+    public User findByUsername(String username){
+        return userRepository.findByUsername(username).orElseThrow(()->new NoSuchElementException("존재하지 않는 아이디입니다."));
+    }
+
+
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    public UserResponseDto login(String loginId, String password) {
+        User user = findByUsername(loginId);
+        if (!user.getPassword().equals(password)){
+            throw new IllegalArgumentException("비밀번호가 틀립니다");
+        }
+        if(!user.checkOnline()){
+            user.markOnline();
+            userRepository.save(user);
+        }
+        return userToResponseDto(user);
+
+    }
+
+    public void logout(UUID userId){
+        User user = findById(userId);
+        user.markOffline();
+        userRepository.save(user);
+    }
+
+    public void markUserStatus(String username){
+        User user = findByUsername(username);
+        user.markOnline();
+        userRepository.save(user);
+    }
 
     private void validateDuplicateUsername(String username) {
         userRepository.findByUsername(username).ifPresent(u -> {

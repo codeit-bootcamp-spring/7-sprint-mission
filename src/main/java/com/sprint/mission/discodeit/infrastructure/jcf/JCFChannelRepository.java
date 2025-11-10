@@ -14,6 +14,19 @@ public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> store= new HashMap<>();
 
+    public JCFChannelRepository() {
+        UUID serverId = UUID.fromString("12121212-1212-1212-1212-121212343434");
+        List<UUID> members = new ArrayList<>();
+        UUID userId = UUID.fromString("32121212-1212-1212-1212-121212343434");
+        members.add(userId);
+        Channel channel = new Channel("testChannel", serverId, members, false);
+
+        UUID channelId = UUID.fromString("02121212-1212-1212-1212-121212343434");
+        store.put(channelId,channel);
+        System.out.println("채널 저장 완료"+store.get(channelId).getChannelName());
+
+    }
+
     public void save(Channel channel){
         UUID key = channel.getId();
         store.put(key, channel);

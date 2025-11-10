@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface ServerRepository {
     void save(Server server);
 
-    void remove(Server server);
+    void remove(UUID id);
 
     Optional<Server> findById(UUID id);
 

@@ -10,7 +10,9 @@ public final class UserDtoMapper {
     private UserDtoMapper(){}
 
     public static UserResponseDto userToResponseDto(User user) {
-        return new UserResponseDto(user.getEmail(), user.getUsername(), user.getPhoneNumber(),null);
+
+        return new UserResponseDto(user.getEmail(), user.getUsername(), user.getPhoneNumber(),
+                user.checkOnline()?true:false);
     }
 
 }

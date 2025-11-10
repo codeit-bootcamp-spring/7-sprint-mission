@@ -1,27 +1,44 @@
 package com.sprint.mission.discodeit.application;
 
+import com.sprint.mission.discodeit.application.dto.request.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.ServerCreateRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.ServerRequestDto;
+import com.sprint.mission.discodeit.application.dto.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.application.dto.response.ServerResponseDto;
+import com.sprint.mission.discodeit.domain.Channel;
+import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.domain.Server;
+import com.sprint.mission.discodeit.domain.User;
+import com.sprint.mission.discodeit.domain.repository.ChannelRepository;
+import com.sprint.mission.discodeit.domain.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.domain.repository.ServerRepository;
+import com.sprint.mission.discodeit.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import static com.sprint.mission.discodeit.application.ServerFindHelper.findById;
-import static com.sprint.mission.discodeit.application.dto.ServerDtoMapper.serverToResponseDto;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
+
+import static com.sprint.mission.discodeit.application.dto.ChannelDtoMapper.channelToResponseDto;
+import static com.sprint.mission.discodeit.application.dto.ServerDtoMapper.serverToResponseDto;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicServerService {
 
 
     private final ServerRepository serverRepository;
+    private final UserRepository userRepository;
+    private final ReadStatusRepository readStatusRepository;
+    private final ChannelRepository channelRepository;
 
-    public ServerResponseDto createServer(ServerCreateRequestDto requestDto, boolean isPrivate) {
+    public ServerResponseDto createServer(ServerCreateRequestDto requestDto) {
         Server server = new Server(
                 requestDto.serverName(),
-                isPrivate,
+                requestDto.isPrivate(),
                 requestDto.serverLevel(),
                 requestDto.members());
         serverRepository.save(server);
@@ -30,7 +47,7 @@ public class BasicServerService {
 
 
     public ServerResponseDto updateServer(ServerRequestDto requestDto) {
-        Server server = findById(serverRepository, requestDto.serverId());
+        Server server = findById(requestDto.serverId());
         server.updatePrivate(requestDto.isPrivate());
         if (requestDto.serverName() != null) {
             server.updateServerName(requestDto.serverName());
@@ -44,11 +61,61 @@ public class BasicServerService {
 
 
     public void deleteServer(ServerRequestDto requestDto) {
-        serverRepository.remove(findById(serverRepository, requestDto.serverId()));
+        findById(requestDto.serverId());
+        serverRepository.remove(requestDto.serverId());
     }
 
     public ServerResponseDto getServer(ServerRequestDto requestDto) {
-        Server server = findById(serverRepository, requestDto.serverId());
+        Server server = findById(requestDto.serverId());
         return serverToResponseDto(server);
+    }
+
+    public Server findById(UUID id) {
+        log.info("Server FindById 로직 실행 시작");
+        return serverRepository.findById(id).orElseThrow(() -> new NoSuchElementException("서버를 찾을 수 없습니다"));
+    }
+
+    public List<String> findAllByUserId(UUID userId) {
+        return serverRepository.findAll()
+                .stream()
+                .filter(server -> server.getMembers().contains(userId))
+                .map(server->server.getServerName())
+                .toList();
+    }
+
+    public void addMember(UUID userId, UUID serverId){
+        Server server = findById(serverId);
+        User user = userRepository.findById(userId).orElseThrow(()->new NoSuchElementException("해당 유저 없음"));
+        server.addMember(user);
+    }
+
+    public void addMembers(List<UUID> usersId, UUID serverId){
+        Server server = findById(serverId);
+        List<User> list = usersId.stream().map(id -> userRepository.findById(id).orElseGet(null)).toList();
+        list.forEach(user -> server.addMember(user));
+    }
+
+    public ChannelResponseDto createChannel(ChannelCreateRequestDto requestDto) {
+        Server server = findById(requestDto.serverId());
+        Channel channel = new Channel(requestDto.channelName(), requestDto.serverId(),requestDto.membersId(), requestDto.isPrivate());
+        channelRepository.save(channel);
+        server.makeChannel(channel);
+        serverRepository.save(server);
+        for (UUID userId : requestDto.membersId()) {
+            ReadStatus readStatus = new ReadStatus(userId, channel.getId());
+            readStatusRepository.save(readStatus);
+        }
+        return channelToResponseDto(channel);
+    }
+
+    public List<UUID> findAllChannelByUser(UUID serverId, UUID userId){
+        Server server = findById(serverId);
+        List<UUID> list = server.getChannels().stream()
+                .map(channelId -> channelRepository.findById(channelId).orElseThrow(()->new IllegalArgumentException("채널이 존재하지 않습니다.")))
+                .filter(channel -> channel.getChannelMember().contains(userId))
+                .map(channel -> channel.getId())
+                .toList();
+        return list;
+
     }
 }

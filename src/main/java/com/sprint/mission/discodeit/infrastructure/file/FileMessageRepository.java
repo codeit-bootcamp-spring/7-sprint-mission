@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.infrastructure.file;
 
 
-import com.sprint.mission.discodeit.domain.repository.ChannelRepository;
-import com.sprint.mission.discodeit.domain.Channel;
+import com.sprint.mission.discodeit.domain.Message;
+import com.sprint.mission.discodeit.domain.repository.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -11,21 +11,22 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+
 @Repository
 @ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file")
-public class FileChannelRepository implements ChannelRepository {
+public class FileMessageRepository implements MessageRepository {
 
-    private final String FILE_PATH = "data/channels.ser"; // 저장 파일 경로
+    private final String FILE_PATH = "data/Message.ser"; // 저장 파일 경로
 
 
-    private Map<UUID, Channel> load() {
+    private Map<UUID, Message> load() {
         Path filePath = Path.of(FILE_PATH);
 
         if (Files.notExists(filePath)) {
-                return new HashMap<>();
+            return new HashMap<>();
         }
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
-                return (Map<UUID, Channel>) ois.readObject();
+            return (Map<UUID, Message>) ois.readObject();
         } catch (Exception e) {
             e.printStackTrace();
             return new HashMap<>();
@@ -33,39 +34,40 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
 
-    private void saveToFile(Map<UUID, Channel> data) {
+    private void saveToFile(Map<UUID, Message> data) {
         Path filePath = Path.of(FILE_PATH);
 
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-                oos.writeObject(data);
+            oos.writeObject(data);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void save(Channel channel){
-        Map<UUID, Channel> store= load();
-        UUID key = channel.getId();
-        store.put(key, channel);
+    @Override
+    public void save(Message message) {
+        Map<UUID, Message> store = load();
+        UUID key = message.getId();
+        store.put(key, message);
         saveToFile(store);
-    }
-
-    public void remove(Channel channel){
-        Map<UUID, Channel> store= load();
-        UUID key = channel.getId();
-        store.remove(key);
-        saveToFile(store);
-    }
-
-    public Optional<Channel> findById(UUID id){
-        Map<UUID, Channel> store= load();
-        return Optional.ofNullable(store.get(id));
     }
 
     @Override
-    public List<Channel> findAll() {
-        Map<UUID, Channel> store= load();
-        return List.copyOf(store.values());
+    public void remove(UUID messageId) {
+        Map<UUID, Message> store = load();
+        store.remove(messageId);
+        saveToFile(store);
     }
 
+    @Override
+    public Optional<Message> findById(UUID messageId) {
+        Map<UUID, Message> store = load();
+        return Optional.ofNullable(store.get(messageId));
+    }
+
+    @Override
+    public List<Message> findAll() {
+        Map<UUID, Message> store = load();
+        return List.copyOf(store.values());
+    }
 }
