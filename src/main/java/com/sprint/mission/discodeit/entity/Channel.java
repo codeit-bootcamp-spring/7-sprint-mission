@@ -42,7 +42,7 @@ public class Channel extends BaseEntity{
         this.memberIds.add(userId);
     }
 
-    public void delMember(UUID userId){
+    public void deleteMember(UUID userId){
         this.setUpdatedAt();
         this.memberIds.remove(userId);
     }

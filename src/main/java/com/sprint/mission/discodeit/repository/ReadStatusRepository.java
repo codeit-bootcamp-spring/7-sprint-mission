@@ -27,4 +27,6 @@ public interface ReadStatusRepository {
     void deleteByChannelMember(UUID channelId, UUID memberId);
 
     boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
+
+    boolean isExist(UUID readStatusId);
 }

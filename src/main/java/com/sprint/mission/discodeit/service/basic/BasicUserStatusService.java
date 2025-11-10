@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.userstatus.request.CreateUserStatusRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.request.UpdateUserStatusRequestDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.global.exception.custom.CustomException;
+import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -22,9 +24,9 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public void create(CreateUserStatusRequestDto request) {
         if (!userRepository.isExist(request.getUserId())) {
-            throw new IllegalArgumentException("user status를 생성할 유저가 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.USER_NOT_FOUND_FOR_STATUS);
         } else if (userStatusRepository.isExist(request.getUserId())) {
-            throw new IllegalArgumentException("해당 유저의 user status가 이미 존재합니다.");
+            throw new CustomException(ErrorCode.USER_STATUS_ALREADY_EXISTS);
         }
 
         UserStatus newUserStatus = new UserStatus(request.getUserId());
@@ -34,7 +36,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus find(UUID userStatusId) {
         return userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new IllegalStateException("user status가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
     }
 
     @Override
@@ -45,7 +47,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public void update(UpdateUserStatusRequestDto request) {
         UserStatus newUserStatus = userStatusRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalStateException("user status가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
         newUserStatus.setUpdatedAt(); // 로그인 시간 변경
         userStatusRepository.update(newUserStatus);
     }
@@ -60,12 +62,15 @@ public class BasicUserStatusService implements UserStatusService {
                     userStatusRepository.update(us);
                 },
                 () -> {
-                    throw new IllegalArgumentException("user status가 존재하지 않습니다.");
+                    throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);
                 });
     }
 
     @Override
     public void delete(UUID userStatusId) {
+        if(!userStatusRepository.isExist(userStatusId)){
+            throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);
+        };
         userStatusRepository.deleteById(userStatusId);
     }
 }

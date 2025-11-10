@@ -1,16 +1,12 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.auth.request.LoginUserDto;
-import com.sprint.mission.discodeit.dto.channel.request.CreateChannelRequestDto;
-import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequestDto;
-import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelNameRequestDto;
+import com.sprint.mission.discodeit.dto.channel.request.*;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.user.request.UpdatePasswordRequestDto;
-import com.sprint.mission.discodeit.dto.user.request.UpdateType;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
@@ -25,9 +21,9 @@ import com.sprint.mission.discodeit.service.basic.BasicAuthService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.utils.Printer;
-import com.sprint.mission.discodeit.utils.TestDataInitializer;
-import com.sprint.mission.discodeit.utils.TimeConvert;
+import com.sprint.mission.discodeit.global.utils.Printer;
+import com.sprint.mission.discodeit.global.utils.TestDataInitializer;
+import com.sprint.mission.discodeit.global.utils.TimeConvert;
 
 import java.io.File;
 import java.util.*;
@@ -48,8 +44,8 @@ public class DiscodeitTest {
     private DiscodeitTest(UserRepository userRepository, ChannelRepository channelRepository, MessageRepository messageRepository,
                           UserStatusRepository userStatusRepository, BinaryContentRepository binaryContentRepository, ReadStatusRepository readStatusRepository) {
         userService = new BasicUserService(userRepository, messageRepository, userStatusRepository, binaryContentRepository);
-        channelService = new BasicChannelService(userRepository, channelRepository, messageRepository, readStatusRepository);
-        messageService = new BasicMessageService(messageRepository, binaryContentRepository);
+        channelService = new BasicChannelService(userRepository, channelRepository, messageRepository, readStatusRepository, binaryContentRepository);
+        messageService = new BasicMessageService(userRepository, messageRepository, channelRepository, binaryContentRepository);
         authService = new BasicAuthService(userRepository, userStatusRepository);
 
         //테스트를 위한 유저, 채널, 메시지 데이터 생성
@@ -155,7 +151,7 @@ public class DiscodeitTest {
             newUserId = sc.nextLine();
             System.out.print("비밀번호: ");
             newPassword = sc.nextLine();
-            userService.create(new CreateUserRequestDto(name, nickName, email, phoneNum, newUserId, newPassword, null));
+            userService.create(new CreateUserRequestDto(name, nickName, email, phoneNum, newUserId, newPassword), null);
             System.out.println("계정이 생성되었습니다. 로그인 해주세요.");
         } catch (IllegalArgumentException e) { // 닉네임, 이메일, 전화번호, 비밀번호 필터링시 발생
             System.out.println(e.getMessage());
@@ -260,7 +256,7 @@ public class DiscodeitTest {
                     Printer.printChatHistory(userService, loginUser, msgs);
                 } else if (input.equals("-1")) break;
                 else {
-                    messageService.create(new CreateMessageRequestDto(loginUser.getId(), receiver.getId(), input, ReceiveType.USER, null));
+                    messageService.create(new CreateMessageRequestDto(loginUser.getId(), receiver.getId(), input, ReceiveType.USER), null);
                 }
             }
 
@@ -468,7 +464,7 @@ public class DiscodeitTest {
                     Printer.printChatHistory(userService, loginUser, channelMessages);
                 } else if (input.equals("-1")) return;
                 else {
-                    messageService.create(new CreateMessageRequestDto(loginUser.getId(), channel.getId(), input, ReceiveType.CHANNEL, null));
+                    messageService.create(new CreateMessageRequestDto(loginUser.getId(), channel.getId(), input, ReceiveType.CHANNEL), null);
                 }
             }
 
@@ -490,7 +486,7 @@ public class DiscodeitTest {
                 System.out.print("변경할 채널 이름: ");
                 String newChannelName = sc.nextLine();
                 if (!newChannelName.equals("-1")) {
-                    channelService.updateName(new UpdateChannelNameRequestDto(channelId, newChannelName));
+                    channelService.updateName(channelId, new UpdateChannelNameRequestDto(loginUser.getId(), newChannelName));
                     System.out.printf("%s로 채널 이름이 변경되었습니다.\n", newChannelName);
                 }
                 System.out.println("이전 메뉴로 돌아갑니다.");
@@ -525,7 +521,7 @@ public class DiscodeitTest {
 
                 if (choice >= 1 && choice <= members.size()) {
                     UserResponseDto newAdmin = members.get(choice - 1);
-                    channelService.updateAdmin(new UpdateChannelRequestDto(privateChannel.getId(), newAdmin.getId()));
+                    channelService.updateAdmin(privateChannel.getId(), new UpdateChannelAdminRequestDto(loginUser.getId(), newAdmin.getId()));
                     System.out.println("관리자가 변경되었습니다. 이전 메뉴로 돌아갑니다.");
                     return;
                 } else if (choice == members.size() + 1) {
@@ -618,7 +614,7 @@ public class DiscodeitTest {
             System.out.printf("채널 이름: %s\n", channel.getChannelName());
             System.out.print("입력: ");
             if (channel.getChannelName().equals(sc.nextLine())) {
-                channelService.delete(channel.getId(), loginUser.getId());
+                channelService.delete(channel.getId(), new DeleteChannelRequestDto(loginUser.getId()));
                 System.out.println("채널이 삭제되었습니다.");
             } else {
                 System.out.println("정확히 입력되지 않았습니다. 이전 메뉴로 돌아갑니다.");
@@ -682,10 +678,10 @@ public class DiscodeitTest {
                     System.out.print("채널 이름: ");
                     String newChannelName = sc.nextLine();
 
-                    if(choice == 1) channelService.createPublic(new CreateChannelRequestDto(ChannelType.MESSAGE, newChannelName, loginUser.getId()));
-                    else if(choice == 2) channelService.createPrivate(new CreateChannelRequestDto(ChannelType.MESSAGE, newChannelName, loginUser.getId()));
-                    else if(choice == 3) channelService.createPublic(new CreateChannelRequestDto(ChannelType.VOICE, newChannelName, loginUser.getId()));
-                    else channelService.createPrivate(new CreateChannelRequestDto(ChannelType.VOICE, newChannelName, loginUser.getId()));
+                    if(choice == 1) channelService.create(loginUser.getId(), new CreateChannelRequestDto(ChannelType.MESSAGE, ChannelVisibility.PUBLIC, newChannelName));
+                    else if(choice == 2) channelService.create(loginUser.getId(), new CreateChannelRequestDto(ChannelType.MESSAGE, ChannelVisibility.PRIVATE, newChannelName));
+                    else if(choice == 3) channelService.create(loginUser.getId(), new CreateChannelRequestDto(ChannelType.VOICE, ChannelVisibility.PUBLIC, newChannelName));
+                    else channelService.create(loginUser.getId(), new CreateChannelRequestDto(ChannelType.VOICE, ChannelVisibility.PRIVATE, newChannelName));
                 }
                 case 5 -> { return; }
                 default -> {
@@ -704,54 +700,62 @@ public class DiscodeitTest {
     }
 
     private void updateInfo() {
+        String newUserName = null;
+        String newNickName = null;
+        String newEmail = null;
+        String newPhoneNum = null;
+        String newPassword = null;
+
         try {
             System.out.println("내 정보 수정");
             System.out.println("1. 이름 2. 닉네임 3. 이메일 4. 전화번호 5. 비밀번호 6. 나가기");
             System.out.print("입력: ");
             int choice = sc.nextInt();
-            UpdateType type;
             sc.nextLine();
             switch (choice) {
-                case 1, 2, 3, 4 -> {
+                case 1, 2, 3, 4, 5 -> {
                     if (choice == 1) {
                         System.out.println("현재 이름: " + loginUser.getUserName());
-                        type = UpdateType.USER_NAME;
+                        System.out.print("변경: ");
+                        newUserName = sc.nextLine();
                     } else if(choice == 2){
                         System.out.println("현재 닉네임: " + loginUser.getNickName());
-                        type = UpdateType.NICK_NAME;
+                        System.out.print("변경: ");
+                        newNickName = sc.nextLine();
                     } else if(choice == 3){
                         System.out.println("현재 이메일: " + loginUser.getEmail());
-                        type =  UpdateType.EMAIL;
-                    } else {
+                        System.out.print("변경: ");
+                        newEmail = sc.nextLine();
+                    } else if(choice == 4){
                         System.out.println("현재 전화번호: " + loginUser.getPhoneNum());
-                        type =  UpdateType.PHONE_NUM;
-                    }
-                    System.out.print("변경: ");
-                    userService.update(new UpdateUserRequestDto(loginUser.getId(), sc.nextLine(), type));
-                }
-                case 5 -> {
-                    String nowPassword, newPassword, newPassword2;
-
-                    System.out.print("현재 비밀번호 입력: ");
-                    nowPassword = sc.nextLine();
-
-                    if(userService.isPasswordMatch(loginUser.getId(), nowPassword)){
-                        System.out.print("새로운 비밀번호 입력: ");
-                        newPassword = sc.nextLine();
-
-                        System.out.print("새로운 비밀번호 한번 더 입력: ");
-                        newPassword2 = sc.nextLine();
-
-                        if (newPassword.equals(newPassword2)) {
-                            userService.updatePassword(new UpdatePasswordRequestDto(loginUser.getId(), newPassword));
-                            login = false;
-                            System.out.println("비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
-                        } else {
-                            System.out.println("새로운 비밀번호가 동일하게 입력되지 않았습니다. 이전 메뉴로 돌아갑니다.");
-                        }
+                        System.out.print("변경: ");
+                        newPhoneNum = sc.nextLine();
                     } else {
-                        System.out.println("비밀번호가 틀렸습니다. 이전 메뉴로 돌아갑니다.");
+                        String nowPassword, newPassword2;
+
+                        System.out.print("현재 비밀번호 입력: ");
+                        nowPassword = sc.nextLine();
+
+                        if(userService.isPasswordMatch(loginUser.getId(), nowPassword)){
+                            System.out.print("새로운 비밀번호 입력: ");
+                            newPassword = sc.nextLine();
+
+                            System.out.print("새로운 비밀번호 한번 더 입력: ");
+                            newPassword2 = sc.nextLine();
+
+                            if (newPassword.equals(newPassword2)) {
+                                login = false;
+                                System.out.println("비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
+                            } else {
+                                System.out.println("새로운 비밀번호가 동일하게 입력되지 않았습니다. 이전 메뉴로 돌아갑니다.");
+                                return;
+                            }
+                        } else {
+                            System.out.println("비밀번호가 틀렸습니다. 이전 메뉴로 돌아갑니다.");
+                            return;
+                        }
                     }
+                    userService.update(loginUser.getId(), new UpdateUserRequestDto(newUserName, newNickName, newEmail, newPhoneNum, newPassword), null);
                 }
                 case 6 -> { return; }
                 default -> {
@@ -834,11 +838,11 @@ public class DiscodeitTest {
                     System.out.println("내용을 입력해 수정하세요.");
                     System.out.printf("기존 메시지 : %s\n", choiceMsg.getContent());
                     System.out.printf("입력 : ");
-                    messageService.update(new UpdateMessageRequestDto(choiceMsg.getId(), sc.nextLine()));
+                    messageService.update(loginUser.getId(), choiceMsg.getId(), new UpdateMessageRequestDto(sc.nextLine()));
                     System.out.println("메시지가 수정되었습니다.");
                 }
                 case 2 -> {
-                    messageService.delete(choiceMsg.getId());
+                    messageService.delete(loginUser.getId(), choiceMsg.getId());
                     System.out.println("메시지가 삭제되었습니다.");
                 }
                 default -> System.out.println("수정/삭제를 선택하지 않아 채팅방으로 이동합니다.");

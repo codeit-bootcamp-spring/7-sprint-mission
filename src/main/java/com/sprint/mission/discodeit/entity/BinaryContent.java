@@ -11,13 +11,15 @@ import java.util.UUID;
 public class BinaryContent implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
+    private final String name;
     private final Instant createdAt;
     private final byte[] content; // 파일 데이터
 
-    public BinaryContent(byte[] content) {
+    public BinaryContent(String name, byte[] content) {
         Instant now = Instant.now();
         this.id = UUID.randomUUID(); // 랜덤 UUID로 초기화
         this.createdAt = now;
+        this.name = name;
         this.content = content;
     }
 
@@ -25,6 +27,7 @@ public class BinaryContent implements Serializable {
     public String toString() {
         return "BinaryContent{" +
                 "id=" + id +
+                ", name='" + name + '\'' +
                 ", (" + content.length + " bytes)" +
                 '}';
     }

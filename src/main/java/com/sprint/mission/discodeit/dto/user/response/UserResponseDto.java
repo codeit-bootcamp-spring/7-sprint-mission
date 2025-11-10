@@ -11,14 +11,14 @@ import java.util.UUID;
 @Builder
 @ToString
 public class UserResponseDto {
-    private UUID id;
-    private String userName;
-    private String nickName;
-    private String email;
-    private String phoneNum;
-    private String loginId;
-    private UUID profileId;
-    private boolean active;
+    private final UUID id;
+    private final String userName;
+    private final String nickName;
+    private final String email;
+    private final String phoneNum;
+    private final String loginId;
+    private final UUID profileId;
+    private final boolean active;
 
     public static UserResponseDto from(User user, boolean active) {
         return UserResponseDto.builder()

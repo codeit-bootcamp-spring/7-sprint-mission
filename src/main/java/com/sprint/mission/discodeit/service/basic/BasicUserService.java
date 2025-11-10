@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.user.request.UpdatePasswordRequestDto;
-import com.sprint.mission.discodeit.dto.user.request.UpdateType;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.vaildator.UserVaildator;
+import com.sprint.mission.discodeit.global.exception.custom.CustomException;
+import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,50 +34,56 @@ public class BasicUserService implements UserService{
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public void create(CreateUserRequestDto request) {
-        // 1. username/email 중복 검사
-        if(userRepository.existsByNickName(request.getNickName())){
-            throw new IllegalArgumentException("닉네임이 이미 존재합니다.");
-        } else if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이메일이 이미 존재합니다.");
+    public UserResponseDto create(CreateUserRequestDto userRequest, MultipartFile file) {
+        // 1. nickname/email 중복 검사
+        if(userRepository.existsByNickName(userRequest.getNickName())){
+            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
+        } else if (userRepository.existsByEmail(userRequest.getEmail())) {
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
-        // 2. 선택적 프로필 이미지 처리
-        UUID profileImageId = null;
-        MultipartFile profileImageFile = request.getProfileImage();
+        // 2. 입력된 정보 형태 검증
+        Optional.ofNullable(userRequest.getNickName()).ifPresent(n -> UserVaildator.vaildateNickname(n));
+        Optional.ofNullable(userRequest.getEmail()).ifPresent(e -> UserVaildator.vaildateEmail(e));
+        Optional.ofNullable(userRequest.getPhoneNum()).ifPresent(pn -> UserVaildator.vaildatePhoneNum(pn));
+        Optional.ofNullable(userRequest.getPassword()).ifPresent(pw -> UserVaildator.vaildatePassword(pw));
 
-        if(profileImageFile != null && !profileImageFile.isEmpty()) {
+        // 3. 선택적 프로필 이미지 처리
+        UUID profileImageId = null;
+
+        if(file != null && !file.isEmpty()) {
             try {
-                byte[] imageBytes = request.getProfileImage().getBytes();
-                BinaryContent profileImage = new BinaryContent(imageBytes);
+                BinaryContent profileImage = new BinaryContent(file.getName(), file.getBytes());
                 binaryContentRepository.save(profileImage);
                 profileImageId = profileImage.getId();
             } catch (IOException e){
-                throw new RuntimeException("프로필 이미지 업로드 실패", e);
+                throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
             }
         }
 
         User newUser  = new User(
-                request.getUserName(),
-                request.getNickName(),
-                request.getEmail(),
-                request.getPhoneNum(),
-                request.getLoginId(),
-                request.getPassword(),
+                userRequest.getUserName(),
+                userRequest.getNickName(),
+                userRequest.getEmail(),
+                userRequest.getPhoneNum(),
+                userRequest.getLoginId(),
+                userRequest.getPassword(),
                 profileImageId
         );
 
         userStatusRepository.save(new UserStatus(newUser.getId()));
         userRepository.save(newUser);
+
+        return UserResponseDto.from(newUser, true);
     }
 
     @Override
     public UserResponseDto find(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean active = userStatusRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -84,10 +92,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalStateException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -96,10 +104,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto findByPhoneNum(String phoneNum) {
         User user = userRepository.findByPhone(phoneNum)
-                .orElseThrow(() -> new IllegalStateException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalStateException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -108,10 +116,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto findByLoginId(String loginId) {
         User user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalStateException("userstatus가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                 .isActiveUser();
 
         return UserResponseDto.from(user, active);
@@ -123,7 +131,7 @@ public class BasicUserService implements UserService{
                 .map(u -> UserResponseDto.from(
                         u,
                         userStatusRepository.findById(u.getId())
-                                .orElseThrow(() -> new IllegalStateException("userstatus가 존재하지 않습니다."))
+                                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                                 .isActiveUser()))
                 .collect(Collectors.toList());
     }
@@ -131,56 +139,66 @@ public class BasicUserService implements UserService{
     @Override
     public String findNickNameById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("유저가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
                 .getNickName();
     }
 
     @Override
-    public void update(UpdateUserRequestDto request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+    public void update(UUID userId, UpdateUserRequestDto request, MultipartFile file) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (request.getType() == UpdateType.USER_NAME){
-            user.setUserName(request.getUpdateParam());
-        } else if(request.getType() == UpdateType.NICK_NAME) {
-            userRepository.existsByNickName(request.getUpdateParam()); // 닉네임 중복 확인
-            user.setNickName(request.getUpdateParam());
-        } else if (request.getType() == UpdateType.EMAIL) {
-            userRepository.existsByEmail(request.getUpdateParam()); // 이메일 중복 확인
-            user.setEmail(request.getUpdateParam());
-        } else if (request.getType() == UpdateType.PHONE_NUM){
-            user.setPhoneNum(request.getUpdateParam());
-        } else if (request.getType() == UpdateType.PROFILE) {
-            MultipartFile profileImageFile = request.getProfileImage();
+        String userName = null;
+        String nickName = null;
+        String email = null;
+        String phoneNum = null;
+        String password = null;
 
-            if (profileImageFile != null && !profileImageFile.isEmpty()) {
-                try {
-                    BinaryContent binaryContent = new BinaryContent(profileImageFile.getBytes());
-                    binaryContentRepository.save(binaryContent);
-                    binaryContentRepository.delete(user.getProfileId()); // 기존 프로필 이미지 삭제
-                    user.setProfileId(binaryContent.getId());
-                } catch (IOException e) {
-                    throw new RuntimeException("프로필 이미지 업로드 실패", e);
-                }
+        // 프로필 이미지만 전달된 경우 null 참조 방지
+        if (Optional.ofNullable(request).isPresent()) {
+            userName = request.getNewUserName();
+            nickName = request.getNewNickName();
+            email = request.getNewEmail();
+            phoneNum = request.getNewPhoneNum();
+            password = request.getNewPassword();
+
+            // 닉네임 중복 확인
+            if (userRepository.existsByNickName(nickName)) {
+                throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
             }
+
+            // 이메일 중복 확인
+            if (userRepository.existsByEmail(email)) {
+                throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
+            }
+
+            // 입력된 정보 형태 검증
+            Optional.ofNullable(nickName).ifPresent(n -> UserVaildator.vaildateNickname(n));
+            Optional.ofNullable(email).ifPresent(e -> UserVaildator.vaildateEmail(e));
+            Optional.ofNullable(phoneNum).ifPresent(pn -> UserVaildator.vaildatePhoneNum(pn));
+            Optional.ofNullable(password).ifPresent(pw -> UserVaildator.vaildatePassword(pw));
         }
 
+        UUID profileImageId = null;
+        if (file != null && !file.isEmpty()) {
+            try {
+                BinaryContent profileImage = new BinaryContent(file.getName(), file.getBytes());
+                binaryContentRepository.save(profileImage);
+                profileImageId = profileImage.getId();
+            } catch (IOException e) {
+                throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
+            }
+            binaryContentRepository.delete(user.getProfileId()); // 기존 프로필 이미지 삭제
+        }
+
+        user.update(userName, nickName, email, phoneNum, password, profileImageId);
         userRepository.update(user);
     }
-
-    @Override
-    public void updatePassword(UpdatePasswordRequestDto request){
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
-        user.setPassword(request.getNewPassword());
-        userRepository.update(user);
-    }
-
 
     @Override
     public void delete(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         messageRepository.deleteByUser(id);
         userStatusRepository.deleteById(user.getId());
         binaryContentRepository.delete(user.getProfileId());
@@ -190,7 +208,7 @@ public class BasicUserService implements UserService{
     @Override
     public boolean isPasswordMatch(UUID userId, String password) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
                 .getPassword().equals(password);
     }
 }

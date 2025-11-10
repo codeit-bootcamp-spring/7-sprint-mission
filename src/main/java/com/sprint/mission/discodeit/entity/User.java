@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-
-import com.sprint.mission.discodeit.entity.vaildator.UserVaildator;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -17,11 +15,6 @@ public class User extends BaseEntity{
     private UUID profileId;
 
     public User(String userName, String nickName, String email, String phoneNum, String loginId, String password) {
-        UserVaildator.vaildateNickname(nickName);
-        UserVaildator.vaildateEmail(email);
-        UserVaildator.vaildatePhoneNum(phoneNum);
-        UserVaildator.vaildatePassword(password);
-
         this.userName = userName;
         this.nickName = nickName;
         this.email = email;
@@ -35,38 +28,36 @@ public class User extends BaseEntity{
         this.profileId = profileId;
     }
 
-    public void setUserName(String userName) {
-        this.setUpdatedAt();
-        this.userName = userName;
-    }
+    public void update(String userName, String nickName, String email, String phoneNum, String password, UUID profileId) {
+        boolean flag = false;
 
-    public void setNickName(String nickName) {
-        UserVaildator.vaildateNickname(nickName);
-        this.setUpdatedAt();
-        this.nickName = nickName;
-    }
-
-    public void setEmail(String email) {
-        UserVaildator.vaildateEmail(email);
-        this.setUpdatedAt();
-        this.email = email;
-    }
-
-    public void setPhoneNum(String phoneNum) {
-        UserVaildator.vaildatePhoneNum(phoneNum);
-        this.setUpdatedAt();
-        this.phoneNum = formatPhoneNum(phoneNum);
-    }
-
-    public void setPassword(String password) {
-        UserVaildator.vaildatePassword(password);
-        this.setUpdatedAt();
-        this.password = password;
-    }
-
-    public void setProfileId(UUID profileId) {
-        this.setUpdatedAt();
-        this.profileId = profileId;
+        if (userName != null && !userName.equals(this.userName)) {
+            this.userName = userName;
+            flag = true;
+        }
+        if (nickName != null && !nickName.equals(this.nickName)) {
+            this.nickName = nickName;
+            flag = true;
+        }
+        if (email != null && !email.equals(this.email)) {
+            this.email = email;
+            flag = true;
+        }
+        if (phoneNum != null && !phoneNum.equals(this.phoneNum)) {
+            this.phoneNum = formatPhoneNum(phoneNum);
+            flag = true;
+        }
+        if (password != null && !password.equals(this.password)) {
+            this.password = password;
+            flag = true;
+        }
+        if (profileId != null && !profileId.equals(this.profileId)) {
+            this.profileId = profileId;
+            flag = true;
+        }
+        if(flag) {
+            this.setUpdatedAt();
+        }
     }
 
     private String formatPhoneNum(String phoneNum){

@@ -2,16 +2,14 @@ package com.sprint.mission.discodeit.dto.user.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @AllArgsConstructor
 public class CreateUserRequestDto {
-    private String userName;
-    private String nickName;
-    private String email;
-    private String phoneNum;
-    private String loginId;
-    private String password;
-    private MultipartFile profileImage;
+    private final String userName;
+    private final String nickName;
+    private final String email;
+    private final String phoneNum;
+    private final String loginId;
+    private final String password;
 }

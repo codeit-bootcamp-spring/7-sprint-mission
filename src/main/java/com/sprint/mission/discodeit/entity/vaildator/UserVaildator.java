@@ -17,6 +17,8 @@ public class UserVaildator {
     }
 
     public static void vaildateEmail(String email){
+        VaildationUtils.vaildateNotNull(email);
+
         if(!email.matches(EMAIL_PATTERN)){
             throw new IllegalArgumentException("이메일 형식에 맞지 않습니다. 다시 입력하세요");
         }

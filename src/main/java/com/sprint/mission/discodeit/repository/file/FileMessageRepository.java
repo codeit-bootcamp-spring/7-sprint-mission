@@ -3,11 +3,12 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.springframework.beans.factory.annotation.Value;
 
-import java.io.*;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
 /**
  * FileMessageRepository
@@ -32,38 +33,13 @@ public class FileMessageRepository implements MessageRepository {
 
     public FileMessageRepository(String filePath) {
         this.filePath = filePath;
-        loadMessagesFromFile();
-    }
-
-    // --- 파일 저장 (직렬화) ---
-    private void saveMessagesToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(messageStore);
-            System.out.println("[저장 완료] 메시지 데이터 파일 저장됨");
-        } catch (IOException e) {
-            System.err.println("[오류] 메시지 저장 실패: " + e.getMessage());
-        }
-    }
-
-    // --- 파일 불러오기 (역직렬화) ---
-    private void loadMessagesFromFile() {
-        File file = new File(filePath);
-        if (!file.exists()) return;
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            Map<UUID, Message> loaded = (Map<UUID, Message>) ois.readObject();
-            messageStore.clear();
-            messageStore.putAll(loaded);
-            System.out.println("[로드 완료] 메시지 데이터 로드됨");
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("[오류] 메시지 로드 실패: " + e.getMessage());
-        }
+        loadFromFile(filePath, messageStore);
     }
 
     @Override
     public void save(Message message) {
         messageStore.put(message.getId(), message);
-        saveMessagesToFile();
+        saveToFile(filePath, messageStore);
     }
 
     @Override
@@ -80,27 +56,33 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void update(Message updatedMessage) {
         messageStore.replace(updatedMessage.getId(), updatedMessage);
-        saveMessagesToFile();
+        saveToFile(filePath, messageStore);
     }
 
     @Override
     public void deleteById(UUID id) {
         messageStore.remove(id);
-        saveMessagesToFile();
+        saveToFile(filePath, messageStore);
     }
 
     @Override
     public void deleteByUser(UUID userId) {
         // 특정 유저가 보낸 메시지 전부 삭제
         messageStore.values().removeIf(m -> userId.equals(m.getSenderId()));
-        saveMessagesToFile();
+        saveToFile(filePath, messageStore);
     }
 
     @Override
-    public void deleteByChannelId(UUID channelId) {
+    public List<UUID> deleteByChannelId(UUID channelId) {
+        List<UUID> contentIds = messageStore.values().stream()
+                .filter(m -> channelId.equals(m.getReceiverId()))
+                .flatMap(m -> m.getAttachmentIds().stream())
+                .collect(Collectors.toList());
+
         // 채널 삭제시 채널의 모든 메시지 삭제
         messageStore.values().removeIf(m -> channelId.equals(m.getReceiverId()));
-        saveMessagesToFile();
+        saveToFile(filePath, messageStore);
+        return contentIds;
     }
 
     @Override

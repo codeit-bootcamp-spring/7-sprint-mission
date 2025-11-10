@@ -8,6 +8,6 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class UpdateReadStatusRequestDto {
-    private UUID userId;
-    private UUID channelId;
+    private final UUID userId;
+    private final UUID channelId;
 }
