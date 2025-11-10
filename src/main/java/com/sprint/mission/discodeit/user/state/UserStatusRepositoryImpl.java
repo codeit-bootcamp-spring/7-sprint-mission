@@ -17,7 +17,6 @@ public class UserStatusRepositoryImpl extends BaseRepositoryImpl<UserStatus, UUI
          Optional<UserStatus> check = dataMap.values().stream()
                 .filter(us -> us.getUserId().equals(userId))
                 .findFirst();
-        System.out.println(dataMap);
         return check;
     }
 

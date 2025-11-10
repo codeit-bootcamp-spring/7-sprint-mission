@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.user.controller;
 
+import com.sprint.mission.discodeit.config.SessionConstants;
 import com.sprint.mission.discodeit.user.AuthService;
 import com.sprint.mission.discodeit.user.UserService;
 import com.sprint.mission.discodeit.user.dto.AuthUserDTO;
@@ -27,7 +28,7 @@ public class AuthController   {
         AuthUserDTO authUserDTO = authService.login(request);
 
         HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("PrincipalUser", userService.findByUsername(authUserDTO.username()));
+        session.setAttribute(SessionConstants.AUTH_USER, authUserDTO);
 
         return ResponseEntity.ok(authUserDTO);
     }

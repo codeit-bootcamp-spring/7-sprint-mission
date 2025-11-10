@@ -25,7 +25,7 @@ public class ChannelController {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public ResponseEntity<ChannelResponseDTO> createChannel(
-            AuthUserDTO authUser,
+            @SessionAttribute() AuthUserDTO authUser,
             @RequestBody @Valid ChannelRequestDTO requestDTO) {
 
         ChannelResponseDTO channelDTO = channelService.create(requestDTO);

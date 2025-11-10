@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit.application.service.impl;
 
-import com.sprint.mission.discodeit.application.dto.ChannelSummaryDTO;
-import com.sprint.mission.discodeit.application.dto.SimpleChannelDTO;
-import com.sprint.mission.discodeit.application.dto.UserDetailInfoDTO;
+import com.sprint.mission.discodeit.application.dto.ChannelSummary;
+import com.sprint.mission.discodeit.application.dto.SimpleChannel;
+import com.sprint.mission.discodeit.application.dto.UserDetailInfo;
 import com.sprint.mission.discodeit.application.service.UserManagementService;
 import com.sprint.mission.discodeit.channel.Channel;
 import com.sprint.mission.discodeit.channel.ChannelService;
 import com.sprint.mission.discodeit.channel.dto.ChannelResponseDTO;
 import com.sprint.mission.discodeit.config.enums.ContentOwner;
 import com.sprint.mission.discodeit.config.enums.Status;
+import com.sprint.mission.discodeit.content.binary.BinaryContentResponse;
 import com.sprint.mission.discodeit.content.binary.BinaryContentService;
 import com.sprint.mission.discodeit.message.channel.ChannelMessageService;
 import com.sprint.mission.discodeit.message.direct.DirectMessageService;
@@ -24,8 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -74,30 +75,34 @@ public class UserManagementServiceImpl implements UserManagementService {
     }
 
     @Override
-    public UserDetailInfoDTO getUserDetailInfo(UUID userId) {
+    public UserDetailInfo getUserDetailInfo(UUID userId) {
+
         UserResponseDTO user = UserResponseDTO.fromEntity(userService.findById(userId));
         Status currentStatus = userStatusService.findByUserId(userId).currentStatus();
         int unreadDirectMessageCount = directMessageService.getUnreadDirectMessageCount(userId);
-        String userProfileImagePath = binaryContentService.findAllByOwnerId(userId).get(1).filePath();
+
+        List<String> filePaths = binaryContentService.findAllByOwnerId(userId).stream()
+                .map(BinaryContentResponse::filePath)
+                .toList();
+
 
         List<ChannelResponseDTO> channels = participationService.findParticipationsByUserId(userId).stream()
                 .map(participaton -> {
-                    UUID channelId = participaton.participationDualKey().channelId();
-
-                    Channel channel = channelService.findById(channelId);
-
-                    if(channel == null) {
+                    try {
+                        UUID channelId = participaton.participationDualKey().channelId();
+                        Channel channel = channelService.findByIdNonDel(channelId);
                         return ChannelResponseDTO.from(channel);
+                    } catch (NoSuchElementException e) {
+                        return null;
                     }
-                    return null;
                 })
                 .filter(Objects::nonNull)
                 .toList();
-        List<ChannelSummaryDTO> channelSummaryList = channels.stream()
+        List<ChannelSummary> channelSummaryList = channels.stream()
                 .map(channelDTO -> {
                     int unreadcount = channelMessageService.countNotReadChannelMessage(channelDTO.id(),userId);
 
-                    return ChannelSummaryDTO.from(
+                    return ChannelSummary.from(
                             channelDTO,unreadcount
                     );
                 })
@@ -105,17 +110,17 @@ public class UserManagementServiceImpl implements UserManagementService {
 
 
 
-        return new UserDetailInfoDTO(
+        return new UserDetailInfo(
                 user,
                 channelSummaryList,
                 currentStatus,
                 unreadDirectMessageCount,
-                userProfileImagePath
+                filePaths
         );
     }
 
     @Override
-    public List<SimpleChannelDTO> getSimpleChannels(UUID userId) {
+    public List<SimpleChannel> getSimpleChannels(UUID userId) {
         List<ParticipationResponseDTO> participations = participationService.findParticipationsByUserId(userId);
         List<UUID> channelIds = participations.stream()
                 .map(p -> p.participationDualKey().channelId())
@@ -123,7 +128,23 @@ public class UserManagementServiceImpl implements UserManagementService {
 
 
         return channelService.findAllByIdNonDel(channelIds).stream()
-                .map(SimpleChannelDTO::from)
+                .map(SimpleChannel::from)
                 .toList();
+    }
+
+    @Override
+    public BinaryContentResponse updateProfileImg(UUID userId, MultipartFile multipartFile) {
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            throw new IllegalArgumentException("이미지를 찾을 수 없습니다.");
+        }
+
+        binaryContentService.deleteAllByOwnerId(userId);
+
+        try {
+            return binaryContentService.uploadFile(userId, ContentOwner.USER, multipartFile);
+
+        } catch (IOException e) {
+            throw new RuntimeException("프로필 이미지 저장에 실패했습니다.");
+        }
     }
 }
