@@ -47,7 +47,7 @@ public class BasicServerService {
 
 
     public ServerResponseDto updateServer(ServerRequestDto requestDto) {
-        Server server = findById(requestDto.serverId());
+        Server server = getById(requestDto.serverId());
         server.updatePrivate(requestDto.isPrivate());
         if (requestDto.serverName() != null) {
             server.updateServerName(requestDto.serverName());
@@ -61,16 +61,16 @@ public class BasicServerService {
 
 
     public void deleteServer(ServerRequestDto requestDto) {
-        findById(requestDto.serverId());
+        getById(requestDto.serverId());
         serverRepository.remove(requestDto.serverId());
     }
 
     public ServerResponseDto getServer(ServerRequestDto requestDto) {
-        Server server = findById(requestDto.serverId());
+        Server server = getById(requestDto.serverId());
         return serverToResponseDto(server);
     }
 
-    public Server findById(UUID id) {
+    private Server getById(UUID id) {
         log.info("Server FindById 로직 실행 시작");
         return serverRepository.findById(id).orElseThrow(() -> new NoSuchElementException("서버를 찾을 수 없습니다"));
     }
@@ -84,19 +84,19 @@ public class BasicServerService {
     }
 
     public void addMember(UUID userId, UUID serverId){
-        Server server = findById(serverId);
+        Server server = getById(serverId);
         User user = userRepository.findById(userId).orElseThrow(()->new NoSuchElementException("해당 유저 없음"));
         server.addMember(user);
     }
 
     public void addMembers(List<UUID> usersId, UUID serverId){
-        Server server = findById(serverId);
+        Server server = getById(serverId);
         List<User> list = usersId.stream().map(id -> userRepository.findById(id).orElseGet(null)).toList();
         list.forEach(user -> server.addMember(user));
     }
 
     public ChannelResponseDto createChannel(ChannelCreateRequestDto requestDto) {
-        Server server = findById(requestDto.serverId());
+        Server server = getById(requestDto.serverId());
         Channel channel = new Channel(requestDto.channelName(), requestDto.serverId(),requestDto.membersId(), requestDto.isPrivate());
         channelRepository.save(channel);
         server.makeChannel(channel);
@@ -108,8 +108,8 @@ public class BasicServerService {
         return channelToResponseDto(channel);
     }
 
-    public List<UUID> findAllChannelByUser(UUID serverId, UUID userId){
-        Server server = findById(serverId);
+    public List<UUID> getAllChannelByUser(UUID serverId, UUID userId){
+        Server server = getById(serverId);
         List<UUID> list = server.getChannels().stream()
                 .map(channelId -> channelRepository.findById(channelId).orElseThrow(()->new IllegalArgumentException("채널이 존재하지 않습니다.")))
                 .filter(channel -> channel.getChannelMember().contains(userId))

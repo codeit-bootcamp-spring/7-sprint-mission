@@ -123,12 +123,12 @@ public final class FileService {
         }
     }
 
-    public BinaryContent findById(UUID binaryId){
+    public BinaryContent getById(UUID binaryId){
         return binaryContentRepository.findById(binaryId).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
     }
 
-    public Resource findImageFile(UUID binaryId) throws MalformedURLException {
-        BinaryContent content = findById(binaryId);
+    public Resource getImageFile(UUID binaryId) throws MalformedURLException {
+        BinaryContent content = getById(binaryId);
         Path path = Paths.get(content.getFilePath());
         return new UrlResource(path.toUri());
     }

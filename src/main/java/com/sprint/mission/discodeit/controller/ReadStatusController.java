@@ -13,30 +13,30 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/read-status")
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController {
 
     private final BasicReadStatusService readStatusService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @PostMapping("/create")
     public String makeReadStatus(@ModelAttribute ReadStatusCreateRequest request){
         readStatusService.createReadStatus(request.userId(),request.channelId());
         return "메시지 수신 정보 생성 성공";
     }
 
-    @RequestMapping(value = "/{id}",method = RequestMethod.GET)
+    @GetMapping("/{id}")
     public long checkLastTime(@PathVariable UUID id){
         return readStatusService.getTimeSinceLastRead(id);
     }
 
-    @RequestMapping(value ="/read/{id}", method = RequestMethod.GET)
+    @GetMapping("/read/{id}")
     public String readChannel(@PathVariable UUID id) {
         readStatusService.updateReadStatus(id);
         return "읽음";
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping("/")
     public ReadStatusResponse getReadStatusByIds(@RequestBody ReadStatusRequest request){
-        return readStatusService.findReadStatusByIds(request);
+        return readStatusService.getReadStatusByIds(request);
     }
 }

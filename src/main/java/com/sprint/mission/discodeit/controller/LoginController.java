@@ -5,19 +5,16 @@ import com.sprint.mission.discodeit.application.dto.login.LoginForm;
 import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/login")
+@RequestMapping("/api/auth/login")
 public class LoginController {
 
     private final BasicUserService userService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public UserResponseDto login(@Valid @RequestBody LoginForm loginForm) {
         return userService.login(loginForm.getLoginId(), loginForm.getPassword());
     }

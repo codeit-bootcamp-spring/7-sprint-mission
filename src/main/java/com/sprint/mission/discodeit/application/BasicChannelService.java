@@ -3,10 +3,8 @@ package com.sprint.mission.discodeit.application;
 
 
 import com.sprint.mission.discodeit.application.dto.ChannelDtoMapper;
-import com.sprint.mission.discodeit.application.dto.request.MessageForm;
 import com.sprint.mission.discodeit.domain.*;
 import com.sprint.mission.discodeit.domain.repository.ChannelRepository;
-import com.sprint.mission.discodeit.application.dto.request.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.application.dto.request.ChannelRequestDto;
 import com.sprint.mission.discodeit.application.dto.response.ChannelResponseDto;
 
@@ -16,9 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 
 
@@ -37,14 +32,14 @@ public class BasicChannelService {
 
 
     public List<String> getAllMessage(UUID channelId){
-        Channel channel = findById(channelId);
+        Channel channel = getById(channelId);
         return channel.getHistory().stream()
                 .map(id-> messageRepository.findById(id).orElse(null).getContent())
                 .toList();
     }
 
     public List<ChannelResponseDto> findAllByServer(UUID serverId) {
-        return findByServer(serverId)
+        return getByServer(serverId)
                 .stream()
                 .map(ChannelDtoMapper::channelToResponseDto)
                 .toList();
@@ -52,7 +47,7 @@ public class BasicChannelService {
 
 
     public ChannelResponseDto updateChannel(ChannelRequestDto requestDto) {
-        Channel channel = findById(requestDto.channelId());
+        Channel channel = getById(requestDto.channelId());
         if (requestDto.channelName()!=null){
             channel.updateChannelName(requestDto.channelName());
         }
@@ -62,26 +57,20 @@ public class BasicChannelService {
 
 
     public void deleteAllByServer(UUID serverId) {
-        findByServer(serverId)
+        getByServer(serverId)
                 .stream()
                 .forEach(channelRepository::remove);
     }
 
 
     public void deleteChannel(UUID channelId) {
-        Channel channel = findById(channelId);
+        Channel channel = getById(channelId);
         channelRepository.remove(channel);
     }
 
-    public Channel findById(UUID channelId){
-        return channelRepository.findById(channelId).orElseThrow(()->new NoSuchElementException("해당 채널이 없습니다"));
-    }
 
-    public List<Channel> findAll(UUID channelId){
-        return channelRepository.findAll();
-    }
 
-    public List<Channel> findByServer(UUID serverId){
+    public List<Channel> getByServer(UUID serverId){
         return channelRepository.findAll()
                 .stream()
                 .filter(c-> c.getServerId().equals(serverId))
@@ -89,10 +78,18 @@ public class BasicChannelService {
     }
 
     public void addChannelMember(UUID channelId,UUID userId){
-        Channel channel = findById( channelId);
+        Channel channel = getById( channelId);
         channel.addChannelMember(userId);
         channelRepository.save(channel);
         ReadStatus readStatus = new ReadStatus(userId, channelId);
         readStatusRepository.save(readStatus);
+    }
+
+    private Channel getById(UUID channelId){
+        return channelRepository.findById(channelId).orElseThrow(()->new NoSuchElementException("해당 채널이 없습니다"));
+    }
+
+    private List<Channel> getAll(UUID channelId){
+        return channelRepository.findAll();
     }
 }

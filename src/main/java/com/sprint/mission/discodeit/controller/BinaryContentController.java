@@ -14,22 +14,22 @@ import java.util.UUID;
 
 @RestController
 @Slf4j
-@RequestMapping("/files")
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
-public class FileController {
+public class BinaryContentController {
 
     private final FileService fileService;
 
-    @RequestMapping("/{id}")
+    @GetMapping("/{id}")
     public Resource getFile(@PathVariable UUID id) throws MalformedURLException {
-        return fileService.findImageFile(id);
+        return fileService.getImageFile(id);
     }
 
     @GetMapping
     public ResponseEntity<List<Resource>> getFiles(@RequestParam List<UUID> ids) throws MalformedURLException {
         List<Resource> result = new ArrayList<>();
         for (UUID id : ids) {
-            result.add(fileService.findImageFile(id));
+            result.add(fileService.getImageFile(id));
         }
         return ResponseEntity.ok(result);
     }

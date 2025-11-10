@@ -11,7 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -21,37 +23,43 @@ public class UserController {
 
     private final BasicUserService userService;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping("/findAll")
     public List<UserResponseDto> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @PostMapping
     public UserResponseDto createUser(@ModelAttribute UserCreateRequestDto requestDto) throws IOException {
         UserResponseDto responseDto = userService.createUser(requestDto);
         log.info("회원가입 성공: {}", responseDto.username());
         return responseDto;
     }
 
-    @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    public UserResponseDto updateUser(@ModelAttribute UserUpdateDto updateDto) throws IOException {
-        UserResponseDto userResponseDto = userService.updateUserInfo(updateDto);
+    @PatchMapping("/{userId}")
+    public UserResponseDto updateUser(@PathVariable UUID id,@ModelAttribute UserUpdateDto updateDto) throws IOException {
+        UserResponseDto userResponseDto = userService.updateUserInfo(id, updateDto);
         log.info("회원 수정 성공: {}", userResponseDto.username());
         return userResponseDto;
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public String deleteUser(@RequestBody UserRequestDto requestDto) {
-        userService.delete(requestDto);
+
+
+
+    @DeleteMapping("/{userId}")
+    public String deleteUser(@PathVariable UUID id) {
+        userService.delete(id);
         return "삭제완료";
     }
 
-    @RequestMapping("/online")
-    public UserResponseDto markOnline(@RequestBody UserRequestDto requestDto) {
-        userService.markUserStatus(requestDto.username());
-        UserResponseDto responseDto = userService.getUser(requestDto);
-        return responseDto;
+    @PatchMapping("/{userId}/userStatus")
+    public void markOnline(@PathVariable UUID userId,@RequestBody Instant newLastActiveAt) {
+        userService.markUserStatus(userId, newLastActiveAt);
     }
 
+
+    @GetMapping
+    public List<UserResponseDto> getAllUSer(){
+       return userService.getAllUsers();
+    }
 
 }

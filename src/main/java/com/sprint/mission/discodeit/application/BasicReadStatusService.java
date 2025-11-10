@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -24,17 +25,17 @@ public class BasicReadStatusService {
     }
 
     public void updateReadStatus(UUID id){
-        ReadStatus readStatus = findById(id);
+        ReadStatus readStatus = getById(id);
         readStatus.read();
     }
 
     public Long getTimeSinceLastRead(UUID id){
-        ReadStatus readStatus = findById(id);
+        ReadStatus readStatus = getById(id);
         return readStatus.timeSinceLastRead();
 
     }
 
-    public ReadStatusResponse findReadStatusByIds(ReadStatusRequest request){
+    public ReadStatusResponse getReadStatusByIds(ReadStatusRequest request){
         ReadStatus readStatus1 = readStatusRepository.findAll().stream()
                 .filter(readStatus -> readStatus.getUserId().equals(request.userId())
                         && readStatus.getChannelId().equals(request.channelId())).findAny().orElseThrow(() -> new NoSuchElementException("해당 메시지 수신 정보가 존재하지 않습니다."));
@@ -43,7 +44,14 @@ public class BasicReadStatusService {
 
     }
 
-    public ReadStatus findById(UUID id){
+    public ReadStatus getById(UUID id){
         return readStatusRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 메시지 수신 정보가 없습니다."));
+    }
+
+    public List<ReadStatusResponse> getAllByUserId(UUID id){
+        return readStatusRepository.findAll().stream()
+                .filter(rs-> rs.getUserId().equals(id))
+                .map(rs-> new ReadStatusResponse(rs.getUserId(),rs.getChannelId(),rs.timeSinceLastRead()))
+                .toList();
     }
 }

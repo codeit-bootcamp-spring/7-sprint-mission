@@ -9,12 +9,17 @@ import java.time.Instant;
 @Getter
 public class UserStatus implements Serializable {
 
-    private final Instant lastLoginAt;
+    private final Instant lastAt;
     private final OnlineStatus onlineStatus;
 
 
     public UserStatus(OnlineStatus status) {
-        this.lastLoginAt=Instant.now();
+        this.lastAt=Instant.now();
+        this.onlineStatus = status;
+    }
+
+    public UserStatus(OnlineStatus status,Instant lastAt) {
+        this.lastAt=lastAt;
         this.onlineStatus = status;
     }
 

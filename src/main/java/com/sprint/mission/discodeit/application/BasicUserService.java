@@ -8,29 +8,29 @@ import com.sprint.mission.discodeit.application.dto.request.UserUpdateDto;
 import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
-import com.sprint.mission.discodeit.domain.repository.UserRepository;
 import com.sprint.mission.discodeit.domain.exception.DuplicateUserException;
+import com.sprint.mission.discodeit.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-
 import static com.sprint.mission.discodeit.application.dto.UserDtoMapper.userToResponseDto;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BasicUserService{
+public class BasicUserService {
 
 
     private final UserRepository userRepository;
 
     private final FileService fileService;
-
 
 
     public UserResponseDto createUser(UserCreateRequestDto requestDto) throws IOException {
@@ -52,8 +52,10 @@ public class BasicUserService{
         return userToResponseDto(user);
     }
 
-    public UserResponseDto updateUserInfo(UserUpdateDto updateDto) throws IOException {
-        User user = findByUsername(updateDto.username());
+    public UserResponseDto updateUserInfo(UUID id,UserUpdateDto updateDto) throws IOException {
+
+        User user = getById(id);
+
         if (updateDto.username() != null) {
             user.updateUsername(updateDto.username());
         }
@@ -73,70 +75,69 @@ public class BasicUserService{
     }
 
 
-    public void delete(UserRequestDto requestDto) {
-        User user;
-        if(requestDto.id()==null){
-            user = findByUsername(requestDto.username());
-        } else {
-            user = findById(requestDto.id());
-        }
+    public void delete(UUID id) {
+        User user = getById(id);
         userRepository.remove(user);
         fileService.deleteUserFolder(user.getId());
     }
 
-    public UserResponseDto getUser(UserRequestDto requestDto){
+    public UserResponseDto getUser(UserRequestDto requestDto) {
         User user;
-        if(requestDto.id()==null){
-            user = findByUsername(requestDto.username());
+        if (requestDto.id() == null) {
+            user = getByUsername(requestDto.username());
         } else {
-            user = findById(requestDto.id());
+            user = getById(requestDto.id());
         }
         return userToResponseDto(user);
     }
 
-    public List<UserResponseDto> getAllUsers(){
-       return findAll().stream().map(user -> UserDtoMapper.userToResponseDto(user)).toList();
+    public List<UserResponseDto> getAllUsers() {
+        return getAll().stream().map(user -> UserDtoMapper.userToResponseDto(user)).toList();
     }
 
-
-    public User findById( UUID userId) {
-        log.info("findUser");
-        return userRepository.findById(userId).orElseThrow(()->new NoSuchElementException("해당 유저가 존재하지 않습니다."));
-    }
-
-    public User findByUsername(String username){
-        return userRepository.findByUsername(username).orElseThrow(()->new NoSuchElementException("존재하지 않는 아이디입니다."));
-    }
-
-
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
 
     public UserResponseDto login(String loginId, String password) {
-        User user = findByUsername(loginId);
-        if (!user.getPassword().equals(password)){
+        User user = getByUsername(loginId);
+        if (!user.getPassword().equals(password)) {
             throw new IllegalArgumentException("비밀번호가 틀립니다");
         }
-        if(!user.checkOnline()){
-            user.markOnline();
+        if (!user.checkOnline()) {
+            user.markOnline(Instant.now());
             userRepository.save(user);
         }
         return userToResponseDto(user);
 
     }
 
-    public void logout(UUID userId){
-        User user = findById(userId);
+    public void logout(UUID userId) {
+        User user = getById(userId);
         user.markOffline();
         userRepository.save(user);
     }
 
-    public void markUserStatus(String username){
-        User user = findByUsername(username);
-        user.markOnline();
+    public void markUserStatus(UUID uuid, Instant lastAt) {
+        User user = getById(uuid);
+        user.markOnline(lastAt);
         userRepository.save(user);
+
+
+        
     }
+
+    private User getById(UUID userId) {
+        log.info("findUser");
+        return userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+    }
+
+    private User getByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new NoSuchElementException("존재하지 않는 아이디입니다."));
+    }
+
+
+    private List<User> getAll() {
+        return userRepository.findAll();
+    }
+
 
     private void validateDuplicateUsername(String username) {
         userRepository.findByUsername(username).ifPresent(u -> {

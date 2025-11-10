@@ -19,25 +19,25 @@ public class ServerController {
 
     private final BasicServerService serverService;
 
-    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    @PostMapping( "/create")
     public ServerResponseDto createServer(@RequestBody ServerCreateRequestDto requestDto){
         ServerResponseDto responseDto = serverService.createServer(requestDto);
         return responseDto;
     }
 
-    @RequestMapping(value = "/edit", method = RequestMethod.POST)
+    @PostMapping( "/edit")
     public ServerResponseDto editServerInfo(@RequestBody ServerRequestDto requestDto){
         ServerResponseDto serverResponseDto = serverService.updateServer(requestDto);
         return  serverResponseDto;
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping( "/delete")
     public String deleteServer(@RequestBody ServerRequestDto requestDto){
         serverService.deleteServer(requestDto);
         return "삭제 완료";
     }
 
-    @RequestMapping(value = "/{userId}",method = RequestMethod.GET)
+    @GetMapping("/{userId}")
     public List<String> findServersByUserId(@PathVariable UUID userId){
         return serverService.findAllByUserId(userId);
     }

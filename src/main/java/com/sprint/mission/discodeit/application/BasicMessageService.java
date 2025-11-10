@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.application.dto.response.MessageResponse;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.domain.Message;
-import com.sprint.mission.discodeit.domain.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.repository.ChannelRepository;
 import com.sprint.mission.discodeit.domain.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,13 +45,13 @@ public class BasicMessageService {
     }
 
     public MessageResponse updateMessage(MessageUpdate messageUpdate) throws IOException {
-        Message message = findById(messageUpdate.id());
+        Message message = getById(messageUpdate.id());
         if(messageUpdate.content()!=null){
             message.updateContent(messageUpdate.content());
         }
         if(messageUpdate.image()!=null){
             if(message.getImage()!=null) {
-                BinaryContent content = fileService.findById(message.getImage());
+                BinaryContent content = fileService.getById(message.getImage());
                 fileService.deleteMessageImage(content);
             }
             BinaryContent content = fileService.saveMessageFile(message.getSenderId(), messageUpdate.image());
@@ -64,9 +63,9 @@ public class BasicMessageService {
     }
 
     public void deleteMessage(UUID messageId) throws IOException {
-        Message message = findById(messageId);
+        Message message = getById(messageId);
         if(message.getImage()!=null){
-            BinaryContent content = fileService.findById(message.getImage());
+            BinaryContent content = fileService.getById(message.getImage());
             fileService.deleteMessageImage(content);
         }
         messageRepository.remove(messageId);
@@ -74,13 +73,13 @@ public class BasicMessageService {
         channel.deleteMessage(messageId);
     }
 
-    public UUID findMessageImageId(UUID messageId){
-        Message message = findById(messageId);
+    public UUID getMessageImageId(UUID messageId){
+        Message message = getById(messageId);
         return message.getImage();
 
     }
 
-    public Message findById(UUID messageId){
+    private Message getById(UUID messageId){
         return messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("메세지가 없습니다."));
     }
 }
