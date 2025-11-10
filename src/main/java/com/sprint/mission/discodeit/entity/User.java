@@ -13,35 +13,34 @@ import java.util.UUID;
 public class User extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String UserEmail;
+    private  String username;
+    private String email;
     private String password;
-    private  String userName;
     private  String userNickname;
-    private UUID profileID;
+    private UUID profileId;
 
 
 
 
 
-    public User(String UserEmail,String password,String userName,String userNickname,UUID profileID)
+    public User(String email, String password, String username, UUID profileId)
     {
-           this.UserEmail = UserEmail;
+           this.email = email;
            this.password = password;
-           this.userName = userName;
-           this.userNickname = userNickname;
-           this.profileID = profileID;
+           this.username = username;
+           this.profileId = profileId;
     }
 
-    public void setProfileID(UUID profileID) {
-        this.profileID = profileID;
+    public void setProfileId(UUID profileId) {
+        this.profileId = profileId;
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "아이디 = '" + UserEmail + '\'' +
+                "아이디 = '" + email + '\'' +
                 ", 비번 = '" + password + '\'' +
-                ", 이름 = '" + userName + '\'' +
+                ", 이름 = '" + username + '\'' +
                 ", 닉네임 = '" + userNickname + '\'' +
                 ", 닉네임 = '" + this.getId() + '\'' +
                 '}';
@@ -52,12 +51,12 @@ public class User extends Common implements Serializable {
     //끝가지가면 트루 아니면 false된다
     public void update(UserUpdateRequest userUpdateRequest) {
         boolean anyValueUpdated = false;
-        if (userUpdateRequest.username() != null && !userUpdateRequest.username().equals(this.userName)) {
-            this.userName = userUpdateRequest.username();
+        if (userUpdateRequest.username() != null && !userUpdateRequest.username().equals(this.username)) {
+            this.username = userUpdateRequest.username();
             anyValueUpdated = true;
         }
-        if (userUpdateRequest.email() != null && !userUpdateRequest.email().equals(this.UserEmail)) {
-            this.UserEmail = userUpdateRequest.email();
+        if (userUpdateRequest.email() != null && !userUpdateRequest.email().equals(this.email)) {
+            this.email = userUpdateRequest.email();
             anyValueUpdated = true;
         }
         if (userUpdateRequest.password() != null && !userUpdateRequest.password().equals(this.password)) {
@@ -68,8 +67,8 @@ public class User extends Common implements Serializable {
             this.userNickname = userUpdateRequest.userNickname();
             anyValueUpdated = true;
         }
-        if (userUpdateRequest.profileImageId() != null && !userUpdateRequest.profileImageId().equals(this.profileID)) {
-            this.profileID = userUpdateRequest.profileImageId();
+        if (userUpdateRequest.profileImageId() != null && !userUpdateRequest.profileImageId().equals(this.profileId)) {
+            this.profileId = userUpdateRequest.profileImageId();
         }
 
         if (anyValueUpdated) {

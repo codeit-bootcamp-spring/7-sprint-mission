@@ -13,9 +13,9 @@ public record UserCreateResponse(
     public static UserCreateResponse from(User user) {
         return new UserCreateResponse(
                 user.getId(),
-                user.getUserName(),
+                user.getUsername(),
                 user.getUserNickname(),
-                user.getProfileID()
+                user.getProfileId()
         );
     }
 }

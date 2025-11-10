@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatustUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.User;
@@ -25,7 +26,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatusResponse create(UserStatusCreateRequest request) {
+    public UserStatus create(UserStatusCreateRequest request) {
         Optional<User> repoUser = userRepository.findById(request.userId());
         Optional<UserStatus> statusUser = userStatusRepository.findByUserId(request.userId());
         //관련된 user가 존재하지 않아?
@@ -39,44 +40,52 @@ public class BasicUserStatusService implements UserStatusService {
 
         UserStatus userStatus = userStatusRepository.save(request.userId());
 
-        return UserStatusResponse.from(userStatus);
+        return userStatus;
     }
 
     @Override
-    public UserStatusResponse find(UUID userStatusId) {
+    public UserStatus find(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository
                 .findByUserId(userStatusId).stream().findFirst()
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userStatusId));
 
-         return UserStatusResponse.from(userStatus);
+         return userStatus;
     }
 
     @Override
-    public List<UserStatusResponse> findAll() {
-        return userStatusRepository.findAll().stream().map(UserStatusResponse::from).toList();
+    public List<UserStatus> findAll() {
+        return userStatusRepository.findAll().stream()
+                .toList();
 
     }
 
+
     @Override
-    public UserStatusResponse update(UserStatustUpdateRequest request) {
-        UserStatus userStatus = userStatusRepository.findByUserId(request.userId()).stream().findFirst()
-                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + request.userId()));
-     //   userStatusRepository.deleteByUserId(userStatus.getId());
-         userStatusRepository.save(userStatus.getUserId());
-        return UserStatusResponse.from(userStatus);
+    public UserStatus update(UUID userId, UserStatusUpdateRequest request) {
+        Instant newLastActiveAt = request.newLastActiveAt();
+        UserStatus userStatus = userStatusRepository.findByUserId(userId).stream().findFirst()
+                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
+        userStatus.update(newLastActiveAt);
+
+        return userStatusRepository.save(userStatus.getUserId());
     }
 
     @Override
-    public UserStatusResponse updateByUserId(UUID userId) {
+    public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+        Instant newLastActiveAt = request.newLastActiveAt();
         UserStatus byUserId = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
-        byUserId.setUpdatedAt(Instant.now());
-        userStatusRepository.save(byUserId.getUserId());
-        return UserStatusResponse.from(byUserId);
+        byUserId.update(newLastActiveAt);
+
+        return userStatusRepository.save(byUserId.getUserId());
     }
 
     @Override
     public void delete(UUID userStatusId) {
-      userStatusRepository.deleteByUserId(userStatusId);
+        if (!userStatusRepository.findAll().stream().anyMatch(userStatus -> userStatus.getId().equals(userStatusId))) {
+            throw new NoSuchElementException("유저스타터스아이디못찾아" + userStatusId + "못찾아 ");
+        }
+
+        userStatusRepository.deleteByUserId(userStatusId);
     }
 }

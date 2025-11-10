@@ -16,11 +16,11 @@ public record UserUpdateResponse(
     public static UserUpdateResponse from(UUID uuid,User user) {
         return new UserUpdateResponse(
                 user.getId(),
-                user.getUserName(),
-                user.getUserEmail(),
+                user.getUsername(),
+                user.getEmail(),
                 user.getPassword(),
                 user.getUserNickname(),
-                user.getProfileID()
+                user.getProfileId()
         );
     }
 }

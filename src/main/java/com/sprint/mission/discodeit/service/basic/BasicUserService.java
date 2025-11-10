@@ -16,9 +16,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -39,59 +39,46 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public UserCreateResponse create(UserCreateRequest userCreateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public User create(UserCreateRequest userCreateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
 
      //이메일매칭
      if(userRepository.findAll().stream()
-             .anyMatch(user -> user.getUserEmail().equals(userCreateRequest.email()))){
+             .anyMatch(user -> user.getEmail().equals(userCreateRequest.email()))){
          throw new IllegalArgumentException("이메일이 이미 존재합니다");
      }
      //닉네임매칭
      if(userRepository.findAll().stream()
-                .anyMatch(user -> user.getUserNickname().equals(userCreateRequest.userNickname()))){
-         throw new IllegalArgumentException("닉네임이 이미 존재합니다");
+                .anyMatch(user -> user.getUserNickname().equals(userCreateRequest.username()))){
+         throw new IllegalArgumentException("이름 이미 존재합니다");
      }
-     
 
-        UUID nullableProfileId = optionalProfileCreateRequest
-                .map(profileRequest -> {
-
-                    byte[] bytes = profileRequest.contentByte();
-                    BinaryContent binaryContent = new BinaryContent(ContentsType.PROFILE_IMAGE, bytes, "null");
-                    return binaryRepository.save(binaryContent).getId();
-                })
-                .orElse(null);
-
+        UUID uuid = profileId(optionalProfileCreateRequest);
         //유저정보
         User user = new User(
                 userCreateRequest.email(),
-                userCreateRequest.rawPassword(),
+                userCreateRequest.password(),
                 userCreateRequest.username(),
-                userCreateRequest.userNickname(),
-                nullableProfileId
+                uuid
 
         );
 
-
         //유저정보저장
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
         //유저 상태 저장
-        userStatusRepository.save(user.getId());
+        userStatusRepository.save(savedUser.getId());
         //유저 스테이터스 생성
-        new  UserStatus(user.getId());
-      return  UserCreateResponse.from(user);
+        UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
+        return  user;
     }
 
 
     @Override
-    public UserFindResponse find(UUID userId) {
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
-        User finduser = userRepository.findById(userId)
-                .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+userId));
+    public UserDto find(UUID userId) {
 
-        //유저 스타터스추가
-        return UserFindResponse.from(finduser,userStatus);
+        return  userRepository.findById(userId)
+                .map(this::toDto)
+                .orElseThrow(()->new NoSuchElementException("유저아이디로 찾을수없어"));
+
     }
 
     @Override
@@ -109,44 +96,74 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserUpdateResponse update(UserUpdateRequest userUpdateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public User update(UserUpdateRequest userUpdateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         //id있는지확인
         User user = userRepository.findById(userUpdateRequest.userId())
                 .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+userUpdateRequest.userId()));
-        UUID nullableProfileId = optionalProfileCreateRequest
-                .map(profileRequest -> {
-                    Optional.ofNullable(user.getId())
-                            .ifPresent(binaryRepository::delete);
 
-                    byte[] bytes = profileRequest.contentByte();
-                    BinaryContent binaryContent = new BinaryContent(ContentsType.PROFILE_IMAGE, bytes,"null");
-                    return binaryRepository.save(binaryContent).getId();
-                })
-                .orElse(null);
+        //이메일매칭
+        if(userRepository.findAll().stream()
+                .anyMatch(u -> u.getEmail().equals(userUpdateRequest.email()))){
+            throw new IllegalArgumentException("이메일이 이미 존재합니다");
+        }
+        //닉네임매칭
+        if(userRepository.findAll().stream()
+                .anyMatch(u -> u.getUserNickname().equals(userUpdateRequest.username()))){
+            throw new IllegalArgumentException("이름 이미 존재합니다");
+        }
+
+
+        UUID uuid = profileId(optionalProfileCreateRequest);
 
         //저장용
-          user.setProfileID(nullableProfileId);
+          user.setProfileId(uuid);
          user.update(userUpdateRequest);//업데이트했으니 갱신해야지
           userRepository.save(user);
           //폼으로 바로넣고주자
-        return UserUpdateResponse.from(userUpdateRequest.userId(),user);
+        return user;
     }
 
     @Override
     public void delete(UUID userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NoSuchElementException("유저uuid못찾아용"+userId);
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("유유아이디없어요" + userId + " 이걸 못찾았어요"));
 
-        UUID profileID = userRepository
-                .findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId))
-                .getProfileID();
-        if(profileID != null) {
-            binaryRepository.delete(profileID);
-        }
-        //이런게 너무번거롭다 싫다
-        userStatusRepository.findByUserId(userId);
+        Optional.ofNullable(user.getProfileId())
+                .ifPresent(binaryRepository::delete);
+        userStatusRepository.deleteByUserId(userId);
+
         userRepository.deleteById(userId);
+    }
+
+
+
+    private UUID profileId(Optional<BinaryContentCreateRequest>  binaryContentCreateRequest){
+        return binaryContentCreateRequest
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+                            contentType, bytes);
+                    return binaryRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+    }
+
+
+    private UserDto toDto(User user) {
+        Boolean online = userStatusRepository.findByUserId(user.getId())
+                .map(UserStatus::isOnline)
+                .orElse(null);
+
+        return new UserDto(
+                user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getProfileId(),
+                online
+        );
     }
 }
