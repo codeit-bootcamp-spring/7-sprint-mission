@@ -217,7 +217,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public boolean isChannelUnavailableForUser(UUID userId, UUID channelId) {
         boolean channelExists = channelRepository.findById(channelId).isPresent();
-        boolean userJoined = channelRepository.findAllJoinedbyUserId(userId).stream()
+        boolean userJoined = channelRepository.findAllJoinedByUserId(userId).stream()
                 .anyMatch(id -> channelId.equals(id));
 
         // 채널이 존재하거나 유저가 채널에 속해있다면 false를 반환
