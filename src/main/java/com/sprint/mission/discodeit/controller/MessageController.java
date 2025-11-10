@@ -47,15 +47,15 @@ public class MessageController {
 
     // 특정 채널의 메시지 조회
     @RequestMapping(value = "/{channelId}", method = RequestMethod.GET)
-    public List<MessageResponseDto> getAllByChannelId(@PathVariable UUID channelId) {
-        return messageService.findAllByChannelId(channelId);
+    public ResponseEntity<List<MessageResponseDto>> getAllByChannelId(@PathVariable UUID channelId) {
+        return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
     }
 
     // 테스트용 모든메시지 조회
-    @RequestMapping(method = RequestMethod.GET)
-    public List<MessageResponseDto> getAll() {
-        return messageService.findAll();
-    }
+//    @RequestMapping(method = RequestMethod.GET)
+//    public List<MessageResponseDto> getAll() {
+//        return messageService.findAll();
+//    }
 }
 
 /*

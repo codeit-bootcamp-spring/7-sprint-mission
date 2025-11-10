@@ -29,6 +29,7 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     // 사용자 등록 (/users)
+    // 201 반환
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<UserResponseDto> userCreate(@RequestBody UserRequestDto userRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userRequestDto));
@@ -46,39 +47,39 @@ public class UserController {
 
     // 사용자 전체 조회 (/users)
     @RequestMapping(method = RequestMethod.GET)
-    public List<UserResponseDto> getAllUser() {
-        return userService.findAllUsers();
+    public ResponseEntity<List<UserResponseDto>> getAllUser() {
+        return ResponseEntity.ok(userService.findAllUsers());
     }
 
     // 사용자 단일 조회 (/user/id)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public UserResponseDto getUserById(@PathVariable UUID id) {
-        return userService.findUserInfoById(id);
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.findUserInfoById(id));
     }
 
 
     // 사용자 정보 수정 (/user/..)
     @RequestMapping(value = "/username", method = RequestMethod.PUT)
-    public UserResponseDto usernameUpdate(@RequestBody UserNameUpdateDto userNameUpdateDto) {
-        return userService.updateUserName(userNameUpdateDto);
+    public ResponseEntity<UserResponseDto> usernameUpdate(@RequestBody UserNameUpdateDto userNameUpdateDto) {
+        return ResponseEntity.ok(userService.updateUserName(userNameUpdateDto));
     }
     @RequestMapping(value = "/phonenum", method = RequestMethod.PUT)
-    public UserResponseDto phoneUpdate(@RequestBody UserPhoneNumUpdateDto userPhoneNumUpdateDto) {
-        return userService.updatePhoneNum(userPhoneNumUpdateDto);
+    public ResponseEntity<UserResponseDto> phoneUpdate(@RequestBody UserPhoneNumUpdateDto userPhoneNumUpdateDto) {
+        return ResponseEntity.ok(userService.updatePhoneNum(userPhoneNumUpdateDto));
     }
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
-    public UserResponseDto passwordUpdate(@RequestBody UserPasswordUpdateDto userPasswordUpdateDto) {
-        return userService.updatePassword(userPasswordUpdateDto);
+    public ResponseEntity<UserResponseDto> passwordUpdate(@RequestBody UserPasswordUpdateDto userPasswordUpdateDto) {
+        return ResponseEntity.ok(userService.updatePassword(userPasswordUpdateDto));
     }
     @RequestMapping(value = "/state", method = RequestMethod.PUT)
-    public UserResponseDto stateUpdate(@RequestBody UserStateUpdateDto userStateUpdateDto) {
-        return userService.updateState(userStateUpdateDto);
+    public ResponseEntity<UserResponseDto> stateUpdate(@RequestBody UserStateUpdateDto userStateUpdateDto) {
+        return ResponseEntity.ok(userService.updateState(userStateUpdateDto));
     }
 
     // 사용자 온라인 상태 업데이트  (/users/userId/online)
     @RequestMapping(value = "/{userId}/online", method = RequestMethod.PUT)
-    public UserStatusResponseDto onlineUpdate(@PathVariable UUID userId) {
-        return userStatusService.updateStatusByUserId(userId);
+    public ResponseEntity<UserStatusResponseDto> onlineUpdate(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userStatusService.updateStatusByUserId(userId));
     }
 }
 /*

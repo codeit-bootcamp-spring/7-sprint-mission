@@ -26,8 +26,8 @@ public class ChannelController {
     }
 
     @RequestMapping(value = "/channelname", method = RequestMethod.PUT)
-    public ChannelResponseDto channelNameUpdate(@RequestBody ChannelUpdateDto channelUpdateDto) {
-        return channelService.updateChannelName(channelUpdateDto);
+    public ResponseEntity<ChannelResponseDto> channelNameUpdate(@RequestBody ChannelUpdateDto channelUpdateDto) {
+        return ResponseEntity.ok(channelService.updateChannelName(channelUpdateDto));
     }
 
     @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
@@ -37,8 +37,8 @@ public class ChannelController {
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public List<ChannelResponseDto> getAllByUserId(@PathVariable UUID userId) {
-        return channelService.findAllByUserId(userId);
+    public ResponseEntity<List<ChannelResponseDto>> getAllByUserId(@PathVariable UUID userId) {
+        return ResponseEntity.ok(channelService.findAllByUserId(userId));
     }
 }
 
