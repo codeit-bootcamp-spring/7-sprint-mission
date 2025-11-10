@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: discodeit
+
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss"
+    time-zone: "Asia/Seoul"
+    serialization:
+      write-dates-as-timestamps: false
+
+
+discodeit:
+  repository:
+    type: file   # jcf | file
+    file-directory: .discodeit

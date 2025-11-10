@@ -1,61 +1,89 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-// 아래 두 개는 셋업/테스트 호출부에서 사용
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.Channel;
+import java.util.ArrayList;
+import java.util.Optional;
 
-@Slf4j
 @SpringBootApplication
 public class DiscodeitApplication {
 
-	public static void main(String[] args) {
-		try (ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args)) {
+    public static void main(String[] args) {
+        SpringApplication.run(DiscodeitApplication.class, args);
+    }
 
-			log.info("✅ Starting Discodeit application test sequence...");
+    /**
+     * 컨트롤러 레이어 (요구사항: @RequestMapping만 사용)
+     * - User 생성
+     * - Channel 생성
+     * - Message 생성
+     * 전역 예외처리는 다음 단계에서 적용 예정.
+     */
+    @RestController
+    @RequestMapping("/api/users")
+    static class UserController {
+        private final UserService userService;
 
-			// 서비스 초기화: Spring Context에서 Bean 조회 (요구사항 충족)
-			UserService userService = context.getBean(UserService.class);
-			ChannelService channelService = context.getBean(ChannelService.class);
-			MessageService messageService = context.getBean(MessageService.class);
+        public UserController(UserService userService) {
+            this.userService = userService;
+        }
 
-			// 셋업 & 테스트
-			User user = setupUser(userService);
-			Channel channel = setupChannel(channelService);
-			org.springframework.core.env.Environment env = context.getEnvironment();
-			String messageContent = env.getProperty("discodeit.message.content", "안녕하세요.");
-			messageCreateTest(messageService, channel, user, messageContent);
+        // POST /api/users
+        @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+        public ResponseEntity<User> create(@RequestBody UserCreateRequest request) {
+            User created = userService.create(request, Optional.empty());
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
+        }
+    }
 
-			log.info("✅ Test sequence completed successfully.");
-		}
-	}
+    @RestController
+    @RequestMapping("/api/channels")
+    static class ChannelController {
+        private final ChannelService channelService;
 
+        public ChannelController(ChannelService channelService) {
+            this.channelService = channelService;
+        }
 
-	private static User setupUser(UserService userService) {
-		User user = userService.create("woody", "woody@codeit.com", "woody1234");
-		log.info("👤 사용자 등록: {}", user.getEmail());
-		return user;
-	}
+        // POST /api/channels
+        @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+        public ResponseEntity<Channel> create(@RequestBody PublicChannelCreateRequest request) {
+            Channel created = channelService.create(request);
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
+        }
+    }
 
-	private static Channel setupChannel(ChannelService channelService) {
-		Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
-		log.info("📢 채널 생성: {}", channel.getName());
-		return channel;
-	}
+    @RestController
+    @RequestMapping("/api/messages")
+    static class MessageController {
+        private final MessageService messageService;
 
-	private static void messageCreateTest(MessageService messageService, Channel channel, User author, String content) {
-		Message message = messageService.create(content, channel.getId(), author.getId());
-		String shortId = message.getId().toString().substring(0, 8);	// ID 앞 8자리만 표시 간소화
-		log.info("💬 메시지 생성: {} at {} | 내용: {}", shortId, message.getCreatedAt(), message.getContent());
-	}
+        public MessageController(MessageService messageService) {
+            this.messageService = messageService;
+        }
+
+        // POST /api/messages
+        @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+        public ResponseEntity<Message> create(@RequestBody MessageCreateRequest request) {
+            // 첨부파일은 추후 구현 예정 → 임시로 빈 리스트 처리
+            Message created = messageService.create(request, new ArrayList<>());
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
+        }
+    }
 }
