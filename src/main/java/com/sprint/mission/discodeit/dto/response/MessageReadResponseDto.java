@@ -1,29 +1,37 @@
 package com.sprint.mission.discodeit.dto.response;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.util.StaticString;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.UUID;
 
 @Getter
 @Builder
 public class MessageReadResponseDto {
+
+
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
     private String content;
-    private UUID senderId;
+    private UUID authorId;
     private boolean isMarkDown;
     private UUID channelId;
-    private HashSet<UUID> attachmentIdList;
+    private HashSet<UUID> attachmentIds;
 
     public static MessageReadResponseDto from(Message message){
         return MessageReadResponseDto.builder()
                 .content(message.getContent())
-                .senderId(message.getSenderId())
+                .authorId(message.getSenderId())
                 .isMarkDown(message.isMarkDown())
                 .channelId(message.getChannelId())
-                .attachmentIdList(message.getAttachmentIdList())
+                .attachmentIds(message.getAttachmentIdList())
+                .id(message.getId())
+                .updatedAt(message.getUpdatedAt())
+                .createdAt(message.getCreatedAt())
                 .build();
     }
 }

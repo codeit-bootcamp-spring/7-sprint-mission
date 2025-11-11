@@ -1,16 +1,14 @@
 package com.sprint.mission.discodeit.dto.response;
 
-import com.sprint.mission.discodeit.entity.User;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
 
+import javax.print.attribute.standard.JobOriginatingUserName;
 import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-
-public record LoginResponseDto(
+public record UserCreateResponseDto(
         UUID id,
         Instant createdAt,
         Instant updatedAt,
@@ -19,5 +17,4 @@ public record LoginResponseDto(
         String password,
         UUID profileId
 ) {
-
 }

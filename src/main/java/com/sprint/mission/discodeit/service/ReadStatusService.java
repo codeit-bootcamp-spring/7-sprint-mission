@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -16,4 +17,5 @@ public interface ReadStatusService {
     public List<ReadStatusResponseDto> findAllyByUserId(UUID userID);
     public void resetReadStatus();
     public List<ReadStatusResponseDto> readAllReadStatus();
+    ReadStatusResponseDto patchReadStatus(UUID readStatusId, ReadStatusPatchRequestDto readStatusPatchRequestDto);
 }

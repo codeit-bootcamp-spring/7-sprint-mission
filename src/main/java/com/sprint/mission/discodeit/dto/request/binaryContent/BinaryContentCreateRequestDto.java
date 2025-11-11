@@ -7,6 +7,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class BinaryContentCreateRequestDto {
-    private final byte[] binaryFile;
-    private BinaryContentUsage binaryContentUsage;
+    private final byte[] bytes;
+    private String fileName;
+    private Long size;
+    private String contentType;
 }

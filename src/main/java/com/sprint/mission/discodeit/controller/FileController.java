@@ -1,35 +1,34 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
 public class FileController {
 
     private final BinaryContentService binaryContentService;
-    @RequestMapping(value = "/read", method = RequestMethod.POST)
-    public List<BinaryContent> read(@RequestBody List<UUID> binaryContentIdList){
-        return binaryContentService.findAllByIdIn(binaryContentIdList);
+    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+    public ResponseEntity<BinaryContent> read(@PathVariable UUID binaryContentId){
+        return new ResponseEntity<>(binaryContentService.find(binaryContentId), HttpStatus.OK);
     }
 
-    @RequestMapping("/readAll")
-    public List<BinaryContent> readAll(){
-        return binaryContentService.findAll();
+    @RequestMapping(value = "",method = RequestMethod.GET)
+    public ResponseEntity<List<BinaryContentResponseDto>> readByIdList(@RequestParam List<UUID> binaryContentIds){
+        return new ResponseEntity<>(binaryContentService.findAllByIdIn(binaryContentIds), HttpStatus.OK);
     }
-
-    @RequestMapping("/reset")
-    public void reset(){
-        binaryContentService.resetBinaryContentService();
-    }
+/// /////////////////////////////////////////////////////////////////////////////////////////////////////
+//    @RequestMapping("/reset")
+//    public void reset(){
+//        binaryContentService.resetBinaryContentService();
+//    }
 }

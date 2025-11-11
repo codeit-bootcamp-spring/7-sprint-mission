@@ -14,9 +14,8 @@ import java.util.UUID;
 public class MessageCreateRequestDto {
 
     private String content;
-    private UUID senderId;
-    private boolean isMarkDown;
+    private UUID authorId;
+    //private boolean isMarkDown;
     private UUID channelId;
-    private Set<ProfileCreateRequestDto> attachmentIdList  = new HashSet<>();
-
+//    private Set<ProfileCreateRequestDto> attachments  = new HashSet<>();
 }

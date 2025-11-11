@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class UserCreateRequestDto {
-    private String name;
+
     private String userName;
     private String email;
     private String password;
