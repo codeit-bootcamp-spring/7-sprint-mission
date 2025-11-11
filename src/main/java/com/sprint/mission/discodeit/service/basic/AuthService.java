@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.dto.Dto_AuthService;
 import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthService implements InterfaceAuthService {
-    private final FileUserRepository userRepository;
+    private final InterfaceUserRepository userRepository;
 
     @Override
     public Res_UserLogin isLogin(Dto_AuthService authService) {

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.dto;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -9,7 +10,8 @@ import java.util.UUID;
 
 @Builder
 // 🚫 편의상 변경. CamelCase 위반 -> 추후 수정 할꺼예용~
-public record Dto_Channel(
+public record Dto_Channel( //all private final
+       @NotBlank(message = "channelId is mandatory")
         UUID id,
         Instant createdAt,
         Instant updatedAt,
@@ -34,7 +36,7 @@ public record Dto_Channel(
 
     public static Dto_Channel fromPublic(Res_Channel resChannel) {
         return Dto_Channel.builder()
-                .id(resChannel.id())
+                .id(resChannel.channelId())
                 .createdAt(resChannel.createdAt())
                 .updatedAt(resChannel.updatedAt())
                 .channelName(resChannel.channelName())
@@ -45,7 +47,7 @@ public record Dto_Channel(
 
     public static Dto_Channel fromPrivate(Res_Channel resChannel) {
         return Dto_Channel.builder()
-                .id(resChannel.id())
+                .id(resChannel.channelId())
                 .createdAt(resChannel.createdAt())
                 .updatedAt(resChannel.updatedAt())
 //                .channelName(resChannel.channelName())

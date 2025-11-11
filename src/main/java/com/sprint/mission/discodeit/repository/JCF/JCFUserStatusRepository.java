@@ -2,11 +2,10 @@ package com.sprint.mission.discodeit.repository.JCF;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.InterfaceUserStatusRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository
+//@Repository
 public class JCFUserStatusRepository implements InterfaceUserStatusRepository {
 
 
@@ -17,18 +16,14 @@ public class JCFUserStatusRepository implements InterfaceUserStatusRepository {
     }
 
     @Override
-    public boolean isOnline() {
-        return false;
-    }
-
-    @Override
     public void save(UserStatus model) {
         this.data.put(model.getId(), model);
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public boolean deleteById(UUID id) {
         this.data.remove(id);
+        return false;
     }
 
     @Override
@@ -40,6 +35,11 @@ public class JCFUserStatusRepository implements InterfaceUserStatusRepository {
     public Optional<List<UserStatus>> findAll() {
         List<UserStatus> list = this.data.values().stream().toList();
         return Optional.ofNullable(list);
+    }
+
+    @Override
+    public Optional<UserStatus> findByUserId(UUID userID) {
+        return Optional.empty();
     }
 
     @Override

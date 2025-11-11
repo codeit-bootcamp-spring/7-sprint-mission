@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface BaseInterfaceRepository<T> {
     void save(T model);
-    void deleteById(UUID id);
+    boolean deleteById(UUID id);
     Optional<T> findById(UUID id);
     Optional<List<T>> findAll();
     boolean existsById(UUID id);

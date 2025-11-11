@@ -1,0 +1,73 @@
+package com.sprint.mission.discodeit.controller;
+
+import com.sprint.mission.discodeit.entity.dto.*;
+import com.sprint.mission.discodeit.service.basic.UserService;
+import com.sprint.mission.discodeit.service.basic.UserStatusService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
+
+import static com.sprint.mission.discodeit.common.Util.parsingMultipartFile;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/user")
+public class UserController {
+    private final UserService userService;
+    private final UserStatusService userStatusService;
+//    사용자 관리
+//    [ ] 사용자를 등록할 수 있다.
+//    [ ] 사용자 정보를 수정할 수 있다.
+//    [ ] 사용자를 삭제할 수 있다.
+//    [ ] 모든 사용자를 조회할 수 있다.
+//    [ ] 사용자의 온라인 상태를 업데이트할 수 있다.
+
+    //!! @Valid 검증 == dependencies 'spring-boot-starter-validation'
+    @RequestMapping(value = "/create", method = POST)
+    public Res_User create(@RequestPart("dtouser") Dto_User dtoUser,
+                           @RequestPart("file") MultipartFile file) {
+
+        Dto_BinaryContent dtoFile = parsingMultipartFile(file);
+        return userService.create(dtoUser, Optional.ofNullable(dtoFile));
+    }
+
+    @RequestMapping(value = "/update", method = PUT)
+    public Res_User update(@RequestPart("dtouser") Dto_UserWithIDAndContent dtoUser,
+                           @RequestPart("file") MultipartFile file) {
+
+        Dto_BinaryContent dtoFile = parsingMultipartFile(file);
+        return userService.update(dtoUser.userId(), dtoUser.dtoUser(), Optional.ofNullable(dtoFile));
+    }
+
+    @RequestMapping(value = "/delete/{id}", method = DELETE)
+    public void delete(@PathVariable("id") UUID userID) {
+        if (userService.find(userID) == null) {
+            throw new NoSuchElementException("userController.delete.userId = [" + userID + "] not found");
+        }
+        userService.delete(userID);
+    }
+
+    @RequestMapping(value = "/findAll", method = GET)
+    public ResponseEntity<List<UserDto>> findAll() {
+        //[ ]  사용자 목록 조회
+        //url - /api/user/findAll
+        //요청 - 파라미터, 바디 없음
+        //응답 - ResponseEntity<List<UserDto>>
+        return ResponseEntity.ok(userService.findAll());
+    }
+
+    @RequestMapping(value = "/updateOnlineStatus/{id}", method = PUT)
+    public void updateOnlineStatus(@PathVariable("id") UUID userId) {
+        userStatusService.updateByUserID(userId);
+    }
+}

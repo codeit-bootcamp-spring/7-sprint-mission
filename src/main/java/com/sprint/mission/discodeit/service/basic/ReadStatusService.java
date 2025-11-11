@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.PrintUtil;
+import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatusUpdate;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileReadStatusRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
+import com.sprint.mission.discodeit.repository.InterfaceChannelRepository;
+import com.sprint.mission.discodeit.repository.InterfaceReadStatusRepository;
+import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,9 +21,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ReadStatusService implements InterfaceReadStatusService {
-    private final FileReadStatusRepository readStatusRepository;
-    private final FileUserRepository userRepository;
-    private final FileChannelRepository channelRepository;
+    private final InterfaceReadStatusRepository readStatusRepository;
+    private final InterfaceUserRepository userRepository;
+    private final InterfaceChannelRepository channelRepository;
 
     public Res_ReadStatus create(Dto_ReadStatus dtoReadStatus) {
         //create
@@ -35,7 +35,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
 
         ReadStatus readStatus = new ReadStatus(user.getId(), channel.getId());
         readStatusRepository.save(readStatus);
-        PrintUtil.okMessage("ReadStatusService.create = [" + readStatus + "]");
+        Util.okMessage("ReadStatusService.create = [" + readStatus + "]");
 
         return Res_ReadStatus.from(readStatus);
     }
@@ -45,7 +45,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         //[ ] id로 조회합니다.
         ReadStatus readStatus = readStatusRepository.findById(statusID).stream().findFirst().orElseThrow(() -> new IllegalArgumentException("🚨statusID = [" + statusID.toString() + "] 오류"));
         Res_ReadStatus dto = Res_ReadStatus.from(readStatus);
-        PrintUtil.okMessage("ReadStatusService.find = [" + dto + "]");
+        Util.okMessage("ReadStatusService.find = [" + dto + "]");
         return dto;
     }
 
@@ -58,7 +58,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         List<Res_ReadStatus> dtoList = new ArrayList<Res_ReadStatus>();
         for (ReadStatus readStatus : list) {
             dtoList.add(Res_ReadStatus.from(readStatus));
-            PrintUtil.okMessage("ReadStatusService.findAllByUserId = [" + readStatus + "]");
+            Util.okMessage("ReadStatusService.findAllByUserId = [" + readStatus + "]");
         }
         return dtoList;
     }
@@ -66,18 +66,18 @@ public class ReadStatusService implements InterfaceReadStatusService {
     public void update(Dto_ReadStatusUpdate requestDto) {
         //update
         //[ ] DTO를 활용해 파라미터를 그룹화합니다.
-        //수정 대상 객체의 id 파라미터, 수정할 값 파라미터
-        ReadStatus readStatus = readStatusRepository.findById(requestDto.id())
+        //수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
+        ReadStatus readStatus = readStatusRepository.findById(requestDto.readStatusID())
                 .orElseThrow(() -> new IllegalArgumentException("🚨readStatusRepository.update.requestDto = [" + requestDto.toString() + "] 오류"));
         readStatus.updateLastReadAt();
         readStatusRepository.save(readStatus);
-        PrintUtil.okMessage("readStatusRepository.update = [" + readStatus + "]");
+        Util.okMessage("readStatusRepository.update = [" + readStatus + "]");
     }
 
     public void delete(UUID statusID) {
         //delete
         //[ ] id로 삭제합니다.
         readStatusRepository.deleteById(statusID);
-        PrintUtil.okMessage("readStatusRepository.deleteById = [" + statusID + "] 삭제 완료");
+        Util.okMessage("readStatusRepository.deleteById = [" + statusID + "] 삭제 완료");
     }
 }

@@ -12,7 +12,7 @@ import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 
 @Getter
 public class Channel extends BaseModel {
-//channelService -        [ ] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
+//channelService -        [ ] PRIVATE 채널인 경우 참여한 User의 readStatusID 정보를 포함합니다.
     private ChannelType channelType;
     private String channelName;
     private String description;

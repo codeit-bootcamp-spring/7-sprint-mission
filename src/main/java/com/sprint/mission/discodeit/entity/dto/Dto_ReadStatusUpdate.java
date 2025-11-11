@@ -1,22 +1,21 @@
 package com.sprint.mission.discodeit.entity.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
-import java.time.Instant;
 import java.util.UUID;
 
 //@Getter
 //@NoArgsConstructor
 //@AllArgsConstructor
 @Builder
-public record Dto_ReadStatusUpdate(
-        UUID id,
-        Instant readAt
+public record Dto_ReadStatusUpdate( //all private final
+        @NotBlank(message = "readStatusID is mandatory")
+        UUID readStatusID
 ) {
     public static Dto_ReadStatusUpdate from(UUID readStatusID) {
         return Dto_ReadStatusUpdate.builder()
-                .id(readStatusID)
-                .readAt(Instant.now())
+                .readStatusID(readStatusID)
                 .build();
     }
 }
