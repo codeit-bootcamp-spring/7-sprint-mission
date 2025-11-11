@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.readstatus.ReadStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -22,7 +23,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus create(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
+    public ReadStatusResponseDto create(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
         UUID userId = Objects.requireNonNull(readStatusCreateRequestDto.userId());
         UUID channelId = Objects.requireNonNull(readStatusCreateRequestDto.channelId());
 
@@ -41,33 +42,40 @@ public class BasicReadStatusService implements ReadStatusService {
                 ? readStatusCreateRequestDto.lastReadAt() :  Instant.now();
 
         ReadStatus readstatus = new ReadStatus(userId, channelId, readAt);
+        ReadStatus save = readStatusRepository.save(readstatus);
 
-        return readStatusRepository.save(readstatus);
+        return ReadStatusResponseDto.from(save);
     }
 
     @Override
-    public ReadStatus get(UUID id) {
-        return readStatusRepository.findById(Objects.requireNonNull(id))
+    public ReadStatusResponseDto get(UUID id) {
+        ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
+        return ReadStatusResponseDto.from(readStatus);
     }
 
     @Override
-    public List<ReadStatus> getAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(Objects.requireNonNull(userId));
+    public List<ReadStatusResponseDto> getAllByUserId(UUID userId) {
+        return readStatusRepository.findAllByUserId(Objects.requireNonNull(userId))
+                .stream()
+                .map(rs -> ReadStatusResponseDto.from(rs))
+                .toList();
     }
 
     @Override
-    public ReadStatus update(ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
-        ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(readStatusUpdateRequestDto
-                .id())).orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
+    public ReadStatusResponseDto update(UUID id, ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
+        ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(id))
+                .orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
 
-        if (readStatusUpdateRequestDto.lastReadAt() != null) {
-            if(readStatus.getLastReadAt() == null || readStatusUpdateRequestDto.lastReadAt().isAfter(readStatus.getLastReadAt())) {
-                readStatus.readAt(readStatusUpdateRequestDto.lastReadAt());
+        if (readStatusUpdateRequestDto.newLastReadAt() != null) {
+            if(readStatus.getLastReadAt() == null ||
+                    readStatusUpdateRequestDto.newLastReadAt().isAfter(readStatus.getLastReadAt())) {
+                readStatus.readAt(readStatusUpdateRequestDto.newLastReadAt());
             }
         }
 
-        return readStatusRepository.save(readStatus);
+        ReadStatus save = readStatusRepository.save(readStatus);
+        return ReadStatusResponseDto.from(save);
     }
 
     @Override

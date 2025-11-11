@@ -53,13 +53,13 @@ public class UserController {
     }
 
     // 사용자 정보 수정
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponseDto update(@Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto,
                                   @PathVariable("userId") UUID userId) {
         return userService.update(userId, userUpdateRequestDto, null);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PUT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserResponseDto updateMultipart(
             @PathVariable("userId") UUID userId,
             @Valid @RequestPart("user") UserUpdateRequestDto userUpdateRequestDto,

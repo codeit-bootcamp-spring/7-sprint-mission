@@ -24,7 +24,7 @@ public class UserStatusController {
         return userStatusService.create(userStatusCreateRequestDto);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public UserStatusResponseDto update(@Valid @RequestBody UserStatusUpdateRequestDto userStatusUpdateRequestDto,
                                         @PathVariable("id") UUID id) {
         if(userStatusUpdateRequestDto.id() == null || !id.equals(userStatusUpdateRequestDto.id())) {
@@ -33,7 +33,7 @@ public class UserStatusController {
         return userStatusService.update(userStatusUpdateRequestDto);
     }
 
-    @RequestMapping(value = "/by-user-id/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/by-user-id/{userId}", method = RequestMethod.PATCH)
     public UserStatusResponseDto updateByUserId(
             @Valid @RequestBody UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto,
             @PathVariable UUID userId) {
