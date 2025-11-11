@@ -28,10 +28,4 @@ public class BinaryContent {
         this.dataType = dataType;
     }
 
-    public BinaryContent(UUID userId, byte[] binaryData, String dataName, String dataType) {
-        this(binaryData, dataName, dataType);
-    }
-
-
-    // 메시지가 채널과 개인 2개라 일단 프로필사진과 채널에 대해서 구현
 }
