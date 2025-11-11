@@ -45,6 +45,7 @@ public class BasicUserService implements UserService {
         if(createBinaryContentDto != null){
             BinaryContent binaryContent = new BinaryContent(
                     createBinaryContentDto.fileName(),
+                    createBinaryContentDto.size(),
                     createBinaryContentDto.contentType(),
                     createBinaryContentDto.bytes()
             );

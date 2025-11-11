@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.global.util.exception;
 
-import com.sprint.mission.discodeit.global.util.ApiResponse;
+import com.sprint.mission.discodeit.global.util.CustomApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ApiResponse<Object>> handleCustomException(CustomException e) {
+    public ResponseEntity<CustomApiResponse<Object>> handleCustomException(CustomException e) {
         ErrorCode errorCode = e.getErrorCode();
         log.error(e.getMessage());
-        ApiResponse<Object> response = ApiResponse.error(
+        CustomApiResponse<Object> response = CustomApiResponse.error(
                 errorCode.getStatus(),
                 errorCode.getCode(),   // 비즈니스 코드
                 errorCode.getMessage() // 사용자 메시지
@@ -27,10 +27,10 @@ public class GlobalExceptionHandler {
 
     // Validation에 대한 에러 핸들러
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Object>> handleValidationException(MethodArgumentNotValidException e) {
+    public ResponseEntity<CustomApiResponse<Object>> handleValidationException(MethodArgumentNotValidException e) {
         String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         log.error(e.getMessage());
-        ApiResponse<Object> response = ApiResponse.error(
+        CustomApiResponse<Object> response = CustomApiResponse.error(
                 HttpStatus.BAD_REQUEST,
                 "VALIDATION_ERROR",
                 message
@@ -39,9 +39,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleException(Exception e) {
+    public ResponseEntity<CustomApiResponse<Object>> handleException(Exception e) {
         log.error(e.getMessage());
-        ApiResponse<Object> response = ApiResponse.error(
+        CustomApiResponse<Object> response = CustomApiResponse.error(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "INTERNAL_SERVER_ERROR",
                 e.getMessage()

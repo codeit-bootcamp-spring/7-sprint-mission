@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.login;
+package com.sprint.mission.discodeit.dto.login.request;
 
 import jakarta.validation.constraints.NotBlank;
 

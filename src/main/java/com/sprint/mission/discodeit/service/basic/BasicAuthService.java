@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.login.LoginRequestDto;
-import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
+import com.sprint.mission.discodeit.dto.login.request.LoginRequestDto;
+import com.sprint.mission.discodeit.dto.login.response.LoginResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.util.exception.CustomException;
@@ -21,7 +21,7 @@ public class BasicAuthService implements AuthService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserResponseDto login(LoginRequestDto loginRequestDto) {
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         User user = userRepository.findByUsername(loginRequestDto.username())
                 .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_USER_NOT_FOUND));
 
@@ -35,6 +35,6 @@ public class BasicAuthService implements AuthService {
         userStatus.update(Instant.now());
         userStatusRepository.save(userStatus);
 
-        return UserResponseDto.from(user, userStatus.isOnline());
+        return LoginResponseDto.from(user);
     }
 }

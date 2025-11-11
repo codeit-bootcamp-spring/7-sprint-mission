@@ -12,7 +12,7 @@ import java.util.UUID;
 @Builder
 public record UserResponseDto(
         UUID userId,
-        Instant createAt,
+        Instant createdAt,
         Instant updateAt,
         String username,
         String email,
@@ -29,7 +29,7 @@ public record UserResponseDto(
 
         return UserResponseDto.builder()
                 .userId(user.getId())
-                .createAt(user.getCreateAt())
+                .createdAt(user.getCreateAt())
                 .updateAt(Instant.now())
                 .username(user.getUsername())
                 .email(user.getEmail())

@@ -45,6 +45,7 @@ public class BasicMessageService implements MessageService {
                     createBinaryContentDto -> {
                         BinaryContent binaryContent = new BinaryContent(
                                 createBinaryContentDto.fileName(),
+                                createBinaryContentDto.size(),
                                 createBinaryContentDto.contentType(),
                                 createBinaryContentDto.bytes());
                         binaryContentRepository.save(binaryContent);

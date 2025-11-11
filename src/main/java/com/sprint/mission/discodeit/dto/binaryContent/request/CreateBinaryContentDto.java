@@ -10,6 +10,8 @@ public record CreateBinaryContentDto(
         @NotBlank(message = "ContentType은 필수입니다.")
         String contentType,
 
+        Long size,
+
         @NotNull(message = "파일은 필수입니다.")
         byte[] bytes
 ) {

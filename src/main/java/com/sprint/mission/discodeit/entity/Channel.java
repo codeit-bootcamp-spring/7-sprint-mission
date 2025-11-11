@@ -44,13 +44,9 @@ public class Channel extends Common {
         participants = new ArrayList<>();
     }
 
-    public void updateChannel(ChannelType channelType, String channelName, String desc) {
+    public void updateChannel(String channelName, String desc) {
         boolean isUpdate = false;
 
-        if(channelType != null && !this.channelType.equals(channelType)) {
-            this.channelType = channelType;
-            isUpdate = true;
-        }
         if(channelName != null && !this.channelName.equals(channelName)) {
             this.channelName = channelName;
             isUpdate = true;

@@ -18,9 +18,7 @@ async function fetchAndRenderUsers() {
         if (!response.ok) throw new Error('Failed to fetch users');
 
         // 응답 데이터
-        const usersApiResponse = await response.json();
-        const users = usersApiResponse.data;
-        console.log('json 데이터: ', users);
+        const users = await response.json();
 
         renderUserList(users);
     } catch (error) {

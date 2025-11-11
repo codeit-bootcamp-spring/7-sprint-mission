@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponseDto;
-import com.sprint.mission.discodeit.global.util.ApiResponse;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -22,14 +21,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * 사용자 관리
- * [ ] 사용자를 등록할 수 있다.                      api/users, Post
- * [ ] 사용자 정보를 수정할 수 있다.                 api/users/{userId}, Put
- * [ ] 사용자를 삭제할 수 있다.                      api/users, Delete
- * [ ] 모든 사용자를 조회할 수 있다.                 api/users, Get
- * [ ] 사용자의 온라인 상태를 업데이트할 수 있다.    api/users/status/{userId}, Put
- */
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/users")
@@ -39,29 +30,28 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<UserResponseDto>> createUser(
+    public ResponseEntity<UserResponseDto> createUser(
             @Valid @RequestPart(value = "userDto") CreateUserDto userDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
         CreateBinaryContentDto createBinaryContentDto = null;
 
         if (profile != null && !profile.isEmpty()) {
             createBinaryContentDto = new CreateBinaryContentDto(
-                    profile.getOriginalFilename(),  // ✅ 실제 업로드된 파일 이름
-                    profile.getContentType(),       // ✅ Content-Type (예: image/jpeg)
-                    profile.getBytes()               // ✅ 파일 데이터
+                    profile.getOriginalFilename(),
+                    profile.getContentType(),
+                    profile.getSize(),
+                    profile.getBytes()
             );
         }
 
         UserResponseDto userResponseDto = userService.createUser(userDto, createBinaryContentDto);
-        ApiResponse<UserResponseDto> responseBody = ApiResponse.success(userResponseDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUser() {
+    public ResponseEntity<List<UserResponseDto>> getAllUser() {
         List<UserResponseDto> users = userService.getAllUsers();
-        ApiResponse<List<UserResponseDto>> responseBody = ApiResponse.success(users);
-        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+        return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
@@ -70,20 +60,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
-    public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(@PathVariable UUID userId, @RequestBody UpdateUserDto updateUserDto) {
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable UUID userId, @RequestBody UpdateUserDto updateUserDto) {
         UserResponseDto userResponseDto = userService.updateUser(userId, updateUserDto);
-        ApiResponse<UserResponseDto> responseBody = ApiResponse.success(userResponseDto);
-        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+        return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }
 
-    @RequestMapping(value = "/status/{userId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateUserState(@PathVariable UUID userId,
+    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
+    public ResponseEntity<UserStatusResponseDto> updateUserState(@PathVariable UUID userId,
                                              @RequestBody UpdateUserStatusDto updateUserDto) {
         UserStatusResponseDto userStatusResponseDto = userStatusService.updateStatusByUserId(userId, updateUserDto);
-        ApiResponse<UserStatusResponseDto> responseBody = ApiResponse.success(userStatusResponseDto);
-        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+        return ResponseEntity.status(HttpStatus.OK).body(userStatusResponseDto);
     }
-
 
 }

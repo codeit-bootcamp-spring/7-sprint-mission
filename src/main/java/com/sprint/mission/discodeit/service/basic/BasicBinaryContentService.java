@@ -22,6 +22,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public BinaryContentResponseDto createBinaryContent(CreateBinaryContentDto createBinaryContentDto) {
         BinaryContent binaryContent = new BinaryContent(
                 createBinaryContentDto.fileName(),
+                createBinaryContentDto.size(),
                 createBinaryContentDto.contentType(),
                 createBinaryContentDto.bytes()
         );

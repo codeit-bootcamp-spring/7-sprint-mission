@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.channel.request.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePublicChannelDto;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.response.CreateChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -33,7 +34,7 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
 
     @Override
-    public ChannelResponseDto createChannel(CreatePublicChannelDto createPublicChannelDto) {
+    public CreateChannelResponseDto createChannel(CreatePublicChannelDto createPublicChannelDto) {
         Channel channel = new Channel(
                 ChannelType.PUBLIC,
                 createPublicChannelDto.channelName(),
@@ -41,12 +42,11 @@ public class BasicChannelService implements ChannelService {
         );
         channelRepository.save(channel);
 
-        // 채널 생성 시, 해당 채널에 대한 메세지가 없으므로, 가장 최근 메세지의 시간은 Instant.MIN으로 정의한다.
-        return ChannelResponseDto.from(channel, Instant.MIN);
+        return CreateChannelResponseDto.from(channel);
     }
 
     @Override
-    public ChannelResponseDto createChannel(CreatePrivateChannelDto createPrivateChannelDto) {
+    public CreateChannelResponseDto createChannel(CreatePrivateChannelDto createPrivateChannelDto) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         createPrivateChannelDto.participantsIds().forEach(userId -> {
             User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -58,7 +58,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.save(channel);
 
         // 채널 생성 시, 해당 채널에 대한 메세지가 없으므로, 가장 최근 메세지의 시간은 Instant.MIN으로 정의한다.
-        return ChannelResponseDto.from(channel, Instant.MIN);
+        return CreateChannelResponseDto.from(channel);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto updateChannel(UUID channelId, UpdateChannelDto updateChannelDto) {
+    public CreateChannelResponseDto updateChannel(UUID channelId, UpdateChannelDto updateChannelDto) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
@@ -106,15 +106,9 @@ public class BasicChannelService implements ChannelService {
         }
 
 
-        Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
-                .map(Message::getCreateAt)
-                .max(Comparator.naturalOrder())
-                .orElse(Instant.MIN);
+        channel.updateChannel(updateChannelDto.channelName(), updateChannelDto.desc());
 
-
-        channel.updateChannel(channel.getChannelType(), updateChannelDto.channelName(), updateChannelDto.desc());
-
-        return ChannelResponseDto.from(channel, lastMessageAt);
+        return CreateChannelResponseDto.from(channel);
     }
 
     @Override
