@@ -8,3 +8,10 @@ discodeit:
 server:
   port: 8080
 
+springdoc:
+  swagger-ui:
+    path: /api-docs.html
+    display-request-duration: true
+  api-docs:
+    path: /api-docs
+

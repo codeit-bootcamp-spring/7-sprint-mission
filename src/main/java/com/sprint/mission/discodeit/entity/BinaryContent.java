@@ -15,6 +15,9 @@ import static java.time.Instant.*;
 public class BinaryContent implements Serializable {
     private final UUID id = UUID.randomUUID();
     private final Instant createdAt = now();
-    private byte [] binaryFile;
-    private BinaryContentUsage binaryContentUsage;
+    private String fileName;
+    private String contentType;
+    private byte [] bytes;
+    private Long size;
+//    private BinaryContentUsage binaryContentUsage;
 }

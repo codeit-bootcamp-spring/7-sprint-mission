@@ -12,6 +12,6 @@ public class ReadStatusCreateRequestDto {
 
     private UUID channelId;
     private UUID userId;
-    private Instant readLastTime;
+    private Instant lastReadAt;
 
 }
