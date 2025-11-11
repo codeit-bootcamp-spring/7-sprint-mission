@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.entity.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum UserStatusType {
     ONLINE(true),
     OFFLINE(false);
@@ -8,10 +11,6 @@ public enum UserStatusType {
 
     UserStatusType(boolean isOnline) {
         this.isOnline = isOnline;
-    }
-
-    public boolean getOnline() {
-        return isOnline;
     }
 
 }

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -12,7 +11,6 @@ import java.io.Serial;
  */
 @Getter
 @ToString(callSuper = true)
-@EqualsAndHashCode
 public final class BinaryContent extends Common {
     @Serial
     private static final long serialVersionUID = 1L;

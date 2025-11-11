@@ -1,16 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.request.CreateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.global.util.exception.CustomException;
+import com.sprint.mission.discodeit.global.util.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -19,44 +22,62 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
     @Override
-    public UserStatus createUserStatus(CreateUserStatusDto createUserStatusDto) {
-        if(!userRepository.existsById(createUserStatusDto.getUserId())) {
-            throw new NoSuchElementException("존재하지 않는 유저입니다." + createUserStatusDto.getUserId());
+    public UserStatusResponseDto createUserStatus(CreateUserStatusDto createUserStatusDto) {
+        if(!userRepository.existsById(createUserStatusDto.userId())) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
-        if(userStatusRepository.findByUserId(createUserStatusDto.getUserId()).isPresent()) {
-            throw new NoSuchElementException("이미 존재하는 UserStatus입니다." + createUserStatusDto.getUserId());
+        if(userStatusRepository.findByUserId(createUserStatusDto.userId()).isPresent()) {
+            throw new CustomException(ErrorCode.USER_STATUS_ALREADY_EXIST);
         }
 
-        UserStatus userstatus = new UserStatus(createUserStatusDto.getUserId(), createUserStatusDto.getLoginAt());
+        UserStatus userstatus = new UserStatus(createUserStatusDto.userId(), createUserStatusDto.loginAt());
         userStatusRepository.save(userstatus);
-        return userstatus;
+
+        return UserStatusResponseDto.from(userstatus);
     }
 
     @Override
-    public UserStatus getUserStatus(UUID userStatusId) {
-        return userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 UserStatus입니다."));
+    public UserStatusResponseDto getUserStatus(UUID userStatusId) {
+        UserStatus userStatus = userStatusRepository.findById(userStatusId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+
+        return UserStatusResponseDto.from(userStatus);
     }
 
     @Override
-    public List<UserStatus> getAllUserStatuses() {
-        return userStatusRepository.findAll();
+    public List<UserStatusResponseDto> getAllUserStatuses() {
+        return userStatusRepository.findAll().stream()
+                .map(UserStatusResponseDto::from)
+                .toList();
     }
 
     @Override
-    public void updateUserStatus(UpdateUserStatusDto updateUserStatusDto) {
-        UserStatus userStatus = userStatusRepository.findById(updateUserStatusDto.getUserStatusId())
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 UserStatus입니다." + updateUserStatusDto.getUserStatusId()));
+    public UserStatusResponseDto updateUserStatus(UUID userStatusId, UpdateUserStatusDto updateUserStatusDto) {
+        UserStatus userStatus = userStatusRepository.findById(userStatusId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
 
-        userStatus.update(updateUserStatusDto.getLoginAt());
+        userStatus.update(updateUserStatusDto.loginAt());
         userStatusRepository.save(userStatus);
+
+        return UserStatusResponseDto.from(userStatus);
+    }
+
+    @Override
+    public UserStatusResponseDto updateStatusByUserId(UUID userId, UpdateUserStatusDto updateUserStatusDto) {
+        Instant lastActiveAt = updateUserStatusDto.loginAt();
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+        userStatus.update(lastActiveAt);
+        userStatusRepository.save(userStatus);
+
+        return UserStatusResponseDto.from(userStatus);
     }
 
     @Override
     public void deleteById(UUID userStatusId) {
         if(!userStatusRepository.existsById(userStatusId)) {
-            throw new NoSuchElementException("찾을 수 없는 UserStauts입니다." + userStatusId);
+            throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);
         }
 
         userStatusRepository.deleteById(userStatusId);
