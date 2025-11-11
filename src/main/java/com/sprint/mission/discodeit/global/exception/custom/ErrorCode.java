@@ -27,6 +27,7 @@ public enum ErrorCode {
 
     // 403 FORBIDDEN
     PUBLIC_CHANNEL_MEMBER_ADD_FORBIDDEN(HttpStatus.FORBIDDEN, "공개 채널에는 멤버를 추가할 수 없습니다."),
+    PRIVATE_CHANNEL_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "비공개 채널은 수정이 불가합니다."),
     CANNOT_LEAVE_AS_CHANNEL_ADMIN(HttpStatus.FORBIDDEN, "당신은 관리자이므로 채널을 나갈 수 없습니다."),
 
     // 404 NOT FOUND

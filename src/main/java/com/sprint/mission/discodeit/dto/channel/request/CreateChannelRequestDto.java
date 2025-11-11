@@ -10,5 +10,6 @@ import lombok.Getter;
 public class CreateChannelRequestDto {
     private final ChannelType channelType;
     private final ChannelVisibility channelVisibility;
+    private final String description;
     private final String channelName;
 }

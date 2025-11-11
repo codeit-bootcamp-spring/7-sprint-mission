@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.channel.request.*;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.global.dto.ApiResponse;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,44 @@ public class ChannelController {
     private final ChannelService channelService;
 
     // 채널 생성
-    @RequestMapping(value = "/channels", method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<Object>> createChannel(@RequestParam UUID userId,
-                                                              @RequestBody CreateChannelRequestDto requestDto) {
-        channelService.create(userId, requestDto);
-        return ApiResponse.success(HttpStatus.CREATED,"채널이 생성되었습니다.");
+    @RequestMapping(value = "/channels/public", method = RequestMethod.POST)
+    public ResponseEntity<Channel> createPublic(@RequestParam UUID userId,
+                                                @RequestBody CreatePublicChannelRequestDto requestDto) {
+        Channel createdChannel = channelService.create(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
+
+    @RequestMapping(value = "/channels/private", method = RequestMethod.POST)
+    public ResponseEntity<ApiResponse<Object>> createPrivate(@RequestParam UUID userId,
+                                                             @RequestBody CreatePrivateChannelRequestDto requestDto) {
+        Channel createdChannel = channelService.create(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
+    }
+
+    @RequestMapping(value = "/channels/{channelId}")
+    public ResponseEntity<Channel> update(@PathVariable UUID channelId,
+                                          @RequestBody UpdatePublicChannelRequestDto request) {
+        Channel udpatedChannel = channelService.update(channelId, request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(udpatedChannel);
+    }
+
+    // 채널 삭제
+    @RequestMapping(value = "/channels/{channelId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
+        channelService.delete(channelId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    // 특정 사용자가 볼 수 있는 채널 목록 조회
+    @RequestMapping(value = "/channels", method = RequestMethod.GET)
+    public ResponseEntity<List<ChannelResponseDto>> searchChannels(@RequestParam UUID userId) {
+        List<ChannelResponseDto> channels = channelService.findAllByUserId(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(channels);
+    }
+
+    //--------------------- 기존의 메서드(심화 요구사항에서 사용하지 않아 변경X) ---------------------//
 
     // 채널에 멤버 추가(비공개 채널만 가능)
     @RequestMapping(value = "/channels/{channelId}/members", method = RequestMethod.PATCH)
@@ -48,20 +81,5 @@ public class ChannelController {
                                                     @RequestBody UpdateChannelNameRequestDto requestDto) {
         channelService.updateName(channelId, requestDto);
         return ApiResponse.success(HttpStatus.OK, "채널 이름이 변경되었습니다.");
-    }
-
-    // 채널 삭제
-    @RequestMapping(value = "/channels/{channelId}", method = RequestMethod.DELETE)
-    public ResponseEntity<ApiResponse<Object>> deleteChannel(@PathVariable UUID channelId,
-                                                @RequestBody DeleteChannelRequestDto requestDto) {
-        channelService.delete(channelId, requestDto);
-        return ApiResponse.success(HttpStatus.OK, "채널이 삭제되었습니다.");
-    }
-
-    // 특정 사용자가 볼 수 있는 채널 목록 조회
-    @RequestMapping(value = "/channels", method = RequestMethod.GET)
-    public ResponseEntity<ApiResponse<List<ChannelResponseDto>>> searchChannels(@RequestParam UUID userId) {
-        List<ChannelResponseDto> channels = channelService.findAllByUserId(userId);
-        return ApiResponse.success(HttpStatus.OK, "사용자 채널 목록 조회", channels);
     }
 }

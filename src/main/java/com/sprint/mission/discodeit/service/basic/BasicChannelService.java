@@ -25,6 +25,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
 
+    // 기존의 채널 생성 메서드
     @Override
     public ChannelResponseDto create(UUID adminId, CreateChannelRequestDto request) {
         // 이름 중복 저장 불가
@@ -36,6 +37,7 @@ public class BasicChannelService implements ChannelService {
                 request.getChannelType(),
                 request.getChannelVisibility(),
                 request.getChannelName(),
+                request.getDescription(),
                 adminId);
 
         channelRepository.save(newChannel);
@@ -48,6 +50,40 @@ public class BasicChannelService implements ChannelService {
 
         return ChannelResponseDto.from(newChannel, newChannel.getCreatedAt());
     }
+
+    // API 스펙에 맞는 공개 채널 및 비공개 채널 생성 메서드 추가
+    @Override
+    public Channel create(CreatePublicChannelRequestDto request) {
+        String name = request.getName();
+        String description = request.getDescription();
+        Channel channel = new Channel(ChannelType.MESSAGE, ChannelVisibility.PUBLIC, name, description, null);
+        channelRepository.save(channel);
+        return channel;
+    }
+
+    @Override
+    public Channel create(CreatePrivateChannelRequestDto request) {
+        Channel channel = new Channel(ChannelType.MESSAGE, ChannelVisibility.PRIVATE, null, null, null);
+        channelRepository.save(channel);
+        request.getParticipantIds().stream()
+                .forEach(userId ->
+                        addMember(channel.getId(), new UpdateChannelRequestDto(userId))
+                );
+        return channel;
+    }
+
+    @Override
+    public Channel update(UUID channelId, UpdatePublicChannelRequestDto request) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() ->  new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+        if (channel.getVisibility() ==  ChannelVisibility.PRIVATE) {
+            throw new CustomException(ErrorCode.PRIVATE_CHANNEL_UPDATE_FORBIDDEN);
+        }
+        channel.update(request.getNewName(), request.getNewDescription());
+        channelRepository.update(channel);
+        return channel;
+    }
+
 
     @Override
     public void addMember(UUID channelId, UpdateChannelRequestDto request){
@@ -170,16 +206,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void delete(UUID channelId, DeleteChannelRequestDto request) {
-        userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
+    public void delete(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
-
-        if(!request.getUserId().equals(channel.getAdminId())) {
-            throw new CustomException(ErrorCode.NOT_CHANNEL_ADMIN);
-        }
 
         readStatusRepository.deleteByChannelId(channelId);
         List<UUID> binaryContentIds = messageRepository.deleteByChannelId(channelId); // 채널 메시지 삭제 및 연관 파일 UUID 저장

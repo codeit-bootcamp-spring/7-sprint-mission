@@ -11,13 +11,15 @@ public class Channel extends BaseEntity{
     private String channelName;
     private final ChannelType channelType;
     private final ChannelVisibility visibility;
+    private String description;
     private UUID adminId;
     private List<UUID> memberIds;
 
-    public Channel(ChannelType channelType, ChannelVisibility visibility, String channelName, UUID adminId) {
+    public Channel(ChannelType channelType, ChannelVisibility visibility, String channelName, String description, UUID adminId) {
         this.channelType = channelType;
         this.visibility = visibility;
         this.channelName = channelName;
+        this.description = description;
         this.adminId = adminId;
         this.memberIds = new ArrayList<>();
         this.memberIds.add(adminId);
@@ -26,6 +28,11 @@ public class Channel extends BaseEntity{
     public void setChannelName(String channelName) {
         this.setUpdatedAt();
         this.channelName = channelName;
+    }
+
+    public void setDescription(String description) {
+        this.setUpdatedAt();
+        this.description = description;
     }
 
     public void setAdmin(UUID adminId) {
@@ -45,6 +52,21 @@ public class Channel extends BaseEntity{
     public void deleteMember(UUID userId){
         this.setUpdatedAt();
         this.memberIds.remove(userId);
+    }
+
+    public void update(String name, String description) {
+        boolean flag = false;
+        if(name != null && !name.isEmpty()){
+            this.channelName = name;
+            flag = true;
+        }
+        if(description != null && !description.isEmpty()){
+            this.description = description;
+            flag = true;
+        }
+        if(flag){
+           this.setUpdatedAt();
+        }
     }
 
     @Override
