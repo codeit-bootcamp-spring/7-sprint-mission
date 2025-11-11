@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 /**
  * @param username 유저 이름 ( 별명 x)

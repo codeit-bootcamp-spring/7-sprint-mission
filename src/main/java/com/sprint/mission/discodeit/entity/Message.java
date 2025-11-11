@@ -18,13 +18,12 @@ public class Message extends BaseEntity {
     private final List<UUID> attachmentIds;
     private boolean isDeleted;
 
-    @Builder
     public Message(String content, String userName, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
         this.content = VerifiedUtils.verifyContent(content);
         this.userName = VerifiedUtils.verifyName(userName);
         this.authorId = VerifiedUtils.verifyNull(authorId);
         this.channelId = VerifiedUtils.verifyNull(channelId);
-        this.attachmentIds = VerifiedUtils.verifyNull(attachmentIds);
+        this.attachmentIds = attachmentIds;
         this.isDeleted = false;
     }
 

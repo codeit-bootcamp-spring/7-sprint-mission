@@ -17,7 +17,6 @@ public class UserStatus extends BaseEntity {
     private final UUID userId;
     private Instant lastReadAt;
 
-    @Builder
     public UserStatus(UUID userId) {
         this.userId = VerifiedUtils.verifyNull(userId);
         this.lastReadAt = Instant.now();

@@ -10,7 +10,10 @@ import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -20,7 +23,7 @@ public class BasicAuthService implements AuthService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public AuthLoginResponseDto login(AuthLoginRequestDto authLoginRequestDto) {
+    public User login(AuthLoginRequestDto authLoginRequestDto) {
         if (authLoginRequestDto == null) {
             throw new IllegalArgumentException("Invalid request");
         }
@@ -47,9 +50,22 @@ public class BasicAuthService implements AuthService {
                 }, () -> userStatusRepository.save(new UserStatus(user.getId()))
                 );
 
-        return new AuthLoginResponseDto(
-                user.getId(),
-                user.getUsername()
-        );
+        return user;
+    }
+
+    @Override
+    public void logout(UUID userId) {
+        if(userId == null) {
+            throw new IllegalArgumentException("Invalid request");
+        }
+
+        userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user id."));
+
+        userStatusRepository.findByUserId(userId).ifPresent(status -> {
+            Instant past = Instant.now().minus(Duration.ofMinutes(10));
+            status.setLastReadAt(past);
+            userStatusRepository.save(status);
+        } );
+
     }
 }

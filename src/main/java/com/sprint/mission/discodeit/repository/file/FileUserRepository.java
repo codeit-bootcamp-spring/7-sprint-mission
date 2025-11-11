@@ -113,13 +113,4 @@ public class FileUserRepository implements UserRepository {
                 .filter(u -> u.getEmail().trim().toLowerCase().equals(e))
                 .findFirst();
     }
-
-    @Override
-    public List<User> findByState(UserState state) {
-        Objects.requireNonNull(state, "UserState cannot be null");
-        return cache.values()
-                .stream()
-                .filter(u-> u.getUserState() == state)
-                .toList();
-    }
 }

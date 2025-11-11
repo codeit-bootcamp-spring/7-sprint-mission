@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.util.HashMap;
@@ -41,7 +40,6 @@ public class Channel extends BaseEntity {
     private final boolean privateChannel; // true: PRIVATE, false: PUBLIC
    // private UUID ownerId; // 추후 채널 삭제/멤버 강퇴 등 권한적인 내용 사용시 사용
 
-   @Builder
     public Channel(ChannelType type, String channelName, boolean privateChannel, int slowModeSeconds, String channelDescription) {
        this.channelName = channelName;
        if(type == null) { throw new IllegalArgumentException("type cannot be null"); }

@@ -13,6 +13,5 @@ public interface UserRepository {
     boolean deleteById(UUID id);
     List<User> findByName(String username);
     Optional<User> findByEmail(String email);
-    List<User> findByState(UserState state);
 }
 

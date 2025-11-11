@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.readstatus.ReadStatusUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.response.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -23,14 +22,14 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatusResponseDto create(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
+    public ReadStatus create(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
         UUID userId = Objects.requireNonNull(readStatusCreateRequestDto.userId());
         UUID channelId = Objects.requireNonNull(readStatusCreateRequestDto.channelId());
 
         userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
         Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException("Channel not found"));
 
-        if(channel.isPrivateChannel() && !channel.getMembers().containsKey(userId)) {
+        if(!channel.getMembers().containsKey(userId)) {
             throw new NoSuchElementException("Channel is private");
         }
 
@@ -41,51 +40,24 @@ public class BasicReadStatusService implements ReadStatusService {
         Instant readAt = readStatusCreateRequestDto.lastReadAt() != null
                 ? readStatusCreateRequestDto.lastReadAt() :  Instant.now();
 
-        ReadStatus readStatus = readStatusRepository.save(
-                ReadStatus.builder()
-                        .userId(userId)
-                        .channelId(channelId)
-                        .lastReadAt(readAt)
-                        .build()
-        );
+        ReadStatus readstatus = new ReadStatus(userId, channelId, readAt);
 
-        return new ReadStatusResponseDto(
-                readStatus.getId(),
-                readStatus.getUserId(),
-                readStatus.getChannelId(),
-                readStatus.getLastReadAt()
-        );
+        return readStatusRepository.save(readstatus);
     }
 
     @Override
-    public ReadStatusResponseDto get(UUID id) {
-        ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new RuntimeException("ReadStatus not found"));
-        return new ReadStatusResponseDto(
-                readStatus.getId(),
-                readStatus.getUserId(),
-                readStatus.getChannelId(),
-                readStatus.getLastReadAt()
-        );
+    public ReadStatus get(UUID id) {
+        return readStatusRepository.findById(Objects.requireNonNull(id))
+                .orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
     }
 
     @Override
-    public List<ReadStatusResponseDto> getAllByUserId(UUID userId) {
-        userRepository.findById(Objects.requireNonNull(userId))
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
-        return readStatusRepository.findAllByUserId(userId)
-                .stream()
-                .map(status -> new ReadStatusResponseDto(
-                        status.getId(),
-                        status.getUserId(),
-                        status.getChannelId(),
-                        status.getLastReadAt()
-                ))
-                .toList();
+    public List<ReadStatus> getAllByUserId(UUID userId) {
+        return readStatusRepository.findAllByUserId(Objects.requireNonNull(userId));
     }
 
     @Override
-    public ReadStatusResponseDto update(ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
+    public ReadStatus update(ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
         ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(readStatusUpdateRequestDto
                 .id())).orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
 
@@ -95,14 +67,7 @@ public class BasicReadStatusService implements ReadStatusService {
             }
         }
 
-        ReadStatus save = readStatusRepository.save(readStatus);
-
-        return new ReadStatusResponseDto(
-                save.getId(),
-                save.getUserId(),
-                save.getChannelId(),
-                save.getLastReadAt()
-        );
+        return readStatusRepository.save(readStatus);
     }
 
     @Override
