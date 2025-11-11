@@ -59,14 +59,13 @@ public class UserController {
             path = "/update"
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<User> update(
+            @RequestParam("userId") UUID userId,
             @RequestPart("userCreateRequest") UserUpdateRequest request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
 
         Optional<BinaryContentCreateRequest> optionalProfile = Optional.ofNullable(profile)
                 .flatMap(this::resolveProfileRequest);
-
-
 
 
         User update = userService.update(request, optionalProfile);
@@ -77,17 +76,20 @@ public class UserController {
 
     // [삭제]
 
-    @RequestMapping(path = "/delete", method = RequestMethod.DELETE)
-    public void delete(@RequestBody UserDeleteRequest req) { userService.delete(req.userId()); }
+    @RequestMapping(path = "/delete")
+    public void delete(@RequestParam("userId") UUID userId) {
+        userService.delete(userId);
+    }
 
 
 
     // [전체 조회]
 
-    @RequestMapping(path = "/findAll", method = RequestMethod.GET)
+    @RequestMapping(path = "/findAll")
     public ResponseEntity<List<UserDto>> findAll() {
-
-       return ResponseEntity.ok(userService.findAll());
+   return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userService.findAll());
     }
 
     @RequestMapping(path = "updateUserStatusByUserId")

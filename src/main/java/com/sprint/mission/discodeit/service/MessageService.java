@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-    MessageResponse create(CreateMessageRequest request,List<BinaryContentCreateRequest> binaryContentCreateRequests);
-    MessageResponse find(UUID messageId);
-    List<MessageResponse> findAllByChannelId(FindAllByChannelIdMessageRequest channelId);
-    MessageResponse update(UpdateMessageRequest request);
-    void delete(DeleteMessageRequest messageId);
+    Message create(CreateMessageRequest request,List<BinaryContentCreateRequest> binaryContentCreateRequests);
+    Message find(UUID messageId);
+    List<Message> findAllByChannelId(UUID channelId);
+    Message update(UUID messageId,UpdateMessageRequest request);
+    void delete(UUID messageId);
 }

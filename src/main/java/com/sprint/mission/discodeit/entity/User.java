@@ -10,71 +10,50 @@ import java.util.UUID;
 
 @Getter
 
-public class User extends Common implements Serializable {
+public class User implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
-    private  String username;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String username;
     private String email;
     private String password;
-    private  String userNickname;
-    private UUID profileId;
+    private UUID profileId;     // BinaryContent
 
-
-
-
-
-    public User(String email, String password, String username, UUID profileId)
-    {
-           this.email = email;
-           this.password = password;
-           this.username = username;
-           this.profileId = profileId;
-    }
-
-    public void setProfileId(UUID profileId) {
+    public User(String username, String email, String password, UUID profileId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.username = username;
+        this.email = email;
+        this.password = password;
         this.profileId = profileId;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "아이디 = '" + email + '\'' +
-                ", 비번 = '" + password + '\'' +
-                ", 이름 = '" + username + '\'' +
-                ", 닉네임 = '" + userNickname + '\'' +
-                ", 닉네임 = '" + this.getId() + '\'' +
-                '}';
-    }
-
-
-    //업데이트하면 하난하나 적용해서 트루로체크해
-    //끝가지가면 트루 아니면 false된다
-    public void update(UserUpdateRequest userUpdateRequest) {
+    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
         boolean anyValueUpdated = false;
-        if (userUpdateRequest.username() != null && !userUpdateRequest.username().equals(this.username)) {
-            this.username = userUpdateRequest.username();
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
             anyValueUpdated = true;
         }
-        if (userUpdateRequest.email() != null && !userUpdateRequest.email().equals(this.email)) {
-            this.email = userUpdateRequest.email();
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
             anyValueUpdated = true;
         }
-        if (userUpdateRequest.password() != null && !userUpdateRequest.password().equals(this.password)) {
-            this.password = userUpdateRequest.password();
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
             anyValueUpdated = true;
         }
-        if (userUpdateRequest.userNickname() != null && !userUpdateRequest.userNickname().equals(this.userNickname)) {
-            this.userNickname = userUpdateRequest.userNickname();
+        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
             anyValueUpdated = true;
-        }
-        if (userUpdateRequest.profileImageId() != null && !userUpdateRequest.profileImageId().equals(this.profileId)) {
-            this.profileId = userUpdateRequest.profileImageId();
         }
 
         if (anyValueUpdated) {
-            this.setUpdatedAt(Instant.ofEpochSecond(Instant.now().getEpochSecond()));
+            this.updatedAt = Instant.now();
         }
     }
-
-
 }

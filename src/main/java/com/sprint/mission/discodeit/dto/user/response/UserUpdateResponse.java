@@ -9,7 +9,6 @@ public record UserUpdateResponse(
         String newUsername,          // null이면 변경 안 함
         String newEmail,
         String newPassword,
-        String newNickname,
         UUID newProfileImage
 
 ){
@@ -19,7 +18,6 @@ public record UserUpdateResponse(
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
-                user.getUserNickname(),
                 user.getProfileId()
         );
     }

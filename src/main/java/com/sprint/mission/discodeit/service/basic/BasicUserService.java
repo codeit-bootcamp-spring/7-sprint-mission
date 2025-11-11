@@ -48,7 +48,7 @@ public class BasicUserService implements UserService {
      }
      //닉네임매칭
      if(userRepository.findAll().stream()
-                .anyMatch(user -> user.getUserNickname().equals(userCreateRequest.username()))){
+                .anyMatch(user -> user.getUsername().equals(userCreateRequest.username()))){
          throw new IllegalArgumentException("이름 이미 존재합니다");
      }
 
@@ -97,30 +97,28 @@ public class BasicUserService implements UserService {
 
     @Override
     public User update(UserUpdateRequest userUpdateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-        //id있는지확인
-        User user = userRepository.findById(userUpdateRequest.userId())
-                .orElseThrow(()->new NoSuchElementException("유저uuid못찾아용"+userUpdateRequest.userId()));
 
         //이메일매칭
         if(userRepository.findAll().stream()
-                .anyMatch(u -> u.getEmail().equals(userUpdateRequest.email()))){
+                .anyMatch(u -> u.getEmail().equals(userUpdateRequest.newEmail()))){
             throw new IllegalArgumentException("이메일이 이미 존재합니다");
         }
-        //닉네임매칭
+        //네임매칭
         if(userRepository.findAll().stream()
-                .anyMatch(u -> u.getUserNickname().equals(userUpdateRequest.username()))){
+                .anyMatch(u -> u.getUsername().equals(userUpdateRequest.newUsername()))){
             throw new IllegalArgumentException("이름 이미 존재합니다");
         }
 
 
-        UUID uuid = profileId(optionalProfileCreateRequest);
 
-        //저장용
-          user.setProfileId(uuid);
-         user.update(userUpdateRequest);//업데이트했으니 갱신해야지
-          userRepository.save(user);
+        UUID uuid = profileId(optionalProfileCreateRequest);
+        User user = new User(userUpdateRequest.newUsername(),userUpdateRequest.newEmail(), userUpdateRequest.newPassword(), uuid);
+
+        Instant now = Instant.now();
+        UserStatus userStatus = new UserStatus(user.getId(), now);
+
           //폼으로 바로넣고주자
-        return user;
+        return userRepository.save(user);
     }
 
     @Override

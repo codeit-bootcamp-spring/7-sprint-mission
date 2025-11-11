@@ -31,7 +31,7 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public MessageResponse create(CreateMessageRequest request,List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+    public Message create(CreateMessageRequest request,List<BinaryContentCreateRequest> binaryContentCreateRequests) {
         //둘의 uuid가 존재유무판단
         System.out.println(request.channelId());
         if (!channelRepository.existsById(request.channelId())) {
@@ -44,9 +44,10 @@ public class BasicMessageService implements MessageService {
         List<UUID> attachmentIds = binaryContentCreateRequests.stream()
                 .map(attachmentRequest -> {
 
-                    byte[] bytes = attachmentRequest.contentByte();
+                    byte[] bytes = attachmentRequest.bytes();
 
-                    BinaryContent binaryContent = new BinaryContent(ContentsType.MESSAGE_ATTACHMENT, attachmentRequest.contentByte(),"null");
+                    BinaryContent binaryContent =
+                            new BinaryContent(attachmentRequest.fileName(),(long)bytes.length,attachmentRequest.contentType(),bytes);
                     BinaryContent createdBinaryContent = binaryRepository.save(binaryContent);
                     return createdBinaryContent.getId();
                 })
@@ -59,48 +60,47 @@ public class BasicMessageService implements MessageService {
                 attachmentIds
         );
 
-            return MessageResponse.from(messageRepository.save(message));
+            return messageRepository.save(message);
     }
 
     @Override
-    public MessageResponse find(UUID messageId) {
-        Message message = messageRepository
+    public Message find(UUID messageId) {
+        return messageRepository
                 .findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("메시지UUID가 없어:" + messageId));
-        return MessageResponse.from(message);
+
     }
 
     @Override
-    public List<MessageResponse> findAllByChannelId(FindAllByChannelIdMessageRequest request) {
+    public List<Message> findAllByChannelId(UUID channelId) {
         return messageRepository.findAll().stream()
-                .filter(message -> message.getChannelId().equals(request.channelId()))
-                .map(MessageResponse::from)
+                .filter(message -> message.getChannelId().equals(channelId))
                 .toList();
 
     }
 
     @Override
-    public MessageResponse update(UpdateMessageRequest request) {
-        Message message = messageRepository.findById(request.messageId())
-                .orElseThrow(() -> new NoSuchElementException("매시지아이디가 없어 " + request.messageId()));
+    public Message update(UUID messageId, UpdateMessageRequest request) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("매시지아이디가 없어 " + messageId));
         message.update(request.newContent());
-        Message updateMessage = messageRepository.save(message);
-        return MessageResponse.from(updateMessage);
+
+        return  messageRepository.save(message);
     } 
 
     @Override
-    public void delete(DeleteMessageRequest request) {
-        if (!messageRepository.existsById(request.messageId())) {
-            throw new NoSuchElementException("메시지 아이디가 없어" + request.messageId());
+    public void delete(UUID messageId) {
+        if (!messageRepository.existsById(messageId)) {
+            throw new NoSuchElementException("메시지 아이디가 없어" + messageId);
         }
         List<UUID> attachmentIds = messageRepository
-                .findById(request.messageId())
-                .orElseThrow(() -> new NoSuchElementException("메시지UUID가 없어:" + request.messageId()))
+                .findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("메시지UUID가 없어:" + messageId))
                 .getAttachmentIds();
 
         if(attachmentIds != null){
             attachmentIds.forEach(binaryRepository::delete);
         }
-        messageRepository.deleteById(request.messageId());
+        messageRepository.deleteById(messageId);
     }
 }

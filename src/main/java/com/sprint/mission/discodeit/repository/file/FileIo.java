@@ -7,10 +7,10 @@ import java.util.*;
 
 public class FileIo {
 
-    public static <T extends Common & Serializable> void save (String folder, T type)
+    public static <T extends  Serializable> void save (String folder, T type)
     {
         //파일명 ->아래에 폴더명 아래에 UUID 객체저장
-        String path = Path.RooT_PATH.getPath()+"/"+folder+"/"+type.getId()+".sav";
+        String path = Path.RooT_PATH.getPath()+"/"+folder+"/"+type.getClass().getSimpleName()+".sav";
 
         //혹시나 저장폴더가 없으면 생성한다
         File file = new File(path);
@@ -29,7 +29,7 @@ public class FileIo {
     }
 
 
-    public static <T extends Common & Serializable> Optional<T> read(String folder, UUID uuid, Class<T> clazz) {
+    public static <T extends Serializable> Optional<T> read(String folder, UUID uuid, Class<T> clazz) {
         String path = Path.RooT_PATH.getPath() + "/" + folder + "/" + uuid + ".sav";
         System.out.println(path);
         File file = new File(path);
@@ -60,7 +60,7 @@ public class FileIo {
         }
     }
 
-    public static <T extends Common & Serializable> List<T> readAll(String folder, Class<T> clazz) {
+    public static <T extends Serializable> List<T> readAll(String folder, Class<T> clazz) {
         String dirPath = Path.RooT_PATH.getPath() + "/" + folder;
         File dir = new File(dirPath);
 

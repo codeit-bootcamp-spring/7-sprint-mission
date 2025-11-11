@@ -15,7 +15,7 @@ public record ChannelCreatePublicResponse(
 
                 channel.getId(),
                 channel.getType(),
-                channel.getChannelName()
+                channel.getName()
         );
     }
 
