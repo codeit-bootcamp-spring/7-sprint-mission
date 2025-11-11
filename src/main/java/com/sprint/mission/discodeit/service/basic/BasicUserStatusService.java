@@ -61,14 +61,13 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResponseDto updateByUserId(UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
-        UUID userId = Objects.requireNonNull(userStatusUpdateByUserIdRequestDto.userId());
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+    public UserStatusResponseDto updateByUserId(UUID userId, UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
+        UserStatus userStatus = userStatusRepository.findByUserId(Objects.requireNonNull(userId))
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
 
-        if(userStatusUpdateByUserIdRequestDto.lastReadAt() != null
-                && (userStatus.getLastReadAt() == null || userStatusUpdateByUserIdRequestDto.lastReadAt().isAfter(userStatus.getLastReadAt()))) {
-            userStatus.setLastReadAt(userStatusUpdateByUserIdRequestDto.lastReadAt());
+        if(userStatusUpdateByUserIdRequestDto.newLastActiveAt() != null
+                && (userStatusUpdateByUserIdRequestDto.newLastActiveAt().isAfter(Objects.requireNonNull(userStatus.getLastReadAt())))) {
+            userStatus.setLastReadAt(userStatusUpdateByUserIdRequestDto.newLastActiveAt());
         }
         UserStatus save = userStatusRepository.save(userStatus);
 

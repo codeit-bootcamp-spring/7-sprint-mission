@@ -3,12 +3,15 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateByUserIdRequestDto;
 import com.sprint.mission.discodeit.dto.response.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.response.userstatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
@@ -26,6 +30,7 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final BinaryContentService binaryContentService;
+    private final UserStatusService userStatusService;
 
     // 사용자 등록
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -71,6 +76,9 @@ public class UserController {
 
             if(profileId != null){
                 boolean delete = binaryContentService.delete(profileId);
+                if(!delete){
+                    throw new NoSuchElementException("BinaryContent not found");
+                }
             }
 
             profileId = newProfileId;
@@ -105,5 +113,13 @@ public class UserController {
         List<UserResponseDto> all = userService.getAll();
 
         return ResponseEntity.ok(all);
+    }
+
+    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
+    public UserStatusResponseDto updateUserStatusByUserId(
+            @PathVariable("userId") UUID userId,
+            @Valid @RequestBody UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto
+    ) {
+        return userStatusService.updateByUserId(userId, userStatusUpdateByUserIdRequestDto);
     }
 }

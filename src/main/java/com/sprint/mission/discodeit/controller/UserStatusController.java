@@ -33,10 +33,11 @@ public class UserStatusController {
         return userStatusService.update(userStatusUpdateRequestDto);
     }
 
-    @RequestMapping(value = "/by-user-id", method = RequestMethod.PUT)
+    @RequestMapping(value = "/by-user-id/{userId}", method = RequestMethod.PUT)
     public UserStatusResponseDto updateByUserId(
-            @Valid @RequestBody UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
-        return userStatusService.updateByUserId(userStatusUpdateByUserIdRequestDto);
+            @Valid @RequestBody UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto,
+            @PathVariable UUID userId) {
+        return userStatusService.updateByUserId(userId, userStatusUpdateByUserIdRequestDto);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
