@@ -1,26 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import lombok.Getter;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ReadStatus extends BasicEntity{
+public class ReadStatus extends BasicEntity implements Serializable {
 
-    private final UUID userId; //유저 ID
-    private final UUID channelId; //채널 ID
-    private Instant lastReadAt; // 마지막 읽은 시간
+  private static final long serialVersionUID = 1L;
 
-    public ReadStatus(UUID userId, UUID channelId){
-        super();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.lastReadAt = Instant.now();
-    }
+  private final UUID userId; //유저 ID
+  private final UUID channelId; //채널 ID
+  private Instant lastReadAt; // 마지막 읽은 시간
 
-    // 업데이트하기
-    public void updateReadTime(){
-        this.lastReadAt = Instant.now();
-    }
+  public ReadStatus(UUID userId, UUID channelId) {
+    super();
+    this.userId = userId;
+    this.channelId = channelId;
+    this.lastReadAt = Instant.now();
+  }
+
+  // 업데이트하기
+  public void updateReadTime() {
+    this.lastReadAt = Instant.now();
+  }
 }
