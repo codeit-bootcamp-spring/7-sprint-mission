@@ -40,7 +40,7 @@ public class BasicMessageService implements MessageService {
         //todo channel id 랑 sender id 관련 안전성 확인, 일단 지금은 안함
         List<Channel> channelList = channelRepository.getAllChannel();
         Channel channel2 = channelRepository.getChannelById(messageCreateRequestDto.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
-        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(messageCreateRequestDto.getAuthorId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
+//        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(messageCreateRequestDto.getAuthorId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
         Message message;
         if(!attachments.isEmpty()) {
             System.out.println("attachment list");

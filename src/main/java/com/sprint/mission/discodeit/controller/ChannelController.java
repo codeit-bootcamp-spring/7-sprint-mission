@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ApiResponseDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateRequestDto;
-import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.ChannelReadResponseDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -19,36 +17,53 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
-public class ChannelController {
+public class ChannelController implements ChannelControllerDocs{
 
     private final ChannelService channelService;
     private final ReadStatusService readStatusService;
 
-    @RequestMapping(value = "/private",method = RequestMethod.POST)
+    @RequestMapping(value = "/private", method = RequestMethod.POST)
+    @Override
     public ResponseEntity<ChannelReadResponseDto> createPrivateChannel(@RequestBody ChannelPrivateCreateRequestDto dto){
        ;
         return new ResponseEntity<>(channelService.createPrivateChannel(dto), HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/public", method = RequestMethod.POST)
+    @Override
     public ResponseEntity<ChannelReadResponseDto> createPublicChannel(@RequestBody ChannelPublicCreateRequestDto dto){
        return new ResponseEntity<>(channelService.createPublicChannel(dto), HttpStatus.CREATED);
     }
 
 
-
-    @RequestMapping(value = "/{channelId}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
+    @Override
     public void deleteChannel(@PathVariable UUID channelId){
         channelService.deleteChannel(channelId);
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
+    @Override
     public ResponseEntity<List<ChannelReadResponseDto>> readChannelById(@RequestParam UUID userId){
         return new ResponseEntity<>(channelService.findAllByUserId(userId),HttpStatus.OK);
     }
-    @RequestMapping(value = "/{channelId}",method = RequestMethod.PATCH)
-    public ResponseEntity<ChannelReadResponseDto> patchChannel(@PathVariable UUID channelId, @RequestParam ChannelPatchRequestDto dto){
+
+    @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
+    @Override
+    public ResponseEntity<ChannelReadResponseDto> patchChannel(@PathVariable UUID channelId, @RequestBody ChannelPatchRequestDto dto){
         return new ResponseEntity<>(channelService.patchChannel(dto,channelId),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/reset", method = RequestMethod.GET)
+    @Override
+    public void reset(){
+        channelService.resetChannelRepository();
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.OPTIONS)
+    @Override
+    public ResponseEntity<List<ChannelReadResponseDto>> readAll(){
+        return new ResponseEntity<>(channelService.readAllChannel(),HttpStatus.OK);
     }
 
 /// //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,10 +77,7 @@ public class ChannelController {
 //        channelService.updateChannel(dto);
 //    }
 //
-//    @RequestMapping("/reset")
-//    public void reset(){
-//        channelService.resetChannelRepository();
-//    }
+
 //
 //    @RequestMapping("/readAll")
 //    public ResponseEntity<List<ApiResponseDto<ChannelReadResponseDto>>> readAll(){

@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ApiResponseDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
-import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.MessageReadResponseDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -49,6 +47,16 @@ public class MessageController {
         return new ResponseEntity<>(  messageService.findallByChannelId(channelId), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/reset",method = RequestMethod.GET)
+    public void reset(){
+        messageService.resetMessage();
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.OPTIONS)
+    public ResponseEntity<List<MessageReadResponseDto>> readAll(){
+        return new ResponseEntity<>(messageService.readAllMessage(), HttpStatus.OK);
+    }
+
 ///  ////////////////////////////////////////////////////////////////////
 
 //    @RequestMapping(value = "update", method = RequestMethod.POST)
@@ -62,15 +70,8 @@ public class MessageController {
 //        List<ApiResponseDto<MessageReadResponseDto>> apiResponseDtoList = messageService.readAllMessageByUserId(userId).stream().map(ApiResponseDto::success).toList();
 //        return new ResponseEntity<List<ApiResponseDto<MessageReadResponseDto>>>(apiResponseDtoList, HttpStatus.OK );
 //    }
-//    @RequestMapping("/reset")
-//    public void reset(){
-//        messageService.resetMessage();
-//    }
+
 //
-//    @RequestMapping("/readAll")
-//    public ResponseEntity<List<ApiResponseDto<MessageReadResponseDto>>> readAll(){
-//        List<ApiResponseDto<MessageReadResponseDto>> apiResponseDtoList = messageService.readAllMessage().stream().map(ApiResponseDto::success).toList();
-//        return new ResponseEntity<List<ApiResponseDto<MessageReadResponseDto>>>(apiResponseDtoList, HttpStatus.OK);
-//    }
+
 
 }

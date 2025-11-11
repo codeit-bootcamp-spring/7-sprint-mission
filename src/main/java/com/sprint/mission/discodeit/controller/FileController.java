@@ -26,9 +26,17 @@ public class FileController {
     public ResponseEntity<List<BinaryContentResponseDto>> readByIdList(@RequestParam List<UUID> binaryContentIds){
         return new ResponseEntity<>(binaryContentService.findAllByIdIn(binaryContentIds), HttpStatus.OK);
     }
+
+    @RequestMapping(value = "",method = RequestMethod.OPTIONS)
+    public ResponseEntity<List<BinaryContent>> readAll(){
+        return new ResponseEntity<>(binaryContentService.findAll(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/reset", method = RequestMethod.GET)
+    public void reset(){
+        binaryContentService.resetBinaryContentService();
+    }
+
 /// /////////////////////////////////////////////////////////////////////////////////////////////////////
-//    @RequestMapping("/reset")
-//    public void reset(){
-//        binaryContentService.resetBinaryContentService();
-//    }
+
 }

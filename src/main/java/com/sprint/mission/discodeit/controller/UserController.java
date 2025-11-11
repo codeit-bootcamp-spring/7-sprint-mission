@@ -2,11 +2,11 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.userStatus.UserStatusPatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.UserCreateResponseDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.dto.response.UserUserStatusPatchResponseDto;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -43,18 +43,13 @@ public class UserController {
 
 
 
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public <T>void update(@RequestBody UserUpdateRequestDto<T> dto){
-        userService.updateUser(dto);
-    }
-
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
     public void delete(@PathVariable UUID userId){
         userService.deleteUser(userId);
     }
 
     @RequestMapping(value = "",method = RequestMethod.GET)
-    public ResponseEntity<List<UserDto>> read(){
+    public ResponseEntity<List<UserDto>> readAll(){
        ;
         return new ResponseEntity<>( userService.advanceFindAllUser(),HttpStatus.OK);
     }
@@ -84,13 +79,24 @@ public class UserController {
 //    public void updateOnline(@RequestParam UUID userId){
 //        userService.updateUserOnlineStatus(userId);
 //    }
-//    @RequestMapping("/reset")
-//    public void reset(){
-//        userService.resetUserRepository();
+    @RequestMapping(value = "/reset",method = RequestMethod.GET)
+    public void reset(){
+        userService.resetUserRepository();
+    }
+
+    @RequestMapping(value = "/userStatus",method = RequestMethod.GET)
+    public ResponseEntity<List<UserStatus>> readAllUserStatus(){
+        return new ResponseEntity<>(userStatusService.findAll(),HttpStatus.OK);
+    }
+
+
+//
+//    @RequestMapping(value = "/update", method = RequestMethod.POST)
+//    public <T>void update(@RequestBody UserUpdateRequestDto<T> dto){
+//        userService.updateUser(dto);
 //    }
 //
-
-
+//
 
 
 
