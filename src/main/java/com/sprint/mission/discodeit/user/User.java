@@ -130,6 +130,16 @@ public class User extends BaseEntity<UUID> {
         super.updateTimestamp();
     }
 
+    public void changeUserName(String newUserName){
+        if(newUserName == null || newUserName.isBlank()){
+            throw new IllegalArgumentException("사용자 아이디를 확인 할 수 없습니다.");
+        }
+        if(newUserName.length()<6){
+            throw new IllegalArgumentException("아이디는 최소한 6자 이상이여야합니다.");
+        }
+        this.username = newUserName;
+        super.updateTimestamp();
+    }
 
     @Override
     public String toString() {

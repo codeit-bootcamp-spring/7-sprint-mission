@@ -19,7 +19,7 @@ public class BinaryContentServiceImpl extends BaseServiceImpl<BinaryContent, UUI
     }
 
     @Override
-    public BinaryContentResponseDTO uploadFile(UUID ownerId, ContentOwner owner, MultipartFile file) throws IOException {
+    public BinaryContentResponse uploadFile(UUID ownerId, ContentOwner owner, MultipartFile file) throws IOException {
         if(file.isEmpty()){
             throw new IllegalArgumentException("파일이 비어있습니다.");
         }
@@ -38,7 +38,7 @@ public class BinaryContentServiceImpl extends BaseServiceImpl<BinaryContent, UUI
             file.transferTo(fullStoragePath);
 
             content.updateStoragePath(fullStoragePath.toString());
-            return BinaryContentResponseDTO.from(save(content));
+            return BinaryContentResponse.from(save(content));
         } catch (IOException e){
             throw new IOException("파일 저장에 실패했습니다.",e);
         }
@@ -46,13 +46,13 @@ public class BinaryContentServiceImpl extends BaseServiceImpl<BinaryContent, UUI
     }
 
     @Override
-    public List<BinaryContentResponseDTO> findAllByOwnerId(UUID ownerId) {
-        return repository.findAllByOwnerId(ownerId).stream().map(BinaryContentResponseDTO::from).toList();
+    public List<BinaryContentResponse> findAllByOwnerId(UUID ownerId) {
+        return repository.findAllByOwnerId(ownerId).stream().map(BinaryContentResponse::from).toList();
     }
 
     @Override
-    public List<BinaryContentResponseDTO> findAllByFilePath(String filePath) {
-        return repository.findAllByFilePath(filePath).stream().map(BinaryContentResponseDTO::from).toList();
+    public List<BinaryContentResponse> findAllByFilePath(String filePath) {
+        return repository.findAllByFilePath(filePath).stream().map(BinaryContentResponse::from).toList();
     }
 
     @Override

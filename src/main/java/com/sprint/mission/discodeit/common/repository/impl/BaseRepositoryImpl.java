@@ -150,7 +150,7 @@ public abstract class BaseRepositoryImpl<T extends Identifiable<ID> & Deletable,
         idsToDelete.forEach(dataMap::remove);
     }
 
-    // BaseRepositoryImpl 클래스 내부에 아래 두 메서드를 추가합니다.
+    @Override
     public void loadDataMap(Map<ID, T> dataMap) {
         this.dataMap.clear();
         this.dataMap.putAll(dataMap);

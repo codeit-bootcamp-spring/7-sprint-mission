@@ -7,20 +7,20 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserStatusService extends BaseService<UserStatus, UUID> {
-    UserStatusDTO create(UUID userId);
+    UserStatusResponseDTO create(UUID userId);
 
-    UserStatusDTO toAway(UUID userId);
-    UserStatusDTO toOffline(UUID userId);
-    UserStatusDTO toOnline(UUID userId);
-    UserStatusDTO toDoNotDisturb(UUID userId, String message);
+    UserStatusResponseDTO toAway(UUID userId);
+    UserStatusResponseDTO toOffline(UUID userId);
+    UserStatusResponseDTO toOnline(UUID userId);
+    UserStatusResponseDTO toDoNotDisturb(UUID userId, String message);
 
-    UserStatusDTO findByUserId(UUID userId);
+    UserStatusResponseDTO findByUserId(UUID userId);
 
     boolean existsByUserId(UUID userId);
 
     void deleteByUserId(UUID userId);
 
-    List<UserStatusDTO> findAllByState(Status currentStatus);
+    List<UserStatusResponseDTO> findAllByState(Status currentStatus);
 
 
 }

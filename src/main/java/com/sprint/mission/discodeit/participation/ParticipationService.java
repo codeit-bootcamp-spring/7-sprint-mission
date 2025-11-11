@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface ParticipationService extends BaseService<Participation, ParticipationDualKey> {
 
 
-    ParticipationResponseDTO joinChannel(ParticipationRequestDTO requestDTO);
+    ParticipationResponseDTO joinChannel(ParticipationRequestDTO requestDTO, UUID userId);
 
     ParticipationResponseDTO setReadAt(UUID channelId, UUID userId);
 

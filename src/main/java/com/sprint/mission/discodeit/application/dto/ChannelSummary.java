@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.config.enums.ChannelType;
 import java.time.Instant;
 import java.util.UUID;
 
-public record ChannelSummaryDTO(
+public record ChannelSummary(
         UUID channelId,
         String channelName,
         ChannelType channelType,
@@ -15,8 +15,8 @@ public record ChannelSummaryDTO(
         boolean isPrivate
 
 ) {
-    public static ChannelSummaryDTO from(ChannelResponseDTO channel,int unreadMessageCount) {
-        return new ChannelSummaryDTO(
+    public static ChannelSummary from(ChannelResponseDTO channel, int unreadMessageCount) {
+        return new ChannelSummary(
                 channel.id(),
                 channel.channelName(),
                 channel.channelType(),

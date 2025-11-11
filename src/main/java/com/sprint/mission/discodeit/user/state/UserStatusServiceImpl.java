@@ -2,8 +2,6 @@ package com.sprint.mission.discodeit.user.state;
 
 import com.sprint.mission.discodeit.common.service.impl.BaseServiceImpl;
 import com.sprint.mission.discodeit.config.enums.Status;
-import com.sprint.mission.discodeit.config.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.user.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,41 +16,41 @@ public class UserStatusServiceImpl extends BaseServiceImpl<UserStatus, UUID, Use
     }
 
     @Override
-    public UserStatusDTO create(UUID userId) {
-        return UserStatusDTO.fromEntity(save(UserStatus.create(userId)));
+    public UserStatusResponseDTO create(UUID userId) {
+        return UserStatusResponseDTO.fromEntity(save(UserStatus.create(userId)));
     }
 
     @Override
-    public UserStatusDTO toAway(UUID userId) {
+    public UserStatusResponseDTO toAway(UUID userId) {
         UserStatus status = findByUserIdHelper(userId);
         status.setAway();
-        return UserStatusDTO.fromEntity(save(status));
+        return UserStatusResponseDTO.fromEntity(save(status));
     }
 
     @Override
-    public UserStatusDTO toOffline(UUID userId) {
+    public UserStatusResponseDTO toOffline(UUID userId) {
         UserStatus status = findByUserIdHelper(userId);
         status.setOffline();
-        return UserStatusDTO.fromEntity(save(status));
+        return UserStatusResponseDTO.fromEntity(save(status));
     }
 
     @Override
-    public UserStatusDTO toOnline(UUID userId) {
+    public UserStatusResponseDTO toOnline(UUID userId) {
         UserStatus status = findByUserIdHelper(userId);
         status.setOnline();
-        return UserStatusDTO.fromEntity(save(status));
+        return UserStatusResponseDTO.fromEntity(save(status));
     }
 
     @Override
-    public UserStatusDTO toDoNotDisturb(UUID userId, String message) {
+    public UserStatusResponseDTO toDoNotDisturb(UUID userId, String message) {
         UserStatus status = findByUserIdHelper(userId);
         status.setDoNotDisturb(message);
-        return UserStatusDTO.fromEntity(save(status));
+        return UserStatusResponseDTO.fromEntity(save(status));
     }
 
     @Override
-    public UserStatusDTO findByUserId(UUID userId) {
-        return UserStatusDTO.fromEntity(findByUserIdHelper(userId));
+    public UserStatusResponseDTO findByUserId(UUID userId) {
+        return UserStatusResponseDTO.fromEntity(findByUserIdHelper(userId));
     }
 
     private UserStatus findByUserIdHelper(UUID userId) {
@@ -71,9 +69,9 @@ public class UserStatusServiceImpl extends BaseServiceImpl<UserStatus, UUID, Use
     }
 
     @Override
-    public List<UserStatusDTO> findAllByState(Status currentStatus) {
+    public List<UserStatusResponseDTO> findAllByState(Status currentStatus) {
         return repository.findAllByState(currentStatus).stream()
-                .map(UserStatusDTO::fromEntity)
+                .map(UserStatusResponseDTO::fromEntity)
                 .toList();
     }
 }

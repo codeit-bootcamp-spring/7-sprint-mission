@@ -71,6 +71,14 @@ public class UserServiceImpl extends BaseServiceImpl<User, UUID, UserRepository>
     }
 
     @Override
+    public UserResponseDTO changeUserName(UUID userId, String newUserName) {
+        User user = findByIdNonDel(userId);
+        user.changeUserName(newUserName);
+        save(user);
+        return UserResponseDTO.fromEntity(user);
+    }
+
+    @Override
     public void changePassword(UUID userId, String newPassword) {
         User user = findByIdNonDel(userId);
         user.changePassword(newPassword);

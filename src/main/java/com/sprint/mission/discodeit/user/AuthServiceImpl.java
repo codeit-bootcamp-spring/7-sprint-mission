@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.user;
 
-import com.sprint.mission.discodeit.channel.ChannelService;
-import com.sprint.mission.discodeit.message.channel.ChannelMessageService;
-import com.sprint.mission.discodeit.message.direct.DirectMessageService;
-import com.sprint.mission.discodeit.participation.ParticipationService;
 import com.sprint.mission.discodeit.user.dto.AuthUserDTO;
+import com.sprint.mission.discodeit.user.dto.LoginRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +15,9 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public AuthUserDTO login(String username, String password) {
+    public AuthUserDTO login(LoginRequestDTO request) {
+        String username = request.username();
+        String password = request.password();
         User user = userRepository.findByUsername(username).orElseThrow(
                 ()->new NoSuchElementException("사용자를 찾을 수 없습니다."));
 

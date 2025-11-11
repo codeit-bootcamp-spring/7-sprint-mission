@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.common.repository;
 
 import com.sprint.mission.discodeit.common.utils.Deletable;
 import com.sprint.mission.discodeit.common.utils.Identifiable;
+import com.sprint.mission.discodeit.config.enums.DataKey;
 
 import java.util.List;
 import java.util.Map;
@@ -141,4 +142,6 @@ public interface BaseRepository<T extends Identifiable<ID> & Deletable, ID> {
      * @return 현재 데이터 맵
      */
     Map<ID, T> getDataMap();
+
+    DataKey getDataKey();
 }

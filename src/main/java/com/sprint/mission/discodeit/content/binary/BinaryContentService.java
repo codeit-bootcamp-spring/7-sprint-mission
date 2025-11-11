@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface BinaryContentService extends BaseService<BinaryContent, UUID> {
-    BinaryContentResponseDTO uploadFile(UUID ownerId, ContentOwner owner, MultipartFile multipartFile) throws IOException;
+    BinaryContentResponse uploadFile(UUID ownerId, ContentOwner owner, MultipartFile multipartFile) throws IOException;
 
-    List<BinaryContentResponseDTO> findAllByOwnerId(UUID ownerId);
-    List<BinaryContentResponseDTO> findAllByFilePath(String filePath);
+    List<BinaryContentResponse> findAllByOwnerId(UUID ownerId);
+    List<BinaryContentResponse> findAllByFilePath(String filePath);
 
     void deleteAllByOwnerId(UUID ownerId);
 }
