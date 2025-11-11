@@ -1,22 +1,22 @@
 package com.sprint.mission.discodeit.application;
 
 
-
-import com.sprint.mission.discodeit.domain.*;
+import com.sprint.mission.discodeit.application.dto.request.ChannelCreateRequest;
+import com.sprint.mission.discodeit.application.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.application.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.domain.Channel;
+import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.domain.repository.ChannelRepository;
-import com.sprint.mission.discodeit.application.dto.request.ChannelRequestDto;
-import com.sprint.mission.discodeit.application.dto.response.ChannelResponseDto;
-
 import com.sprint.mission.discodeit.domain.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.repository.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
-
-import static com.sprint.mission.discodeit.application.dto.ChannelDtoMapper.channelToResponseDto;
+import java.time.Instant;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 
 @Service
@@ -25,40 +25,24 @@ import static com.sprint.mission.discodeit.application.dto.ChannelDtoMapper.chan
 public class BasicChannelService {
 
     private final ChannelRepository channelRepository;
-    private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
 
 
+    public ChannelResponse createChannel(ChannelCreateRequest request, boolean isPrivate){
 
-    public List<String> getAllMessage(UUID channelId){
+        Channel channel = new Channel(request.name(),request.participantIds(), isPrivate);
+        channelRepository.save(channel);
+        return ChannelResponse.from(channel);
+    }
+
+
+    public ChannelResponse updateChannel(UUID channelId, ChannelUpdateRequest requestDto) {
         Channel channel = getById(channelId);
-        return channel.getHistory().stream()
-                .map(id-> messageRepository.findById(id).orElse(null).getContent())
-                .toList();
-    }
-
-    public List<ChannelResponseDto> findAllByServer(UUID serverId) {
-        return getByServer(serverId)
-                .stream()
-                .map(ChannelDtoMapper::channelToResponseDto)
-                .toList();
-    }
-
-
-    public ChannelResponseDto updateChannel(ChannelRequestDto requestDto) {
-        Channel channel = getById(requestDto.channelId());
-        if (requestDto.channelName()!=null){
-            channel.updateChannelName(requestDto.channelName());
+        if (requestDto.newName() != null) {
+            channel.updateChannelName(requestDto.newName());
         }
         channelRepository.save(channel);
-        return channelToResponseDto(channel);
-    }
-
-
-    public void deleteAllByServer(UUID serverId) {
-        getByServer(serverId)
-                .stream()
-                .forEach(channelRepository::remove);
+        return ChannelResponse.from(channel);
     }
 
 
@@ -68,27 +52,24 @@ public class BasicChannelService {
     }
 
 
-
-    public List<Channel> getByServer(UUID serverId){
-        return channelRepository.findAll()
-                .stream()
-                .filter(c-> c.getServerId().equals(serverId))
-                .toList();
-    }
-
-    public void addChannelMember(UUID channelId,UUID userId){
-        Channel channel = getById( channelId);
-        channel.addChannelMember(userId);
-        channelRepository.save(channel);
-        ReadStatus readStatus = new ReadStatus(userId, channelId);
+    public void addChannelMember(UUID channelId, UUID userId) {
+        ReadStatus readStatus = new ReadStatus(userId,channelId, Instant.now());
         readStatusRepository.save(readStatus);
     }
 
-    private Channel getById(UUID channelId){
-        return channelRepository.findById(channelId).orElseThrow(()->new NoSuchElementException("해당 채널이 없습니다"));
+    public List<ChannelResponse> getAllByUser(UUID userId){
+
+        return getAll().stream()
+                .filter(channel -> channel.getMembers().contains(userId))
+                .map(channel -> ChannelResponse.from(channel))
+                .toList();
     }
 
-    private List<Channel> getAll(UUID channelId){
+    private Channel getById(UUID channelId) {
+        return channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다"));
+    }
+
+    private List<Channel> getAll() {
         return channelRepository.findAll();
     }
 }

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.application;
 
+import com.sprint.mission.discodeit.application.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.application.dto.request.ReadStatusRequest;
 import com.sprint.mission.discodeit.application.dto.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.domain.ReadStatus;
@@ -19,14 +20,17 @@ public class BasicReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
 
-    public void createReadStatus(UUID userId, UUID channelId){
-        ReadStatus readStatus = new ReadStatus(userId, channelId);
+    public ReadStatusResponse createReadStatus(ReadStatusCreateRequest request){
+        ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId(), request.lastReadAt());
         readStatusRepository.save(readStatus);
+        return ReadStatusResponse.from(readStatus);
     }
 
-    public void updateReadStatus(UUID id){
+    public ReadStatusResponse updateReadStatus(UUID id){
         ReadStatus readStatus = getById(id);
         readStatus.read();
+        readStatusRepository.save(readStatus);
+        return ReadStatusResponse.from(readStatus);
     }
 
     public Long getTimeSinceLastRead(UUID id){
@@ -40,18 +44,19 @@ public class BasicReadStatusService {
                 .filter(readStatus -> readStatus.getUserId().equals(request.userId())
                         && readStatus.getChannelId().equals(request.channelId())).findAny().orElseThrow(() -> new NoSuchElementException("해당 메시지 수신 정보가 존재하지 않습니다."));
 
-        return new ReadStatusResponse(readStatus1.getUserId(),readStatus1.getChannelId(),readStatus1.timeSinceLastRead());
+        return ReadStatusResponse.from(readStatus1);
 
     }
 
-    public ReadStatus getById(UUID id){
-        return readStatusRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 메시지 수신 정보가 없습니다."));
-    }
+
 
     public List<ReadStatusResponse> getAllByUserId(UUID id){
         return readStatusRepository.findAll().stream()
                 .filter(rs-> rs.getUserId().equals(id))
-                .map(rs-> new ReadStatusResponse(rs.getUserId(),rs.getChannelId(),rs.timeSinceLastRead()))
+                .map(rs-> ReadStatusResponse.from(rs))
                 .toList();
+    }
+    private ReadStatus getById(UUID id){
+        return readStatusRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 메시지 수신 정보가 없습니다."));
     }
 }

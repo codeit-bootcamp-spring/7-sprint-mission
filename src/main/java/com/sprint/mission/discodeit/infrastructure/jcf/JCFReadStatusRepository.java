@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.domain.repository.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.*;
 
 @Repository
@@ -16,7 +17,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     public JCFReadStatusRepository() {
         UUID userId = UUID.fromString("32121212-1212-1212-1212-121212343434");
         UUID channelId = UUID.fromString("02121212-1212-1212-1212-121212343434");
-        ReadStatus readStatus = new ReadStatus(userId, channelId);
+        ReadStatus readStatus = new ReadStatus(userId, channelId, Instant.now());
         UUID readStatusId = UUID.fromString("82121212-1212-1212-1212-121212343434");
         store.put(readStatusId,readStatus);
     }

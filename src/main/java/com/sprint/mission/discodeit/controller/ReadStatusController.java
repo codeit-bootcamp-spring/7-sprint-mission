@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -18,25 +19,19 @@ public class ReadStatusController {
 
     private final BasicReadStatusService readStatusService;
 
-    @PostMapping("/create")
-    public String makeReadStatus(@ModelAttribute ReadStatusCreateRequest request){
-        readStatusService.createReadStatus(request.userId(),request.channelId());
-        return "메시지 수신 정보 생성 성공";
+    @GetMapping
+    public List<ReadStatusResponse> getReadStatus(@RequestParam UUID userId){
+        return readStatusService.getAllByUserId(userId);
     }
 
-    @GetMapping("/{id}")
-    public long checkLastTime(@PathVariable UUID id){
-        return readStatusService.getTimeSinceLastRead(id);
+    @PatchMapping("/{id}")
+    public ReadStatusResponse readChannel(@PathVariable UUID id) {
+        return readStatusService.updateReadStatus(id);
+
     }
 
-    @GetMapping("/read/{id}")
-    public String readChannel(@PathVariable UUID id) {
-        readStatusService.updateReadStatus(id);
-        return "읽음";
-    }
-
-    @PostMapping("/")
-    public ReadStatusResponse getReadStatusByIds(@RequestBody ReadStatusRequest request){
-        return readStatusService.getReadStatusByIds(request);
+    @PostMapping
+    public ReadStatusResponse createReadStatus(@RequestBody ReadStatusCreateRequest request){
+        return readStatusService.createReadStatus(request);
     }
 }

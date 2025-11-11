@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.application;
 
+import com.sprint.mission.discodeit.application.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.domain.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import lombok.RequiredArgsConstructor;
@@ -12,31 +13,44 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public final class FileService {
+public final class BinaryContentService {
 
     private final Path rootDir = Paths.get("data/uploads"); // 루트 폴더
 
     private final BinaryContentRepository binaryContentRepository;
 
     // 유저별 폴더 생성
-    public Path createUserFolder(UUID userId) throws IOException {
+    public Path createUserFolder(UUID userId)  {
 
-        Path userFolder = Files.createDirectories(rootDir.resolve("user_" + userId.toString()));
-        Path profileFolder = Files.createDirectories(userFolder.resolve("profile"));
+        Path userFolder;
+
+        try {
+            userFolder = Files.createDirectories(rootDir.resolve("user_" + userId.toString()));
+            Files.createDirectories(userFolder.resolve("profile"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return userFolder;
     }
     
-    public BinaryContent saveMessageFile(UUID userId, MultipartFile file) throws IOException {
+    public BinaryContent saveMessageFile(UUID userId, MultipartFile file)  {
         createUserFolder(userId);
         Path userFolder = rootDir.resolve("user_" + userId.toString());
         String fileName= makeFileName(file.getOriginalFilename());
         Path filePath = userFolder.resolve(fileName);
-        file.transferTo(filePath);
+
+        try {
+            file.transferTo(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         BinaryContent content = new BinaryContent(
                 fileName,
@@ -49,25 +63,39 @@ public final class FileService {
         return content;
     }
 
-    public void deleteMessageImage(BinaryContent binaryContent) throws IOException {
+    public void deleteMessageImage(BinaryContent binaryContent) {
         Path filePath = Paths.get(binaryContent.getFilePath());
-        Files.deleteIfExists(filePath);
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
-    public BinaryContent saveUserProfile(UUID userId, MultipartFile profile) throws IOException {
+    public BinaryContent saveUserProfile(UUID userId, MultipartFile profile) {
         String contentType = profile.getContentType();
         validateContentType(contentType);
 
         Path userFolder = rootDir.resolve("user_" + userId.toString());
         
-        Path profileFolder = Files.createDirectories(userFolder.resolve("profile"));
+        Path profileFolder;
+
+        try {
+            profileFolder = Files.createDirectories(userFolder.resolve("profile"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         String profileFilePath = makeProfileName(profile.getOriginalFilename());
         Path profilePath = profileFolder.resolve(profileFilePath);
-        
-        Files.deleteIfExists(profilePath);
-        
-        profile.transferTo(profilePath);
+
+        try {
+            Files.deleteIfExists(profilePath);
+            profile.transferTo(profilePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         BinaryContent content = new BinaryContent("profile",
                 profile.getContentType(),
@@ -127,10 +155,37 @@ public final class FileService {
         return binaryContentRepository.findById(binaryId).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
     }
 
-    public Resource getImageFile(UUID binaryId) throws MalformedURLException {
+    public Resource getImageFile(UUID binaryId) {
         BinaryContent content = getById(binaryId);
         Path path = Paths.get(content.getFilePath());
-        return new UrlResource(path.toUri());
+
+        UrlResource urlResource =null;
+        try {
+            urlResource = new UrlResource(path.toUri());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        return urlResource;
+    }
+
+    public List<BinaryContentResponse> getBinaryContents(List<UUID> ids){
+        List<BinaryContentResponse> result = new ArrayList<>();
+        for (UUID id : ids) {
+            BinaryContent content =
+                    binaryContentRepository.findById(id)
+                            .orElseThrow(() -> new IllegalArgumentException("없음"));
+
+            result.add(BinaryContentResponse.from(content));
+        }
+
+        return result;
+    }
+
+    public BinaryContentResponse getBinaryContent(UUID id){
+            BinaryContent content =
+                    binaryContentRepository.findById(id)
+                            .orElseThrow(() -> new IllegalArgumentException("없음"));
+            return BinaryContentResponse.from(content);
     }
 
     private void validateContentType(String contentType) {

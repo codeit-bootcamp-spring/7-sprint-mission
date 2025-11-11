@@ -16,28 +16,20 @@ public class Channel implements Serializable {
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
-
-
     private String channelName;
-
     private final List<UUID> members;
     private final boolean isPrivate;
-    private final List<UUID> history = new ArrayList<>();
+    private final List<UUID> history=new ArrayList<>();
 
 
-    public Channel(String channelName,UUID serverId, List<UUID> membersId, boolean isPrivate) {
+    public Channel(String channelName, List<UUID> membersId, boolean isPrivate) {
         validateChannelName(channelName);
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt=Instant.now();
         this.channelName=channelName;
         this.isPrivate=isPrivate;
-        if (this.isPrivate){
-            this.members=new ArrayList<>();
-            membersId.forEach(id-> members.add(id));
-        } else {
-            this.members=null;
-        }
+        this.members=membersId;
     }
 
     public void updateChannelName(String name){

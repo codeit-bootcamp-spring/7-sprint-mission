@@ -19,7 +19,7 @@ public class JCFChannelRepository implements ChannelRepository {
         List<UUID> members = new ArrayList<>();
         UUID userId = UUID.fromString("32121212-1212-1212-1212-121212343434");
         members.add(userId);
-        Channel channel = new Channel("testChannel", serverId, members, false);
+        Channel channel = new Channel("testChannel", members, false);
 
         UUID channelId = UUID.fromString("02121212-1212-1212-1212-121212343434");
         store.put(channelId,channel);

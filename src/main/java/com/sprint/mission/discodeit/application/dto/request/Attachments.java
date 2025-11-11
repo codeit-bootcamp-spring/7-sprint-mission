@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.application.dto.request;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
+import java.util.List;
 
-public record MessageUpdate(
-        String newContent
+public record Attachments(
+        List<MultipartFile> files
 ) {
 }

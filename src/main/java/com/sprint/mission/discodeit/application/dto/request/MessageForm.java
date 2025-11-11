@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public record MessageForm (
         String content,
-        UUID userId,
-        UUID channelId,
-        MultipartFile image
+        UUID authorId,
+        UUID channelId
 ){}

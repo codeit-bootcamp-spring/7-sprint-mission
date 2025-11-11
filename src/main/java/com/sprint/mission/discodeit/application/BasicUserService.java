@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.application;
 
 
-import com.sprint.mission.discodeit.application.dto.request.UserCreateRequestDto;
-import com.sprint.mission.discodeit.application.dto.request.UserRequestDto;
-import com.sprint.mission.discodeit.application.dto.request.UserUpdateDto;
+import com.sprint.mission.discodeit.application.dto.request.ProfileRequest;
+import com.sprint.mission.discodeit.application.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.application.dto.request.UserRequest;
+import com.sprint.mission.discodeit.application.dto.request.UserUpdateReq;
 import com.sprint.mission.discodeit.application.dto.response.UserResponse;
+import com.sprint.mission.discodeit.application.dto.response.UserStatusResponse;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.domain.exception.DuplicateUserException;
@@ -13,12 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
 
 
 @Slf4j
@@ -28,11 +28,10 @@ public class BasicUserService {
 
 
     private final UserRepository userRepository;
+    private final BinaryContentService binaryContentService;
 
-    private final FileService fileService;
 
-
-    public UserResponse createUser(UserCreateRequestDto requestDto) throws IOException {
+    public UserResponse createUser(UserCreateRequest requestDto, ProfileRequest profileRequest) {
         validateDuplicateEmail(requestDto.email());
         validateDuplicateUsername(requestDto.username());
 
@@ -43,15 +42,15 @@ public class BasicUserService {
                 requestDto.username(),
                 requestDto.phoneNumber());
         userRepository.save(user);
-        fileService.createUserFolder(user.getId());
-        if (requestDto.profileImage() != null && !requestDto.profileImage().isEmpty()) {
-            BinaryContent content = fileService.saveUserProfile(user.getId(), requestDto.profileImage());
+        binaryContentService.createUserFolder(user.getId());
+        if (profileRequest.profileImage() != null && !profileRequest.profileImage().isEmpty()) {
+            BinaryContent content = binaryContentService.saveUserProfile(user.getId(), profileRequest.profileImage());
             user.setProfile(content.getId());
         }
         return UserResponse.from(user);
     }
 
-    public UserResponse updateUserInfo(UUID id, UserUpdateDto updateDto) throws IOException {
+    public UserResponse updateUserInfo(UUID id, UserUpdateReq updateDto, ProfileRequest profileRequest) {
 
         User user = getById(id);
 
@@ -64,8 +63,8 @@ public class BasicUserService {
         if (updateDto.phoneNumber() != null) {
             user.updatePhoneNumber(updateDto.phoneNumber());
         }
-        if (updateDto.updateFile() != null) {
-            BinaryContent content = fileService.saveUserProfile(user.getId(), updateDto.updateFile());
+        if (profileRequest.profileImage() != null) {
+            BinaryContent content = binaryContentService.saveUserProfile(user.getId(), profileRequest.profileImage());
             user.setProfile(content.getId());
         }
         userRepository.save(user);
@@ -77,10 +76,10 @@ public class BasicUserService {
     public void delete(UUID id) {
         User user = getById(id);
         userRepository.remove(user);
-        fileService.deleteUserFolder(user.getId());
+        binaryContentService.deleteUserFolder(user.getId());
     }
 
-    public UserResponse getUser(UserRequestDto requestDto) {
+    public UserResponse getUser(UserRequest requestDto) {
         User user;
         if (requestDto.id() == null) {
             user = getByUsername(requestDto.username());
@@ -114,13 +113,11 @@ public class BasicUserService {
         userRepository.save(user);
     }
 
-    public void markUserStatus(UUID uuid, Instant lastAt) {
+    public UserStatusResponse markUserStatus(UUID uuid, Instant lastAt) {
         User user = getById(uuid);
         user.markOnline(lastAt);
         userRepository.save(user);
-
-
-        
+        return UserStatusResponse.from(user);
     }
 
     private User getById(UUID userId) {

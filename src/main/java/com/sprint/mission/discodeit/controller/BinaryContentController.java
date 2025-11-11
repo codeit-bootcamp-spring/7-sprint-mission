@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.FileService;
+import com.sprint.mission.discodeit.application.BinaryContentService;
+import com.sprint.mission.discodeit.application.dto.response.BinaryContentResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,20 +18,27 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BinaryContentController {
 
-    private final FileService fileService;
-
-    @GetMapping("/{id}")
-    public Resource getFile(@PathVariable UUID id) throws MalformedURLException {
-        return fileService.getImageFile(id);
-    }
+    private final BinaryContentService binaryContentService;
 
     @GetMapping
-    public ResponseEntity<List<Resource>> getFiles(@RequestParam List<UUID> ids) throws MalformedURLException {
-        List<Resource> result = new ArrayList<>();
-        for (UUID id : ids) {
-            result.add(fileService.getImageFile(id));
-        }
-        return ResponseEntity.ok(result);
+    public List<BinaryContentResponse> getFile(@RequestParam List<UUID> binaryContentId) {
+
+        return binaryContentService.getBinaryContents(binaryContentId);
     }
+
+    @GetMapping("/{binaryContentId}")
+    public BinaryContentResponse getFile(@PathVariable UUID binaryContentId) {
+        return binaryContentService.getBinaryContent(binaryContentId);
+    }
+
+
+//    @GetMapping
+//    public ResponseEntity<List<Resource>> getFiles(@RequestParam List<UUID> ids){
+//        List<Resource> result = new ArrayList<>();
+//        for (UUID id : ids) {
+//            result.add(binaryContentService.getImageFile(id));
+//        }
+//        return ResponseEntity.ok(result);
+//    }
 
 }
