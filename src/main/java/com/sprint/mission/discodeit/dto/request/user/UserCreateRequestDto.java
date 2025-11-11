@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 /**
  * @param username 유저 이름 ( 별명 x)
@@ -16,8 +13,5 @@ public record UserCreateRequestDto(
         String password,
 
         @NotBlank(message = "email이 필요합니다.")
-        String email,
-        String profileFileName,
-        String profileContentType,
-        byte[] profileData) {
+        String email) {
 }

@@ -56,38 +56,44 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<UserResponseDto> getAll() {
-        userRepository.findAll();
+        return userRepository.findAll().stream()
+                .map(user -> UserResponseDto.from(user, isOnline(user.getId())))
+                .toList();
     }
 
     @Override
-    public User update(UserUpdateRequestDto userUpdateRequestDto, UUID profileId) {
-        User user = userRepository.findById(userUpdateRequestDto.id())
+    public UserResponseDto update(UUID userId, UserUpdateRequestDto userUpdateRequestDto, UUID profileId) {
+        User user = userRepository.findById(Objects.requireNonNull(userId))
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
         // 유저 이름이 비어있지 않고, 기존 이름과 다르다면 수정!
-        if(userUpdateRequestDto.username() != null && !userUpdateRequestDto.username().equals(user.getUsername())){
-            if(!userRepository.findByName(userUpdateRequestDto.username()).isEmpty()) {
+        if(userUpdateRequestDto.newUsername() != null && !userUpdateRequestDto.newUsername().equals(user.getUsername())){
+            if(!userRepository.findByName(userUpdateRequestDto.newUsername()).isEmpty()) {
                 throw new IllegalArgumentException("존재하는 유저이름입니다!");
             }
-            user.setUsername(userUpdateRequestDto.username());
+            user.setUsername(userUpdateRequestDto.newUsername());
         }
 
         // 유저 이메일이 비어있지 않고, 기존 이메일과 다르다면 수정!
-        if(userUpdateRequestDto.email() != null && !userUpdateRequestDto.email().equals(user.getEmail())){
-            if(userRepository.findByEmail(userUpdateRequestDto.email()).isPresent()) {
+        if(userUpdateRequestDto.newEmail() != null && !userUpdateRequestDto.newEmail().equals(user.getEmail())){
+            if(userRepository.findByEmail(userUpdateRequestDto.newEmail()).isPresent()) {
                 throw new IllegalArgumentException("존재하는 이메일입니다!");
             }
-            user.setEmail(userUpdateRequestDto.email());
+            user.setEmail(userUpdateRequestDto.newEmail());
         }
 
-        if(userUpdateRequestDto.password() != null) {
-            user.setPassword(userUpdateRequestDto.password());
+        if(userUpdateRequestDto.newPassword() != null) {
+            user.setPassword(userUpdateRequestDto.newPassword());
         }
 
-            if(profileId != null && !profileId.equals(user.getProfileId())){
-                user.setProfileId(profileId);
-            }
-        return userRepository.save(user);
+        if(profileId != null && !profileId.equals(user.getProfileId())){
+            user.setProfileId(profileId);
+        }
+
+        User save = userRepository.save(user);
+        boolean online = isOnline(save.getProfileId());
+
+        return UserResponseDto.from(save, online);
     }
 
     @Override
@@ -102,25 +108,28 @@ public class BasicUserService implements UserService {
 
     // 이름으로 조회
     @Override
-    public List<User> getUsersByName(String username) {
-        Objects.requireNonNull(username);
-        return userRepository.findByName(username);
+    public List<UserResponseDto> getUsersByName(String username) {
+        return userRepository.findByName(Objects.requireNonNull(username))
+                .stream()
+                .map(user -> UserResponseDto.from(user, isOnline(user.getId())))
+                .toList();
     }
 
     // 이메일로 조회
     @Override
-    public Optional<User> getUsersByEmail(String email) {
-        Objects.requireNonNull(email);
-        return userRepository.findByEmail(email);
+    public Optional<UserResponseDto> getUsersByEmail(String email) {
+        return userRepository.findByEmail(Objects.requireNonNull(email))
+                .map(user -> UserResponseDto.from(user, isOnline(user.getId())));
     }
 
     // 로그인
     @Override
     public void login(UUID userId) {
-        userStatusRepository.findByUserId(userId).ifPresentOrElse(u -> {
-            u.timeUpdated();
-            userStatusRepository.save(u);
-        }, () -> userStatusRepository.save(new UserStatus(userId)));
+        userStatusRepository.findByUserId(Objects.requireNonNull(userId))
+                .ifPresentOrElse(u -> {
+                    u.timeUpdated();
+                    userStatusRepository.save(u);
+                    }, () -> userStatusRepository.save(new UserStatus(userId)));
     }
     // 로그아웃
     @Override
@@ -129,8 +138,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public boolean isOnline(UUID userId) {
-        Objects.requireNonNull(userId);
-        return userStatusRepository.findByUserId(userId)
+        return userStatusRepository.findByUserId(Objects.requireNonNull(userId))
                 .map(status -> status.isOnlineNow())
                 .orElse(false);
     }
