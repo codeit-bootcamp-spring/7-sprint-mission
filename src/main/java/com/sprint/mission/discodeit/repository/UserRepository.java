@@ -27,7 +27,7 @@ public interface UserRepository {
     Optional<User> findByPhone(String phoneNum);
 
     /** 아이디로 유저를 조회 */
-    Optional<User> findByLoginId(String loginId);
+    Optional<User> findByUsername(String username);
 
     /** 모든 유저를 반환 */
     List<User> findAll();

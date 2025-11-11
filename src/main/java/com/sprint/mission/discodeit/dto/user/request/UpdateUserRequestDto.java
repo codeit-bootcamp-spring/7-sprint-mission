@@ -6,9 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class UpdateUserRequestDto {
-    private final String newUserName;
+    private final String newRealName;
     private final String newNickName;
     private final String newEmail;
+    private final String newUsername;
     private final String newPassword;
     private final String newPhoneNum;
 }

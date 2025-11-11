@@ -12,24 +12,24 @@ import java.util.UUID;
 @ToString
 public class UserResponseDto {
     private final UUID id;
-    private final String userName;
+    private final String realName;
     private final String nickName;
     private final String email;
     private final String phoneNum;
-    private final String loginId;
+    private final String username;
     private final UUID profileId;
-    private final boolean active;
+    private final boolean online;
 
-    public static UserResponseDto from(User user, boolean active) {
+    public static UserResponseDto from(User user, boolean online) {
         return UserResponseDto.builder()
                 .id(user.getId())
-                .userName(user.getUserName())
+                .realName(user.getRealName())
                 .nickName(user.getNickName())
                 .email(user.getEmail())
                 .phoneNum(user.getPhoneNum())
-                .loginId(user.getLoginId())
+                .username(user.getUsername())
                 .profileId(user.getProfileId())
-                .active(active)
+                .online(online)
                 .build();
     }
 }

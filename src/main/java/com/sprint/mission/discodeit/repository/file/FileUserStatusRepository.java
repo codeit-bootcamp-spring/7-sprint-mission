@@ -20,7 +20,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public void save(UserStatus userStatus) {
         // 유저는 하나의 UserStatus를 가지기 때문에 key를 유저 UUID로 설정
-        userStatusStore.put(userStatus.getUserId(), userStatus);
+        userStatusStore.put(userStatus.getId(), userStatus);
         saveToFile(filePath, userStatusStore);
     }
 
@@ -30,13 +30,20 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return userStatusStore.values().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst();
+    }
+
+    @Override
     public List<UserStatus> findAll() {
         return new ArrayList<>(userStatusStore.values());
     }
 
     @Override
     public void update(UserStatus status) {
-        userStatusStore.replace(status.getUserId(), status);
+        userStatusStore.replace(status.getId(), status);
         saveToFile(filePath, userStatusStore);
     }
 

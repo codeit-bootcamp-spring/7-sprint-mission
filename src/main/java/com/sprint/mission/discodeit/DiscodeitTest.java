@@ -700,10 +700,11 @@ public class DiscodeitTest {
     }
 
     private void updateInfo() {
-        String newUserName = null;
+        String newRealName = null;
         String newNickName = null;
         String newEmail = null;
         String newPhoneNum = null;
+        String newUsername = null;
         String newPassword = null;
 
         try {
@@ -715,9 +716,9 @@ public class DiscodeitTest {
             switch (choice) {
                 case 1, 2, 3, 4, 5 -> {
                     if (choice == 1) {
-                        System.out.println("현재 이름: " + loginUser.getUserName());
+                        System.out.println("현재 이름: " + loginUser.getRealName());
                         System.out.print("변경: ");
-                        newUserName = sc.nextLine();
+                        newRealName = sc.nextLine();
                     } else if(choice == 2){
                         System.out.println("현재 닉네임: " + loginUser.getNickName());
                         System.out.print("변경: ");
@@ -755,7 +756,7 @@ public class DiscodeitTest {
                             return;
                         }
                     }
-                    userService.update(loginUser.getId(), new UpdateUserRequestDto(newUserName, newNickName, newEmail, newPhoneNum, newPassword), null);
+                    userService.update(loginUser.getId(), new UpdateUserRequestDto(newRealName, newNickName, newEmail, newPhoneNum, newUsername, newPassword), null);
                 }
                 case 6 -> { return; }
                 default -> {

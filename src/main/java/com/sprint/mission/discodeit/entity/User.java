@@ -6,33 +6,33 @@ import java.util.UUID;
 
 @Getter
 public class User extends BaseEntity{
-    private String userName;
+    private String realName;
     private String nickName;
     private String email;
     private String phoneNum;
-    private final String loginId;
+    private String username;
     private String password;
     private UUID profileId;
 
-    public User(String userName, String nickName, String email, String phoneNum, String loginId, String password) {
-        this.userName = userName;
+    public User(String realName, String nickName, String email, String phoneNum, String username, String password) {
+        this.realName = realName;
         this.nickName = nickName;
         this.email = email;
         this.phoneNum = formatPhoneNum(phoneNum);
-        this.loginId = loginId;
+        this.username = username;
         this.password = password;
     }
 
-    public User(String userName, String nickName, String email, String phoneNum, String loginId, String password, UUID profileId) {
-        this(userName, nickName, email, phoneNum, loginId, password);
+    public User(String realName, String nickName, String email, String phoneNum, String username, String password, UUID profileId) {
+        this(realName, nickName, email, phoneNum, username, password);
         this.profileId = profileId;
     }
 
-    public void update(String userName, String nickName, String email, String phoneNum, String password, UUID profileId) {
+    public void update(String realName, String nickName, String email, String phoneNum, String username, String password, UUID profileId) {
         boolean flag = false;
 
-        if (userName != null && !userName.equals(this.userName)) {
-            this.userName = userName;
+        if (realName != null && !realName.equals(this.realName)) {
+            this.realName = realName;
             flag = true;
         }
         if (nickName != null && !nickName.equals(this.nickName)) {
@@ -45,6 +45,10 @@ public class User extends BaseEntity{
         }
         if (phoneNum != null && !phoneNum.equals(this.phoneNum)) {
             this.phoneNum = formatPhoneNum(phoneNum);
+            flag = true;
+        }
+        if (username != null && !username.equals(this.username)) {
+            this.username = username;
             flag = true;
         }
         if (password != null && !password.equals(this.password)) {
@@ -78,11 +82,11 @@ public class User extends BaseEntity{
         String str = super.toString();
 
         return "User{" +
-                "userName='" + userName + '\'' +
+                "realName='" + realName + '\'' +
                 ", nickName='" + nickName + '\'' +
                 ", email='" + email + '\'' +
                 ", phoneNum='" + phoneNum + '\'' +
-                ", userId='" + loginId + '\'' +
+                ", userId='" + username + '\'' +
                 ", password='" + password + '\'' +
                 str +
                 '}';

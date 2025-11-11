@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -45,25 +46,23 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void update(UpdateUserStatusRequestDto request) {
-        UserStatus newUserStatus = userStatusRepository.findById(request.getUserId())
+    public UserStatus update(UUID userStatusId, UpdateUserStatusRequestDto request) {
+        UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
-        newUserStatus.setUpdatedAt(); // 로그인 시간 변경
-        userStatusRepository.update(newUserStatus);
+        userStatus.setUpdatedAt(); // 로그인 시간 변경
+        userStatusRepository.update(userStatus);
+        return userStatus;
     }
 
     @Override
-    public void updateByUserId(UUID userId) {
-        userStatusRepository.findAll().stream()
-                .filter(us -> userId.equals(us.getUserId()))
-                .findFirst()
-                .ifPresentOrElse(us -> {
-                    us.setUpdatedAt();
-                    userStatusRepository.update(us);
-                },
-                () -> {
-                    throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);
-                });
+    public UserStatus updateByUserId(UUID userId, UpdateUserStatusRequestDto request) {
+        Instant newLastActiveAt = request.getNewLastActiveAt();
+
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+        userStatus.update(newLastActiveAt);
+        userStatusRepository.update(userStatus);
+        return userStatus;
     }
 
     @Override

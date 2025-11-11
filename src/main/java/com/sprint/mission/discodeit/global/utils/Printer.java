@@ -18,11 +18,11 @@ public class Printer {
 
     public static void printInfo(UserResponseDto user){
         System.out.printf("%s님의 정보\n", user.getNickName());
-        System.out.printf("이름: %s\n", user.getUserName());
+        System.out.printf("이름: %s\n", user.getRealName());
         System.out.printf("닉네임: %s\n", user.getNickName());
         System.out.printf("이메일: %s\n", user.getEmail());
         System.out.printf("전화번호: %s\n", user.getPhoneNum());
-        System.out.printf("아이디: %s\n", user.getLoginId());
+        System.out.printf("아이디: %s\n", user.getUsername());
     }
 
     public static void printChatHistory(UserService userService, UserResponseDto user, List<Message> msgs) {
