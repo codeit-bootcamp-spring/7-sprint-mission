@@ -1,68 +1,108 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
-import java.util.Map;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@RestController
-@RequestMapping("/api/users")
-@RequiredArgsConstructor // 의존성 주입을 생성자로 처리
+@RequiredArgsConstructor
+@Controller
+@ResponseBody
+@RequestMapping("/api/user")
 public class UserController {
 
-    private final UserService userService;
+  private final UserService userService;
+  private final UserStatusService userStatusService;
 
-    /** 사용자 등록 */
-    @RequestMapping(value = "/api/users", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Map<String, UUID>> create(@RequestBody UserCreateRequest req) {
-        Assert.hasText(req.username(), "username must not be empty");
-        Assert.hasText(req.email(), "email must not be empty");
-        Assert.hasText(req.password(), "password must not be empty");
-        var created = userService.create(req, Optional.empty());
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("id", created.getId()));
-    }
+  @RequestMapping(
+      path = "create",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
+  )
+  public ResponseEntity<User> create(
+      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
+  ) {
+    Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
+        .flatMap(this::resolveProfileRequest);
+    User createdUser = userService.create(userCreateRequest, profileRequest);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdUser);
+  }
 
-    /** 사용자 단건 조회 */
-    @RequestMapping(value = "/api/users", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<UserDto> find(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.find(id));
-    }
+  @RequestMapping(
+      path = "update",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
+  )
+  public ResponseEntity<User> update(
+      @RequestParam("userId") UUID userId,
+      @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
+  ) {
+    Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
+        .flatMap(this::resolveProfileRequest);
+    User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedUser);
+  }
 
-    /** 모든 사용자 조회 */
-    @RequestMapping(value = "/api/users", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<List<UserDto>> findAll() {
-        return ResponseEntity.ok(userService.findAll());
-    }
+  @RequestMapping(path = "delete")
+  public ResponseEntity<Void> delete(@RequestParam("userId") UUID userId) {
+    userService.delete(userId);
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
+  }
 
-    /** 사용자 정보 수정 */
-    @RequestMapping(value = "/api/users", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Map<String, UUID>> update(@PathVariable UUID id, @RequestBody UserUpdateRequest req) {
-        Assert.notNull(id, "userId must not be null");
-        var updated = userService.update(id, req, Optional.empty());
-        return ResponseEntity.ok(Map.of("id", updated.getId()));
-    }
+  @RequestMapping(path = "findAll")
+  public ResponseEntity<List<UserDto>> findAll() {
+    List<UserDto> users = userService.findAll();
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(users);
+  }
 
-    /** 사용자 삭제 */
-    @RequestMapping(value = "/api/users", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        Assert.notNull(id, "userId must not be null");
-        userService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+  @RequestMapping(path = "updateUserStatusByUserId")
+  public ResponseEntity<UserStatus> updateUserStatusByUserId(@RequestParam("userId") UUID userId,
+      @RequestBody UserStatusUpdateRequest request) {
+    UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedUserStatus);
+  }
 
-    /** 온라인 상태 업데이트(서비스 메서드 확정 시 연결) */
-    @RequestMapping(value = "/api/users/online", method = RequestMethod.PATCH, consumes = "application/json")
-    public ResponseEntity<Void> updateOnline(@PathVariable UUID id, @RequestBody Object req) {
-        throw new UnsupportedOperationException("User online update service not wired yet");
+  private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
+    if (profileFile.isEmpty()) {
+      return Optional.empty();
+    } else {
+      try {
+        BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
+            profileFile.getOriginalFilename(),
+            profileFile.getContentType(),
+            profileFile.getBytes()
+        );
+        return Optional.of(binaryContentCreateRequest);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
+  }
 }
