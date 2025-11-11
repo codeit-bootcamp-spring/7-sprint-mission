@@ -17,8 +17,8 @@ public record ChannelFindResponse(
 ) {
     public static ChannelFindResponse from(Channel channel,Instant lastMessageTime){
         return new ChannelFindResponse(
-                channel.getBose(),
-                channel.getChannelName(),
+                channel.getId(),
+                channel.getName(),
                 channel.getType(),
                 //프라이빗 아니면 일단 널
                 null,
@@ -33,7 +33,7 @@ public record ChannelFindResponse(
                 this.bose(),
                 this.channelName(),
                 this.channelType(),
-                channel.getUsers(),
+                null,
                 this.description(),
                 this.lastMessageTime()
         );

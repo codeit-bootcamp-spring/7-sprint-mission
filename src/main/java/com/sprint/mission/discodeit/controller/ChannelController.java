@@ -9,16 +9,19 @@ import com.sprint.mission.discodeit.dto.channel.response.ChannelCreatePrivateRes
 import com.sprint.mission.discodeit.dto.channel.response.ChannelCreatePublicResponse;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelFindResponse;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelUpdateResponse;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/channels")
+@RequestMapping("/api/channel")
 @RequiredArgsConstructor
 public class ChannelController {
 
@@ -27,14 +30,18 @@ public class ChannelController {
 
     // [공개채널 생성]
 
-   @RequestMapping(value = "/createpublic", method = RequestMethod.POST)
-    public ChannelCreatePublicResponse createPublicChannel(@RequestBody ChannelCreateRequest request) {
-          return channelService.createPublicChannel(request);
+   @RequestMapping(value = "createPublic", method = RequestMethod.POST)
+    public ResponseEntity<Channel> createPublicChannel(@RequestBody ChannelCreateRequest request) {
+       Channel publicChannel = channelService.createPublicChannel(request);
+
+       return ResponseEntity
+               .status(HttpStatus.CREATED)
+               .body(publicChannel);
    }
     // [비공개 채널 생성]
 
     @RequestMapping(value = "/createprivate", method = RequestMethod.POST)
-    public ChannelCreatePrivateResponse createPrivateChannel(@RequestBody ChannelCreateRequest request) {
+    public ResponseEntity<Channel> createPrivateChannel(@RequestBody ChannelCreateRequest request) {
         return channelService.createPrivateChannel(request);
     }
 

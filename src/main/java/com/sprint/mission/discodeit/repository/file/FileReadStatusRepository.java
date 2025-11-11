@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.*;
 
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
@@ -22,7 +23,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public ReadStatus save(UUID userId, UUID channelId) {
         // 새로운 ReadStatus 생성 (Common에서 id 자동 생성된다고 가정)
-        ReadStatus readStatus = new ReadStatus(userId, channelId);
+        ReadStatus readStatus = new ReadStatus(userId, channelId, Instant.now());
 
         FileIo.save(filename, readStatus);
         return readStatus;

@@ -4,37 +4,53 @@ import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusFindByUserRequest;
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusUpdateReuqest;
+import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/readstatus")
+@RequestMapping("/api/readStatus")
 public class ReadStatusController {
 
     private final ReadStatusService readStatusService;
 
     //[ ] 특정 채널의 메시지 수신 정보를 생성할 수 있다.
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ReadStatusResponse createStatus(@RequestBody ReadStatusCreateRequest request){
-        return readStatusService.create(request);
+    @RequestMapping(value = "create")
+    public ResponseEntity<ReadStatus> createStatus(@RequestBody ReadStatusCreateRequest request){
+        ReadStatus readStatus = readStatusService.create(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(readStatus);
     }
     // [ ] 특정 채널의 메시지 수신 정보를 수정할 수 있다.
 
 
-    @RequestMapping(value = "/update", method = RequestMethod.PATCH)
-    public ReadStatusResponse updateStatus(@RequestBody ReadStatusUpdateReuqest request){
-        return readStatusService.update(request);
+    @RequestMapping(value = "update")
+    public ResponseEntity<ReadStatus> updateStatus(@RequestParam("readStatusId") UUID readStatusId,
+                                                   @RequestBody ReadStatusUpdateReuqest request){
+        ReadStatus update = readStatusService.update(readStatusId, request);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(update);
     }
     //  [ ] 특정 사용자의 메시지 수신 정보를 조회할 수 있다.
 
-    @RequestMapping(value = "/findbyuserid", method = RequestMethod.POST)
-    public List<ReadStatusResponse> findStatusByUserId(@RequestBody ReadStatusFindByUserRequest request){
-        return readStatusService.findAllByUserId(request);
+    @RequestMapping(value = "findAllByUserId")
+    public ResponseEntity<List<ReadStatus>> findStatusByUserId(@RequestParam("userId") UUID userId){
+        List<ReadStatus> allByUserId = readStatusService.findAllByUserId(userId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(allByUserId);
     }
 }
