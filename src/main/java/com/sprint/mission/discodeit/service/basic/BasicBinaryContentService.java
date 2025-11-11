@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.response.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -15,7 +16,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public BinaryContent create(BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
+    public BinaryContentResponseDto create(BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
         if(binaryContentCreateRequestDto.contentType() == null) {
             throw new IllegalArgumentException("contentType must not be null");
         }
@@ -25,17 +26,23 @@ public class BasicBinaryContentService implements BinaryContentService {
                 binaryContentCreateRequestDto.data()
         );
 
-        return binaryContentRepository.save(bc);
+        BinaryContent save = binaryContentRepository.save(bc);
+
+        return BinaryContentResponseDto.from(save);
     }
 
     @Override
-    public Optional<BinaryContent> findById(UUID id) {
-        return binaryContentRepository.findById(Objects.requireNonNull(id));
+    public Optional<BinaryContentResponseDto> findById(UUID id) {
+        return binaryContentRepository.findById(Objects.requireNonNull(id))
+                .map(bc -> BinaryContentResponseDto.from(bc));
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> id) {
-        return binaryContentRepository.findAllByIdIn(Objects.requireNonNull(id));
+    public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> id) {
+        return binaryContentRepository.findAllByIdIn(Objects.requireNonNull(id))
+                .stream()
+                .map(binaryContent -> BinaryContentResponseDto.from(binaryContent))
+                .toList();
     }
 
     @Override
