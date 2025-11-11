@@ -1,108 +1,87 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@RestController
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Controller
-@ResponseBody
-@RequestMapping("/api/user")
 public class UserController {
 
   private final UserService userService;
-  private final UserStatusService userStatusService;
 
-  @RequestMapping(
-      path = "create",
-      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
-  )
-  public ResponseEntity<User> create(
-      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile
-  ) {
-    Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
-        .flatMap(this::resolveProfileRequest);
-    User createdUser = userService.create(userCreateRequest, profileRequest);
+  /** 사용자 등록 (JSON) */
+  @RequestMapping(method = RequestMethod.POST,
+      consumes = "application/json",
+      produces = "application/json")
+  public ResponseEntity<Map<String, UUID>> create(@RequestBody UserCreateRequest req) {
+    Assert.hasText(req.username(), "유저 이름을 정확히 입력해주세요.");
+    Assert.hasText(req.email(), "이메일을 정확히 입력해주세요.");
+    Assert.hasText(req.password(), "비밀번호를 다시 확인해주세요.");
+
+    var created = userService.create(req, Optional.empty());
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(createdUser);
+        .body(Map.of("id", created.getId()));
   }
 
-  @RequestMapping(
-      path = "update",
-      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
-  )
-  public ResponseEntity<User> update(
-      @RequestParam("userId") UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile
-  ) {
-    Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
-        .flatMap(this::resolveProfileRequest);
-    User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(updatedUser);
+  /** 사용자 단건 조회 */
+  @RequestMapping(value = "/{id}",
+      method = RequestMethod.GET,
+      produces = "application/json")
+  public ResponseEntity<UserDto> find(@PathVariable UUID id) {
+    return ResponseEntity.ok(userService.find(id));
   }
 
-  @RequestMapping(path = "delete")
-  public ResponseEntity<Void> delete(@RequestParam("userId") UUID userId) {
-    userService.delete(userId);
-    return ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
-        .build();
-  }
-
-  @RequestMapping(path = "findAll")
+  /** 모든 사용자 조회 */
+  @RequestMapping(method = RequestMethod.GET,
+      produces = "application/json")
   public ResponseEntity<List<UserDto>> findAll() {
-    List<UserDto> users = userService.findAll();
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(users);
+    return ResponseEntity.ok(userService.findAll());
   }
 
-  @RequestMapping(path = "updateUserStatusByUserId")
-  public ResponseEntity<UserStatus> updateUserStatusByUserId(@RequestParam("userId") UUID userId,
-      @RequestBody UserStatusUpdateRequest request) {
-    UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(updatedUserStatus);
+  /** 사용자 정보 수정 (스펙에 맞게 PATCH 사용) */
+  @RequestMapping(value = "/{id}",
+      method = RequestMethod.PATCH,
+      consumes = "application/json",
+      produces = "application/json")
+  public ResponseEntity<Map<String, UUID>> update(
+      @PathVariable UUID id,
+      @RequestBody UserUpdateRequest req
+  ) {
+    Assert.notNull(id, "userId must not be null");
+    var updated = userService.update(id, req, Optional.empty());
+    return ResponseEntity.ok(Map.of("id", updated.getId()));
   }
 
-  private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
-    if (profileFile.isEmpty()) {
-      return Optional.empty();
-    } else {
-      try {
-        BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
-            profileFile.getOriginalFilename(),
-            profileFile.getContentType(),
-            profileFile.getBytes()
-        );
-        return Optional.of(binaryContentCreateRequest);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
+  /** 사용자 삭제 */
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+  public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    Assert.notNull(id, "userId must not be null");
+    userService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  /** 사용자 상태(온라인 등) 업데이트 - 추후 구현 */
+  @RequestMapping(value = "/{id}/userStatus",
+      method = RequestMethod.PATCH,
+      consumes = "application/json")
+  public ResponseEntity<Void> updateOnline(
+      @PathVariable UUID id,
+      @RequestBody Object req
+  ) {
+    throw new UnsupportedOperationException("User status update service not wired yet");
   }
 }
