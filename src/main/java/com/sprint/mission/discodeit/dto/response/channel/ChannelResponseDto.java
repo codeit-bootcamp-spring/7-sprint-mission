@@ -12,16 +12,16 @@ import java.util.UUID;
  * @param slowModeSeconds 슬로우모드 초(s)
  */
 public record ChannelResponseDto(
-        UUID channelId,
-        String channelName,
-        String channelDescription,
+        UUID id,
+        String name,
+        String description,
         Integer slowModeSeconds,
-        Instant lastMessage,
+        Instant lastMessageAt,
         boolean isPrivate,
-        List<UUID> userIds,
+        List<UUID> participantIds,
         ChannelType channelType) {
 
-    public static ChannelResponseDto from(Channel channel, Instant lastMessage) {
+    public static ChannelResponseDto from(Channel channel, Instant lastMessageAt) {
         String name = channel.isPrivateChannel() ? null : channel.getChannelName();
         String description = channel.isPrivateChannel() ? null : channel.getChannelDescription();
 
@@ -32,7 +32,7 @@ public record ChannelResponseDto(
                 name,
                 description,
                 channel.getSlowModeSeconds(),
-                lastMessage,
+                lastMessageAt,
                 channel.isPrivateChannel(),
                 members,
                 channel.getType()
