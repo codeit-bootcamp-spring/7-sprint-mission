@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Getter
@@ -17,6 +18,9 @@ public class User extends BaseEntity {
     private String userName;        // 닉네임
     private String phoneNum;        // 전화번호
     private UserState userState; // 상태
+
+    // 프로필 이미지 추가
+    private UUID profileId;
 
     // regular expression
     private static final Pattern REGEX_EMAIL_PATTERN
@@ -40,6 +44,7 @@ public class User extends BaseEntity {
         this.userName = userName;       // 특수문자 불가
         this.userState = UserState.ONLINE;      // 기본 상태
         this.phoneNum = phoneNum == null || phoneNum.isBlank() ? "비어있음" : phoneNum;
+        this.profileId = null;
     }
 
     // Update
@@ -66,6 +71,11 @@ public class User extends BaseEntity {
 
     public void updateState(UserState userState) {
         this.userState = userState;
+        updateTimestamp();
+    }
+
+    public void updateProfileId(UUID profileId) {
+        this.profileId = profileId;
         updateTimestamp();
     }
 

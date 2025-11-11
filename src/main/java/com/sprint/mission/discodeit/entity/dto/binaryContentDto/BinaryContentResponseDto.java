@@ -10,8 +10,6 @@ import java.util.UUID;
 @Builder
 public record BinaryContentResponseDto(
         UUID id,
-        UUID userId,
-        UUID messageId,
         byte[] data,
         String dataName,
         String dataType,
@@ -20,8 +18,6 @@ public record BinaryContentResponseDto(
     public static BinaryContentResponseDto from(BinaryContent binaryContent) {
         return BinaryContentResponseDto.builder()
                 .id(binaryContent.getId())
-                .userId(binaryContent.getUserId())
-                .messageId(binaryContent.getMessageId())
                 .data(binaryContent.getBinaryData())
                 .dataName(binaryContent.getDataName())
                 .dataType(binaryContent.getDataType())

@@ -12,13 +12,7 @@ import java.util.UUID;
 public record MessageResponseDto(UUID id, String authorName, String content,
                                  Instant createdAt, Instant updatedAt, List<UUID> attachmentIds) {
 
-    public static MessageResponseDto from(Message message, List<BinaryContent> files) {
-
-        // 첨부파일 선택
-        List<UUID> fileIds = null;
-        if (files != null && !files.isEmpty()) {
-            fileIds = files.stream().map(BinaryContent::getId).toList();
-        }
+    public static MessageResponseDto from(Message message) {
 
         return MessageResponseDto.builder()
                 .id(message.getId())
@@ -26,7 +20,7 @@ public record MessageResponseDto(UUID id, String authorName, String content,
                 .content(message.getContent())
                 .createdAt(message.getCreatedAt())
                 .updatedAt(message.getUpdatedAt())
-                .attachmentIds(fileIds)
+                .attachmentIds(message.getAttachmentIds())
                 .build();
     }
 

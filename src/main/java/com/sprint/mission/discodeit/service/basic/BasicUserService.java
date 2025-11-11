@@ -47,6 +47,19 @@ public class BasicUserService implements UserService {
             throw new DuplicateEmailException("이미 존재하는 닉네임");
         });
 
+        UUID profileId = null;
+
+        // 이미지 추가
+        if (requestDto.getProfileImage() != null) {
+            BinaryContent newImage = new BinaryContent(
+                    requestDto.getProfileImage(),
+                    requestDto.getProfileName(),
+                    requestDto.getProfileType()
+            );
+            binaryContentRepository.save(newImage);
+            profileId = newImage.getId();
+        }
+
         User newUser = User.builder()
                 .email(requestDto.getEmail())
                 .userName(requestDto.getUserName())
@@ -54,24 +67,12 @@ public class BasicUserService implements UserService {
                 .phoneNum(requestDto.getPhoneNum())
                 .build();
 
+        newUser.updateProfileId(profileId);
+
         userRepository.save(newUser);
 
         UserStatus newUserStatus = new UserStatus(newUser.getId());
         userStatusRepository.save(newUserStatus);
-
-        // 이미지 추가
-        if (requestDto.getProfileImage() != null) {
-            BinaryContent newImage = new BinaryContent(
-                    newUser.getId(),
-                    null,
-                    requestDto.getProfileImage(),
-                    requestDto.getProfileName(),
-                    requestDto.getProfileType()
-                    // messageId = null;
-            );
-            binaryContentRepository.save(newImage);
-        }
-
 
         return UserResponseDto.from(newUser, true);
     }
@@ -165,20 +166,26 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(imageUpdateDto.userId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
 
-        // 기존 이미지 삭제
-        binaryContentRepository.deleteProfileImageByUserId(user.getId());
+        // 기존 이미지 백업
+        UUID oldId = user.getProfileId();
+
         // 새로운 이미지 업데이트
         if (imageUpdateDto.image() != null) {
             BinaryContent newImage = new BinaryContent(
-                    user.getId(),
                     imageUpdateDto.image(),
                     imageUpdateDto.imageName(),
                     imageUpdateDto.imageType()
             );
             binaryContentRepository.save(newImage);
+            user.updateProfileId(newImage.getId());
         }
-        return toDto(user);
+        // 기존 이미지 삭제
+        if (oldId != null) {
+            binaryContentRepository.deleteById(oldId);
+        }
 
+        userRepository.save(user);
+        return toDto(user);
     }
 
     // 논리 삭제
@@ -195,7 +202,8 @@ public class BasicUserService implements UserService {
         // 상태 삭제
         userStatusRepository.deleteStatusByUserId(userId);
         // 이미지 삭제
-        binaryContentRepository.deleteProfileImageByUserId(userId);
+        if (user.getProfileId() != null)
+            binaryContentRepository.deleteById(user.getProfileId());
 
         user.softDelete(); // 논리 삭제
         userRepository.save(user);    // 유저만 저장해서, 재시작 시 채널이나 메시지에는 적용이 안됨;;

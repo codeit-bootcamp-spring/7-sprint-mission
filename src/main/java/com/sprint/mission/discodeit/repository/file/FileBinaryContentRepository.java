@@ -72,41 +72,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public Optional<BinaryContent> findProfileImageByUserId(UUID userId) {
-        return data.values().stream()
-                .filter(content -> content.getMessageId() == null)
-                .filter(content -> content.getUserId().equals(userId))
-                .findFirst();
-    }
-
-    @Override
-    public void deleteProfileImageByUserId(UUID userId) {
-        data.values().removeIf(profile ->
-                profile.getUserId().equals(userId) && profile.getMessageId() == null);
-        saveData();
-    }
-
-    @Override
-    public List<BinaryContent> findAllByMessageId(UUID messageId) {
-        return data.values().stream()
-                .filter(content -> messageId.equals(content.getMessageId()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<BinaryContent> findAllByMessageIdIn(List<UUID> messageIds) {
-        return List.of();
-    }
-
-    @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
         return ids.stream().map(data::get)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteAllByMessageId(UUID messageId) {
-        data.values().removeIf(content -> content.getMessageId().equals(messageId));
-        saveData();
     }
 }

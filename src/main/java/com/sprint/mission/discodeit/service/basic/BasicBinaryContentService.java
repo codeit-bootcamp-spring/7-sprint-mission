@@ -44,7 +44,6 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         // messageId == null ? profileImage : attachment
         BinaryContent newContent = new BinaryContent(
-                requestDto.userId(), requestDto.messageId(),
                 requestDto.data(), requestDto.dataName(),
                 requestDto.dataType());
         binaryContentRepository.save(newContent);

@@ -26,26 +26,25 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
 
-    private MessageResponseDto toDto(Message message) {
-        List<BinaryContent> attachments = binaryContentRepository.findAllByMessageId(message.getId());
-        return MessageResponseDto.from(message, attachments);
-    }
-
-    private void SaveAttachment(Message message, List<AttachmentDto> attachments) {
-        if (attachments != null && !attachments.isEmpty()) {
-            for (AttachmentDto attachment : attachments) {
-                BinaryContent file = new BinaryContent(
-                        message.getAuthor().getId(),
-                        message.getId(),
-                        attachment.file(),
-                        attachment.fileName(),
-                        attachment.fileType()
-                );
-                binaryContentRepository.save(file);
-            }
+    private List<UUID> saveAttachment(List<AttachmentDto> attachments) {
+        if (attachments == null || attachments.isEmpty()) {
+            return new ArrayList<>();
         }
-    }
 
+        List<UUID> ids = new ArrayList<>();
+
+        for (AttachmentDto attachment : attachments) {
+            BinaryContent file = new BinaryContent(
+                    attachment.file(),
+                    attachment.fileName(),
+                    attachment.fileType()
+            );
+            binaryContentRepository.save(file);
+
+            ids.add(file.getId());
+        }
+        return ids;
+    }
 
     // Message Create
     @Override
@@ -58,11 +57,13 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new NotFoundUserException("메시지를 보내는 사용자를 찾을 수 없음"));
         User receiver = userRepository.findById(requestDto.getReceiverId())
                 .orElseThrow(() -> new NotFoundUserException("메시지를 받을 사용자를 찾을 수 없음"));
-        Message message = new Message(author, receiver, requestDto.getContent());
+
+        List<UUID> attachmentIds = saveAttachment(requestDto.getFiles());
+
+        Message message = new Message(author, receiver, requestDto.getContent(), attachmentIds);
         messageRepository.save(message);
 
-        SaveAttachment(message, requestDto.getFiles());
-        return toDto(message);
+        return MessageResponseDto.from(message);
 
     }
 
@@ -83,10 +84,11 @@ public class BasicMessageService implements MessageService {
             throw new InvalidInputException("파일은 한번에 10개까지만 보낼 수 있습니다."); // 예외 임시
         }
 
-        Message message = new Message(author, channel, requestDto.getContent());
+        List<UUID> attachmentIds = saveAttachment(requestDto.getFiles());
+        Message message = new Message(author, channel, requestDto.getContent(), attachmentIds);
         messageRepository.save(message);
-        SaveAttachment(message, requestDto.getFiles());
-        return toDto(message);
+
+        return MessageResponseDto.from(message);
     }
 
 
@@ -96,7 +98,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다."));
 
-        return toDto(message);
+        return MessageResponseDto.from(message);
     }
 
     // update를 해도 순서는 바뀌지않음 생성일자로 정렬
@@ -104,14 +106,14 @@ public class BasicMessageService implements MessageService {
     public List<MessageResponseDto> findMessageBetweenUsers(UUID userId1, UUID userId2) {
         return messageRepository.findAllByBetweenUserIds(userId1, userId2)
                 .stream().sorted(Comparator.comparing(Message::getCreatedAt))
-                .map(this::toDto).collect(Collectors.toList());
+                .map(MessageResponseDto::from).collect(Collectors.toList());
     }
 
     @Override
     public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
         return messageRepository.findAllByChannelId(channelId).stream()
                 .sorted(Comparator.comparing(Message::getCreatedAt))
-                .map(this::toDto).collect(Collectors.toList());
+                .map(MessageResponseDto::from).collect(Collectors.toList());
     }
 
     // Message Update
@@ -127,7 +129,7 @@ public class BasicMessageService implements MessageService {
 
         message.updateContent(updateDto.newContent());
         messageRepository.save(message);
-        return Optional.of(toDto(message));
+        return Optional.of(MessageResponseDto.from(message));
     }
 
     // Message Delete
@@ -136,13 +138,16 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다."));
 
-        binaryContentRepository.deleteAllByMessageId(message.getId());
+        for (UUID attachmentId : message.getAttachmentIds()){
+            binaryContentRepository.deleteById(attachmentId);
+        }
+
         messageRepository.deleteById(id);
     }
 
     @Override
     public List<MessageResponseDto> findAll() {
         return messageRepository.findAll().stream()
-                .map(this::toDto).collect(Collectors.toList());
+                .map(MessageResponseDto::from).collect(Collectors.toList());
     }
 }

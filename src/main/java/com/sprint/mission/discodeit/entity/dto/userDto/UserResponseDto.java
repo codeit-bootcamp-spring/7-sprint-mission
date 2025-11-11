@@ -12,7 +12,8 @@ import java.util.UUID;
 @Builder
 public record UserResponseDto(
         UUID id, String userName, String state,
-        Instant createAt, String phoneNum, boolean isOnline
+        Instant createAt, String phoneNum, boolean isOnline,
+        UUID profileId
 ) {
 
     public static UserResponseDto from(User user, boolean isOnline) {
@@ -23,6 +24,7 @@ public record UserResponseDto(
                 .createAt(user.getCreatedAt())
                 .phoneNum(user.getPhoneNum())
                 .isOnline(isOnline)     // 시스템의 온라인 상태 여부
+                .profileId(user.getProfileId())
                 .build();
     }
 
