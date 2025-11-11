@@ -5,11 +5,11 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-@Repository
 public class JCFMessageRepository implements MessageRepository {
 
-    private final Map<UUID, Message> messages = new HashMap<>();
+    private final Map<UUID, Message> messages = new ConcurrentHashMap<>();
 
     @Override
     public Message save(Message message) {

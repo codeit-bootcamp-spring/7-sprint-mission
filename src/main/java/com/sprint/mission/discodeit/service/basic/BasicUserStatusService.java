@@ -23,12 +23,6 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
 
-    // 중복 메서드 만들기
-    private UserStatus getUserStatus(UUID userStatusId) {
-        return userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
-    }
-
     @Override
     public UserStatusResponseDto createUserStatus(CreateUserStatusRequestDto requestDto) {
         UUID userId = requestDto.userId();
@@ -63,8 +57,9 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResponseDto updateUserStatus(UpdateUserStatusDto updateDto) {
-        UserStatus userStatus = getUserStatus(updateDto.userStatusId());
+    public UserStatusResponseDto updateUserStatus(UUID id) {
+        UserStatus userStatus = userStatusRepository.findByUserId(id)
+                        .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
         userStatus.statusUpdate(Instant.now());
         UserStatus userstatus = userStatusRepository.save(userStatus);
         return UserStatusResponseDto.from(userstatus);
@@ -84,4 +79,11 @@ public class BasicUserStatusService implements UserStatusService {
         getUserStatus(userStatusId);
         userStatusRepository.delete(userStatusId);
     }
+
+    // 중복 메서드 만들기
+    private UserStatus getUserStatus(UUID userStatusId) {
+        return userStatusRepository.findById(userStatusId)
+                .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
+    }
+
 }

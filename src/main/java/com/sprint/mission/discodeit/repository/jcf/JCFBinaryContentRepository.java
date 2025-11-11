@@ -5,12 +5,12 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-@Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
 
-    private final Map<UUID, BinaryContent> binaryContents = new HashMap<>();
+    private final Map<UUID, BinaryContent> binaryContents = new ConcurrentHashMap<>();
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {

@@ -7,6 +7,5 @@ public record CreateMessageRequestDto (
 
     String content, // 메시지
     UUID authorId, // 유저ID
-    UUID channelId, // 채널ID
-    List<UUID> attachmentIds // 첨부파일
+    UUID channelId // 채널ID
 ) {}

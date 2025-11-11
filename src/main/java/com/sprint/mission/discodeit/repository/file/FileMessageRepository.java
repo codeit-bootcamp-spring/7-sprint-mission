@@ -10,11 +10,15 @@ import java.util.*;
 
 public class FileMessageRepository extends AbstractFileRepository<Message, UUID> implements MessageRepository {
 
-    private static final String FILE_PATH = "data" + File.separator + "messages.ser";
+    private final String filePath;
+
+    public FileMessageRepository(String fileDirectory) {
+        this.filePath = fileDirectory + File.separator + "messages.ser";
+    }
 
     @Override
     protected String getFilePath() {
-        return FILE_PATH;
+        return filePath;
     }
 
     @Override

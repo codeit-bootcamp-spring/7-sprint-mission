@@ -9,11 +9,16 @@ import java.util.UUID;
 
 public class FileBinaryContentRepository extends AbstractFileRepository<BinaryContent, UUID> implements BinaryContentRepository {
 
-    private static final String FILE_PATH = "data" + File.separator + "binaryContent.ser";
+
+    private final String filePath;
+
+    public FileBinaryContentRepository(String fileDirectory) {
+        this.filePath = fileDirectory + File.separator + "binaryContent.ser";
+    }
 
     @Override
     protected String getFilePath() {
-        return FILE_PATH;
+        return filePath;
     }
 
     @Override

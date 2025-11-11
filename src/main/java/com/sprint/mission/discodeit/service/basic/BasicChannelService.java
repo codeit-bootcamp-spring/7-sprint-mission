@@ -34,19 +34,18 @@ public class BasicChannelService implements ChannelService {
         Channel channel = new Channel(
                 null,
                 null,
-                ChannelType.PRIVATE
+                ChannelType.PRIVATE,
+                dto.members()
         );
 
         Channel saved = channelRepository.save(channel);
 
-        List<UUID> members = dto.members();
-        for (UUID member : members) {
-            saved.getMembers().add(member);
+        for (UUID member : saved.getMembers()) {
             ReadStatus readStatus = new ReadStatus(member, saved.getId());
             readStatusRepository.save(readStatus);
         }
 
-        return ChannelResponseDto.from(saved, null, members);
+        return ChannelResponseDto.from(saved, null, saved.getMembers());
     }
 
     @Override
@@ -88,10 +87,10 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelResponseDto> findAllByUserId(UUID userId) {
-        List<Channel> channels = channelRepository.findAll();
+        List<Channel> channels = channelRepository.findChannelsByUserId(userId);
         List<ChannelResponseDto> dtoList = new ArrayList<>();
 
-        for(Channel channel : channels){
+        for (Channel channel : channels) {
             List<Message> messages = messageRepository.findByChannelId(channel.getId());
 
             Instant readMassage = messages.stream()
@@ -100,24 +99,18 @@ public class BasicChannelService implements ChannelService {
                     .orElse(null);
 
             List<UUID> members = null;
-
-            if(channel.getType() == ChannelType.PUBLIC){
-                ChannelResponseDto response = ChannelResponseDto.from(channel, readMassage, null);
-                dtoList.add(response);
-
-            } else if(channel.getType() == ChannelType.PRIVATE &&
-                    channel.getMembers().contains(userId)){
+            if (channel.getType() == ChannelType.PRIVATE) {
                 members = channel.getMembers();
-                ChannelResponseDto response = ChannelResponseDto.from(channel, readMassage, members);
-                dtoList.add(response);
             }
+            ChannelResponseDto response = ChannelResponseDto.from(channel, readMassage, members);
+            dtoList.add(response);
         }
         return dtoList;
     }
 
     @Override
-    public ChannelResponseDto updateChannel(UpdateChannelDto updateChannelDto) {
-        Channel channel = channelRepository.findById(updateChannelDto.channelId())
+    public ChannelResponseDto updateChannel(UUID id, UpdateChannelDto updateChannelDto) {
+        Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
 
         if(channel.getType() == ChannelType.PRIVATE){
