@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.channel.request.*;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -48,7 +49,7 @@ public interface ChannelService {
     /**
      * 전체 채널 조회
      */
-    List<ChannelResponseDto> findAllByUserId(UUID userId);
+    List<ChannelDto>  findAllByUserId(UUID userId);
 
     /**
      * 채널 관리자 변경

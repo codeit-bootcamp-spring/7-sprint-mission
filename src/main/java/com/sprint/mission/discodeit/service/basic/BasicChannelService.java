@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.request.*;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
 import com.sprint.mission.discodeit.entity.*;
@@ -145,17 +146,13 @@ public class BasicChannelService implements ChannelService {
 
     // Public 채널 목록은 전체 조회 + Private 채널은 User가 참여한 채널만 조회
     @Override
-    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+    public List<ChannelDto> findAllByUserId(UUID userId) {
         return channelRepository.findAll().stream()
                 .filter(c -> c.getVisibility() == ChannelVisibility.PUBLIC ||
                         (c.getVisibility() == ChannelVisibility.PRIVATE && c.getMemberIds().contains(userId)))
-                .map(c -> c.getVisibility() == ChannelVisibility.PRIVATE
-                                ? PrivateChannelResponseDto.from(c, messageRepository.searchLastedMessageTime(c.getId()))
-                                : ChannelResponseDto.from(c, messageRepository.searchLastedMessageTime(c.getId()))
-                )
-                .sorted(Comparator.comparing(ChannelResponseDto::getVisibility)
-                        .thenComparing(c -> c.getChannelType())
-                        .thenComparing(c -> c.getChannelName())
+                .map(c -> ChannelDto.from(c, messageRepository.searchLastedMessageTime(c.getId())))
+                .sorted(Comparator.comparing(ChannelDto::getType)
+                        .thenComparing(c -> c.getName())
                 )
                 .collect(Collectors.toList());
     }

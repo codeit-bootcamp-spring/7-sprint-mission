@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.channel.request.*;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.global.dto.ApiResponse;
@@ -21,15 +22,13 @@ public class ChannelController {
 
     // 채널 생성
     @RequestMapping(value = "/channels/public", method = RequestMethod.POST)
-    public ResponseEntity<Channel> createPublic(@RequestParam UUID userId,
-                                                @RequestBody CreatePublicChannelRequestDto requestDto) {
+    public ResponseEntity<Channel> createPublic(@RequestBody CreatePublicChannelRequestDto requestDto) {
         Channel createdChannel = channelService.create(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
 
     @RequestMapping(value = "/channels/private", method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<Object>> createPrivate(@RequestParam UUID userId,
-                                                             @RequestBody CreatePrivateChannelRequestDto requestDto) {
+    public ResponseEntity<Channel> createPrivate(@RequestBody CreatePrivateChannelRequestDto requestDto) {
         Channel createdChannel = channelService.create(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
@@ -52,8 +51,8 @@ public class ChannelController {
 
     // 특정 사용자가 볼 수 있는 채널 목록 조회
     @RequestMapping(value = "/channels", method = RequestMethod.GET)
-    public ResponseEntity<List<ChannelResponseDto>> searchChannels(@RequestParam UUID userId) {
-        List<ChannelResponseDto> channels = channelService.findAllByUserId(userId);
+    public ResponseEntity<List<ChannelDto>> searchChannels(@RequestParam UUID userId) {
+        List<ChannelDto> channels = channelService.findAllByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(channels);
     }
 
