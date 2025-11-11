@@ -61,7 +61,7 @@ public class UserController {
       @PathVariable UUID id,
       @RequestBody UserUpdateRequest req
   ) {
-    Assert.notNull(id, "userId must not be null");
+    Assert.notNull(id, "유저ID가 null일 수 없습니다.");
     var updated = userService.update(id, req, Optional.empty());
     return ResponseEntity.ok(Map.of("id", updated.getId()));
   }
