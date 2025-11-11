@@ -76,7 +76,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserUserStatusPatchResponseDto patchUserStatus(UUID userId, UserStatusPatchRequestDto dto) {
         User user = userRepository.getUserById(userId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 User 입니다."));
-        UserStatus userStatus = userStatusRepository.readUserStatus(userId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 userStatus 입니다."));
+        UserStatus userStatus = userStatusRepository.readAllUserStatus().stream().filter(x->x.getUserId().equals(userId)).findFirst().orElseThrow(()->new IllegalArgumentException("존재하지 않는 UserStatus 입니다."));
         userStatus.setLastOnlineTime(dto.newLastActiveAt());
         user.setOnline(userStatus.isUserOnline());
 

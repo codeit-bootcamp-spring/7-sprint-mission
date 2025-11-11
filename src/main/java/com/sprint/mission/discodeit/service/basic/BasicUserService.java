@@ -249,6 +249,7 @@ public class BasicUserService implements UserService {
         user.setUserName(dto.newUsername());
         user.setName(dto.newUsername());
         user.setPassword(dto.newPassword());
+        user.setEmail(dto.newEmail());
         binaryContentRepository.deleteBinaryContent(user.getProfileId());
         BinaryContent tmpBinaryContent= binaryContentRepository.createBinaryContent(BinaryContent.builder()
                 .bytes(profile.getBytes())
