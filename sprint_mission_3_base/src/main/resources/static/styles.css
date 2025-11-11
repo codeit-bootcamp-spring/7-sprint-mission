@@ -1,0 +1,123 @@
+body {
+    font-family: "Pretendard", sans-serif;
+    background-color: #f5f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 80px;
+}
+
+.container {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px 50px;
+    width: 600px;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.title {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 24px;
+    color: #222;
+    font-weight: 700;
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.user-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafafa;
+    border-radius: 12px;
+    padding: 14px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease-in-out;
+}
+
+.user-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+.user-card img.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: transparent;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.user-info img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #eee;
+    transition: all 0.2s ease-in-out;
+}
+
+.user-info img:hover {
+    border-color: #4caf50;
+}
+
+.user-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.username {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.email {
+    font-size: 14px;
+    color: #888;
+}
+
+.status {
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 14px;
+    cursor: default;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+
+.status.offline {
+    background: #9e9e9e;
+}
+
+.status:hover {
+    transform: scale(1.05);
+}
+
+.loading {
+    text-align: center;
+    color: #777;
+    font-size: 16px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}

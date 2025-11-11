@@ -34,7 +34,15 @@ public class BasicAuthService implements AuthService {
         );
 
         // online 계산은 UserService.find/findAll에서 해주므로 여기선 간단 응답
-        UserDto dto = new UserDto(user.getId(), user.getUsername(), user.getEmail(), true, null);
+        UserDto dto = new UserDto(
+                user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getUsername(),
+                user.getEmail(),
+                null, // profileId가 아직 없을 가능성이 높음
+                true  // 로그인 시점이므로 online = true
+        );
         return new LoginResponse(dto);
     }
 

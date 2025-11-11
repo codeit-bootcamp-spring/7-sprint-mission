@@ -74,4 +74,6 @@ public class BasicUserStatusService implements UserStatusService {
     public void delete(UUID id) {
         userStatusRepository.deleteById(id);
     }
+
+    //committest
 }
