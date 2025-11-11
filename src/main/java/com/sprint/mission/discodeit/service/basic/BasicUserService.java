@@ -67,7 +67,7 @@ public class BasicUserService implements UserService {
         if(!userRepository.existsById(id)){
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
-        validateDuplicate(req.email(), req.nickname());
+        validateDuplicate(id, req.email(), req.nickname());
         userRepository.update(id, req.email(), req.nickname(),req.password());
     }
 
@@ -78,12 +78,22 @@ public class BasicUserService implements UserService {
 
 
     // ===== 🔒 Private Logic (내부 사용) =====
-    //중복 검사
+    // 신규 유저 중복 검사
     private void validateDuplicate(String email, String nickname){
         if(userRepository.existsByEmail(email)){
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         if(userRepository.existsByNickname(nickname)){
+            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
+        }
+    }
+
+    //기존 유저 회원 정보 수정 시 중복 검사
+    private void validateDuplicate(UUID userId, String email, String nickname){
+        if(userRepository.existsByEmailAndIdNot(email, userId)){
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+        if(userRepository.existsByNicknameAndIdNot(nickname, userId)){
             throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         }
     }

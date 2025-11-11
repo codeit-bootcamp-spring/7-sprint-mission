@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +20,7 @@ import java.time.Instant;
 public class ChannelMapper {
     private final MessageService messageService;
 
-    public ChannelInfoRes toInfoRes(Channel channel) {
+    public ChannelInfoRes toInfoRes(@NonNull Channel channel) {
         Message lastMessage = messageService.findLastMessageByChannelId(channel.getId());
         Instant lastMessageTime = lastMessage == null ? null : lastMessage.getCreatedAt();
 

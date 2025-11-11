@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +16,8 @@ public class UserStatusCreateFacade {
     private final UserService userService;
 
     //UserState
-    public UserStatus create(UserStatusCreateReq req){
+    public UserStatus create(@NonNull UserStatusCreateReq req){
         User user = userService.findById(req.userId());
-        return userStatusService.create(new UserStatus(user.getId()));
+        return userStatusService.create(UserStatus.create(user.getId()));
     }
 }

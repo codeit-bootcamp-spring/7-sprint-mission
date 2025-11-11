@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 
@@ -9,8 +10,8 @@ import java.util.UUID;
 
 public class FileUserStatusRepository extends BaseFileRepository<UserStatus>
 implements UserStatusRepository {
-    public FileUserStatusRepository() {
-        super(UserStatus.class);
+    public FileUserStatusRepository(RepositoryProperties repositoryProperties) {
+        super(UserStatus.class, repositoryProperties);
     }
 
     //저장

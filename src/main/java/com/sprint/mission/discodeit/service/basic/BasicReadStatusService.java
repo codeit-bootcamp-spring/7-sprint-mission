@@ -25,12 +25,6 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
-        return readStatusRepository.findById(id).orElseThrow(() ->
-                new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
-    }
-
-    @Override
     public void update(UUID id) {
         readStatusRepository.update(id);
     }
@@ -48,5 +42,13 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId);
+    }
+
+    // ===== 🎯 Controller Direct (DTO 반환) =====
+    @Override
+    public ReadStatusInfoRes findById(UUID id) {
+        ReadStatus readStatus=readStatusRepository.findById(id).orElseThrow(() ->
+                new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
+        return ReadStatusInfoRes.from(readStatus);
     }
 }

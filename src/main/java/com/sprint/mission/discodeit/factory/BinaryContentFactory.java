@@ -4,8 +4,6 @@ import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreat
 import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentUpdateReq;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
-import java.util.UUID;
-
 public class BinaryContentFactory {
     private BinaryContentFactory(){}
 
@@ -17,12 +15,7 @@ public class BinaryContentFactory {
         return create(req.data(), req.fileName(), req.fileType());
     }
 
-    public static BinaryContent create(byte[] data, String fileName, String fileType) {
-        return BinaryContent.builder()
-                .id(UUID.randomUUID())
-                .data(data)
-                .fileName(fileName)
-                .fileType(fileType)
-                .build();
+    public static BinaryContent create(byte[] data, String fileName, String fileType){
+        return BinaryContent.create(data, fileName, fileType);
     }
 }

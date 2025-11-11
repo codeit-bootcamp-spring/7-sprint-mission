@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     // ===== 🎯 Controller Direct (DTO 반환) =====
     @Override
-    public UserStatusViewRes findById(UUID id) {
+    public UserStatusViewRes findById(@NonNull UUID id) {
         UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(
                 ()-> new CustomException(ErrorCode.USERSTATUS_NOT_FOUND)
         );
@@ -40,27 +41,27 @@ public class BasicUserStatusService implements UserStatusService {
 
     // ===== 🔧 Controller Direct (단일 도메인 / void) =====
     @Override
-    public void updateOnlineAt(UUID id) {
+    public void updateOnlineAt(@NonNull UUID id) {
         userStatusRepository.updateOnlineAt(id);
     }
 
     @Override
-    public void updateOfflineAt(UUID id) {
+    public void updateOfflineAt(@NonNull UUID id) {
         userStatusRepository.updateOfflineAt(id);
     }
 
     @Override
-    public void update(UUID id) {
+    public void update(@NonNull UUID id) {
         userStatusRepository.update(id);
     }
 
     @Override
-    public void updateByUserId(UUID userId) {
+    public void updateByUserId(@NonNull UUID userId) {
         userStatusRepository.updateByUserId(userId);
     }
 
     @Override
-    public void delete(UUID id) {
+    public void delete(@NonNull UUID id) {
         userStatusRepository.delete(id);
     }
 }

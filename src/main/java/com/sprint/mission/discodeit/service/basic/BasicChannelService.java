@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,14 +27,14 @@ public class BasicChannelService implements ChannelService {
     // ===== 🏗️ Domain Logic (Facade 용)  =====
     //채널 생성
     @Override
-    public Channel create(ChannelCreateReq req) {
-        return channelRepository.save(ChannelFactory.create(req));
+    public Channel create(UUID managerId, ChannelCreateReq req) {
+        return channelRepository.save(ChannelFactory.create(managerId, req));
     }
 
     //채널 생성: 비공개
     @Override
-    public Channel create(ChannelCreateSecReq req) {
-        return channelRepository.save(ChannelFactory.create(req));
+    public Channel create(UUID managerId, ChannelCreateSecReq req) {
+        return channelRepository.save(ChannelFactory.create(managerId, req));
     }
 
     //채널 삭제
@@ -49,6 +50,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public List<Channel> findAllByUserId(UUID userId){
         return channelRepository.findAll().stream().filter(channel ->
+                channel.getManagerId().equals(userId) ||
                 channel.getPublicType() == ChannelType.PUBLIC ||
                 (channel.getPublicType() == ChannelType.PRIVATE &&
                 channelRepository.isMember(userId, channel.getId()))).toList();
@@ -72,7 +74,7 @@ public class BasicChannelService implements ChannelService {
     // ===== 🔧 Controller Direct (단일 도메인 / void) =====
     //채널 수정
     @Override
-    public void update(UUID id, ChannelUpdateReq req) {
+    public void update(@NonNull UUID id, @NonNull ChannelUpdateReq req) {
         Channel channel = channelRepository.findById(id).orElseThrow(
                 () -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND)
         );

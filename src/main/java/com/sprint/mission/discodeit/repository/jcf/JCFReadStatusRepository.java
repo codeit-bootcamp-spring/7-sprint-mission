@@ -2,21 +2,15 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import lombok.Getter;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-@Getter
-public class JCFReadStatusRepository implements ReadStatusRepository {
-    //Status 데이터
-    private final Map<UUID, ReadStatus> data = new ConcurrentHashMap<>();
-
+public class JCFReadStatusRepository extends BaseJCFRepository<ReadStatus> implements ReadStatusRepository {
     @Override
     public ReadStatus save(ReadStatus readStatus) {
+        beforeModify();
         data.put(readStatus.getId(), readStatus);
         return readStatus;
     }
@@ -42,11 +36,13 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void update(UUID statusId) {
-        data.get(statusId).update();
+        beforeModify();
+        data.get(statusId).updateReadAt();
     }
 
     @Override
     public void delete(UUID statusId) {
+        beforeModify();
         data.remove(statusId);
     }
 

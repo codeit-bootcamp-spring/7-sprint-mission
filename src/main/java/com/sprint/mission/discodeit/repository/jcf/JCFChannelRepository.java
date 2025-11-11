@@ -2,22 +2,16 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import lombok.Getter;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-@Getter
-public class JCFChannelRepository implements ChannelRepository {
-    //채널 데이터
-    private final Map<UUID, Channel> data = new ConcurrentHashMap<>();
-
+public class JCFChannelRepository extends BaseJCFRepository<Channel> implements ChannelRepository {
     //저장
     @Override
     public Channel save(Channel channel) {
+        beforeModify();
         data.put(channel.getId(), channel);
         return channel;
     }
@@ -32,7 +26,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public List<Channel> findAllByUserId(UUID userId) {
         return findAll().stream()
-                .filter(ch -> ch.getUsers().contains(userId))
+                .filter(ch -> ch.getUserIds().contains(userId))
                 .toList();
     }
 
@@ -54,12 +48,14 @@ public class JCFChannelRepository implements ChannelRepository {
     //수정
     @Override
     public void update(UUID id, String name, String description) {
+        beforeModify();
         data.get(id).update(name, description);
     }
 
     //삭제
     @Override
     public void delete(UUID id) {
+        beforeModify();
         data.remove(id);
     }
 
@@ -68,7 +64,7 @@ public class JCFChannelRepository implements ChannelRepository {
     public boolean isMember(UUID userId, UUID channelId) {
         return findAll().stream()
                 .filter(ch -> ch.getId().equals(channelId))
-                .anyMatch(ch -> ch.getUsers().contains(userId));
+                .anyMatch(ch -> ch.getUserIds().contains(userId));
     }
 
     @Override

@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.transactional.CustomTransactional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,23 +22,25 @@ public class UserUpdateFacade {
     private final UserStatusService userStatusService;
 
     //유저 수정
-    public void updateUser(UUID userId, UserUpdateReq req){
+    @CustomTransactional
+    public void updateUser(@NonNull UUID userId, @NonNull UserUpdateReq req){
         User user = userService.findById(userId);
         UUID profileId = null;
 
+        //이메일과 닉네임 부터 update(조건 맞지 않으면 바로 예외처리)
+        userService.update(userId, req);
 
+        //기존 프로필 사진 있으면 무조건 삭제
+        if(user.getProfileId() != null){binaryContentService.delete(user.getProfileId());}
+
+        //올라온 데이터가 있으면 무조건 만들어서 배정
         if(req.profileImage().data() != null){
-            //기존 사진이 있으면 삭제
-            if(user.getProfileId() != null){
-                binaryContentService.delete(user.getProfileId());
-            }
             BinaryContent profileImg = binaryContentService.create(
-                BinaryContentFactory.create(req.profileImage())
+                    BinaryContentFactory.create(req.profileImage())
             );
             profileId = profileImg.getId();
-
         }
-        userService.update(userId, req);
+
         userService.updateProfileImage(userId, profileId);
         userStatusService.updateByUserId(userId);
     }

@@ -1,29 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@ToString
-@Builder
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseEntity{
     private static final long serialVersionUID = 1L;
 
     //Field
-    private final UUID userId;
-    private final UUID channelId;
+    private UUID userId;
+    private UUID channelId;
     private Instant readAt;
 
     //Constructor
-    public ReadStatus(UUID userId, UUID channelId) {
+    private ReadStatus(UUID userId, UUID channelId) {
         this.userId = userId;
         this.channelId = channelId;
+    }
+
+    //Factory Method
+    public static ReadStatus create(UUID userId, UUID channelId){
+        return new ReadStatus(userId, channelId);
     }
 
     //사용자가 채널을 읽음.

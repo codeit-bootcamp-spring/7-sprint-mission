@@ -2,22 +2,16 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import lombok.Getter;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-@Getter
-public class JCFUserRepository implements UserRepository {
-    // 유저 데이터
-    private final Map<UUID, User> data = new ConcurrentHashMap<>();
-
+public class JCFUserRepository extends BaseJCFRepository<User> implements UserRepository{
     // 저장
     @Override
     public User save(User user) {
+        beforeModify();
         data.put(user.getId(), user);
         return user;
     }
@@ -52,16 +46,19 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void update(UUID userId, String email, String nickname, String password){
+        beforeModify();
         data.get(userId).update(email, nickname, password);
     }
 
     @Override
     public void updateProfileImage(UUID userId, UUID profileId) {
+        beforeModify();
         data.get(userId).updateProfile(profileId);
     }
 
     @Override
     public void delete(UUID userId) {
+        beforeModify();
         data.remove(userId);
     }
 
@@ -78,5 +75,20 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public boolean existsById(UUID id) {
         return data.containsKey(id);
+    }
+
+    @Override
+    public boolean existsByEmailAndIdNot(String email, UUID id) {
+        return data.values().stream().anyMatch(
+                user -> user.getEmail().equals(email) &&
+                        !user.getId().equals(id));
+    }
+
+    @Override
+    public boolean existsByNicknameAndIdNot(String nickname, UUID id) {
+        return data.values().stream().anyMatch(
+                user -> user.getNickname().equals(nickname) &&
+                                !user.getId().equals(id)
+                );
     }
 }

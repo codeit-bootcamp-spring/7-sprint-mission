@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.facade.channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.transactional.CustomTransactional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,8 @@ public class ChannelDeleteFacade {
     private final MessageService messageService;
     private final ReadStatusService readStatusService;
 
-    public void deleteChannel(UUID channelId){
+    @CustomTransactional
+    public void deleteChannel(@NonNull UUID channelId){
         readStatusService.findAllByChannelId(channelId)
                 .forEach(readStatus -> readStatusService.delete(readStatus.getId()));
         messageService.findAllByChannelId(channelId)

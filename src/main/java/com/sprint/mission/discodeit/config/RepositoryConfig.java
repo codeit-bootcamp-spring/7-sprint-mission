@@ -27,8 +27,8 @@ public class RepositoryConfig {
             name = "type",
             havingValue = "file"
     )
-    public UserRepository fileUserRepository() {
-        return new FileUserRepository();
+    public UserRepository fileUserRepository(RepositoryProperties repositoryProperties) {
+        return new FileUserRepository(repositoryProperties);
     }
 
     //UserStatusRepository
@@ -49,8 +49,8 @@ public class RepositoryConfig {
             name = "type",
             havingValue = "file"
     )
-    public UserStatusRepository fileUserStatusRepository() {
-        return new FileUserStatusRepository();
+    public UserStatusRepository fileUserStatusRepository(RepositoryProperties repositoryProperties) {
+        return new FileUserStatusRepository(repositoryProperties);
     }
 
     //BinaryContentRepository
@@ -71,8 +71,8 @@ public class RepositoryConfig {
             name = "type",
             havingValue = "file"
     )
-    public BinaryContentRepository fileBinaryContentRepository() {
-        return new FileBinaryContentRepository();
+    public BinaryContentRepository fileBinaryContentRepository(RepositoryProperties repositoryProperties) {
+        return new FileBinaryContentRepository(repositoryProperties);
     }
 
     //ChannelRepository
@@ -93,8 +93,8 @@ public class RepositoryConfig {
             name = "type",
             havingValue = "file"
     )
-    public ChannelRepository fileChannelRepository() {
-        return new FileChannelRepository();
+    public ChannelRepository fileChannelRepository(RepositoryProperties repositoryProperties) {
+        return new FileChannelRepository(repositoryProperties);
     }
 
     //MessageRepository
@@ -115,8 +115,8 @@ public class RepositoryConfig {
             name = "type",
             havingValue = "file"
     )
-    public MessageRepository fileMessageRepository() {
-        return new FileMessageRepository();
+    public MessageRepository fileMessageRepository(RepositoryProperties repositoryProperties) {
+        return new FileMessageRepository(repositoryProperties);
     }
 
     //ReadStatusRepository
@@ -137,7 +137,7 @@ public class RepositoryConfig {
             name = "type",
             havingValue = "file"
     )
-    public ReadStatusRepository fileReadStatusRepository() {
-        return new FileReadStatusRepository();
+    public ReadStatusRepository fileReadStatusRepository(RepositoryProperties repositoryProperties) {
+        return new FileReadStatusRepository(repositoryProperties);
     }
 }

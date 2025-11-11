@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
@@ -8,8 +9,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileChannelRepository extends BaseFileRepository<Channel> implements ChannelRepository {
-    public FileChannelRepository() {
-        super(Channel.class);
+    public FileChannelRepository(RepositoryProperties repositoryProperties) {
+        super(Channel.class, repositoryProperties);
     }
 
     //저장
@@ -29,7 +30,7 @@ public class FileChannelRepository extends BaseFileRepository<Channel> implement
     @Override
     public List<Channel> findAllByUserId(UUID userId) {
         return findAllFiles().stream()
-                .filter(ch -> ch.getUsers().contains(userId))
+                .filter(ch -> ch.getUserIds().contains(userId))
                 .toList();
     }
     
@@ -67,7 +68,7 @@ public class FileChannelRepository extends BaseFileRepository<Channel> implement
     public boolean isMember(UUID userId, UUID channelId) {
         return findAllFiles().stream()
                 .filter(ch -> ch.getId().equals(channelId))
-                .anyMatch(ch -> ch.getUsers().contains(userId));
+                .anyMatch(ch -> ch.getUserIds().contains(userId));
     }
 
     @Override

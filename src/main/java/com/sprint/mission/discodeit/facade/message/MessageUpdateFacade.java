@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.facade.message;
 
-import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentUpdateReq;
 import com.sprint.mission.discodeit.dto.message.request.MessageUpdateReq;
 import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.transactional.CustomTransactional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,38 +22,20 @@ public class MessageUpdateFacade {
     private final BinaryContentService binaryContentService;
     private final MessageMapper messageMapper;
 
-    //메세지 수정
-    public MessageViewRes updateMessage(UUID messageId, MessageUpdateReq req){
-        List<UUID> updatedAttachmentIds = new ArrayList<>();
-        List<BinaryContentUpdateReq> attachmentUpdateReqs = req.attachmentReqs();
+    @CustomTransactional
+    public MessageViewRes updateMessage(@NonNull UUID messageId, @NonNull MessageUpdateReq req){
+        List<UUID> oldIds = messageService.findById(messageId).getAttachmentIds();
+        List<UUID> updatedIds = new ArrayList<>(req.keepAttachmentIds());
+        //새로운 첨부파일 파일 생성 : 파일 생성 및 updateIds 에 id 넣기
+        req.newAttachmentReqs().forEach(r ->
+                updatedIds.add(binaryContentService.create(BinaryContentFactory.create(r)).getId()));
+        //파일 유지 UUID 에 없으면, 파일 삭제. 있으면 유지이므로, updateIds 에 id 넣기
+        oldIds.stream()
+                .filter(id -> !req.keepAttachmentIds().contains(id))
+                .forEach(binaryContentService::delete);
 
-        attachmentUpdateReqs.forEach(binaryContentUpdateReq -> {
-            if(binaryContentUpdateReq.binaryContentId() != null){
-                handleExistingFile(binaryContentUpdateReq, updatedAttachmentIds);
-            }else{
-                handleNewFile(binaryContentUpdateReq, updatedAttachmentIds);
-            }
-        });
-
-        messageService.update(messageId, req.content(), updatedAttachmentIds);
+        messageService.update(messageId, req.content(), updatedIds);
         return messageMapper.mapToView(messageService.findById(messageId));
-    }
-
-    //기존 파일(데이터 없으면 삭제, 있으면 유지)
-    private void handleExistingFile(BinaryContentUpdateReq req, List<UUID> attachmentIds){
-        if(req.data() == null){
-            binaryContentService.delete(req.binaryContentId());
-        }else{
-            attachmentIds.add(req.binaryContentId());
-        }
-    }
-
-    //새로 업로드 된 파일
-    private void handleNewFile(BinaryContentUpdateReq req, List<UUID> attachmentIds){
-        BinaryContent newFile = binaryContentService.create(
-            BinaryContentFactory.create(req)
-        );
-        attachmentIds.add(newFile.getId());
     }
 }
 

@@ -7,9 +7,9 @@ public class ReadStatusFactory {
     private ReadStatusFactory(){}
 
     public static ReadStatus create(ReadStatusCreateReq req){
-        return ReadStatus.builder()
-                .channelId(req.channelId())
-                .userId(req.userId())
-                .build();
+        return ReadStatus.create(
+                req.userId(),
+                req.channelId()
+        );
     }
 }

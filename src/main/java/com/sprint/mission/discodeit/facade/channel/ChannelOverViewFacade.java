@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.facade.channel;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.facade.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class ChannelOverViewFacade {
     private final ChannelMapper channelMapper;
     
     //채널 목록 : Public 인 경우 전부, Private 인 경우 자신이 참여한 채널만
-    public List<ChannelInfoRes> findAllMyChannels(UUID userId) {
+    public List<ChannelInfoRes> findAllMyChannels(@NonNull UUID userId) {
         return channelService.findAllByUserId(userId).stream()
                 .map(channelMapper::toInfoRes).toList();
     }

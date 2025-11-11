@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.facade.message;
 
 import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
-import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.transactional.CustomTransactional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +21,10 @@ import java.util.UUID;
 public class MessageCreationFacade {
     private final MessageService messageService;
     private final BinaryContentService binaryContentService;
-    private final MessageMapper messageMapper;
 
     //메세지 추가
-    public MessageViewRes createMessage(MessageCreateReq req){
+    @CustomTransactional
+    public Message createMessage(@NonNull UUID speakerId, @NonNull UUID channelId, @NonNull MessageCreateReq req){
         List<UUID> attachments = new ArrayList<>();
         
         if(!req.attachmentIds().isEmpty()){
@@ -36,8 +36,7 @@ public class MessageCreationFacade {
             });
         }
 
-        Message newMessage = messageService.create(MessageFactory.create(req, attachments));
-        return messageMapper.mapToView(newMessage);
+        return messageService.create(MessageFactory.create(speakerId, channelId, req, attachments));
     }
 }
 

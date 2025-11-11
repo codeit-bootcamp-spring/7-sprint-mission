@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
@@ -8,8 +9,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileUserRepository extends BaseFileRepository<User> implements UserRepository {
-    public FileUserRepository(){
-        super(User.class);
+    public FileUserRepository(RepositoryProperties repositoryProperties){
+        super(User.class, repositoryProperties);
     }
     
     //저장
@@ -87,5 +88,20 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
     @Override
     public boolean existsById(UUID id) {
         return fileExistsById(id);
+    }
+
+    @Override
+    public boolean existsByEmailAndIdNot(String email, UUID id) {
+        return findAllFiles().stream().anyMatch(
+                user -> user.getEmail().equals(email) &&
+                        !user.getId().equals(id));
+    }
+
+    @Override
+    public boolean existsByNicknameAndIdNot(String nickname, UUID id) {
+        return findAllFiles().stream().anyMatch(
+                user -> user.getNickname().equals(nickname) &&
+                        !user.getId().equals(id)
+        );
     }
 }

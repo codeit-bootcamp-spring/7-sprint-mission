@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.facade.channel;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.facade.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,7 @@ public class ChannelDetailViewFacade {
     private final ChannelMapper channelMapper;
 
     //채널명으로 찾기
-    public ChannelInfoRes findByName(String name) {
+    public ChannelInfoRes findByName(@NonNull String name) {
         if (channelService.findByName(name) == null) return null;
         return channelMapper.toInfoRes(channelService.findByName(name));
     }

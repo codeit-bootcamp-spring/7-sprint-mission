@@ -2,16 +2,13 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import lombok.Getter;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-@Getter
-public class JCFMessageRepository implements MessageRepository {
-    //메세지 데이터
-    private final Map<UUID, Message> data = new ConcurrentHashMap<>();
-
+public class JCFMessageRepository extends BaseJCFRepository<Message> implements MessageRepository {
     //메세지 전부 조회
     @Override
     public List<Message> findAll() {
@@ -51,6 +48,7 @@ public class JCFMessageRepository implements MessageRepository {
     //메세지 저장
     @Override
     public Message save(Message message) {
+        beforeModify();
         data.put(message.getId(), message);
         return message;
     }
@@ -58,12 +56,14 @@ public class JCFMessageRepository implements MessageRepository {
     //메세지 수정
     @Override
     public void update(UUID id, String content, List<UUID> attachmentIds) {
+        beforeModify();
         data.get(id).update(content, attachmentIds);
     }
 
     //메세지 삭제
     @Override
     public void delete(UUID id) {
+        beforeModify();
         data.remove(id);
     }
 

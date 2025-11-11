@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class AuthFacade {
     private final UserStatusService userStatusService;
 
     //로그인
-    public void login(UserLoginReq req){
+    public void login(@NonNull UserLoginReq req){
         User user = userService.findByNickname(req.nickname());
         if(user == null){
             throw new CustomException(ErrorCode.INVALID_NICKNAME);
@@ -29,10 +30,11 @@ public class AuthFacade {
         }
         UserStatus userStatus= userStatusService.findByUserId(user.getId());
         userStatusService.updateOnlineAt(userStatus.getId());
+        userStatusService.updateOfflineAt(userStatus.getId());
     }
 
     //로그아웃
-    public void logout(UUID userId){
+    public void logout(@NonNull UUID userId){
         userStatusService.findByUserId(userId);
         UserStatus userStatus= userStatusService.findByUserId(userId);
         userStatusService.updateOfflineAt(userStatus.getId());
