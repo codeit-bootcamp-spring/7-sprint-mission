@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
-    void create(CreateReadStatusRequestDto request);
+    ReadStatus create(CreateReadStatusRequestDto request);
     ReadStatus find(UUID readStatusId);
     List<ReadStatus> findAllByUserId(UUID userId);
-    void update(UpdateReadStatusRequestDto request);
+    ReadStatus update(UUID readStatusId, UpdateReadStatusRequestDto request);
     void delete(UUID readStatusId);
 }

@@ -46,7 +46,7 @@ public class BasicChannelService implements ChannelService {
         // 비공개 채널의 경우 멤버 정보 저장
         if (request.getChannelVisibility() == ChannelVisibility.PRIVATE) {
             channelRepository.addChannelIdForUser(newChannel.getId(), adminId); // 유저 객체에 속한 채널 UUID 리스트 저장
-            readStatusRepository.save(new ReadStatus(adminId, newChannel.getId()));
+            readStatusRepository.save(new ReadStatus(adminId, newChannel.getId(), Instant.MIN));
         }
 
         return ChannelResponseDto.from(newChannel, newChannel.getCreatedAt());
@@ -104,7 +104,7 @@ public class BasicChannelService implements ChannelService {
             throw new CustomException(ErrorCode.PUBLIC_CHANNEL_MEMBER_ADD_FORBIDDEN);
         }
 
-        readStatusRepository.save(new ReadStatus(request.getUserId(), channelId));
+        readStatusRepository.save(new ReadStatus(request.getUserId(), channelId, Instant.now()));
         channel.addMember(request.getUserId());
         channelRepository.addChannelIdForUser(channel.getId(), request.getUserId()); // 유저 객체에 속한 채널 UUID 리스트 저장
         channelRepository.save(channel);

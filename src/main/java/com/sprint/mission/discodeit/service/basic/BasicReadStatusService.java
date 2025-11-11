@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,7 +25,9 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public void create(CreateReadStatusRequestDto request) {
+    public ReadStatus create(CreateReadStatusRequestDto request) {
+        ReadStatus status;
+
         // 유저가 존재하지 않으면 예외 발생
         userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -34,10 +37,13 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
         if(!existsByUserIdAndChannelId(request.getUserId(),request.getChannelId())) {
-            readStatusRepository.save(new ReadStatus(request.getUserId(),request.getChannelId()));
+            status = new ReadStatus(request.getUserId(),request.getChannelId(), request.getLastReadAt());
+            readStatusRepository.save(status);
         } else {
             throw new CustomException(ErrorCode.CHANNEL_MEMBER_ALREADY_EXISTS);
         }
+
+        return status;
     }
 
     @Override
@@ -54,11 +60,12 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public void update(UpdateReadStatusRequestDto request) {
-        ReadStatus rs = readStatusRepository.findByUserIdAndChannelId(request.getUserId(),request.getChannelId())
+    public ReadStatus update(UUID readStatusId, UpdateReadStatusRequestDto request) {
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
-        rs.setUpdatedAt(); // 유저가 채널 메시지를 읽을 경우 읽은 시간 변경
-        readStatusRepository.update(rs);
+        readStatus.setLastReadAt(request.getNewLastReadAt());
+        readStatusRepository.update(readStatus);
+        return readStatus;
     }
 
     @Override
