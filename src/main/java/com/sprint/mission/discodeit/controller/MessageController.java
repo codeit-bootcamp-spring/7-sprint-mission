@@ -1,14 +1,20 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.response.message.MessageResponseDto;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,42 +23,34 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MessageController {
     private final MessageService messageService;
+    private final BinaryContentService binaryContentService;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public MessageResponseDto create(@Valid @RequestBody MessageCreateRequestDto messageCreateRequestDto) {
-        Message message = messageService.create(messageCreateRequestDto);
-        return MessageResponseDto.from(message);
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public MessageResponseDto create(@Valid @RequestBody MessageCreateRequestDto messageCreateRequestDto,
+                                     @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
+        return messageService.create(messageCreateRequestDto, attachments);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public MessageResponseDto get(@PathVariable("id") UUID id) {
-        Message message = messageService.get(id);
-        return MessageResponseDto.from(message);
+    @RequestMapping(value = "/{messageId}", method = RequestMethod.GET)
+    public MessageResponseDto get(@PathVariable("messageId") UUID messageId) {
+        return messageService.get(messageId);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public MessageResponseDto update(@PathVariable("id") UUID id,
+    @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public MessageResponseDto update(@PathVariable("messageId") UUID messageId,
                                      @Valid @RequestBody MessageUpdateRequestDto messageUpdateRequestDto) {
-        if(messageUpdateRequestDto.messageId() == null
-        || !id.equals(messageUpdateRequestDto.messageId())) {
-            throw new IllegalArgumentException("Invalid message id");
-        }
-        Message message = messageService.update(messageUpdateRequestDto);
-        return MessageResponseDto.from(message);
+        return messageService.update(messageId, messageUpdateRequestDto);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public void delete(@PathVariable("id") UUID id) {
-        messageService.delete(id);
+    @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
+    public void delete(@PathVariable("messageId") UUID messageId) {
+        messageService.delete(messageId);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public List<MessageResponseDto> getByChannelId(
-            @RequestParam("channelId") UUID channelId,
-            @RequestParam("userId") UUID userId)  {
-        List<Message> messages = messageService.getAllByChannelForUser(channelId, userId);
-        return messages.stream()
-                .map(message -> MessageResponseDto.from(message))
-                .toList();
+            @RequestParam("channelId") UUID channelId)  {
+        return messageService.getAllByChannelId(channelId);
     }
 }
