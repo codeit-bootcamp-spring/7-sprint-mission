@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.auth.request.LoginUserDto;
+import com.sprint.mission.discodeit.dto.auth.request.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -19,7 +19,7 @@ public class BasicAuthService implements AuthService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserResponseDto login(LoginUserDto request) {
+    public User login(LoginRequestDto request) {
         // 아이디 또는 비밀번호를 입력하지 않은 경우 예외 발생
         if (request.getUsername() == null || request.getUsername().isBlank() ||
                 request.getPassword() == null || request.getPassword().isBlank()) {
@@ -37,7 +37,7 @@ public class BasicAuthService implements AuthService {
         status.setUpdatedAt();
         userStatusRepository.update(status);
 
-        return UserResponseDto.from(user, true);
+        return user;
     }
 
     @Override

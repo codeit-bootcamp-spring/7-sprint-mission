@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.auth.request.LoginUserDto;
+import com.sprint.mission.discodeit.dto.auth.request.LoginRequestDto;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.dto.ApiResponse;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
 
-    @RequestMapping(value ="/login",method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<Object>> login(@RequestBody LoginUserDto loginUserDto){
-        authService.login(loginUserDto);
-        return ApiResponse.success(HttpStatus.OK, "로그인에 성공했습니다.");
+    @RequestMapping(value ="/auth/login",method = RequestMethod.POST)
+    public ResponseEntity<User> login(@RequestBody LoginRequestDto loginRequestDto){
+        User user = authService.login(loginRequestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 }
