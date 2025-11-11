@@ -37,12 +37,12 @@ public class Printer {
                 System.out.printf("====================%s====================\n", date);
             }
 
-            if (msg.getSenderId().equals(user.getId())) {
+            if (msg.getAuthorId().equals(user.getId())) {
                 System.out.printf("%s 나: %s\n", time, msg.getContent());
-            } else if(!msg.getReceiverId().equals(user.getId()) && msg.getReceiverId().equals(msg.getSenderId())) { // 채널이 보낸 메시지의 경우
+            } else if(!msg.getChannelId().equals(user.getId()) && msg.getChannelId().equals(msg.getAuthorId())) { // 채널이 보낸 메시지의 경우
                 System.out.printf("%s\n", msg.getContent());
             } else {
-                System.out.printf("%s %s: %s\n", time, userService.findNickNameById(msg.getSenderId()), msg.getContent());
+                System.out.printf("%s %s: %s\n", time, userService.findNickNameById(msg.getAuthorId()), msg.getContent());
             }
         }
     }

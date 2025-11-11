@@ -68,19 +68,19 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void deleteByUser(UUID userId) {
         // 특정 유저가 보낸 메시지 전부 삭제
-        messageStore.values().removeIf(m -> userId.equals(m.getSenderId()));
+        messageStore.values().removeIf(m -> userId.equals(m.getAuthorId()));
         saveToFile(filePath, messageStore);
     }
 
     @Override
     public List<UUID> deleteByChannelId(UUID channelId) {
         List<UUID> contentIds = messageStore.values().stream()
-                .filter(m -> channelId.equals(m.getReceiverId()))
+                .filter(m -> channelId.equals(m.getChannelId()))
                 .flatMap(m -> m.getAttachmentIds().stream())
                 .collect(Collectors.toList());
 
         // 채널 삭제시 채널의 모든 메시지 삭제
-        messageStore.values().removeIf(m -> channelId.equals(m.getReceiverId()));
+        messageStore.values().removeIf(m -> channelId.equals(m.getChannelId()));
         saveToFile(filePath, messageStore);
         return contentIds;
     }
@@ -90,7 +90,7 @@ public class FileMessageRepository implements MessageRepository {
         // 채널의 마지막 메시지를 보낸 시간 리턴
         // 메시지를 저장하지 않은 채널의 경우 null을 리턴 : Printer에서 최근 시간 대신 다른 메시지를 출력
         return findAll().stream()
-                .filter(m -> channelId.equals(m.getReceiverId()) && m.getReceiveType() == ReceiveType.CHANNEL)
+                .filter(m -> channelId.equals(m.getChannelId()) && m.getReceiveType() == ReceiveType.CHANNEL)
                 .map(m -> m.getUpdatedAt())
                 .sorted(Collections.reverseOrder())
                 .findFirst()
