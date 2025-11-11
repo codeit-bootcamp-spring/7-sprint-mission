@@ -87,7 +87,7 @@ public class UserController {
     private CreateBinaryContentRequestDto convertToRequestDto(MultipartFile file) {
         CreateBinaryContentRequestDto profileRequestDto = null;
 
-        if(!file.isEmpty()) {
+        if(file != null || !file.isEmpty()) {
             try {
                 profileRequestDto = new CreateBinaryContentRequestDto(
                         file.getOriginalFilename(),

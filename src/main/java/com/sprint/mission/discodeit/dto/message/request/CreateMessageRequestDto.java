@@ -9,8 +9,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class CreateMessageRequestDto {
-    private final UUID senderId;
-    private final UUID receiverId;
     private final String content;
-    private final ReceiveType receiveType;
+    private final UUID channelId;
+    private final UUID authorId;
 }

@@ -8,15 +8,15 @@ import java.util.UUID;
 
 @Getter
 public class Message extends BaseEntity{
-    private final UUID senderId;
-    private final UUID receiverId;
+    private final UUID authorId;
+    private final UUID channelId;
     private final ReceiveType receiveType;
     private String content;
     private List<UUID> attachmentIds;
 
-    public Message(UUID senderId, UUID receiverId, ReceiveType receiveType, String content) {
-        this.senderId = senderId;
-        this.receiverId = receiverId;
+    public Message(UUID authorId, UUID channelId, ReceiveType receiveType, String content) {
+        this.authorId = authorId;
+        this.channelId = channelId;
         this.receiveType = receiveType;
         this.content = content;
         this.attachmentIds = new ArrayList<>();
@@ -44,8 +44,8 @@ public class Message extends BaseEntity{
         String str = super.toString();
         return "Message{" +
                 "contents='" + content + '\'' +
-                ", senderId=" + senderId +
-                ", receiverId=" + receiverId +
+                ", authorId=" + authorId +
+                ", channelId=" + channelId +
                 str +
                 '}';
     }

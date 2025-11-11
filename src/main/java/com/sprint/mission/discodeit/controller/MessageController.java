@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
@@ -11,8 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,34 +26,53 @@ public class MessageController {
 
     // 메시지 생성
     @RequestMapping(value = "/messages", method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<Object>> createMessage(@RequestPart("request") CreateMessageRequestDto requestDto,
-                                                 @RequestPart(value = "file", required = false) List<MultipartFile> file) {
-        messageService.create(requestDto, file);
-        return ApiResponse.success(HttpStatus.CREATED,"메시지가 생성되었습니다.");
+    public ResponseEntity<Message> createMessage(
+            @RequestPart("messageCreateRequest") CreateMessageRequestDto requestDto,
+            @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+    ) {
+        List<CreateBinaryContentRequestDto> attachmentRequests;
+        if(attachments != null || !attachments.isEmpty()) {
+            attachmentRequests = attachments.stream()
+                .map(attachment -> {
+                        try {
+                            return new CreateBinaryContentRequestDto(
+                                    attachment.getOriginalFilename(),
+                                    attachment.getContentType(),
+                                    attachment.getBytes());
+                        } catch(IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                ).collect(Collectors.toList());
+        } else {
+            attachmentRequests = new ArrayList<>();
+        }
+
+        Message createdMessage = messageService.create(requestDto, attachmentRequests);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
     }
 
     // 메시지 수정
     @RequestMapping(value = "/messages/{messageId}", method = RequestMethod.PATCH)
-    public ResponseEntity<ApiResponse<Object>> updateMessage(@PathVariable UUID messageId,
-                                                @RequestParam UUID userId,
-                                                @RequestBody UpdateMessageRequestDto requestDto) {
-        messageService.update(userId, messageId, requestDto);
-        return ApiResponse.success(HttpStatus.OK,"메시지가 수정되었습니다.");
+    public ResponseEntity<Message> updateMessage(
+            @PathVariable UUID messageId,
+            @RequestBody UpdateMessageRequestDto requestDto
+    ) {
+        Message updatedMessage = messageService.update(messageId, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedMessage);
     }
 
     // 메시지 삭제
     @RequestMapping(value = "/messages/{messageId}", method = RequestMethod.DELETE)
-    public ResponseEntity<ApiResponse<Object>> deleteMessage(@PathVariable UUID messageId,
-                                                             @RequestParam UUID userId) {
-        messageService.delete(userId, messageId);
-        return ApiResponse.success(HttpStatus.OK,"메시지가 삭제되었습니다.");
+    public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+        messageService.delete(messageId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     // 특정 채널 메시지 목록 조회
     @RequestMapping(value = "/messages", method = RequestMethod.GET)
-    public ResponseEntity<ApiResponse<List<Message>>> searchMessage(@RequestParam UUID channelId) {
+    public ResponseEntity<List<Message>> searchMessage(@RequestParam UUID channelId) {
         List<Message> messageList = messageService.findAllByChannelId(channelId);
-        return ApiResponse.success(HttpStatus.OK,"채널 메시지 목록 조회", messageList);
+        return ResponseEntity.status(HttpStatus.OK).body(messageList);
     }
-
 }
