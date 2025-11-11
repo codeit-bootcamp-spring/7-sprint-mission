@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.global.dto.ApiResponse;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.websocket.Decoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,19 @@ public class BinaryContentController {
     private final MessageService messageService;
     private final BinaryContentService binaryContentService;
 
+    @RequestMapping(value = "/binaryContents/{binaryContentId}", method = RequestMethod.GET)
+    public ResponseEntity<BinaryContent> find(@PathVariable UUID binaryContentId) {
+        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+        return ResponseEntity.status(HttpStatus.OK).body(binaryContent);
+    }
+
+    @RequestMapping(value = "/binaryContents", method = RequestMethod.GET)
+    public ResponseEntity<List<BinaryContent>> findAllByIdIn(@RequestParam List<UUID> binaryContentIds) {
+        List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+        return ResponseEntity.status(HttpStatus.OK).body(binaryContents);
+    }
+
+    //--------------------- 기존의 메서드(심화 요구사항에서 사용하지 않아 변경X) ---------------------//
     // 유저 프로필 이미지 조회
     @RequestMapping(value = "/binarycontent/profile", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<BinaryContent>> searchProfile(@RequestParam UUID userId) {
