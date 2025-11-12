@@ -21,8 +21,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     private final String filename = "usersStatus";
 
     @Override
-    public UserStatus save(UUID UserUUID) {
-        UserStatus userStatus = new UserStatus(UserUUID);
+    public UserStatus save(UserStatus userStatus) {
         FileIo.save(filename,userStatus);
         return userStatus;
     }

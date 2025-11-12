@@ -21,9 +21,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     private static final String filename = "readStatus";
 
     @Override
-    public ReadStatus save(UUID userId, UUID channelId) {
-        // 새로운 ReadStatus 생성 (Common에서 id 자동 생성된다고 가정)
-        ReadStatus readStatus = new ReadStatus(userId, channelId, Instant.now());
+    public ReadStatus save(ReadStatus readStatus) {
 
         FileIo.save(filename, readStatus);
         return readStatus;
@@ -52,6 +50,13 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return FileIo.readAll(filename, ReadStatus.class).stream()
                 .filter(rs -> rs.getUserId().equals(userId))
+                .toList();
+    }
+
+    @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return FileIo.readAll(filename, ReadStatus.class).stream()
+                .filter(rs -> rs.getUserId().equals(channelId))
                 .toList();
     }
 

@@ -37,19 +37,18 @@ public class BasicUserStatusService implements UserStatusService {
         if(statusUser.isPresent()){
             throw new IllegalStateException("이미 생성된 Userstatus가 있어 UUID 는 : " +statusUser.get().getUserId() );
         }
+        Instant lastActiveAt = request.lastActiveAt();
+        UserStatus userStatus = new UserStatus(request.userId(),lastActiveAt);
 
-        UserStatus userStatus = userStatusRepository.save(request.userId());
-
-        return userStatus;
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
     public UserStatus find(UUID userStatusId) {
-        UserStatus userStatus = userStatusRepository
+
+        return userStatusRepository
                 .findByUserId(userStatusId).stream().findFirst()
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userStatusId));
-
-         return userStatus;
     }
 
     @Override
@@ -67,7 +66,7 @@ public class BasicUserStatusService implements UserStatusService {
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
         userStatus.update(newLastActiveAt);
 
-        return userStatusRepository.save(userStatus.getUserId());
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class BasicUserStatusService implements UserStatusService {
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
         byUserId.update(newLastActiveAt);
 
-        return userStatusRepository.save(byUserId.getUserId());
+        return userStatusRepository.save(byUserId);
     }
 
     @Override

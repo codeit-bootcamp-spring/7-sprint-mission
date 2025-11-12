@@ -35,6 +35,13 @@ public class FileBinaryContentRepository implements BinaryRepository {
     }
 
     @Override
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        return FileIo.readAll(filename, BinaryContent.class).stream()
+                .filter(bc -> ids.contains(bc.getId()))
+                .toList();
+    }
+
+    @Override
     public List<BinaryContent> findAll() {
         return FileIo.readAll(filename, BinaryContent.class);
     }

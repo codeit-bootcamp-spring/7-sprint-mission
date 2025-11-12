@@ -63,12 +63,11 @@ public class BasicUserService implements UserService {
         );
 
         //유저정보저장
-        User savedUser = userRepository.save(user);
-        //유저 상태 저장
-        userStatusRepository.save(savedUser.getId());
-        //유저 스테이터스 생성
-        UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
-        return  user;
+        User save = userRepository.save(user);
+
+        UserStatus userStatus = new UserStatus(save.getId(), Instant.now());
+        userStatusRepository.save(userStatus);
+        return save;
     }
 
 

@@ -39,6 +39,12 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return findAll().stream().filter(mesage -> mesage.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
     public boolean existsById(UUID id) {
         String path = Path.RooT_PATH.getPath() + "/" + filename + "/" + id + ".sav";
         File file = new File(path);

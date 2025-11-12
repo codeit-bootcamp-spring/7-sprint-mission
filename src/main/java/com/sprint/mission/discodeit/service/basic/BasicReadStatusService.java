@@ -44,8 +44,8 @@ public class BasicReadStatusService implements ReadStatusService {
       }else if(UserChannelMatch){
          throw new IllegalStateException("이미 존재하는 ReadStatus다");
       }
-
-        ReadStatus save = readStatusRepository.save(request.userId(),request.channelId());
+      ReadStatus createReadStatus = new ReadStatus(request.userId(),request.channelId(),request.lastReadAt());
+        ReadStatus save = readStatusRepository.save(createReadStatus);
 
       return save;
 
@@ -68,7 +68,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = readStatusRepository.find(readStatusId);
         //업데이트자체가 시간만 있는게아닌가 시간초기화
         readStatus.update(newLastReadAt);
-      return  readStatusRepository.save(readStatus.getUserId(),readStatus.getChannelId());
+      return  readStatusRepository.save(readStatus);
 
     }
 

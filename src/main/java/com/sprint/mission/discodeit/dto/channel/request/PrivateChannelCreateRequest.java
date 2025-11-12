@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.dto.channel.request;
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelUpdateRequest(
-        String newName,
-        String newDescription
+public record PrivateChannelCreateRequest(
+        List<UUID> participantIds
 ) {
 }
