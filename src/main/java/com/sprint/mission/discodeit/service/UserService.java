@@ -9,13 +9,16 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponseDto createUser(CreateUserDto createUserDto, CreateBinaryContentDto createBinaryContentDto);
 
-    UserResponseDto getUser(UUID uuid);
+  UserResponseDto createUser(CreateUserDto createUserDto,
+      CreateBinaryContentDto createBinaryContentDto);
 
-    List<UserResponseDto> getAllUsers();
+  UserResponseDto getUser(UUID uuid);
 
-    UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto);
+  List<UserResponseDto> getAllUsers();
 
-    void deleteUser(UUID uuid);
+  UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
+      CreateBinaryContentDto createBinaryContentDto);
+
+  void deleteUser(UUID uuid);
 }

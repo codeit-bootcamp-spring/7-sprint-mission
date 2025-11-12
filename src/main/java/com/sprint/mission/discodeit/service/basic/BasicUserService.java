@@ -14,16 +14,13 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -96,12 +93,26 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto) {
+  public UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
+      CreateBinaryContentDto createBinaryContentDto) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
         .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+
+    UUID profileId = null;
+
+    if (createBinaryContentDto != null) {
+      BinaryContent binaryContent = new BinaryContent(
+          createBinaryContentDto.fileName(),
+          createBinaryContentDto.size(),
+          createBinaryContentDto.contentType(),
+          createBinaryContentDto.bytes()
+      );
+      profileId = binaryContent.getId();
+      binaryContentRepository.save(binaryContent);
+    }
 
     user.updateUser(updateUserDto.username(),
         updateUserDto.password(),
@@ -110,6 +121,7 @@ public class BasicUserService implements UserService {
         updateUserDto.pronoun(),
         profileId
     );
+
     userRepository.save(user);
     return UserResponseDto.from(user, userStatus.isOnline());
   }

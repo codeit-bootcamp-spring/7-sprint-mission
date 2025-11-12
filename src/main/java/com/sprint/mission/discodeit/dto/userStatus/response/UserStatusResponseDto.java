@@ -8,19 +8,20 @@ import java.util.UUID;
 
 @Builder
 public record UserStatusResponseDto(
-        UUID userStatusId,
-        Instant createdAt,
-        Instant updateAt,
-        UUID userId,
-        Instant loginAt
+    UUID id,
+    Instant createdAt,
+    Instant updateAt,
+    UUID userId,
+    Instant loginAt
 ) {
-    public static UserStatusResponseDto from(UserStatus userStatus) {
-        return UserStatusResponseDto.builder()
-                .userStatusId(userStatus.getId())
-                .createdAt(userStatus.getCreateAt())
-                .updateAt(userStatus.getUpdateAt())
-                .userId(userStatus.getUserId())
-                .loginAt(userStatus.getLoginAt())
-                .build();
-    }
+
+  public static UserStatusResponseDto from(UserStatus userStatus) {
+    return UserStatusResponseDto.builder()
+        .id(userStatus.getId())
+        .createdAt(userStatus.getCreateAt())
+        .updateAt(userStatus.getUpdateAt())
+        .userId(userStatus.getUserId())
+        .loginAt(userStatus.getLoginAt())
+        .build();
+  }
 }
