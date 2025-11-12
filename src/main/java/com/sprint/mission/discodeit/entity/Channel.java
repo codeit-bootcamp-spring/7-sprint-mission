@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -22,7 +24,7 @@ public class Channel extends BaseEntity{
         this.description = description;
         this.adminId = adminId;
         this.memberIds = new ArrayList<>();
-        this.memberIds.add(adminId);
+        if(adminId != null) this.memberIds.add(adminId);
     }
 
     public void setChannelName(String channelName) {

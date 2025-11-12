@@ -33,7 +33,8 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
 
-    @RequestMapping(value = "/channels/{channelId}")
+    // 채널 수정
+    @RequestMapping(value = "/channels/{channelId}", method = RequestMethod.PATCH)
     public ResponseEntity<Channel> update(@PathVariable UUID channelId,
                                           @RequestBody UpdatePublicChannelRequestDto request) {
         Channel udpatedChannel = channelService.update(channelId, request);

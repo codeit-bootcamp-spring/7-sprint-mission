@@ -57,6 +57,12 @@ public class BasicChannelService implements ChannelService {
     public Channel create(CreatePublicChannelRequestDto request) {
         String name = request.getName();
         String description = request.getDescription();
+
+        // 이름 중복 저장 불가
+        if(existsByName(name)) {
+            throw new CustomException(ErrorCode.CHANNEL_NAME_ALREADY_EXISTS);
+        }
+
         Channel channel = new Channel(ChannelType.MESSAGE, ChannelVisibility.PUBLIC, name, description, null);
         channelRepository.save(channel);
         return channel;
@@ -77,6 +83,11 @@ public class BasicChannelService implements ChannelService {
     public Channel update(UUID channelId, UpdatePublicChannelRequestDto request) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() ->  new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+
+        // 이름 중복 저장 불가
+        if(existsByName(request.getNewName())) {
+            throw new CustomException(ErrorCode.CHANNEL_NAME_ALREADY_EXISTS);
+        }
         if (channel.getVisibility() ==  ChannelVisibility.PRIVATE) {
             throw new CustomException(ErrorCode.PRIVATE_CHANNEL_UPDATE_FORBIDDEN);
         }
@@ -151,9 +162,6 @@ public class BasicChannelService implements ChannelService {
                 .filter(c -> c.getVisibility() == ChannelVisibility.PUBLIC ||
                         (c.getVisibility() == ChannelVisibility.PRIVATE && c.getMemberIds().contains(userId)))
                 .map(c -> ChannelDto.from(c, messageRepository.searchLastedMessageTime(c.getId())))
-                .sorted(Comparator.comparing(ChannelDto::getType)
-                        .thenComparing(c -> c.getName())
-                )
                 .collect(Collectors.toList());
     }
 
@@ -252,6 +260,7 @@ public class BasicChannelService implements ChannelService {
 
     private boolean existsByName(String name) {
         return channelRepository.findAll().stream()
+                .filter(c -> c.getChannelName() != null)
                 .anyMatch(c -> c.getChannelName().equals(name));
     }
 }

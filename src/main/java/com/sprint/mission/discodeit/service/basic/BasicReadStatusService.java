@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.request.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.request.UpdateReadStatusRequestDto;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelVisibility;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
@@ -33,8 +35,13 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 채널이 존재하지 않으면 예외 발생
-        channelRepository.findById(request.getChannelId())
+        Channel channel = channelRepository.findById(request.getChannelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+
+        // 공개 채널에 생성하는 경우 예외 발생
+        if(channel.getVisibility() == ChannelVisibility.PUBLIC) {
+            throw new CustomException(ErrorCode.PUBLIC_CHANNEL_ADD_READSTATUS_FORBIDDEN);
+        }
 
         if(!existsByUserIdAndChannelId(request.getUserId(),request.getChannelId())) {
             status = new ReadStatus(request.getUserId(),request.getChannelId(), request.getLastReadAt());

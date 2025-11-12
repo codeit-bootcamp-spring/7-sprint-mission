@@ -32,7 +32,7 @@ public class BasicAuthService implements AuthService {
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_CREDENTIALS));
 
         // 유저 최근 접속 시간 변경
-        UserStatus status = userStatusRepository.findById(user.getId())
+        UserStatus status = userStatusRepository.findByUserId(user.getId())
                         .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
         status.setUpdatedAt();
         userStatusRepository.update(status);

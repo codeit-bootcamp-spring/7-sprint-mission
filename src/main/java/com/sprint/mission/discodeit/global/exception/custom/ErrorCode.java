@@ -64,6 +64,7 @@ public enum ErrorCode {
 
     //===== READ_STATUS =====//
     READSTATUS_NOT_FOUND(HttpStatus.BAD_REQUEST, "read status가 존재하지 않습니다."),
+    PUBLIC_CHANNEL_ADD_READSTATUS_FORBIDDEN(HttpStatus.FORBIDDEN, "공개 채널에는 read status를 생성할 수 없습니다."),
 
     //===== BINARY_CONTENT =====//
     BINARYCONTENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "파일이 존재하지 않습니다."),

@@ -65,10 +65,10 @@ public class BasicUserService implements UserService{
         }
 
         User newUser  = new User(
-                userRequest.getRealName(),
-                userRequest.getNickName(),
+                userRequest.getUsername(),
+                userRequest.getUsername(),
                 userRequest.getEmail(),
-                userRequest.getPhoneNum(),
+                "010-0000-0000",
                 userRequest.getUsername(),
                 userRequest.getPassword(),
                 profileImageId
@@ -133,7 +133,7 @@ public class BasicUserService implements UserService{
         return userRepository.findAll().stream()
                 .map(u -> UserResponseDto.from(
                         u,
-                        userStatusRepository.findById(u.getId())
+                        userStatusRepository.findByUserId(u.getId())
                                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
                                 .isOnline()))
                 .collect(Collectors.toList());
@@ -160,10 +160,10 @@ public class BasicUserService implements UserService{
 
         // 프로필 이미지만 전달된 경우 null 참조 방지
         if (Optional.ofNullable(userRequest).isPresent()) {
-            realName = userRequest.getNewRealName();
-            nickName = userRequest.getNewNickName();
+            realName = userRequest.getNewUsername();
+            nickName = userRequest.getNewUsername();
             email = userRequest.getNewEmail();
-            phoneNum = userRequest.getNewPhoneNum();
+            phoneNum = "010-0000-0000";
             username = userRequest.getNewUsername();
             password = userRequest.getNewPassword();
 
@@ -185,7 +185,6 @@ public class BasicUserService implements UserService{
 
         UUID profileImageId = null;
 
-
         if (Optional.ofNullable(profileRequest).isPresent()) {
             BinaryContent profileImage = new BinaryContent(
                     profileRequest.getFileName(),
@@ -197,7 +196,7 @@ public class BasicUserService implements UserService{
             binaryContentRepository.delete(user.getProfileId()); // 기존 프로필 이미지 삭제
         }
 
-        user.update(realName, nickName, email, phoneNum, password, username, profileImageId);
+        user.update(realName, nickName, email, phoneNum, username, password, profileImageId);
         userRepository.update(user);
         return user;
     }

@@ -36,8 +36,8 @@ public class UserController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
     )
     public ResponseEntity<User> createUser(
-            @RequestPart("request") CreateUserRequestDto requestDto,
-            @RequestPart(value = "file", required = false) MultipartFile profile
+            @RequestPart("userCreateRequest") CreateUserRequestDto requestDto,
+            @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
         CreateBinaryContentRequestDto profileRequestDto = convertToRequestDto(profile);
         User createdUser = userService.create(requestDto, profileRequestDto);
@@ -52,8 +52,8 @@ public class UserController {
     )
     public ResponseEntity<User> updateUser(
             @PathVariable UUID userId,
-            @RequestPart(name = "request", required = false) UpdateUserRequestDto requestDto,
-            @RequestPart(name = "file", required = false) MultipartFile profile
+            @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
+            @RequestPart(name = "profile", required = false) MultipartFile profile
     ) {
         CreateBinaryContentRequestDto profileRequestDto = convertToRequestDto(profile);
         User updatedUser = userService.update(userId, requestDto, profileRequestDto);
