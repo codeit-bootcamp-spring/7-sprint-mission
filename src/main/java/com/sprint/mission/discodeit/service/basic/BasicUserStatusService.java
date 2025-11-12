@@ -25,7 +25,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatusResponseDto createUserStatus(UserStatusRequestDto requestDto) {
+    public UserStatus createUserStatus(UserStatusRequestDto requestDto) {
 
         userRepository.findById(requestDto.userId())
                         .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
@@ -36,7 +36,7 @@ public class BasicUserStatusService implements UserStatusService {
 
         UserStatus userStatus = new UserStatus(requestDto.userId());
         userStatusRepository.save(userStatus);
-        return UserStatusResponseDto.from(userStatus);
+        return userStatus;
     }
 
     @Override
@@ -48,13 +48,13 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResponseDto updateStatusByUserId(UUID userId) {
+    public UserStatus updateStatusByUserId(UUID userId, UserStatusUpdateDto requestDto) {
         UserStatus status = userStatusRepository.findStatusByUserId(userId)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
 
-        status.updateLastAccess();
+        status.updateLastAccess(requestDto.newLastActiveAt());
         userStatusRepository.save(status);
-        return UserStatusResponseDto.from(status);
+        return status;
     }
 
     @Override
@@ -64,12 +64,13 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResponseDto updateStatus(UserStatusUpdateDto updateDto) {
-        UserStatus status = userStatusRepository.findById(updateDto.userStatusId())
+    public UserStatus updateStatusById(UUID id, UserStatusUpdateDto updateDto) {
+        UserStatus status = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
-        status.updateLastAccess();
+
+        status.updateLastAccess(updateDto.newLastActiveAt());
         userStatusRepository.save(status);
-        return UserStatusResponseDto.from(status);
+        return status;
 
     }
 

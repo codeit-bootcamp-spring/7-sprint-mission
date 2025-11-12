@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserResponseDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserUpdateDto;
@@ -70,11 +71,11 @@ public class UserController {
     }
 
     // 사용자 온라인 상태 업데이트  (/users/userId/online)
-    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PUT)
-    public ResponseEntity<UserStatusResponseDto> onlineUpdate(
+    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
+    public ResponseEntity<UserStatus> onlineUpdate(
             @PathVariable UUID userId,
             @RequestBody UserStatusUpdateDto updateDto) {
-        return ResponseEntity.ok(userStatusService.updateStatusByUserId(userId));
+        return ResponseEntity.ok(userStatusService.updateStatusByUserId(userId, updateDto));
     }
 }
 /*

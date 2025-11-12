@@ -18,23 +18,19 @@ public class Channel extends BaseEntity {
     private final List<User> members;
 
     // 피드백을 통한 수정
-    private String SetChannelName(User user, String channelName, ChannelType type) {
-        if (type == ChannelType.PRIVATE)
-            return user.getUserName() + "의 비공개 채널";
+    private String SetChannelName(User user, String channelName) {
+        if (channelName == null || channelName.isBlank())
+            return user.getUserName() + "의 채널";
+        else return channelName;
 
-        else {
-            if (channelName == null || channelName.isBlank())
-                return user.getUserName() + "의 채널";
-            else return channelName;
-        }
     }
 
-    public Channel(User user, String channelName, ChannelType type) {
+    public Channel(User user, String channelName) {
         super();
 
         this.channelAdmin = user;
-        this.type = type;
-        this.channelName = SetChannelName(user, channelName, type);
+        this.type = ChannelType.PUBLIC;
+        this.channelName = SetChannelName(user, channelName);
         this.members = new ArrayList<>();
         members.add(user);
     }
