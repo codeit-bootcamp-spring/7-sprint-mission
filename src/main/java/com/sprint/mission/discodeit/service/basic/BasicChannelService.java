@@ -10,8 +10,8 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.enums.ChannelType;
-import com.sprint.mission.discodeit.global.util.exception.CustomException;
-import com.sprint.mission.discodeit.global.util.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.CustomException;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -49,7 +49,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public CreateChannelResponseDto createChannel(CreatePrivateChannelDto createPrivateChannelDto) {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
-    createPrivateChannelDto.participantsIds().forEach(userId -> {
+    createPrivateChannelDto.participantIds().forEach(userId -> {
       User user = userRepository.findById(userId)
           .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
       ReadStatus readStatus = new ReadStatus(userId, channel.getId(), Instant.now());
@@ -107,7 +107,7 @@ public class BasicChannelService implements ChannelService {
       throw new CustomException(ErrorCode.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED);
     }
 
-    channel.updateChannel(updateChannelDto.channelName(), updateChannelDto.desc());
+    channel.updateChannel(updateChannelDto.newName(), updateChannelDto.newDescription());
 
     return CreateChannelResponseDto.from(channel);
   }

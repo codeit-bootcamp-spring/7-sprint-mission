@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.readStatus.request.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,7 +30,7 @@ public interface ReadStatusDocs {
           content = @Content(mediaType = "*/*", schema = @Schema(implementation = ReadStatusResponseDto.class))),
       @ApiResponse(responseCode = "400",
           description = "이미 읽음 상태가 존재함",
-          content = @Content(mediaType = "*/*", examples = @ExampleObject(value = "ReadStatus with userId {userId} and channelID {channelId] already exists"))
+          content = @Content(mediaType = "*/*", examples = @ExampleObject(value = "ReadStatus with userId {userId} and channelId {channelId} already exists"))
       ),
       @ApiResponse(responseCode = "404",
           description = "Channel 또는 User를 찾을 수 없음",
@@ -37,7 +38,7 @@ public interface ReadStatusDocs {
       )
   })
   ResponseEntity<ReadStatusResponseDto> createReadStatus(
-      @Parameter(description = "Message 읽음 상태 정보")
+      @Parameter(description = "Message 읽음 상태 생성 정보")
       @Valid @RequestBody CreateReadStatusDto createReadStatusDto);
 
   @Operation(summary = "Message 읽음 상태 수정")
@@ -57,8 +58,8 @@ public interface ReadStatusDocs {
   @Operation(summary = "User의 Message 읽음 상태 목록 조회")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200",
-          description = "Message 읽음 상태가 성공적으로 수정됨",
-          content = @Content(mediaType = "*/*", schema = @Schema(implementation = ReadStatusResponseDto.class))),
+          description = "Message 읽음 상태 목록 조회 성공",
+          content = @Content(mediaType = "*/*", array = @ArraySchema(schema = @Schema(implementation = ReadStatusResponseDto.class)))),
   })
   ResponseEntity<List<ReadStatusResponseDto>> getAllReadStatus(
       @Parameter(description = "조회할 User ID") @RequestParam UUID userId);

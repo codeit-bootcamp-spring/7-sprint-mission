@@ -11,10 +11,10 @@ import java.util.UUID;
 public record MessageResponseDto(
     UUID id,
     Instant createdAt,
-    Instant updateAt,
+    Instant updatedAt,
     String content,
     UUID channelId,
-    UUID userId,
+    UUID authorId,
     List<UUID> attachmentIds
 ) {
 
@@ -22,10 +22,10 @@ public record MessageResponseDto(
     return MessageResponseDto.builder()
         .id(message.getId())
         .createdAt(message.getCreateAt())
-        .updateAt(message.getUpdateAt())
+        .updatedAt(message.getUpdateAt())
         .content(message.getContent())
         .channelId(message.getChannelId())
-        .userId(message.getUserId())
+        .authorId(message.getUserId())
         .attachmentIds(message.getAttachmentIds())
         .build();
   }

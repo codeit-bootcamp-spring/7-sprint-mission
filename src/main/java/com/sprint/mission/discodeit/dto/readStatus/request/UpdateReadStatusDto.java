@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.dto.readStatus.request;
 import java.time.Instant;
 
 public record UpdateReadStatusDto(
-        Instant lastReadAt
+    Instant newLastReadAt
 ) {
+
 }

@@ -10,7 +10,7 @@ import java.util.UUID;
 public record ReadStatusResponseDto(
     UUID id,
     Instant createdAt,
-    Instant updateAt,
+    Instant updatedAt,
     UUID userId,
     UUID channelId,
     Instant lastReadAt
@@ -20,7 +20,7 @@ public record ReadStatusResponseDto(
     return ReadStatusResponseDto.builder()
         .id(readStatus.getId())
         .createdAt(readStatus.getCreateAt())
-        .updateAt(readStatus.getUpdateAt())
+        .updatedAt(readStatus.getUpdateAt())
         .userId(readStatus.getUserId())
         .channelId(readStatus.getChannelId())
         .lastReadAt(readStatus.getLastReadAt())

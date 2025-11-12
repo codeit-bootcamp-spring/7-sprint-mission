@@ -1,32 +1,39 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.doc.BinaryContentDocs;
 import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/binaryContents")
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
-public class BinaryContentController implements BinaryContentDocs {
+public class BinaryContentController {
 
-    private final BinaryContentService binaryContentService;
+  private final BinaryContentService binaryContentService;
 
-    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContentResponseDto> getBinaryContent(@PathVariable UUID binaryContentId) {
-        BinaryContentResponseDto binaryContent = binaryContentService.getBinaryContent(binaryContentId);
-        return ResponseEntity.status(HttpStatus.OK).body(binaryContent);
-    }
+  // 단일 조회: PathVariable 사용
+  @GetMapping("/{binaryContentId}")
+  public ResponseEntity<BinaryContentResponseDto> getBinaryContent(
+      @PathVariable UUID binaryContentId) {
+    BinaryContentResponseDto binaryContent = binaryContentService.getBinaryContent(binaryContentId);
+    return ResponseEntity.ok(binaryContent);
+  }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentResponseDto>> getAllBinaryContent(@RequestParam List<UUID> binaryContentIds) {
-        List<BinaryContentResponseDto> binaryContentResponseDtos = binaryContentService.getAllBinaryContentByIdIn(binaryContentIds);
-        return ResponseEntity.status(HttpStatus.OK).body(binaryContentResponseDtos);
-    }
+  // 다중 조회: RequestParam List 사용
+  @GetMapping
+  public ResponseEntity<List<BinaryContentResponseDto>> getAllBinaryContent(
+      @RequestParam(required = false) List<UUID> binaryContentIds) {
+    List<BinaryContentResponseDto> dtos = binaryContentService.getAllBinaryContentByIdIn(
+        binaryContentIds);
+    return ResponseEntity.ok(dtos);
+  }
 }
+

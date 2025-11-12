@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.controller.doc.UserDocs;
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.user.response.CreateUserResponseDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponseDto;
@@ -36,8 +37,8 @@ public class UserController implements UserDocs {
   private final UserStatusService userStatusService;
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserResponseDto> createUser(
-      @Valid @RequestPart(value = "userDto") CreateUserDto userDto,
+  public ResponseEntity<CreateUserResponseDto> createUser(
+      @Valid @RequestPart(value = "userCreateRequest") CreateUserDto userDto,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
     CreateBinaryContentDto createBinaryContentDto = null;
 
@@ -50,7 +51,7 @@ public class UserController implements UserDocs {
       );
     }
 
-    UserResponseDto userResponseDto = userService.createUser(userDto, createBinaryContentDto);
+    CreateUserResponseDto userResponseDto = userService.createUser(userDto, createBinaryContentDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
   }
 
@@ -66,8 +67,8 @@ public class UserController implements UserDocs {
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
-  public ResponseEntity<UserResponseDto> updateUser(@PathVariable UUID userId,
+  @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<CreateUserResponseDto> updateUser(@PathVariable UUID userId,
       @RequestPart(value = "userUpdateRequest") UpdateUserDto updateUserDto,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
     CreateBinaryContentDto createBinaryContentDto = null;
@@ -80,9 +81,9 @@ public class UserController implements UserDocs {
           profile.getBytes()
       );
     }
-    UserResponseDto userResponseDto = userService.updateUser(userId, updateUserDto,
+    CreateUserResponseDto createUserResponseDto = userService.updateUser(userId, updateUserDto,
         createBinaryContentDto);
-    return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
+    return ResponseEntity.status(HttpStatus.OK).body(createUserResponseDto);
   }
 
   @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)

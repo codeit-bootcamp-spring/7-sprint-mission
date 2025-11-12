@@ -3,12 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.user.response.CreateUserResponseDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.global.util.exception.CustomException;
-import com.sprint.mission.discodeit.global.util.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.CustomException;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -32,7 +33,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public UserResponseDto createUser(CreateUserDto createUserDto,
+  public CreateUserResponseDto createUser(CreateUserDto createUserDto,
       CreateBinaryContentDto createBinaryContentDto) {
     if (userRepository.findByUsername(createUserDto.username()).isPresent()) {
       throw new CustomException(ErrorCode.USERNAME_ALREADY_EXIST);
@@ -55,15 +56,14 @@ public class BasicUserService implements UserService {
     }
 
     User user = new User(
-        createUserDto.username(), createUserDto.email(), createUserDto.password(),
-        createUserDto.phoneNumber(), createUserDto.pronoun(), profileId);
+        createUserDto.username(), createUserDto.email(), createUserDto.password(), profileId);
 
     UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
 
     userRepository.save(user);
     userStatusRepository.save(userStatus);
 
-    return UserResponseDto.from(user, userStatus.isOnline());
+    return CreateUserResponseDto.from(user);
   }
 
   @Override
@@ -93,7 +93,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
+  public CreateUserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
       CreateBinaryContentDto createBinaryContentDto) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -114,16 +114,14 @@ public class BasicUserService implements UserService {
       binaryContentRepository.save(binaryContent);
     }
 
-    user.updateUser(updateUserDto.username(),
-        updateUserDto.password(),
-        updateUserDto.email(),
-        updateUserDto.phoneNumber(),
-        updateUserDto.pronoun(),
+    user.updateUser(updateUserDto.newUsername(),
+        updateUserDto.newPassword(),
+        updateUserDto.newEmail(),
         profileId
     );
 
     userRepository.save(user);
-    return UserResponseDto.from(user, userStatus.isOnline());
+    return CreateUserResponseDto.from(user);
   }
 
   @Override

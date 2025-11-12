@@ -10,18 +10,20 @@ import java.util.UUID;
 public record UserStatusResponseDto(
     UUID id,
     Instant createdAt,
-    Instant updateAt,
+    Instant updatedAt,
     UUID userId,
-    Instant loginAt
+    Instant lastActiveAt,
+    boolean online
 ) {
 
   public static UserStatusResponseDto from(UserStatus userStatus) {
     return UserStatusResponseDto.builder()
         .id(userStatus.getId())
         .createdAt(userStatus.getCreateAt())
-        .updateAt(userStatus.getUpdateAt())
+        .updatedAt(userStatus.getUpdateAt())
         .userId(userStatus.getUserId())
-        .loginAt(userStatus.getLoginAt())
+        .lastActiveAt(userStatus.getLastActiveAt())
+        .online(userStatus.isOnline().isOnline())
         .build();
   }
 }
