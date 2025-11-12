@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface BinaryContentService {
-   ResponseEntity<BinaryContentResponse> create(BinaryContentCreateRequest request );
-    BinaryContentResponse find(UUID BinaryContentId);
-    List<BinaryContentResponse> findAllByIn(UUID BinaryContentId);
+    BinaryContent create(BinaryContentCreateRequest request );
+    BinaryContent find(UUID BinaryContentId);
+    List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds);
     void delete(UUID BinaryContentId);
 
 }

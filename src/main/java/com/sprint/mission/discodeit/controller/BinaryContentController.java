@@ -8,10 +8,12 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,38 +22,24 @@ import java.util.UUID;
 public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
-    @RequestMapping(value = "/find", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContent> findBinaryContent(
-            @RequestParam UUID binaryContentId){
-        System.out.println(binaryContentId);
-        BinaryContentResponse findBinary = binaryContentService.find(binaryContentId);
 
-        byte[] bytes = binaryContentService.find(binaryContentId).contentByte();
 
-        //이건 화면에 보이게 하려고 억지로 넣었다
-        String encodedString = Base64.getEncoder().encodeToString(bytes);
-        //
-        BinaryContent binaryContent = new BinaryContent(findBinary.contentsType(),bytes, encodedString );
-
-        return ResponseEntity.ok(binaryContent);
+    @RequestMapping(path = "find")
+    public ResponseEntity<BinaryContent> find(@RequestParam("binaryContentId") UUID binaryContentId) {
+        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(binaryContent);
     }
 
-    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContent> findBinaryConten(
-            @PathVariable UUID binaryContentId){
-        System.out.println(binaryContentId);
-        BinaryContentResponse findBinary = binaryContentService.find(binaryContentId);
-
-        byte[] bytes = binaryContentService.find(binaryContentId).contentByte();
-
-        //이건 화면에 보이게 하려고 억지로 넣었다
-        String encodedString = Base64.getEncoder().encodeToString(bytes);
-        //
-        BinaryContent binaryContent = new BinaryContent(findBinary.contentsType(),bytes, encodedString );
-
-        return ResponseEntity.ok(binaryContent);
+    @RequestMapping(path = "findAllByIdIn")
+    public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+            @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+        List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(binaryContents);
     }
-
 
 
 

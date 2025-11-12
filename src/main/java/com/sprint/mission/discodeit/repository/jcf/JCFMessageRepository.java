@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 @Repository
 @ConditionalOnProperty(
@@ -35,6 +36,12 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAll() {
         return this.data.values().stream().toList();
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return findAll().stream().filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override

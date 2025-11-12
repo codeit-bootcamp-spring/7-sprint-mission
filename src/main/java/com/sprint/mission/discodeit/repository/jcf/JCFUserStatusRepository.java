@@ -30,11 +30,10 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
 
     @Override
-    public UserStatus save(UUID userUUID) {
-        UserStatus status = new UserStatus(userUUID);
-        //   status.setUpdatedAt(Instant.now());
-        this.data.put(userUUID,status);
-        return status;
+    public UserStatus save(UserStatus userStatus) {
+
+        this.data.put(userStatus.getId(),userStatus);
+        return userStatus;
     }
 
     @Override

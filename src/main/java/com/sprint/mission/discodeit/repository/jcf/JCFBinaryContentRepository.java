@@ -41,6 +41,14 @@ public class JCFBinaryContentRepository implements BinaryRepository {
         return Optional.ofNullable(this.data.get(binaryId));
     }
 
+
+    @Override
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        return this.data.values().stream()
+                .filter(content -> ids.contains(content.getId()))
+                .toList();
+    }
+
     @Override
     public List<BinaryContent> findAll() {
         return List.of();
