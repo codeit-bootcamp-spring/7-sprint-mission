@@ -22,74 +22,69 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
 
-    private final ReadStatusRepository readStatusRepository;
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
+  private final ReadStatusRepository readStatusRepository;
+  private final UserRepository userRepository;
+  private final ChannelRepository channelRepository;
 
 
-    @Override
-    public ReadStatusResponseDto createReadStatus(UUID channelId, CreateReadStatusRequestDto request) {
-        channelRepository.findById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
+  @Override
+  public ReadStatus createReadStatus(CreateReadStatusRequestDto request) {
+    channelRepository.findById(request.channelId())
+        .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
 
-        userRepository.findById(request.userId())
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+    userRepository.findById(request.userId())
+        .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        Optional<ReadStatus> exist = readStatusRepository.findByUserIdAndChannelId(
-                request.userId(),
-                channelId
-        );
+    Optional<ReadStatus> exist = readStatusRepository.findByUserIdAndChannelId(
+        request.userId(),
+        request.channelId()
+    );
 
-        if(exist.isPresent()) {
-            throw new IllegalArgumentException("이미 존재합니다.");
-        }
-
-        ReadStatus readStatus = new ReadStatus(
-                request.userId(),
-                channelId
-        );
-
-        ReadStatus save = readStatusRepository.save(readStatus);
-        return ReadStatusResponseDto.from(save);
+    if (exist.isPresent()) {
+      throw new IllegalArgumentException("이미 존재합니다.");
     }
 
-    @Override
-    public ReadStatusResponseDto find(UUID userId) {
-        ReadStatus readStatus = getReadStatus(userId);
-        return ReadStatusResponseDto.from(readStatus);
-    }
+    ReadStatus readStatus = new ReadStatus(
+        request.userId(),
+        request.channelId()
+    );
 
-    @Override
-    public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
-        List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
-        List<ReadStatusResponseDto> dtoList = new ArrayList<>();
-        for(ReadStatus readStatus : readStatuses){
-            dtoList.add(ReadStatusResponseDto.from(readStatus));
-        }
-        return dtoList;
-    }
+    return readStatusRepository.save(readStatus);
+  }
 
-    @Override
-    public ReadStatusResponseDto updateReadStatus(UUID channelId, UpdateReadStatusDto updateReadStatus) {
-        ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(updateReadStatus.userId(), channelId)
-                .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
+  @Override
+  public ReadStatusResponseDto find(UUID userId) {
+    ReadStatus readStatus = getReadStatus(userId);
+    return ReadStatusResponseDto.from(readStatus);
+  }
 
-        readStatus.updateReadTime();
+  @Override
+  public List<ReadStatus> findAllByUserId(UUID userId) {
+    List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
+    return readStatuses;
+  }
 
-        ReadStatus save = readStatusRepository.save(readStatus);
-        return ReadStatusResponseDto.from(save);
-    }
+  @Override
+  public ReadStatus updateReadStatus(UUID readStatusId,
+      UpdateReadStatusDto request) {
+    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+        .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
 
-    @Override
-    public void deleteReadStatus(UUID readStatusId) {
-        getReadStatus(readStatusId);
+    readStatus.updateReadTime(request.newLastReadAt());
 
-        readStatusRepository.delete(readStatusId);
-    }
+    return readStatusRepository.save(readStatus);
+  }
 
-    // 중복 메서드 만들기
-    private ReadStatus getReadStatus(UUID readStatusId) {
-        return readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new IllegalArgumentException("ReadStatus를 찾을 수 없습니다."));
-    }
+  @Override
+  public void deleteReadStatus(UUID readStatusId) {
+    getReadStatus(readStatusId);
+
+    readStatusRepository.delete(readStatusId);
+  }
+
+  // 중복 메서드 만들기
+  private ReadStatus getReadStatus(UUID readStatusId) {
+    return readStatusRepository.findById(readStatusId)
+        .orElseThrow(() -> new IllegalArgumentException("ReadStatus를 찾을 수 없습니다."));
+  }
 }

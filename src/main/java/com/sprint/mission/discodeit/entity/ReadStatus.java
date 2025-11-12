@@ -23,7 +23,7 @@ public class ReadStatus extends BasicEntity implements Serializable {
   }
 
   // 업데이트하기
-  public void updateReadTime() {
+  public void updateReadTime(Instant newTime) {
     this.lastReadAt = Instant.now();
   }
 }
