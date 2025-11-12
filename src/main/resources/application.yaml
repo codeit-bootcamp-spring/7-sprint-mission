@@ -12,6 +12,7 @@ springdoc:
   swagger-ui:
     path: /api-docs.html
     display-request-duration: true
+    enabled: true
   api-docs:
     path: /api-docs
 

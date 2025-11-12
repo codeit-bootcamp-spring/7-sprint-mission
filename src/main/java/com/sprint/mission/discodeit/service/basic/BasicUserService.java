@@ -70,32 +70,28 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserCreateResponseDto createUser(UserCreateRequestDto userCreateRequestDto, MultipartFile profile) throws IOException {
-
-        BinaryContent binaryContent = BinaryContent.builder()
+        userNameEmailCheck(userCreateRequestDto);
+    if(profile!=null) {
+        BinaryContent binaryContent = binaryContentRepository.createBinaryContent(BinaryContent.builder()
                 .fileName(profile.getName())
                 .contentType(profile.getContentType())
                 .size(profile.getSize())
                 .bytes(profile.getBytes())
-                .build();
+                .build()
+        );
 
-        User user = User.builder()
-                .userName(userCreateRequestDto.getUserName())
-                .name(userCreateRequestDto.getUserName())
+        User user = userRepository.saveUser(User.builder()
+                .userName(userCreateRequestDto.getUsername())
+                .name(userCreateRequestDto.getUsername())
                 .email(userCreateRequestDto.getEmail())
                 .profileId(binaryContent.getId())
                 .password(userCreateRequestDto.getPassword())
-                .build();
+                .build());
 
-        UserStatus userStatus = UserStatus.builder()
+        userStatusRepository.createUserStatus(UserStatus.builder()
                 .userId(user.getId())
                 .lastOnlineTime(Instant.now())
-                .build();
-
-        userNameEmailCheck(user);
-
-        binaryContentRepository.createBinaryContent(binaryContent);
-        userRepository.saveUser(user);
-        userStatusRepository.createUserStatus(userStatus);
+                .build());
 
         return UserCreateResponseDto.builder()
                 .id(user.getId())
@@ -105,6 +101,27 @@ public class BasicUserService implements UserService {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .profileId(user.getProfileId())
+                .build();
+    }
+        User user = userRepository.saveUser(User.builder()
+                .userName(userCreateRequestDto.getUsername())
+                .name(userCreateRequestDto.getUsername())
+                .email(userCreateRequestDto.getEmail())
+                .password(userCreateRequestDto.getPassword())
+                .build());
+
+        userStatusRepository.createUserStatus(UserStatus.builder()
+                .userId(user.getId())
+                .lastOnlineTime(Instant.now())
+                .build());
+
+        return UserCreateResponseDto.builder()
+                .id(user.getId())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .username(user.getUserName())
+                .email(user.getEmail())
+                .password(user.getPassword())
                 .build();
     }
 
@@ -208,9 +225,9 @@ public class BasicUserService implements UserService {
         channelRepository.updateChannel(channel);
     }
 
-    private void userNameEmailCheck(User user){
-        boolean isUserNameExit = userRepository.getAllUser().stream().anyMatch(x -> x.getUserName().equals(user.getUserName()));
-        boolean isEmailExit = userRepository.getAllUser().stream().anyMatch(x -> x.getEmail().equals(user.getEmail()));
+    private void userNameEmailCheck(UserCreateRequestDto dto){
+        boolean isUserNameExit = userRepository.getAllUser().stream().anyMatch(x -> x.getUserName().equals(dto.getUsername()));
+        boolean isEmailExit = userRepository.getAllUser().stream().anyMatch(x -> x.getEmail().equals(dto.getEmail()));
         if(isUserNameExit) throw new IllegalArgumentException("USERNAME_ALREADY_EXIST");
         if(isEmailExit) throw new IllegalArgumentException("EMAIL_ALREADY_EXIST");
     }
@@ -225,7 +242,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void resetUserRepository() {
-        userRepository.getAllUser().forEach(x->deleteUser(x.getId()));
+        userRepository.resetUserRepository();
     }
 
     @Override
@@ -250,15 +267,18 @@ public class BasicUserService implements UserService {
         user.setName(dto.newUsername());
         user.setPassword(dto.newPassword());
         user.setEmail(dto.newEmail());
-        binaryContentRepository.deleteBinaryContent(user.getProfileId());
-        BinaryContent tmpBinaryContent= binaryContentRepository.createBinaryContent(BinaryContent.builder()
-                .bytes(profile.getBytes())
-                .fileName(profile.getName())
-                        .size(profile.getSize())
-                        .contentType(profile.getContentType())
-                .build());
-        user.setProfileId(tmpBinaryContent.getId());
+        if(profile!=null) {
+            binaryContentRepository.deleteBinaryContent(user.getProfileId());
+            BinaryContent tmpBinaryContent = binaryContentRepository.createBinaryContent(BinaryContent.builder()
+                    .bytes(profile.getBytes())
+                    .fileName(profile.getName())
+                    .size(profile.getSize())
+                    .contentType(profile.getContentType())
+                    .build());
+            user.setProfileId(tmpBinaryContent.getId());
+        }
         user.updateEntity();
+        userRepository.updateUser(user);
 
         return UserCreateResponseDto.builder()
                 .id(user.getId())
@@ -267,7 +287,7 @@ public class BasicUserService implements UserService {
                 .email(user.getEmail())
                 .username(user.getUserName())
                 .password(user.getPassword())
-                .profileId(user.getProfileId())
+                .profileId(user.getProfileId()!=null?user.getProfileId():null)
                 .build();
     }
 

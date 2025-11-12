@@ -9,8 +9,11 @@ import com.sprint.mission.discodeit.dto.response.UserUserStatusPatchResponseDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,21 +53,21 @@ public class UserController {
 
     @RequestMapping(value = "",method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> readAll(){
-       ;
         return new ResponseEntity<>( userService.advanceFindAllUser(),HttpStatus.OK);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<UserCreateResponseDto> createUser(@RequestPart("userCreateRequest")UserCreateRequestDto dto
-    , @RequestPart("profile")MultipartFile profile
+    @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserCreateResponseDto> createUser(
+            @RequestPart("userCreateRequest")UserCreateRequestDto dto
+    , @RequestPart(value = "profile",required = false)MultipartFile profile
                                                                             ) throws IOException {
         return new ResponseEntity<UserCreateResponseDto>(userService.createUser(dto,profile),HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserCreateResponseDto> patchUser(@PathVariable UUID userId,
                                                            @RequestPart("userUpdateRequest") UserUpdateRequest dto,
-                                                           @RequestPart("profile")MultipartFile profile) throws IOException {
+                                                           @RequestPart(value = "profile",required = false)MultipartFile profile ) throws IOException {
        ;
         return new ResponseEntity<UserCreateResponseDto>(userService.patchUser(userId, dto,profile), HttpStatus.OK);
     }

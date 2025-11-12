@@ -83,6 +83,9 @@ public class BasicUserStatusService implements UserStatusService {
         userStatus.updateEntity();
         user.updateEntity();
 
+        userStatusRepository.updateUserStatus(userStatus);
+        userRepository.updateUser(user);
+
 
         return UserUserStatusPatchResponseDto.from(userStatus);
     }

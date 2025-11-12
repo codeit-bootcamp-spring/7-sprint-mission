@@ -42,7 +42,7 @@ public class BasicMessageService implements MessageService {
         Channel channel2 = channelRepository.getChannelById(messageCreateRequestDto.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
 //        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(messageCreateRequestDto.getAuthorId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
         Message message;
-        if(!attachments.isEmpty()) {
+        if(attachments!=null) {
             System.out.println("attachment list");
             message = messageRepository.saveMessage(Message.builder()
                     .content(messageCreateRequestDto.getContent())
@@ -74,6 +74,7 @@ public class BasicMessageService implements MessageService {
                             .content(messageCreateRequestDto.getContent())
                     .channelId(messageCreateRequestDto.getChannelId())
                             .attachmentIdList(new HashSet<>())
+                            .senderId(messageCreateRequestDto.getAuthorId())
                     .build()
             );
         }
