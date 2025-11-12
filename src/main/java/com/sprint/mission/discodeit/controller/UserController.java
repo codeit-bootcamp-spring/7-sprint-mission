@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.openapi.UserControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
@@ -24,7 +25,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class UserController {
+public class UserController implements UserControllerDocs {
 
     private final UserService userService;
     private final UserStatusService userStatusService;
@@ -87,7 +88,7 @@ public class UserController {
     private CreateBinaryContentRequestDto convertToRequestDto(MultipartFile file) {
         CreateBinaryContentRequestDto profileRequestDto = null;
 
-        if(file != null || !file.isEmpty()) {
+        if(file != null && !file.isEmpty()) {
             try {
                 profileRequestDto = new CreateBinaryContentRequestDto(
                         file.getOriginalFilename(),

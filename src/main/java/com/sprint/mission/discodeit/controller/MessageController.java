@@ -31,7 +31,7 @@ public class MessageController {
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
         List<CreateBinaryContentRequestDto> attachmentRequests;
-        if(attachments != null || !attachments.isEmpty()) {
+        if(attachments != null && !attachments.isEmpty()) {
             attachmentRequests = attachments.stream()
                 .map(attachment -> {
                         try {
