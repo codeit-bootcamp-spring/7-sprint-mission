@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,9 +23,9 @@ public class MessageController {
     private final MessageService messageService;
     private final ChannelService channelService;
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageReadResponseDto> createMessage(@RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
-                                                                @RequestPart("attachments") List<MultipartFile> attachments
+                                                                @RequestPart(value = "attachments",required = false) List<MultipartFile> attachments
                                                                                 ){
 
         return new ResponseEntity<>(messageService.createMessage(dto, attachments), HttpStatus.CREATED);

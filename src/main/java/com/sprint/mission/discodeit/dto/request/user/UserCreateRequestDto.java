@@ -9,7 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserCreateRequestDto {
 
-    private String userName;
+    private String username = "default_user";
     private String email;
     private String password;
 }

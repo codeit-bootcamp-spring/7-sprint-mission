@@ -44,7 +44,6 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         readStatusMap.put(readStatus.getId(),readStatus);
         saveAllReadStatus(readStatusMap);
         return readStatus;
-
     }
 
     @Override

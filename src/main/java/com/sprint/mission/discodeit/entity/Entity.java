@@ -21,16 +21,16 @@ public class Entity implements Serializable {
         this.createdAt = now();
         this.updatedAt = createdAt;
     }
-    public Entity(UUID id) {
-        this.id = id;
-        this.createdAt = now();
-        this.updatedAt = createdAt;
-    }
-    public Entity(UUID id, long updatedAt) {
-        this.id = id;
-        this.createdAt = now();
-        this.updatedAt =createdAt;
-    }
+//    public Entity(UUID id) {
+//        this.id = id;
+//        this.createdAt = now();
+//        this.updatedAt = createdAt;
+//    }
+//    public Entity(UUID id, long updatedAt) {
+//        this.id = id;
+//        this.createdAt = now();
+//        this.updatedAt =createdAt;
+//    }
 
 
     public void updateEntity(){

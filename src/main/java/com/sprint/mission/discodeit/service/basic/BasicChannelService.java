@@ -45,27 +45,29 @@ public class BasicChannelService implements ChannelService {
         List<User> userList = userRepository.getAllUser();
         HashSet<UUID> userIdList = channelPrivateCreateRequestDto.getParticipantIds();
 
-    Channel channel = Channel.builder()
+    Channel channel = channelRepository.saveChannel(Channel.builder()
             .name(channelPrivateCreateRequestDto.getName())
             .isTextChannel(channelPrivateCreateRequestDto.isTextChannel())
             .isPublic(false)
             .joinUserList(userIdList)
             .description(channelPrivateCreateRequestDto.getDescription())
-            .build();
+            .build());
     userList.forEach(x->x.addChannel(channel.getId()));
 
-       channelPrivateCreateRequestDto.getParticipantIds().stream().map(
+       channelPrivateCreateRequestDto.getParticipantIds().forEach(
                 x ->
                 {
                     User tempUser = userRepository.getUserById(x).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
                     tempUser.addChannel(channel.getId());
                     userRepository.updateUser(tempUser);
-                    return ReadStatus.builder().userId(x).channelId(channel.getId()).build();
+                   readStatusRepository.createReadStatus(ReadStatus.builder()
+                           .userId(x)
+                           .channelId(channel.getId())
+                           .build());
                 }
-        ).forEach(readStatusRepository::createReadStatus);
-        Channel saveChannel = channelRepository.saveChannel(channel);
+        );
 
-        return ChannelReadResponseDto.from(saveChannel);
+        return ChannelReadResponseDto.from(channel);
 
     }
 
