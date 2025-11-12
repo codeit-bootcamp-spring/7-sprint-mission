@@ -19,8 +19,10 @@ public interface LoginControllerDocs {
     @ApiResponse(responseCode = "200", description = "로그인 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginRequestDto.class),
     examples = @ExampleObject(value = """
-            로그인 로직입니다. 가장 먼저 화면에 마주하는 로직입니다.
-            """)
+           "username": "SiUUU"
+           "password": "1557"
+           
+           """)
     )
     )
     @ApiResponse(responseCode = "400", description = "유효하지 않은 id랑 비밀번호를 치면 발생합니다")

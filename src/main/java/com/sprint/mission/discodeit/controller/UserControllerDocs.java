@@ -37,7 +37,7 @@ public interface UserControllerDocs {
     @ApiResponse(responseCode = "200", description = "유저 조회 성공",
     content = @Content( mediaType = "application/json",
     examples = @ExampleObject(value = """
-            유저를 전부 조회합니다. 이거 꼭 잘 하셔야 하는게 채팅 화면 부를때 수시로
+            유저를 전부 조회합니다.채팅 화면 부를때 수시로
             유저 전체 조회를 호출합니다.
     """)
     )
@@ -48,10 +48,11 @@ public interface UserControllerDocs {
     @Operation(summary = "유저 생성(Create User)", description = "유저를 생성합니다.")
     @ApiResponse(responseCode = "201", description = "유저 생성 성공",
     content = @Content(mediaType = "application/json",
+    schema = @Schema(implementation = UserCreateRequestDto.class),
     examples = @ExampleObject(value = """
-            유저 생성 성공시, user-status도 동시에 생성됩니다. 가장 부담이 적은 리퀘스트입니다.
-            왜냐면 유저는 다른 누군가한테 의존하고 있지 않기 때문입니다. 
-            테스트 할때 가장 먼저 만들 수 있어서 부담이 적습니다.
+            "username": "Ronaldo"
+            "email": "genius5375@gmail.com"
+            "password" : "1234"
     """)
     )
     )
@@ -64,9 +65,11 @@ public interface UserControllerDocs {
     @Operation(summary = "유저 수정(Patch User)", description = "유저를 수정합니다.")
     @ApiResponse(responseCode = "200", description = "유저 수정 성공",
     content = @Content(mediaType = "application/json",
-    schema = @Schema(implementation = UserPatchRequestDto.class),
+    schema = @Schema(implementation = UserUpdateRequest.class),
     examples = @ExampleObject(value = """
-            유저를 수정합니다. AI 자동 완성이 없었으면 정말 작성하기 귀찮았을 겁니다.
+           "newUsername":"Messi"
+           "newEmail": "loser@gmail.com"
+           "newPassword":"4321"
     """)
     )
     )
@@ -78,7 +81,7 @@ public interface UserControllerDocs {
     @ApiResponse(responseCode = "200", description = "유저 상태 수정 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserUserStatusPatchResponseDto.class),
     examples = @ExampleObject(value = """
-            user status를 수정해서 유저가 온라인인지 체크하게 하는 기믹입니다. 정작 이걸 부르긴 하는데 실제 화면에서는 꺼지질 않네요
+            "newLastActiveAt": Instant
             """)))
     @RequestMapping(value = "/{userId}/userStatus",method = RequestMethod.PATCH)
     ResponseEntity<UserUserStatusPatchResponseDto> patchUserStatus(@PathVariable UUID userId, @RequestBody UserStatusPatchRequestDto dto);

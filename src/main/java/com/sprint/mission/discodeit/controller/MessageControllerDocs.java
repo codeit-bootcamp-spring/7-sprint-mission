@@ -23,8 +23,9 @@ public interface MessageControllerDocs {
     @ApiResponse(responseCode = "200", description = "메세지 생성 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageCreateRequestDto.class),
             examples = @ExampleObject(value = """
-                    메세지를 생성합니다. 원래는 채널에 유저가 들어있어야 하는 경우도 체크했지만, 이제 그렇게 빡빡하게 하지
-                    않습니다.
+                    "content": "T1 Faker"
+                    "authorId": UUID
+                    "channelId":UUID
                     """)
     )
     )
@@ -35,10 +36,10 @@ public interface MessageControllerDocs {
 
     @Operation(summary = "메세지 변경(Patch Message)", description = "메세지를 변경합니다.")
     @ApiResponse(responseCode = "200", description = "메세지 변경 성공",
-    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageReadResponseDto.class),
+    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessagePatchRequestDto.class),
     examples = @ExampleObject(value = """
             
-            현재 메세지는 content만 변경이 가능합니다. 그 이외에는 변경이 불가합니다. 
+            "newContent" : "Ronaldo is Goat"
             """)
     )
     )

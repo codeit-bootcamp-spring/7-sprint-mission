@@ -20,9 +20,9 @@ import java.util.UUID;
 public interface FileControllerDocs {
     @Operation(summary = "파일 조회(Create File)", description = "파일을 id로 조회합니다.")
     @ApiResponse(responseCode = "200", description = "파일 조회 성공",
-    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BinaryContentResponseDto.class),
+    content = @Content(mediaType = "application/json",
     examples = @ExampleObject(value = """
-            파일을 조회합니다. byte로 돼 있으니 읽으려고 하지 마십시오
+            파일을 조회합니다. 쿼리스트링으로 파일id를 잘 전달합시다.
             """)
     )
     )
@@ -32,8 +32,7 @@ public interface FileControllerDocs {
     @ApiResponse(responseCode = "200", description = "파일 조회 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = BinaryContentResponseDto.class),
     examples = @ExampleObject(value = """
-            다건 조회입니다, 별 거는 없습니다. 생각할 거는 유저나 메세지 id가 아닌 binarycontent id로 조회하는 겁니다.
-            이게 왜 있는지는 저도 모르겠습니다.
+            다건 조회입니다, 쿼리 스트링으로 List<UUID> 를 전달합니다.
             """)
     )
     )
