@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController implements UserControllerDocs {
 
      private final UserService userService;
@@ -34,8 +34,8 @@ public class UserController implements UserControllerDocs {
 
     // [등록]
 
-    @RequestMapping(path = "create"
-            ,method = RequestMethod.POST
+    @RequestMapping(
+            method = RequestMethod.POST
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<User> create(
             @RequestPart("userCreateRequest") UserCreateRequest request,
@@ -79,7 +79,7 @@ public class UserController implements UserControllerDocs {
 
     // [삭제]
 
-    @RequestMapping(path = "delete",method = RequestMethod.DELETE)
+    @RequestMapping(path = "{userId}",method = RequestMethod.DELETE)
     public ResponseEntity<Void> delete(@RequestParam("userId") UUID userId) {
         userService.delete(userId);
         return ResponseEntity
@@ -91,15 +91,15 @@ public class UserController implements UserControllerDocs {
 
     // [전체 조회]
 
-    @RequestMapping(path = "findAll",method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> findAll() {
    return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userService.findAll());
     }
 
-    @RequestMapping(path = "updateUserStatusByUserId",method = RequestMethod.PATCH)
-    public ResponseEntity<UserStatus> updateUserStatusByUserId(@RequestParam("userId") UUID userId,
+    @RequestMapping(path = "/{userId}/userStatus",method = RequestMethod.PATCH)
+    public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
                                                                @RequestBody UserStatusUpdateRequest request) {
 
         UserStatus updatedUserStatus = userStatusService.updateByUserId(userId,request);
