@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponseDt
 import com.sprint.mission.discodeit.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -50,7 +51,7 @@ public interface UserDocs {
           description = "User 목록 조회 성공",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = UserResponseDto.class))),
+              array = @ArraySchema(schema = @Schema(implementation = UserResponseDto.class))))
   })
   ResponseEntity<List<UserResponseDto>> getAllUser();
 
