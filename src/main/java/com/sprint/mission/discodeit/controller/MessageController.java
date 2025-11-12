@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.doc.MessageDocs;
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
@@ -20,49 +21,54 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
-public class MessageController {
-    private final MessageService messageService;
+public class MessageController implements MessageDocs {
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageResponseDto> createMessage(
-            @Valid @RequestPart("messageCreateRequest") CreateMessageDto createMessageDto,
-            @RequestPart(value = "attachments") List<MultipartFile> attachments) {
-        List<CreateBinaryContentDto> createBinaryContentDtos = attachments.stream()
-                .map(attachment -> {
-                    CreateBinaryContentDto createBinaryContentDto = null;
-                    try {
-                        createBinaryContentDto = new CreateBinaryContentDto(
-                                attachment.getOriginalFilename(),
-                                attachment.getContentType(),
-                                attachment.getSize(),
-                                attachment.getBytes());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return createBinaryContentDto;
-                }).toList();
+  private final MessageService messageService;
 
-        MessageResponseDto messageResponseDto = messageService.createMessage(createMessageDto, createBinaryContentDtos);
-        return ResponseEntity.status(HttpStatus.CREATED).body(messageResponseDto);
-    }
+  @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<MessageResponseDto> createMessage(
+      @Valid @RequestPart("messageCreateRequest") CreateMessageDto createMessageDto,
+      @RequestPart(value = "attachments") List<MultipartFile> attachments) {
+    List<CreateBinaryContentDto> createBinaryContentDtos = attachments.stream()
+        .map(attachment -> {
+          CreateBinaryContentDto createBinaryContentDto = null;
+          try {
+            createBinaryContentDto = new CreateBinaryContentDto(
+                attachment.getOriginalFilename(),
+                attachment.getContentType(),
+                attachment.getSize(),
+                attachment.getBytes());
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+          return createBinaryContentDto;
+        }).toList();
 
-    @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
-    public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable UUID messageId, @RequestBody UpdateMessageDto updateMessageDto) {
-        MessageResponseDto messageResponseDto = messageService.updateMessage(messageId, updateMessageDto);
-        return ResponseEntity.status(HttpStatus.OK).body(messageResponseDto);
-    }
+    MessageResponseDto messageResponseDto = messageService.createMessage(createMessageDto,
+        createBinaryContentDtos);
+    return ResponseEntity.status(HttpStatus.CREATED).body(messageResponseDto);
+  }
 
-    @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
-        messageService.deleteMessage(messageId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-    }
+  @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
+  public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable UUID messageId,
+      @RequestBody UpdateMessageDto updateMessageDto) {
+    MessageResponseDto messageResponseDto = messageService.updateMessage(messageId,
+        updateMessageDto);
+    return ResponseEntity.status(HttpStatus.OK).body(messageResponseDto);
+  }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<MessageResponseDto>> getMessages(@RequestParam UUID channelId) {
-        List<MessageResponseDto> allMessageByChannelId = messageService.getAllMessageByChannelId(channelId);
-        return ResponseEntity.status(HttpStatus.OK).body(allMessageByChannelId);
-    }
+  @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
+  public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+    messageService.deleteMessage(messageId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+  }
+
+  @RequestMapping(method = RequestMethod.GET)
+  public ResponseEntity<List<MessageResponseDto>> getMessages(@RequestParam UUID channelId) {
+    List<MessageResponseDto> allMessageByChannelId = messageService.getAllMessageByChannelId(
+        channelId);
+    return ResponseEntity.status(HttpStatus.OK).body(allMessageByChannelId);
+  }
 
 
 }

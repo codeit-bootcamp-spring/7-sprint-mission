@@ -26,93 +26,97 @@ import java.util.UUID;
 @Tag(name = "Channel", description = "Channel API")
 public interface ChannelDocs {
 
-    @Operation(summary = "Public Channel 생성")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Public Channel이 성공적으로 생성됨",
-                    content = @Content(
-                            mediaType = "*/*",
-                            schema = @Schema(implementation = CreateChannelResponseDto.class)
-                    )
-            ),
-    })
-    ResponseEntity<CreateChannelResponseDto> createChannel(@Parameter(description = "Public Channel 생성 정보")
-                                                           @Valid @RequestBody CreatePublicChannelDto createPublicChannelDto);
+  @Operation(summary = "Public Channel 생성")
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "201",
+          description = "Public Channel이 성공적으로 생성됨",
+          content = @Content(
+              mediaType = "*/*",
+              schema = @Schema(implementation = CreateChannelResponseDto.class)
+          )
+      ),
+  })
+  ResponseEntity<CreateChannelResponseDto> createChannel(
+      @Parameter(description = "Public Channel 생성 정보")
+      @Valid @RequestBody CreatePublicChannelDto createPublicChannelDto);
 
-    @Operation(summary = "Private Channel 생성")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Private Channel이 성공적으로 생성됨",
-                    content = @Content(
-                            mediaType = "*/*",
-                            schema = @Schema(implementation = CreateChannelResponseDto.class)
-                    )
-            ),
-    })
-    ResponseEntity<CreateChannelResponseDto> createChannel(@Parameter(description = "Private Channel 생성 정보")
-                                                           @Valid @RequestBody CreatePrivateChannelDto createPrivateChannelDto);
+  @Operation(summary = "Private Channel 생성")
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "201",
+          description = "Private Channel이 성공적으로 생성됨",
+          content = @Content(
+              mediaType = "*/*",
+              schema = @Schema(implementation = CreateChannelResponseDto.class)
+          )
+      ),
+  })
+  ResponseEntity<CreateChannelResponseDto> createChannel(
+      @Parameter(description = "Private Channel 생성 정보")
+      @Valid @RequestBody CreatePrivateChannelDto createPrivateChannelDto);
 
-    @Operation(summary = "Channel 삭제")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Channel이 성공적으로 삭제됨"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Channel을 찾을 수 없음",
-                    content = @Content(
-                            examples = @ExampleObject(value = "Channel with id {channelId} not found")
-                    )
-            )
-    })
+  @Operation(summary = "Channel 삭제")
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "204",
+          description = "Channel이 성공적으로 삭제됨"
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Channel을 찾을 수 없음",
+          content = @Content(
+              examples = @ExampleObject(value = "Channel with id {channelId} not found")
+          )
+      )
+  })
+  ResponseEntity<Void> deleteChannel(
+      @Parameter(description = "삭제할 Channel ID") @PathVariable UUID channelId);
 
-    ResponseEntity<Void> deleteChannel(@Parameter(description = "삭제할 Channel ID") @PathVariable UUID channelId);
+  @Operation(summary = "Channel 정보 수정")
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "Channel 정보가 성공적으로 수정됨",
+          content = @Content(
+              mediaType = "*/*",
+              schema = @Schema(implementation = CreateChannelResponseDto.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Private Channel은 수정할 수 없음",
+          content = @Content(
+              mediaType = "*/*",
+              examples = @ExampleObject(value = "Private channel cannot be updated")
+          )
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Channel을 찾을 수 없음",
+          content = @Content(
+              mediaType = "*/*",
+              examples = @ExampleObject(value = "Channel with id {channelId} not found")
+          )
+      )
+  })
+  ResponseEntity<CreateChannelResponseDto> updateChannel(
+      @Parameter(description = "수정할 Channel ID") @PathVariable UUID channelId,
+      @Parameter(description = "수정할 Channel 정보") @RequestBody UpdateChannelDto updateChannelDto);
 
-    @Operation(summary = "Channel 정보 수정")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Channel 정보가 성공적으로 수정됨",
-                    content = @Content(
-                            mediaType = "*/*",
-                            schema = @Schema(implementation = CreateChannelResponseDto.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Private Channel은 수정할 수 없음",
-                    content = @Content(
-                            mediaType = "*/*",
-                            examples = @ExampleObject(value = "Private channel cannot be updated")
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Channel을 찾을 수 없음",
-                    content = @Content(
-                            mediaType = "*/*",
-                            examples = @ExampleObject(value = "Channel with id {channelId} not found")
-                    )
-            )
-    })
-    ResponseEntity<CreateChannelResponseDto> updateChannel(@Parameter(description = "수정할 채널 ID") @PathVariable UUID channelId,
-                                                           @Parameter(description = "수정할 Channel 정보") @RequestBody UpdateChannelDto updateChannelDto);
 
-
-    @Operation(summary = "User가 참여 중인 Channel 목록 조회")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Channel 목록 조회 성공",
-                    content = @Content(
-                            mediaType = "*/*",
-                            array = @ArraySchema(schema = @Schema(implementation = ChannelResponseDto.class))
-                    )
-            ),
-    })
-    ResponseEntity<List<ChannelResponseDto>> getAllChannelByUser(@Parameter(description = "조회할 User ID") @RequestParam UUID userId);
+  @Operation(summary = "User가 참여 중인 Channel 목록 조회")
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "Channel 목록 조회 성공",
+          content = @Content(
+              mediaType = "*/*",
+              array = @ArraySchema(schema = @Schema(implementation = ChannelResponseDto.class))
+          )
+      ),
+  })
+  ResponseEntity<List<ChannelResponseDto>> getAllChannelByUser(
+      @Parameter(description = "조회할 User ID") @RequestParam UUID userId);
 
 }
