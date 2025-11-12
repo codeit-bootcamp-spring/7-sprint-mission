@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.BasicReadStatusService;
-import com.sprint.mission.discodeit.application.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.application.dto.request.ReadStatusRequest;
-import com.sprint.mission.discodeit.application.dto.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.service.BasicReadStatusService;
+import com.sprint.mission.discodeit.service.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.service.dto.response.ReadStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

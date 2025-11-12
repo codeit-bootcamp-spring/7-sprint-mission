@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.BasicChannelService;
-import com.sprint.mission.discodeit.application.BasicMessageService;
-import com.sprint.mission.discodeit.application.dto.request.Attachments;
-import com.sprint.mission.discodeit.application.dto.request.MessageForm;
-import com.sprint.mission.discodeit.application.dto.request.MessageUpdate;
-import com.sprint.mission.discodeit.application.dto.response.MessageResponse;
+import com.sprint.mission.discodeit.service.BasicMessageService;
+import com.sprint.mission.discodeit.service.dto.request.Attachments;
+import com.sprint.mission.discodeit.service.dto.request.MessageForm;
+import com.sprint.mission.discodeit.service.dto.request.MessageUpdate;
+import com.sprint.mission.discodeit.service.dto.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

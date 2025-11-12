@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.BasicChannelService;
-import com.sprint.mission.discodeit.application.dto.request.ChannelCreateRequest;
-import com.sprint.mission.discodeit.application.dto.request.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.application.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.service.BasicChannelService;
+import com.sprint.mission.discodeit.service.dto.request.ChannelCreateRequest;
+import com.sprint.mission.discodeit.service.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.response.ChannelResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
