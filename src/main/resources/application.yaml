@@ -6,7 +6,7 @@ discodeit:
     type: file
     file-directory:  "${user.home}/Documents/discodeit/data"
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 springdoc:
   swagger-ui:
