@@ -6,10 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.UUID;
 
-public record CreatePrivateChannelDto (
+public record CreatePrivateChannelDto(
 
-    String channelName, //채널 이름
-    String description, //채널 설명
-    ChannelType channelType,
-    List<UUID> members
-) {}
+    List<UUID> participantIds
+) {
+
+}

@@ -8,9 +8,9 @@ import java.util.UUID;
 
 public interface ChannelRepository extends Repository<Channel, UUID> {
 
-    // 공통 CRUD 메서드는 Repository에서 상속받음
+  // 공통 CRUD 메서드는 Repository에서 상속받음
 
 
-    Optional<Channel> findByName(String channelName);
-    List<Channel> findChannelsByUserId(UUID userId);
+  Optional<Channel> findByName(String channelName);
+
 }
