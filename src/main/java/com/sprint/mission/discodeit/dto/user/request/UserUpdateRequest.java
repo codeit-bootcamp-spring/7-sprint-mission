@@ -6,9 +6,11 @@ public record UserUpdateRequest(
         UUID userId,
         String username,
         String email,
-        String Password,
+        String password,
         String userNickname,
-        UUID profileImageUrl
+        UUID profileImageId
+
+
 
 ) {
 }

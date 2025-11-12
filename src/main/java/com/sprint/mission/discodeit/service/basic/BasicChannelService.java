@@ -1,11 +1,12 @@
-package com.sprint.mission.discodeit.service.jcf.basic;
+package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.request.ChannelCreatePrivateRequest;
-import com.sprint.mission.discodeit.dto.channel.request.ChannelCreatePublicRequest;
+
+import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelCreatePrivateResponse;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelCreatePublicResponse;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelFindResponse;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelUpdateResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -14,12 +15,11 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Service
 public class BasicChannelService implements ChannelService {
@@ -32,7 +32,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public ChannelCreatePrivateResponse createPrivateChannel(ChannelCreatePrivateRequest request) {
+    public ChannelCreatePrivateResponse createPrivateChannel(ChannelCreateRequest request) {
         if(request.channelType() != ChannelType.PRIVATE) {
             throw  new IllegalArgumentException("아니 타입이 다르잖아요");
         }
@@ -46,7 +46,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelCreatePublicResponse createPublicChannel(ChannelCreatePublicRequest request) {
+    public ChannelCreatePublicResponse createPublicChannel(ChannelCreateRequest request) {
         if(request.channelType() != ChannelType.PUBLIC) {
             throw  new IllegalArgumentException("아니 타입이 다르잖아요");
         }
@@ -97,7 +97,7 @@ public class BasicChannelService implements ChannelService {
                 //일단public은전체 private는 user만조회한거니 유저id에맞거나 public이거나
                 //둘중하나보여주니 필터로 (유저가속한채널,퍼블릭채널)->전부다
                 .filter(channel ->
-                        channel.getType() == ChannelType.PUBLIC || channel.getUsers().contains(userId)
+                        channel.getType() == ChannelType.PUBLIC && channel.getUsers().contains(userId)
                 )
                 .map(channel -> {
                     //채널달 최근메시지 시간은 각각해주고
@@ -117,19 +117,20 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(ChannelUpdateRequest request) {
+    public ChannelUpdateResponse update(ChannelUpdateRequest request) {
         Channel channel = channelRepository.findById(request.channelId())
                 .orElseThrow(() -> new NoSuchElementException("채널을 찾을수가 없어 " + request.channelId() ));
 
         //채널이 퍼블릭이면 수정해서 넣어주고
         if(channel.getType() != ChannelType.PRIVATE) {
             //수정해서
-            channel.update(request.newChannelName(), request.newBose(),request.newUsers(),request.newDescription());
+            channel.update(request.newChannelName(),request.newDescription());
             //저장동시 리턴값 수정한 채널
-            return channelRepository.save(channel);
+            return ChannelUpdateResponse.from(channelRepository.save(channel));
         }
         //아니야 프라이빗이야 그냥 수정전채널
-        return channel;
+        System.out.println("수정불가 그대로 반환");
+        return ChannelUpdateResponse.from(channel) ;
     }
 
     @Override

@@ -8,22 +8,22 @@ import java.util.List;
 import java.util.UUID;
 
 public record ChannelFindResponse(
-          UUID bose
-        , String channelName
-        , ChannelType channelType
-        , List<UUID> users
-        ,String description
-        , Instant lastMessageTime
+        UUID bose,
+        String channelName,
+        ChannelType channelType,
+        List<UUID> users,
+        String description,
+        Instant lastMessageTime
 ) {
     public static ChannelFindResponse from(Channel channel,Instant lastMessageTime){
         return new ChannelFindResponse(
-                channel.getBose()
-                ,channel.getChannelName()
-                ,channel.getType()
+                channel.getBose(),
+                channel.getChannelName(),
+                channel.getType(),
                 //프라이빗 아니면 일단 널
-                ,null
-                ,channel.getDescription()
-                ,lastMessageTime
+                null,
+                channel.getDescription(),
+                lastMessageTime
 
         );
     }

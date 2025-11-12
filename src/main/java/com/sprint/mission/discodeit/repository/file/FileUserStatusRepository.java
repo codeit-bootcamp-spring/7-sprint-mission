@@ -1,15 +1,11 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.file.FileIo;
-import com.sprint.mission.discodeit.service.file.Path;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,13 +33,16 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public Optional<UserStatus> findByUserId(UUID userId) {
-      return FileIo.read(filename, userId, UserStatus.class);
+    public List<UserStatus> findAll() {
+        return FileIo.readAll(filename, UserStatus.class);
     }
 
     @Override
-    public List<UserStatus> findAll() {
-        return List.of();
+    public Optional<UserStatus> findByUserId(UUID userId) {
+      return   FileIo.readAll(filename, UserStatus.class).stream()
+                .filter(us -> us.getUserId().equals(userId))
+                .findFirst();
+
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf.basic;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.Binarycontent.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.Binarycontent.response.BinaryContentResponse;
@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.content.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,10 +20,11 @@ public class BasicBinaryContentService implements BinaryContentService {
     private  final BinaryRepository binaryRepository;
 
     @Override
-    public BinaryContentResponse create(BinaryContentCreateRequest request) {
-        BinaryContent binaryContent = new BinaryContent(request.contentsType(), request.contentByte());
+    public ResponseEntity<BinaryContentResponse> create(BinaryContentCreateRequest request) {
+        BinaryContent binaryContent = new BinaryContent(request.contentsType(), request.contentByte(),"null");
         binaryRepository.save(binaryContent);
-        return  BinaryContentResponse.from(binaryContent);
+
+        return  ResponseEntity.ok(BinaryContentResponse.from(binaryContent));
 
     }
 

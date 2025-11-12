@@ -23,12 +23,13 @@ public class User extends Common implements Serializable {
 
 
 
-    public User(String userId,String password,String userName,String userNickname)
+    public User(String UserEmail,String password,String userName,String userNickname,UUID profileID)
     {
-           this.UserEmail = userId;
-           this.userName = userName;
+           this.UserEmail = UserEmail;
            this.password = password;
+           this.userName = userName;
            this.userNickname = userNickname;
+           this.profileID = profileID;
     }
 
     public void setProfileID(UUID profileID) {
@@ -59,16 +60,16 @@ public class User extends Common implements Serializable {
             this.UserEmail = userUpdateRequest.email();
             anyValueUpdated = true;
         }
-        if (userUpdateRequest.Password() != null && !userUpdateRequest.Password().equals(this.password)) {
-            this.password = userUpdateRequest.Password();
+        if (userUpdateRequest.password() != null && !userUpdateRequest.password().equals(this.password)) {
+            this.password = userUpdateRequest.password();
             anyValueUpdated = true;
         }
         if (userUpdateRequest.userNickname() != null && !userUpdateRequest.userNickname().equals(this.userNickname)) {
             this.userNickname = userUpdateRequest.userNickname();
             anyValueUpdated = true;
         }
-        if (userUpdateRequest.profileImageUrl() != null && !userUpdateRequest.profileImageUrl().equals(this.profileID)) {
-            this.profileID = userUpdateRequest.profileImageUrl();
+        if (userUpdateRequest.profileImageId() != null && !userUpdateRequest.profileImageId().equals(this.profileID)) {
+            this.profileID = userUpdateRequest.profileImageId();
         }
 
         if (anyValueUpdated) {

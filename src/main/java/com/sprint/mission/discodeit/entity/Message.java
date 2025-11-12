@@ -23,11 +23,12 @@ public class Message extends Common implements Serializable {
     }
 
 
-    public  Message(String content,UUID channelId,UUID authorId ){
+    public  Message(String content,UUID channelId,UUID authorId,List<UUID> attachmentIds ){
         this.authorId = authorId;
         this.channelId = channelId;
         this.time = Instant.now();
         this.content = content;
+        this.attachmentIds = attachmentIds;
     }
 
 /*    public UUID getSender() {

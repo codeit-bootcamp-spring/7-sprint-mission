@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.repository.file;
 
 public enum Path {
    RooT_PATH("C:\\Users\\qlqhr\\sprint");

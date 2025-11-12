@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf.basic;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatustUpdateRequest;
@@ -59,9 +59,10 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusResponse update(UserStatustUpdateRequest request) {
-        UserStatus userStatus = userStatusRepository.findByUserId(request.userStatustId()).stream().findFirst()
-                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + request.userStatustId()));
-        userStatus.setUpdatedAt(Instant.now());
+        UserStatus userStatus = userStatusRepository.findByUserId(request.userId()).stream().findFirst()
+                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + request.userId()));
+     //   userStatusRepository.deleteByUserId(userStatus.getId());
+         userStatusRepository.save(userStatus.getUserId());
         return UserStatusResponse.from(userStatus);
     }
 
@@ -70,6 +71,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus byUserId = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
         byUserId.setUpdatedAt(Instant.now());
+        userStatusRepository.save(byUserId.getUserId());
         return UserStatusResponse.from(byUserId);
     }
 
