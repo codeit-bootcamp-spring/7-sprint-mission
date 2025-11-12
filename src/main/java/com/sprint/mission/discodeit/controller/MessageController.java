@@ -18,27 +18,29 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
-public class MessageController {
+public class MessageController implements MessageControllerDocs {
 
     private final MessageService messageService;
     private final ChannelService channelService;
 
-    @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Override
     public ResponseEntity<MessageReadResponseDto> createMessage(@RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
-                                                                @RequestPart(value = "attachments",required = false) List<MultipartFile> attachments
-                                                                                ){
+                                                                @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+    ){
 
         return new ResponseEntity<>(messageService.createMessage(dto, attachments), HttpStatus.CREATED);
     }
 
-
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
+    @Override
     public ResponseEntity<MessageReadResponseDto> patchMessage(@PathVariable UUID messageId, @RequestBody MessagePatchRequestDto dto){
         MessageReadResponseDto mRRDto = messageService.patchMessage(dto, messageId);
         return new ResponseEntity<>(mRRDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{messageId}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
+    @Override
     public void deleteMessage(@PathVariable UUID messageId){
         messageService.deleteMessage(messageId);
     }
@@ -47,13 +49,14 @@ public class MessageController {
     public ResponseEntity<List<MessageReadResponseDto>> readChannelMessage(@RequestParam UUID channelId){
         return new ResponseEntity<>(  messageService.findallByChannelId(channelId), HttpStatus.OK);
     }
-
-    @RequestMapping(value = "/reset",method = RequestMethod.GET)
+    @RequestMapping(value = "/reset", method = RequestMethod.GET)
+    @Override
     public void reset(){
         messageService.resetMessage();
     }
 
     @RequestMapping(value = "", method = RequestMethod.OPTIONS)
+    @Override
     public ResponseEntity<List<MessageReadResponseDto>> readAll(){
         return new ResponseEntity<>(messageService.readAllMessage(), HttpStatus.OK);
     }

@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.dto.response;
 
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.Builder;
 
-import javax.print.attribute.standard.JobOriginatingUserName;
 import java.time.Instant;
 import java.util.UUID;
 

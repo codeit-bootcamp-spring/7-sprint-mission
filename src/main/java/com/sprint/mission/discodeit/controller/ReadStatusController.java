@@ -15,11 +15,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/readStatuses")
 @RequiredArgsConstructor
-public class ReadStatusController {
+public class ReadStatusController implements ReadStatusControllerDocs {
 
     private final ReadStatusService readStatusService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
+    @Override
     public ResponseEntity<ReadStatusResponseDto> createReadStatus(@RequestBody ReadStatusCreateRequestDto dto){
 
         return new ResponseEntity<ReadStatusResponseDto>(readStatusService.createReadStatus(
@@ -28,11 +29,13 @@ public class ReadStatusController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
+    @Override
     public ResponseEntity<List<ReadStatusResponseDto>> readReadStatus(@RequestParam UUID userId){
         return new ResponseEntity<List<ReadStatusResponseDto>>(readStatusService.findAllyByUserId(userId), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{readStatusId}",method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
+    @Override
     public ResponseEntity<ReadStatusResponseDto> patchReadStatus(@PathVariable UUID readStatusId, @RequestBody ReadStatusPatchRequestDto dto)
     {
      return new ResponseEntity<>(readStatusService.patchReadStatus(readStatusId, dto), HttpStatus.OK);

@@ -14,15 +14,17 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
-public class FileController {
+public class FileController implements FileControllerDocs {
 
     private final BinaryContentService binaryContentService;
     @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+    @Override
     public ResponseEntity<BinaryContent> read(@PathVariable UUID binaryContentId){
         return new ResponseEntity<>(binaryContentService.find(binaryContentId), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "",method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    @Override
     public ResponseEntity<List<BinaryContentResponseDto>> readByIdList(@RequestParam List<UUID> binaryContentIds){
         return new ResponseEntity<>(binaryContentService.findAllByIdIn(binaryContentIds), HttpStatus.OK);
     }

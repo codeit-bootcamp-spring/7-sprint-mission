@@ -9,8 +9,6 @@ import com.sprint.mission.discodeit.dto.response.UserUserStatusPatchResponseDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +23,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
 
     private final UserService userService;
     private final UserStatusService userStatusService;
@@ -45,34 +43,38 @@ public class UserController {
 //    }
 
 
-
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+    @Override
     public void delete(@PathVariable UUID userId){
         userService.deleteUser(userId);
     }
 
-    @RequestMapping(value = "",method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    @Override
     public ResponseEntity<List<UserDto>> readAll(){
         return new ResponseEntity<>( userService.advanceFindAllUser(),HttpStatus.OK);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Override
     public ResponseEntity<UserCreateResponseDto> createUser(
-            @RequestPart("userCreateRequest")UserCreateRequestDto dto
-    , @RequestPart(value = "profile",required = false)MultipartFile profile
-                                                                            ) throws IOException {
+            @RequestPart("userCreateRequest") UserCreateRequestDto dto
+            , @RequestPart(value = "profile", required = false) MultipartFile profile
+    ) throws IOException {
         return new ResponseEntity<UserCreateResponseDto>(userService.createUser(dto,profile),HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Override
     public ResponseEntity<UserCreateResponseDto> patchUser(@PathVariable UUID userId,
                                                            @RequestPart("userUpdateRequest") UserUpdateRequest dto,
-                                                           @RequestPart(value = "profile",required = false)MultipartFile profile ) throws IOException {
+                                                           @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
        ;
-        return new ResponseEntity<UserCreateResponseDto>(userService.patchUser(userId, dto,profile), HttpStatus.OK);
+        return new ResponseEntity<>(userService.patchUser(userId, dto,profile), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{userId}/userStatus",method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
+    @Override
     public ResponseEntity<UserUserStatusPatchResponseDto> patchUserStatus(@PathVariable UUID userId, @RequestBody UserStatusPatchRequestDto dto){
 ;
         return new ResponseEntity<UserUserStatusPatchResponseDto>(userStatusService.patchUserStatus(userId, dto), HttpStatus.OK);
@@ -82,6 +84,7 @@ public class UserController {
 //    public void updateOnline(@RequestParam UUID userId){
 //        userService.updateUserOnlineStatus(userId);
 //    }
+
     @RequestMapping(value = "/reset",method = RequestMethod.GET)
     public void reset(){
         userService.resetUserRepository();
