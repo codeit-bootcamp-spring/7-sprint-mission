@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.dto.ApiResponse;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,7 +38,7 @@ public class UserController implements UserControllerDocs {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
     )
     public ResponseEntity<User> createUser(
-            @RequestPart("userCreateRequest") CreateUserRequestDto requestDto,
+            @Valid @RequestPart("userCreateRequest") CreateUserRequestDto requestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
         CreateBinaryContentRequestDto profileRequestDto = convertToRequestDto(profile);

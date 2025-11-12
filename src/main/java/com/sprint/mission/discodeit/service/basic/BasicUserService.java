@@ -39,16 +39,12 @@ public class BasicUserService implements UserService{
         // 1. username/nickname/email 중복 검사
         if (existsByUsername(userRequest.getUsername())) {
             throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
-        } else if (existsByNickName(userRequest.getNickName())) {
-            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         } else if (existsByEmail(userRequest.getEmail())) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         // 2. 입력된 정보 형태 검증
-        Optional.ofNullable(userRequest.getNickName()).ifPresent(n -> UserVaildator.vaildateNickname(n));
         Optional.ofNullable(userRequest.getEmail()).ifPresent(e -> UserVaildator.vaildateEmail(e));
-        Optional.ofNullable(userRequest.getPhoneNum()).ifPresent(pn -> UserVaildator.vaildatePhoneNum(pn));
         Optional.ofNullable(userRequest.getPassword()).ifPresent(pw -> UserVaildator.vaildatePassword(pw));
 
         // 3. 선택적 프로필 이미지 처리
@@ -170,8 +166,6 @@ public class BasicUserService implements UserService{
             // 아이디와 닉네임, 이메일 중복 확인
             if (existsByUsername(username)) {
                 throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
-            } else if (existsByNickName(nickName)) {
-                throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
             } else if (existsByEmail(email)) {
                 throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
             }

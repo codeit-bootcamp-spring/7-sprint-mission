@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.openapi.ReadStatusControllerDocs;
 import com.sprint.mission.discodeit.dto.readstatus.request.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.request.UpdateReadStatusRequestDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class ReadStatusController {
+public class ReadStatusController implements ReadStatusControllerDocs {
     private final ReadStatusService readStatusService;
 
     // 특정 채널의 메시지 수신 정보 생성

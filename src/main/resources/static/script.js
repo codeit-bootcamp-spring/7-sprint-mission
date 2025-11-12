@@ -30,7 +30,7 @@ async function fetchUserProfile(profileId) {
         const profile = await response.json();
 
         // Convert base64 encoded bytes to data URL
-        return `data:profile;base64,${profile.content}`;
+        return `data:${profile.contentType};base64,${profile.bytes}`;
     } catch (error) {
         console.error('Error fetching profile:', error);
         return '/default-avatar.png'; // Fallback to default avatar
@@ -40,7 +40,7 @@ async function fetchUserProfile(profileId) {
 // Render user list
 async function renderUserList(users) {
     const userListElement = document.getElementById('userList');
-    userListElement.innerHTML = ''; // Clear existing
+    userListElement.innerHTML = ''; // Clear existing content
 
     for (const user of users) {
         const userElement = document.createElement('div');
