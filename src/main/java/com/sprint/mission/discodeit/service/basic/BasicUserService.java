@@ -1,16 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentRequestDto;
+import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserUpdateDto;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.entity.dto.binaryContentDto.UserProfileImageUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserResponseDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserNameUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPasswordUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPhoneNumUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserStateUpdateDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
@@ -19,7 +16,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,51 +32,56 @@ public class BasicUserService implements UserService {
     // 고도화 의존성 추가
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
+    private final BinaryContentService binaryContentService;
 
     // 생성
     @Override
-    public UserResponseDto createUser(UserRequestDto requestDto) {
-        userRepository.findByEmail(requestDto.getEmail()).ifPresent(user
+    public User createUser(UserRequestDto requestDto, MultipartFile profileImage) {
+        userRepository.findByEmail(requestDto.email()).ifPresent(user
                 -> {
             throw new DuplicateEmailException("이미 존재하는 이메일");
         });
 
-        userRepository.findByUserName(requestDto.getUserName()).ifPresent(user
+        userRepository.findByUserName(requestDto.userName()).ifPresent(user
                 -> {
             throw new DuplicateEmailException("이미 존재하는 닉네임");
         });
 
-        UUID profileId = null;
+        UUID profileId = saveProfileImage(profileImage);
 
-        // 이미지 추가
-        if (requestDto.getProfileImage() != null) {
-            BinaryContent newImage = new BinaryContent(
-                    requestDto.getProfileImage(),
-                    requestDto.getProfileName(),
-                    requestDto.getProfileType()
-            );
-            binaryContentRepository.save(newImage);
-            profileId = newImage.getId();
-        }
-
+        // 유저 생성
         User newUser = User.builder()
-                .email(requestDto.getEmail())
-                .userName(requestDto.getUserName())
-                .password(requestDto.getPassword())
-                .phoneNum(requestDto.getPhoneNum())
+                .email(requestDto.email())
+                .userName(requestDto.userName())
+                .password(requestDto.password())
                 .build();
 
         newUser.updateProfileId(profileId);
-
         userRepository.save(newUser);
+        userStatusRepository.save(new UserStatus(newUser.getId()));
 
-        UserStatus newUserStatus = new UserStatus(newUser.getId());
-        userStatusRepository.save(newUserStatus);
-
-        return UserResponseDto.from(newUser, true);
+        return newUser;
     }
 
-    // User -> UserInfoDto
+    private UUID saveProfileImage(MultipartFile profileImage) {
+        if (profileImage == null || profileImage.isEmpty()) {
+            return null;
+        }
+        try {
+
+            BinaryContentRequestDto requestDto = BinaryContentRequestDto.builder()
+                    .data(profileImage.getBytes())
+                    .dataName(profileImage.getOriginalFilename())
+                    .dataType(profileImage.getContentType())
+                    .build();
+            BinaryContentResponseDto saveProfile = binaryContentService.createBinaryContent(requestDto);
+            return saveProfile.id();
+
+        } catch (IOException e) {
+            throw new RuntimeException("오류가 발생", e);
+        }
+    }
+
     private UserResponseDto toDto(User user) {
 
         boolean isOnline = userStatusRepository.findStatusByUserId(user.getId())
@@ -89,17 +93,9 @@ public class BasicUserService implements UserService {
 
     // ID로 출력
     @Override
-    public UserResponseDto findUserInfoById(UUID userId) {
+    public UserResponseDto findUserById(UUID userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
-        return toDto(user);
-    }
-
-    // 이메일로 출력
-    @Override
-    public UserResponseDto findUserInfoByEmail(String email) {
-        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
         return toDto(user);
     }
@@ -111,82 +107,38 @@ public class BasicUserService implements UserService {
     }
 
     // --- 수정 ---
-    @Override
-    public UserResponseDto updateUserName(UserNameUpdateDto updateDto) {
-
-        userRepository.findByUserName(updateDto.newUserName()).ifPresent(user -> {
-            if (!user.getUserName().equals(updateDto.newUserName()))
-                throw new DuplicateEmailException("이미 사용중인 닉네임입니다.");
-        });
-
-        User user = userRepository.findById(updateDto.userId())
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
-
-        user.updateName(updateDto.newUserName());
-        userRepository.save(user);
-        return toDto(user);
-    }
 
     @Override
-    public UserResponseDto updatePassword(UserPasswordUpdateDto updateDto) {
+    public User updateUserInfo(UUID userId, UserUpdateDto updateDto, MultipartFile profileImage) {
 
-        User user = userRepository.findById(updateDto.userId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
 
-        user.updatePassword(updateDto.newPassword());
-        userRepository.save(user);
-        return toDto(user);
-    }
-
-    @Override
-    public UserResponseDto updateState(UserStateUpdateDto updateDto) {
-
-        User user = userRepository.findById(updateDto.userId())
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
-
-        user.updateState(updateDto.newState());
-        userRepository.save(user);
-        return toDto(user);
-    }
-
-    @Override
-    public UserResponseDto updatePhoneNum(UserPhoneNumUpdateDto updateDto) {
-
-        User user = userRepository.findById(updateDto.userId())
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
-
-        user.updatePhoneNum(updateDto.newPhoneNum());
-        userRepository.save(user);
-        return toDto(user);
-    }
-
-    @Override
-    public UserResponseDto updateProfileImage(UserProfileImageUpdateDto imageUpdateDto) {
-
-        User user = userRepository.findById(imageUpdateDto.userId())
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
-
-        // 기존 이미지 백업
-        UUID oldId = user.getProfileId();
-
-        // 새로운 이미지 업데이트
-        if (imageUpdateDto.image() != null) {
-            BinaryContent newImage = new BinaryContent(
-                    imageUpdateDto.image(),
-                    imageUpdateDto.imageName(),
-                    imageUpdateDto.imageType()
-            );
-            binaryContentRepository.save(newImage);
-            user.updateProfileId(newImage.getId());
+        if (profileImage != null && !profileImage.isEmpty()) {
+            UUID oldProfileId = user.getProfileId();
+            user.updateProfileId(saveProfileImage(profileImage));
+            if (oldProfileId != null) {
+                binaryContentRepository.deleteById(oldProfileId);
+            }
         }
-        // 기존 이미지 삭제
-        if (oldId != null) {
-            binaryContentRepository.deleteById(oldId);
+
+        if (updateDto.newUserName() != null && !updateDto.newUserName().isBlank()) {
+            userRepository.findByUserName(updateDto.newUserName()).ifPresent(existingUser -> {
+                if (!existingUser.getId().equals(user.getId())) {
+                    throw new DuplicateEmailException("이미 존재하는 닉네임");
+                }
+            });
+            user.updateUserName(updateDto.newUserName());
+        }
+
+        if (updateDto.newPassword() != null && !updateDto.newPassword().isBlank()) {
+            user.updatePassword(updateDto.newPassword());
         }
 
         userRepository.save(user);
-        return toDto(user);
+        return user;
     }
+
 
     // 논리 삭제
     @Override

@@ -29,7 +29,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatusResponseDto createReadStatus(ReadStatusRequestDto requestDto) {
+    public ReadStatus createReadStatus(ReadStatusRequestDto requestDto) {
         // User, Channel Id 입력
         userRepository.findById(requestDto.userId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
@@ -44,7 +44,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = new ReadStatus(requestDto.userId(), requestDto.channelId());
         readStatusRepository.save(readStatus);
 
-        return ReadStatusResponseDto.from(readStatus);
+        return readStatus;
     }
 
     @Override
@@ -61,13 +61,13 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResponseDto updateReadStatus(ReadStatusUpdateDto updateDto) {
-        ReadStatus status = readStatusRepository.findByUserIdAndChannelId(updateDto.userId(), updateDto.channelId())
+    public ReadStatus updateReadStatus(UUID id, ReadStatusUpdateDto updateDto) {
+        ReadStatus status = readStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
 
         status.updateReadStatus();
         readStatusRepository.save(status);
-        return ReadStatusResponseDto.from(status);
+        return status;
     }
 
     @Override

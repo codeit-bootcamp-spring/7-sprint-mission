@@ -1,21 +1,19 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserRequestDto;
 import com.sprint.mission.discodeit.entity.dto.userDto.UserResponseDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserNameUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPasswordUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserPhoneNumUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.userUpdate.UserStateUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,8 +29,24 @@ public class UserController {
     // 사용자 등록 (/users)
     // 201 반환
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<UserResponseDto> userCreate(@RequestBody UserRequestDto userRequestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userRequestDto));
+    public ResponseEntity<User> userCreate(
+            @Valid @RequestPart("userRequestDto") UserRequestDto userRequestDto,
+            @RequestPart(value = "profile", required = false) MultipartFile profileImage
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.createUser(userRequestDto, profileImage));
+    }
+
+    // 사용자 전체 조회 (/users)
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<List<UserResponseDto>> getAllUser() {
+        return ResponseEntity.ok(userService.findAllUsers());
+    }
+
+    // 사용자 단일 조회 (/user/id)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.findUserById(id));
     }
 
     // 사용자 삭제 (/user/id)
@@ -45,40 +59,21 @@ public class UserController {
         // 실패 시 예외를 알아서 처리
     }
 
-    // 사용자 전체 조회 (/users)
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<UserResponseDto>> getAllUser() {
-        return ResponseEntity.ok(userService.findAllUsers());
-    }
-
-    // 사용자 단일 조회 (/user/id)
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.findUserInfoById(id));
-    }
-
-
     // 사용자 정보 수정 (/user/..)
-    @RequestMapping(value = "/username", method = RequestMethod.PUT)
-    public ResponseEntity<UserResponseDto> usernameUpdate(@RequestBody UserNameUpdateDto userNameUpdateDto) {
-        return ResponseEntity.ok(userService.updateUserName(userNameUpdateDto));
-    }
-    @RequestMapping(value = "/phonenum", method = RequestMethod.PUT)
-    public ResponseEntity<UserResponseDto> phoneUpdate(@RequestBody UserPhoneNumUpdateDto userPhoneNumUpdateDto) {
-        return ResponseEntity.ok(userService.updatePhoneNum(userPhoneNumUpdateDto));
-    }
-    @RequestMapping(value = "/password", method = RequestMethod.PUT)
-    public ResponseEntity<UserResponseDto> passwordUpdate(@RequestBody UserPasswordUpdateDto userPasswordUpdateDto) {
-        return ResponseEntity.ok(userService.updatePassword(userPasswordUpdateDto));
-    }
-    @RequestMapping(value = "/state", method = RequestMethod.PUT)
-    public ResponseEntity<UserResponseDto> stateUpdate(@RequestBody UserStateUpdateDto userStateUpdateDto) {
-        return ResponseEntity.ok(userService.updateState(userStateUpdateDto));
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
+    public ResponseEntity<User> userUpdate(
+            @PathVariable UUID userId,
+            @Valid @RequestPart("UserUpdateDto") UserUpdateDto userUpdateDto,
+            @RequestPart(value = "profile",  required = false) MultipartFile profileImage
+    ) {
+        return ResponseEntity.ok(userService.updateUserInfo(userId,userUpdateDto,profileImage));
     }
 
     // 사용자 온라인 상태 업데이트  (/users/userId/online)
-    @RequestMapping(value = "/{userId}/online", method = RequestMethod.PUT)
-    public ResponseEntity<UserStatusResponseDto> onlineUpdate(@PathVariable UUID userId) {
+    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PUT)
+    public ResponseEntity<UserStatusResponseDto> onlineUpdate(
+            @PathVariable UUID userId,
+            @RequestBody UserStatusUpdateDto updateDto) {
         return ResponseEntity.ok(userStatusService.updateStatusByUserId(userId));
     }
 }
@@ -101,5 +96,4 @@ public class UserController {
     @RequestParam 쿼리 파라미터
     @RequestBody 요청본문
     @Valid 유효성 검 -> @RequestBody 바로 앞에 붙여서 DTO를 검증
-
      */

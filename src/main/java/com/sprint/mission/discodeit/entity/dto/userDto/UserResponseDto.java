@@ -6,36 +6,26 @@ import lombok.Builder;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * @param createAt 가입시기
- */
 @Builder
 public record UserResponseDto(
-        UUID id, String userName, String state,
-        Instant createAt, String phoneNum, boolean isOnline,
-        UUID profileId
+        UUID id,
+        Instant createdAt,
+        Instant updatedAt,
+        String username,
+        String email,
+        UUID profileId,
+        Boolean online
 ) {
 
     public static UserResponseDto from(User user, boolean isOnline) {
         return UserResponseDto.builder()
                 .id(user.getId())
-                .userName(user.getUserName())
-                .state(user.getUserState().getDescState()) // 유저가 설정 가능한 상태
-                .createAt(user.getCreatedAt())
-                .phoneNum(user.getPhoneNum())
-                .isOnline(isOnline)     // 시스템의 온라인 상태 여부
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .username(user.getUserName())
+                .email(user.getEmail())
                 .profileId(user.getProfileId())
+                .online(isOnline)
                 .build();
-    }
-
-    @Override
-    public String toString() {
-        String userStatus = isOnline ? " (online)" : " (offline)";  // 실제로는 띄우지 않을 것
-
-        return "유저 정보\n" +
-                "이름: " + userName + userStatus + '\n' +
-                "상태: " + state + '\n' +
-                "가입 시기: " + createAt + '\n' +
-                "전화번호: " + phoneNum + '\n';
     }
 }
