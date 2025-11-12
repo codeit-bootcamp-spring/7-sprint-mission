@@ -11,48 +11,29 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class CommonExceptionHandler {
 
-
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> illegalArgsHandler(IllegalArgumentException e){
-        e.printStackTrace();
-
-
-
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-
-    }
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> methodArgumentNotValidHandler(MethodArgumentNotValidException e){
-        e.printStackTrace();
-
-        //가공이 필요하다
-        Map<String,String> errors= new HashMap<>();
-
-        BindingResult bindingResult = e.getBindingResult();
-
-
-        e.getBindingResult().getFieldErrors().forEach(error->{
-                String field = error.getField();
-             String message = error.getDefaultMessage();
-        errors.put(field, message);
-        });
-
-        return  ResponseEntity
+    public ResponseEntity<String> handleException(IllegalArgumentException e) {
+        return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(errors);
+                .body(e.getMessage());
     }
 
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<String> handleException(NoSuchElementException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
 
-
-    //모르는 예외
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> exceptionHandler(Exception e){
-        e.printStackTrace();
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<String> handleException(Exception e) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(e.getMessage());
     }
-
 }

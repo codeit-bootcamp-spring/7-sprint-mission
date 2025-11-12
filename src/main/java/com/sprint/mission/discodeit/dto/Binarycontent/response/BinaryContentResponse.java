@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public record BinaryContentResponse(
 
-        ContentsType contentsType,
+        String contentsType,
         byte[] contentByte
 ) {
     public static BinaryContentResponse from(BinaryContent binaryContent) {
         return new BinaryContentResponse(
-                binaryContent.getContentsType(),
-                binaryContent.getContentByte()
+                binaryContent.getContentType(),
+                binaryContent.getBytes()
         );
     }
 }
