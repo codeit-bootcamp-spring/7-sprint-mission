@@ -1,1 +1,11 @@
 rootProject.name = 'discodeit'
+toolchainManagement {
+    jvm {
+        javaRepositories {
+            // Gradle이 JDK를 다운로드할 수 있는 저장소를 알려줍니다.
+            repository('FoojayToolchains') {
+                url = new URI('https://api.foojay.io/disco/v3.0/feeds')
+            }
+        }
+    }
+}
