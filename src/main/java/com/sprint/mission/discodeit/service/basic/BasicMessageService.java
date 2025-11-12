@@ -22,80 +22,73 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
-    private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
-    private final BinaryContentRepository binaryContentRepository;
+  private final MessageRepository messageRepository;
+  private final UserRepository userRepository;
+  private final ChannelRepository channelRepository;
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public MessageResponseDto createMessage(CreateMessageRequestDto request,
-                                            List<CreateBinaryContentRequestDto> fileRequests) {
-        userRepository.findById(request.authorId())
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-        channelRepository.findById(request.channelId())
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
+  @Override
+  public Message createMessage(CreateMessageRequestDto request,
+      List<CreateBinaryContentRequestDto> fileRequests) {
+    userRepository.findById(request.authorId())
+        .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+    channelRepository.findById(request.channelId())
+        .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
 
-        List<UUID> attachmentIds = new ArrayList<>();
+    List<UUID> attachmentIds = new ArrayList<>();
 
-        if(fileRequests != null){
-            for (CreateBinaryContentRequestDto fileRequest : fileRequests) {
-                BinaryContent binaryContent = new BinaryContent(
-                        fileRequest.data(),
-                        fileRequest.fileName(),
-                        fileRequest.fileType()
-                );
-                BinaryContent saved = binaryContentRepository.save(binaryContent);
-                attachmentIds.add(saved.getId());
-            }
-        }
-
-        Message message = new Message(
-                request.content(),
-                request.authorId(),
-                request.channelId(),
-                attachmentIds
-                );
-
-        Message save = messageRepository.save(message);
-        return MessageResponseDto.from(save);
+    if (fileRequests != null) {
+      for (CreateBinaryContentRequestDto fileRequest : fileRequests) {
+        BinaryContent binaryContent = new BinaryContent(
+            fileRequest.data(),
+            fileRequest.fileName(),
+            fileRequest.fileType()
+        );
+        BinaryContent saved = binaryContentRepository.save(binaryContent);
+        attachmentIds.add(saved.getId());
+      }
     }
 
-    @Override
-    public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
-        channelRepository.findById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
+    Message message = new Message(
+        request.content(),
+        request.channelId(),
+        request.authorId(),
+        attachmentIds
+    );
 
-        List<Message> messages = messageRepository.findByChannelId(channelId);
-        List<MessageResponseDto> dtoList = new ArrayList<>();
-        for(Message message : messages){
-            dtoList.add(MessageResponseDto.from(message));
-        }
-        return dtoList;
+    return messageRepository.save(message);
+  }
+
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    channelRepository.findById(channelId)
+        .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
+
+    return messageRepository.findByChannelId(channelId);
+  }
+
+  @Override
+  public Message updateMessage(UUID messageId, UpdateMessageDto MessageUpdateRequest) {
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
+
+    String newContent = MessageUpdateRequest.newContent();
+
+    message.updateContent(newContent);
+
+    return messageRepository.save(message);
+  }
+
+  @Override
+  public void deleteMessage(UUID messageId) {
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
+
+    List<UUID> attachmentIds = message.getAttachmentIds();
+
+    for (UUID attachmentId : attachmentIds) {
+      binaryContentRepository.delete(attachmentId);
     }
-
-    @Override
-    public MessageResponseDto updateMessage(UUID id, UpdateMessageDto newContents) {
-        Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
-
-
-        String newContent = newContents.newContent();
-
-        message.updateContent(newContent);
-        Message save = messageRepository.save(message);
-        return MessageResponseDto.from(save);
-    }
-
-    @Override
-    public void deleteMessage(UUID messageId) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
-
-        List<UUID> attachmentIds = message.getAttachmentIds();
-
-        for(UUID attachmentId : attachmentIds){
-            binaryContentRepository.delete(attachmentId);
-        }
-        messageRepository.delete(messageId);
-    }
+    messageRepository.delete(messageId);
+  }
 }

@@ -12,16 +12,16 @@ public class Message extends BasicEntity implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String content; // 메시지
-  private final UUID authorId; // 유저ID
   private final UUID channelId; // 채널ID
+  private final UUID authorId; // 유저ID
   private List<UUID> attachmentIds; // 첨부파일
 
 
-  public Message(String content, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
+  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
     super();
     this.content = content;
-    this.authorId = authorId;
     this.channelId = channelId;
+    this.authorId = authorId;
     this.attachmentIds = attachmentIds;
   }
 
