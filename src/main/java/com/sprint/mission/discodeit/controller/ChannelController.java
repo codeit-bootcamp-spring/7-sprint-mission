@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 
+import com.sprint.mission.discodeit.controller.Docs.ChannelControllerDocs;
 import com.sprint.mission.discodeit.dto.channel.request.*;
 import com.sprint.mission.discodeit.dto.channel.response.*;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -18,14 +19,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/channel")
 @RequiredArgsConstructor
-public class ChannelController {
+public class ChannelController implements ChannelControllerDocs {
 
     private final ChannelService channelService;
 
 
     // [공개채널 생성]
 
-   @RequestMapping(path = "createPublic")
+   @RequestMapping(path = "createPublic",method = RequestMethod.POST)
     public ResponseEntity<Channel> create(@RequestBody PublicChannelCreateRequest request) {
        Channel createdChannel = channelService.create(request);
        return ResponseEntity
@@ -34,7 +35,7 @@ public class ChannelController {
    }
     // [비공개 채널 생성]
 
-    @RequestMapping(path = "createPrivate")
+    @RequestMapping(path = "createPrivate",method = RequestMethod.POST)
     public ResponseEntity<Channel> create(@RequestBody PrivateChannelCreateRequest request) {
         Channel createdChannel = channelService.create(request);
         return ResponseEntity
@@ -45,7 +46,7 @@ public class ChannelController {
 
 
     // [공개채널 정보 수정]
-   @RequestMapping(path = "/update")
+   @RequestMapping(path = "/update",method = RequestMethod.PATCH)
    public ResponseEntity<Channel> update(@RequestParam("channelId") UUID channelId,
            @RequestBody ChannelUpdateRequest request){
        Channel udpatedChannel = channelService.update(channelId, request);
@@ -54,7 +55,7 @@ public class ChannelController {
                .body(udpatedChannel);
    }
     // [채널 삭제]
-   @RequestMapping(path = "/delete")
+   @RequestMapping(path = "/delete",method = RequestMethod.DELETE)
   public ResponseEntity<Void> delete(@RequestBody ChannelDeleteRequest request){
        channelService.delete(request.channelId());
 
@@ -65,7 +66,7 @@ public class ChannelController {
 
 
   // [특정 사용자가 볼 수 있는 모든 채널 목록 조회]
-  @RequestMapping(path = "/findAll")
+  @RequestMapping(path = "/findAll",method = RequestMethod.GET)
   public ResponseEntity<List<ChannelDto>> findAllByUserId(@RequestParam("userId") UUID userId){
       List<ChannelDto> allByUserId = channelService.findAllByUserId(userId);
 

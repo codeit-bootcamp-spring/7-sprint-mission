@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.Docs.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.Binarycontent.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
@@ -20,12 +21,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/message")
 @RequiredArgsConstructor
-public class MessageController {
+public class MessageController implements MessageControllerDocs {
 
     private final MessageService messageService;
 
                //[ ] 메시지를 보낼 수 있다.
                @RequestMapping( path = "create",
+                       method = RequestMethod.POST,
                        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
                public ResponseEntity<Message> createMessage(
                        @RequestPart("messageCreateRequest") CreateMessageRequest request,
@@ -55,7 +57,7 @@ public class MessageController {
                            .body(messageResponse);
                }
 
-         @RequestMapping(path = "update")
+         @RequestMapping(path = "update",method = RequestMethod.PATCH)
          public ResponseEntity<Message> updateMessage(@RequestParam("messageId")  UUID messageId,
                                       @RequestBody UpdateMessageRequest request){
              Message update = messageService.update(messageId, request);
@@ -66,7 +68,7 @@ public class MessageController {
          }
            // [ ] 메시지를 삭제할 수 있다.
 
-           @RequestMapping(path = "delete")
+           @RequestMapping(path = "delete",method = RequestMethod.DELETE)
            public ResponseEntity<Void> deleteMessage(@RequestParam("messageId") UUID messageId){
 
                    messageService.delete(messageId);
@@ -78,7 +80,7 @@ public class MessageController {
 
           // [ ] 특정 채널의 메시지 목록을 조회할 수 있다.
 
-       @RequestMapping("findAllByChannelId")
+       @RequestMapping(path ="findAllByChannelId",method = RequestMethod.GET)
        public ResponseEntity<List<Message>> findAllByChannelId(@RequestParam("channelId") UUID channelId){
 
            List<Message> allByChannelId = messageService.findAllByChannelId(channelId);
