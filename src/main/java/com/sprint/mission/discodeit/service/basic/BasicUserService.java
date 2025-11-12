@@ -95,28 +95,27 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateRequest userUpdateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-
+    public User update(UUID userId,UserUpdateRequest userUpdateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("맞는 유저 ID가 없습니다 " + userId ));
         //이메일매칭
         if(userRepository.findAll().stream()
                 .anyMatch(u -> u.getEmail().equals(userUpdateRequest.newEmail()))){
-            throw new IllegalArgumentException("이메일이 이미 존재합니다");
+            throw new IllegalArgumentException("이메일이 존재합니다 : "+userUpdateRequest.newEmail());
         }
         //네임매칭
         if(userRepository.findAll().stream()
                 .anyMatch(u -> u.getUsername().equals(userUpdateRequest.newUsername()))){
-            throw new IllegalArgumentException("이름 이미 존재합니다");
+            throw new IllegalArgumentException("이름이 존재합니다 : "+userUpdateRequest.newUsername());
         }
 
 
 
         UUID uuid = profileId(optionalProfileCreateRequest);
-        User user = new User(userUpdateRequest.newUsername(),userUpdateRequest.newEmail(), userUpdateRequest.newPassword(), uuid);
+        user.update(userUpdateRequest.newUsername(),userUpdateRequest.newEmail(),userUpdateRequest.newPassword(),uuid);
 
-        Instant now = Instant.now();
-        UserStatus userStatus = new UserStatus(user.getId(), now);
-
-          //폼으로 바로넣고주자
+/*        Instant now = Instant.now();
+        UserStatus userStatus = new UserStatus(user.getId(), now);*/
         return userRepository.save(user);
     }
 

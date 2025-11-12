@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.Docs.UserControllerDocs;
 import com.sprint.mission.discodeit.dto.Binarycontent.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.request.UserDeleteRequest;
 
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserDto;
@@ -26,7 +26,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
-public class UserController {
+public class UserController implements UserControllerDocs {
 
      private final UserService userService;
      private final UserStatusService userStatusService;
@@ -35,6 +35,7 @@ public class UserController {
     // [등록]
 
     @RequestMapping(path = "create"
+            ,method = RequestMethod.POST
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<User> create(
             @RequestPart("userCreateRequest") UserCreateRequest request,
@@ -56,7 +57,8 @@ public class UserController {
 // [수정]
 
     @RequestMapping(
-            path = "/update"
+            path = "update"
+            ,method = RequestMethod.PATCH
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<User> update(
             @RequestParam("userId") UUID userId,
@@ -68,31 +70,35 @@ public class UserController {
                 .flatMap(this::resolveProfileRequest);
 
 
-        User update = userService.update(request, optionalProfile);
+        User update = userService.update(userId,request, optionalProfile);
         return   ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(update);
     }
 
+
     // [삭제]
 
-    @RequestMapping(path = "/delete")
-    public void delete(@RequestParam("userId") UUID userId) {
+    @RequestMapping(path = "delete",method = RequestMethod.DELETE)
+    public ResponseEntity<Void> delete(@RequestParam("userId") UUID userId) {
         userService.delete(userId);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
 
 
     // [전체 조회]
 
-    @RequestMapping(path = "/findAll")
+    @RequestMapping(path = "findAll",method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> findAll() {
    return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userService.findAll());
     }
 
-    @RequestMapping(path = "updateUserStatusByUserId")
+    @RequestMapping(path = "updateUserStatusByUserId",method = RequestMethod.PATCH)
     public ResponseEntity<UserStatus> updateUserStatusByUserId(@RequestParam("userId") UUID userId,
                                                                @RequestBody UserStatusUpdateRequest request) {
 

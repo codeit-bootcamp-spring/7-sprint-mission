@@ -20,6 +20,6 @@ public interface UserService {
             , Optional<BinaryContentCreateRequest> optionalProfileCreateRequest);
     UserDto find(UUID userId);
     List<UserDto> findAll();
-    User update( UserUpdateRequest userUpdateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest);
+    User update(UUID userId, UserUpdateRequest userUpdateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest);
     void delete(UUID userId);
 }

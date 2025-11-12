@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
+import java.time.Instant;
 import java.util.NoSuchElementException;
 
 
@@ -35,7 +36,8 @@ public class AuthService {
                 .orElseThrow(() -> new NoSuchElementException("맞는유저ID가 없어"));
 
         //로그인하면 상태는 최신화 아닐까 생각해서 넣어봤다
-        userstatusRepository.save(userStatus.getUserId());
+        userStatus.update(Instant.now());
+        userstatusRepository.save(userStatus);
         LoginResponse.from(user,userStatus.isOnline());
         return user;
 

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.Docs.ReadStatusControllerDocs;
 import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusFindByUserRequest;
@@ -18,13 +19,13 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/readStatus")
-public class ReadStatusController {
+public class ReadStatusController implements ReadStatusControllerDocs {
 
     private final ReadStatusService readStatusService;
 
     //[ ] 특정 채널의 메시지 수신 정보를 생성할 수 있다.
 
-    @RequestMapping(value = "create")
+    @RequestMapping(path = "create",method = RequestMethod.POST)
     public ResponseEntity<ReadStatus> createStatus(@RequestBody ReadStatusCreateRequest request){
         ReadStatus readStatus = readStatusService.create(request);
 
@@ -35,7 +36,7 @@ public class ReadStatusController {
     // [ ] 특정 채널의 메시지 수신 정보를 수정할 수 있다.
 
 
-    @RequestMapping(value = "update")
+    @RequestMapping(path = "update",method = RequestMethod.PATCH)
     public ResponseEntity<ReadStatus> updateStatus(@RequestParam("readStatusId") UUID readStatusId,
                                                    @RequestBody ReadStatusUpdateReuqest request){
         ReadStatus update = readStatusService.update(readStatusId, request);
@@ -46,7 +47,7 @@ public class ReadStatusController {
     }
     //  [ ] 특정 사용자의 메시지 수신 정보를 조회할 수 있다.
 
-    @RequestMapping(value = "findAllByUserId")
+    @RequestMapping(path = "findAllByUserId",method = RequestMethod.GET)
     public ResponseEntity<List<ReadStatus>> findStatusByUserId(@RequestParam("userId") UUID userId){
         List<ReadStatus> allByUserId = readStatusService.findAllByUserId(userId);
         return ResponseEntity
