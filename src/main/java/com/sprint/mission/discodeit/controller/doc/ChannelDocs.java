@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.response.CreateChannelResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,7 +44,7 @@ public interface ChannelDocs {
     @ApiResponses({
             @ApiResponse(
                     responseCode = "201",
-                    description = "Public Channel이 성공적으로 생성됨",
+                    description = "Private Channel이 성공적으로 생성됨",
                     content = @Content(
                             mediaType = "*/*",
                             schema = @Schema(implementation = CreateChannelResponseDto.class)
@@ -57,11 +58,7 @@ public interface ChannelDocs {
     @ApiResponses({
             @ApiResponse(
                     responseCode = "204",
-                    description = "Channel이 성공적으로 삭제됨",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(type = "string", example = "string")
-                    )
+                    description = "Channel이 성공적으로 삭제됨"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -105,17 +102,17 @@ public interface ChannelDocs {
                                                            @Parameter(description = "수정할 Channel 정보") @RequestBody UpdateChannelDto updateChannelDto);
 
 
-    @Operation(summary = "Channel 목록 조회 성공")
+    @Operation(summary = "User가 참여 중인 Channel 목록 조회")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "Channel 목록 조회 성공",
                     content = @Content(
                             mediaType = "*/*",
-                            schema = @Schema(implementation = ChannelResponseDto.class)
+                            array = @ArraySchema(schema = @Schema(implementation = ChannelResponseDto.class))
                     )
             ),
     })
-    ResponseEntity<List<ChannelResponseDto>> getAllChannelByUser(@RequestParam UUID userId);
+    ResponseEntity<List<ChannelResponseDto>> getAllChannelByUser(@Parameter(description = "조회할 User ID") @RequestParam UUID userId);
 
 }

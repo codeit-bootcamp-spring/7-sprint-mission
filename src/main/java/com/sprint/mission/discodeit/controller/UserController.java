@@ -26,51 +26,55 @@ import java.util.UUID;
 @RequestMapping(value = "/api/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
-    private final UserStatusService userStatusService;
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResponseDto> createUser(
-            @Valid @RequestPart(value = "userDto") CreateUserDto userDto,
-            @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
-        CreateBinaryContentDto createBinaryContentDto = null;
+  private final UserService userService;
+  private final UserStatusService userStatusService;
 
-        if (profile != null && !profile.isEmpty()) {
-            createBinaryContentDto = new CreateBinaryContentDto(
-                    profile.getOriginalFilename(),
-                    profile.getContentType(),
-                    profile.getSize(),
-                    profile.getBytes()
-            );
-        }
+  @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<UserResponseDto> createUser(
+      @Valid @RequestPart(value = "userDto") CreateUserDto userDto,
+      @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+    CreateBinaryContentDto createBinaryContentDto = null;
 
-        UserResponseDto userResponseDto = userService.createUser(userDto, createBinaryContentDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
+    if (profile != null && !profile.isEmpty()) {
+      createBinaryContentDto = new CreateBinaryContentDto(
+          profile.getOriginalFilename(),
+          profile.getContentType(),
+          profile.getSize(),
+          profile.getBytes()
+      );
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<UserResponseDto>> getAllUser() {
-        List<UserResponseDto> users = userService.getAllUsers();
-        return ResponseEntity.status(HttpStatus.OK).body(users);
-    }
+    UserResponseDto userResponseDto = userService.createUser(userDto, createBinaryContentDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
+  }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
-        userService.deleteUser(userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
+  @RequestMapping(method = RequestMethod.GET)
+  public ResponseEntity<List<UserResponseDto>> getAllUser() {
+    List<UserResponseDto> users = userService.getAllUsers();
+    return ResponseEntity.status(HttpStatus.OK).body(users);
+  }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable UUID userId, @RequestBody UpdateUserDto updateUserDto) {
-        UserResponseDto userResponseDto = userService.updateUser(userId, updateUserDto);
-        return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
-    }
+  @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+  public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+    userService.deleteUser(userId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
 
-    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-    public ResponseEntity<UserStatusResponseDto> updateUserState(@PathVariable UUID userId,
-                                             @RequestBody UpdateUserStatusDto updateUserDto) {
-        UserStatusResponseDto userStatusResponseDto = userStatusService.updateStatusByUserId(userId, updateUserDto);
-        return ResponseEntity.status(HttpStatus.OK).body(userStatusResponseDto);
-    }
+  @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
+  public ResponseEntity<UserResponseDto> updateUser(@PathVariable UUID userId,
+      @RequestPart(value = "userUpdateRequest") UpdateUserDto updateUserDto,
+      @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+    UserResponseDto userResponseDto = userService.updateUser(userId, updateUserDto);
+    return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
+  }
+
+  @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
+  public ResponseEntity<UserStatusResponseDto> updateUserState(@PathVariable UUID userId,
+      @RequestBody UpdateUserStatusDto updateUserDto) {
+    UserStatusResponseDto userStatusResponseDto = userStatusService.updateStatusByUserId(userId,
+        updateUserDto);
+    return ResponseEntity.status(HttpStatus.OK).body(userStatusResponseDto);
+  }
 
 }
