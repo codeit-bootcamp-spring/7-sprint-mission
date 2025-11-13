@@ -26,7 +26,7 @@ public class UserStatus extends Common {
 
   public void update(Instant lastActiveAt) {
     boolean isUpdate = false;
-    if (this.lastActiveAt != null && !this.lastActiveAt.equals(lastActiveAt)) {
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
       this.lastActiveAt = lastActiveAt;
       isUpdate = true;
     }

@@ -47,11 +47,11 @@ public class Channel extends Common {
   public void updateChannel(String channelName, String desc) {
     boolean isUpdate = false;
 
-    if (channelName != null && !this.channelName.equals(channelName)) {
+    if (channelName != null && !channelName.equals(this.channelName)) {
       this.channelName = channelName;
       isUpdate = true;
     }
-    if (desc != null && !this.desc.equals(desc)) {
+    if (desc != null && !desc.equals(this.desc)) {
       this.desc = desc;
       isUpdate = true;
     }

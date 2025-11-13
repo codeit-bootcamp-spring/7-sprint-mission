@@ -13,31 +13,34 @@ import java.util.UUID;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Message extends Common {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private Instant updateAt;
 
-    private String content;
-    private final UUID channelId;
-    private final UUID userId;
-    private final List<UUID> attachmentIds;
+  @Serial
+  private static final long serialVersionUID = 1L;
+  private Instant updateAt;
 
-    public Message(String content, UUID channelId, UUID userId, List<UUID> attachmentIds) {
-        updateAt = Instant.now();
-        this.content = content;
-        this.channelId = channelId;
-        this.userId = userId;
-        this.attachmentIds = attachmentIds;
+  private String content;
+  private final UUID channelId;
+  private final UUID userId;
+  private final List<UUID> attachmentIds;
+
+  public Message(String content, UUID channelId, UUID userId, List<UUID> attachmentIds) {
+    updateAt = Instant.now();
+    this.content = content;
+    this.channelId = channelId;
+    this.userId = userId;
+    this.attachmentIds = attachmentIds;
+  }
+
+  public void messageUpdate(String content) {
+    boolean isUpdate = false;
+    if (content != null && !content.equals(this.content)) {
+      this.content = content;
+      isUpdate = true;
     }
 
-    public void messageUpdate(String content) {
-        boolean isUpdate = false;
-        if(this.content != null && !this.content.equals(content)) {
-            this.content = content;
-            isUpdate = true;
-        }
-
-        if(isUpdate) this.updateAt = Instant.now();
+    if (isUpdate) {
+      this.updateAt = Instant.now();
     }
+  }
 
 }
