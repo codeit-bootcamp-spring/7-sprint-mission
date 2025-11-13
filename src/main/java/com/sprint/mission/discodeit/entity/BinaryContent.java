@@ -12,18 +12,20 @@ public class BinaryContent implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final UUID id; // ID
-  private final Instant createdAt; // 생성 시간
+  private Instant createdAt; // 생성 시간
 
-  private final byte[] data; //표준 데이터
-  private final String fileName; // 파일 이름
-  private final String fileType; // 파일 타입
+  private String fileName; // 파일 이름
+  private Long size;
+  private String contentType;
+  private byte[] bytes;
 
 
-  public BinaryContent(byte[] data, String fileName, String fileType) {
+  public BinaryContent(String fileName, String contentType, byte[] bytes) {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
-    this.data = data;
     this.fileName = fileName;
-    this.fileType = fileType;
+    this.size = (long) bytes.length;
+    this.contentType = contentType;
+    this.bytes = bytes;
   }
 }
