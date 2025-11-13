@@ -9,10 +9,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class UserCreateRequestDto {
-    @NotBlank
+    @NotBlank(message = "User name")
     private String username ;
-    @NotBlank
+    @NotBlank(message = "User email")
     private String email;
-    @NotBlank
+    @NotBlank(message = "User password")
     private String password;
 }

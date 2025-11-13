@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto.request.channel;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import static com.sprint.mission.discodeit.service.util.StaticString.*;
 
 @Getter
 public class ChannelPrivateCreateRequestDto {
-    @NotBlank
+    @NotNull(message = "ChannelPrivate participantIds")
     private final HashSet<UUID> participantIds;
     private String name = DEFAULT_CHANNEL_NAME;
     private String description = DEFAULT_CHANNEL_DESCRIPTION;

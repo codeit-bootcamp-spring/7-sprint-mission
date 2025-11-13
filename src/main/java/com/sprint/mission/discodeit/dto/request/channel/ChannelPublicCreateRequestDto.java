@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ChannelPublicCreateRequestDto {
     public HashSet<UUID> participantIds;
-    @NotBlank
+    @NotBlank(message = "Public Channel name")
     public String name ;
     public String description;
     public boolean isTextChannel;
