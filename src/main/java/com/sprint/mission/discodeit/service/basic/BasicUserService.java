@@ -40,12 +40,15 @@ public class BasicUserService implements UserService {
     }
   }
 
+  // 유저를 만들고, 필요하면 프로필 파일을 저장하고 상태까지 기본 값을 넣는 작업을 전부 한 번에 하고
+  // 마지막에 만들어진 User를 돌려주는 메서드
   @Override
   public User create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
 
+    // 중복 체크 (이미 있는 이메일이나 유저네임이면 예외 던짐)
     if (userRepository.existsByEmail(email)) {
       throw new IllegalArgumentException("User with email " + email + " already exists");
     }
@@ -53,6 +56,14 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("User with username " + username + " already exists");
     }
 
+    // 프로필 이미지 저장
+    /*
+    optionalProfileCreateRequest안에 값이 있으면
+      - 파일 이름, 타입, 바이트 배열을 꺼낸다
+      - BinaryContent 엔티티를 만들어서 biranyContentRepository.save()로 저장한다.
+      - 저장된 파일의 id만 꺼내서 nullableProfileId에 넣는다.
+    값이 있으면 nullalbleProfileId는 null로 둔다.
+    * */
     UUID nullableProfileId = optionalProfileCreateRequest
         .map(profileRequest -> {
           String fileName = profileRequest.fileName();
@@ -65,31 +76,37 @@ public class BasicUserService implements UserService {
         .orElse(null);
     String password = userCreateRequest.password();
 
+    // Entity 생성 + 저장
+    // 이름 이메일 패스워드 프로필이미지
     User user = new User(username, email, password, nullableProfileId);
+    // userRepository.save(user) 로 DB 같은 저장소에 저장
     User createdUser = userRepository.save(user);
 
+    // 현재 시간 Instant.now()로
+    // UserStatus 엔티티를 만들어서 userRepository.save(user) 로 DB 같은 저장소에 저장
     Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(createdUser.getId(), now);
+    UserStatus userStatus = new UserStatus(createdUser.getId(), now); //
     userStatusRepository.save(userStatus);
 
     return createdUser;
   }
 
   @Override
-  public UserDto find(UUID userId) {
+  public UserDto find(UUID userId) {  // id로 유저 찾고 없으면 에러
     return userRepository.findById(userId)
         .map(this::toDto)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
   }
 
   @Override
-  public List<UserDto> findAll() {
+  public List<UserDto> findAll() {  // 전체 유저 목록 가져온 후, toDto로 변환
     return userRepository.findAll()
         .stream()
         .map(this::toDto)
         .toList();
   }
 
+  // 유저 찾기 → 중복 체크 → 프로필 바꾸면 이전 파일 삭제 → 새 파일 저장 → 유저 정보 업데이트
   @Override
   public User update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -125,6 +142,7 @@ public class BasicUserService implements UserService {
     return userRepository.save(user);
   }
 
+  // 유저 찾기 → 프로필 파일 있으면 같이 삭제 → UserStatus 삭제 → 마지막에 유저 삭제
   @Override
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
