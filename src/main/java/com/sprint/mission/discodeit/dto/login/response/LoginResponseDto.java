@@ -8,22 +8,24 @@ import java.util.UUID;
 
 @Builder
 public record LoginResponseDto(
-        UUID id,
-        Instant createdAt,
-        Instant updatedAt,
-        String username,
-        String email,
-        String password,
-        UUID profileId
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    String username,
+    String email,
+    String password,
+    UUID profileId
 ) {
-    public static LoginResponseDto from(User user) {
-        return LoginResponseDto.builder()
-                .id(user.getId())
-                .createdAt(user.getCreateAt())
-                .updatedAt(user.getUpdateAt())
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .profileId(user.getProfileId())
-                .build();
-    }
+
+  public static LoginResponseDto from(User user) {
+    return LoginResponseDto.builder()
+        .id(user.getId())
+        .createdAt(user.getCreateAt())
+        .updatedAt(user.getUpdateAt())
+        .username(user.getUsername())
+        .email(user.getEmail())
+        .password(user.getPassword())
+        .profileId(user.getProfileId())
+        .build();
+  }
 }
