@@ -40,9 +40,9 @@ public class BasicMessageService implements MessageService {
     if (fileRequests != null) {
       for (CreateBinaryContentRequestDto fileRequest : fileRequests) {
         BinaryContent binaryContent = new BinaryContent(
-            fileRequest.data(),
             fileRequest.fileName(),
-            fileRequest.fileType()
+            fileRequest.contentType(),
+            fileRequest.bytes()
         );
         BinaryContent saved = binaryContentRepository.save(binaryContent);
         attachmentIds.add(saved.getId());

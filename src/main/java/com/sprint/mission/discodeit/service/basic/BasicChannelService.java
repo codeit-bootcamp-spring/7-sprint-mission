@@ -45,8 +45,8 @@ public class BasicChannelService implements ChannelService {
 
     for (UUID participantId : request.participantIds()) {
       ReadStatus readStatus = new ReadStatus(
-          saved.getId(),
-          participantId
+          participantId,
+          saved.getId()
       );
       readStatusRepository.save(readStatus);
     }
@@ -82,12 +82,17 @@ public class BasicChannelService implements ChannelService {
         .filter(channel -> channel.getType() == ChannelType.PUBLIC ||
             channelIds.contains(channel.getId()))
         .map(channel -> {
-          Instant lastMassageAt = messageRepository.findByChannelId(channel.getId())
+          List<UUID> participantIds = readStatusRepository.findAllByChannelId(channel.getId())
               .stream()
-              .map(Message -> Message.getCreatedAt())
+              .map(ReadStatus::getUserId)
+              .toList();
+          
+          Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
+              .stream()
+              .map(message -> message.getCreatedAt())
               .max(Instant::compareTo)
               .orElse(null);
-          return ChannelResponseDto.from(channel, lastMassageAt);
+          return ChannelResponseDto.from(channel, participantIds, lastMessageAt);
         })
         .toList();
   }
