@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.global.dto.ApiResponse;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class ChannelController implements ChannelControllerDocs {
 
     // 채널 생성
     @RequestMapping(value = "/channels/public", method = RequestMethod.POST)
-    public ResponseEntity<Channel> createPublic(@RequestBody CreatePublicChannelRequestDto requestDto) {
+    public ResponseEntity<Channel> createPublic(@Valid @RequestBody CreatePublicChannelRequestDto requestDto) {
         Channel createdChannel = channelService.create(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
@@ -39,9 +40,7 @@ public class ChannelController implements ChannelControllerDocs {
     public ResponseEntity<Channel> update(@PathVariable UUID channelId,
                                           @RequestBody UpdatePublicChannelRequestDto request) {
         Channel udpatedChannel = channelService.update(channelId, request);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(udpatedChannel);
+        return ResponseEntity.status(HttpStatus.OK).body(udpatedChannel);
     }
 
     // 채널 삭제
