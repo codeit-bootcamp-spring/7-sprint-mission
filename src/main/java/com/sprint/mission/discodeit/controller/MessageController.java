@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.MessageReadResponseDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +26,7 @@ public class MessageController implements MessageControllerDocs {
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Override
-    public ResponseEntity<MessageReadResponseDto> createMessage(@RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
+    public ResponseEntity<MessageReadResponseDto> createMessage(@Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
                                                                 @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ){
 
@@ -34,7 +35,7 @@ public class MessageController implements MessageControllerDocs {
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
     @Override
-    public ResponseEntity<MessageReadResponseDto> patchMessage(@PathVariable UUID messageId, @RequestBody MessagePatchRequestDto dto){
+    public ResponseEntity<MessageReadResponseDto> patchMessage(@PathVariable UUID messageId, @Valid @RequestBody MessagePatchRequestDto dto){
         MessageReadResponseDto mRRDto = messageService.patchMessage(dto, messageId);
         return new ResponseEntity<>(mRRDto, HttpStatus.OK);
     }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.authService.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.response.LoginResponseDto;
 import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class LoginController implements LoginControllerDocs {
     private final AuthService authService;
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @Override
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto dto){
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto dto){
         return new ResponseEntity<>(authService.checkLoginUser(dto), HttpStatus.OK);
     }
 }

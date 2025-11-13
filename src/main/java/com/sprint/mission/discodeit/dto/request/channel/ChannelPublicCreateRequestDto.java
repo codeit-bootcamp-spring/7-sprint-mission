@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.request.channel;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ChannelPublicCreateRequestDto {
     public HashSet<UUID> participantIds;
+    @NotBlank
     public String name ;
     public String description;
     public boolean isTextChannel;

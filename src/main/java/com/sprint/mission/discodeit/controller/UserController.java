@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.response.UserUserStatusPatchResponseDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -58,7 +59,7 @@ public class UserController implements UserControllerDocs {
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Override
     public ResponseEntity<UserCreateResponseDto> createUser(
-            @RequestPart("userCreateRequest") UserCreateRequestDto dto
+            @Valid @RequestPart("userCreateRequest") UserCreateRequestDto dto
             , @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
         return new ResponseEntity<UserCreateResponseDto>(userService.createUser(dto,profile),HttpStatus.CREATED);
@@ -67,7 +68,7 @@ public class UserController implements UserControllerDocs {
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Override
     public ResponseEntity<UserCreateResponseDto> patchUser(@PathVariable UUID userId,
-                                                           @RequestPart("userUpdateRequest") UserUpdateRequest dto,
+                                                           @Valid @RequestPart("userUpdateRequest") UserUpdateRequest dto,
                                                            @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
        ;
         return new ResponseEntity<>(userService.patchUser(userId, dto,profile), HttpStatus.OK);
@@ -75,7 +76,7 @@ public class UserController implements UserControllerDocs {
 
     @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
     @Override
-    public ResponseEntity<UserUserStatusPatchResponseDto> patchUserStatus(@PathVariable UUID userId, @RequestBody UserStatusPatchRequestDto dto){
+    public ResponseEntity<UserUserStatusPatchResponseDto> patchUserStatus(@PathVariable UUID userId, @Valid @RequestBody UserStatusPatchRequestDto dto){
 ;
         return new ResponseEntity<UserUserStatusPatchResponseDto>(userStatusService.patchUserStatus(userId, dto), HttpStatus.OK);
     }

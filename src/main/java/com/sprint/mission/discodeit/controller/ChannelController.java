@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateReque
 import com.sprint.mission.discodeit.dto.response.ChannelReadResponseDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +25,14 @@ public class ChannelController implements ChannelControllerDocs{
 
     @RequestMapping(value = "/private", method = RequestMethod.POST)
     @Override
-    public ResponseEntity<ChannelReadResponseDto> createPrivateChannel(@RequestBody ChannelPrivateCreateRequestDto dto){
+    public ResponseEntity<ChannelReadResponseDto> createPrivateChannel(@Valid @RequestBody ChannelPrivateCreateRequestDto dto){
        ;
         return new ResponseEntity<>(channelService.createPrivateChannel(dto), HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/public", method = RequestMethod.POST)
     @Override
-    public ResponseEntity<ChannelReadResponseDto> createPublicChannel(@RequestBody ChannelPublicCreateRequestDto dto){
+    public ResponseEntity<ChannelReadResponseDto> createPublicChannel(@Valid @RequestBody ChannelPublicCreateRequestDto dto){
        return new ResponseEntity<>(channelService.createPublicChannel(dto), HttpStatus.CREATED);
     }
 
@@ -50,7 +51,7 @@ public class ChannelController implements ChannelControllerDocs{
 
     @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
     @Override
-    public ResponseEntity<ChannelReadResponseDto> patchChannel(@PathVariable UUID channelId, @RequestBody ChannelPatchRequestDto dto){
+    public ResponseEntity<ChannelReadResponseDto> patchChannel(@PathVariable UUID channelId, @Valid @RequestBody ChannelPatchRequestDto dto){
         return new ResponseEntity<>(channelService.patchChannel(dto,channelId),HttpStatus.OK);
     }
 

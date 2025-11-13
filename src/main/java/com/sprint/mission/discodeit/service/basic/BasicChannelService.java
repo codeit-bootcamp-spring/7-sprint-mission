@@ -226,8 +226,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelReadResponseDto patchChannel(ChannelPatchRequestDto dto, UUID channelId) {
         Channel channel = channelRepository.getChannelById(channelId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
-        channel.setDescription(dto.newDescription());
-        channel.setName(dto.newName());
+        channel.setDescription(dto.newDescription()==null?channel.getDescription():dto.newDescription());
+        channel.setName(dto.newName()==null?channel.getName():dto.newName());
         channel.updateEntity();
         channelRepository.updateChannel(channel);
         return ChannelReadResponseDto.from(channel);

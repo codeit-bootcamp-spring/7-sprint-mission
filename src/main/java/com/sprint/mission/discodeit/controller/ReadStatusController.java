@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusCreateReque
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusPatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class ReadStatusController implements ReadStatusControllerDocs {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     @Override
-    public ResponseEntity<ReadStatusResponseDto> createReadStatus(@RequestBody ReadStatusCreateRequestDto dto){
+    public ResponseEntity<ReadStatusResponseDto> createReadStatus(@Valid @RequestBody ReadStatusCreateRequestDto dto){
 
         return new ResponseEntity<ReadStatusResponseDto>(readStatusService.createReadStatus(
                 dto
@@ -36,7 +37,7 @@ public class ReadStatusController implements ReadStatusControllerDocs {
 
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
     @Override
-    public ResponseEntity<ReadStatusResponseDto> patchReadStatus(@PathVariable UUID readStatusId, @RequestBody ReadStatusPatchRequestDto dto)
+    public ResponseEntity<ReadStatusResponseDto> patchReadStatus(@PathVariable UUID readStatusId, @Valid @RequestBody ReadStatusPatchRequestDto dto)
     {
      return new ResponseEntity<>(readStatusService.patchReadStatus(readStatusId, dto), HttpStatus.OK);
     }

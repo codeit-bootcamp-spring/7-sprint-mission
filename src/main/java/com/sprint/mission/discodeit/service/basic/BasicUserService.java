@@ -263,10 +263,10 @@ public class BasicUserService implements UserService {
     @Override
     public UserCreateResponseDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile) throws IOException {
         User user = userRepository.getUserById(userId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
-        user.setUserName(dto.newUsername());
-        user.setName(dto.newUsername());
-        user.setPassword(dto.newPassword());
-        user.setEmail(dto.newEmail());
+        user.setUserName(dto.newUsername()==null?user.getUserName():dto.newUsername());
+        user.setName(dto.newUsername()==null?user.getName():dto.newUsername());
+        user.setPassword(dto.newPassword()==null?user.getPassword():dto.newPassword());
+        user.setEmail(dto.newEmail()==null?user.getEmail():dto.newEmail());
         if(profile!=null) {
             binaryContentRepository.deleteBinaryContent(user.getProfileId());
             BinaryContent tmpBinaryContent = binaryContentRepository.createBinaryContent(BinaryContent.builder()

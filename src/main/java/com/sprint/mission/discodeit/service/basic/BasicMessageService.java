@@ -138,7 +138,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageReadResponseDto patchMessage(MessagePatchRequestDto dto, UUID messageId) {
         Message message = messageRepository.getMessageById(messageId).orElseThrow(()->new IllegalArgumentException("Message not found"));
-        message.setContent(dto.newContent());
+        message.setContent(dto.newContent()==null?message.getContent():dto.newContent());
         message.updateEntity();
         messageRepository.updateMessage(message);
         return MessageReadResponseDto.from(message);
