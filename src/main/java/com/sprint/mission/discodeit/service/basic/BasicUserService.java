@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -104,6 +105,7 @@ public class BasicUserService implements UserService {
     UUID profileId = null;
 
     if (createBinaryContentDto != null) {
+      Optional.ofNullable(user.getProfileId()).ifPresent(binaryContentRepository::deleteById);
       BinaryContent binaryContent = new BinaryContent(
           createBinaryContentDto.fileName(),
           createBinaryContentDto.size(),
