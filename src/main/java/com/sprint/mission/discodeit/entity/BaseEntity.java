@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-public class BaseEntity implements Serializable {
+public abstract class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Instant createdAt;
