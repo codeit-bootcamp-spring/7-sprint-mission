@@ -30,7 +30,6 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
 
 
-
     @Override
     public Channel create(PublicChannelCreateRequest request) {
         String name = request.name();
@@ -57,10 +56,9 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findById(channelId)
                 .map(this::toDto)
                 .orElseThrow(
-                        () -> new NoSuchElementException("채널없어: " + channelId ));
+                        () -> new NoSuchElementException("채널없어: " + channelId));
 
     }
-
 
 
     @Override
@@ -70,24 +68,26 @@ public class BasicChannelService implements ChannelService {
                 .map(ReadStatus::getChannelId)
                 .toList();
 
-        return channelRepository.findAll().stream()
+        List<ChannelDto> list = channelRepository.findAll().stream()
                 .filter(channel ->
                         channel.getType().equals(ChannelType.PUBLIC)
                                 || mySubscribedChannelIds.contains(channel.getId())
                 )
                 .map(this::toDto)
                 .toList();
+        System.out.println("리스트들이다" + list);
+        return list;
     }
 
     @Override
-    public Channel update(UUID channelId,ChannelUpdateRequest request) {
+    public Channel update(UUID channelId, ChannelUpdateRequest request) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을수가 없어 " + channelId ));
+                .orElseThrow(() -> new NoSuchElementException("채널을 찾을수가 없어 " + channelId));
 
         //채널이 퍼블릭이면 수정해서 넣어주고
-        if(channel.getType() != ChannelType.PRIVATE) {
+        if (channel.getType() != ChannelType.PRIVATE) {
             //수정해서
-            channel.update(request.newName(),request.newDescription());
+            channel.update(request.newName(), request.newDescription());
             //저장동시 리턴값 수정한 채널
             return channelRepository.save(channel);
         }
@@ -103,23 +103,21 @@ public class BasicChannelService implements ChannelService {
         }
         //매시지삭제
         messageRepository.findAll().stream()
-                        .filter(message -> message.getChannelId().equals(channelId))
-                        .forEach(message -> messageRepository.deleteById(message.getId()));
+                .filter(message -> message.getChannelId().equals(channelId))
+                .forEach(message -> messageRepository.deleteById(message.getId()));
         //리드상태 삭제
         readStatusRepository.findAllByUserId(channelId).stream()
-                        .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                        .forEach(message -> readStatusRepository.deleteById(message.getId()));
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .forEach(message -> readStatusRepository.deleteById(message.getId()));
         //채널 삭제
         channelRepository.deleteById(channelId);
     }
 
 
-
-
-
     //dto로보낼려고 최신메시지 시간
     //
     private ChannelDto toDto(Channel channel) {
+        System.out.println(channel.getId());
         Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId())
                 .stream()
                 .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
@@ -129,13 +127,14 @@ public class BasicChannelService implements ChannelService {
                 .orElse(Instant.MIN);
 
         List<UUID> participantIds = new ArrayList<>();
+        System.out.println("이건하고있냐" + channel.getType());
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             readStatusRepository.findAllByChannelId(channel.getId())
                     .stream()
                     .map(ReadStatus::getUserId)
                     .forEach(participantIds::add);
         }
-
+        System.out.println("왜이걸못얻지" + participantIds.size());
         return new ChannelDto(
                 channel.getId(),
                 channel.getType(),

@@ -1,4 +1,5 @@
 package com.sprint.mission.discodeit.repository.file;
+
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -19,12 +20,11 @@ public class FileMessageRepository implements MessageRepository {
     private static final String filename = "messages";
 
 
-
     //로드 세이브
     //근데 잘해보면 한번에 할수있겟는데?
     @Override
     public Message save(Message message) {
-        FileIo.save(filename, message);
+        FileIo.save(filename, message, message.getId());
         return message;
     }
 

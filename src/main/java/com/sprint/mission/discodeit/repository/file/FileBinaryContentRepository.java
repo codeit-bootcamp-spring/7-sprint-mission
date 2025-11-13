@@ -22,7 +22,7 @@ public class FileBinaryContentRepository implements BinaryRepository {
 
     @Override
     public BinaryContent save(BinaryContent binary) {
-        FileIo.save(filename, binary);
+        FileIo.save(filename, binary, binary.getId());
         return binary;
 
     }
@@ -30,7 +30,7 @@ public class FileBinaryContentRepository implements BinaryRepository {
     @Override
     public Optional<BinaryContent> find(UUID binaryId) {
 
-        return  FileIo.read(filename, binaryId, BinaryContent.class);
+        return FileIo.read(filename, binaryId, BinaryContent.class);
 
     }
 
@@ -47,10 +47,9 @@ public class FileBinaryContentRepository implements BinaryRepository {
     }
 
 
-
     @Override
     public void delete(UUID contentId) {
-        String path = Path.RooT_PATH.getPath() + "/" + filename+"/"  + contentId + ".sav";
+        String path = Path.RooT_PATH.getPath() + "/" + filename + "/" + contentId + ".sav";
         File file = new File(path);
         if (file.exists()) {
             file.delete();

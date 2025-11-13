@@ -16,13 +16,9 @@ import java.util.concurrent.ConcurrentHashMap;
         havingValue = "jcf"
 )
 public class JCFUserStatusRepository implements UserStatusRepository {
-    @Override
-    public Optional<UserStatus> find(UUID binaryId) {
-        return Optional.empty();
-    }
-
     //여기 uuid는 유저 uuid다
-    private final Map<UUID,UserStatus> data;
+
+    private final Map<UUID, UserStatus> data;
 
     public JCFUserStatusRepository() {
         this.data = new ConcurrentHashMap<>();
@@ -32,9 +28,15 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public UserStatus save(UserStatus userStatus) {
 
-        this.data.put(userStatus.getId(),userStatus);
+        this.data.put(userStatus.getId(), userStatus);
         return userStatus;
     }
+
+    @Override
+    public Optional<UserStatus> find(UUID binaryId) {
+        return Optional.empty();
+    }
+
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
@@ -51,7 +53,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void deleteByUserId(UUID userId) {
-       data.remove(userId);
+        data.remove(userId);
     }
 
 }

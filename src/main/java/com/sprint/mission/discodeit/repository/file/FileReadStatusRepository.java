@@ -23,7 +23,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public ReadStatus save(ReadStatus readStatus) {
 
-        FileIo.save(filename, readStatus);
+        FileIo.save(filename, readStatus, readStatus.getId());
         return readStatus;
     }
 
@@ -56,7 +56,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
         return FileIo.readAll(filename, ReadStatus.class).stream()
-                .filter(rs -> rs.getUserId().equals(channelId))
+                .filter(rs -> rs.getChannelId().equals(channelId))
                 .toList();
     }
 
