@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-public record UserResponseDto(
+public record UserDto(
         UUID id,
         Instant createdAt,
         Instant updatedAt,
@@ -17,8 +17,8 @@ public record UserResponseDto(
         Boolean online
 ) {
 
-    public static UserResponseDto from(User user, boolean isOnline) {
-        return UserResponseDto.builder()
+    public static UserDto from(User user, boolean isOnline) {
+        return UserDto.builder()
                 .id(user.getId())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())

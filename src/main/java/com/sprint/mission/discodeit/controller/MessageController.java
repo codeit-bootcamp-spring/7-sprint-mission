@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.dto.messageDto.MessageRequestDto;
-import com.sprint.mission.discodeit.entity.dto.messageDto.MessageUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageCreateRequest;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -26,7 +25,7 @@ public class MessageController {
     // (채널)메시지 생성
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Message> channelMessageCreate(
-            @Valid @RequestPart("MessageRequestDto") MessageRequestDto messageRequestDto,
+            @Valid @RequestPart("MessageRequestDto") MessageCreateRequest messageRequestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -37,7 +36,7 @@ public class MessageController {
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
     public ResponseEntity<Message> channelMessageUpdate(
             @PathVariable UUID messageId,
-            @Valid @RequestBody MessageUpdateDto updateDto) {
+            @Valid @RequestBody MessageUpdateRequest updateDto) {
 
         return ResponseEntity.ok(messageService.updateMessage(messageId, updateDto));
     }

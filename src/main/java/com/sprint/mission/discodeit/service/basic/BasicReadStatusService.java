@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.dto.readStatusDto.ReadStatusRequestDto;
-import com.sprint.mission.discodeit.entity.dto.readStatusDto.ReadStatusResponseDto;
-import com.sprint.mission.discodeit.entity.dto.readStatusDto.ReadStatusUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.readStatusDto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.entity.dto.readStatusDto.ReadStatusDto;
+import com.sprint.mission.discodeit.entity.dto.readStatusDto.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.exception.NotFoundChannelException;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -29,7 +28,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus createReadStatus(ReadStatusRequestDto requestDto) {
+    public ReadStatus createReadStatus(ReadStatusCreateRequest requestDto) {
         // User, Channel Id 입력
         userRepository.findById(requestDto.userId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
@@ -48,20 +47,20 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResponseDto findReadStatusById(UUID id) {
+    public ReadStatusDto findReadStatusById(UUID id) {
         ReadStatus status = readStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
-        return ReadStatusResponseDto.from(status);
+        return ReadStatusDto.from(status);
     }
 
     @Override
-    public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
+    public List<ReadStatusDto> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId)
-                .stream().map(ReadStatusResponseDto::from).collect(Collectors.toList());
+                .stream().map(ReadStatusDto::from).collect(Collectors.toList());
     }
 
     @Override
-    public ReadStatus updateReadStatus(UUID id, ReadStatusUpdateDto updateDto) {
+    public ReadStatus updateReadStatus(UUID id, ReadStatusUpdateRequest updateDto) {
         ReadStatus status = readStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
 

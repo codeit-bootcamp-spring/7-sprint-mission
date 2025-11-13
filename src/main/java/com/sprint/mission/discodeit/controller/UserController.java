@@ -2,11 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserRequestDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserResponseDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusResponseDto;
-import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequest;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -31,7 +30,7 @@ public class UserController {
     // 201 반환
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<User> userCreate(
-            @Valid @RequestPart("userRequestDto") UserRequestDto userRequestDto,
+            @Valid @RequestPart("userRequestDto") UserCreateRequest userRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profileImage
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -40,13 +39,13 @@ public class UserController {
 
     // 사용자 전체 조회 (/users)
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<UserResponseDto>> getAllUser() {
+    public ResponseEntity<List<UserDto>> getAllUser() {
         return ResponseEntity.ok(userService.findAllUsers());
     }
 
     // 사용자 단일 조회 (/user/id)
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable UUID id) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
         return ResponseEntity.ok(userService.findUserById(id));
     }
 
@@ -64,7 +63,7 @@ public class UserController {
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
     public ResponseEntity<User> userUpdate(
             @PathVariable UUID userId,
-            @Valid @RequestPart("UserUpdateDto") UserUpdateDto userUpdateDto,
+            @Valid @RequestPart("UserUpdateDto") UserUpdateRequest userUpdateDto,
             @RequestPart(value = "profile",  required = false) MultipartFile profileImage
     ) {
         return ResponseEntity.ok(userService.updateUserInfo(userId,userUpdateDto,profileImage));
@@ -74,7 +73,7 @@ public class UserController {
     @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
     public ResponseEntity<UserStatus> onlineUpdate(
             @PathVariable UUID userId,
-            @RequestBody UserStatusUpdateDto updateDto) {
+            @RequestBody UserStatusUpdateRequest updateDto) {
         return ResponseEntity.ok(userStatusService.updateStatusByUserId(userId, updateDto));
     }
 }

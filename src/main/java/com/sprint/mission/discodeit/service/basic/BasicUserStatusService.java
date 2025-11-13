@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusRequestDto;
-import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusResponseDto;
-import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusDto;
+import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -25,7 +25,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatus createUserStatus(UserStatusRequestDto requestDto) {
+    public UserStatus createUserStatus(UserStatusCreateRequest requestDto) {
 
         userRepository.findById(requestDto.userId())
                         .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
@@ -40,15 +40,15 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResponseDto findStatusById(UUID id) {
+    public UserStatusDto findStatusById(UUID id) {
         UserStatus status = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
 
-        return UserStatusResponseDto.from(status);
+        return UserStatusDto.from(status);
     }
 
     @Override
-    public UserStatus updateStatusByUserId(UUID userId, UserStatusUpdateDto requestDto) {
+    public UserStatus updateStatusByUserId(UUID userId, UserStatusUpdateRequest requestDto) {
         UserStatus status = userStatusRepository.findStatusByUserId(userId)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
 
@@ -58,13 +58,13 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public List<UserStatusResponseDto> findAllStatus() {
-        return userStatusRepository.findAll().stream().map(UserStatusResponseDto::from)
+    public List<UserStatusDto> findAllStatus() {
+        return userStatusRepository.findAll().stream().map(UserStatusDto::from)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public UserStatus updateStatusById(UUID id, UserStatusUpdateDto updateDto) {
+    public UserStatus updateStatusById(UUID id, UserStatusUpdateRequest updateDto) {
         UserStatus status = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
 

@@ -3,16 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentRequestDto;
-import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.exception.FileSizeLimitExceededException;
-import com.sprint.mission.discodeit.exception.InvalidInputException;
+import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,7 +20,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public BinaryContentResponseDto createBinaryContent(BinaryContentRequestDto requestDto) {
+    public BinaryContentDto createBinaryContent(BinaryContentCreateRequest requestDto) {
 
         BinaryContent newContent = BinaryContent.builder()
                 .binaryData(requestDto.data())
@@ -32,20 +29,20 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .build();
 
         binaryContentRepository.save(newContent);
-        return BinaryContentResponseDto.from(newContent);
+        return BinaryContentDto.from(newContent);
     }
 
     @Override
-    public BinaryContentResponseDto findBinaryContentById(UUID id) {
+    public BinaryContentDto findBinaryContentById(UUID id) {
         BinaryContent content=  binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
-        return BinaryContentResponseDto.from(content);
+        return BinaryContentDto.from(content);
     }
 
     @Override
-    public List<BinaryContentResponseDto> findAllBinaryContentByIdIn(List<UUID> ids) {
+    public List<BinaryContentDto> findAllBinaryContentByIdIn(List<UUID> ids) {
         return binaryContentRepository.findAllByIdIn(ids).stream()
-                .map(BinaryContentResponseDto::from)
+                .map(BinaryContentDto::from)
                 .collect(Collectors.toList());
     }
 

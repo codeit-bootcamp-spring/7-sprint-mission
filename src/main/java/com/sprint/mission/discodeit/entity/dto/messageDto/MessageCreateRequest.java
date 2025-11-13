@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-public class MessageRequestDto {
+public class MessageCreateRequest {
 
     private String content;
     @NotNull

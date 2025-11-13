@@ -7,10 +7,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-public record UserStatusResponseDto(UUID id, UUID userId, Instant createdAt, Instant lastAccessAt, boolean isOnline) {
+public record UserStatusDto(UUID id, UUID userId, Instant createdAt, Instant lastAccessAt, boolean isOnline) {
 
-    public static UserStatusResponseDto from(UserStatus userStatus) {
-        return UserStatusResponseDto.builder()
+    public static UserStatusDto from(UserStatus userStatus) {
+        return UserStatusDto.builder()
                 .id(userStatus.getId())
                 .userId(userStatus.getUserId())
                 .createdAt(userStatus.getCreatedAt())

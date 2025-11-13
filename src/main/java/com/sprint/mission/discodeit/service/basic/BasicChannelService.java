@@ -20,19 +20,19 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
 
-    private ChannelResponseDto toDto(Channel channel) {
+    private ChannelDto toDto(Channel channel) {
 
         Optional<Message> lastMessage = messageRepository.findTopByChannelId(channel.getId());
 
         List<UUID> participantIds = readStatusRepository.findAllByChannelId(channel.getId())
                 .stream().map(ReadStatus::getUserId).toList();
 
-        return ChannelResponseDto.from(channel, participantIds, lastMessage.orElse(null));
+        return ChannelDto.from(channel, participantIds, lastMessage.orElse(null));
     }
 
 
     @Override
-    public Channel createPublicChannel(PublicChannelRequestDto requestDto) {
+    public Channel createPublicChannel(PublicChannelCreateRequest requestDto) {
 
         Channel newChannel = new Channel(
                 requestDto.getName(),
@@ -45,7 +45,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createPrivateChannel(PrivateChannelRequestDto requestDto) {
+    public Channel createPrivateChannel(PrivateChannelCreateRequest requestDto) {
 
         Channel newChannel = new Channel(ChannelType.PRIVATE);
         channelRepository.save(newChannel);
@@ -59,7 +59,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto findChannelById(UUID id) {
+    public ChannelDto findChannelById(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
 
@@ -67,7 +67,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+    public List<ChannelDto> findAllByUserId(UUID userId) {
 
         List<Channel> allChannels = channelRepository.findAll();    // 모든 채널
 
@@ -87,7 +87,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannel(UUID channelId, PublicChannelUpdateDto updateDto) {
+    public Channel updateChannel(UUID channelId, PublicChannelUpdateRequest updateDto) {
 
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));

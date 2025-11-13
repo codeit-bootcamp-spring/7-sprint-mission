@@ -4,8 +4,7 @@ import lombok.Builder;
 import lombok.NonNull;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Builder
-public record ReadStatusUpdateDto(@NonNull Instant newLastReadAt) {
+public record ReadStatusUpdateRequest(@NonNull Instant newLastReadAt) {
 }

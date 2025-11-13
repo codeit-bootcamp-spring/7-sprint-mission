@@ -34,26 +34,19 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         return data.values().stream()
-                .filter(m -> m.getType() == MessageType.CHANNEL &&
-                        m.getChannel().getId().equals(channelId)).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Message> findAllByBetweenUserIds(UUID userId1, UUID userId2) {
-        return data.values().stream()
-                .filter(m -> (m.getAuthor().getId().equals(userId1)
-                        && m.getReceiver().getId().equals(userId2))
-                || m.getAuthor().getId().equals(userId2) &&  m.getReceiver().getId().equals(userId1))
+                .filter(m -> channelId.equals(m.getChannelId()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteAllByChannelId(UUID channelId) {
-        data.values().removeIf(message-> message.getChannel().getId().equals(channelId));
+        data.values().removeIf(m -> channelId.equals(m.getChannelId()));
     }
 
     @Override
     public Optional<Message> findTopByChannelId(UUID channelId) {
-        return Optional.empty();
+        return data.values().stream()
+                .filter(m -> channelId.equals(m.getChannelId()))
+                .max(Comparator.comparing(Message::getCreatedAt));
     }
 }

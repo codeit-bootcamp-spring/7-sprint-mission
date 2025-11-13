@@ -21,7 +21,7 @@ public class ReadStatusController {
     // 수신 정보 생성
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<ReadStatus> createReadStatus(
-            @RequestBody ReadStatusRequestDto readStatusRequestDto) {
+            @RequestBody ReadStatusCreateRequest readStatusRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(readStatusService.createReadStatus(readStatusRequestDto));
     }
 
@@ -29,14 +29,14 @@ public class ReadStatusController {
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PUT)
     public ResponseEntity<ReadStatus> readStatusUpdate(
             @PathVariable UUID readStatusId,
-            @RequestBody ReadStatusUpdateDto readStatusUpdateDto) {
+            @RequestBody ReadStatusUpdateRequest readStatusUpdateDto) {
 
         return ResponseEntity.ok(readStatusService.updateReadStatus(readStatusId ,readStatusUpdateDto));
     }
 
     // 사용자의 메시지 수신 정보 조회
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<List<ReadStatusResponseDto>> getAllByUserId(
+    public ResponseEntity<List<ReadStatusDto>> getAllByUserId(
             @PathVariable UUID userId) {
         return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
     }

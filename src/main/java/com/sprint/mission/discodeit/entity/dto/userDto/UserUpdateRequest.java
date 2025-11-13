@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.entity.dto.userDto;
 
-import jakarta.validation.constraints.NotNull;
-
-public record UserUpdateDto(
+public record UserUpdateRequest(
         String newUserName,
         String newEmail,
         String newPassword

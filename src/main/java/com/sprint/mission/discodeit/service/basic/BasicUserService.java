@@ -2,13 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentRequestDto;
-import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserRequestDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserResponseDto;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequest;
+import com.sprint.mission.discodeit.entity.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
@@ -36,7 +34,7 @@ public class BasicUserService implements UserService {
 
     // 생성
     @Override
-    public User createUser(UserRequestDto requestDto, MultipartFile profileImage) {
+    public User createUser(UserCreateRequest requestDto, MultipartFile profileImage) {
         userRepository.findByEmail(requestDto.email()).ifPresent(user
                 -> {
             throw new DuplicateEmailException("이미 존재하는 이메일");
@@ -81,18 +79,18 @@ public class BasicUserService implements UserService {
         }
     }
 
-    private UserResponseDto toDto(User user) {
+    private UserDto toDto(User user) {
 
         boolean isOnline = userStatusRepository.findStatusByUserId(user.getId())
                 .map(UserStatus::isOnline).orElse(false);
-        return UserResponseDto.from(user, isOnline);
+        return UserDto.from(user, isOnline);
     }
 
     // --- 조회 ---
 
     // ID로 출력
     @Override
-    public UserResponseDto findUserById(UUID userId) {
+    public UserDto findUserById(UUID userId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
@@ -101,14 +99,14 @@ public class BasicUserService implements UserService {
 
     // 전체출력
     @Override
-    public List<UserResponseDto> findAllUsers() {
+    public List<UserDto> findAllUsers() {
         return userRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
     }
 
     // --- 수정 ---
 
     @Override
-    public User updateUserInfo(UUID userId, UserUpdateDto updateDto, MultipartFile profileImage) {
+    public User updateUserInfo(UUID userId, UserUpdateRequest updateDto, MultipartFile profileImage) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));

@@ -2,8 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentRequestDto;
-import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.entity.dto.messageDto.*;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
@@ -59,7 +57,7 @@ public class BasicMessageService implements MessageService {
         return ids;
     }
 
-    public Message createMessage(MessageRequestDto requestDto, List<MultipartFile> attachments) {
+    public Message createMessage(MessageCreateRequest requestDto, List<MultipartFile> attachments) {
         if ((requestDto.getContent() == null || requestDto.getContent().isBlank()) &&
                 (attachments == null || attachments.isEmpty())) {
             throw new InvalidInputException("공백을 보낼 수 없음");
@@ -92,7 +90,7 @@ public class BasicMessageService implements MessageService {
 
     // Message Update
     @Override
-    public Message updateMessage(UUID messageId, MessageUpdateDto updateDto) {
+    public Message updateMessage(UUID messageId, MessageUpdateRequest updateDto) {
 
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다."));
