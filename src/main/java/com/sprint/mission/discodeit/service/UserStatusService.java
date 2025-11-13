@@ -11,10 +11,15 @@ import java.util.UUID;
 
 public interface UserStatusService {
 
-    UserStatusResponseDto createUserStatus(CreateUserStatusRequestDto requestDto);
-    UserStatusResponseDto find(UUID userStatusId);
-    List<UserStatusResponseDto> findAll();
-    UserStatusResponseDto updateUserStatus(UUID id);
-    UserStatusResponseDto updateByUserId(UpdateUserIdStatusDto updateUserIdDto);
-    void deleteUserStatus(UUID userStatusId);
+  UserStatusResponseDto createUserStatus(CreateUserStatusRequestDto requestDto);
+
+  UserStatusResponseDto find(UUID userStatusId);
+
+  List<UserStatusResponseDto> findAll();
+
+  UserStatus updateUserStatus(UUID userId);
+
+  UserStatus updateByUserId(UUID userId);
+
+  void deleteUserStatus(UUID userStatusId);
 }

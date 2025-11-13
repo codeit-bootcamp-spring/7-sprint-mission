@@ -10,7 +10,7 @@ import java.util.UUID;
 @Builder
 public record UserResponseDto(
 
-    UUID userId,
+    UUID id,
     Instant createdAt,
     Instant updateAt,
     String username, // 유저 이름

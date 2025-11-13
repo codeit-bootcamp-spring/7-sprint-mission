@@ -36,7 +36,7 @@ public class UserController implements UserControllerDocs {
 
   //사용자를 등록할 수 있다. * 해결.
   @PostMapping(consumes = "multipart/form-data")
-  public ResponseEntity<User> create(
+  public ResponseEntity<User> createUser(
       //RequestPart 파트별로 분할해서 전달
       @Valid
       @RequestPart("userCreateRequest") CreateUserRequestDto userCreateRequest,
@@ -45,9 +45,9 @@ public class UserController implements UserControllerDocs {
     CreateBinaryContentRequestDto content = null;
     if (profile != null) {
       content = new CreateBinaryContentRequestDto(
-          profile.getBytes(),
           profile.getOriginalFilename(),
-          profile.getContentType()
+          profile.getContentType(),
+          profile.getBytes()
       );
     }
     CreateUserCommand from = CreateUserCommand.from(userCreateRequest, content);
@@ -63,8 +63,8 @@ public class UserController implements UserControllerDocs {
   }
 
   //사용자 정보를 수정할 수 있다. * 해결
-  @PatchMapping(value = "/{userId}", consumes = "multipart/form-data")
-  public ResponseEntity<User> update(
+  @PatchMapping(value = "/{userId}", consumes = "multipart/form-data", produces = "application/json")
+  public ResponseEntity<User> updateUser(
       @Valid @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UpdateUserDto userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
@@ -74,7 +74,7 @@ public class UserController implements UserControllerDocs {
 
   //사용자를 삭제할 수 있다. * 해결
   @DeleteMapping(value = "/{userId}")
-  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+  public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
     userService.deleteUser(userId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
@@ -83,7 +83,7 @@ public class UserController implements UserControllerDocs {
   @PatchMapping(value = "/{userId}/userStatus")
   public ResponseEntity<UserStatus> updateUserStatusByUserId(
       @PathVariable UUID userId) {
-    UserStatus userStatus = userStatusService.updateUserStatus(userId);
+    UserStatus userStatus = userStatusService.updateByUserId(userId);
     return ResponseEntity.status(HttpStatus.OK).body(userStatus);
   }
 }

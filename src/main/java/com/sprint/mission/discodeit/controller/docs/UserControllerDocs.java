@@ -44,7 +44,7 @@ public interface UserControllerDocs {
           )
       )
   })
-  ResponseEntity<User> create(
+  ResponseEntity<User> createUser(
       @Parameter(description = "User 정보 생성")
       @Valid @RequestPart("user") CreateUserRequestDto UserCreateRequestDto,
       @Parameter(description = "User 프로필 이미지")
@@ -89,7 +89,7 @@ public interface UserControllerDocs {
           )
       )
   })
-  ResponseEntity<User> update(
+  ResponseEntity<User> updateUser(
       @Parameter(description = "수정 할 User ID")
       @Valid @PathVariable UUID userId,
       @Parameter(description = "수정 할 User 정보")
@@ -114,7 +114,7 @@ public interface UserControllerDocs {
           )
       )
   })
-  ResponseEntity<Void> delete(
+  ResponseEntity<Void> deleteUser(
       @Parameter(description = "삭제할 User ID")
       @PathVariable UUID userId);
 

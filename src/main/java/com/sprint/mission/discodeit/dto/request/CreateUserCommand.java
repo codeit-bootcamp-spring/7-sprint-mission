@@ -17,9 +17,9 @@ public record CreateUserCommand(
     String password, // 유저 비밀번호
 
     //프로필파일
-    byte[] data, // 데이터 (byte)
-    String fileName, //파일 이름
-    String fileType //파일 타입
+    String fileName,
+    String contentType,
+    byte[] bytes//표준 데이터
 ) {
 
   public static CreateUserCommand from(
@@ -39,9 +39,9 @@ public record CreateUserCommand(
         userDto.username(),
         userDto.email(),
         userDto.password(),
-        contentDto.data(),
         contentDto.fileName(),
-        contentDto.fileType()
+        contentDto.contentType(),
+        contentDto.bytes()
     );
   }
 }

@@ -41,11 +41,11 @@ public class BasicUserService implements UserService {
 
     // 프로필 이미지 선택적 로직, ID로 체크해서. 컨텐츠 만들어서
     UUID profileId = null;
-    if (request.data() != null) {
+    if (request.bytes() != null) {
       BinaryContent content = new BinaryContent(
-          request.data(),
           request.fileName(),
-          request.fileType()
+          request.contentType(),
+          request.bytes()
       );
 
       BinaryContent saved = binaryContentRepository.save(content);
@@ -66,7 +66,6 @@ public class BasicUserService implements UserService {
     // UserStatus 생성
     UserStatus status = new UserStatus(userCreated.getId());
     userStatusRepository.save(status);
-
     return userCreated;
   }
 
@@ -87,7 +86,10 @@ public class BasicUserService implements UserService {
     List<UserResponseDto> dtos = new ArrayList<>();
     for (User user : users) {
       UserStatus status = userStatusRepository.findByUserId(user.getId())
-          .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
+          .orElseGet(() -> {
+            UserStatus userStatus = new UserStatus(user.getId());
+            return userStatusRepository.save(userStatus);
+          });
 
       UserResponseDto dto = UserResponseDto.from(user, status);
       dtos.add(dto);
@@ -105,9 +107,9 @@ public class BasicUserService implements UserService {
     if (profile != null && !profile.isEmpty()) {
       try {
         BinaryContent content = new BinaryContent(
-            profile.getBytes(),
             profile.getOriginalFilename(),
-            profile.getContentType()
+            profile.getContentType(),
+            profile.getBytes()
         );
 
         BinaryContent saved = binaryContentRepository.save(content);
