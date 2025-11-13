@@ -37,9 +37,9 @@ public class MessageController implements MessageControllerDocs {
           {
             try {
               return new CreateBinaryContentRequestDto(
-                  file.getBytes(),
                   file.getOriginalFilename(),
-                  file.getContentType()
+                  file.getContentType(),
+                  file.getBytes()
               );
             } catch (IOException e) {
               throw new RuntimeException(e);
