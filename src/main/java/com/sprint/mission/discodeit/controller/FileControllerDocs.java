@@ -21,18 +21,35 @@ public interface FileControllerDocs {
     @Operation(summary = "파일 조회(Create File)", description = "파일을 id로 조회합니다.")
     @ApiResponse(responseCode = "200", description = "파일 조회 성공",
     content = @Content(mediaType = "application/json",
+    schema = @Schema(implementation = BinaryContentResponseDto.class),
     examples = @ExampleObject(value = """
-            파일을 조회합니다. 쿼리스트링으로 파일id를 잘 전달합시다.
+            {
+            "id":UUID,
+            "createdAt":Instant,
+            "fileName" : "Siuuuuuu",
+            "size":256,
+            "contentTyp":"jpg",
+            "bytes": byte[]
+            }
             """)
     )
     )
     @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
-    ResponseEntity<BinaryContent> read(@PathVariable UUID binaryContentId);
+    ResponseEntity<BinaryContentResponseDto> read(@PathVariable UUID binaryContentId);
     @Operation(summary = "파일 다건 조회(Read File)", description = "파일을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "파일 조회 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = BinaryContentResponseDto.class),
     examples = @ExampleObject(value = """
-            다건 조회입니다, 쿼리 스트링으로 List<UUID> 를 전달합니다.
+             [
+             {
+            "id":UUID,
+            "createdAt":Instant,
+            "fileName" : "Siuuuuuu",
+            "size":256,
+            "contentTyp":"jpg",
+            "bytes": byte[]
+            }
+            ]
             """)
     )
     )

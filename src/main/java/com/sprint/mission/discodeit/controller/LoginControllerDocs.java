@@ -17,12 +17,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface LoginControllerDocs {
     @Operation(summary = "로그인(Login)", description = "로그인을 해도 되는 유저인지 검증하는 메서드입니다.")
     @ApiResponse(responseCode = "200", description = "로그인 성공",
-    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginRequestDto.class),
+    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponseDto.class),
     examples = @ExampleObject(value = """
-           "username": "SiUUU"
-           "password": "1557"
-           
-           """)
+          {
+          "id":UUID,
+          "createdAt":Instant,
+          "updatedAt":Instant,
+          "username": "Ronaldo",
+          "email":"Ronaldo@Goat.com",
+          "password": "1111",
+          "profileId":UUId
+          }
+          """)
     )
     )
     @ApiResponse(responseCode = "400", description = "유효하지 않은 id랑 비밀번호를 치면 발생합니다")

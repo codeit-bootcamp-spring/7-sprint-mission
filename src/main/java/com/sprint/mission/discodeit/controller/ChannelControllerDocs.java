@@ -31,17 +31,22 @@ public interface ChannelControllerDocs {
     @ApiResponse(responseCode = "201", description = "채널 생성 성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = ChannelPrivateCreateRequestDto.class),
+                    schema = @Schema(implementation = ChannelReadResponseDto.class),
                     examples = @ExampleObject(
                             value = """
-                                    
-                                    "name":"ManChesterCity"
-                                    "description":"ManChester city travel"
-                                    "isTextChannel": true
+                                    {
+                                    "id" : UUID,
+                                    "createdAt" : Instant,\s
+                                    "updatedAt" : Instant,
+                                    "name":"ManChesterCity",
+                                    "description":"ManChester city travel",
+                                    "ChannelType" : "PRIVATE",          \s
+                                    "isTextChannel": true,
                                     "participantIds":[
                                     UUID,UUID
                                     ]
-                                    """
+                                    }
+                                   \s"""
                     )
 
             )
@@ -59,12 +64,22 @@ public interface ChannelControllerDocs {
     )
     @ApiResponse(responseCode = "201", description = "public 채널 생성 성공",
     content = @Content(mediaType = "application/json",
-            schema = @Schema(implementation = ChannelPublicCreateRequestDto.class),
+            schema = @Schema(implementation = ChannelReadResponseDto.class),
             examples = @ExampleObject(
                     """
-                             "name":"RealMadrid"
-                                    "description":"Umbappe Fan"
-                                    "isTextChannel": false
+                            {
+                                                                    "id" : UUID,
+                                                                 "createdAt" : Instant,\\s
+                                                                 "updatedAt" : Instant,
+                                                                 "name":"ManChesterCity",
+                                                                 "description":"ManChester city travel",
+                                                                 "ChannelType" : "PRIVATE",          \\s
+                                                                 "isTextChannel": true,
+                                                                 "participantIds":[
+                                                                 UUID,UUID
+                                                                 ]
+                                                                 }
+                                                                \\s""\"
                             """
             )
     )
@@ -93,9 +108,23 @@ public interface ChannelControllerDocs {
 
     @Operation(summary = "유저 채널 조회(Read Channel)", description = "유저가 접근 권한이 있는 채널을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "채널 조회 성공",
-    content = @Content( schema = @Schema(implementation = UUID.class),
+    content = @Content( schema = @Schema(implementation = ChannelReadResponseDto.class),
     examples = @ExampleObject(value = """
-                UUID 만 쿼리스트링으로 잘 넘겨 주시면 됩니다.
+                ""\"[
+                      {
+                         "id" : UUID,
+                          "createdAt" : Instant,\\s
+                           "updatedAt" : Instant,
+                         "name":"ManChesterCity",
+                         "description":"ManChester city travel",
+                           "ChannelType" : "PRIVATE",          \\s
+                           "isTextChannel": true,
+                       "participantIds":[
+                         UUID,UUID
+                                                    ]
+                                                    }
+                                                    ]
+                                                   \\s""\"
             """)
     )
     )
@@ -105,8 +134,19 @@ public interface ChannelControllerDocs {
     @ApiResponse(responseCode = "200", description = "채널 수정 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelPatchRequestDto.class),
     examples = @ExampleObject(value = """
-            "newName": "Harry Kane"
-            "newDescription": "I really like Harry Kane"
+             {
+                                    "id" : UUID,
+                                    "createdAt" : Instant,\s
+                                    "updatedAt" : Instant,
+                                    "name":"ManChesterCity",
+                                    "description":"ManChester city travel",
+                                    "ChannelType" : "PRIVATE",          \s
+                                    "isTextChannel": true,
+                                    "participantIds":[
+                                    UUID,UUID
+                                    ]
+                                    }
+                                   \s
             """)
     )
     )

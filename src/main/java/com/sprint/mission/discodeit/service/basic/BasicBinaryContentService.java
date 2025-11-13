@@ -31,15 +31,18 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContent find(UUID binaryContentID) {
+    public BinaryContentResponseDto find(UUID binaryContentID) {
 
-        return binaryContentRepository.readBinaryContent(binaryContentID).orElseThrow(()->new IllegalArgumentException("존재하지 않는 binaryContent 입니다."));
+        return  BinaryContentResponseDto.from(
+                binaryContentRepository.readBinaryContent(binaryContentID)
+                        .orElseThrow(
+                                ()->new IllegalArgumentException(
+                                        "존재하지 않는 binaryContent 입니다."))) ;
     }
 
     @Override
     public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> binaryContentIdList) {
        return binaryContentIdList.stream().map(this::find)
-                       .map(BinaryContentResponseDto::from)
                .toList();
 
     }

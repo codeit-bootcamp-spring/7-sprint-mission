@@ -36,9 +36,17 @@ public interface UserControllerDocs {
     @Operation(summary = "유저 조회(Read User)", description = "유저를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "유저 조회 성공",
     content = @Content( mediaType = "application/json",
+    schema = @Schema(implementation = UserDto.class),
     examples = @ExampleObject(value = """
-            유저를 전부 조회합니다.채팅 화면 부를때 수시로
-            유저 전체 조회를 호출합니다.
+           [{
+            "id":UUID,
+            "createdAt":Instant,
+            "updatedAt":Instant,
+            "username": "김넙죽",
+            "email":"genius5375@gmail.com",
+            "profileId":UUID,
+            "online" : true
+            }]
     """)
     )
     )
@@ -48,11 +56,17 @@ public interface UserControllerDocs {
     @Operation(summary = "유저 생성(Create User)", description = "유저를 생성합니다.")
     @ApiResponse(responseCode = "201", description = "유저 생성 성공",
     content = @Content(mediaType = "application/json",
-    schema = @Schema(implementation = UserCreateRequestDto.class),
+    schema = @Schema(implementation = UserCreateResponseDto.class),
     examples = @ExampleObject(value = """
-            "username": "Ronaldo"
-            "email": "genius5375@gmail.com"
-            "password" : "1234"
+           {
+            "id":UUID,
+            "createdAt":Instant,
+            "updatedAt":Instant,
+            "username": "김넙죽",
+            "email":"genius5375@gmail.com",
+            "password": "1557"
+            "profileId":UUID,
+            }
     """)
     )
     )
@@ -65,11 +79,17 @@ public interface UserControllerDocs {
     @Operation(summary = "유저 수정(Patch User)", description = "유저를 수정합니다.")
     @ApiResponse(responseCode = "200", description = "유저 수정 성공",
     content = @Content(mediaType = "application/json",
-    schema = @Schema(implementation = UserUpdateRequest.class),
+    schema = @Schema(implementation = UserCreateResponseDto.class),
     examples = @ExampleObject(value = """
-           "newUsername":"Messi"
-           "newEmail": "loser@gmail.com"
-           "newPassword":"4321"
+           {
+            "id":UUID,
+            "createdAt":Instant,
+            "updatedAt":Instant,
+            "username": "김넙죽",
+            "email":"genius5375@gmail.com",
+            "password": "1557"
+            "profileId":UUID,
+            }
     """)
     )
     )
@@ -81,7 +101,14 @@ public interface UserControllerDocs {
     @ApiResponse(responseCode = "200", description = "유저 상태 수정 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserUserStatusPatchResponseDto.class),
     examples = @ExampleObject(value = """
-            "newLastActiveAt": Instant
+            {
+            "id":UUID,
+            "createdAt":Instant,
+            "updatedAt":Instant,
+            "userId":UUID,
+            "lastActiveAt":Instant,
+            "online":false
+            }
             """)))
     @RequestMapping(value = "/{userId}/userStatus",method = RequestMethod.PATCH)
     ResponseEntity<UserUserStatusPatchResponseDto> patchUserStatus(@PathVariable UUID userId, @RequestBody UserStatusPatchRequestDto dto);

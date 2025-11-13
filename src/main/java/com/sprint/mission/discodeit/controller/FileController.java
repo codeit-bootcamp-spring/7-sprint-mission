@@ -19,7 +19,7 @@ public class FileController implements FileControllerDocs {
     private final BinaryContentService binaryContentService;
     @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
     @Override
-    public ResponseEntity<BinaryContent> read(@PathVariable UUID binaryContentId){
+    public ResponseEntity<BinaryContentResponseDto> read(@PathVariable UUID binaryContentId){
         return new ResponseEntity<>(binaryContentService.find(binaryContentId), HttpStatus.OK);
     }
 

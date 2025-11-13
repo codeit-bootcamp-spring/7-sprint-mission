@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface BinaryContentService {
 
     public BinaryContentResponseDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto);
-    public BinaryContent find(UUID binaryContentID);
+    public BinaryContentResponseDto find(UUID binaryContentID);
     public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> binaryContentIdList);
     public void deleteBinaryContent(UUID binaryContentId);
     public List<BinaryContent> findAll();

@@ -21,11 +21,18 @@ import java.util.UUID;
 public interface MessageControllerDocs {
     @Operation(summary = "메세지 생성(Create Message)", description = "메세지를 생성합니다.")
     @ApiResponse(responseCode = "200", description = "메세지 생성 성공",
-    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageCreateRequestDto.class),
+    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageReadResponseDto.class),
             examples = @ExampleObject(value = """
-                    "content": "T1 Faker"
-                    "authorId": UUID
-                    "channelId":UUID
+                    { "id":UUID,
+                    "createdAt":Instant,
+                    "updatedAt":Instant,
+                    "content":"T1 is world champion",
+                    "authorId": UUID,
+                    "isMarkDown": True,
+                    "channelId": UUID,
+                    "attachmentIds":[
+                    UUID,UUID]
+                    }
                     """)
     )
     )
@@ -36,10 +43,18 @@ public interface MessageControllerDocs {
 
     @Operation(summary = "메세지 변경(Patch Message)", description = "메세지를 변경합니다.")
     @ApiResponse(responseCode = "200", description = "메세지 변경 성공",
-    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessagePatchRequestDto.class),
+    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageReadResponseDto.class),
     examples = @ExampleObject(value = """
-            
-            "newContent" : "Ronaldo is Goat"
+            { "id":UUID,
+                    "createdAt":Instant,
+                    "updatedAt":Instant,
+                    "content":"T1 is world champion",
+                    "authorId": UUID,
+                    "isMarkDown": True,
+                    "channelId": UUID,
+                    "attachmentIds":[
+                    UUID,UUID]
+                    }
             """)
     )
     )
