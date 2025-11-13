@@ -13,4 +13,6 @@ public interface UserService {
     List<UserDto> findAll();
     UserDto update(UserUpdateRequest request);
     void delete(UUID userId);
+    void updateUsername(UUID userId, String username);
+    void updateEmail(UUID userId, String email);
 }

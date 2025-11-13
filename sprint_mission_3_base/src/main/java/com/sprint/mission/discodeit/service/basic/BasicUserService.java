@@ -212,4 +212,20 @@ public class BasicUserService implements UserService {
         // 2) 본체 삭제
         userRepository.deleteById(userId);
     }
+
+    @Override
+    public void updateUsername(UUID userId, String username) {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new NoSuchElementException("User not found: " + userId));
+        user.setUsername(username);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updateEmail(UUID userId, String email) {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new NoSuchElementException("User not found: " + userId));
+        user.setEmail(email);
+        userRepository.save(user);
+    }
 }

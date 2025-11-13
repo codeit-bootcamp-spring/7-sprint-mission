@@ -47,11 +47,12 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public void update(ReadStatusUpdateRequest request) {
+    public ReadStatus update(ReadStatusUpdateRequest request) {
         var rs = readStatusRepository.findById(request.id())
                 .orElseThrow(() -> new NoSuchElementException("ReadStatus not found: " + request.id()));
         rs.update(request.lastReadAt()); // 엔티티에 update(Instant) 메서드가 있다고 가정
         readStatusRepository.save(rs);
+        return rs;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -57,7 +58,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void updateByUserId(UUID userId, Instant lastSeenAt) {
+    public UserStatusDto updateByUserId(UUID userId, Instant lastSeenAt) {
         var usOpt = userStatusRepository.findByUserId(userId);
         if (usOpt.isPresent()) {
             var us = usOpt.get();
@@ -68,6 +69,7 @@ public class BasicUserStatusService implements UserStatusService {
             var us = new UserStatus(userId, lastSeenAt);
             userStatusRepository.save(us);
         }
+        return null;
     }
 
     @Override
