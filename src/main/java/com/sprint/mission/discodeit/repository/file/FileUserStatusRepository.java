@@ -7,34 +7,36 @@ import java.io.File;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FileUserStatusRepository extends AbstractFileRepository<UserStatus, UUID> implements UserStatusRepository {
+public class FileUserStatusRepository extends AbstractFileRepository<UserStatus, UUID> implements
+    UserStatusRepository {
 
-    private final String filePath;
+  private final String filePath;
 
-    public FileUserStatusRepository(String fileDirectory) {
-        this.filePath = fileDirectory + File.separator + "userStatus.ser";
-    }
+  public FileUserStatusRepository(String fileDirectory) {
+    this.filePath = fileDirectory + File.separator + "userStatus.ser";
+  }
 
-    @Override
-    protected String getFilePath() {
-        return filePath;
-    }
+  @Override
+  protected String getFilePath() {
+    return filePath;
+  }
 
-    @Override
-    protected UUID getId(UserStatus userStatus) {
-        return userStatus.getId();
-    }
+  @Override
+  protected UUID getId(UserStatus userStatus) {
+    return userStatus.getId();
+  }
 
-    @Override
-    public Optional<UserStatus> findByUserId(UUID userId) {
-        return findAll().stream()
-                .filter(userStatus -> userStatus.getId().equals(userId))
-                .findFirst();
-    }
+  @Override
+  public Optional<UserStatus> findByUserId(UUID userId) {
+    return findAll().stream()
+        .filter(userStatus -> userStatus.getUserId().equals(userId))
+        .findFirst();
+  }
 
-    @Override
-    public void deleteByUserId(UUID userId) {
-        Optional<UserStatus> byUserId = findByUserId(userId);
-        byUserId.ifPresent(userStatus -> delete(userStatus.getId()));
-    }
+
+  @Override
+  public void deleteByUserId(UUID userId) {
+    Optional<UserStatus> byUserId = findByUserId(userId);
+    byUserId.ifPresent(userStatus -> delete(userStatus.getId()));
+  }
 }
