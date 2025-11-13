@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -25,9 +26,19 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  //
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
+
+  @Override
+  public void updateStatus(UUID userId, Map<String, Object> statusReq) {
+    // TODO: 실제 상태 변경 로직은 UserStatus 구조와 요구사항에 맞게 구현하세요.
+    // 현재는 사용자 존재 여부만 검증하는 최소 구현입니다.
+    if (!userRepository.existsById(userId)) {
+      throw new NoSuchElementException("User with id " + userId + " not found");
+      // userId로 사용자가 존재하는지 확인 후 없으면 예외 던지고 (NoSuchElementException,
+      // 있으면 아직 아무것도 안 하는 상태임(추가 예정).
+    }
+  }
 
   @Override
   public User create(UserCreateRequest userCreateRequest,

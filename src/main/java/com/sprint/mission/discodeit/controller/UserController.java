@@ -1,14 +1,20 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
@@ -22,66 +28,85 @@ public class UserController {
 
   private final UserService userService;
 
-  /** 사용자 등록 (JSON) */
-  @RequestMapping(method = RequestMethod.POST,
-      consumes = "application/json",
-      produces = "application/json")
-  public ResponseEntity<Map<String, UUID>> create(@RequestBody UserCreateRequest req) {
+  /** 사용자 등록 (multipart/form-data: userCreateRequest JSON + profile 파일) */
+  @RequestMapping(
+      method = org.springframework.web.bind.annotation.RequestMethod.POST,
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public ResponseEntity<Map<String, UUID>> create(
+      @RequestPart("userCreateRequest") UserCreateRequest req,
+      @RequestPart(name = "profile", required = false) BinaryContentCreateRequest profile
+  ) {
     Assert.hasText(req.username(), "유저 이름을 정확히 입력해주세요.");
     Assert.hasText(req.email(), "이메일을 정확히 입력해주세요.");
     Assert.hasText(req.password(), "비밀번호를 다시 확인해주세요.");
 
-    var created = userService.create(req, Optional.empty());
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(Map.of("id", created.getId()));
+    var created = userService.create(req, Optional.ofNullable(profile));
+    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("id", created.getId()));
   }
 
   /** 사용자 단건 조회 */
-  @RequestMapping(value = "/{id}",
-      method = RequestMethod.GET,
-      produces = "application/json")
-  public ResponseEntity<UserDto> find(@PathVariable UUID id) {
-    return ResponseEntity.ok(userService.find(id));
+  @RequestMapping(
+      value = "/{userId}",
+      method = org.springframework.web.bind.annotation.RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public ResponseEntity<UserDto> find(@PathVariable("userId") UUID userId) {
+    return ResponseEntity.ok(userService.find(userId));
   }
 
   /** 모든 사용자 조회 */
-  @RequestMapping(method = RequestMethod.GET,
-      produces = "application/json")
+  @RequestMapping(
+      method = org.springframework.web.bind.annotation.RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
   public ResponseEntity<List<UserDto>> findAll() {
     return ResponseEntity.ok(userService.findAll());
   }
 
-  /** 사용자 정보 수정 (스펙에 맞게 PATCH 사용) */
-  @RequestMapping(value = "/{id}",
-      method = RequestMethod.PATCH,
-      consumes = "application/json",
-      produces = "application/json")
+  /** 사용자 정보 수정 (multipart/form-data: userUpdateRequest JSON + profile 파일) */
+  @RequestMapping(
+      value = "/{userId}",
+      method = org.springframework.web.bind.annotation.RequestMethod.PATCH,
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
   public ResponseEntity<Map<String, UUID>> update(
-      @PathVariable UUID id,
-      @RequestBody UserUpdateRequest req
+      @PathVariable("userId") UUID userId,
+      @RequestPart("userUpdateRequest") UserUpdateRequest req,
+      @RequestPart(name = "profile", required = false) BinaryContentCreateRequest profile
   ) {
-    Assert.notNull(id, "유저ID가 null일 수 없습니다.");
-    var updated = userService.update(id, req, Optional.empty());
+    Assert.notNull(userId, "유저ID가 null일 수 없습니다.");
+    var updated = userService.update(userId, req, Optional.ofNullable(profile));
     return ResponseEntity.ok(Map.of("id", updated.getId()));
   }
 
   /** 사용자 삭제 */
-  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<Void> delete(@PathVariable UUID id) {
-    Assert.notNull(id, "userId must not be null");
-    userService.delete(id);
+  @RequestMapping(
+      value = "/{userId}",
+      method = org.springframework.web.bind.annotation.RequestMethod.DELETE
+  )
+  public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
+    Assert.notNull(userId, "userId must not be null");
+    userService.delete(userId);
     return ResponseEntity.noContent().build();
   }
 
-  /** 사용자 상태(온라인 등) 업데이트 - 추후 구현 */
-  @RequestMapping(value = "/{id}/userStatus",
-      method = RequestMethod.PATCH,
-      consumes = "application/json")
-  public ResponseEntity<Void> updateOnline(
-      @PathVariable UUID id,
-      @RequestBody Object req
+  /** 사용자 상태(온라인/오프라인 등) 업데이트 */
+  @RequestMapping(
+      value = "/{userId}/userStatus",
+      method = org.springframework.web.bind.annotation.RequestMethod.PATCH,
+      consumes = MediaType.APPLICATION_JSON_VALUE
+  )
+  public ResponseEntity<Void> updateStatus(
+      @PathVariable("userId") UUID userId,
+      @RequestBody Map<String, Object> statusReq
   ) {
-    throw new UnsupportedOperationException("User status update service not wired yet");
+    Assert.notNull(userId, "userId must not be null");
+    Assert.notEmpty(statusReq, "요청 데이터가 비어 있습니다.");
+
+    userService.updateStatus(userId, statusReq);
+    return ResponseEntity.ok().build();
   }
 }
