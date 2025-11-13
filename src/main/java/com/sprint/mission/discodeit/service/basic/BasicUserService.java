@@ -37,27 +37,26 @@ public class BasicUserService implements UserService {
     private final BinaryRepository binaryRepository;
 
 
-
     @Override
-    public User create(UserCreateRequest userCreateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
 
-     //이메일매칭
-     if(userRepository.findAll().stream()
-             .anyMatch(user -> user.getEmail().equals(userCreateRequest.email()))){
-         throw new IllegalArgumentException("이메일이 이미 존재합니다");
-     }
-     //닉네임매칭
-     if(userRepository.findAll().stream()
-                .anyMatch(user -> user.getUsername().equals(userCreateRequest.username()))){
-         throw new IllegalArgumentException("이름 이미 존재합니다");
-     }
+        //이메일매칭
+        if (userRepository.findAll().stream()
+                .anyMatch(user -> user.getEmail().equals(userCreateRequest.email()))) {
+            throw new IllegalArgumentException("이메일이 이미 존재합니다");
+        }
+        //닉네임매칭
+        if (userRepository.findAll().stream()
+                .anyMatch(user -> user.getUsername().equals(userCreateRequest.username()))) {
+            throw new IllegalArgumentException("이름 이미 존재합니다");
+        }
 
         UUID uuid = profileId(optionalProfileCreateRequest);
         //유저정보
         User user = new User(
+                userCreateRequest.username(),
                 userCreateRequest.email(),
                 userCreateRequest.password(),
-                userCreateRequest.username(),
                 uuid
 
         );
@@ -73,46 +72,40 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDto find(UUID userId) {
-
-        return  userRepository.findById(userId)
+        System.out.println("서비스하나찾기");
+        return userRepository.findById(userId)
                 .map(this::toDto)
-                .orElseThrow(()->new NoSuchElementException("유저아이디로 찾을수없어"));
+                .orElseThrow(() -> new NoSuchElementException("유저아이디로 찾을수없어"));
 
     }
 
     @Override
     public List<UserDto> findAll() {
-        List<UserDto>  userList = new ArrayList<>(List.of());
-        for(User user:userRepository.findAll()){
-
-            UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                    .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + user.getId()));
-
-            userList.add(UserDto.from(user,userStatus));
-        }
-
-        return userList;
+        System.out.println("서비스전체 찾기");
+        return userRepository.findAll()
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
     @Override
-    public User update(UUID userId,UserUpdateRequest userUpdateRequest,Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("맞는 유저 ID가 없습니다 " + userId ));
+                .orElseThrow(() -> new NoSuchElementException("맞는 유저 ID가 없습니다 " + userId));
         //이메일매칭
-        if(userRepository.findAll().stream()
-                .anyMatch(u -> u.getEmail().equals(userUpdateRequest.newEmail()))){
-            throw new IllegalArgumentException("이메일이 존재합니다 : "+userUpdateRequest.newEmail());
+        if (userRepository.findAll().stream()
+                .anyMatch(u -> u.getEmail().equals(userUpdateRequest.newEmail()))) {
+            throw new IllegalArgumentException("이메일이 존재합니다 : " + userUpdateRequest.newEmail());
         }
         //네임매칭
-        if(userRepository.findAll().stream()
-                .anyMatch(u -> u.getUsername().equals(userUpdateRequest.newUsername()))){
-            throw new IllegalArgumentException("이름이 존재합니다 : "+userUpdateRequest.newUsername());
+        if (userRepository.findAll().stream()
+                .anyMatch(u -> u.getUsername().equals(userUpdateRequest.newUsername()))) {
+            throw new IllegalArgumentException("이름이 존재합니다 : " + userUpdateRequest.newUsername());
         }
-
 
 
         UUID uuid = profileId(optionalProfileCreateRequest);
-        user.update(userUpdateRequest.newUsername(),userUpdateRequest.newEmail(),userUpdateRequest.newPassword(),uuid);
+        user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword(), uuid);
 
 /*        Instant now = Instant.now();
         UserStatus userStatus = new UserStatus(user.getId(), now);*/
@@ -132,8 +125,7 @@ public class BasicUserService implements UserService {
     }
 
 
-
-    private UUID profileId(Optional<BinaryContentCreateRequest>  binaryContentCreateRequest){
+    private UUID profileId(Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
         return binaryContentCreateRequest
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();

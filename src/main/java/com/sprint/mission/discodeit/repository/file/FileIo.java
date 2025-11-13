@@ -7,10 +7,9 @@ import java.util.*;
 
 public class FileIo {
 
-    public static <T extends  Serializable> void save (String folder, T type)
-    {
+    public static <T extends Serializable> void save(String folder, T type, UUID uuid) {
         //파일명 ->아래에 폴더명 아래에 UUID 객체저장
-        String path = Path.RooT_PATH.getPath()+"/"+folder+"/"+type.getClass().getSimpleName()+".sav";
+        String path = Path.RooT_PATH.getPath() + "/" + folder + "/" + uuid + ".sav";
 
         //혹시나 저장폴더가 없으면 생성한다
         File file = new File(path);
@@ -19,10 +18,10 @@ public class FileIo {
 
         //IO로 파일로저장하고 경론느 위에 path 저장은 type
         try (ObjectOutputStream oos =
-                        new ObjectOutputStream(new FileOutputStream(path))
+                     new ObjectOutputStream(new FileOutputStream(path))
         ) {
             oos.writeObject(type);
-            System.out.println( path + "에 객체 저장 성공");
+            System.out.println(path + "에 객체 저장 성공");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,7 +52,6 @@ public class FileIo {
                 System.out.println("타입 불일치: 기대=" + clazz.getName() + ", 실제=" + obj.getClass().getName());
                 return Optional.empty();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             return Optional.empty();
@@ -87,12 +85,6 @@ public class FileIo {
                 .flatMap(Optional::stream)
                 .toList();
     }
-
-
-
-
-
-
 
 
 }

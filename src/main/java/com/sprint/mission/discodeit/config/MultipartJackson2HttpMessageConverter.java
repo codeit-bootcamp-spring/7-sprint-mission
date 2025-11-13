@@ -14,6 +14,7 @@ import java.lang.reflect.Type;
 //'application/octet-stream이거로 인식을 한다고 한다
 //그래서 강제로 받는 정보는 json이라고 지명했다
 //
+/*
 @Component // 스프링 빈으로 자동 등록됨
 public class MultipartJackson2HttpMessageConverter extends AbstractJackson2HttpMessageConverter {
 
@@ -32,3 +33,4 @@ public class MultipartJackson2HttpMessageConverter extends AbstractJackson2HttpM
     @Override
     protected boolean canWrite(MediaType mediaType) { return false; }
 }
+*/

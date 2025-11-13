@@ -26,7 +26,7 @@ public class FileChannelRepository implements ChannelRepository {
     //근데 잘해보면 한번에 할수있겟는데?
     @Override
     public Channel save(Channel channel) {
-        FileIo.save(filename, channel);
+        FileIo.save(filename, channel, channel.getId());
         return channel;
     }
 

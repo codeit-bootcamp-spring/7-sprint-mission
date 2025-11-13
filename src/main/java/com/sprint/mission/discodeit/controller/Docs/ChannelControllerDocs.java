@@ -297,6 +297,6 @@ public interface ChannelControllerDocs {
                     )
             )
     })
-    ResponseEntity<Void> delete(ChannelDeleteRequest request);
+    ResponseEntity<Void> delete(UUID channelId);
 }
 

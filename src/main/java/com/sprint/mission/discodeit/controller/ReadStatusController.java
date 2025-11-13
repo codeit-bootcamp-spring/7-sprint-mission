@@ -18,14 +18,14 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/readStatus")
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController implements ReadStatusControllerDocs {
 
     private final ReadStatusService readStatusService;
 
     //[ ] 특정 채널의 메시지 수신 정보를 생성할 수 있다.
 
-    @RequestMapping(path = "create",method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<ReadStatus> createStatus(@RequestBody ReadStatusCreateRequest request){
         ReadStatus readStatus = readStatusService.create(request);
 
@@ -36,8 +36,8 @@ public class ReadStatusController implements ReadStatusControllerDocs {
     // [ ] 특정 채널의 메시지 수신 정보를 수정할 수 있다.
 
 
-    @RequestMapping(path = "update",method = RequestMethod.PATCH)
-    public ResponseEntity<ReadStatus> updateStatus(@RequestParam("readStatusId") UUID readStatusId,
+    @RequestMapping(path = "{readStatusId}",method = RequestMethod.PATCH)
+    public ResponseEntity<ReadStatus> updateStatus(@PathVariable UUID readStatusId,
                                                    @RequestBody ReadStatusUpdateReuqest request){
         ReadStatus update = readStatusService.update(readStatusId, request);
 
@@ -47,7 +47,7 @@ public class ReadStatusController implements ReadStatusControllerDocs {
     }
     //  [ ] 특정 사용자의 메시지 수신 정보를 조회할 수 있다.
 
-    @RequestMapping(path = "findAllByUserId",method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<ReadStatus>> findStatusByUserId(@RequestParam("userId") UUID userId){
         List<ReadStatus> allByUserId = readStatusService.findAllByUserId(userId);
         return ResponseEntity

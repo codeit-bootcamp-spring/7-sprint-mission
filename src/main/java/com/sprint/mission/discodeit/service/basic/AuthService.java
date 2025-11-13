@@ -24,7 +24,12 @@ public class AuthService {
 
     public User login(LoginRequest loginRequest) {
         //이메일매칭
-        User user = userRepository.findAll().stream()
+        /*      UserStatus userStatus = userstatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new NoSuchElementException("맞는유저ID가 없어"));*/
+
+        //로그인하면 상태는 최신화 아닐까 생각해서 넣어봤다
+        //LoginResponse.from(user, userStatus.isOnline());
+        return userRepository.findAll().stream()
                 .filter(u -> u.getUsername().equals(loginRequest.username()))
                 .filter(u -> u.getPassword().equals(loginRequest.password()))
                 .findFirst()
@@ -32,17 +37,9 @@ public class AuthService {
                         "이름과 패스워드가 맞지않아 \n" +
                                 "이름 :" + loginRequest.username() + "\n" +
                                 "패스워드 :" + loginRequest.password() + "\n"));
-        UserStatus userStatus = userstatusRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new NoSuchElementException("맞는유저ID가 없어"));
-
-        //로그인하면 상태는 최신화 아닐까 생각해서 넣어봤다
-        userStatus.update(Instant.now());
-        userstatusRepository.save(userStatus);
-        LoginResponse.from(user,userStatus.isOnline());
-        return user;
 
 
     }
-    }
+}
 
 

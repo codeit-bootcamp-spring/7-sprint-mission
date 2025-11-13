@@ -26,8 +26,8 @@ public class FileUserRepository implements UserRepository {
     //근데 잘해보면 한번에 할수있겟는데?
     @Override
     public User save(User user) {
-       FileIo.save(filename, user);
-      return user;
+        FileIo.save(filename, user, user.getId());
+        return user;
     }
 
     @Override
@@ -37,7 +37,10 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return FileIo.readAll(filename,User.class);
+        FileIo.readAll(filename, User.class).forEach(
+                user -> System.out.println("프로필아뒤" + user.getProfileId())
+        );
+        return FileIo.readAll(filename, User.class);
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,8 +29,8 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 public class UserController implements UserControllerDocs {
 
-     private final UserService userService;
-     private final UserStatusService userStatusService;
+    private final UserService userService;
+    private final UserStatusService userStatusService;
 
 
     // [등록]
@@ -40,29 +41,28 @@ public class UserController implements UserControllerDocs {
     public ResponseEntity<User> create(
             @RequestPart("userCreateRequest") UserCreateRequest request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
-    ){
+    ) {
         Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
                 .flatMap(this::resolveProfileRequest);
 
 
         User createUser = userService.create(request, profileRequest);
 
-        return  ResponseEntity
+        return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(createUser);
     }
 
 
-
 // [수정]
 
     @RequestMapping(
-            path = "update"
-            ,method = RequestMethod.PATCH
+            path = "{userId}"
+            , method = RequestMethod.PATCH
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<User> update(
-            @RequestParam("userId") UUID userId,
-            @RequestPart("userCreateRequest") UserUpdateRequest request,
+            @PathVariable UUID userId,
+            @RequestPart("userUpdateRequest") UserUpdateRequest request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
 
@@ -70,8 +70,8 @@ public class UserController implements UserControllerDocs {
                 .flatMap(this::resolveProfileRequest);
 
 
-        User update = userService.update(userId,request, optionalProfile);
-        return   ResponseEntity
+        User update = userService.update(userId, request, optionalProfile);
+        return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(update);
     }
@@ -79,8 +79,8 @@ public class UserController implements UserControllerDocs {
 
     // [삭제]
 
-    @RequestMapping(path = "{userId}",method = RequestMethod.DELETE)
-    public ResponseEntity<Void> delete(@RequestParam("userId") UUID userId) {
+    @RequestMapping(path = "{userId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
         userService.delete(userId);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
@@ -88,26 +88,30 @@ public class UserController implements UserControllerDocs {
     }
 
 
-
     // [전체 조회]
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> findAll() {
-   return ResponseEntity
+        System.out.println("다찾을꺼야");
+        for (UserDto userDto : userService.findAll()) {
+            System.out.println("없어?" + userDto.profileId());
+        }
+
+        return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userService.findAll());
     }
 
-    @RequestMapping(path = "/{userId}/userStatus",method = RequestMethod.PATCH)
+    @RequestMapping(path = "{userId}/userStatus", method = RequestMethod.PATCH)
     public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
                                                                @RequestBody UserStatusUpdateRequest request) {
 
-        UserStatus updatedUserStatus = userStatusService.updateByUserId(userId,request);
+
+        UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(updatedUserStatus);
     }
-
 
 
     private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
@@ -116,6 +120,7 @@ public class UserController implements UserControllerDocs {
         } else {
             try {
                 BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
+
                         profileFile.getOriginalFilename(),
                         profileFile.getContentType(),
                         profileFile.getBytes()
@@ -126,8 +131,6 @@ public class UserController implements UserControllerDocs {
             }
         }
     }
-
-
 
 
 }

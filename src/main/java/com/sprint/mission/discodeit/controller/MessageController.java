@@ -19,27 +19,28 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/message")
+@RequestMapping("/api/messages")
 @RequiredArgsConstructor
 public class MessageController implements MessageControllerDocs {
 
     private final MessageService messageService;
 
                //[ ] 메시지를 보낼 수 있다.
-               @RequestMapping( path = "create",
+               @RequestMapping(
                        method = RequestMethod.POST,
                        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
                public ResponseEntity<Message> createMessage(
                        @RequestPart("messageCreateRequest") CreateMessageRequest request,
                        @RequestPart(value = "attachments", required = false) List<MultipartFile> profiles
                ) {
-                   List<BinaryContentCreateRequest> binarys = new ArrayList<>();
+                   List<BinaryContentCreateRequest> binary = new ArrayList<>();
 
 
                    if (profiles != null && !profiles.isEmpty()) {
+
                        for (MultipartFile profile : profiles) {
                            try {
-                               binarys.add(new BinaryContentCreateRequest(
+                               binary.add(new BinaryContentCreateRequest(
                                        profile.getName(),
                                        profile.getContentType(),
                                        profile.getBytes()
@@ -50,15 +51,15 @@ public class MessageController implements MessageControllerDocs {
                        }
                    }
 
-                   Message messageResponse = messageService.create(request, binarys);
+                   Message messageResponse = messageService.create(request, binary);
 
                    return ResponseEntity
                            .status(HttpStatus.CREATED)
                            .body(messageResponse);
                }
 
-         @RequestMapping(path = "update",method = RequestMethod.PATCH)
-         public ResponseEntity<Message> updateMessage(@RequestParam("messageId")  UUID messageId,
+         @RequestMapping(path = "{messageId}",method = RequestMethod.PATCH)
+         public ResponseEntity<Message> updateMessage(@PathVariable  UUID messageId,
                                       @RequestBody UpdateMessageRequest request){
              Message update = messageService.update(messageId, request);
 
@@ -68,8 +69,8 @@ public class MessageController implements MessageControllerDocs {
          }
            // [ ] 메시지를 삭제할 수 있다.
 
-           @RequestMapping(path = "delete",method = RequestMethod.DELETE)
-           public ResponseEntity<Void> deleteMessage(@RequestParam("messageId") UUID messageId){
+           @RequestMapping(path = "{messageId}",method = RequestMethod.DELETE)
+           public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId){
 
                    messageService.delete(messageId);
 
@@ -80,7 +81,7 @@ public class MessageController implements MessageControllerDocs {
 
           // [ ] 특정 채널의 메시지 목록을 조회할 수 있다.
 
-       @RequestMapping(path ="findAllByChannelId",method = RequestMethod.GET)
+       @RequestMapping(method = RequestMethod.GET)
        public ResponseEntity<List<Message>> findAllByChannelId(@RequestParam("channelId") UUID channelId){
 
            List<Message> allByChannelId = messageService.findAllByChannelId(channelId);

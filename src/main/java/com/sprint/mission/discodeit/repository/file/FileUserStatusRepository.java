@@ -22,7 +22,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        FileIo.save(filename,userStatus);
+        FileIo.save(filename, userStatus, userStatus.getId());
         return userStatus;
     }
 
@@ -38,7 +38,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-      return   FileIo.readAll(filename, UserStatus.class).stream()
+        return FileIo.readAll(filename, UserStatus.class).stream()
                 .filter(us -> us.getUserId().equals(userId))
                 .findFirst();
 
