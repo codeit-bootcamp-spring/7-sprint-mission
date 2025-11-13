@@ -48,6 +48,13 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void deleteAllByChannelId(UUID channelId) {
         data.values().removeIf(readStatus -> readStatus.getChannelId().equals(channelId));
     }

@@ -15,16 +15,4 @@ public class FileChannelRepository extends FileBaseRepository<Channel> implement
         super(basePath + "/" + CHANNEL_DATA_FILE);
     }
 
-    @Override
-    public boolean existsByAdminId(UUID adminId) {
-        return data.values().stream()
-                .anyMatch(c -> c.getChannelAdmin().getId().equals(adminId));
-    }
-
-    @Override
-    public Optional<Channel> findByChannelName(String channelName) {
-        return data.values().stream()
-                .filter(c -> c.getChannelName().equals(channelName))
-                .findFirst();
-    }
 }

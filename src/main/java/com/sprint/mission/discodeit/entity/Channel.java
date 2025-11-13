@@ -5,17 +5,13 @@ import com.sprint.mission.discodeit.exception.InvalidInputException;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
 @ToString
 public class Channel extends BaseEntity {
 
-    private String channelName;
     private final ChannelType type;    // 채널타입(public, private)
-    private final User channelAdmin;
-    private final List<User> members;
+    private String name;
+    private String description;
 
     // 피드백을 통한 수정
     private String SetChannelName(User user, String channelName) {
@@ -25,46 +21,30 @@ public class Channel extends BaseEntity {
 
     }
 
-    public Channel(User user, String channelName) {
+    // PUBLIC
+    public Channel(String name, String description, ChannelType type) {
         super();
+        this.name = name;
+        this.description = description;
+        this.type = type;
+    }
 
-        this.channelAdmin = user;
-        this.type = ChannelType.PUBLIC;
-        this.channelName = SetChannelName(user, channelName);
-        this.members = new ArrayList<>();
-        members.add(user);
+    // PRIVATE
+    public Channel(ChannelType type) {
+        super();
+        this.name = null;
+        this.description = null;
+        this.type = type;
     }
 
     // updateMessage (private는 수정불가)
-    public void changeChannelName(String channelName) {
-        if (channelName == null || channelName.isBlank()) {
-            throw new InvalidInputException("잘못된 이름입니다.");
+    public void updateChannelInfo(String newName, String newDescription) {
+        if (newName != null && !newName.isBlank()) {
+            this.name = newName;
         }
-        this.channelName = channelName;
+        if (newDescription != null) {
+            this.description = newDescription;
+        }
         updateTimestamp();
     }
-
-    public boolean addMember(User user) {
-        if (!members.contains(user)) {
-            members.add(user);
-            updateTimestamp();
-            return true;
-        }
-        return false;
-    }
-
-    public boolean removeMember(User user) {
-        if (members.contains(user)) {
-            members.remove(user);
-            updateTimestamp();
-            return true;
-        }
-        return false;
-    }
-
-/* 현재 코드가 '누가' '어떤 채널'의 정보를 바꾼다는 것이 아니라 미구현
-    public boolean isAdmin(User user) {
-        return this.channelAdmin.getId().equals(user.getId());
-    }
-*/
 }

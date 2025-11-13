@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentRequestDto;
 import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentResponseDto;
@@ -32,7 +33,6 @@ public class BasicUserService implements UserService {
     // 고도화 의존성 추가
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
-    private final BinaryContentService binaryContentService;
 
     // 생성
     @Override
@@ -68,14 +68,13 @@ public class BasicUserService implements UserService {
             return null;
         }
         try {
-
-            BinaryContentRequestDto requestDto = BinaryContentRequestDto.builder()
-                    .data(profileImage.getBytes())
+            BinaryContent binaryContent = BinaryContent.builder()
+                    .binaryData(profileImage.getBytes())
                     .dataName(profileImage.getOriginalFilename())
                     .dataType(profileImage.getContentType())
                     .build();
-            BinaryContentResponseDto saveProfile = binaryContentService.createBinaryContent(requestDto);
-            return saveProfile.id();
+            binaryContentRepository.save(binaryContent);
+            return binaryContent.getId();
 
         } catch (IOException e) {
             throw new RuntimeException("오류가 발생", e);
@@ -131,6 +130,15 @@ public class BasicUserService implements UserService {
             user.updateUserName(updateDto.newUserName());
         }
 
+        if (updateDto.newEmail() != null && !updateDto.newEmail().isBlank()) {
+            userRepository.findByEmail(updateDto.newEmail()).ifPresent(existingUser -> {
+                if (!existingUser.getId().equals(user.getId())) {
+                    throw new DuplicateEmailException("이미 존재하는 이메일");
+                }
+            });
+            user.updateEmail(updateDto.newUserName());
+        }
+
         if (updateDto.newPassword() != null && !updateDto.newPassword().isBlank()) {
             user.updatePassword(updateDto.newPassword());
         }
@@ -146,10 +154,6 @@ public class BasicUserService implements UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
-
-        if (channelRepository.existsByAdminId(userId)) {
-            throw new IllegalStateException("채널관리자는 삭제할 수 없습니다.");
-        }
 
         // 상태 삭제
         userStatusRepository.deleteStatusByUserId(userId);

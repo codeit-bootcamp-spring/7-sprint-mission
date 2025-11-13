@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.entityType.MessageType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.Comparator;

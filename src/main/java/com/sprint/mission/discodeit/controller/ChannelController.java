@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelResponseDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelRequestDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelRequestDto;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +22,25 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ChannelResponseDto> channelCreate(@RequestBody ChannelRequestDto channelRequestDto) {
-        ChannelResponseDto channel = channelService.createChannel(channelRequestDto);
+    @RequestMapping(value = "/public", method = RequestMethod.POST)
+    public ResponseEntity<Channel> channelCreate(
+            @Valid @RequestBody PublicChannelRequestDto channelRequestDto) {
+        Channel channel = channelService.createPublicChannel(channelRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
-    @RequestMapping(value = "/channelname", method = RequestMethod.PUT)
-    public ResponseEntity<ChannelResponseDto> channelNameUpdate(@RequestBody ChannelUpdateDto channelUpdateDto) {
-        return ResponseEntity.ok(channelService.updateChannelName(channelUpdateDto));
+    @RequestMapping(value = "/private", method = RequestMethod.POST)
+    public ResponseEntity<Channel> channelCreate(
+            @Valid @RequestBody PrivateChannelRequestDto channelRequestDto) {
+        Channel channel = channelService.createPrivateChannel(channelRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(channel);
+    }
+
+    @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
+    public ResponseEntity<Channel> channelNameUpdate(
+            @PathVariable UUID channelId,
+            @Valid @RequestBody PublicChannelUpdateDto channelUpdateDto) {
+        return ResponseEntity.ok(channelService.updateChannel(channelId, channelUpdateDto));
     }
 
     @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
@@ -36,8 +49,9 @@ public class ChannelController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<List<ChannelResponseDto>> getAllByUserId(@PathVariable UUID userId) {
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<List<ChannelResponseDto>> getAllByUserId(
+            @RequestParam UUID userId) {
         return ResponseEntity.ok(channelService.findAllByUserId(userId));
     }
 }

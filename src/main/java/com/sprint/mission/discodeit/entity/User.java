@@ -33,9 +33,9 @@ public class User extends BaseEntity {
         validatePassword(password);
         validateUserName(userName);
 
+        this.userName = userName;       // 특수문자 불가
         this.email = email;             // 받을때 @ 있는지 확인
         this.password = password;       // 8자리 이상
-        this.userName = userName;       // 특수문자 불가
         this.profileId = null;
     }
 
@@ -43,6 +43,12 @@ public class User extends BaseEntity {
     public void updateUserName(String userName) {
         validateUserName(userName);
         this.userName = userName;
+        updateTimestamp();
+    }
+
+    public void updateEmail(String email) {
+        validateEmail(email);
+        this.email = email;
         updateTimestamp();
     }
 
