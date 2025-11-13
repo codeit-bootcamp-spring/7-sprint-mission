@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 @ToString
 public class User extends BaseEntity {
 
-    private String userName;        // 닉네임
+    private String username;        // 닉네임
     private String email;     // 이메일 -> 아이디로 사용
     private String password;        // 비밀번호
 
@@ -26,23 +26,23 @@ public class User extends BaseEntity {
             = Pattern.compile("^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$");
 
     @Builder
-    public User(String email, String password, String userName, String phoneNum) {
+    public User(String email, String password, String username) {
         super();
 
         validateEmail(email);
         validatePassword(password);
-        validateUserName(userName);
+        validateUserName(username);
 
-        this.userName = userName;       // 특수문자 불가
+        this.username = username;       // 특수문자 불가
         this.email = email;             // 받을때 @ 있는지 확인
         this.password = password;       // 8자리 이상
         this.profileId = null;
     }
 
     // Update
-    public void updateUserName(String userName) {
-        validateUserName(userName);
-        this.userName = userName;
+    public void updateUsername(String username) {
+        validateUserName(username);
+        this.username = username;
         updateTimestamp();
     }
 
@@ -65,7 +65,7 @@ public class User extends BaseEntity {
 
     // 논리 삭제
     public void softDelete() {
-        this.userName = "Deleted User";
+        this.username = "Deleted User";
         this.email = this.id.toString() + "@deleted.user";
         this.password = this.id.toString();
         updateTimestamp();  // 탈퇴일자

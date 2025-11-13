@@ -40,7 +40,7 @@ public class BasicUserService implements UserService {
             throw new DuplicateEmailException("이미 존재하는 이메일");
         });
 
-        userRepository.findByUserName(requestDto.userName()).ifPresent(user
+        userRepository.findByUserName(requestDto.username()).ifPresent(user
                 -> {
             throw new DuplicateEmailException("이미 존재하는 닉네임");
         });
@@ -50,7 +50,7 @@ public class BasicUserService implements UserService {
         // 유저 생성
         User newUser = User.builder()
                 .email(requestDto.email())
-                .userName(requestDto.userName())
+                .username(requestDto.username())
                 .password(requestDto.password())
                 .build();
 
@@ -119,13 +119,13 @@ public class BasicUserService implements UserService {
             }
         }
 
-        if (updateDto.newUserName() != null && !updateDto.newUserName().isBlank()) {
-            userRepository.findByUserName(updateDto.newUserName()).ifPresent(existingUser -> {
+        if (updateDto.newUsername() != null && !updateDto.newUsername().isBlank()) {
+            userRepository.findByUserName(updateDto.newUsername()).ifPresent(existingUser -> {
                 if (!existingUser.getId().equals(user.getId())) {
                     throw new DuplicateEmailException("이미 존재하는 닉네임");
                 }
             });
-            user.updateUserName(updateDto.newUserName());
+            user.updateUsername(updateDto.newUsername());
         }
 
         if (updateDto.newEmail() != null && !updateDto.newEmail().isBlank()) {
@@ -134,7 +134,7 @@ public class BasicUserService implements UserService {
                     throw new DuplicateEmailException("이미 존재하는 이메일");
                 }
             });
-            user.updateEmail(updateDto.newUserName());
+            user.updateEmail(updateDto.newUsername());
         }
 
         if (updateDto.newPassword() != null && !updateDto.newPassword().isBlank()) {

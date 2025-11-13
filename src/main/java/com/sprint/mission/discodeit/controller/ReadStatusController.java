@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.dto.readStatusDto.*;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,23 +22,23 @@ public class ReadStatusController {
     // 수신 정보 생성
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<ReadStatus> createReadStatus(
-            @RequestBody ReadStatusCreateRequest readStatusRequestDto) {
+            @Valid @RequestBody ReadStatusCreateRequest readStatusRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(readStatusService.createReadStatus(readStatusRequestDto));
     }
 
     // 수신 정보 수정
-    @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
     public ResponseEntity<ReadStatus> readStatusUpdate(
             @PathVariable UUID readStatusId,
-            @RequestBody ReadStatusUpdateRequest readStatusUpdateDto) {
+            @Valid @RequestBody ReadStatusUpdateRequest readStatusUpdateDto) {
 
         return ResponseEntity.ok(readStatusService.updateReadStatus(readStatusId ,readStatusUpdateDto));
     }
 
     // 사용자의 메시지 수신 정보 조회
-    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<ReadStatusDto>> getAllByUserId(
-            @PathVariable UUID userId) {
+            @RequestParam UUID userId) {
         return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
     }
 }

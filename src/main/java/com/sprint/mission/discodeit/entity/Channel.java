@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.entityType.ChannelType;
-import com.sprint.mission.discodeit.exception.InvalidInputException;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -16,7 +15,7 @@ public class Channel extends BaseEntity {
     // 피드백을 통한 수정
     private String SetChannelName(User user, String channelName) {
         if (channelName == null || channelName.isBlank())
-            return user.getUserName() + "의 채널";
+            return user.getUsername() + "의 채널";
         else return channelName;
 
     }
@@ -38,13 +37,18 @@ public class Channel extends BaseEntity {
     }
 
     // updateMessage (private는 수정불가)
-    public void updateChannelInfo(String newName, String newDescription) {
+    public void updateChannelName(String newName) {
         if (newName != null && !newName.isBlank()) {
             this.name = newName;
         }
+        updateTimestamp();
+    }
+
+    public void updateChannelDescription(String newDescription) {
         if (newDescription != null) {
             this.description = newDescription;
         }
         updateTimestamp();
     }
+
 }

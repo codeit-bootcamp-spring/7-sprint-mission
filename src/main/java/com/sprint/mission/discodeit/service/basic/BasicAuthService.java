@@ -17,9 +17,9 @@ public class BasicAuthService implements AuthService {
     @Override
     public User login(LoginRequest loginRequestDto) {
         User user = userRepository.findByUserName(loginRequestDto.username())
-                .orElseThrow(() -> new AuthenticationException("아이디 또는 비밀번호가 틀립니다."));
+                .orElseThrow(() -> new AuthenticationException("아이디ㅁ 또는 비밀번호가 틀립니다."));
         if (!user.getPassword().equals(loginRequestDto.password())) {
-            throw new AuthenticationException("아이디 또는 비밀번호가 틀립니다.");
+            throw new AuthenticationException("아이디 또는 비밀번호ㅁ가 틀립니다.");
         }
         return user;
     }

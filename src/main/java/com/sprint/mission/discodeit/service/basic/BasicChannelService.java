@@ -96,7 +96,9 @@ public class BasicChannelService implements ChannelService {
             throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
         }
 
-        channel.updateChannelInfo(updateDto.newName(), updateDto.newDescription());
+        channel.updateChannelName(updateDto.newName());
+
+        channel.updateChannelDescription(updateDto.newDescription());
         channelRepository.save(channel);
 
         return channel;

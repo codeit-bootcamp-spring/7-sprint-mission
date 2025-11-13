@@ -25,7 +25,7 @@ public class MessageController {
     // (채널)메시지 생성
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Message> channelMessageCreate(
-            @Valid @RequestPart("MessageRequestDto") MessageCreateRequest messageRequestDto,
+            @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageRequestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)

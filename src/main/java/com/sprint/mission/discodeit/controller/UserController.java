@@ -30,7 +30,7 @@ public class UserController {
     // 201 반환
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<User> userCreate(
-            @Valid @RequestPart("userRequestDto") UserCreateRequest userRequestDto,
+            @Valid @RequestPart("userCreateRequest") UserCreateRequest userRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profileImage
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -63,7 +63,7 @@ public class UserController {
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
     public ResponseEntity<User> userUpdate(
             @PathVariable UUID userId,
-            @Valid @RequestPart("UserUpdateDto") UserUpdateRequest userUpdateDto,
+            @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateDto,
             @RequestPart(value = "profile",  required = false) MultipartFile profileImage
     ) {
         return ResponseEntity.ok(userService.updateUserInfo(userId,userUpdateDto,profileImage));
@@ -73,7 +73,7 @@ public class UserController {
     @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
     public ResponseEntity<UserStatus> onlineUpdate(
             @PathVariable UUID userId,
-            @RequestBody UserStatusUpdateRequest updateDto) {
+            @Valid @RequestBody UserStatusUpdateRequest updateDto) {
         return ResponseEntity.ok(userStatusService.updateStatusByUserId(userId, updateDto));
     }
 }

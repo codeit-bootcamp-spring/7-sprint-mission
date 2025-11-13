@@ -5,11 +5,12 @@ import com.sprint.mission.discodeit.exception.InvalidInputException;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class BinaryContent {
+public class BinaryContent implements Serializable {
     /* 10MB, 500MB 업로드 제한
     private static final long BASIC_MAX_FILE_SIZE = 10 * 1024 * 1024;
     private static final long NITRO_MAX_FILE_SIZE = 500 * 1024 * 1024;
@@ -22,13 +23,9 @@ public class BinaryContent {
     private final UUID id;
     private final Instant createAt;
 
-    private final byte[] binaryData;
+    private final transient byte[] binaryData;
     private final String dataName;
     private final String dataType;    // txt, zip, jpg등
-
-    // 요구사항에 맞춰 삭제
-//    private final UUID userId;  // 프로필
-//    private final UUID messageId;   // 메시지첨부
 
     @Builder
     public BinaryContent(byte[] binaryData, String dataName, String dataType) {
@@ -51,5 +48,4 @@ public class BinaryContent {
             throw new FileSizeLimitExceededException("파일용량은 10MB를 넘을 수 없습니다.");
         }
     }
-
 }
