@@ -123,6 +123,7 @@ public class UserController {
    * 파일이 null 이거나 비어 있으면 프로필을 설정하지 않은 것으로 보고 Optional.empty()를 반환하고,
    * 파일을 읽는 중 오류가 발생하면 IllegalStateException으로 감싸서 던진다.
    */
+  // “프로필 이미지 MultipartFile을 서비스에서 사용하는 BinaryContentCreateRequest로 바꿔주는 메서드. 파일이 없으면 Optional.empty()를 돌려준다.”
   private Optional<BinaryContentCreateRequest> toBinaryContentCreateRequest(MultipartFile file) {
     if (file == null || file.isEmpty()) {
       return Optional.empty();  // 파일이 없거나 비었으면 > Optional.empty() 반환
