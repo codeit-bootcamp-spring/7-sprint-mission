@@ -20,9 +20,9 @@ public interface ReadStatusControllerDocs {
     @ApiResponse(responseCode = "200", description = "읽음 상태 생성 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReadStatusCreateRequestDto.class),
     examples = @ExampleObject(value = """
-            "channelId":UUID
-            "userId":UUID
-            "lastReadAt": Instant
+            {"channelId":"a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412",
+            "userId":"a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412",
+            "lastReadAt":"2025-11-13T10:30:00Z"}
             """)
     )
     )
@@ -45,7 +45,7 @@ public interface ReadStatusControllerDocs {
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReadStatusPatchRequestDto.class),
     examples = @ExampleObject(value = """
             
-            "newLastReadAt": Instant
+            {"newLastReadAt":"2025-11-13T10:30:00Z"}
             """)
     )
     )

@@ -23,15 +23,15 @@ public interface MessageControllerDocs {
     @ApiResponse(responseCode = "200", description = "메세지 생성 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageReadResponseDto.class),
             examples = @ExampleObject(value = """
-                    { "id":UUID,
-                    "createdAt":Instant,
-                    "updatedAt":Instant,
+                    { "id":"550e8400-e29b-41d4-a716-446655440000",
+                    "createdAt":"2025-11-13T10:30:00Z",
+                    "updatedAt":"2025-11-13T10:30:00Z",
                     "content":"T1 is world champion",
-                    "authorId": UUID,
-                    "isMarkDown": True,
-                    "channelId": UUID,
+                    "authorId": "550e8400-e29b-41d4-a716-446655440000",
+                    "isMarkDown": true,
+                    "channelId": "550e8400-e29b-41d4-a716-446655440000",
                     "attachmentIds":[
-                    UUID,UUID]
+                    "550e8400-e29b-41d4-a716-446655440000","a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412"]
                     }
                     """)
     )
@@ -45,17 +45,17 @@ public interface MessageControllerDocs {
     @ApiResponse(responseCode = "200", description = "메세지 변경 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageReadResponseDto.class),
     examples = @ExampleObject(value = """
-            { "id":UUID,
-                    "createdAt":Instant,
-                    "updatedAt":Instant,
+           {"id":"550e8400-e29b-41d4-a716-446655440000",
+                    "createdAt":"2025-11-13T10:30:00Z",
+                    "updatedAt":"2025-11-13T10:30:00Z",
                     "content":"T1 is world champion",
-                    "authorId": UUID,
-                    "isMarkDown": True,
-                    "channelId": UUID,
+                    "authorId": "550e8400-e29b-41d4-a716-446655440000",
+                    "isMarkDown": true,
+                    "channelId": "550e8400-e29b-41d4-a716-446655440000",
                     "attachmentIds":[
-                    UUID,UUID]
+                    "550e8400-e29b-41d4-a716-446655440000","a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412"]
                     }
-            """)
+           """)
     )
     )
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)

@@ -20,13 +20,13 @@ public interface LoginControllerDocs {
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponseDto.class),
     examples = @ExampleObject(value = """
           {
-          "id":UUID,
-          "createdAt":Instant,
-          "updatedAt":Instant,
+          "id":"550e8400-e29b-41d4-a716-446655440000",
+          "createdAt":"2025-11-13T10:30:00Z",
+          "updatedAt":"2025-11-13T10:30:00Z",
           "username": "Ronaldo",
           "email":"Ronaldo@Goat.com",
           "password": "1111",
-          "profileId":UUId
+          "profileId":"a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412"
           }
           """)
     )

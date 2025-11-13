@@ -24,12 +24,12 @@ public interface FileControllerDocs {
     schema = @Schema(implementation = BinaryContentResponseDto.class),
     examples = @ExampleObject(value = """
             {
-            "id":UUID,
-            "createdAt":Instant,
+            "id":"550e8400-e29b-41d4-a716-446655440000",
+            "createdAt":"2025-11-13T10:30:00Z",
             "fileName" : "Siuuuuuu",
             "size":256,
             "contentTyp":"jpg",
-            "bytes": byte[]
+            "bytes": "111111111111"
             }
             """)
     )
@@ -37,17 +37,17 @@ public interface FileControllerDocs {
     @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
     ResponseEntity<BinaryContentResponseDto> read(@PathVariable UUID binaryContentId);
     @Operation(summary = "파일 다건 조회(Read File)", description = "파일을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "파일 조회 성공",
+    @ApiResponse(responseCode = "200", description = "파일 다건 조회 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = BinaryContentResponseDto.class),
     examples = @ExampleObject(value = """
              [
              {
-            "id":UUID,
-            "createdAt":Instant,
+            "id":"550e8400-e29b-41d4-a716-446655440000",
+            "createdAt":"2025-11-13T10:30:00Z",
             "fileName" : "Siuuuuuu",
             "size":256,
             "contentTyp":"jpg",
-            "bytes": byte[]
+            "bytes": "111111111111111111111"
             }
             ]
             """)

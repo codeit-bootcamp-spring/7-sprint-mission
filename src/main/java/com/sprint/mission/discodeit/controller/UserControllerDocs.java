@@ -39,12 +39,12 @@ public interface UserControllerDocs {
     schema = @Schema(implementation = UserDto.class),
     examples = @ExampleObject(value = """
            [{
-            "id":UUID,
-            "createdAt":Instant,
-            "updatedAt":Instant,
+            "id":"550e8400-e29b-41d4-a716-446655440000",
+            "createdAt":"2025-11-13T10:30:00Z",
+            "updatedAt":"2025-11-13T10:31:00Z",
             "username": "김넙죽",
             "email":"genius5375@gmail.com",
-            "profileId":UUID,
+            "profileId":"a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412",
             "online" : true
             }]
     """)
@@ -58,14 +58,14 @@ public interface UserControllerDocs {
     content = @Content(mediaType = "application/json",
     schema = @Schema(implementation = UserCreateResponseDto.class),
     examples = @ExampleObject(value = """
-           {
-            "id":UUID,
-            "createdAt":Instant,
-            "updatedAt":Instant,
+          {
+            "id":"550e8400-e29b-41d4-a716-446655440000",
+            "createdAt":"2025-11-13T10:30:00Z",
+            "updatedAt":"2025-11-13T10:31:00Z",
             "username": "김넙죽",
             "email":"genius5375@gmail.com",
-            "password": "1557"
-            "profileId":UUID,
+            "profileId":"a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412",
+            "online" : true
             }
     """)
     )
@@ -81,14 +81,13 @@ public interface UserControllerDocs {
     content = @Content(mediaType = "application/json",
     schema = @Schema(implementation = UserCreateResponseDto.class),
     examples = @ExampleObject(value = """
-           {
-            "id":UUID,
-            "createdAt":Instant,
-            "updatedAt":Instant,
-            "username": "김넙죽",
+          {
+            "id":"550e8400-e29b-41d4-a716-446655440000",
+            "createdAt":"2025-11-13T10:30:00Z",
+            "updatedAt":"2025-11-13T10:31:00Z",
+            "username":"김넙죽",
             "email":"genius5375@gmail.com",
-            "password": "1557"
-            "profileId":UUID,
+            "profileId":"a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412"
             }
     """)
     )
@@ -102,11 +101,11 @@ public interface UserControllerDocs {
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserUserStatusPatchResponseDto.class),
     examples = @ExampleObject(value = """
             {
-            "id":UUID,
-            "createdAt":Instant,
-            "updatedAt":Instant,
-            "userId":UUID,
-            "lastActiveAt":Instant,
+            "id":"550e8400-e29b-41d4-a716-446655440000",
+            "createdAt":"2025-11-13T10:30:00Z",
+            "updatedAt":"2025-11-13T10:30:00Z",
+            "userId":"a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412",
+            "lastActiveAt":"2025-11-13T10:30:00Z",
             "online":false
             }
             """)))

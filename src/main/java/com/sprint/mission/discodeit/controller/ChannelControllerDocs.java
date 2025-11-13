@@ -35,18 +35,18 @@ public interface ChannelControllerDocs {
                     examples = @ExampleObject(
                             value = """
                                     {
-                                    "id" : UUID,
-                                    "createdAt" : Instant,\s
-                                    "updatedAt" : Instant,
+                                    "id" : "550e8400-e29b-41d4-a716-446655440000",
+                                    "createdAt" : "2025-11-13T10:30:00Z",
+                                    "updatedAt" : "2025-11-13T10:30:00Z",
                                     "name":"ManChesterCity",
                                     "description":"ManChester city travel",
-                                    "ChannelType" : "PRIVATE",          \s
+                                    "ChannelType" : "PRIVATE",
                                     "isTextChannel": true,
                                     "participantIds":[
-                                    UUID,UUID
+                                    "550e8400-e29b-41d4-a716-446655440000","a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412"
                                     ]
                                     }
-                                   \s"""
+                                   """
                     )
 
             )
@@ -68,18 +68,17 @@ public interface ChannelControllerDocs {
             examples = @ExampleObject(
                     """
                             {
-                                                                    "id" : UUID,
-                                                                 "createdAt" : Instant,\\s
-                                                                 "updatedAt" : Instant,
-                                                                 "name":"ManChesterCity",
-                                                                 "description":"ManChester city travel",
-                                                                 "ChannelType" : "PRIVATE",          \\s
-                                                                 "isTextChannel": true,
-                                                                 "participantIds":[
-                                                                 UUID,UUID
-                                                                 ]
-                                                                 }
-                                                                \\s""\"
+                                   "id" : "550e8400-e29b-41d4-a716-446655440000",
+                                    "createdAt" : "2025-11-13T10:30:00Z",
+                                    "updatedAt" : "2025-11-13T10:30:00Z",
+                                    "name":"ManChesterCity",
+                                    "description":"ManChester city travel",
+                                    "ChannelType" : "PRIVATE",
+                                    "isTextChannel": true,
+                                    "participantIds":[
+                                    "550e8400-e29b-41d4-a716-446655440000","a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412"
+                                    ]
+                                    }
                             """
             )
     )
@@ -110,21 +109,18 @@ public interface ChannelControllerDocs {
     @ApiResponse(responseCode = "200", description = "채널 조회 성공",
     content = @Content( schema = @Schema(implementation = ChannelReadResponseDto.class),
     examples = @ExampleObject(value = """
-                ""\"[
-                      {
-                         "id" : UUID,
-                          "createdAt" : Instant,\\s
-                           "updatedAt" : Instant,
-                         "name":"ManChesterCity",
-                         "description":"ManChester city travel",
-                           "ChannelType" : "PRIVATE",          \\s
-                           "isTextChannel": true,
-                       "participantIds":[
-                         UUID,UUID
-                                                    ]
-                                                    }
-                                                    ]
-                                                   \\s""\"
+               {
+                                    "id" : "550e8400-e29b-41d4-a716-446655440000",
+                                    "createdAt" : "2025-11-13T10:30:00Z",
+                                    "updatedAt" : "2025-11-13T10:30:00Z",
+                                    "name":"ManChesterCity",
+                                    "description":"ManChester city travel",
+                                    "ChannelType" : "PRIVATE",
+                                    "isTextChannel": true,
+                                    "participantIds":[
+                                    "550e8400-e29b-41d4-a716-446655440000","a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412"
+                                    ]
+                                    }
             """)
     )
     )
@@ -134,19 +130,18 @@ public interface ChannelControllerDocs {
     @ApiResponse(responseCode = "200", description = "채널 수정 성공",
     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelPatchRequestDto.class),
     examples = @ExampleObject(value = """
-             {
-                                    "id" : UUID,
-                                    "createdAt" : Instant,\s
-                                    "updatedAt" : Instant,
+            {
+                                    "id" : "550e8400-e29b-41d4-a716-446655440000",
+                                    "createdAt" : "2025-11-13T10:30:00Z",
+                                    "updatedAt" : "2025-11-13T10:30:00Z",
                                     "name":"ManChesterCity",
                                     "description":"ManChester city travel",
-                                    "ChannelType" : "PRIVATE",          \s
+                                    "ChannelType" : "PRIVATE",
                                     "isTextChannel": true,
                                     "participantIds":[
-                                    UUID,UUID
+                                    "550e8400-e29b-41d4-a716-446655440000","a9f3e1f1-22c3-4e50-9b12-38d5a0c0f412"
                                     ]
                                     }
-                                   \s
             """)
     )
     )
