@@ -33,6 +33,7 @@ public class UserStatusController {
         return userStatusService.update(userStatusUpdateRequestDto);
     }
 
+    // 쿼리파람
     @RequestMapping(value = "/by-user-id/{userId}", method = RequestMethod.PATCH)
     public UserStatusResponseDto updateByUserId(
             @Valid @RequestBody UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto,
