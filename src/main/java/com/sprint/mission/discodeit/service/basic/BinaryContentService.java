@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Res_BinaryContent;
@@ -10,8 +9,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BinaryContentService implements InterfaceBinaryContentService {
@@ -21,7 +22,7 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
         BinaryContent binaryContent = new BinaryContent(dtoBinaryContent);
         binaryContentRepository.save(binaryContent);
-        Util.okMessage("BinaryContentService.create = [" + binaryContent.getId() + "]");
+        log.info("✅ BinaryContentService.create = [" + binaryContent.getId() + "]");
         return Res_BinaryContent.from(binaryContent);
     }
 
@@ -29,7 +30,7 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 //    [ ] id로 조회합니다.
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
             .orElseThrow(() -> new NoSuchElementException("🚨첨부파일[" + binaryContentId.toString() + "]을 찾을 수 없음"));
-        Util.okMessage("BinaryContentService.find.binaryContentId = [" + binaryContentId + "]");
+        log.info("✅ BinaryContentService.find.binaryContentId = [" + binaryContentId + "]");
         return Res_BinaryContent.from(binaryContent);
     }
 
@@ -39,13 +40,13 @@ public class BinaryContentService implements InterfaceBinaryContentService {
             .map(Res_BinaryContent::from)
             .toList();
 
-        Util.okMessage("BinaryContentService.findAllByIdIn");
+        log.info("✅ BinaryContentService.findAllByIdIn");
         return list;
     }
 
     public void delete(UUID binaryContentId) {
 //    [ ] id로 삭제합니다.
         binaryContentRepository.deleteById(binaryContentId);
-        Util.okMessage("BinaryContentService.delete.readStatusID = [" + binaryContentId + "]");
+        log.info("✅ BinaryContentService.delete.readStatusID = [" + binaryContentId + "]");
     }
 }

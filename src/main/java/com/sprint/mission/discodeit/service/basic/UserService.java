@@ -68,11 +68,11 @@ public class UserService implements InterfaceUserService {
         User user = new User(dto_userCreate, binaryContentId);
         Res_User resUser = Res_User.from(user);
         userRepository.save(user);
-        log.info("🌸 user.save = " + user.toString());
+        log.info("✅ 🌸 user.save = " + user.toString());
 
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
-        log.info("🌸 userstatus.save = " + userStatus.toString());
+        log.info("✅ 🌸 userstatus.save = " + userStatus.toString());
 
         return resUser;
     }
@@ -85,10 +85,10 @@ public class UserService implements InterfaceUserService {
         String message = "🚨 find.userID = [" + userID.toString() + "] 오류";
         User user = userRepository.findById(userID).orElseThrow(() -> new IllegalArgumentException(message));
 
-//        Util.okMessage("♣️user.readStatusID() = [" + user.getId() + "]");
+//        log.info("✅ ♣️user.readStatusID() = [" + user.getId() + "]");
         UserStatus userStatus = userStatusRepository.findByUserId(userID).orElseThrow(() -> new IllegalArgumentException(message));
 
-        Util.okMessage("UserService.findAllByChannleId = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
+        log.info("✅ UserService.findAllByChannleId = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
 
         return UserDto.from(user, userStatus.isOnline());
     }
@@ -110,7 +110,7 @@ public class UserService implements InterfaceUserService {
             if (userStatus != null) {
                 UserDto dto = UserDto.from(user, userStatus.isOnline());
                 dtoList.add(dto);
-                Util.okMessage("UserService.findAll = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
+                log.info("✅ UserService.findAll = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
             }
         }
 
@@ -123,8 +123,8 @@ public class UserService implements InterfaceUserService {
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //        수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
 
-        Util.okMessage("UserService.update.id = [" + userId + "]");
-        Util.okMessage("dto_userCreate = [" + dtoUserUpdate.toString() + "]");
+        log.info("✅ UserService.update.id = [" + userId + "]");
+        log.info("✅ dto_userCreate = [" + dtoUserUpdate.toString() + "]");
 
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new NoSuchElementException("🚨User [" + userId.toString() + "]를 찾을 수 없음"));
@@ -154,7 +154,7 @@ public class UserService implements InterfaceUserService {
 
         //!! 순서 유의_II
         userRepository.save(user);
-        Util.okMessage("UserService.update = [" + userName + "]를 [" + dtoUserUpdate.newUsername() + "]로 변경 완료");
+        log.info("✅ UserService.update = [" + userName + "]를 [" + dtoUserUpdate.newUsername() + "]로 변경 완료");
         return Res_User.from(user);
     }
 
@@ -167,24 +167,24 @@ public class UserService implements InterfaceUserService {
         Optional<UserStatus> optionalStatus = userStatusRepository.findByUserId(user.getId());
         if (optionalStatus.isPresent()) {
             userStatusRepository.deleteById(optionalStatus.get().getId());
-            Util.okMessage("UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
+            log.info("✅ UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
         }
 //        else {
-//            Util.errMessage("UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
+//            log.error("🚨UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
 //        }
 
         if (user.getProfileId() != null) {
             Optional<BinaryContent> optionalContents = binaryContentRepository.findById(user.getProfileId());
             if (optionalContents.isPresent()) {
                 binaryContentRepository.deleteById(optionalContents.get().getId());
-                Util.okMessage("UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
+                log.info("✅ UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
             }
 //            else {
-//                Util.errMessage("UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
+//                log.error("🚨UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
 //            }
         }
 
         userRepository.deleteById(userID);
-        Util.okMessage("⛔️ UserService.userRepository.deleteById [" + user.getUserName() + "] 완료 ️⛔️");
+        log.info("✅ ⛔️ UserService.userRepository.deleteById [" + user.getUserName() + "] 완료 ️⛔️");
     }
 }

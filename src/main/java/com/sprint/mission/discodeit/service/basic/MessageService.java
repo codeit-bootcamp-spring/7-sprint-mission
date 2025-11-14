@@ -1,22 +1,26 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
+import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.dto.Res_Message;
 import com.sprint.mission.discodeit.repository.InterfaceBinaryContentRepository;
 import com.sprint.mission.discodeit.repository.InterfaceChannelRepository;
 import com.sprint.mission.discodeit.repository.InterfaceMessageRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 public class MessageService implements InterfaceMessageService {
@@ -48,7 +52,7 @@ public class MessageService implements InterfaceMessageService {
         Message newMessage = new Message(dtoMessage, attachemntIds);
         messageRepository.save(newMessage);
 
-        Util.okMessage("💌 MessageService.create.content = [" + newMessage.getMessage() + "] 💬");
+        log.info("✅ 💌 MessageService.create.content = [" + newMessage.getMessage() + "] 💬");
         return Res_Message.from(newMessage);
     }
 
@@ -58,13 +62,13 @@ public class MessageService implements InterfaceMessageService {
           .orElseThrow(() -> new NoSuchElementException("🚨Message [" + messageID.toString() + "] 를 찾을 수 없음"));
 
       messageRepository.deleteById(messageID);
-      Util.okMessage("deleteMessage = [" + message.getMessage() + "]");
+      log.info("✅ deleteMessage = [" + message.getMessage() + "]");
     }
 
     @Override
     public Res_Message find(UUID messageID) {
         Message message = messageRepository.findById(messageID).orElseThrow(() -> new IllegalArgumentException("🚨MessageService.find.messageID = [" + messageID.toString() + "] 오류"));
-        Util.okMessage("MessageService.find = [" + message.getMessage() + "]");
+        log.info("✅ MessageService.find = [" + message.getMessage() + "]");
         return Res_Message.from(message);
     }
 
@@ -73,13 +77,13 @@ public class MessageService implements InterfaceMessageService {
 //        [ ] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
         List<Message> messages = messageRepository.findAll();
 //        for (Message content : messages) {
-//            Util.okMessage("findAllByChannleId.channelID = [" + channelID + "][" + content.getMessage() + "]");
+//            log.info("✅ findAllByChannleId.channelID = [" + channelID + "][" + content.getMessage() + "]");
 //        }
 
         List<Res_Message> resMessage = messages.stream().filter(msg -> msg.getChannelId().equals(channelID)).map(Res_Message::from).toList();
-        resMessage.stream().forEach(message -> Util.okMessage("findAllByChannleId = [" + channelID + "][" + message.content() + "]"));
+        resMessage.stream().forEach(message -> log.info("✅ findAllByChannleId = [" + channelID + "][" + message.content() + "]"));
 //        for (Res_Message content : resMessage) {
-//            Util.okMessage("findAllByChannleId = [" + channelID + "][" + content.content() + "]");
+//            log.info("✅ findAllByChannleId = [" + channelID + "][" + content.content() + "]");
 //        }
         return resMessage;
     }
@@ -93,7 +97,7 @@ public class MessageService implements InterfaceMessageService {
 
         message.updateMessage(requestDto.newContent());
         messageRepository.save(message);
-        Util.okMessage("updateMessage = [" + message.getMessage() + "]");
+        log.info("✅ updateMessage = [" + message.getMessage() + "]");
 
         return Res_Message.from(message);
     }

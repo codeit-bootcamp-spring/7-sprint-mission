@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import static com.sprint.mission.discodeit.entity.ChannelType.PRIVATE;
 import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 
-import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -24,8 +23,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 public class ChannelService implements InterfaceChannelService {
@@ -38,7 +39,9 @@ public class ChannelService implements InterfaceChannelService {
     public Res_Channel createPublic(Dto_CreateChannelPublic dtoCreateChannel) {
         Channel channel = new Channel(dtoCreateChannel);
         channelRepository.save(channel);
-        Util.okMessage("createPublic = [" + dtoCreateChannel.name() + "] 채널 생성");
+
+        log.info("✅ createPublic = [" + dtoCreateChannel.name() + "] 채널 생성");
+
         return Res_Channel.from(channel);
     }
 
@@ -55,13 +58,8 @@ public class ChannelService implements InterfaceChannelService {
 
         List<ReadStatus> list = dtoCreateChannel.participantIds().stream()
             .map(userId -> new ReadStatus(userId, channel.getId()))
+            .peek(readStatus -> readStatusRepository.save(readStatus))
             .toList();
-
-        list.forEach(readStatusRepository::save);
-
-        for (UUID uuid : dtoCreateChannel.participantIds().stream().toList()) {
-            Util.okMessage("PrivateChannel.participantIds = [" + uuid + "]");
-        }
 
         return Res_Channel.from(channel);
     }
@@ -86,13 +84,15 @@ public class ChannelService implements InterfaceChannelService {
         if (dtoChannel.channelType() == PRIVATE) {
             List<ReadStatus> readStatuses = readStatusRepository.findAll();
             List<UUID> userIdList = readStatuses.stream()
-                .map(readStatus -> readStatus.getUserId()).distinct().toList();
+                .map(readStatus -> readStatus.getUserId())
+                .distinct()
+                .peek(userId -> log.info("✅ ChannelService.find <PRIVATE> 🔰.userids = [" + userId + "]"))
+                .toList();
 
-            userIdList.forEach(userId -> Util.okMessage("ChannelService.find <PRIVATE> 🔰.userids = [" + userId + "]"));
             return Res_ChannelFind.from(dtoChannel, lastMessageAt, userIdList);
         }
         else {
-            Util.okMessage("ChannelService.find <PUBLIC> = [" + channel.getChannelName() + "]");
+            log.info("✅ ChannelService.find <PUBLIC> = [" + channel.getChannelName() + "]");
             return Res_ChannelFind.from(dtoChannel, lastMessageAt, null);
         }
     }
@@ -112,7 +112,7 @@ public class ChannelService implements InterfaceChannelService {
 
         allChannel.stream()
             .filter(channel -> channel.getChannelType() == PUBLIC)
-            .peek(channel -> Util.okMessage("findAllByUserId.[✅ PUBLIC] = [" + channel.getChannelName() + "]"))
+            .peek(channel -> log.info("✅ findAllByUserId.[✅ PUBLIC] = [" + channel.getChannelName() + "]"))
             .forEach(channel -> resChannelFinds.add(this.find(ChannelDto.create(channel))));
 
         //[ ] 특정 User가 볼 수 있는 Channel 목록 조회
@@ -127,7 +127,7 @@ public class ChannelService implements InterfaceChannelService {
 
         privateChannels.stream()
             .filter(channel -> readStatusInUserID.stream().anyMatch(readStatus -> readStatus.getChannelId().equals(channel.getId())))
-            .peek(channel -> Util.okMessage("findAllByUserId.[🅰️ PRIVATE] = [" + channel.getChannelName() + "]"))
+            .peek(channel -> log.info("✅ findAllByUserId.[🅰️ PRIVATE] = [" + channel.getChannelName() + "]"))
             .forEach(channel -> resChannelFinds.add(this.find(ChannelDto.create(channel))));
 
         return resChannelFinds;
@@ -143,7 +143,7 @@ public class ChannelService implements InterfaceChannelService {
 //        else {
 //            findedChannel.updateChannelName(reName);
 //            channelRepository.save(findedChannel);
-//            Util.okMessage(content);
+//            log.info(content);
 //        }
 //    }
 //
@@ -152,7 +152,7 @@ public class ChannelService implements InterfaceChannelService {
 //        Channel findedChannel = channelRepository.findById(channel.getId()).orElseThrow(() -> new IllegalArgumentException("🚨updateChannelType 오류"));
 //        findedChannel.updateChannelType(channelType);
 //        channelRepository.save(findedChannel);
-//        Util.okMessage("updateChannelType = [" + channel.getChannelName() + "] 채널 타입이 [" + channelType.name() + "] 으로 변경");
+//        log.info("✅ updateChannelType = [" + channel.getChannelName() + "] 채널 타입이 [" + channelType.name() + "] 으로 변경");
 //    }
 
     @Override
@@ -161,15 +161,16 @@ public class ChannelService implements InterfaceChannelService {
             .orElseThrow(() -> new NoSuchElementException("🚨Channel[" + channelId.toString() + "]을 찾을 수 없음"));
 
         if (channel.getChannelType() == PRIVATE) {
-            Util.errMessage("PRIVATE 채널 수정 불가");
             throw new IllegalArgumentException("🚨Private Channel은 수정할 수 없음");
         }
         else {
             Channel findedChannel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("🚨update 오류"));
+
             findedChannel.update(channelDtoUpdate);
             channelRepository.save(findedChannel);
-            Util.okMessage("ChannelService.update = [" + channelDtoUpdate.newName() + "] [" + channelDtoUpdate.newDescription() + "]");
+
+            log.info("✅ ChannelService.update = [" + channelDtoUpdate.newName() + "] [" + channelDtoUpdate.newDescription() + "]");
 
             return Res_Channel.from(findedChannel);
         }
@@ -182,26 +183,16 @@ public class ChannelService implements InterfaceChannelService {
         Channel findedChannel = channelRepository.findById(channelID)
             .orElseThrow(() -> new NoSuchElementException("Channel[" + channelID.toString() + "]을 찾을 수 없음"));
 
-      channelRepository.deleteById(findedChannel.getId());
+        channelRepository.deleteById(findedChannel.getId());
 
-      List<ReadStatus> allResdStatus = readStatusRepository.findAll();
-      List<ReadStatus> filteredReadStatuses = allResdStatus.stream()
+        readStatusRepository.findAll().stream()
           .filter(ReadStatus -> ReadStatus.getChannelId() == channelID)
-          .toList();
+          .forEach(readStatus -> readStatusRepository.deleteById(readStatus.getId()));
 
-      for (ReadStatus readStatus : filteredReadStatuses) {
-        readStatusRepository.deleteById(readStatus.getId());
-      }
-
-      List<Message> allMessage = messageRepository.findAll();
-      List<Message> messageList = allMessage.stream()
+        messageRepository.findAll().stream()
           .filter(Message -> Message.getChannelId() == channelID)
-          .toList();
+          .forEach(message -> messageRepository.deleteById(message.getId()));
 
-      for (Message message : messageList) {
-        messageRepository.deleteById(message.getId());
-      }
-
-      Util.okMessage("ChannelService.delete = [" + findedChannel.getChannelName() + "] 채널 삭제");
+        log.info("✅ ChannelService.delete = [" + findedChannel.getChannelName() + "] 채널 삭제");
     }
 }

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -16,8 +15,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReadStatusService implements InterfaceReadStatusService {
@@ -40,7 +41,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
 
         ReadStatus newReadStatus = new ReadStatus(user.getId(), channel.getId());
         readStatusRepository.save(newReadStatus);
-        Util.okMessage("🍎🍎ReadStatusService.create = [" + newReadStatus + "]");
+        log.info("✅ 🍎🍎ReadStatusService.create = [" + newReadStatus + "]");
 
         return Res_ReadStatus.from(newReadStatus);
     }
@@ -50,7 +51,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         //[ ] id로 조회합니다.
         ReadStatus readStatus = readStatusRepository.findById(statusID).stream().findFirst().orElseThrow(() -> new IllegalArgumentException("🚨statusID = [" + statusID.toString() + "] 오류"));
         Res_ReadStatus dto = Res_ReadStatus.from(readStatus);
-        Util.okMessage("ReadStatusService.find = [" + dto + "]");
+        log.info("✅ ReadStatusService.find = [" + dto + "]");
         return dto;
     }
 
@@ -63,7 +64,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         List<Res_ReadStatus> dtoList = new ArrayList<Res_ReadStatus>();
         for (ReadStatus readStatus : list) {
             dtoList.add(Res_ReadStatus.from(readStatus));
-            Util.okMessage("ReadStatusService.findAllByUserId = [" + readStatus + "]");
+            log.info("✅ ReadStatusService.findAllByUserId = [" + readStatus + "]");
         }
         return dtoList;
     }
@@ -77,7 +78,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
 
         readStatus.updateLastReadAt(requestDto);
         readStatusRepository.save(readStatus);
-        Util.okMessage("readStatusRepository.update = [" + readStatus + "]");
+        log.info("✅ readStatusRepository.update = [" + readStatus + "]");
 
         return Res_ReadStatus.from(readStatus);
     }
@@ -86,6 +87,6 @@ public class ReadStatusService implements InterfaceReadStatusService {
         //delete
         //[ ] id로 삭제합니다.
         readStatusRepository.deleteById(statusID);
-        Util.okMessage("readStatusRepository.deleteById = [" + statusID + "] 삭제 완료");
+        log.info("✅ readStatusRepository.deleteById = [" + statusID + "] 삭제 완료");
     }
 }

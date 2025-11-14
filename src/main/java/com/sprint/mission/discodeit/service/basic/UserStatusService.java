@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatus;
@@ -9,14 +8,15 @@ import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserStatusRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserStatusService;
 import java.time.Instant;
-import java.util.NoSuchElementException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserStatusService implements InterfaceUserStatusService {
@@ -33,7 +33,7 @@ public class UserStatusService implements InterfaceUserStatusService {
         if (userStatus != null && userStatus.isPresent()) {
             userStatusRepository.save(userStatus.get());
 
-            Util.okMessage("UserStatusService.create = [" + user.getUserName() + "]");
+            log.info("✅ UserStatusService.create = [" + user.getUserName() + "]");
             return Res_UserStatus.from(userStatus.get());
         }
         else {
@@ -47,7 +47,7 @@ public class UserStatusService implements InterfaceUserStatusService {
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.find.statusID = [" + statusID.toString() + "] err"));
 
         Optional<User> user = userRepository.findById(userStatus.getUserId());
-        Util.okMessage("UserStatusService.find = [" + user.get().getUserName() + "]");
+        log.info("✅ UserStatusService.find = [" + user.get().getUserName() + "]");
 
         return Res_UserStatus.from(userStatus);
     }
@@ -59,7 +59,7 @@ public class UserStatusService implements InterfaceUserStatusService {
         List<Res_UserStatus> list = userStatuses.stream().map(Res_UserStatus::from).toList();
 
         for (Res_UserStatus resUserStatus : list) {
-            Util.okMessage("UserStatusService.findAll = [" + userRepository.findById(resUserStatus.userId()).get().getUserName() + "]");
+            log.info("✅ UserStatusService.findAll = [" + userRepository.findById(resUserStatus.userId()).get().getUserName() + "]");
         }
 
         return list;
@@ -80,7 +80,7 @@ public class UserStatusService implements InterfaceUserStatusService {
             .orElseThrow(() -> new IllegalArgumentException(
                 "🚨UserStatusService.update.userStatus = [" + userStatus.getUserId().toString() + "]"));
         String userName = user.getUserName();
-        Util.okMessage("UserStatusService.update = [" + userName + "]");
+        log.info("✅ UserStatusService.update = [" + userName + "]");
     }
 
     public Res_UserStatus updateUserStatus(UUID userId, Instant newLastActiveAt) {
@@ -91,13 +91,13 @@ public class UserStatusService implements InterfaceUserStatusService {
       userStatus.setNewLastActiveAt(newLastActiveAt);
       userStatusRepository.save(userStatus);
 
-      Util.okMessage("UserStatusService.userStatus = [" + userStatus + "]");
+      log.info("✅ UserStatusService.userStatus = [" + userStatus + "]");
       return Res_UserStatus.from(userStatus);
     }
 
     public void delete(UUID statusID) {
 //    [ ] id로 삭제합니다.
         userStatusRepository.deleteById(statusID);
-        Util.okMessage("UserStatusService.delete = [" + statusID + "]");
+        log.info("✅ UserStatusService.delete = [" + statusID + "]");
     }
 }

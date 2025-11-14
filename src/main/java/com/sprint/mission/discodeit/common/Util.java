@@ -1,16 +1,13 @@
 package com.sprint.mission.discodeit.common;
 
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@Slf4j
 public class Util {
-    public static void okMessage(String message) {
-        System.out.println("Ⓜ️ " + message);
-    }
-    public static void errMessage(String message) { System.out.println("🚨" + message +  "🚨");}
-
     public static Dto_BinaryContent parsingMultipartFile(MultipartFile file) {
         if (file == null) {
           return null;
@@ -26,7 +23,7 @@ public class Util {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Util.okMessage("file.getOriginalFilename() = [" + file.getOriginalFilename() + "]");
+        log.info("✅ file.getOriginalFilename() = [" + file.getOriginalFilename() + "]");
         return dtoFile;
     }
 }

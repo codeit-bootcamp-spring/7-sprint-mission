@@ -1,18 +1,18 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.AuthServiceDto;
 import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
-
 import java.lang.module.FindException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
 
+@Slf4j
 @Repository
 public class FileUserRepository implements InterfaceUserRepository {
     private final FileUtil fileUtil;
@@ -78,7 +78,7 @@ public class FileUserRepository implements InterfaceUserRepository {
                             .filter(user -> user.getUserName().equals(authServiceDto.username()) && user.getPassword().equals(authServiceDto.password()))
                             .findFirst()
                             .orElseThrow(() -> new FindException("AuthService.login.name = [" + authServiceDto.username() + "] 또는 newPassword 오류"));
-        Util.okMessage("AuthService.login = [" + user1.getUserName() + "]");
+        log.info("✅ AuthService.login = [" + user1.getUserName() + "]");
         return Res_UserLogin.from(user1);
     }
 }
