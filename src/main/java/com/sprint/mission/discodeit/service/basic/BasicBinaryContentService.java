@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -39,5 +40,18 @@ public class BasicBinaryContentService implements BinaryContentService {
             throw new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUNT);
         }
         binaryContentRepository.delete(id);
+    }
+
+    // ===== 🎯 Controller Direct (DTO 반환) ======
+    @Override
+    public BinaryContentInfoRes getBinaryContent(UUID id) {
+        return BinaryContentInfoRes.from(findById(id));
+    }
+
+    @Override
+    public List<BinaryContentInfoRes> getBinaryContentList() {
+        return findAll().stream()
+                .map(BinaryContentInfoRes::from)
+                .toList();
     }
 }
