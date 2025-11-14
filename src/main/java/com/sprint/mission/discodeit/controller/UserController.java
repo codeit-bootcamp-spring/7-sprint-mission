@@ -7,13 +7,12 @@ import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateByUse
 import com.sprint.mission.discodeit.dto.response.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.response.userstatus.UserStatusResponseDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+@Slf4j
+public class UserController implements UserControllerDocs {
     private final UserService userService;
     private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
@@ -62,7 +62,7 @@ public class UserController {
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserResponseDto updateMultipart(
             @PathVariable("userId") UUID userId,
-            @Valid @RequestPart("user") UserUpdateRequestDto userUpdateRequestDto,
+            @Valid @RequestPart("userUpdateRequest") UserUpdateRequestDto userUpdateRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
         UserResponseDto userResponseDto = userService.get(userId);
@@ -98,7 +98,7 @@ public class UserController {
         }
         boolean delete = userService.delete(userId);
         if(!delete){
-            throw new IllegalArgumentException("User not found");
+            log.info("User not found");
         }
     }
 
