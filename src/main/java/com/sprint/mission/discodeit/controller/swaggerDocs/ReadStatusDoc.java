@@ -18,11 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-//@Tag(name="Message", description="Message API")
-
-//@Tag(name="BinaryContent", description="첨부 파일 API")
-//@Tag(name="Auth", description="인증 API")
-
 @Tag(name="ReadStatus", description="Message 읽음 상태 API")
 public interface ReadStatusDoc {
     @Operation(summary = "User의 Message 읽음 상태 목록 조회")
