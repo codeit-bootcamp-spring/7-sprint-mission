@@ -4,14 +4,12 @@ import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,6 +52,9 @@ public class ChannelController {
     @RequestMapping(method = RequestMethod.GET)
     public List<ChannelResponseDto> getAllByUserId(
             @RequestParam(name = "userId", required = false) UUID userId) {
+        if(userId == null) {
+            return channelService.getAll();
+        }
         return channelService.getAllByUserId(userId);
     }
 

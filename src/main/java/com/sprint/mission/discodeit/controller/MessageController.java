@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,8 +26,9 @@ public class MessageController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public MessageResponseDto create(@Valid @RequestBody MessageCreateRequestDto messageCreateRequestDto,
-                                     @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
+    public MessageResponseDto create(
+            @Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto messageCreateRequestDto,
+            @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
         return messageService.create(messageCreateRequestDto, attachments);
     }
 
