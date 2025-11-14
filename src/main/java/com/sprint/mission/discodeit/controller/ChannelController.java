@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.response.CustomApiResponse;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateReq;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateSecReq;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateReq;
@@ -34,13 +33,13 @@ public class ChannelController {
 
     //채널 목록 조회 : 공개방은 전부, 비밀방은 내 기준 참여되어있는 것 기준
     @RequestMapping(method = RequestMethod.GET, value ="/list")
-    public ResponseEntity<CustomApiResponse<List<ChannelInfoRes>>> getAllChannels(@RequestHeader("X-LOGINUSER-ID") UUID userId){
-        return ResponseEntity.ok(CustomApiResponse.success(channelOverViewFacade.findAllMyChannels(userId)));
+    public ResponseEntity<List<ChannelInfoRes>> getAllChannels(@RequestHeader("X-LOGINUSER-ID") UUID userId){
+        return ResponseEntity.ok(channelOverViewFacade.findAllMyChannels(userId));
     }
 
     // 공개 채널 생성
     @RequestMapping(method = RequestMethod.POST, value = "/public")
-    public ResponseEntity<CustomApiResponse<Void>> createPublicChannel(@RequestHeader("X-LOGINUSER-ID") UUID managerId, @RequestBody ChannelCreateReq req){
+    public ResponseEntity<Void> createPublicChannel(@RequestHeader("X-LOGINUSER-ID") UUID managerId, @RequestBody ChannelCreateReq req){
         Channel channel = channelCreationFacade.createPublicChannel(managerId, req);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -51,12 +50,12 @@ public class ChannelController {
         log.info("공개 채널 생성: id = {}, name = {}, discription = {}, 생성한 사람 id = {}",
                 channel.getId(), channel.getName(), channel.getDescription(), channel.getManagerId());
 
-        return ResponseEntity.created(location).body(CustomApiResponse.success());
+        return ResponseEntity.created(location).build();
     }
     
     //비밀 채널 생성
     @RequestMapping(method = RequestMethod.POST, value="/private")
-    public ResponseEntity<CustomApiResponse<Void>> createPrivateChannel(@RequestHeader("X-LOGINUSER-ID") UUID managerId, @RequestBody ChannelCreateSecReq req){
+    public ResponseEntity<Void> createPrivateChannel(@RequestHeader("X-LOGINUSER-ID") UUID managerId, @RequestBody ChannelCreateSecReq req){
         Channel channel = channelCreationFacade.createPrivateChannel(managerId, req);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -67,25 +66,25 @@ public class ChannelController {
         log.info("비밀 채널 생성: id = {}, 참여인들 id = {}, 생성한 사람 id = {}",
                 channel.getId(), channel.getUserIds(), channel.getManagerId());
 
-        return ResponseEntity.created(location).body(CustomApiResponse.success());
+        return ResponseEntity.created(location).build();
     }
 
     //공개 채널 수정
     @RequestMapping(method = RequestMethod.PUT, value = "/{channelId}")
-    public ResponseEntity<CustomApiResponse<Void>> updatePublicChannel(@PathVariable UUID channelId, @RequestBody ChannelUpdateReq req){
+    public ResponseEntity<Void> updatePublicChannel(@PathVariable UUID channelId, @RequestBody ChannelUpdateReq req){
         channelService.update(channelId, req);
 
         log.info("공개 채널 수정: id = {}, name = {}, description = {}",
                 channelId, req.name(), req.description());
 
-        return ResponseEntity.ok(CustomApiResponse.success());
+        return ResponseEntity.noContent().build();
     }
     
     //채널 삭제
     @RequestMapping(method = RequestMethod.DELETE, value = "/{channelId}")
-    public ResponseEntity<CustomApiResponse<Void>> deleteChannel(@PathVariable UUID channelId){
+    public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId){
         log.info("채널 삭제 id : {}", channelId);
         channelDeleteFacade.deleteChannel(channelId);
-        return ResponseEntity.ok(CustomApiResponse.success());
+        return ResponseEntity.noContent().build();
     }
 }

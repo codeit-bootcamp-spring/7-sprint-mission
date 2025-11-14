@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.response.CustomApiResponse;
 import com.sprint.mission.discodeit.dto.readstatus.request.ReadStatusCreateReq;
 import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusInfoRes;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -25,26 +24,26 @@ public class ReadStatusController {
 
     //메세지 수신 정보 생성
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<CustomApiResponse<Void>> createReadStatus(@RequestBody ReadStatusCreateReq req){
+    public ResponseEntity<Void> createReadStatus(@RequestBody ReadStatusCreateReq req){
         ReadStatus readStatus = readStatusCreateFacade.create(req);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
                 .path("/{id}")
                 .buildAndExpand(readStatus.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(CustomApiResponse.success());
+        return ResponseEntity.created(location).build();
     }
     
     //메세지 수신 정보 업데이트
     @RequestMapping(method = RequestMethod.PATCH, value = "/{readStatusId}")
-    public ResponseEntity<CustomApiResponse<Void>> updateReadStatus(@PathVariable UUID readStatusId){
+    public ResponseEntity<Void> updateReadStatus(@PathVariable UUID readStatusId){
         readStatusService.update(readStatusId);
-        return ResponseEntity.ok(CustomApiResponse.success());
+        return ResponseEntity.noContent().build();
     }
 
     //메세지 수신 정보 조회
     @RequestMapping(method = RequestMethod.GET, value = "/{readStatusId}")
-    public ResponseEntity<CustomApiResponse<ReadStatusInfoRes>> getReadStatus(@PathVariable UUID readStatusId){
-        return ResponseEntity.ok(CustomApiResponse.success(readStatusService.findById(readStatusId)));
+    public ResponseEntity<ReadStatusInfoRes> getReadStatus(@PathVariable UUID readStatusId){
+        return ResponseEntity.ok(readStatusService.findById(readStatusId));
     }
 }

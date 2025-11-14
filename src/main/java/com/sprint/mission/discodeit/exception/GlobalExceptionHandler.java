@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.common.response.CustomApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<CustomApiResponse<String>> handleValidationException(
+    public ResponseEntity<ErrorInfoRes> handleValidationException(
             MethodArgumentNotValidException e, HttpServletRequest request) {
 
         FieldError fieldError = e.getBindingResult().getFieldError(); // 첫 번째 오류 처리
@@ -45,11 +44,11 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(CustomApiResponse.fail(errorCode));
+                .body(ErrorInfoRes.from(errorCode));
     }
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<CustomApiResponse<String>> handleCustomException(CustomException e, HttpServletRequest request){
+    public ResponseEntity<ErrorInfoRes> handleCustomException(CustomException e, HttpServletRequest request){
         ErrorCode errorCode = e.getErrorCode();
         log.error("[CustomException] {} - {} | url={} | method={} | ip={}",
                 errorCode.getCode(),
@@ -60,11 +59,11 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(CustomApiResponse.fail(errorCode));
+                .body(ErrorInfoRes.from(errorCode));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CustomApiResponse<String>> handleException(CustomException e, HttpServletRequest request){
+    public ResponseEntity<ErrorInfoRes> handleException(CustomException e, HttpServletRequest request){
         log.error("[Exception] {} | url={} | method={} | ip={}",
                 e.getMessage(),
                 request.getRequestURI(),
@@ -75,6 +74,6 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(CustomApiResponse.fail(errorCode));
+                .body(ErrorInfoRes.from(errorCode));
     }
 }

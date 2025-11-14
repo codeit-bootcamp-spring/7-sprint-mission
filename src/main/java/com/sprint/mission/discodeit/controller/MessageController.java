@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.response.CustomApiResponse;
 import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreateReq;
 import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
@@ -36,13 +35,13 @@ public class MessageController {
 
     //특정 채널의 메세지들 조회
     @RequestMapping(method= RequestMethod.GET, value = "/{channelId}/list")
-    public ResponseEntity<CustomApiResponse<List<MessageViewRes>>> findAllByChannelId(@PathVariable UUID channelId){
-        return ResponseEntity.ok(CustomApiResponse.success(messageOverviewFacade.findAllByChannelId(channelId)));
+    public ResponseEntity<List<MessageViewRes>> findAllByChannelId(@PathVariable UUID channelId){
+        return ResponseEntity.ok(messageOverviewFacade.findAllByChannelId(channelId));
     }
 
     //메세지 입력
     @RequestMapping(method=RequestMethod.POST, value = "/{channelId}")
-    public ResponseEntity<CustomApiResponse<Void>> createMessage(
+    public ResponseEntity<Void> createMessage(
             @RequestHeader("X-LOGINUSER-ID") UUID speakerId,
             @PathVariable UUID channelId,
             @Valid @RequestPart("messageInfoReq")MessageInfoReq messageInfoReq,
@@ -61,12 +60,12 @@ public class MessageController {
 
         log.info("메세지 생성: speakerId={}, channelId={}, content={}, attachmentIds={}",
                 speakerId, channelId, req.content(), message.getAttachmentIds());
-        return ResponseEntity.created(location).body(CustomApiResponse.success());
+        return ResponseEntity.created(location).build();
     }
 
     //메세지 수정
     @RequestMapping(method=RequestMethod.PUT, value="/{messageId}")
-    public ResponseEntity<CustomApiResponse<Void>> updateMessage(
+    public ResponseEntity<Void> updateMessage(
             @PathVariable UUID messageId,
             @Valid @RequestPart("messageInfoReq")MessageInfoReq messageInfoReq,
             @RequestPart(value = "attachmentIds", required = false) List<UUID> keepAttachmentIds,
@@ -80,15 +79,15 @@ public class MessageController {
         log.info("메세지 수정: messageId={}, content={}, attachmentIds={}",
                 messageId, messageInfoReq.content(),
                 message.attachmentDatas().stream().map(BinaryContentInfoRes::binaryContentId));
-        return ResponseEntity.ok(CustomApiResponse.success());
+        return ResponseEntity.noContent().build();
     }
 
     //메세지 삭제
     @RequestMapping(method=RequestMethod.DELETE, value="/{messageId}")
-    public ResponseEntity<CustomApiResponse<Void>> deleteMessage(@PathVariable UUID messageId){
+    public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId){
         messageDeleteFacade.deleteMessage(messageId);
         log.info("메세지 삭제: messageId={}", messageId);
 
-        return ResponseEntity.ok(CustomApiResponse.success());
+        return ResponseEntity.noContent().build();
     }
 }
