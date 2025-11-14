@@ -30,16 +30,17 @@ public class BasicReadStatusService implements ReadStatusService {
         userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
         Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException("Channel not found"));
 
-        if(!channel.getMembers().containsKey(userId)) {
+        if(channel.isPrivateChannel() && !channel.getMembers().containsKey(userId)) {
             throw new NoSuchElementException("Channel is private");
         }
+
+        Instant readAt = readStatusCreateRequestDto.lastReadAt() != null
+                ? readStatusCreateRequestDto.lastReadAt() :  Instant.now();
 
         if(readStatusRepository.existsByUserIdAndChannelId(userId, channelId)) {
             throw new IllegalStateException("User already has read status");
         }
 
-        Instant readAt = readStatusCreateRequestDto.lastReadAt() != null
-                ? readStatusCreateRequestDto.lastReadAt() :  Instant.now();
 
         ReadStatus readstatus = new ReadStatus(userId, channelId, readAt);
         ReadStatus save = readStatusRepository.save(readstatus);

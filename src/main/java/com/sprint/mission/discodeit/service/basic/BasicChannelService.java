@@ -29,9 +29,13 @@ public class BasicChannelService implements ChannelService {
         int slowMode = channelCreateRequestDto.slowModeSeconds() == null
                 ? 0 :  channelCreateRequestDto.slowModeSeconds();
 
+        ChannelType channelType =
+                channelCreateRequestDto.type() == null ?
+                        ChannelType.PUBLIC : channelCreateRequestDto.type();
+
         Channel channel = new Channel(
-                channelCreateRequestDto.channelType(),
-                channelCreateRequestDto.channelName(),
+                channelType,
+                channelCreateRequestDto.name(),
                 false,
                 slowMode,
                 channelCreateRequestDto.description()
@@ -52,24 +56,28 @@ public class BasicChannelService implements ChannelService {
         int slowMode = channelCreateRequestDto.slowModeSeconds() == null
                 ? 0 :  channelCreateRequestDto.slowModeSeconds();
 
+        ChannelType channelType =
+                channelCreateRequestDto.type() == null ?
+                        ChannelType.PRIVATE : channelCreateRequestDto.type();
+
         Channel channel = new Channel(
-                channelCreateRequestDto.channelType(),
+                channelType,
                 null,
                 true,
                 slowMode,
                 null
         );
 
-        if (channelCreateRequestDto.userIds() != null) {
-            for(UUID id : channelCreateRequestDto.userIds()) {
+        if (channelCreateRequestDto.participantIds() != null) {
+            for(UUID id : channelCreateRequestDto.participantIds()) {
                 channel.join(id);
             }
         }
 
         channel = channelRepository.save(channel);
 
-        if(channelCreateRequestDto.userIds() != null) {
-            for(UUID id : channelCreateRequestDto.userIds()) {
+        if(channelCreateRequestDto.participantIds() != null) {
+            for(UUID id : channelCreateRequestDto.participantIds()) {
                 readStatusRepository.save(new ReadStatus(id, channel.getId(), channel.getCreatedAt()));
             }
         }
@@ -111,7 +119,9 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelResponseDto> getAllByUserId(UUID userId) {
         return channelRepository.findAll()
                 .stream()
-                .filter(channel -> channel.getMembers().containsKey(userId))
+                .filter(channel ->
+                        !channel.isPrivateChannel()
+                                ||(userId != null && channel.getMembers().containsKey(userId)))
                 .map(channel -> ChannelResponseDto.from(channel,
                         messageRepository.findByChannelId(channel.getId())
                                 .stream()

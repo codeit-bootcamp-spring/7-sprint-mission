@@ -43,8 +43,10 @@ public class BasicMessageService implements MessageService {
         User user = userRepository.findById(messageCreateRequestDto.authorId()).orElseThrow(()
                 -> new NoSuchElementException("User not found"));
 
-        if(!ch.getMembers().containsKey(authorId)) {
+        if(ch.isPrivateChannel() && !ch.getMembers().containsKey(authorId)) {
             throw new NoSuchElementException("Member not found");
+        } else {
+            ch.join(authorId);
         }
 
 
@@ -113,11 +115,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<MessageResponseDto> getAllByChannelId(UUID channelId) {
-        List<Message> messages = messageRepository.findByChannelId(Objects.requireNonNull(channelId));
-        messages.removeIf(m -> m.isDeleted());
-        messages.sort(Comparator.comparing(m -> m.getCreatedAt()));
-
-        return messages.stream()
+        return messageRepository.findByChannelId(Objects.requireNonNull(channelId))
+                .stream()
                 .map(message -> MessageResponseDto.from(message))
                 .toList();
     }

@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * @param slowModeSeconds 슬로우모드 초(s)
- */
 public record ChannelResponseDto(
         UUID id,
         String name,
@@ -19,7 +16,7 @@ public record ChannelResponseDto(
         Instant lastMessageAt,
         boolean isPrivate,
         List<UUID> participantIds,
-        ChannelType channelType) {
+        ChannelType type) {
 
     public static ChannelResponseDto from(Channel channel, Instant lastMessageAt) {
         String name = channel.isPrivateChannel() ? null : channel.getChannelName();
