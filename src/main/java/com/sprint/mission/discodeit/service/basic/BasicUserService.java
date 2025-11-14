@@ -91,7 +91,7 @@ public class BasicUserService implements UserService {
         }
 
         User save = userRepository.save(user);
-        boolean online = isOnline(save.getProfileId());
+        boolean online = isOnline(save.getId());
 
         return UserResponseDto.from(save, online);
     }
