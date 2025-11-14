@@ -28,9 +28,10 @@ public class FileChannelRepository extends AbstractFileRepository<Channel, UUID>
   }
 
   @Override
-  public Optional<Channel> findByName(String channelName) {
+  public Optional<Channel> findByName(String channelName, ChannelType channelType) {
     return findAll().stream()
-        .filter(channel -> channel.getName().equals(channelName))
+        .filter(
+            channel -> channelType == channel.getType() && channelName.equals(channel.getName()))
         .findFirst();
   }
 }

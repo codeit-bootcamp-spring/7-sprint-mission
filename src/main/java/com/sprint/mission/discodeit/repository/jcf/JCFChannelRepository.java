@@ -26,10 +26,11 @@ public class JCFChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public Optional<Channel> findByName(String channelName) {
+  public Optional<Channel> findByName(String channelName, ChannelType channelType) {
     return channels.values()
         .stream()
-        .filter(channel -> channelName.equals(channel.getName()))
+        .filter(
+            channel -> channelType == channel.getType() && channelName.equals(channel.getName()))
         .findFirst();
   }
 

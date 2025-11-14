@@ -59,7 +59,7 @@ public class BasicChannelService implements ChannelService {
       throw new IllegalArgumentException("채널 이름은 필수입니다.");
     }
 
-    if (channelRepository.findByName(request.name()).isPresent()) {
+    if (channelRepository.findByName(request.name(), ChannelType.PUBLIC).isPresent()) {
       throw new IllegalArgumentException("채널이 이미 존재합니다.");
     }
 
@@ -86,7 +86,7 @@ public class BasicChannelService implements ChannelService {
               .stream()
               .map(ReadStatus::getUserId)
               .toList();
-          
+
           Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
               .stream()
               .map(message -> message.getCreatedAt())
