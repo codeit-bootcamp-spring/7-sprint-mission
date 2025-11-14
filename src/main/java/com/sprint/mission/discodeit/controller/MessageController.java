@@ -64,7 +64,7 @@ public class MessageController {
     }
 
     //메세지 수정
-    @RequestMapping(method=RequestMethod.PUT, value="/{messageId}")
+    @RequestMapping(method=RequestMethod.PATCH, value="/{messageId}")
     public ResponseEntity<Void> updateMessage(
             @PathVariable UUID messageId,
             @Valid @RequestPart("messageInfoReq")MessageInfoReq messageInfoReq,
