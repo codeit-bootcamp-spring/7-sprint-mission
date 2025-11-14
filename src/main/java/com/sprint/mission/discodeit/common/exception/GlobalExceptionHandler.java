@@ -62,6 +62,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> exceptionHandler(Exception exception) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        return ResponseEntity.status(status).body(ErrorResponse.of(status, "Internal Server Error"));
+        return ResponseEntity.status(status).body(ErrorResponse.of(status, exception.getMessage()));
     }
 }
