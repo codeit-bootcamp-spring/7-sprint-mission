@@ -4,10 +4,11 @@ import static com.sprint.mission.discodeit.common.Util.parsingMultipartFile;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 
+import com.sprint.mission.discodeit.controller.swaggerDocs.UserDoc;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatusUpdate;
+import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
 import com.sprint.mission.discodeit.entity.dto.Res_UserStatus;
 import com.sprint.mission.discodeit.entity.dto.UserDto;
@@ -36,7 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @ResponseBody
 @RequestMapping("/api/users")
-public class UserController {
+public class UserController implements UserDoc {
     private final UserService userService;
     private final UserStatusService userStatusService;
 

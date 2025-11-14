@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
+import com.sprint.mission.discodeit.controller.swaggerDocs.BinaryContentDoc;
 import com.sprint.mission.discodeit.entity.dto.Res_BinaryContent;
 import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ResponseBody
 @RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
-public class BinaryContentController {
+public class BinaryContentController implements BinaryContentDoc {
     private final BinaryContentService binaryContentService;
 
     //💎 여러 첨부 파일 조회
