@@ -37,7 +37,7 @@ public class UserController {
     private final UserService userService;
 
     //사용자 목록 조회
-    @RequestMapping(method = RequestMethod.GET, value="/list")
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<UserSimpleInfoRes>> getAllUsers(){
         return ResponseEntity.ok(userOverviewFacade.findAll());
     }

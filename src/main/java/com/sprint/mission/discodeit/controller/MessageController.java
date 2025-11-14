@@ -34,16 +34,16 @@ public class MessageController {
     private final MessageDeleteFacade messageDeleteFacade;
 
     //특정 채널의 메세지들 조회
-    @RequestMapping(method= RequestMethod.GET, value = "/{channelId}/list")
-    public ResponseEntity<List<MessageViewRes>> findAllByChannelId(@PathVariable UUID channelId){
+    @RequestMapping(method= RequestMethod.GET)
+    public ResponseEntity<List<MessageViewRes>> findAllByChannelId(@RequestParam UUID channelId){
         return ResponseEntity.ok(messageOverviewFacade.findAllByChannelId(channelId));
     }
 
     //메세지 입력
-    @RequestMapping(method=RequestMethod.POST, value = "/{channelId}")
+    @RequestMapping(method=RequestMethod.POST)
     public ResponseEntity<Void> createMessage(
             @RequestHeader("X-LOGINUSER-ID") UUID speakerId,
-            @PathVariable UUID channelId,
+            @RequestParam UUID channelId,
             @Valid @RequestPart("messageInfoReq")MessageInfoReq messageInfoReq,
             @RequestPart(value = "attachmentFiles", required = false) List<MultipartFile> attachmentFiles){
 

@@ -32,7 +32,7 @@ public class ChannelController {
     private final ChannelService channelService;
 
     //채널 목록 조회 : 공개방은 전부, 비밀방은 내 기준 참여되어있는 것 기준
-    @RequestMapping(method = RequestMethod.GET, value ="/list")
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<ChannelInfoRes>> getAllChannels(@RequestHeader("X-LOGINUSER-ID") UUID userId){
         return ResponseEntity.ok(channelOverViewFacade.findAllMyChannels(userId));
     }
