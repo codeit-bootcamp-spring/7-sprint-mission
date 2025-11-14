@@ -1,0 +1,67 @@
+package com.sprint.mission.discodeit.controller;
+
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
+import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatus;
+import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatusUpdate;
+import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
+import com.sprint.mission.discodeit.service.basic.ReadStatusService;
+import java.util.List;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@ResponseBody
+@RequestMapping("/api/readStatuses")
+public class ReadStatusController {
+    private final ReadStatusService readStatusService;
+
+    //💎User의 Message 읽음 상태 목록 조회
+    @GetMapping
+    public ResponseEntity<List<Res_ReadStatus>> findAllByUserId(
+        @RequestParam UUID userId) {
+        List<Res_ReadStatus> allByUserId = readStatusService.findAllByUserId(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(allByUserId);
+    }
+
+    //💎Message 읽음 상태 생성
+    @RequestMapping(method = POST)
+    public ResponseEntity<Res_ReadStatus> create(
+        @RequestBody Dto_ReadStatus dtoReadStatus) {
+        Res_ReadStatus resReadStatus = readStatusService.create(dtoReadStatus);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(resReadStatus);
+    }
+
+    //💎Message 읽음 상태 수정
+    @RequestMapping(value = "/{readStatusId}", method = PATCH)
+    public ResponseEntity<Res_ReadStatus> update(
+        @PathVariable("readStatusId") UUID readStatusId,
+        @RequestBody Dto_ReadStatusUpdate requestDto) {
+        Res_ReadStatus resReadStatus = readStatusService.update(readStatusId, requestDto);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(resReadStatus);
+    }
+
+    
+//    @RequestMapping(value = "/delete/{userStatusId}", method = DELETE)
+//    public void delete(@PathVariable("userStatusId") UUID statusID) {}
+//
+//    @RequestMapping(value = "/find/{userStatusId}", method = GET)
+//    public Res_ReadStatus find(@PathVariable("userStatusId") UUID statusID) {}
+}
