@@ -73,7 +73,7 @@ public class MessageController implements MessageDoc {
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(null);
+            .build();
     }
 
 
