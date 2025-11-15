@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.dto.archive.response;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ChannelVisibility;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
@@ -12,14 +14,15 @@ import java.util.UUID;
 
 @Getter
 @SuperBuilder
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 public class ChannelResponseDto {
-    private final UUID id;
-    private final String channelName;
-    private final ChannelType channelType;
-    private final ChannelVisibility visibility;
-    private final UUID adminId;
-    private final Instant lastedMessageAt;
+    UUID id;
+    String channelName;
+    ChannelType channelType;
+    ChannelVisibility visibility;
+    UUID adminId;
+    Instant lastedMessageAt;
 
     public static ChannelResponseDto from(Channel channel, Instant lastedMessageAt) {
         return ChannelResponseDto.builder()

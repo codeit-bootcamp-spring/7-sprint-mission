@@ -1,24 +1,27 @@
 package com.sprint.mission.discodeit.dto.user.response;
 
 import com.sprint.mission.discodeit.entity.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 public class UserResponseDto {
-    private final UUID id;
-    private final Instant createdAt;
-    private final Instant updatedAt;
-    private final String username;
-    private final String email;
-    private final UUID profileId;
-    private final boolean online;
+    UUID id;
+    Instant createdAt;
+    Instant updatedAt;
+    String username;
+    String email;
+    UUID profileId;
+    boolean online;
 
     public static UserResponseDto from(User user, boolean online) {
         return UserResponseDto.builder()
