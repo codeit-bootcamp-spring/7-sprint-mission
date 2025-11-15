@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller.docs;
 
 import com.sprint.mission.discodeit.dto.user.request.UserLoginReq;
 import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
+import com.sprint.mission.discodeit.exception.ErrorInfoRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -24,23 +25,25 @@ public interface AuthControllerDocs {
               description = "로그인 성공",
               content = @Content(
                   mediaType = "*/*",
-                  schema = @Schema(implementation = ApiResponse.class),
+                  schema = @Schema(implementation = UserDetailInfoRes.class),
                   examples = @ExampleObject(
+                      name = "로그인 성공 했을 때 반환되는 유저 정보 예시",
                       value = """
-                          "userId": "734ec33f-c6a6-4077-8ef8-70a5c5bd7700",
-                               "nickname": "테스터1",
-                               "email": "tester1@naver.com",
-                               "profileImg": {
-                                   "binaryContentId": "9db76f78-7dbb-4956-8669-d25d42bb19cc",
-                                   "data": "/9j/4AAQSkZJRgABAQAAAQABAAD/...중략.../2Q==",
-                                   "fileName": "D3343D40-5CF8-438E-92D0-4ED668688E43.jpg",
-                                   "fileType": "image/jpeg",
-                                   "createdAt": "2025-11-15 12:33:34"
-                               },
-                               "isOnline": true,
-                               "createAt": "2025-11-15 12:33:34",
-                               "updateAt": "2025-11-15 12:33:34"
-                           }
+                          {
+                            "userId": "734ec33f-c6a6-4077-8ef8-70a5c5bd7700",
+                             "nickname": "테스터1",
+                             "email": "tester1@naver.com",
+                             "profileImg": {
+                                 "binaryContentId": "9db76f78-7dbb-4956-8669-d25d42bb19cc",
+                                 "data": "/9j/4AAQSkZJRgABAQAAAQABAAD/...중략.../2Q==",
+                                 "fileName": "D3343D40-5CF8-438E-92D0-4ED668688E43.jpg",
+                                 "fileType": "image/jpeg",
+                                 "createdAt": "2025-11-15 12:33:34"
+                             },
+                             "isOnline": true,
+                             "createAt": "2025-11-15 12:33:34",
+                             "updateAt": "2025-11-15 12:33:34"
+                          }
                           """
                   )
               )
@@ -50,8 +53,9 @@ public interface AuthControllerDocs {
               description = "사용자를 찾을 수 없음",
               content = @Content(
                   mediaType = "*/*",
-                  schema = @Schema(implementation = ApiResponse.class),
+                  schema = @Schema(implementation = ErrorInfoRes.class),
                   examples = @ExampleObject(
+                      name = "해당 닉네임 유저 없음 예시",
                       value = """
                           {
                                "code": "AUTH_001",
@@ -67,8 +71,9 @@ public interface AuthControllerDocs {
               description = "비밀번호가 일치하지 않음",
               content = @Content(
                   mediaType = "*/*",
-                  schema = @Schema(implementation = ApiResponse.class),
+                  schema = @Schema(implementation = ErrorInfoRes.class),
                   examples = @ExampleObject(
+                      name = "비밀번호 틀림 예시",
                       value = """
                           {
                               "code": "AUTH_002",
@@ -81,5 +86,5 @@ public interface AuthControllerDocs {
           )
       }
   )
-  ResponseEntity<UserDetailInfoRes> login(@Valid @RequestBody UserLoginReq req);
+  public ResponseEntity<UserDetailInfoRes> login(@Valid @RequestBody UserLoginReq req);
 }
