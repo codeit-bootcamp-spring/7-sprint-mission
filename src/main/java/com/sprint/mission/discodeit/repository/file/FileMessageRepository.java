@@ -45,7 +45,7 @@ public class FileMessageRepository implements InterfaceMessageRepository {
 
     @Override
     public Set<UUID> findAllUsersInChannel(List<Message> allMessageInChannel) {
-        Set userIDs = new HashSet<>();
+        Set<UUID> userIDs = new HashSet<>();
         for (Message message : allMessageInChannel) {
             userIDs.add(message.getAuthorId());
         }
