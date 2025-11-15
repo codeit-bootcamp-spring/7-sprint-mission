@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.docs.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreateReq;
 import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
 import com.sprint.mission.discodeit.dto.message.request.MessageInfoReq;
@@ -16,13 +17,13 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
-public class MessageController {
+public class MessageController implements MessageControllerDocs {
 
   private final MessageCreationFacade messageCreationFacade;
   private final MessageOverviewFacade messageOverviewFacade;
@@ -83,7 +84,7 @@ public class MessageController {
   }
 
   //메세지 삭제
-  @RequestMapping(method = RequestMethod.DELETE, value = "/{messageId}")
+  @DeleteMapping("/{messageId}")
   public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
     messageDeleteFacade.deleteMessage(messageId);
     return ResponseEntity.noContent().build();
