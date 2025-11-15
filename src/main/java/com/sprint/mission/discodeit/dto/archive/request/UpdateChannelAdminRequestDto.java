@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.channel.request;
+package com.sprint.mission.discodeit.dto.archive.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class UpdateChannelNameRequestDto {
+public class UpdateChannelAdminRequestDto {
     private final UUID adminId;
-    private final String name;
+    private final UUID newAdminId;
 }

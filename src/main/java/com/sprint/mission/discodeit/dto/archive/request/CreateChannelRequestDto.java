@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.channel.request;
+package com.sprint.mission.discodeit.dto.archive.request;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ChannelVisibility;

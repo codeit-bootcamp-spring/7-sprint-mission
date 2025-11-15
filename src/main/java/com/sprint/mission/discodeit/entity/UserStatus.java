@@ -14,8 +14,13 @@ public class UserStatus extends BaseEntity{
     private Instant lastActiveAt;
 
     public void update(Instant lastActiveAt){
+        boolean flag = false;
+
         if(lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)){
             this.lastActiveAt = lastActiveAt;
+            flag = true;
+        }
+        if(flag){
             this.setUpdatedAt();
         }
     }

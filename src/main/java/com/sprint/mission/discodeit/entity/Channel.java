@@ -14,32 +14,20 @@ public class Channel extends BaseEntity{
     private final ChannelType channelType;
     private final ChannelVisibility visibility;
     private String description;
-    private UUID adminId;
+    private UUID adminId; // 요구사항 API에 필요없는 필드로 제외하였습니다. 이후 사용해도 되면 관련해서 추가할 예정 입니다.
     private List<UUID> memberIds;
 
-    public Channel(ChannelType channelType, ChannelVisibility visibility, String channelName, String description, UUID adminId) {
-        this.channelType = channelType;
-        this.visibility = visibility;
-        this.channelName = channelName;
-        this.description = description;
-        this.adminId = adminId;
+    public Channel() {
+        this.channelType = ChannelType.MESSAGE;
+        this.visibility = ChannelVisibility.PRIVATE;
         this.memberIds = new ArrayList<>();
-        if(adminId != null) this.memberIds.add(adminId);
     }
 
-    public void setChannelName(String channelName) {
-        this.setUpdatedAt();
+    public Channel(String channelName, String description) {
+        this.channelType = ChannelType.MESSAGE;
+        this.visibility = ChannelVisibility.PUBLIC;
         this.channelName = channelName;
-    }
-
-    public void setDescription(String description) {
-        this.setUpdatedAt();
         this.description = description;
-    }
-
-    public void setAdmin(UUID adminId) {
-        this.setUpdatedAt();
-        this.adminId = adminId;
     }
 
     public List<UUID> getMemberIds() {
@@ -79,6 +67,7 @@ public class Channel extends BaseEntity{
                 "channelName='" + channelName + '\'' +
                 ", channelType=" + channelType +
                 ", channelVisibility=" + visibility +
+                ", description=" + description +
                 ", adminId=" + adminId +
                 ", memberIds=" + memberIds +
                 str +

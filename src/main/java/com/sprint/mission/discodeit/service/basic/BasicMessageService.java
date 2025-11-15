@@ -162,7 +162,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
 
-        message.setContent(request.getNewContent());
+        message.update(request.getNewContent());
         messageRepository.update(message);
         return message;
     }

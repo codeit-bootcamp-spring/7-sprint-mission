@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.channel.request.*;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.archive.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
@@ -19,8 +18,6 @@ public interface ChannelService {
     /**
      * 새로운 채널 생성
      */
-    ChannelResponseDto create(UUID adminId, CreateChannelRequestDto request);
-
     Channel create(CreatePublicChannelRequestDto request);
     Channel create(CreatePrivateChannelRequestDto request);
 
@@ -50,16 +47,6 @@ public interface ChannelService {
      * 전체 채널 조회
      */
     List<ChannelDto>  findAllByUserId(UUID userId);
-
-    /**
-     * 채널 관리자 변경
-     */
-    void updateAdmin(UUID channelId, UpdateChannelAdminRequestDto request);
-
-    /**
-     * 채널 이름 변경
-     */
-    void updateName(UUID channelId, UpdateChannelNameRequestDto request);
 
     /**
      * 채널 삭제 (관리자 권한 필요)

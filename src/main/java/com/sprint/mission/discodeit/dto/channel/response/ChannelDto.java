@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.dto.channel.response;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelVisibility;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
 @Builder
 public class ChannelDto {
     private final UUID id;

@@ -70,7 +70,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatus update(UUID readStatusId, UpdateReadStatusRequestDto request) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
-        readStatus.setLastReadAt(request.getNewLastReadAt());
+        readStatus.update(request.getNewLastReadAt());
         readStatusRepository.update(readStatus);
         return readStatus;
     }

@@ -22,9 +22,16 @@ public class Message extends BaseEntity{
         this.attachmentIds = new ArrayList<>();
     }
 
-    public void setContent(String content) {
-        this.setUpdatedAt();
-        this.content = content;
+    public void update(String content) {
+        boolean flag = false;
+
+        if (content != null && !content.equals(this.content)) {
+            this.content = content;
+            flag = true;
+        }
+        if (flag) {
+            this.setUpdatedAt();
+        }
     }
 
     public void addAttachmentId(UUID id) {

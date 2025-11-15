@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.channel.response;
+package com.sprint.mission.discodeit.dto.archive.response;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import lombok.Getter;
