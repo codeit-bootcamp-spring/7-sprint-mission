@@ -61,7 +61,7 @@ public enum ErrorCode {
   // Channel
   CHANNEL_NOT_FOUND("CHANNEL_001", HttpStatus.NOT_FOUND,
       "해당 UUID를 가진 채널이 존재하지 않습니다."),
-  CHANNEL_PRIVATE_CANNOT_MODIFY("CHANNEL_002", HttpStatus.FORBIDDEN,
+  CHANNEL_PRIVATE_CANNOT_MODIFY("CHANNEL_002", HttpStatus.BAD_REQUEST,
       "Private 채널은 수정할 수 없습니다."),
   INVALID_CHANNEL_TYPE("CHANNEL_003", HttpStatus.BAD_REQUEST,
       "유효하지 않은 채널 타입입니다."),
