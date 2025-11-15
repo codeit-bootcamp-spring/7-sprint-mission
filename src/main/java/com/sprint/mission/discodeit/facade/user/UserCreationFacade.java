@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.facade.user;
 
 
 import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
+import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -20,25 +21,31 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserCreationFacade {
-    private final UserService userService;
-    private final BinaryContentService binaryContentService;
-    private final UserStatusService userStatusService;
 
-    //유저 추가
-    @CustomTransactional
-    public User createUser(@NonNull UserCreateReq req) {
-        UUID profileId = null;
+  private final UserService userService;
+  private final BinaryContentService binaryContentService;
+  private final UserStatusService userStatusService;
 
-        if (req.profileImage().data() != null) {
+  //유저 추가
+  @CustomTransactional
+  public UserDetailInfoRes createUser(@NonNull UserCreateReq req) {
+    UUID profileId = null;
 
-            BinaryContent profile = binaryContentService.create(
-                    BinaryContentFactory.create(req.profileImage())
-            );
+    if (req.profileImage().data() != null) {
 
-            profileId = profile.getId();
-        }
-        User user = userService.create(UserFactory.create(req, profileId));
-        userStatusService.create(UserStatus.create(user.getId()));
-        return user;
+      BinaryContent profile = binaryContentService.create(
+          BinaryContentFactory.create(req.profileImage())
+      );
+
+      profileId = profile.getId();
     }
+    User user = userService.create(UserFactory.create(req, profileId));
+    userStatusService.create(UserStatus.create(user.getId()));
+    return UserDetailInfoRes.from(
+        user,
+        user.getProfileId() == null ?
+            null : binaryContentService.getBinaryContent(user.getProfileId()),
+        true
+    );
+  }
 }

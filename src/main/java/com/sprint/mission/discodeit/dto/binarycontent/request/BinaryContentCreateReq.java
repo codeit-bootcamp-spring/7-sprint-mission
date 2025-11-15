@@ -7,20 +7,23 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public record BinaryContentCreateReq(
-        byte[] data,
-        String fileName,
-        String fileType
-){
-    public static BinaryContentCreateReq from(MultipartFile file){
-        if(file == null) return new BinaryContentCreateReq(null, null, null);
-        try {
-            return new BinaryContentCreateReq(
-                    file.getBytes(),
-                    file.getOriginalFilename(),
-                    file.getContentType()
-            );
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.FILE_CONVERSION_FAILED);
-        }
+    byte[] data,
+    String fileName,
+    String fileType
+) {
+
+  public static BinaryContentCreateReq from(MultipartFile file) {
+    if (file == null || file.isEmpty()) {
+      return new BinaryContentCreateReq(null, null, null);
     }
+    try {
+      return new BinaryContentCreateReq(
+          file.getBytes(),
+          file.getOriginalFilename(),
+          file.getContentType()
+      );
+    } catch (IOException e) {
+      throw new CustomException(ErrorCode.FILE_CONVERSION_FAILED);
+    }
+  }
 }

@@ -20,6 +20,7 @@ public class ResponseCode {
   public static final String UNAUTHORIZED = "401";
   public static final String FORBIDDEN = "403";
   public static final String NOT_FOUND = "404";
+  public static final String CONFLICT = "409";
 
   public static final String INTERNAL_ERROR = "500";
 }
