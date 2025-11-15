@@ -1,27 +1,25 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
-import com.sprint.mission.discodeit.entity.dto.UserDto;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
+import com.sprint.mission.discodeit.entity.dto.UserDto;
 import com.sprint.mission.discodeit.repository.InterfaceBinaryContentRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserStatusRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -68,25 +66,25 @@ public class UserService implements InterfaceUserService {
         User user = new User(dto_userCreate, binaryContentId);
         Res_User resUser = Res_User.from(user);
         userRepository.save(user);
-        log.info("✅ 🌸 user.save = " + user.toString());
 
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
-        log.info("✅ 🌸 userstatus.save = " + userStatus.toString());
+
+        log.info("✅ create = [" + dto_userCreate.username() + "]");
 
         return resUser;
     }
 
     @Override
     public UserDto find(UUID userID) {
-//        DTO를 활용하여:
 //        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
 //        [ ] 패스워드 정보는 제외하세요.
         String message = "🚨 find.userID = [" + userID.toString() + "] 오류";
-        User user = userRepository.findById(userID).orElseThrow(() -> new IllegalArgumentException(message));
+        User user = userRepository.findById(userID)
+            .orElseThrow(() -> new IllegalArgumentException(message));
 
-//        log.info("✅ ♣️user.readStatusID() = [" + user.getId() + "]");
-        UserStatus userStatus = userStatusRepository.findByUserId(userID).orElseThrow(() -> new IllegalArgumentException(message));
+        UserStatus userStatus = userStatusRepository.findByUserId(userID)
+            .orElseThrow(() -> new IllegalArgumentException(message));
 
         log.info("✅ UserService.findAllByChannleId = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
 
@@ -106,7 +104,9 @@ public class UserService implements InterfaceUserService {
             UserStatus userStatus = userStatusList.stream()
                   .filter(status -> status.getUserId() != null
                       && status.getUserId().equals(user.getId()))
-                  .findFirst().orElse(null);
+                  .findFirst()
+                  .orElse(null);
+
             if (userStatus != null) {
                 UserDto dto = UserDto.from(user, userStatus.isOnline());
                 dtoList.add(dto);
@@ -123,8 +123,7 @@ public class UserService implements InterfaceUserService {
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //        수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
 
-        log.info("✅ UserService.update.id = [" + userId + "]");
-        log.info("✅ dto_userCreate = [" + dtoUserUpdate.toString() + "]");
+        log.info("✅ UserService.update.id = [" + userId.toString() + "] / dto_userCreate = [" + dtoUserUpdate.toString() + "]");
 
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new NoSuchElementException("🚨User [" + userId.toString() + "]를 찾을 수 없음"));

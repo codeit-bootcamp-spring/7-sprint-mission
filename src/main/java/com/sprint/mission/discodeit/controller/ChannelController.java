@@ -66,6 +66,7 @@ public class ChannelController implements ChannelDoc {
     public ResponseEntity<Res_Channel> update(
         @PathVariable("channelId") UUID channelId,
         @RequestBody ChannelDto_Update channelDtoUpdate) {
+
         Res_Channel resChannel = channelService.update(channelId, channelDtoUpdate);
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -76,8 +77,9 @@ public class ChannelController implements ChannelDoc {
     @GetMapping
     public ResponseEntity<List<Res_ChannelFind>> findAllByUserId(
         @RequestParam("userId") UUID userId) {
+
         List<Res_ChannelFind> allByUserId = channelService.findAllByUserId(userId);
-      System.out.println(allByUserId);
+        System.out.println(allByUserId);
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(allByUserId);

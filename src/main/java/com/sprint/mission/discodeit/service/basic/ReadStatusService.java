@@ -10,9 +10,9 @@ import com.sprint.mission.discodeit.repository.InterfaceChannelRepository;
 import com.sprint.mission.discodeit.repository.InterfaceReadStatusRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceReadStatusService;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +33,14 @@ public class ReadStatusService implements InterfaceReadStatusService {
         Channel channel = channelRepository.findById(dtoReadStatus.channelId()).stream().findFirst()
             .orElseThrow(() -> new NoSuchElementException("🚨Channel[" + dtoReadStatus.channelId().toString() + "] 를 찾을 수 없음 "));
 
-        ReadStatus readStatus = readStatusRepository.findByUserAndChannelId(user.getId(),
-            channel.getId()).orElse(null);
-        if (readStatus != null) {
-            throw new IllegalArgumentException("🚨userID + channelID = ReadStatus[" + readStatus + "] 이미 존재");
+        // 이미 있으면 오류가 맞는걸까? => 그냥 이게 의도한 오류 한줄 던지니 깔끔! 요걸로 채택!
+        // 있는걸 되돌려줘도 되는걸까?  => 해봤더니 줄줄이 사탕 에러!
+        Optional<ReadStatus> byUserAndChannelId = readStatusRepository.findByUserAndChannelId(
+            user.getId(), channel.getId()).stream().findFirst();
+
+        if (byUserAndChannelId == null) {
+//            return Res_ReadStatus.from(byUserAndChannelId.get());
+            throw new IllegalArgumentException("⚠️이미 있는 User + Channel 임!");
         }
 
         ReadStatus newReadStatus = new ReadStatus(user.getId(), channel.getId());
@@ -49,9 +53,12 @@ public class ReadStatusService implements InterfaceReadStatusService {
     public Res_ReadStatus find(UUID statusID) {
         //find
         //[ ] id로 조회합니다.
-        ReadStatus readStatus = readStatusRepository.findById(statusID).stream().findFirst().orElseThrow(() -> new IllegalArgumentException("🚨statusID = [" + statusID.toString() + "] 오류"));
+        ReadStatus readStatus = readStatusRepository.findById(statusID).stream().findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("🚨statusID = [" + statusID.toString() + "] 오류"));
+
         Res_ReadStatus dto = Res_ReadStatus.from(readStatus);
         log.info("✅ ReadStatusService.find = [" + dto + "]");
+
         return dto;
     }
 
@@ -59,13 +66,13 @@ public class ReadStatusService implements InterfaceReadStatusService {
         //findAllByUserId
         //[ ] userId를 조건으로 조회합니다.
         List<ReadStatus> readStatuses = readStatusRepository.findAll();
-        List<ReadStatus> list = readStatuses.stream().filter(readStatus -> readStatus.getUserId().equals(userID)).toList();
 
-        List<Res_ReadStatus> dtoList = new ArrayList<Res_ReadStatus>();
-        for (ReadStatus readStatus : list) {
-            dtoList.add(Res_ReadStatus.from(readStatus));
-            log.info("✅ ReadStatusService.findAllByUserId = [" + readStatus + "]");
-        }
+        List<Res_ReadStatus> dtoList = readStatuses.stream()
+            .filter(readStatus -> readStatus.getUserId().equals(userID))
+            .map(Res_ReadStatus::from)
+            .peek(resReadStatus -> log.info("🍎 ReadStatusService.findAllByUserId = [" + resReadStatus + "]"))
+            .toList();
+
         return dtoList;
     }
 
@@ -78,6 +85,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
 
         readStatus.updateLastReadAt(requestDto);
         readStatusRepository.save(readStatus);
+
         log.info("✅ readStatusRepository.update = [" + readStatus + "]");
 
         return Res_ReadStatus.from(readStatus);
@@ -87,6 +95,6 @@ public class ReadStatusService implements InterfaceReadStatusService {
         //delete
         //[ ] id로 삭제합니다.
         readStatusRepository.deleteById(statusID);
-        log.info("✅ readStatusRepository.deleteById = [" + statusID + "] 삭제 완료");
+        log.info("✅ readStatusRepository.deleteById = [" + statusID.toString() + "] 삭제 완료");
     }
 }

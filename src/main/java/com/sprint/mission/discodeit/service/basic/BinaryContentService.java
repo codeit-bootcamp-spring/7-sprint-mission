@@ -30,7 +30,7 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 //    [ ] id로 조회합니다.
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
             .orElseThrow(() -> new NoSuchElementException("🚨첨부파일[" + binaryContentId.toString() + "]을 찾을 수 없음"));
-        log.info("✅ BinaryContentService.find.binaryContentId = [" + binaryContentId + "]");
+        log.info("✅ BinaryContentService.find.binaryContentId = [" + binaryContentId.toString() + "]");
         return Res_BinaryContent.from(binaryContent);
     }
 
@@ -47,6 +47,6 @@ public class BinaryContentService implements InterfaceBinaryContentService {
     public void delete(UUID binaryContentId) {
 //    [ ] id로 삭제합니다.
         binaryContentRepository.deleteById(binaryContentId);
-        log.info("✅ BinaryContentService.delete.readStatusID = [" + binaryContentId + "]");
+        log.info("✅ BinaryContentService.delete.readStatusID = [" + binaryContentId.toString() + "]");
     }
 }

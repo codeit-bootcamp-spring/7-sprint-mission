@@ -55,7 +55,7 @@ public class MessageController implements MessageDoc {
         if (fileList != null) {
             collect = fileList.stream()
                 .map(Util::parsingMultipartFile)
-                .toList(); // 변경가능 list
+                .toList();
         }
 
         Res_Message resMessage = messageService.create(dtoMessage, Optional.ofNullable(collect));

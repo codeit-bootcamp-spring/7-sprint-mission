@@ -17,7 +17,7 @@ public class UserStatus extends BaseModel {
     }
 
     public String toString() {
-        return "🌸 super = " + super.toString() + "/ userId = [" + userId + "]";
+        return "🌸 super = " + super.toString() + "/ userId = [" + userId.toString() + "]";
     }
 
     public boolean isOnline() {

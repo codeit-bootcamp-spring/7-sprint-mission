@@ -77,13 +77,13 @@ public class MessageService implements InterfaceMessageService {
 //        [ ] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
         List<Message> messages = messageRepository.findAll();
 //        for (Message content : messages) {
-//            log.info("✅ findAllByChannleId.channelID = [" + channelID + "][" + content.getMessage() + "]");
+//            log.info("✅ findAllByChannleId.channelID = [" + channelID.toString() + "][" + content.getMessage() + "]");
 //        }
 
         List<Res_Message> resMessage = messages.stream().filter(msg -> msg.getChannelId().equals(channelID)).map(Res_Message::from).toList();
-        resMessage.stream().forEach(message -> log.info("✅ findAllByChannleId = [" + channelID + "][" + message.content() + "]"));
+        resMessage.stream().forEach(message -> log.info("✅ findAllByChannleId = [" + channelID.toString() + "][" + message.content() + "]"));
 //        for (Res_Message content : resMessage) {
-//            log.info("✅ findAllByChannleId = [" + channelID + "][" + content.content() + "]");
+//            log.info("✅ findAllByChannleId = [" + channelID.toString() + "][" + content.content() + "]");
 //        }
         return resMessage;
     }

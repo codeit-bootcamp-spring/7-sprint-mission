@@ -29,7 +29,7 @@ public class User extends BaseModel {
                 "\n name = [" + userName + "] " +
                 "\n newPassword = [" + password + "]"   +
                 "\n newEmail = [" + eMail + "]"   +
-                "\n profileId = [" + strProfileId + "]" + //❌ 생성자에서 제외
+                "\n profileId = [" + strProfileId.toString() + "]" + //❌ 생성자에서 제외
                 "}";
     }
 

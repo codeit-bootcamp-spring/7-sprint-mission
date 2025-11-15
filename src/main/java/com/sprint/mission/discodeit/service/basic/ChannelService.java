@@ -86,7 +86,7 @@ public class ChannelService implements InterfaceChannelService {
             List<UUID> userIdList = readStatuses.stream()
                 .map(readStatus -> readStatus.getUserId())
                 .distinct()
-                .peek(userId -> log.info("✅ ChannelService.find <PRIVATE> 🔰.userids = [" + userId + "]"))
+                .peek(userId -> log.info("✅ ChannelService.find <PRIVATE> 🔰.userids = [" + userId.toString() + "]"))
                 .toList();
 
             return Res_ChannelFind.from(dtoChannel, lastMessageAt, userIdList);
@@ -127,7 +127,7 @@ public class ChannelService implements InterfaceChannelService {
 
         privateChannels.stream()
             .filter(channel -> readStatusInUserID.stream().anyMatch(readStatus -> readStatus.getChannelId().equals(channel.getId())))
-            .peek(channel -> log.info("✅ findAllByUserId.[🅰️ PRIVATE] = [" + channel.getChannelName() + "]"))
+            .peek(channel -> log.info("✅ findAllByUserId.[🅰️ PRIVATE]. userID = [" + userID.toString() + "]"))
             .forEach(channel -> resChannelFinds.add(this.find(ChannelDto.create(channel))));
 
         return resChannelFinds;

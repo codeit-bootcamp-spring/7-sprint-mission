@@ -29,7 +29,9 @@ public class UserStatusService implements InterfaceUserStatusService {
 //    [ ] 같은 User와 관련된 객체가 이미 존재하면 예외를 발생시킵니다.
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(("🚨Res_UserStatus.create.id = [" + userId.toString() + "] err")));
+
         Optional<UserStatus> userStatus = userStatusRepository.findByUserId(user.getId());
+
         if (userStatus != null && userStatus.isPresent()) {
             userStatusRepository.save(userStatus.get());
 
@@ -42,12 +44,12 @@ public class UserStatusService implements InterfaceUserStatusService {
     }
 
     public Res_UserStatus find(UUID statusID) {
-//    [ ] id로 조회합니다.
+//      [ ] id로 조회합니다.
         UserStatus userStatus = userStatusRepository.findById(statusID)
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.find.statusID = [" + statusID.toString() + "] err"));
 
-        Optional<User> user = userRepository.findById(userStatus.getUserId());
-        log.info("✅ UserStatusService.find = [" + user.get().getUserName() + "]");
+        userRepository.findById(userStatus.getUserId())
+            .ifPresent(user -> log.info("✅ UserStatusService.find = [" + user.getUserName() + "]"));
 
         return Res_UserStatus.from(userStatus);
     }
@@ -59,7 +61,11 @@ public class UserStatusService implements InterfaceUserStatusService {
         List<Res_UserStatus> list = userStatuses.stream().map(Res_UserStatus::from).toList();
 
         for (Res_UserStatus resUserStatus : list) {
-            log.info("✅ UserStatusService.findAll = [" + userRepository.findById(resUserStatus.userId()).get().getUserName() + "]");
+            log.info("✅ UserStatusService.findAll = ["
+                + userRepository.findById(resUserStatus.userId())
+                                .get()
+                                .getUserName()
+                + "]");
         }
 
         return list;
@@ -98,6 +104,6 @@ public class UserStatusService implements InterfaceUserStatusService {
     public void delete(UUID statusID) {
 //    [ ] id로 삭제합니다.
         userStatusRepository.deleteById(statusID);
-        log.info("✅ UserStatusService.delete = [" + statusID + "]");
+        log.info("✅ UserStatusService.delete = [" + statusID.toString() + "]");
     }
 }
