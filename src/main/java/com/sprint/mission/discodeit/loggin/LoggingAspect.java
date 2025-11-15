@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.loggin;
 
-import com.sprint.mission.discodeit.dto.user.request.UserInfoReq;
-import com.sprint.mission.discodeit.dto.user.request.UserLoginReq;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,17 +12,19 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @Aspect
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class LoggingAspect {
+    //각 케이스에 해당하는 유형 리스트
+    private final List<ArgSanitizer> sanitizers;
+
     // Pointcut : Controller에서 GET 요청 빼고, CUD 관련 메서드들만
     @Pointcut("execution(public * com.sprint.mission.discodeit.controller..*(..))")
     public void controllerMethods() {}
@@ -77,27 +78,12 @@ public class LoggingAspect {
                 .toList();
     }
 
-    //매개변수 처리 함수 : multipartfile 에서 간단한 정보만, UserInfoReq password 없애기
+    //매개변수 처리 함수 : multipartfile, password 관련 필드 없애기
     private Object sanitizeArg(Object arg) {
-        if(arg instanceof MultipartFile file){
-            return Map.of(
-                "fileName", file.getOriginalFilename(),
-                "size", file.getSize(),
-                "contentType", file.getContentType()
-            );
-        }
-        if(arg instanceof List<?> list){
-            return list.stream().map(this::sanitizeArg).toList();
-        }
-        if(arg instanceof UserInfoReq req) {
-            return Map.of(
-                    "nickname", req.nickname(),
-                    "email", req.email()
-            );
-        }
-        if(arg instanceof UserLoginReq req) {
-            return Map.of("nickname", req.nickname());
-        }
-        return arg;
+        return sanitizers.stream()
+                .filter(s -> s.isFilterCase(arg))
+                .findFirst()
+                .map(s -> s.sanitize(arg))
+                .orElse(arg);
     }
 }
