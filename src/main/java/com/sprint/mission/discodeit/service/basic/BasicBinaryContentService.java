@@ -15,43 +15,45 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    // ===== 🏗️ Domain Logic (Facade 용)  =====
-    @Override
-    public BinaryContent create(BinaryContent binaryContent) {
-        return binaryContentRepository.save(binaryContent);
-    }
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent findById(UUID id) {
-        return binaryContentRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUNT));
-    }
+  // ===== 🏗️ Domain Logic (Facade 용)  =====
+  @Override
+  public BinaryContent create(BinaryContent binaryContent) {
+    return binaryContentRepository.save(binaryContent);
+  }
 
-    @Override
-    public List<BinaryContent> findAll() {
-        return binaryContentRepository.findAll();
-    }
+  @Override
+  public BinaryContent findById(UUID id) {
+    return binaryContentRepository.findById(id).orElseThrow(
+        () -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUNT));
+  }
 
-    @Override
-    public void delete(UUID id) {
-        if(!binaryContentRepository.existsById(id)){
-            throw new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUNT);
-        }
-        binaryContentRepository.delete(id);
-    }
+  @Override
+  public List<BinaryContent> findAll() {
+    return binaryContentRepository.findAll();
+  }
 
-    // ===== 🎯 Controller Direct (DTO 반환) ======
-    @Override
-    public BinaryContentInfoRes getBinaryContent(UUID id) {
-        return BinaryContentInfoRes.from(findById(id));
+  @Override
+  public void delete(UUID id) {
+    if (!binaryContentRepository.existsById(id)) {
+      throw new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUNT);
     }
+    binaryContentRepository.delete(id);
+  }
 
-    @Override
-    public List<BinaryContentInfoRes> getBinaryContentList() {
-        return findAll().stream()
-                .map(BinaryContentInfoRes::from)
-                .toList();
-    }
+  // ===== 🎯 Controller Direct (DTO 반환) ======
+  @Override
+  public BinaryContentInfoRes getBinaryContent(UUID id) {
+    return BinaryContentInfoRes.from(findById(id));
+  }
+
+  @Override
+  public List<BinaryContentInfoRes> getBinaryContentList(List<UUID> binaryContentIdList) {
+    return findAll().stream()
+        .filter(bc -> binaryContentIdList.contains(bc.getId()))
+        .map(BinaryContentInfoRes::from)
+        .toList();
+  }
 }
