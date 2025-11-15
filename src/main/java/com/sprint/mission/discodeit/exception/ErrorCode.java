@@ -10,6 +10,8 @@ public enum ErrorCode {
     // Common
     INTERNAL_SERVER_ERROR("COMMON_001", HttpStatus.INTERNAL_SERVER_ERROR,
             "서버 내부 오류가 발생했습니다."),
+    FIELD_ACCESS_FAILED("COMMON_002", HttpStatus.INTERNAL_SERVER_ERROR,
+            "클래스의 필드 접근에 실패하였습니다."),
 
     // File
     DATA_DIRECTORY_CREATE_FAILED("FILE_001", HttpStatus.INTERNAL_SERVER_ERROR,

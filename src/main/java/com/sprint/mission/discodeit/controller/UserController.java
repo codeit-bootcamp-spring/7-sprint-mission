@@ -10,10 +10,8 @@ import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusSimpleView
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.facade.user.*;
 import com.sprint.mission.discodeit.facade.userstatus.UserStatusUpdateFacade;
-import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +21,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -34,7 +31,6 @@ public class UserController {
     private final UserUpdateFacade userUpdateFacade;
     private final UserDeletionFacade userDeletionFacade;
     private final UserStatusUpdateFacade userStatusUpdateFacade;
-    private final UserService userService;
 
     //사용자 목록 조회
     @RequestMapping(method = RequestMethod.GET)
@@ -53,9 +49,6 @@ public class UserController {
     public ResponseEntity<Void> createUser(
             @Valid @RequestPart("userInfoReq") UserInfoReq userInfoReq,
             @RequestPart(value = "profile", required = false) MultipartFile profileFile){
-
-        log.info("회원 가입 요청: nickname={}, email={}", userInfoReq.nickname(), userInfoReq.email());
-
         BinaryContentCreateReq binaryContentCreateReq = BinaryContentCreateReq.from(profileFile);
         User user = userCreationFacade.createUser(UserCreateReq.from(userInfoReq, binaryContentCreateReq));
         URI location = ServletUriComponentsBuilder
@@ -72,9 +65,6 @@ public class UserController {
             @PathVariable UUID userId,
             @Valid @RequestPart("userInfoReq") UserInfoReq userInfoReq,
             @RequestPart(value = "profile", required = false) MultipartFile profileFile){
-
-        log.info("회원 정보 수정 요청: nickname={}, email={}", userInfoReq.nickname(), userInfoReq.email());
-        
         BinaryContentCreateReq binaryContentCreateReq = BinaryContentCreateReq.from(profileFile);
         UserUpdateReq req = UserUpdateReq.from(userInfoReq, binaryContentCreateReq);
         userUpdateFacade.updateUser(userId, req);
@@ -84,9 +74,6 @@ public class UserController {
     // 회원 삭제
     @RequestMapping(method = RequestMethod.DELETE, value = "/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId){
-        User user = userService.findById(userId);
-        log.info("유저 탈퇴: user.nickname = {}, user.email = {} ", user.getNickname(), user.getEmail());
-
         userDeletionFacade.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }

@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.facade.channel.ChannelDetailViewFacade;
 import com.sprint.mission.discodeit.facade.channel.ChannelOverViewFacade;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -20,7 +19,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
@@ -46,10 +44,6 @@ public class ChannelController {
                 .path("/{id}")
                 .buildAndExpand(channel.getId())
                 .toUri();
-
-        log.info("공개 채널 생성: id = {}, name = {}, discription = {}, 생성한 사람 id = {}",
-                channel.getId(), channel.getName(), channel.getDescription(), channel.getManagerId());
-
         return ResponseEntity.created(location).build();
     }
     
@@ -62,10 +56,6 @@ public class ChannelController {
                 .path("/{id}")
                 .buildAndExpand(channel.getId())
                 .toUri();
-
-        log.info("비밀 채널 생성: id = {}, 참여인들 id = {}, 생성한 사람 id = {}",
-                channel.getId(), channel.getUserIds(), channel.getManagerId());
-
         return ResponseEntity.created(location).build();
     }
 
@@ -73,17 +63,12 @@ public class ChannelController {
     @RequestMapping(method = RequestMethod.PUT, value = "/{channelId}")
     public ResponseEntity<Void> updatePublicChannel(@PathVariable UUID channelId, @RequestBody ChannelUpdateReq req){
         channelService.update(channelId, req);
-
-        log.info("공개 채널 수정: id = {}, name = {}, description = {}",
-                channelId, req.name(), req.description());
-
         return ResponseEntity.noContent().build();
     }
     
     //채널 삭제
     @RequestMapping(method = RequestMethod.DELETE, value = "/{channelId}")
     public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId){
-        log.info("채널 삭제 id : {}", channelId);
         channelDeleteFacade.deleteChannel(channelId);
         return ResponseEntity.noContent().build();
     }

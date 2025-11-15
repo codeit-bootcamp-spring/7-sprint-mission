@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.facade.readstatus.ReadStatusCreateFacade;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -14,7 +13,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.UUID;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/read-statuses")
 @RequiredArgsConstructor
