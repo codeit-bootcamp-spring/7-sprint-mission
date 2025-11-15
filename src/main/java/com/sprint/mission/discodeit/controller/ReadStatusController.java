@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.docs.ReadStatusControllerDocs;
 import com.sprint.mission.discodeit.service.BasicReadStatusService;
 import com.sprint.mission.discodeit.service.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ReadStatusResponse;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/readStatuses")
-public class ReadStatusController {
+public class ReadStatusController implements ReadStatusControllerDocs {
 
     private final BasicReadStatusService readStatusService;
 

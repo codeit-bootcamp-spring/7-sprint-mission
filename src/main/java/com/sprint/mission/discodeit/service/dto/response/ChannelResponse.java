@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.dto.response;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.domain.Channel;
 
 import java.time.Instant;
 import java.util.UUID;

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.dto.response;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.domain.Message;
 
 import java.time.Instant;
 import java.util.List;

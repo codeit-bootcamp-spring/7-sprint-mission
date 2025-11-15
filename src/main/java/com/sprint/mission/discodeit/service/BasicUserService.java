@@ -1,16 +1,14 @@
 package com.sprint.mission.discodeit.service;
 
 
-import com.sprint.mission.discodeit.service.dto.request.ProfileRequest;
+import com.sprint.mission.discodeit.domain.BinaryContent;
+import com.sprint.mission.discodeit.domain.User;
+import com.sprint.mission.discodeit.domain.exception.DuplicateUserException;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.request.UserRequest;
-import com.sprint.mission.discodeit.service.dto.request.UserUpdateReq;
+import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.UserResponse;
 import com.sprint.mission.discodeit.service.dto.response.UserStatusResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.exception.DuplicateUserException;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,42 +30,44 @@ public class BasicUserService {
     private final BinaryContentService binaryContentService;
 
 
-    public UserResponse createUser(UserCreateRequest requestDto, MultipartFile profileRequest) {
+    public UserResponse createUser(UserCreateRequest requestDto, MultipartFile file) {
         validateDuplicateEmail(requestDto.email());
         validateDuplicateUsername(requestDto.username());
-        System.out.println("BasicUserService.createUser");
-        //우선 폰넘버가 안 넘어와서 임의로 넣었음
+
+
         User user = new User(
                 requestDto.email(),
                 requestDto.password(),
-                requestDto.username(),
-                "010-1234-1234");
+                requestDto.username());
+
         userRepository.save(user);
         binaryContentService.createUserFolder(user.getId());
-        if (profileRequest != null && !profileRequest.isEmpty()) {
-            BinaryContent content = binaryContentService.saveUserProfile(user.getId(), profileRequest);
+        if (file != null) {
+            BinaryContent content = binaryContentService.saveUserProfile(user.getId(), file);
             user.setProfile(content.getId());
         }
         return UserResponse.from(user);
     }
 
-    public UserResponse updateUserInfo(UUID id, UserUpdateReq updateDto, ProfileRequest profileRequest) {
+    public UserResponse updateUserInfo(UUID id, UserUpdateRequest updateDto, MultipartFile file) {
 
         User user = getById(id);
 
-        if (updateDto.username() != null) {
-            user.updateUsername(updateDto.username());
+        if (updateDto.newUsername() != null) {
+            user.updateUsername(updateDto.newUsername());
         }
-        if (updateDto.password() != null) {
-            user.updatePassword(updateDto.password());
+        if (updateDto.newPassword() != null) {
+            user.updatePassword(updateDto.newPassword());
         }
-        if (updateDto.phoneNumber() != null) {
-            user.updatePhoneNumber(updateDto.phoneNumber());
+        if (updateDto.newEmail() != null) {
+            user.updateEmail(updateDto.newEmail());
         }
-        if (profileRequest.profileImage() != null) {
-            BinaryContent content = binaryContentService.saveUserProfile(user.getId(), profileRequest.profileImage());
+
+        if (file != null) {
+            BinaryContent content = binaryContentService.saveUserProfile(user.getId(), file);
             user.setProfile(content.getId());
         }
+
         userRepository.save(user);
 
         return UserResponse.from(user);
@@ -78,16 +78,6 @@ public class BasicUserService {
         User user = getById(id);
         userRepository.remove(user);
         binaryContentService.deleteUserFolder(user.getId());
-    }
-
-    public UserResponse getUser(UserRequest requestDto) {
-        User user;
-        if (requestDto.id() == null) {
-            user = getByUsername(requestDto.username());
-        } else {
-            user = getById(requestDto.id());
-        }
-        return UserResponse.from(user);
     }
 
     public List<UserResponse> getAllUsers() {
@@ -108,13 +98,8 @@ public class BasicUserService {
 
     }
 
-    public void logout(UUID userId) {
-        User user = getById(userId);
-        user.markOffline();
-        userRepository.save(user);
-    }
 
-    public UserStatusResponse markUserStatus(UUID uuid, Instant lastAt) {
+    public UserStatusResponse markOnline(UUID uuid, Instant lastAt) {
         User user = getById(uuid);
         user.markOnline(lastAt);
         userRepository.save(user);
@@ -122,7 +107,6 @@ public class BasicUserService {
     }
 
     private User getById(UUID userId) {
-        log.info("findUser");
         return userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
     }
 

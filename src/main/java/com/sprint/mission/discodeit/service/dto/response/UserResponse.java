@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.dto.response;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.domain.User;
 
 
 import java.time.Instant;
@@ -12,12 +12,11 @@ public record UserResponse(
     Instant updatedAt,
     String email,
     String username,
-    String phoneNumber,
     UUID profileId,
     Boolean online
 ){
     public static UserResponse from(User user){
         return new UserResponse(user.getId(),user.getCreatedAt(),user.getUpdatedAt(),user.getEmail(),
-                user.getUsername(),user.getPhoneNumber(),user.getProfile(),user.checkOnline());
+                user.getUsername(),user.getProfile(),user.checkOnline());
     }
 }

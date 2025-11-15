@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.domain.User;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -12,12 +12,6 @@ matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
 
     private final Map<UUID, User> store = new HashMap<>();
-
-    public JCFUserRepository() {
-        User user = new User("ee@email.com", "1234", "in", "010-0000-0000");
-        UUID uuid = UUID.fromString("32121212-1212-1212-1212-121212343434");
-        store.put(uuid,user);
-    }
 
     @Override
     public void save(User user){

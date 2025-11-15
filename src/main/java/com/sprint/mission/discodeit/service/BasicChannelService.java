@@ -1,13 +1,16 @@
 package com.sprint.mission.discodeit.service;
 
 
-import com.sprint.mission.discodeit.service.dto.request.ChannelCreateRequest;
+import com.sprint.mission.discodeit.domain.ChannelType;
+import com.sprint.mission.discodeit.service.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ChannelResponse;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.domain.Channel;
+import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.service.dto.response.ChannelListResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,9 +30,17 @@ public class BasicChannelService {
     private final ReadStatusRepository readStatusRepository;
 
 
-    public ChannelResponse createChannel(ChannelCreateRequest request, boolean isPrivate){
+    public ChannelResponse createPublicChannel(PublicChannelCreateRequest request){
 
-        Channel channel = new Channel(request.name(),request.participantIds(), isPrivate);
+
+        Channel channel = new Channel(request.name(), false, null);
+        channelRepository.save(channel);
+        return ChannelResponse.from(channel);
+    }
+
+    public ChannelResponse createPrivateChannel(PrivateChannelCreateRequest request){
+
+        Channel channel = new Channel("DM", true, request.participantIds());
         channelRepository.save(channel);
         return ChannelResponse.from(channel);
     }
@@ -56,11 +67,9 @@ public class BasicChannelService {
         readStatusRepository.save(readStatus);
     }
 
-    public List<ChannelResponse> getAllByUser(UUID userId){
-
-        return getAll().stream()
-                .filter(channel -> channel.getMembers().contains(userId))
-                .map(channel -> ChannelResponse.from(channel))
+    public List<ChannelListResponse> getAllByUser(UUID userId){
+        return getAll().stream().filter(channel -> channel.getType()== ChannelType.PUBLIC||channel.getMembers().contains(userId))
+                .map(channel -> ChannelListResponse.from(channel))
                 .toList();
     }
 

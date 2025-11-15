@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.domain;
 
 import lombok.Getter;
 
@@ -17,19 +17,27 @@ public class Channel implements Serializable {
     private final Instant createdAt;
     private Instant updatedAt;
     private String channelName;
+    private ChannelType type;
     private final List<UUID> members;
-    private final boolean isPrivate;
     private final List<UUID> history=new ArrayList<>();
 
 
-    public Channel(String channelName, List<UUID> membersId, boolean isPrivate) {
+    public Channel(String channelName, boolean isPrivate, List<UUID> members) {
         validateChannelName(channelName);
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt=Instant.now();
         this.channelName=channelName;
-        this.isPrivate=isPrivate;
-        this.members=membersId;
+        if(isPrivate){
+            this.type=ChannelType.PRIVATE;
+        }else{
+            this.type=ChannelType.PUBLIC;
+        }
+        if(members==null){
+            this.members=new ArrayList<>();
+        } else {
+            this.members=members;
+        }
     }
 
     public void updateChannelName(String name){
@@ -45,10 +53,6 @@ public class Channel implements Serializable {
 
     public List<UUID> getHistory() {
         return List.copyOf(history);
-    }
-
-    public List<UUID> getChannelMember(){
-        return List.copyOf(members);
     }
 
 

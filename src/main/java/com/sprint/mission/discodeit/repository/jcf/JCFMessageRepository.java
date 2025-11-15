@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.domain.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -13,14 +13,6 @@ import java.util.*;
 public class JCFMessageRepository implements MessageRepository {
 
     private final Map<UUID, Message> store = new HashMap<>();
-
-    public JCFMessageRepository() {
-        UUID userId = UUID.fromString("32121212-1212-1212-1212-121212343434");
-        UUID channelId = UUID.fromString("02121212-1212-1212-1212-121212343434");
-        UUID messageId = UUID.fromString("92121212-1212-1212-1212-121212343434");
-        Message message = new Message(userId, "생성자를 통해 보낸 메세지입니다.", channelId, null);
-        store.put(messageId,message);
-    }
 
     @Override
     public void save(Message message) {

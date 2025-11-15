@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.service.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.service.dto.request.ReadStatusRequest;
 import com.sprint.mission.discodeit.service.dto.response.ReadStatusResponse;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,23 +31,6 @@ public class BasicReadStatusService {
         readStatusRepository.save(readStatus);
         return ReadStatusResponse.from(readStatus);
     }
-
-    public Long getTimeSinceLastRead(UUID id){
-        ReadStatus readStatus = getById(id);
-        return readStatus.timeSinceLastRead();
-
-    }
-
-    public ReadStatusResponse getReadStatusByIds(ReadStatusRequest request){
-        ReadStatus readStatus1 = readStatusRepository.findAll().stream()
-                .filter(readStatus -> readStatus.getUserId().equals(request.userId())
-                        && readStatus.getChannelId().equals(request.channelId())).findAny().orElseThrow(() -> new NoSuchElementException("해당 메시지 수신 정보가 존재하지 않습니다."));
-
-        return ReadStatusResponse.from(readStatus1);
-
-    }
-
-
 
     public List<ReadStatusResponse> getAllByUserId(UUID id){
         return readStatusRepository.findAll().stream()

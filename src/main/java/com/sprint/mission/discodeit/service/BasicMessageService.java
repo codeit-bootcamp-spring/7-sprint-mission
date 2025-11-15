@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.service.dto.request.Attachments;
 import com.sprint.mission.discodeit.service.dto.request.MessageForm;
 import com.sprint.mission.discodeit.service.dto.request.MessageUpdate;
 import com.sprint.mission.discodeit.service.dto.response.MessageResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.domain.BinaryContent;
+import com.sprint.mission.discodeit.domain.Channel;
+import com.sprint.mission.discodeit.domain.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,14 +28,14 @@ public class BasicMessageService {
     private final BinaryContentService binaryContentService;
 
 
-    public MessageResponse sendMessage(MessageForm form, Attachments attachments) {
+    public MessageResponse sendMessage(MessageForm form, List<MultipartFile> attachments) {
         Message message;
-        List<MultipartFile> files = attachments.files().stream().filter(f->!f.isEmpty()).toList();
-        if(files == null || files.isEmpty()){
+
+        if(attachments == null || attachments.isEmpty()){
             message = new Message(form.authorId(), form.content(), form.channelId(), null);
         } else {
             List<UUID> attachmentsIds= new ArrayList<>();
-            for (MultipartFile file : attachments.files()) {
+            for (MultipartFile file : attachments) {
                 BinaryContent content = binaryContentService.saveMessageFile(form.authorId(), file);
                 attachmentsIds.add(content.getId());
             }
@@ -73,15 +72,6 @@ public class BasicMessageService {
         channel.deleteMessage(messageId);
     }
 
-    public List<UUID> getMessageImageId(UUID messageId){
-        Message message = getById(messageId);
-        return message.getAttachmentIds();
-
-    }
-
-    private Message getById(UUID messageId){
-        return messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("메세지가 없습니다."));
-    }
 
     public List<MessageResponse> getAllMessage(UUID channelId) {
         Channel channel = channelRepository.findById(channelId).orElseThrow(()->new IllegalArgumentException("해당 채널에는 메세지가 없습니다."));
@@ -89,6 +79,10 @@ public class BasicMessageService {
                 .map(id -> messageRepository.findById(id).orElse(null))
                 .map(message -> MessageResponse.from(message))
                 .toList();
+    }
+
+    private Message getById(UUID messageId){
+        return messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("메세지가 없습니다."));
     }
 
 }

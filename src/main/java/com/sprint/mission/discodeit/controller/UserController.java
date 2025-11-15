@@ -1,14 +1,16 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.docs.UserControllerDocs;
 import com.sprint.mission.discodeit.service.BasicUserService;
-import com.sprint.mission.discodeit.service.dto.request.ProfileRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.request.UserUpdateReq;
+import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.UserResponse;
 import com.sprint.mission.discodeit.service.dto.response.UserStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +21,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
 
     private final BasicUserService userService;
 
@@ -29,17 +31,18 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponse createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-                                   @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+    public ResponseEntity<UserResponse> createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+                                     @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
 
-        return userService.createUser(userCreateRequest, profileImage);
+        UserResponse response = userService.createUser(userCreateRequest, profileImage);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{userId}")
     public UserResponse updateUser(
             @PathVariable UUID userId,
-            @ModelAttribute UserUpdateReq userUpdateRequest,
-            @ModelAttribute ProfileRequest profile) {
+            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @RequestPart(value = "profile",required = false) MultipartFile profile) {
         UserResponse userResponse = userService.updateUserInfo(userId, userUpdateRequest, profile);
         return userResponse;
     }
@@ -53,7 +56,7 @@ public class UserController {
 
     @PatchMapping("/{userId}/userStatus")
     public UserStatusResponse markOnline(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request) {
-        return userService.markUserStatus(userId, request.newLastActiveAt());
+        return userService.markOnline(userId, request.newLastActiveAt());
     }
 
 }

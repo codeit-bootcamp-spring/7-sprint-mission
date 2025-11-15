@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.dto.response;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.domain.BinaryContent;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -10,14 +10,16 @@ public record BinaryContentResponse(
         Instant createAt,
         String fileName,
         long size,
-        String contentType
+        String contentType,
+        byte[] bytes
 
 ) {
-    public static BinaryContentResponse from(BinaryContent content){
+    public static BinaryContentResponse from(BinaryContent content,byte[] file){
         return new BinaryContentResponse(content.getId(),
                 content.getCreatedAt(),
                 content.getFileName(),
                 content.getFileSize(),
-                content.getFileType());
+                content.getFileType(),
+                file);
     }
 }

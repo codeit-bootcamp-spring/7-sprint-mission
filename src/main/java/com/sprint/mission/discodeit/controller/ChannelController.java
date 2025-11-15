@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.docs.ChannelControllerDocs;
 import com.sprint.mission.discodeit.service.BasicChannelService;
-import com.sprint.mission.discodeit.service.dto.request.ChannelCreateRequest;
+import com.sprint.mission.discodeit.service.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.service.dto.response.ChannelListResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -15,24 +18,25 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
-public class ChannelController {
+public class ChannelController implements ChannelControllerDocs {
 
     private final BasicChannelService channelService;
 
 
     @PostMapping("/public")
-    public ChannelResponse createPublicChannel(@RequestBody ChannelCreateRequest channelCreateRequest){
-        return channelService.createChannel(channelCreateRequest, false);
+    public ChannelResponse createPublicChannel(@RequestBody PublicChannelCreateRequest request){
+        return channelService.createPublicChannel(request);
 
     }
 
     @PostMapping("/private")
-    public ChannelResponse createPrivateChannel(@RequestBody ChannelCreateRequest channelCreateRequest){
-        return channelService.createChannel(channelCreateRequest, true);
+    public ChannelResponse createPrivateChannel(@RequestBody PrivateChannelCreateRequest request){
+        return channelService.createPrivateChannel(request);
     }
 
     @GetMapping
-    public List<ChannelResponse> getAllChannelByUserId(@RequestParam UUID userId){
+    public List<ChannelListResponse> getAllChannelByUserId(@RequestParam UUID userId){
+        channelService.getAllByUser(userId);
         return channelService.getAllByUser(userId);
     }
 

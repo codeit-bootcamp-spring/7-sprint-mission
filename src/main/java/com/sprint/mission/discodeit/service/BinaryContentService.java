@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.service.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.service.dto.response.BinaryContentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -27,7 +27,7 @@ public final class BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     // 유저별 폴더 생성
-    public Path createUserFolder(UUID userId)  {
+    public Path createUserFolder(UUID userId) {
 
         Path userFolder;
 
@@ -39,11 +39,11 @@ public final class BinaryContentService {
         }
         return userFolder;
     }
-    
-    public BinaryContent saveMessageFile(UUID userId, MultipartFile file)  {
+
+    public BinaryContent saveMessageFile(UUID userId, MultipartFile file) {
         createUserFolder(userId);
         Path userFolder = rootDir.resolve("user_" + userId.toString());
-        String fileName= makeFileName(file.getOriginalFilename());
+        String fileName = makeFileName(file.getOriginalFilename());
         Path filePath = userFolder.resolve(fileName);
 
         try {
@@ -78,7 +78,7 @@ public final class BinaryContentService {
         validateContentType(contentType);
 
         Path userFolder = rootDir.resolve("user_" + userId.toString());
-        
+
         Path profileFolder;
 
         try {
@@ -108,7 +108,7 @@ public final class BinaryContentService {
         return content;
     }
 
-    private String makeProfileName(String originalName){
+    private String makeProfileName(String originalName) {
         int pos = originalName.lastIndexOf(".");
         String ext = originalName.substring(pos + 1);
         String fileName = "profile" + "." + ext;
@@ -116,14 +116,13 @@ public final class BinaryContentService {
     }
 
 
-    private String makeFileName(String originalName){
+    private String makeFileName(String originalName) {
         int pos = originalName.lastIndexOf(".");
         String Ext = originalName.substring(pos + 1);
         String uuid = UUID.randomUUID().toString();
         String fileName = uuid + "." + Ext;
         return fileName;
     }
-
 
 
     public void deleteUserFolder(UUID userId) {
@@ -151,7 +150,7 @@ public final class BinaryContentService {
         }
     }
 
-    public BinaryContent getById(UUID binaryId){
+    public BinaryContent getById(UUID binaryId) {
         return binaryContentRepository.findById(binaryId).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
     }
 
@@ -159,7 +158,7 @@ public final class BinaryContentService {
         BinaryContent content = getById(binaryId);
         Path path = Paths.get(content.getFilePath());
 
-        UrlResource urlResource =null;
+        UrlResource urlResource = null;
         try {
             urlResource = new UrlResource(path.toUri());
         } catch (MalformedURLException e) {
@@ -168,24 +167,35 @@ public final class BinaryContentService {
         return urlResource;
     }
 
-    public List<BinaryContentResponse> getBinaryContents(List<UUID> ids){
+    public List<BinaryContentResponse> getBinaryContents(List<UUID> ids) {
         List<BinaryContentResponse> result = new ArrayList<>();
-        for (UUID id : ids) {
-            BinaryContent content =
-                    binaryContentRepository.findById(id)
-                            .orElseThrow(() -> new IllegalArgumentException("없음"));
 
-            result.add(BinaryContentResponse.from(content));
+        for (UUID id : ids) {
+            BinaryContent content = getById(id);
+            Path path = Paths.get(content.getFilePath());
+            try {
+                byte[] bytes = Files.readAllBytes(path);
+                result.add(BinaryContentResponse.from(content, bytes));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+
         }
 
         return result;
     }
 
-    public BinaryContentResponse getBinaryContent(UUID id){
-            BinaryContent content =
-                    binaryContentRepository.findById(id)
-                            .orElseThrow(() -> new IllegalArgumentException("없음"));
-            return BinaryContentResponse.from(content);
+    public BinaryContentResponse getBinaryContent(UUID id) {
+        BinaryContent content = getById(id);
+        Path path = Paths.get(content.getFilePath());
+        try {
+            byte[] bytes = Files.readAllBytes(path);
+            return BinaryContentResponse.from(content, bytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void validateContentType(String contentType) {
@@ -196,7 +206,6 @@ public final class BinaryContentService {
             throw new IllegalArgumentException("허용되지 않는 파일 형식입니다: " + contentType);
         }
     }
-
 
 
 }
