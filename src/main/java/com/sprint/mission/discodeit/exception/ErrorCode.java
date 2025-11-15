@@ -73,6 +73,8 @@ public enum ErrorCode {
   // ReadStatus
   READSTATUS_NOT_FOUND("READSTATUS_001", HttpStatus.NOT_FOUND,
       "해당 UUID를 가진 읽은 상태가 존재하지 않습니다."),
+  READSTATUS_ALREADY_EXISTS("READSTATUS_002", HttpStatus.BAD_REQUEST,
+      "이미 읽은 상태가 존재합니다."),
 
   // User
   USER_NOT_FOUND("USER_001", HttpStatus.NOT_FOUND,

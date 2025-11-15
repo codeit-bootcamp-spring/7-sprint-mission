@@ -6,17 +6,18 @@ import com.sprint.mission.discodeit.util.DateTimeUtil;
 import java.util.UUID;
 
 public record ReadStatusInfoRes(
-        String CreatedAt,
-        String UpdatedAt,
-        UUID userId,
-        UUID channelId
-){
-    public static ReadStatusInfoRes from(ReadStatus readStatus) {
-        return new ReadStatusInfoRes(
-                DateTimeUtil.format(readStatus.getCreatedAt()),
-                DateTimeUtil.format(readStatus.getUpdatedAt()),
-                readStatus.getUserId(),
-                readStatus.getChannelId()
-        );
-    }
+    String createdAt,
+    String updatedAt,
+    UUID userId,
+    UUID channelId
+) {
+
+  public static ReadStatusInfoRes from(ReadStatus readStatus) {
+    return new ReadStatusInfoRes(
+        DateTimeUtil.format(readStatus.getCreatedAt()),
+        DateTimeUtil.format(readStatus.getUpdatedAt()),
+        readStatus.getUserId(),
+        readStatus.getChannelId()
+    );
+  }
 }

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.docs.ReadStateControllerDocs;
 import com.sprint.mission.discodeit.dto.readstatus.request.ReadStatusCreateReq;
 import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusInfoRes;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -16,32 +17,34 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/read-statuses")
 @RequiredArgsConstructor
-public class ReadStatusController {
-    private final ReadStatusCreateFacade readStatusCreateFacade;
-    private final ReadStatusService readStatusService;
+public class ReadStatusController implements ReadStateControllerDocs {
 
-    //메세지 수신 정보 생성
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Void> createReadStatus(@RequestBody ReadStatusCreateReq req){
-        ReadStatus readStatus = readStatusCreateFacade.create(req);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequestUri()
-                .path("/{id}")
-                .buildAndExpand(readStatus.getId())
-                .toUri();
-        return ResponseEntity.created(location).build();
-    }
-    
-    //메세지 수신 정보 업데이트
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{readStatusId}")
-    public ResponseEntity<Void> updateReadStatus(@PathVariable UUID readStatusId){
-        readStatusService.update(readStatusId);
-        return ResponseEntity.noContent().build();
-    }
+  private final ReadStatusCreateFacade readStatusCreateFacade;
+  private final ReadStatusService readStatusService;
 
-    //메세지 수신 정보 조회
-    @RequestMapping(method = RequestMethod.GET, value = "/{readStatusId}")
-    public ResponseEntity<ReadStatusInfoRes> getReadStatus(@PathVariable UUID readStatusId){
-        return ResponseEntity.ok(readStatusService.findById(readStatusId));
-    }
+  //메세지 수신 정보 생성
+  @PostMapping
+  public ResponseEntity<ReadStatusInfoRes> createReadStatus(@RequestBody ReadStatusCreateReq req) {
+    ReadStatus readStatus = readStatusCreateFacade.create(req);
+    URI location = ServletUriComponentsBuilder
+        .fromCurrentRequestUri()
+        .path("/{id}")
+        .buildAndExpand(readStatus.getId())
+        .toUri();
+
+    return ResponseEntity.created(location).body(ReadStatusInfoRes.from(readStatus));
+  }
+
+  //메세지 수신 정보 업데이트
+  @PatchMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatusInfoRes> updateReadStatus(@PathVariable UUID readStatusId) {
+    ReadStatus readStatus = readStatusService.update(readStatusId);
+    return ResponseEntity.ok(ReadStatusInfoRes.from(readStatus));
+  }
+
+  //메세지 수신 정보 조회
+  @GetMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatusInfoRes> getReadStatus(@PathVariable UUID readStatusId) {
+    return ResponseEntity.ok(readStatusService.findById(readStatusId));
+  }
 }

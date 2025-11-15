@@ -9,54 +9,62 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileReadStatusRepository extends BaseFileRepository<ReadStatus>
-implements ReadStatusRepository {
-    public FileReadStatusRepository(RepositoryProperties repositoryProperties) {
-        super(ReadStatus.class, repositoryProperties);
-    }
+    implements ReadStatusRepository {
 
-    //저장
-    @Override
-    public ReadStatus save(ReadStatus readStatus) {
-        saveToFile(readStatus.getId(), readStatus);
-        return readStatus;
-    }
+  public FileReadStatusRepository(RepositoryProperties repositoryProperties) {
+    super(ReadStatus.class, repositoryProperties);
+  }
 
-    //단일조회
-    @Override
-    public Optional<ReadStatus> findById(UUID statusId) {
-        return loadFromFile(statusId);
-    }
+  //저장
+  @Override
+  public ReadStatus save(ReadStatus readStatus) {
+    saveToFile(readStatus.getId(), readStatus);
+    return readStatus;
+  }
 
-    @Override
-    public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        return findAllFiles().stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .toList();
-    }
+  //단일조회
+  @Override
+  public Optional<ReadStatus> findById(UUID statusId) {
+    return loadFromFile(statusId);
+  }
 
-    @Override
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return findAllFiles().stream()
-                .filter(readStatus -> readStatus.getUserId().equals(userId))
-                .toList();
-    }
+  @Override
+  public List<ReadStatus> findAllByChannelId(UUID channelId) {
+    return findAllFiles().stream()
+        .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+        .toList();
+  }
 
-    @Override
-    public void update(UUID statusId) {
-        loadFromFile(statusId).ifPresent(readStatus ->{
-            readStatus.updateReadAt();
-            saveToFile(statusId, readStatus);
-        });
-    }
+  @Override
+  public List<ReadStatus> findAllByUserId(UUID userId) {
+    return findAllFiles().stream()
+        .filter(readStatus -> readStatus.getUserId().equals(userId))
+        .toList();
+  }
 
-    //삭제
-    @Override
-    public void delete(UUID statusId) {
-        deleteFile(statusId);
-    }
+  @Override
+  public void update(UUID statusId) {
+    loadFromFile(statusId).ifPresent(readStatus -> {
+      readStatus.updateReadAt();
+      saveToFile(statusId, readStatus);
+    });
+  }
 
-    @Override
-    public boolean existsById(UUID statusId) {
-        return fileExistsById(statusId);
-    }
+  //삭제
+  @Override
+  public void delete(UUID statusId) {
+    deleteFile(statusId);
+  }
+
+  @Override
+  public boolean existsById(UUID statusId) {
+    return fileExistsById(statusId);
+  }
+
+  @Override
+  public boolean existsByUserIdAndChannelId(UUID userId, UUID channelId) {
+    return findAllFiles().stream().anyMatch(readStatus ->
+        readStatus.getUserId().equals(userId) && readStatus.getChannelId().equals(channelId)
+    );
+  }
 }
