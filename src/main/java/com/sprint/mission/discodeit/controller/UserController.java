@@ -58,8 +58,6 @@ public class UserController implements UserDoc {
         @RequestPart("userCreateRequest") Dto_UserCreate dtoUser,
         @RequestPart(value = "profile", required = false) MultipartFile file) {
         //💎User 등록
-        System.out.println("🩷 " + dtoUser.toString());
-
         Dto_BinaryContent dtoFile = parsingMultipartFile(file);
         Res_User resUser = userService.create(dtoUser, Optional.ofNullable(dtoFile));
 

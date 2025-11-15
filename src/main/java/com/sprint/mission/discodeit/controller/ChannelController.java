@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.service.basic.ChannelService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @ResponseBody
 @RequiredArgsConstructor
@@ -35,7 +37,9 @@ public class ChannelController implements ChannelDoc {
     @RequestMapping(value = "/public", method = POST)
     public ResponseEntity<Res_Channel> createPublic(
         @RequestBody Dto_CreateChannelPublic dtoCreateChannel) {
+
         Res_Channel aPublic = channelService.createPublic(dtoCreateChannel);
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(aPublic);
@@ -45,7 +49,9 @@ public class ChannelController implements ChannelDoc {
     @RequestMapping(value = "/private", method = POST)
     public ResponseEntity<Res_Channel> createPrivate(@
         RequestBody Dto_CreateChannelPrivate dtoCreateChannel) {
+
         Res_Channel channel = channelService.createPrivate(dtoCreateChannel);
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(channel);
@@ -55,7 +61,9 @@ public class ChannelController implements ChannelDoc {
     @RequestMapping(value = "/{channelId}", method = DELETE)
     public ResponseEntity<Object> delete(
         @PathVariable("channelId") UUID channelId) {
+
       channelService.delete(channelId);
+
       return ResponseEntity
           .status(HttpStatus.NO_CONTENT)
           .build();
@@ -68,6 +76,7 @@ public class ChannelController implements ChannelDoc {
         @RequestBody ChannelDto_Update channelDtoUpdate) {
 
         Res_Channel resChannel = channelService.update(channelId, channelDtoUpdate);
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(resChannel);
@@ -79,7 +88,7 @@ public class ChannelController implements ChannelDoc {
         @RequestParam("userId") UUID userId) {
 
         List<Res_ChannelFind> allByUserId = channelService.findAllByUserId(userId);
-        System.out.println(allByUserId);
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(allByUserId);

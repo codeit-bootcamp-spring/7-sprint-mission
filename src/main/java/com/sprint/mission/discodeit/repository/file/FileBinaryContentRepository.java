@@ -21,7 +21,11 @@ public class FileBinaryContentRepository implements InterfaceBinaryContentReposi
     }
 
     public Optional<BinaryContent> findById(UUID binaryContentId) {
-        Optional<BinaryContent> optionalUserContents = fileUtil.findAll().stream().map(userContent -> (BinaryContent) userContent).filter(userContent -> userContent.getId().equals(binaryContentId)).findFirst();
+        Optional<BinaryContent> optionalUserContents = fileUtil.findAll().stream()
+            .map(userContent -> (BinaryContent) userContent)
+            .filter(userContent -> userContent.getId().equals(binaryContentId))
+            .findFirst();
+
         return optionalUserContents;
     }
 
