@@ -11,3 +11,13 @@ discodeit:
     type: file   # jcf | file
     file-directory: .discodeit
 
+springdoc:
+  swagger-ui:
+    path: /api-docs-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+    display-request-duration: true
+    doc-expansion: list
+
+  api-docs:
+    path: /my-api
