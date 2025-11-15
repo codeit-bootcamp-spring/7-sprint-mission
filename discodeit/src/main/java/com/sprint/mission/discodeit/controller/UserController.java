@@ -42,7 +42,7 @@ public class UserController {
     return ResponseEntity.status(201).body(response);
   }
 
-  @RequestMapping(method = RequestMethod.PUT, value = "/{userId}")
+  @PatchMapping("/{userId}")
   public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
       @RequestBody UserUpdateRequest request) {
     User user = userService.update(userId, request, Optional.empty());
@@ -59,13 +59,13 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-  @RequestMapping(method = RequestMethod.DELETE, value = "/{userId}")
+  @DeleteMapping("/{userId}")
   public ResponseEntity<UserDto> deleteUser(@PathVariable UUID userId) {
     userService.delete(userId);
     return ResponseEntity.noContent().build();
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/{userId}")
+  @GetMapping("/{userId}")
   public ResponseEntity<UserDto> getUser(@PathVariable UUID userId) {
     UserDto user = userService.find(userId);
     return ResponseEntity.ok(user);

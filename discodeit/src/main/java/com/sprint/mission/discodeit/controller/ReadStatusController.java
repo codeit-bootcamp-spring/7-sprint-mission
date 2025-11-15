@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/read-status")
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
@@ -20,24 +20,27 @@ public class ReadStatusController {
         this.readStatusService = readStatusService;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ResponseEntity<ReadStatusDto> createReadStatus(@RequestBody ReadStatusCreateRequest request) {
         ReadStatus created = readStatusService.create(request);
         return ResponseEntity.ok(ReadStatusDto.from(created));
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{statusId}")
-    public ResponseEntity<ReadStatusDto> updateReadStatus(@PathVariable UUID statusId, @RequestBody ReadStatusUpdateRequest request) {
-        ReadStatus updated = readStatusService.update(statusId, request);
+    @PatchMapping("/{id}")
+    public ResponseEntity<ReadStatusDto> update(@PathVariable UUID id,
+        @RequestBody ReadStatusUpdateRequest request) {
+        ReadStatus updated = readStatusService.update(id, request);
         return ResponseEntity.ok(ReadStatusDto.from(updated));
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/user/{userId}")
-    public ResponseEntity<List<ReadStatusDto>> getUserReadStatus(@PathVariable UUID userId) {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ReadStatusDto>> findAllByUser(@PathVariable UUID userId) {
         List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+
         List<ReadStatusDto> response = readStatuses.stream()
                 .map(status -> ReadStatusDto.from(status))
                 .toList();
+
         return ResponseEntity.ok(response);
     }
 }
