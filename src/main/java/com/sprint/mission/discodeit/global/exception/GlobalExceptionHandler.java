@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.global.exception;
 
-import com.sprint.mission.discodeit.global.util.CustomApiResponse;
+import com.sprint.mission.discodeit.global.dto.CustomApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
