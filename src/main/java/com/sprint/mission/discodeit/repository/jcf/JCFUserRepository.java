@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * JCFUserRepository
@@ -13,7 +14,7 @@ import java.util.*;
  * 실제 DB를 사용하지 않고 List<User>를 저장소로 활용합니다.
  */
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> userStore = new HashMap<>();
+    private final Map<UUID, User> userStore = new ConcurrentHashMap<>();
 
     @Override
     public void save(User user) {

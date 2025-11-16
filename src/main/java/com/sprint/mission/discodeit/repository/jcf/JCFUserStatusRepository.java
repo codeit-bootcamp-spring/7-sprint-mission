@@ -4,9 +4,10 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFUserStatusRepository implements UserStatusRepository {
-    private final Map<UUID, UserStatus> userStatusStore = new HashMap<>();
+    private final Map<UUID, UserStatus> userStatusStore = new ConcurrentHashMap<>();
 
     @Override
     public void save(UserStatus userStatus) {

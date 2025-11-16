@@ -4,12 +4,13 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
 public class FileUserStatusRepository implements UserStatusRepository {
     //파일 저장 필요
-    private final Map<UUID, UserStatus> userStatusStore = new HashMap<>();
+    private final Map<UUID, UserStatus> userStatusStore = new ConcurrentHashMap<>();
     private final String filePath;
 
     public FileUserStatusRepository(String filePath) {

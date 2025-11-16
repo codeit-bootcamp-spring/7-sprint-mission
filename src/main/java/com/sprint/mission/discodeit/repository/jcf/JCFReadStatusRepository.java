@@ -4,9 +4,10 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFReadStatusRepository implements ReadStatusRepository {
-    Map<UUID, ReadStatus> readStatusStore = new HashMap<>();
+    Map<UUID, ReadStatus> readStatusStore = new ConcurrentHashMap<>();
 
     @Override
     public void save(ReadStatus readStatus) {

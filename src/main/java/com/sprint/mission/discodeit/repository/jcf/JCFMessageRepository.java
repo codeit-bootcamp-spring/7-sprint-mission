@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
  * 실제 DB를 사용하지 않고 List<Message>를 저장소로 활용합니다.
  */
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> messageStore = new LinkedHashMap<>();
+    private final Map<UUID, Message> messageStore = new ConcurrentHashMap<>();
 
     @Override
     public void save(Message message) {

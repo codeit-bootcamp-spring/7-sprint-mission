@@ -4,11 +4,12 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
 public class FileReadStatusRepository implements ReadStatusRepository {
-    Map<UUID, ReadStatus> readStatusStore = new HashMap<>();
+    Map<UUID, ReadStatus> readStatusStore = new ConcurrentHashMap<>();
     private final String filePath;
 
     public FileReadStatusRepository(String filePath) {

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -16,8 +17,8 @@ import java.util.stream.Collectors;
  * joinedChannels에 유저가 속한 채널 UUID를 저장합니다.
  */
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channelStore = new HashMap<>();
-    private final Map<UUID, Set<UUID>> joinedChannels = new HashMap<>();
+    private final Map<UUID, Channel> channelStore = new ConcurrentHashMap<>();
+    private final Map<UUID, Set<UUID>> joinedChannels = new ConcurrentHashMap<>();
 
     @Override
     public void addChannelIdForUser(UUID channelId, UUID userId) {

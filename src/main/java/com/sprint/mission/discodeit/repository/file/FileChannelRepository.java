@@ -6,13 +6,14 @@ import com.sprint.mission.discodeit.entity.ChannelVisibility;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
 public class FileChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channelStore = new HashMap<>();
-    private final Map<UUID, Set<UUID>> joinedChannels = new HashMap<>();
+    private final Map<UUID, Channel> channelStore = new ConcurrentHashMap<>();
+    private final Map<UUID, Set<UUID>> joinedChannels = new ConcurrentHashMap<>();
     private final String channelPath;
     private final String joinedPath;
 

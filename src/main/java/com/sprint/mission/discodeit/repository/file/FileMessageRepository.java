@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
@@ -28,7 +29,7 @@ import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
  * - messages.sav : 메시지 객체들이 직렬화되어 저장되는 파일
  */
 public class FileMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> messageStore = new LinkedHashMap<>();
+    private final Map<UUID, Message> messageStore = new ConcurrentHashMap<>();
     private final String filePath;
 
     public FileMessageRepository(String filePath) {

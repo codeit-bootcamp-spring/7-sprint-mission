@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
@@ -25,7 +26,7 @@ import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
  * - users.sav : 메시지 객체들이 직렬화되어 저장되는 파일
  */
 public class FileUserRepository implements UserRepository {
-    private final Map<UUID, User> userStore = new HashMap<>();
+    private final Map<UUID, User> userStore = new ConcurrentHashMap<>();
     private final String filePath;
 
     public FileUserRepository(String filePath) {
