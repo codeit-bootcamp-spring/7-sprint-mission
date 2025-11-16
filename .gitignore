@@ -38,3 +38,6 @@ out/
 
 ### myCustom ###
 !**/logs/**
+
+### my Mail ###
+!.env
