@@ -538,7 +538,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_UserStatus"
+                  "$ref": "#/components/schemas/Res_UserUpdate"
                 }
               }
             }
@@ -1171,7 +1171,7 @@
           }
         }
       },
-      "Res_UserStatus": {
+      "Res_UserUpdate": {
         "type": "object",
         "properties": {
           "id": {
