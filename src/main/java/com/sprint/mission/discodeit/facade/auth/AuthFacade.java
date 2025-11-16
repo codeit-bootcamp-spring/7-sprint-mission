@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.facade.auth;
 
-import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
-import com.sprint.mission.discodeit.dto.user.request.UserLoginReq;
+import com.sprint.mission.discodeit.dto.auth.request.UserLoginReq;
 import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -10,11 +9,10 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
