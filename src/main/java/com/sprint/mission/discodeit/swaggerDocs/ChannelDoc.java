@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller.swaggerDocs;
+package com.sprint.mission.discodeit.swaggerDocs;
 
 import com.sprint.mission.discodeit.entity.dto.ChannelDto_Update;
 import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPrivate;

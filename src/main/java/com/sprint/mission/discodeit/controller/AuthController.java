@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.swaggerDocs.AuthDoc;
+import com.sprint.mission.discodeit.swaggerDocs.AuthDoc;
 import com.sprint.mission.discodeit.entity.dto.AuthServiceDto;
 import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.service.basic.AuthService;

@@ -67,7 +67,8 @@ public class MessageService implements InterfaceMessageService {
 
     @Override
     public Res_Message find(UUID messageID) {
-        Message message = messageRepository.findById(messageID).orElseThrow(() -> new IllegalArgumentException("🚨MessageService.find.messageID = [" + messageID.toString() + "] 오류"));
+        Message message = messageRepository.findById(messageID)
+            .orElseThrow(() -> new IllegalArgumentException("🚨MessageService.find.messageID = [" + messageID.toString() + "] 오류"));
         log.info("✅ MessageService.find = [" + message.getMessage() + "]");
         return Res_Message.from(message);
     }
@@ -80,7 +81,9 @@ public class MessageService implements InterfaceMessageService {
 //            log.info("✅ findAllByChannleId.channelID = [" + channelID.toString() + "][" + content.getMessage() + "]");
 //        }
 
-        List<Res_Message> resMessage = messages.stream().filter(msg -> msg.getChannelId().equals(channelID)).map(Res_Message::from).toList();
+        List<Res_Message> resMessage = messages.stream()
+            .filter(msg -> msg.getChannelId().equals(channelID)).map(Res_Message::from).toList();
+
         resMessage.stream().forEach(message -> log.info("✅ findAllByChannleId = [" + channelID.toString() + "][" + message.content() + "]"));
 //        for (Res_Message content : resMessage) {
 //            log.info("✅ findAllByChannleId = [" + channelID.toString() + "][" + content.content() + "]");

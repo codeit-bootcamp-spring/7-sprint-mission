@@ -5,7 +5,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import com.sprint.mission.discodeit.common.Util;
-import com.sprint.mission.discodeit.controller.swaggerDocs.MessageDoc;
+import com.sprint.mission.discodeit.swaggerDocs.MessageDoc;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;

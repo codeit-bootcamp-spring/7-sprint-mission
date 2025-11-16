@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
-import com.sprint.mission.discodeit.controller.swaggerDocs.BinaryContentDoc;
+import com.sprint.mission.discodeit.swaggerDocs.BinaryContentDoc;
 import com.sprint.mission.discodeit.entity.dto.Res_BinaryContent;
 import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import java.util.ArrayList;

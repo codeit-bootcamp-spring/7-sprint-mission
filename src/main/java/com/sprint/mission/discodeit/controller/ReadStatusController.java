@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.swaggerDocs.ReadStatusDoc;
+import com.sprint.mission.discodeit.swaggerDocs.ReadStatusDoc;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatusUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;

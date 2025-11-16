@@ -1,14 +1,10 @@
 package com.sprint.mission.discodeit.common;
 
 import com.sprint.mission.discodeit.entity.ModelType;
-import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.repository.file.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @Slf4j
 @Configuration
@@ -36,18 +32,18 @@ public class FileUtilConfig {
     @Bean
     public FileUtil binaryContentFileUtil()  { return new FileUtil(ModelType.BINARYCONTENT); }
 
-    public static Dto_BinaryContent parsingMultipartFile(MultipartFile file) {
-        Dto_BinaryContent dtoFile = null;
-        try {
-            dtoFile = Dto_BinaryContent.from(
-                    file.getOriginalFilename(),
-                    file.getContentType(),
-                    file.getBytes(),
-                    file.getSize());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        log.info("✅ file.getOriginalFilename() = [" + file.getOriginalFilename() + "]");
-        return dtoFile;
-    }
+//    public static Dto_BinaryContent parsingMultipartFile(MultipartFile file) {
+//        Dto_BinaryContent dtoFile = null;
+//        try {
+//            dtoFile = Dto_BinaryContent.from(
+//                    file.getOriginalFilename(),
+//                    file.getContentType(),
+//                    file.getBytes(),
+//                    file.getSize());
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        log.info("✅ file.getOriginalFilename() = [" + file.getOriginalFilename() + "]");
+//        return dtoFile;
+//    }
 }

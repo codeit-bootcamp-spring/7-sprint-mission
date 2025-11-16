@@ -4,7 +4,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
-import com.sprint.mission.discodeit.controller.swaggerDocs.ChannelDoc;
+import com.sprint.mission.discodeit.swaggerDocs.ChannelDoc;
 import com.sprint.mission.discodeit.entity.dto.ChannelDto_Update;
 import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPrivate;
 import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPublic;
