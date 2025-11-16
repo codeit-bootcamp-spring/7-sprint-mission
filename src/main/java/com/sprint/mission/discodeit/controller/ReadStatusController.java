@@ -27,32 +27,41 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReadStatusController implements ReadStatusDoc {
     private final ReadStatusService readStatusService;
 
-    //💎User의 Message 읽음 상태 목록 조회
     @GetMapping
     public ResponseEntity<List<Res_ReadStatus>> findAllByUserId(
         @RequestParam UUID userId) {
-        List<Res_ReadStatus> allByUserId = readStatusService.findAllByUserId(userId);
+
+        //💎User의 Message 읽음 상태 목록 조회
+        List<Res_ReadStatus> allByUserId
+            = readStatusService.findAllByUserId(userId);
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(allByUserId);
     }
 
-    //💎Message 읽음 상태 생성
     @PostMapping
     public ResponseEntity<Res_ReadStatus> create(
         @RequestBody Dto_ReadStatus dtoReadStatus) {
-        Res_ReadStatus resReadStatus = readStatusService.create(dtoReadStatus);
+
+        //💎Message 읽음 상태 생성
+        Res_ReadStatus resReadStatus
+            = readStatusService.create(dtoReadStatus);
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(resReadStatus);
     }
 
-    //💎Message 읽음 상태 수정
     @PatchMapping("/{readStatusId}")
     public ResponseEntity<Res_ReadStatus> update(
         @PathVariable("readStatusId") UUID readStatusId,
         @RequestBody Dto_ReadStatusUpdate requestDto) {
-        Res_ReadStatus resReadStatus = readStatusService.update(readStatusId, requestDto);
+
+        //💎Message 읽음 상태 수정
+        Res_ReadStatus resReadStatus
+            = readStatusService.update(readStatusId, requestDto);
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(resReadStatus);

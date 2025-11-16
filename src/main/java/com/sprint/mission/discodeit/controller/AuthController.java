@@ -24,7 +24,9 @@ public class AuthController implements AuthDoc {
     public ResponseEntity<Res_UserLogin> login(
         @RequestBody AuthServiceDto authServiceDto) {
        //💎로그인
-        Res_UserLogin resUserLogin = authService.login(authServiceDto);
+        Res_UserLogin resUserLogin
+            = authService.login(authServiceDto);
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(resUserLogin);

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatus;
-import com.sprint.mission.discodeit.entity.dto.Res_UserStatus;
+import com.sprint.mission.discodeit.entity.dto.Res_UserUpdate;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserStatusRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserStatusService;
@@ -23,12 +23,12 @@ public class UserStatusService implements InterfaceUserStatusService {
     private final InterfaceUserStatusRepository userStatusRepository;
     private final InterfaceUserRepository userRepository;
 
-    public Res_UserStatus create(UUID userId) {
+    public Res_UserUpdate create(UUID userId) {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //    [ ] 관련된 User가 존재하지 않으면 예외를 발생시킵니다.
 //    [ ] 같은 User와 관련된 객체가 이미 존재하면 예외를 발생시킵니다.
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException(("🚨Res_UserStatus.create.id = [" + userId.toString() + "] err")));
+                .orElseThrow(() -> new IllegalArgumentException(("🚨Res_UserUpdate.create.id = [" + userId.toString() + "] err")));
 
         Optional<UserStatus> userStatus = userStatusRepository.findByUserId(user.getId());
 
@@ -36,14 +36,14 @@ public class UserStatusService implements InterfaceUserStatusService {
             userStatusRepository.save(userStatus.get());
 
             log.info("✅ UserStatusService.create = [" + user.getUserName() + "]");
-            return Res_UserStatus.from(userStatus.get());
+            return Res_UserUpdate.from(userStatus.get());
         }
         else {
-            throw new IllegalArgumentException("🚨Res_UserStatus.create.id = [" + userId.toString() + "] err");
+            throw new IllegalArgumentException("🚨Res_UserUpdate.create.id = [" + userId.toString() + "] err");
         }
     }
 
-    public Res_UserStatus find(UUID statusID) {
+    public Res_UserUpdate find(UUID statusID) {
 //      [ ] id로 조회합니다.
         UserStatus userStatus = userStatusRepository.findById(statusID)
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.find.statusID = [" + statusID.toString() + "] err"));
@@ -51,16 +51,16 @@ public class UserStatusService implements InterfaceUserStatusService {
         userRepository.findById(userStatus.getUserId())
             .ifPresent(user -> log.info("✅ UserStatusService.find = [" + user.getUserName() + "]"));
 
-        return Res_UserStatus.from(userStatus);
+        return Res_UserUpdate.from(userStatus);
     }
 
-    public List<Res_UserStatus> findAll() {
+    public List<Res_UserUpdate> findAll() {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //    수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
         List<UserStatus> userStatuses = userStatusRepository.findAll();
-        List<Res_UserStatus> list = userStatuses.stream().map(Res_UserStatus::from).toList();
+        List<Res_UserUpdate> list = userStatuses.stream().map(Res_UserUpdate::from).toList();
 
-        for (Res_UserStatus resUserStatus : list) {
+        for (Res_UserUpdate resUserStatus : list) {
             log.info("✅ UserStatusService.findAll = ["
                 + userRepository.findById(resUserStatus.userId())
                                 .get()
@@ -89,7 +89,7 @@ public class UserStatusService implements InterfaceUserStatusService {
         log.info("✅ UserStatusService.update = [" + userName + "]");
     }
 
-    public Res_UserStatus updateUserStatus(UUID userId, Instant newLastActiveAt) {
+    public Res_UserUpdate updateUserStatus(UUID userId, Instant newLastActiveAt) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("🚨해당 User[" + userId.toString() + "]의 UserStatus를 찾을 수 없음"));
 
@@ -98,7 +98,7 @@ public class UserStatusService implements InterfaceUserStatusService {
       userStatusRepository.save(userStatus);
 
       log.info("✅ UserStatusService.userStatus = [" + userStatus + "]");
-      return Res_UserStatus.from(userStatus);
+      return Res_UserUpdate.from(userStatus);
     }
 
     public void delete(UUID statusID) {

@@ -37,9 +37,12 @@ public class MessageController implements MessageDoc {
     private final MessageService messageService;
 
     @GetMapping
-    public ResponseEntity<List<Res_Message>> findAllByChannleId(@RequestParam("channelId") UUID channelID) {
+    public ResponseEntity<List<Res_Message>> findAllByChannleId(
+        @RequestParam("channelId") UUID channelID) {
         //💎Channel의 Message 목록 조회
-        List<Res_Message> allByChannleId = messageService.findAllByChannleId(channelID);
+        List<Res_Message> allByChannleId
+            = messageService.findAllByChannleId(channelID);
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(allByChannleId);
@@ -47,8 +50,9 @@ public class MessageController implements MessageDoc {
 
 
     @RequestMapping(method = POST)
-    public ResponseEntity<Res_Message> create(@RequestPart("messageCreateRequest") MessageCreateRequest dtoMessage,
-                                              @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList) {
+    public ResponseEntity<Res_Message> create(
+        @RequestPart("messageCreateRequest") MessageCreateRequest dtoMessage,
+        @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList) {
 
         //💎Message 생성
         List<Dto_BinaryContent> collect = null;
@@ -58,16 +62,17 @@ public class MessageController implements MessageDoc {
                 .toList();
         }
 
-        Res_Message resMessage = messageService.create(dtoMessage, Optional.ofNullable(collect));
+        Res_Message resMessage
+            = messageService.create(dtoMessage, Optional.ofNullable(collect));
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(resMessage);
     }
 
-
     @RequestMapping(value = "/{messageId}", method = DELETE)
-    public ResponseEntity<Object> deleteMessage(@PathVariable("messageId") UUID messageId) {
+    public ResponseEntity<Object> deleteMessage(
+        @PathVariable("messageId") UUID messageId) {
         //💎Message 삭제
         messageService.deleteMessage(messageId);
 
@@ -76,12 +81,14 @@ public class MessageController implements MessageDoc {
             .build();
     }
 
-
     @RequestMapping(value = "/{messageId}", method = PATCH)
-    public ResponseEntity<Res_Message> updateMessage(@PathVariable("messageId") UUID messageId,
-                                                      @RequestBody Dto_MessageUpdate requestDto) {
+    public ResponseEntity<Res_Message> updateMessage(
+        @PathVariable("messageId") UUID messageId,
+        @RequestBody Dto_MessageUpdate requestDto) {
         //💎Message 내용 수정
-        Res_Message resMessage = messageService.updateMessage(messageId, requestDto);
+        Res_Message resMessage
+            = messageService.updateMessage(messageId, requestDto);
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(resMessage);

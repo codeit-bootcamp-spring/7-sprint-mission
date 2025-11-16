@@ -10,7 +10,7 @@ import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatusUpdate;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
-import com.sprint.mission.discodeit.entity.dto.Res_UserStatus;
+import com.sprint.mission.discodeit.entity.dto.Res_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.UserDto;
 import com.sprint.mission.discodeit.service.basic.UserService;
 import com.sprint.mission.discodeit.service.basic.UserStatusService;
@@ -45,11 +45,13 @@ public class UserController implements UserDoc {
 
     @GetMapping
     public ResponseEntity<List<UserDto>> findAll() {
-      //💎 전체 User 목록 조회
-      List<UserDto> userDtoList = userService.findAll();
-      return ResponseEntity
-          .status(HttpStatus.OK)
-          .body(userDtoList);
+    //💎 전체 User 목록 조회
+    List<UserDto> userDtoList
+        = userService.findAll();
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(userDtoList);
     }
 
     @PostMapping
@@ -59,7 +61,8 @@ public class UserController implements UserDoc {
         @RequestPart(value = "profile", required = false) MultipartFile file) {
         //💎User 등록
         Dto_BinaryContent dtoFile = parsingMultipartFile(file);
-        Res_User resUser = userService.create(dtoUser, Optional.ofNullable(dtoFile));
+        Res_User resUser
+            = userService.create(dtoUser, Optional.ofNullable(dtoFile));
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -86,7 +89,8 @@ public class UserController implements UserDoc {
         //💎User 정보 수정
         Dto_BinaryContent dtoFile = parsingMultipartFile(file);
 
-        Res_User resUser = userService.update(userId, dtoUser, Optional.ofNullable(dtoFile));
+        Res_User resUser
+            = userService.update(userId, dtoUser, Optional.ofNullable(dtoFile));
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -94,12 +98,15 @@ public class UserController implements UserDoc {
     }
 
     @RequestMapping(value = "/{userId}/userStatus", method = PATCH)
-    public ResponseEntity<Res_UserStatus> updateUserStatus(
+    public ResponseEntity<Res_UserUpdate> updateUserStatus(
         @PathVariable("userId") UUID userId,
         @RequestBody Dto_UserStatusUpdate userStatusUpdate) {
+
         //💎User 온라인 상태 업데이트
-      Res_UserStatus resUserStatus = userStatusService.updateUserStatus(userId, userStatusUpdate.newLastActiveAt());
-      return ResponseEntity
+        Res_UserUpdate resUserStatus
+          = userStatusService.updateUserStatus(userId, userStatusUpdate.newLastActiveAt());
+
+        return ResponseEntity
             .status(HttpStatus.OK)
             .body(resUserStatus);
     }

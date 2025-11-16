@@ -38,7 +38,8 @@ public class ChannelController implements ChannelDoc {
     public ResponseEntity<Res_Channel> createPublic(
         @RequestBody Dto_CreateChannelPublic dtoCreateChannel) {
 
-        Res_Channel aPublic = channelService.createPublic(dtoCreateChannel);
+        Res_Channel aPublic
+            = channelService.createPublic(dtoCreateChannel);
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -50,7 +51,8 @@ public class ChannelController implements ChannelDoc {
     public ResponseEntity<Res_Channel> createPrivate(@
         RequestBody Dto_CreateChannelPrivate dtoCreateChannel) {
 
-        Res_Channel channel = channelService.createPrivate(dtoCreateChannel);
+        Res_Channel channel
+            = channelService.createPrivate(dtoCreateChannel);
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -75,7 +77,8 @@ public class ChannelController implements ChannelDoc {
         @PathVariable("channelId") UUID channelId,
         @RequestBody ChannelDto_Update channelDtoUpdate) {
 
-        Res_Channel resChannel = channelService.update(channelId, channelDtoUpdate);
+        Res_Channel resChannel
+            = channelService.update(channelId, channelDtoUpdate);
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -87,7 +90,8 @@ public class ChannelController implements ChannelDoc {
     public ResponseEntity<List<Res_ChannelFind>> findAllByUserId(
         @RequestParam("userId") UUID userId) {
 
-        List<Res_ChannelFind> allByUserId = channelService.findAllByUserId(userId);
+        List<Res_ChannelFind> allByUserId
+            = channelService.findAllByUserId(userId);
 
         return ResponseEntity
             .status(HttpStatus.OK)

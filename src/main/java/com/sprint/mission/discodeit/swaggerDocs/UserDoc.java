@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatusUpdate;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
-import com.sprint.mission.discodeit.entity.dto.Res_UserStatus;
+import com.sprint.mission.discodeit.entity.dto.Res_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -136,7 +136,7 @@ public interface UserDoc {
             responseCode = "200",
             description = "User 온라인 상태가 성공적으로 업데이트됨",
             content = @Content(
-                schema = @Schema(implementation = Res_UserStatus.class)
+                schema = @Schema(implementation = Res_UserUpdate.class)
             )
         ),
         @ApiResponse(
@@ -147,7 +147,7 @@ public interface UserDoc {
             )
         )
     })
-    ResponseEntity<Res_UserStatus> updateUserStatus(
+    ResponseEntity<Res_UserUpdate> updateUserStatus(
         @Parameter(description = "상태를 변경할 User ID") @PathVariable("userId") UUID userId,
         @org.springframework.web.bind.annotation.RequestBody Dto_UserStatusUpdate userStatusUpdate);
 }

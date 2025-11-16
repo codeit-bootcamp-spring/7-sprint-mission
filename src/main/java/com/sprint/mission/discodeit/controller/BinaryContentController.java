@@ -26,7 +26,10 @@ public class BinaryContentController implements BinaryContentDoc {
     @RequestMapping(method = GET)
     public ResponseEntity<ArrayList<Res_BinaryContent>> find(
         UUID[] binaryContentIds) {
-        ArrayList<Res_BinaryContent> arrayList = new ArrayList<>(binaryContentService.findAllByIdIn(binaryContentIds));
+
+        ArrayList<Res_BinaryContent> arrayList
+            = new ArrayList<>(binaryContentService.findAllByIdIn(binaryContentIds));
+
         return ResponseEntity
               .status(HttpStatus.OK)
               .body(arrayList);
@@ -36,7 +39,10 @@ public class BinaryContentController implements BinaryContentDoc {
     @RequestMapping(value = "/{binaryContentId}", method = GET)
     public ResponseEntity<Res_BinaryContent> find(
         @PathVariable("binaryContentId") UUID binaryContentId) {
-        Res_BinaryContent resBinaryContent = binaryContentService.find(binaryContentId);
+
+        Res_BinaryContent resBinaryContent
+            = binaryContentService.find(binaryContentId);
+
         return ResponseEntity
               .status(HttpStatus.OK)
               .body(resBinaryContent);
