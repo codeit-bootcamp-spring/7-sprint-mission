@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Res_BinaryContent;
+import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.repository.file.FileBinaryContentRepository;
 import com.sprint.mission.discodeit.service.InterfaceBinaryContentService;
 import java.util.List;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BinaryContentService implements InterfaceBinaryContentService {
-    private final FileBinaryContentRepository binaryContentRepository;
+    private final BaseInterfaceRepository<BinaryContent> binaryContentRepository;
 
     public Res_BinaryContent create(Dto_BinaryContent dtoBinaryContent) {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.

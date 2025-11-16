@@ -6,10 +6,7 @@ import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.dto.Res_Message;
-import com.sprint.mission.discodeit.repository.InterfaceBinaryContentRepository;
-import com.sprint.mission.discodeit.repository.InterfaceChannelRepository;
-import com.sprint.mission.discodeit.repository.InterfaceMessageRepository;
-import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
+import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +21,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 public class MessageService implements InterfaceMessageService {
-    private final InterfaceMessageRepository messageRepository;
-    private final InterfaceChannelRepository channelRepository;
-    private final InterfaceUserRepository userRepository;
-    private final InterfaceBinaryContentRepository userContentsRepository;
+    private final BaseInterfaceRepository<Message> messageRepository;
+    private final BaseInterfaceRepository<BinaryContent> binaryContentRepository;
 
     @Override
     public Res_Message create(MessageCreateRequest dtoMessage, Optional<List<Dto_BinaryContent>> dtoList) {
@@ -45,7 +40,7 @@ public class MessageService implements InterfaceMessageService {
             for (Dto_BinaryContent dtoBinaryContent : dtoList.get()) {
                 BinaryContent binaryContent = new BinaryContent(dtoBinaryContent);
                 attachemntIds.add(binaryContent.getId());
-                userContentsRepository.save(binaryContent);
+                binaryContentRepository.save(binaryContent);
             }
         }
 
@@ -58,7 +53,8 @@ public class MessageService implements InterfaceMessageService {
 
     @Override
     public void deleteMessage(UUID messageID) {
-      Message message = messageRepository.findById(messageID).map(model -> (Message)model)
+      Message message = messageRepository.findById(messageID)
+          .map(model -> (Message)model)
           .orElseThrow(() -> new NoSuchElementException("🚨Message [" + messageID.toString() + "] 를 찾을 수 없음"));
 
       messageRepository.deleteById(messageID);
@@ -82,7 +78,8 @@ public class MessageService implements InterfaceMessageService {
 //        }
 
         List<Res_Message> resMessage = messages.stream()
-            .filter(msg -> msg.getChannelId().equals(channelID)).map(Res_Message::from).toList();
+            .filter(msg -> msg.getChannelId().equals(channelID)).map(Res_Message::from)
+            .toList();
 
         resMessage.stream().forEach(message -> log.info("✅ findAllByChannleId = [" + channelID.toString() + "][" + message.content() + "]"));
 //        for (Res_Message content : resMessage) {
@@ -95,7 +92,8 @@ public class MessageService implements InterfaceMessageService {
     public Res_Message updateMessage(UUID messageId, Dto_MessageUpdate requestDto) {
         // [ ] DTO를 활용해 파라미터를 그룹화합니다.
         // 수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
-        Message message = messageRepository.findById(messageId).stream().findFirst()
+        Message message = messageRepository.findById(messageId).stream()
+            .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("🚨Message [" + messageId.toString() + "]를 찾을 수 없음"));
 
         message.updateMessage(requestDto.newContent());

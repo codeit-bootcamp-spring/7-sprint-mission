@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.repository.InterfaceReadStatusRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
-
+import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
 
 @Repository
-public class FileReadStatusRepository  implements InterfaceReadStatusRepository {
+public class FileReadStatusRepository  implements BaseInterfaceRepository<ReadStatus> {
     private final FileUtil fileUtil;
     public FileReadStatusRepository(@Qualifier("readStatusFileUtil") FileUtil fileUtil) {
         this.fileUtil = fileUtil;
@@ -35,16 +34,6 @@ public class FileReadStatusRepository  implements InterfaceReadStatusRepository 
     @Override
     public List<ReadStatus> findAll() {
         return fileUtil.findAll().stream().map(readStatusID -> (ReadStatus)readStatusID).toList();
-    }
-
-    @Override
-    public boolean existsById(UUID readStatusID) {
-        return false;
-    }
-
-    @Override
-    public boolean existsByName(String name) {
-        return false;
     }
 
     //    @Override

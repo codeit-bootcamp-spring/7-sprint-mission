@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.repository.InterfaceChannelRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
-
+import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
 
 @Repository
-public class FileChannelRepository implements InterfaceChannelRepository {
+public class FileChannelRepository implements BaseInterfaceRepository<Channel> {
     private final FileUtil fileUtil;
 
     public FileChannelRepository(@Qualifier("channelFileUtil") FileUtil fileUtil) {
@@ -36,15 +35,5 @@ public class FileChannelRepository implements InterfaceChannelRepository {
     @Override
     public List<Channel> findAll() {
         return fileUtil.findAll().stream().map(model -> (Channel)model).toList();
-    }
-
-    @Override
-    public boolean existsById(UUID channelID) {
-        return fileUtil.existsRepository(channelID);
-    }
-
-    @Override
-    public boolean existsByName(String name) {
-        return fileUtil.findAll().stream().map(channel -> (Channel)channel).anyMatch(channel -> channel.getChannelName().equals(name));
     }
 }

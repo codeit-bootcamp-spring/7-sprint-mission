@@ -6,8 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatusUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
-import com.sprint.mission.discodeit.repository.InterfaceChannelRepository;
-import com.sprint.mission.discodeit.repository.InterfaceReadStatusRepository;
+import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceReadStatusService;
 import java.util.List;
@@ -22,24 +21,26 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ReadStatusService implements InterfaceReadStatusService {
-    private final InterfaceReadStatusRepository readStatusRepository;
     private final InterfaceUserRepository userRepository;
-    private final InterfaceChannelRepository channelRepository;
+    private final BaseInterfaceRepository<Channel> channelRepository;
+    private final BaseInterfaceRepository<ReadStatus> readStatusRepository;
 
     public Res_ReadStatus create(Dto_ReadStatus dtoReadStatus) {
-        User user = userRepository.findById(dtoReadStatus.userId()).stream().findFirst()
+        User user = userRepository.findById(dtoReadStatus.userId()).stream()
+            .findFirst()
             .orElseThrow(() -> new NoSuchElementException("🚨User[" + dtoReadStatus.userId().toString() + "] 를 찾을 수 없음 "));
 
-        Channel channel = channelRepository.findById(dtoReadStatus.channelId()).stream().findFirst()
+        Channel channel = channelRepository.findById(dtoReadStatus.channelId()).stream()
+            .findFirst()
             .orElseThrow(() -> new NoSuchElementException("🚨Channel[" + dtoReadStatus.channelId().toString() + "] 를 찾을 수 없음 "));
 
         // 이미 있으면 오류가 맞는걸까? => 그냥 이게 의도한 오류 한줄 던지니 깔끔! 요걸로 채택!
         // 있는걸 되돌려줘도 되는걸까?  => 해봤더니 줄줄이 사탕 에러!
-        Optional<ReadStatus> byUserAndChannelId = readStatusRepository.findByUserAndChannelId(
-            user.getId(), channel.getId()).stream().findFirst();
+        Optional<ReadStatus> byUserAndChannelId
+            = readStatusRepository.findByUserAndChannelId(user.getId(), channel.getId()).stream()
+            .findFirst();
 
         if (byUserAndChannelId == null) {
-//            return Res_ReadStatus.from(byUserAndChannelId.get());
             throw new IllegalArgumentException("⚠️이미 있는 User + Channel 임!");
         }
 
@@ -53,7 +54,8 @@ public class ReadStatusService implements InterfaceReadStatusService {
     public Res_ReadStatus find(UUID statusID) {
         //find
         //[ ] id로 조회합니다.
-        ReadStatus readStatus = readStatusRepository.findById(statusID).stream().findFirst()
+        ReadStatus readStatus = readStatusRepository.findById(statusID).stream()
+            .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("🚨statusID = [" + statusID.toString() + "] 오류"));
 
         Res_ReadStatus dto = Res_ReadStatus.from(readStatus);

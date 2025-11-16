@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Res_UserUpdate;
+import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
-import com.sprint.mission.discodeit.repository.InterfaceUserStatusRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserStatusService;
 import java.time.Instant;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserStatusService implements InterfaceUserStatusService {
-    private final InterfaceUserStatusRepository userStatusRepository;
+    private final BaseInterfaceRepository<UserStatus> userStatusRepository;
     private final InterfaceUserRepository userRepository;
 
     public Res_UserUpdate create(UUID userId) {

@@ -12,9 +12,7 @@ import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPrivate;
 import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPublic;
 import com.sprint.mission.discodeit.entity.dto.Res_Channel;
 import com.sprint.mission.discodeit.entity.dto.Res_ChannelFind;
-import com.sprint.mission.discodeit.repository.InterfaceChannelRepository;
-import com.sprint.mission.discodeit.repository.InterfaceMessageRepository;
-import com.sprint.mission.discodeit.repository.InterfaceReadStatusRepository;
+import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.service.InterfaceChannelService;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -30,10 +28,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 public class ChannelService implements InterfaceChannelService {
-    private final InterfaceChannelRepository channelRepository;
-    private final InterfaceReadStatusRepository readStatusRepository;
-    private final InterfaceMessageRepository messageRepository;
-
+    private final BaseInterfaceRepository<Channel> channelRepository;
+    private final BaseInterfaceRepository<Message> messageRepository;
+    private final BaseInterfaceRepository<ReadStatus> readStatusRepository;
 
     @Override
     public Res_Channel createPublic(Dto_CreateChannelPublic dtoCreateChannel) {
@@ -76,7 +73,8 @@ public class ChannelService implements InterfaceChannelService {
         List<Message> allMessageInChannel = messageRepository.findAllMessageInChannel(dtoChannel.id())
             .orElseThrow(() -> new IllegalArgumentException("🚨채널[" + dtoChannel.id().toString() + "]에 해당하는 메세지 없음"));
         Message message = allMessageInChannel.stream()
-            .max(Comparator.comparing(Message::getCreatedAt)).orElse(null);
+            .max(Comparator.comparing(Message::getCreatedAt))
+            .orElse(null);
         Instant lastMessageAt = (message != null) ? message.getCreatedAt() : null;
 
         //!!⭐️ ReadStatus = Private Channel 만 가능??

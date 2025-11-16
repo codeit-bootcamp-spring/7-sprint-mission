@@ -8,9 +8,8 @@ import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
 import com.sprint.mission.discodeit.entity.dto.UserDto;
-import com.sprint.mission.discodeit.repository.InterfaceBinaryContentRepository;
+import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
-import com.sprint.mission.discodeit.repository.InterfaceUserStatusRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +26,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor //@Repository 있어야 등록시켜 줌!!
 public class UserService implements InterfaceUserService {
     private final InterfaceUserRepository userRepository;
-    private final InterfaceUserStatusRepository userStatusRepository;
-    private final InterfaceBinaryContentRepository binaryContentRepository;
+    private final BaseInterfaceRepository<UserStatus> userStatusRepository;
+    private final BaseInterfaceRepository<BinaryContent> binaryContentRepository;
 
 //    public UserService(FileUserRepository fileUserRepository) {
 //        this.fileUserRepository = fileUserRepository;
