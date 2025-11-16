@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.global.utils;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.UUID;
 - 4. 내부 클래스도 자동 static 처리
  */
 @UtilityClass
+@Slf4j
 public class FileIOHandler {
 
     // 저장하기
@@ -24,7 +26,7 @@ public class FileIOHandler {
             oos.writeObject(store);
             System.out.printf("✅ %s 정보가 파일에 저장되었습니다.\n", extractType(filePath));
         } catch (IOException e) {
-            System.out.println("❌ 정보 저장 중 오류 발생: " + e.getMessage());
+            log.error("❌ 정보 저장 중 오류 발생: {}", e.getMessage());
         }
     }
 
@@ -42,7 +44,7 @@ public class FileIOHandler {
             store.putAll(loaded);
             System.out.printf("✅ %s 정보를 파일에서 불러왔습니다.\n", extractType(filePath));
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("❌ 정보 불러오기 중 오류 발생: " + e.getMessage());
+            log.error("❌ 정보 불러오기 중 오류 발생: {}", e.getMessage());
         }
     }
 
