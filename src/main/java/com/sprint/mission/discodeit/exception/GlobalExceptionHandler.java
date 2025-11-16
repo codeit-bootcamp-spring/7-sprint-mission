@@ -11,69 +11,72 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorInfoRes> handleValidationException(
-            MethodArgumentNotValidException e, HttpServletRequest request) {
 
-        FieldError fieldError = e.getBindingResult().getFieldError(); // 첫 번째 오류 처리
-        ErrorCode errorCode;
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorInfoRes> handleValidationException(
+      MethodArgumentNotValidException e, HttpServletRequest request) {
 
-        switch (fieldError.getField()) {
-            case "email":
-                errorCode = ErrorCode.SIGNUP_EMAIL_INVALID;
-                break;
-            case "nickname":
-                errorCode = ErrorCode.SIGNUP_NICKNAME_INVALID;
-                break;
-            case "password":
-                errorCode = ErrorCode.SIGNUP_PASSWORD_INVALID;
-                break;
-            default:
-                errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
-                break;
-        }
+    FieldError fieldError = e.getBindingResult().getFieldError(); // 첫 번째 오류 처리
+    ErrorCode errorCode;
 
-        log.error("[ValidationError] {} - field={} value={} | url={} | method={} | ip={}",
-                errorCode.getCode(),
-                fieldError.getField(),
-                fieldError.getRejectedValue(),
-                request.getRequestURI(),
-                request.getMethod(),
-                request.getRemoteAddr()
-        );
-
-        return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(ErrorInfoRes.from(errorCode));
+    switch (fieldError.getField()) {
+      case "email":
+        errorCode = ErrorCode.EMAIL_INVALID;
+        break;
+      case "nickname":
+        errorCode = ErrorCode.NICKNAME_INVALID;
+        break;
+      case "password":
+        errorCode = ErrorCode.PASSWORD_INVALID;
+        break;
+      default:
+        errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        break;
     }
 
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorInfoRes> handleCustomException(CustomException e, HttpServletRequest request){
-        ErrorCode errorCode = e.getErrorCode();
-        log.error("[CustomException] {} - {} | url={} | method={} | ip={}",
-                errorCode.getCode(),
-                errorCode.getMessage(),
-                request.getRequestURI(),
-                request.getMethod(),
-                request.getRemoteAddr()
-        );
-        return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(ErrorInfoRes.from(errorCode));
-    }
+    log.error("[ValidationError] {} - field={} value={} | url={} | method={} | ip={}",
+        errorCode.getCode(),
+        fieldError.getField(),
+        fieldError.getRejectedValue(),
+        request.getRequestURI(),
+        request.getMethod(),
+        request.getRemoteAddr()
+    );
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorInfoRes> handleException(CustomException e, HttpServletRequest request){
-        log.error("[Exception] {} | url={} | method={} | ip={}",
-                e.getMessage(),
-                request.getRequestURI(),
-                request.getMethod(),
-                request.getRemoteAddr()
-                //e  // stack trace 포함
-        );
-        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
-        return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(ErrorInfoRes.from(errorCode));
-    }
+    return ResponseEntity
+        .status(errorCode.getStatus())
+        .body(ErrorInfoRes.from(errorCode));
+  }
+
+  @ExceptionHandler(CustomException.class)
+  public ResponseEntity<ErrorInfoRes> handleCustomException(CustomException e,
+      HttpServletRequest request) {
+    ErrorCode errorCode = e.getErrorCode();
+    log.error("[CustomException] {} - {} | url={} | method={} | ip={}",
+        errorCode.getCode(),
+        errorCode.getMessage(),
+        request.getRequestURI(),
+        request.getMethod(),
+        request.getRemoteAddr()
+    );
+    return ResponseEntity
+        .status(errorCode.getStatus())
+        .body(ErrorInfoRes.from(errorCode));
+  }
+
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ErrorInfoRes> handleException(CustomException e,
+      HttpServletRequest request) {
+    log.error("[Exception] {} | url={} | method={} | ip={}",
+        e.getMessage(),
+        request.getRequestURI(),
+        request.getMethod(),
+        request.getRemoteAddr()
+        //e  // stack trace 포함
+    );
+    ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+    return ResponseEntity
+        .status(errorCode.getStatus())
+        .body(ErrorInfoRes.from(errorCode));
+  }
 }
