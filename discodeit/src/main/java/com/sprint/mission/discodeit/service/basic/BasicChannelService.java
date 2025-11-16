@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
-import com.sprint.mission.discodeit.dto.request.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -29,20 +31,30 @@ public class BasicChannelService implements ChannelService {
      * 채널 생성
      */
     @Override
-    public Channel create(ChannelCreateRequest request) {
-        Channel channel;
+    public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
+        Channel channel = new Channel(
+            ChannelType.PUBLIC,
+            request.name(),
+            request.description()
+        );
 
-        if (request.type() == ChannelType.PUBLIC) {
-            channel = new Channel(ChannelType.PUBLIC, request.name(), request.description());
-        } else if (request.type() == ChannelType.PRIVATE) {
-            channel = new Channel(ChannelType.PRIVATE, null, null);
-        } else {
-            throw new IllegalArgumentException("지원하지 않는 채널 타입입니다.");
-        }
+        Channel saved = channelRepository.save(channel);
+        return toDto(saved);
+    }
+
+    @Override
+    public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
+
+        Channel channel = new Channel(
+            ChannelType.PRIVATE,
+            null,
+            null
+        );
 
         Channel saved = channelRepository.save(channel);
 
-        if (channel.getType() == ChannelType.PRIVATE && request.participantIds() != null) {
+        // 참여자 읽음 상태 초기화
+        if (request.participantIds() != null) {
             request.participantIds().forEach(userId -> {
                 readStatusRepository.save(
                     new ReadStatus(userId, saved.getId(), Instant.MIN)
@@ -50,7 +62,7 @@ public class BasicChannelService implements ChannelService {
             });
         }
 
-        return saved;
+        return toDto(saved);
     }
 
     /**
@@ -79,6 +91,16 @@ public class BasicChannelService implements ChannelService {
             )
             .map(this::toDto)
             .toList();
+    }
+
+    @Override
+    public ChannelDto updatePublicChannel(UUID channelId, PublicChannelUpdateRequest request) {
+        return null;
+    }
+
+    @Override
+    public void deleteChannel(UUID channelId) {
+
     }
 
     /**
