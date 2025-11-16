@@ -19,6 +19,7 @@ public class SwaggerConfig {
     );
 
     return new OpenAPI()
+        .openapi("2.8.8")
         .info(apiInfo())
         .servers(servers)
         .components(new Components());
