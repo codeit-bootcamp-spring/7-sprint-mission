@@ -5,23 +5,22 @@ import com.sprint.mission.discodeit.dto.channel.request.CreatePublicChannelDto;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.response.CreateChannelResponseDto;
+import com.sprint.mission.discodeit.global.dto.CustomApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
-import java.util.UUID;
 
 @Tag(name = "Channel", description = "Channel API")
 public interface ChannelDocs {
@@ -66,7 +65,7 @@ public interface ChannelDocs {
           responseCode = "404",
           description = "Channel을 찾을 수 없음",
           content = @Content(
-              examples = @ExampleObject(value = "Channel with id {channelId} not found")
+              schema = @Schema(implementation = CustomApiResponse.class)
           )
       )
   })
@@ -84,11 +83,11 @@ public interface ChannelDocs {
           )
       ),
       @ApiResponse(
-          responseCode = "400",
+          responseCode = "403",
           description = "Private Channel은 수정할 수 없음",
           content = @Content(
               mediaType = "*/*",
-              examples = @ExampleObject(value = "Private channel cannot be updated")
+              schema = @Schema(implementation = CustomApiResponse.class)
           )
       ),
       @ApiResponse(
@@ -96,14 +95,13 @@ public interface ChannelDocs {
           description = "Channel을 찾을 수 없음",
           content = @Content(
               mediaType = "*/*",
-              examples = @ExampleObject(value = "Channel with id {channelId} not found")
+              schema = @Schema(implementation = CustomApiResponse.class)
           )
       )
   })
   ResponseEntity<CreateChannelResponseDto> updateChannel(
       @Parameter(description = "수정할 Channel ID") @PathVariable UUID channelId,
       @Parameter(description = "수정할 Channel 정보") @RequestBody UpdateChannelDto updateChannelDto);
-
 
   @Operation(summary = "User가 참여 중인 Channel 목록 조회")
   @ApiResponses({

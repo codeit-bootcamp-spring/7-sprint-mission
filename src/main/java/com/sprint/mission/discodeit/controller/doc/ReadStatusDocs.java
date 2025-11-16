@@ -3,11 +3,11 @@ package com.sprint.mission.discodeit.controller.doc;
 import com.sprint.mission.discodeit.dto.readStatus.request.CreateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.request.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.global.dto.CustomApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -30,11 +30,11 @@ public interface ReadStatusDocs {
           content = @Content(mediaType = "*/*", schema = @Schema(implementation = ReadStatusResponseDto.class))),
       @ApiResponse(responseCode = "400",
           description = "이미 읽음 상태가 존재함",
-          content = @Content(mediaType = "*/*", examples = @ExampleObject(value = "ReadStatus with userId {userId} and channelId {channelId} already exists"))
+          content = @Content(mediaType = "*/*", schema = @Schema(implementation = CustomApiResponse.class))
       ),
       @ApiResponse(responseCode = "404",
           description = "Channel 또는 User를 찾을 수 없음",
-          content = @Content(mediaType = "*/*", examples = @ExampleObject(value = "Channel | User with id {channelId | userId} not found"))
+          content = @Content(mediaType = "*/*", schema = @Schema(implementation = CustomApiResponse.class))
       )
   })
   ResponseEntity<ReadStatusResponseDto> createReadStatus(
@@ -48,7 +48,7 @@ public interface ReadStatusDocs {
           content = @Content(mediaType = "*/*", schema = @Schema(implementation = ReadStatusResponseDto.class))),
       @ApiResponse(responseCode = "404",
           description = "Message 읽음 상태를 찾을 수 없음",
-          content = @Content(mediaType = "*/*", examples = @ExampleObject(value = "ReadStatus with id {readStatusId} not found"))
+          content = @Content(mediaType = "*/*", schema = @Schema(implementation = CustomApiResponse.class))
       )
   })
   ResponseEntity<ReadStatusResponseDto> updateReadStatus(
