@@ -35,7 +35,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public CreateUserResponseDto createUser(CreateUserDto createUserDto,
-      CreateBinaryContentDto createBinaryContentDto) {
+      Optional<CreateBinaryContentDto> createBinaryContentDto) {
     if (userRepository.findByUsername(createUserDto.username()).isPresent()) {
       throw new CustomException(ErrorCode.USERNAME_ALREADY_EXIST);
     }
@@ -43,18 +43,18 @@ public class BasicUserService implements UserService {
       throw new CustomException(ErrorCode.EMAIL_ALREADY_EXIST);
     }
 
-    UUID profileId = null;
+    UUID profileId = createBinaryContentDto
+        .map(profileRequest -> {
+          String fileName = profileRequest.fileName();
+          String contentType = profileRequest.contentType();
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType, bytes);
+          binaryContentRepository.save(binaryContent);
 
-    if (createBinaryContentDto != null) {
-      BinaryContent binaryContent = new BinaryContent(
-          createBinaryContentDto.fileName(),
-          createBinaryContentDto.size(),
-          createBinaryContentDto.contentType(),
-          createBinaryContentDto.bytes()
-      );
-      profileId = binaryContent.getId();
-      binaryContentRepository.save(binaryContent);
-    }
+          return binaryContent.getId();
+        })
+        .orElse(null);
 
     User user = new User(
         createUserDto.username(), createUserDto.email(), createUserDto.password(), profileId);
@@ -95,26 +95,27 @@ public class BasicUserService implements UserService {
 
   @Override
   public CreateUserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
-      CreateBinaryContentDto createBinaryContentDto) {
+      Optional<CreateBinaryContentDto> createBinaryContentDto) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
         .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
 
-    UUID profileId = null;
+    UUID profileId = createBinaryContentDto
+        .map(profileRequest -> {
+          Optional.ofNullable(user.getProfileId()).ifPresent(binaryContentRepository::deleteById);
 
-    if (createBinaryContentDto != null) {
-      Optional.ofNullable(user.getProfileId()).ifPresent(binaryContentRepository::deleteById);
-      BinaryContent binaryContent = new BinaryContent(
-          createBinaryContentDto.fileName(),
-          createBinaryContentDto.size(),
-          createBinaryContentDto.contentType(),
-          createBinaryContentDto.bytes()
-      );
-      profileId = binaryContent.getId();
-      binaryContentRepository.save(binaryContent);
-    }
+          String fileName = profileRequest.fileName();
+          String contentType = profileRequest.contentType();
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType, bytes);
+          binaryContentRepository.save(binaryContent);
+
+          return binaryContent.getId();
+        })
+        .orElse(null);
 
     user.updateUser(updateUserDto.newUsername(),
         updateUserDto.newPassword(),

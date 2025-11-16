@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -40,17 +39,7 @@ public class MessageController implements MessageDocs {
     List<CreateBinaryContentDto> createBinaryContentDtos =
         Stream.ofNullable(attachments)
             .flatMap(Collection::stream)
-            .map(attachment -> {
-              try {
-                return new CreateBinaryContentDto(
-                    attachment.getOriginalFilename(),
-                    attachment.getContentType(),
-                    attachment.getSize(),
-                    attachment.getBytes());
-              } catch (IOException e) {
-                throw new RuntimeException(e);
-              }
-            })
+            .flatMap(attachment -> CreateBinaryContentDto.of(attachment).stream())
             .toList();
 
     MessageResponseDto messageResponseDto = messageService.createMessage(createMessageDto,

@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,17 +41,8 @@ public class UserController implements UserDocs {
   public ResponseEntity<CreateUserResponseDto> createUser(
       @Valid @RequestPart(value = "userCreateRequest") CreateUserDto userDto,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
-    CreateBinaryContentDto createBinaryContentDto = null;
 
-    if (profile != null && !profile.isEmpty()) {
-      createBinaryContentDto = new CreateBinaryContentDto(
-          profile.getOriginalFilename(),
-          profile.getContentType(),
-          profile.getSize(),
-          profile.getBytes()
-      );
-    }
-
+    Optional<CreateBinaryContentDto> createBinaryContentDto = CreateBinaryContentDto.of(profile);
     CreateUserResponseDto userResponseDto = userService.createUser(userDto, createBinaryContentDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
   }
@@ -71,16 +63,8 @@ public class UserController implements UserDocs {
   public ResponseEntity<CreateUserResponseDto> updateUser(@PathVariable UUID userId,
       @RequestPart(value = "userUpdateRequest") UpdateUserDto updateUserDto,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
-    CreateBinaryContentDto createBinaryContentDto = null;
 
-    if (profile != null && !profile.isEmpty()) {
-      createBinaryContentDto = new CreateBinaryContentDto(
-          profile.getOriginalFilename(),
-          profile.getContentType(),
-          profile.getSize(),
-          profile.getBytes()
-      );
-    }
+    Optional<CreateBinaryContentDto> createBinaryContentDto = CreateBinaryContentDto.of(profile);
     CreateUserResponseDto createUserResponseDto = userService.updateUser(userId, updateUserDto,
         createBinaryContentDto);
     return ResponseEntity.status(HttpStatus.OK).body(createUserResponseDto);
@@ -93,5 +77,4 @@ public class UserController implements UserDocs {
         updateUserDto);
     return ResponseEntity.status(HttpStatus.OK).body(userStatusResponseDto);
   }
-
 }
