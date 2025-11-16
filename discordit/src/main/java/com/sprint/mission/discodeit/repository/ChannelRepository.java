@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface ChannelRepository {
     void save(Channel channel);
     void update(Channel channel);
-    Optional<Channel> findById(UUID uuid);
+    Optional<Channel> find(UUID uuid);
     List<Channel> findAll();
     List<Channel> findAllPublic();
     List<Channel> findAllPrivateByUser(User user);

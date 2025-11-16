@@ -38,18 +38,17 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public Optional<ReadStatus> find(User user, Channel channel) {
+    public Optional<ReadStatus> find(UUID uuid) {
+        return data.stream()
+                .filter(r -> r.getUuid().equals(uuid))
+                .findFirst();
+    }
+
+    public Optional<ReadStatus> findBySenderAndReceiver(User user, Channel channel) {
         return data.stream()
                 .filter(r -> r.getUser().equals(user))
                 .filter(r -> r.getChannel().equals(channel))
                 .findFirst(); // 1개 이하가 보장됨
-    }
-
-    @Override
-    public Optional<ReadStatus> findById(UUID uuid) {
-        return data.stream()
-                .filter(r -> r.getId().equals(uuid))
-                .findFirst();
     }
 
     @Override
@@ -79,7 +78,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void delete(UUID uuid) {
-        data.removeIf(d -> d.getId().equals(uuid));
+        data.removeIf(d -> d.getUuid().equals(uuid));
         write();
     }
 

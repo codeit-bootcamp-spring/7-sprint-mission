@@ -1,24 +1,29 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.message.request.MessageRemoveRequest;
-import com.sprint.mission.discodeit.dto.message.request.MessageEditRequest;
-import com.sprint.mission.discodeit.dto.message.request.MessageGetRequest;
-import com.sprint.mission.discodeit.dto.message.request.MessageSendRequest;
-import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
+import com.sprint.mission.discodeit.dto.channel.request.MessageGetByChannelIdRequest;
+import com.sprint.mission.discodeit.dto.message.request.*;
+import com.sprint.mission.discodeit.dto.message.response.MessageResponseV2;
 import com.sprint.mission.discodeit.entity.Message;
 
+import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
+import java.util.UUID;
 
 public interface MessageService {
-    MessageResponse send(MessageSendRequest dto);
-    List<MessageResponse> get(MessageGetRequest dto);
-    void delete(MessageRemoveRequest message);
+    List<MessageResponseV2> get(MessageGetRequest dto);
+    void remove(UUID message);
     /**
      * 테스트용 임시 메서드: 마지막으로 전송된 메시지를 반환합니다.
      */
     Message getLastMessage();
 
-    MessageResponse editMessage(MessageEditRequest request);
+    MessageResponseV2 editMessage(UUID id, MessageEditRequest request);
 
-    List<MessageResponse> getAll();
+    List<MessageResponseV2> getAll();
+
+    List<MessageResponseV2> getAllByChannelId(@Valid MessageGetByChannelIdRequest request);
+
+    MessageResponseV2 send(@Valid MessageCreateRequestV2 messageCreateRequest, List<MultipartFile> attachments);
 }

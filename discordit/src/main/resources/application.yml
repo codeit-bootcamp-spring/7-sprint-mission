@@ -1,6 +1,9 @@
 spring:
   application:
     name: discordit
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
 
 validation:
   user:
@@ -27,3 +30,8 @@ data:
       binary-content: "${data.path.project-dir}${data.path.base-dir}/binary-content.sav"
       read-status: "${data.path.project-dir}${data.path.base-dir}/read-status.sav"
       user-status: "${data.path.project-dir}${data.path.base-dir}/user-status.sav"
+
+dummy-data:
+  enabled: true
+  skip-if-present: true
+  clean-before-seed: true

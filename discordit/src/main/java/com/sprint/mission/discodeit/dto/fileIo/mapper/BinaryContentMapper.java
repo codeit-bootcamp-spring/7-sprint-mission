@@ -9,7 +9,9 @@ final class BinaryContentMapper {
 
     public static BinaryContentIoDTO toDto(BinaryContent content) {
         return new BinaryContentIoDTO(
-                content.getId(),
+                content.getUuid(),
+                content.getCreatedAt(),
+                content.getUpdatedAt(),
                 content.getUploadedAt(),
                 content.getFileUrl()
         );
@@ -18,6 +20,8 @@ final class BinaryContentMapper {
     public static BinaryContent toBinaryContent(BinaryContentIoDTO dto) {
         return BinaryContent.fromDto(
                 dto.getUuid(),
+                dto.getCreatedAt(),
+                dto.getUpdatedAt(),
                 dto.getUploadedAt(),
                 dto.getFileUrl()
         );

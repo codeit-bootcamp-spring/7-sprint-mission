@@ -7,14 +7,18 @@ import java.util.UUID;
 
 public record ReadStatusResponse (
         UUID id,
-        String userId,
+        Instant createdAt,
+        Instant updatedAt,
+        UUID userId,
         UUID channelId,
         Instant lastReadAt
 ){
     public static ReadStatusResponse toDto(ReadStatus readStatus) {
         return new ReadStatusResponse(
-                readStatus.getId(),
-                readStatus.getUser().getUserId(),
+                readStatus.getUuid(),
+                readStatus.getCreatedAt(),
+                readStatus.getUpdatedAt(),
+                readStatus.getUser().getUuid(),
                 readStatus.getChannel().getUuid(),
                 readStatus.getLastReadAt()
         );

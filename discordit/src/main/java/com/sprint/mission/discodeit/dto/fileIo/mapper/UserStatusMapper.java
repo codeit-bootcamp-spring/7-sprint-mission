@@ -23,7 +23,7 @@ final class UserStatusMapper {
     public static UserStatus toUserStatus(UserStatusIoDTO dto, UserRepository userRepository) {
         User user = userRepository.find(dto.getUserUuid())
                 .orElseThrow(() -> new UserNotFoundException(dto.getUserUuid()));
-        return new UserStatus(user, dto.getOnlineStatus());
+        return new UserStatus(user, dto.getLastActiveAt(), dto.getOnlineStatus());
     }
 }
 

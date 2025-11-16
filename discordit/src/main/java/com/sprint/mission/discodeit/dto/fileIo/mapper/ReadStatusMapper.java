@@ -15,10 +15,12 @@ final class ReadStatusMapper {
 
     public static ReadStatusIoDTO toDto(ReadStatus readStatus) {
         return new ReadStatusIoDTO(
-                readStatus.getId(),
+                readStatus.getUuid(),
                 readStatus.getUser().getUuid(),
                 readStatus.getChannel().getUuid(),
-                readStatus.getLastReadAt()
+                readStatus.getLastReadAt(),
+                readStatus.getCreatedAt(),
+                readStatus.getUpdatedAt()
         );
     }
 
@@ -27,9 +29,9 @@ final class ReadStatusMapper {
                                           ChannelRepository channelRepository) {
         User user = userRepository.find(dto.getUserUuid())
                 .orElseThrow(() -> new UserNotFoundException(dto.getUserUuid()));
-        Channel channel = channelRepository.findById(dto.getChannelUuid())
+        Channel channel = channelRepository.find(dto.getChannelUuid())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.getChannelUuid()));
-        return ReadStatus.fromDto(dto.getUuid(), user, channel, dto.getLastReadAt());
+        return ReadStatus.fromDto(dto.getUuid(), user, channel, dto.getCreatedAt(), dto.getUpdatedAt(), dto.getLastReadAt());
     }
 }
 

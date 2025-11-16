@@ -17,12 +17,16 @@ public class ReadStatusIoDTO implements Serializable {
     private UUID userUuid;
     private UUID channelUuid;
     private Instant lastReadAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 
-    public ReadStatusIoDTO(UUID uuid, UUID userUuid, UUID channelUuid, Instant lastReadAt) {
+    public ReadStatusIoDTO(UUID uuid, UUID userUuid, UUID channelUuid, Instant lastReadAt, Instant createdAt, Instant updatedAt) {
         this.uuid = uuid;
         this.userUuid = userUuid;
         this.channelUuid = channelUuid;
         this.lastReadAt = lastReadAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }
 

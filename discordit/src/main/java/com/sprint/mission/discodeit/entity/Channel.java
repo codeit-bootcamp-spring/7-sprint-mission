@@ -12,18 +12,29 @@ public class Channel extends BaseEntity implements Receivable {
 
     private String channelName;
     private final ChannelScope scope;
-    private final ChannelType type;
+    private ChannelType type;
     private String description;
 
-    private Set<User> members; // 채널 등록 멤버 목록
-    private Set<User> moderators;// 운영진
+    private final Set<User> members = new HashSet<>(); // 채널 등록 멤버 목록
+    private final Set<User> moderators = new HashSet<>();// 운영진
 
-    public Channel(String channelName, ChannelScope scope, ChannelType type, Set<User> moderators) {
-        this.channelName = channelName;
+    // 기존 코드와의 호환성을 위해 남김
+    private Channel(ChannelScope scope) {
         this.scope = scope;
-        this.type = type;
-        this.members = new HashSet<>();
-        this.moderators = moderators;
+    }
+
+    public static Channel newPublicChannel(String channelName, String description) {
+        Channel channel = new Channel(ChannelScope.PUBLIC);
+        channel.channelName = channelName;
+        channel.description = description;
+        return channel;
+    }
+
+    public static Channel newPrivateChannel(Set<User> members) {
+        Channel channel = new Channel(ChannelScope.PRIVATE);
+        channel.channelName = null;
+        channel.members.addAll(members);
+        return channel;
     }
 
 
@@ -33,7 +44,8 @@ public class Channel extends BaseEntity implements Receivable {
     }
 
     public void setMembers(Set<User> members) {
-        this.members = members;
+        this.members.clear();
+        this.members.addAll(members);
         update();
     }
 
@@ -87,15 +99,17 @@ public class Channel extends BaseEntity implements Receivable {
         return channelName;
     }
 
+    // TODO: 시그니처 수정
     public static Channel fromDto(UUID uuid, Instant createdAt, Instant updatedAt,
                                   String channelName, String description, ChannelScope scope, ChannelType type,
                                   Set<User> moderators, Set<User> members) {
-        Channel channel = new Channel(channelName, scope, type, moderators);
+        Channel channel = new Channel(scope);
         channel.createdAt = createdAt;
         channel.uuid = uuid;
         channel.description = description;
-        channel.members = members;
+        channel.setMembers(members);
         channel.updatedAt = updatedAt;
+        channel.channelName = channelName;
         return channel;
     }
 

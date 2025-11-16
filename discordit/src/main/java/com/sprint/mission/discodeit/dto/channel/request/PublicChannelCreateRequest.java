@@ -2,21 +2,17 @@ package com.sprint.mission.discodeit.dto.channel.request;
 
 import com.sprint.mission.discodeit.enums.ChannelScope;
 import com.sprint.mission.discodeit.enums.ChannelType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Set;
 
+@Schema(description = "공개 채널 생성 요청")
 public record PublicChannelCreateRequest(
+        @Schema(description = "채널 이름", example = "일반 채팅방")
         @NotNull(message = "채널이름은 필수입니다.")
-        String channelName,
-        @NotNull(message = "공개 범위는 필수입니다.")
-        ChannelScope scope,
-        @NotNull(message = "타입은 필수입니다.")
-        ChannelType type,
-        String description,
-        @NotNull(message = "한 명 이상의 운영자는 필수입니다.")
-        Set<String> moderatorIds,
-        @NotNull(message = "한 명 이상의 멤버는 필수입니다.")
-        Set<String> memberIds
+        String name,
+        @Schema(description = "채널 설명", example = "자유롭게 대화하는 채널입니다", nullable = true)
+        String description
 ) {
 }

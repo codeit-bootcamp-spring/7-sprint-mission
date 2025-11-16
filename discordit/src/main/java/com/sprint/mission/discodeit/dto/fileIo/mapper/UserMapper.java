@@ -38,7 +38,7 @@ final class UserMapper {
                 user.getDisplayName(),
                 user.getBio(),
                 user.getOnlineStatus(),
-                user.getProfileImage() == null ? null : user.getProfileImage().getId()
+                user.getProfileImage() == null ? null : user.getProfileImage().getUuid()
         );
     }
 }

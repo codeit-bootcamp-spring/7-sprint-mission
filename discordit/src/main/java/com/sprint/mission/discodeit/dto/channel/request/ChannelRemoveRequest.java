@@ -6,6 +6,6 @@ import java.util.UUID;
 
 public record ChannelRemoveRequest(
         @NotNull(message = "id는 필수입니다.")
-        UUID id
+        UUID channelId
 ) {
 }

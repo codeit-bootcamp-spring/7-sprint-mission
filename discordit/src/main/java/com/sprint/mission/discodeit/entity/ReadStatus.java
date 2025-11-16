@@ -7,27 +7,34 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ReadStatus{
-    private UUID id;
-    private User user;
-    private Channel channel;
+public class ReadStatus extends BaseEntity{
+    private final User user;
+    private final Channel channel;
     @Setter
     private Instant lastReadAt;
 
-    public void read() {
-        this.lastReadAt = Instant.now();
-    }
-
     public ReadStatus(User user, Channel channel) {
-        id = UUID.randomUUID();
         this.user = user;
         this.channel = channel;
     }
 
-    public static ReadStatus fromDto(UUID id, User user, Channel channel, Instant lastReadAt) {
+    public void read() {
+        this.lastReadAt = Instant.now();
+        update();
+    }
+
+    public void read(Instant readAt) {
+        this.lastReadAt = readAt;
+        update();
+    }
+
+    public static ReadStatus fromDto(UUID id, User user, Channel channel,
+                                     Instant createdAt, Instant updatedAt, Instant lastReadAt) {
         ReadStatus r = new ReadStatus(user, channel);
-        r.id = id;
         r.lastReadAt = lastReadAt;
+        r.uuid = id;
+        r.createdAt = createdAt;
+        r.updatedAt = updatedAt;
         return r;
     }
 

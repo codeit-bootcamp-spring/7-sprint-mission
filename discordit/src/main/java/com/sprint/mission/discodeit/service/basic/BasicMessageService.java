@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.request.MessageRemoveRequest;
-import com.sprint.mission.discodeit.dto.message.request.MessageEditRequest;
-import com.sprint.mission.discodeit.dto.message.request.MessageGetRequest;
-import com.sprint.mission.discodeit.dto.message.request.MessageSendRequest;
-import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
+import com.sprint.mission.discodeit.dto.channel.request.MessageGetByChannelIdRequest;
+import com.sprint.mission.discodeit.dto.message.request.*;
+import com.sprint.mission.discodeit.dto.message.response.MessageResponseV2;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.enums.ReceiverType;
 import com.sprint.mission.discodeit.common.exceptions.channel.ChannelNotFoundException;
@@ -19,6 +17,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,48 +32,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public MessageResponse send(MessageSendRequest dto) {
-        User sender = getUserAndHandleException(dto.senderUserId());
-        Receivable receiver;
-        ReceiverType type = dto.type();
-
-        if (type == ReceiverType.USER) {
-            receiver = getUserAndHandleException(dto.receiverId());
-        } else if (type == ReceiverType.CHANNEL) {
-            UUID channelId = UUID.fromString(dto.receiverId());
-            receiver = channelRepository.findById(channelId)
-                    .orElseThrow(() -> new ChannelNotFoundException(channelId));
-        } else {
-            throw new ReceiverNotFoundException(dto.receiverId());
-        }
-
-        Message message = new Message(
-                sender,
-                type,
-                receiver,
-                dto.message()
-        );
-
-        if (dto.fileUrls() != null) {
-            List<BinaryContent> contents = dto.fileUrls().stream()
-                    .map(BinaryContent::new)
-                    .toList();
-            binaryContentRepository.saveAll(contents);
-            message.addAttachments(contents);
-        }
-
-        messageRepository.save(message);
-        return MessageResponse.toDto(message);
-    }
-
-    private User getUserAndHandleException(String userId) {
-        return userRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
-    }
-
-    // 이거 너무 어지러운데 한 메서드에서 너무 많은걸 하고 있는걸까요
-    @Override
-    public List<MessageResponse> get(MessageGetRequest dto) {
+    public List<MessageResponseV2> get(MessageGetRequest dto) {
         List<Message> messages;
         if (dto.senderId() != null && dto.receiverId() != null) {
             messages = messageRepository.findBySenderAndReceiver(
@@ -91,12 +49,12 @@ public class BasicMessageService implements MessageService {
             }
         }
         return messages.stream()
-                .map(MessageResponse::toDto)
+                .map(MessageResponseV2::toDto)
                 .toList();
     }
 
     private Channel findChannel(UUID channelId) {
-        return channelRepository.findById(channelId)
+        return channelRepository.find(channelId)
                 .orElseThrow(() -> new ChannelNotFoundException(channelId));
     }
 
@@ -106,9 +64,9 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void delete(MessageRemoveRequest dto) {
-        Message message = messageRepository.find(dto.id())
-                .orElseThrow(() -> new MessageNotFoundException(dto.id()));
+    public void remove(UUID id) {
+        Message message = messageRepository.find(id)
+                .orElseThrow(() -> new MessageNotFoundException(id));
         if (!message.getAttachments().isEmpty()) {
             binaryContentRepository.deleteAll(message.getAttachments());
         }
@@ -126,18 +84,43 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResponse editMessage(MessageEditRequest dto) {
-        Message message = messageRepository.find(dto.uuid())
-                .orElseThrow(() -> new MessageNotFoundException(dto.uuid()));
-        message.setContent(dto.content());
+    public MessageResponseV2 editMessage(UUID id, MessageEditRequest dto) {
+        Message message = messageRepository.find(id)
+                .orElseThrow(() -> new MessageNotFoundException(id));
+        message.setContent(dto.newContent());
         messageRepository.update(message);
-        return MessageResponse.toDto(message);
+        return MessageResponseV2.toDto(message);
     }
 
     @Override
-    public List<MessageResponse> getAll() {
+    public List<MessageResponseV2> getAll() {
         return messageRepository.findAll().stream()
-                .map(MessageResponse::toDto)
+                .map(MessageResponseV2::toDto)
                 .toList();
+    }
+
+    @Override
+    public List<MessageResponseV2> getAllByChannelId(MessageGetByChannelIdRequest request) {
+        return messageRepository.findByReceiver(channelRepository.find(request.channelId())
+                        .orElseThrow(() -> new ChannelNotFoundException(request.channelId())))
+                .stream()
+                .map(MessageResponseV2::toDto)
+                .toList();
+    }
+
+    @Override
+    public MessageResponseV2 send(MessageCreateRequestV2 messageCreateRequest, List<MultipartFile> attachments) {
+        Message message = new Message(
+                userRepository.find(messageCreateRequest.authorId())
+                        .orElseThrow(() -> new UserNotFoundException(messageCreateRequest.authorId())),
+                ReceiverType.CHANNEL,
+                channelRepository.find(messageCreateRequest.channelId())
+                        .orElseThrow(() -> new ChannelNotFoundException(messageCreateRequest.channelId())),
+                messageCreateRequest.content()
+
+        );
+        messageRepository.save(message);
+        // 파일 저장은 다음 미션때 구현...
+        return MessageResponseV2.toDto(message);
     }
 }

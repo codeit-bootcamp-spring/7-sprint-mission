@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface ReadStatusService {
     ReadStatusResponse create(ReadStatusCreateRequest dto);
-    ReadStatusResponse update(ReadStatusUpdateRequest dto);
+    ReadStatusResponse update(UUID id, ReadStatusUpdateRequest dto);
 
     void delete(UUID uuid);
     ReadStatusResponse get(UUID uuid);

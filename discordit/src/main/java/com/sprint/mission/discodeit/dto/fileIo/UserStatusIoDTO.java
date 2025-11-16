@@ -15,6 +15,7 @@ public class UserStatusIoDTO implements Serializable {
     private Instant createdAt;
     private Instant updatedAt;
     private UUID userUuid;
+    private Instant lastActiveAt;
     private OnlineStatus onlineStatus;
 
     public UserStatusIoDTO(UUID uuid,
