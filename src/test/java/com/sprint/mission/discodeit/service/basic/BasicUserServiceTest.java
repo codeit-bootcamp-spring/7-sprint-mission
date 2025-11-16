@@ -23,131 +23,131 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BasicUserServiceTest {
 
-    private UserService userService;
-    private UserRepository userRepository;
-    private BinaryContentRepository binaryContentRepository;
-    private UserStatusRepository userStatusRepository;
+  private UserService userService;
+  private UserRepository userRepository;
+  private BinaryContentRepository binaryContentRepository;
+  private UserStatusRepository userStatusRepository;
 
-    @BeforeEach
-    void setUp() {
-        userRepository = new JCFUserRepository();
-        binaryContentRepository = new JCFBinaryContentRepository();
-        userStatusRepository = new JCFUserStatusRepository();
-        userService = new BasicUserService(userRepository, binaryContentRepository, userStatusRepository);
-    }
+  @BeforeEach
+  void setUp() {
+    userRepository = new JCFUserRepository();
+    binaryContentRepository = new JCFBinaryContentRepository();
+    userStatusRepository = new JCFUserStatusRepository();
+    userService = new BasicUserService(userRepository, binaryContentRepository,
+        userStatusRepository);
+  }
 
-    @Test
-    void createUser() {
-        //given
-        User user = new User("진우", "닉네임", "a@a.com", "1234", null);
-        CreateUserCommand createUserCommand = new CreateUserCommand(user.getUsername(), user.getNickName(), user.getEmail(),user.getPassword(), null, null ,null);
+  @Test
+  void createUser() {
+    //given
+    User user = new User("진우", "닉네임", "a@a.com", "1234", null);
+    CreateUserCommand createUserCommand = new CreateUserCommand(user.getUsername(),
+        user.getNickName(), user.getEmail(), user.getPassword(), null, null, null);
 
+    //when (서비스 테스트)
+    UserResponseDto dto = userService.createUser(createUserCommand);
 
-        //when (서비스 테스트)
-        UserResponseDto dto = userService.createUser(createUserCommand);
+    //then
+    User userById = userRepository.findById(dto.userId()).orElseThrow();
+    assertEquals(user.getUsername(), userById.getUsername());
+    assertEquals(user.getNickName(), userById.getNickName());
+    assertEquals(user.getEmail(), userById.getEmail());
+    assertEquals(user.getPassword(), userById.getPassword());
+  }
 
-        //then
-        User userById = userRepository.findById(dto.userId()).orElseThrow();
-        assertEquals(user.getUsername(), userById.getUsername());
-        assertEquals(user.getNickName(), userById.getNickName());
-        assertEquals(user.getEmail(), userById.getEmail());
-        assertEquals(user.getPassword(), userById.getPassword());
-    }
+  @Test
+  void find() {
+    //given
+    User user = new User("진우", "닉네임", "a@a.com", "1234", null);
+    User user1 = userRepository.save(user);
+    UserStatus userStatus = new UserStatus(user1.getId());
+    userStatusRepository.save(userStatus);
 
-    @Test
-    void find() {
-        //given
-        User user = new User("진우", "닉네임", "a@a.com", "1234", null);
-        User user1 = userRepository.save(user);
-        UserStatus userStatus = new UserStatus(user1.getId());
-        userStatusRepository.save(userStatus);
+    //when
+    UserResponseDto dto = userService.find(user1.getId());
 
-        //when
-        UserResponseDto dto = userService.find(user1.getId());
+    //then
+    assertEquals(user1.getId(), dto.userId());
+    assertEquals(user1.getUsername(), dto.username());
+    assertEquals(user1.getEmail(), dto.email());
+    assertEquals(user1.getNickName(), dto.nickName());
+  }
 
-        //then
-        assertEquals(user1.getId(), dto.userId());
-        assertEquals(user1.getUsername(), dto.username());
-        assertEquals(user1.getEmail(), dto.email());
-        assertEquals(user1.getNickName(), dto.nickName());
-    }
+  @Test
+  void find_throw_when_invalid_id() {
+    //given
+    UUID invalidId = UUID.randomUUID();
 
-    @Test
-    void find_throw_when_invalid_id(){
-        //given
-        UUID invalidId = UUID.randomUUID();
+    //when&then
+    assertThrows(IllegalArgumentException.class, () -> userService.find(invalidId));
+    //then
+  }
 
-        //when&then
-        assertThrows(IllegalArgumentException.class, () -> userService.find(invalidId));
-        //then
-    }
+  @Test
+  void findAll() {
+    //given
+    User user = new User("진우", "닉네임", "a@a.com", "1234", null);
+    User user1 = new User("이름", "닉넴", "b", "2345", null);
+    userRepository.save(user);
+    userRepository.save(user1);
 
-    @Test
-    void findAll() {
-        //given
-        User user = new User("진우", "닉네임", "a@a.com", "1234", null);
-        User user1 = new User("이름", "닉넴", "b", "2345", null);
-        userRepository.save(user);
-        userRepository.save(user1);
+    UserStatus userStatus = new UserStatus(user.getId());
+    userStatusRepository.save(userStatus);
+    UserStatus userStatus1 = new UserStatus(user1.getId());
+    userStatusRepository.save(userStatus1);
 
-        UserStatus userStatus = new UserStatus(user.getId());
-        userStatusRepository.save(userStatus);
-        UserStatus userStatus1 = new UserStatus(user1.getId());
-        userStatusRepository.save(userStatus1);
+    //when
+    List<UserResponseDto> all = userService.findAll();
 
+    //then
+    assertEquals(2, all.size());
 
-        //when
-        List<UserResponseDto> all = userService.findAll();
+    List<UUID> userIds = all.stream()
+        .map(UserResponseDto::userId)
+        .toList();
 
-        //then
-        assertEquals(2, all.size());
+    assertTrue(userIds.contains(user.getId()));
+    assertTrue(userIds.contains(user1.getId()));
+  }
 
-        List<UUID> userIds = all.stream()
-                .map(UserResponseDto::userId)
-                .toList();
+  @Test
+  void updateUser() {
+    //given
+    User user = new User("진우", "닉네임", "a@a.com", "1234", null);
+    User saveUser = userRepository.save(user);
+    UserStatus userStatus = new UserStatus(saveUser.getId());
+    userStatusRepository.save(userStatus);
 
-        assertTrue(userIds.contains(user.getId()));
-        assertTrue(userIds.contains(user1.getId()));
-    }
+    //when
+    UpdateUserDto dto = new UpdateUserDto("아토", "하이", "b", saveUser.getId());
+    UserResponseDto user2 = userService.updateUser(dto, null);
 
-    @Test
-    void updateUser() {
-        //given
-        User user = new User("진우", "닉네임", "a@a.com", "1234", null);
-        User saveUser = userRepository.save(user);
-        UserStatus userStatus = new UserStatus(saveUser.getId());
-        userStatusRepository.save(userStatus);
+    //then
+    assertEquals(dto.username(), user2.username());
+    assertEquals(dto.nickName(), user2.nickName());
+    assertEquals(dto.email(), user2.email());
 
-        //when
-        UpdateUserDto dto = new UpdateUserDto("아토", "하이", "b", saveUser.getId());
-        UserResponseDto user2 = userService.updateUser(dto, null);
+    User updateUser = userRepository.findById(saveUser.getId()).orElseThrow();
 
-        //then
-        assertEquals(dto.username(), user2.username());
-        assertEquals(dto.nickName(), user2.nickName());
-        assertEquals(dto.email(), user2.email());
+    assertEquals(user2.username(), updateUser.getUsername());
+    assertEquals(user2.nickName(), updateUser.getNickName());
+    assertEquals(user2.email(), updateUser.getEmail());
+  }
 
-        User updateUser = userRepository.findById(saveUser.getId()).orElseThrow();
+  @Test
+  void deleteUser() {
+    //given
+    User user = new User("진우", "닉네임", "a@a.com", "1234", null);
+    User saveUser = userRepository.save(user);
+    UserStatus userStatus = new UserStatus(saveUser.getId());
+    userStatusRepository.save(userStatus);
 
-        assertEquals(user2.username(), updateUser.getUsername());
-        assertEquals(user2.nickName(), updateUser.getNickName());
-        assertEquals(user2.email(), updateUser.getEmail());
-    }
+    //when
+    userService.deleteUser(saveUser.getId());
 
-    @Test
-    void deleteUser() {
-        //given
-        User user = new User("진우", "닉네임", "a@a.com", "1234", null);
-        User saveUser = userRepository.save(user);
-        UserStatus userStatus = new UserStatus(saveUser.getId());
-        userStatusRepository.save(userStatus);
+    //then
+    Optional<User> deleteUser = userRepository.findById(saveUser.getId());
 
-        //when
-        userService.deleteUser(saveUser.getId());
-
-        //then
-        Optional<User> deleteUser = userRepository.findById(saveUser.getId());
-
-        assertTrue(deleteUser.isEmpty());
-    }
+    assertTrue(deleteUser.isEmpty());
+  }
 }
