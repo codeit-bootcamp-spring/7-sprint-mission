@@ -43,8 +43,15 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel create(CreatePrivateChannelRequestDto request) {
+        // 비공개 채널 참가 유저 존재 여부 판단
+        request.getParticipantIds().forEach(participantId -> {
+            userRepository.findById(participantId)
+                    .orElseThrow(() -> new  CustomException(ErrorCode.USER_NOT_FOUND));
+        });
+
         Channel channel = new Channel();
         channelRepository.save(channel);
+
         request.getParticipantIds().stream()
                 .forEach(userId ->
                         addMember(channel.getId(), new UpdateChannelRequestDto(userId))
@@ -72,9 +79,6 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void addMember(UUID channelId, UpdateChannelRequestDto request){
-        userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new  CustomException(ErrorCode.USER_NOT_FOUND));
-
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
@@ -131,6 +135,7 @@ public class BasicChannelService implements ChannelService {
     // Public 채널 목록은 전체 조회 + Private 채널은 User가 참여한 채널만 조회
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
+        System.out.println(channelRepository.findAll());
         return channelRepository.findAll().stream()
                 .filter(c -> c.getVisibility() == ChannelVisibility.PUBLIC ||
                         (c.getVisibility() == ChannelVisibility.PRIVATE && c.getMemberIds().contains(userId)))
