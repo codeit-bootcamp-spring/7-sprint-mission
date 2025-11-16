@@ -33,9 +33,12 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 
     // Swagger/OpenAPI 추가
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
+
 
     // 테스트 시에도 Lombok 사용
     testCompileOnly 'org.projectlombok:lombok:1.18.30'
