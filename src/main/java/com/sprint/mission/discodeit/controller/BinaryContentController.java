@@ -24,7 +24,7 @@ public class BinaryContentController {
 
     // 하나 및 여러 개 조회
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentDto>> getAllByIdIn(@RequestParam List<UUID> ids) {
-        return ResponseEntity.ok(binaryContentService.findAllBinaryContentByIdIn(ids));
+    public ResponseEntity<List<BinaryContentDto>> getAllByIdIn(@RequestParam List<UUID> binaryContentIds) {
+        return ResponseEntity.ok(binaryContentService.findAllBinaryContentByIdIn(binaryContentIds));
     }
 }
