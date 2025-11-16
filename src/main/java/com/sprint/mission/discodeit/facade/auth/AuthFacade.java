@@ -38,7 +38,8 @@ public class AuthFacade {
     userStatusService.updateOfflineAt(userStatus.getId());
 
     return UserDetailInfoRes.from(user,
-        binaryContentService.getBinaryContent(user.getProfileId()),
+        user.getProfileId() == null ? null
+            : binaryContentService.getBinaryContent(user.getProfileId()),
         true);
   }
 
