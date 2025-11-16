@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.entity.dto;
 
-import lombok.Builder;
-
-@Builder
 public record Dto_BinaryContent( //all private final
         String fileName,
         String contentType,
@@ -10,11 +7,11 @@ public record Dto_BinaryContent( //all private final
         Long fileSize
 ) {
     public static Dto_BinaryContent from(String fileName, String contentType, byte[] bytes, Long fileSize) {
-        return Dto_BinaryContent.builder()
-                .fileName(fileName)
-                .contentType(contentType)
-                .bytes(bytes)
-                .fileSize(fileSize)
-                .build();
+        return new Dto_BinaryContent(
+            fileName,
+            contentType,
+            bytes,
+            fileSize
+        );
     }
 }

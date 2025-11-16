@@ -2,34 +2,31 @@ package com.sprint.mission.discodeit.entity.dto;
 
 import com.sprint.mission.discodeit.entity.Message;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 
-@Builder
+
 public record Res_Message( //all private final
-    @NotBlank(message = "messageId is mandatory")
-    UUID messageId,
+    //@NotBlank(message = "messageId is mandatory")
+    UUID id,
     Instant createdAt,
     Instant updatedAt,
-
+    String content,
     UUID channelId,
     UUID authorId,
-    List<UUID>attachemntIds,
-    String message
-) {
+    List<UUID> attachmentIds
+    ) {
     public static Res_Message from(Message message) {
-        return Res_Message.builder()
-                .messageId(message.getId())
-                .createdAt(message.getCreatedAt())
-                .updatedAt(message.getUpdatedAt())
-                .channelId(message.getChannelId())
-                .authorId(message.getAuthorId())
-                .attachemntIds(message.getAttachemntIds())
-                .message(message.getMessage())
-                .build();
+        return new Res_Message(
+            message.getId(),
+            message.getCreatedAt(),
+            message.getUpdatedAt(),
+            message.getMessage(),
+            message.getChannelId(),
+            message.getAuthorId(),
+            message.getAttachemntIds()
+        );
     }
 }

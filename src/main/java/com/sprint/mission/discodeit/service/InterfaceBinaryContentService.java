@@ -9,6 +9,6 @@ import java.util.UUID;
 public interface InterfaceBinaryContentService extends BaseInterfaceService {
     Res_BinaryContent create(Dto_BinaryContent dtoBinaryContent);
     Res_BinaryContent find(UUID binaryContentId);
-    List<Res_BinaryContent> findAllByIdIn();
+    List<Res_BinaryContent> findAllByIdIn(UUID[] binaryContentIds);
     public void delete(UUID binaryContentId);
 }

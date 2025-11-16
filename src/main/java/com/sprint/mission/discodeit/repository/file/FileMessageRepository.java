@@ -1,14 +1,17 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.InterfaceMessageRepository;
+import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
-
 @Repository
-public class FileMessageRepository implements InterfaceMessageRepository {
+public class FileMessageRepository implements BaseInterfaceRepository<Message> {
     private final FileUtil fileUtil;
 
     public FileMessageRepository(@Qualifier("messageFileUtil") FileUtil fileUtil) {
@@ -32,9 +35,8 @@ public class FileMessageRepository implements InterfaceMessageRepository {
     }
 
     @Override
-    public Optional<List<Message>> findAll() {
-        List<Message> list = fileUtil.findAll().stream().map(model -> (Message) model).toList();
-        return Optional.ofNullable(list);
+    public List<Message> findAll() {
+        return fileUtil.findAll().stream().map(model -> (Message) model).toList();
     }
 
     @Override
@@ -46,20 +48,10 @@ public class FileMessageRepository implements InterfaceMessageRepository {
 
     @Override
     public Set<UUID> findAllUsersInChannel(List<Message> allMessageInChannel) {
-        Set userIDs = new HashSet<>();
+        Set<UUID> userIDs = new HashSet<>();
         for (Message message : allMessageInChannel) {
             userIDs.add(message.getAuthorId());
         }
         return userIDs;
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
-        return fileUtil.existsRepository(id);
-    }
-
-    @Override
-    public boolean existsByName(String name) { //?? name?? is  message?????
-        return fileUtil.findAll().stream().map(message-> (Message)message).anyMatch(message -> message.getMessage().equals(name));
     }
 }

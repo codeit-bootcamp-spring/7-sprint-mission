@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.common;
 
+import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,27 +20,32 @@ public class CommonExceptionHandler {
     // ❤️ 메서드를 호출한 상위 계층으로 전파됩니다.
     // ❤️ book, user, rental controller들 여기에서 다 처리
 
-
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> illegalArgsHandler(IllegalArgumentException e) {
-//        e.printStackTrace();
         log.error(e.getMessage(), e);
 //        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 
         // 예외의 원인을 http 상태 코드와 메세지를 통해 알려주고 싶다. -> ResponseEntity
         ApiResponse<Object> response = ApiResponse.error("ILLEGAL_ARGS", e.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // 400
     }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<?> noSuchElementHandler(NoSuchElementException e) {
+        log.error(e.getMessage(), e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND); // 404
+    }
+
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<?> illegalStateHandler(IllegalStateException e) {
-        e.printStackTrace();
+        log.error(e.getMessage(), e);
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> methodArgsNotValidHandler(MethodArgumentNotValidException e) {
-        e.printStackTrace();
+        log.error(e.getMessage(), e);
 
         // 1. 오류 결과를 담을 Map을 생성합니다. (Key: 필드명, Value: 에러 메세지)
         Map<String, String> errors = new HashMap<>();
@@ -52,8 +58,8 @@ public class CommonExceptionHandler {
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         for (FieldError error : fieldErrors) {
             String field = error.getField();
-            String message = error.getDefaultMessage();
-            errors.put(field, message);
+            String content = error.getDefaultMessage();
+            errors.put(field, content);
         }
         */
         e.getBindingResult().getFieldErrors().forEach(error -> {
@@ -69,7 +75,7 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> exceptionHandler(Exception e) {
-        e.printStackTrace();
+        log.error(e.getMessage(), e);
         return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

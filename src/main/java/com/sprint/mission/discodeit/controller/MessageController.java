@@ -1,59 +1,102 @@
 package com.sprint.mission.discodeit.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 import com.sprint.mission.discodeit.common.Util;
+import com.sprint.mission.discodeit.swaggerDocs.MessageDoc;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.Dto_Message;
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
+import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.dto.Res_Message;
 import com.sprint.mission.discodeit.service.basic.MessageService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.springframework.web.bind.annotation.RequestMethod.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/message")
-public class MessageController {
+@ResponseBody
+@RequestMapping("/api/messages")
+@Slf4j
+public class MessageController implements MessageDoc {
     private final MessageService messageService;
-    //    메시지 관리
-//    [ ] 메시지를 보낼 수 있다.
-//    [ ] 메시지를 수정할 수 있다.
-//    [ ] 메시지를 삭제할 수 있다.
-//    [ ] 특정 채널의 메시지 목록을 조회할 수 있다.
-    @RequestMapping(value = "/create", method = POST)
-    public Res_Message create(@RequestPart("message") Dto_Message dtoMessage,
-                              @RequestPart("file") List<MultipartFile> fileList) {
 
-        List<Dto_BinaryContent> collect = fileList.stream()
+    @GetMapping
+    public ResponseEntity<List<Res_Message>> findAllByChannleId(
+        @RequestParam("channelId") UUID channelID) {
+        //💎Channel의 Message 목록 조회
+        List<Res_Message> allByChannleId
+            = messageService.findAllByChannleId(channelID);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(allByChannleId);
+    }
+
+
+    @RequestMapping(method = POST)
+    public ResponseEntity<Res_Message> create(
+        @RequestPart("messageCreateRequest") MessageCreateRequest dtoMessage,
+        @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList) {
+
+        //💎Message 생성
+        List<Dto_BinaryContent> collect = null;
+        if (fileList != null) {
+            collect = fileList.stream()
                 .map(Util::parsingMultipartFile)
-                .toList(); // 변경가능 list
+                .toList();
+        }
 
-        return messageService.create(dtoMessage, Optional.of(collect));
+        Res_Message resMessage
+            = messageService.create(dtoMessage, Optional.ofNullable(collect));
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(resMessage);
     }
 
-    @RequestMapping(value = "/findAllByChannelId/{id}", method = GET)
-    public List<Res_Message> findAllByChannleId(@PathVariable("id") UUID channelID) {
-        return messageService.findAllByChannleId(channelID);
+    @RequestMapping(value = "/{messageId}", method = DELETE)
+    public ResponseEntity<Object> deleteMessage(
+        @PathVariable("messageId") UUID messageId) {
+        //💎Message 삭제
+        messageService.deleteMessage(messageId);
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .build();
     }
 
-    @RequestMapping(value = "/find/{id}", method = GET)
-    public Res_Message find(@PathVariable("id") UUID messageID) {
-        return messageService.find(messageID);
+    @RequestMapping(value = "/{messageId}", method = PATCH)
+    public ResponseEntity<Res_Message> updateMessage(
+        @PathVariable("messageId") UUID messageId,
+        @RequestBody Dto_MessageUpdate requestDto) {
+        //💎Message 내용 수정
+        Res_Message resMessage
+            = messageService.updateMessage(messageId, requestDto);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(resMessage);
     }
 
-    @RequestMapping(value = "/update", method = PUT)
-    public Res_Message updateMessage(@RequestBody Dto_MessageUpdate requestDto) {
-        return messageService.updateMessage(requestDto);
-    }
-
-    @RequestMapping(value = "/delete/{id}", method = DELETE)
-    public void deleteMessage(@PathVariable("id") UUID messageID) {
-        messageService.deleteMessage(messageID);
-    }
+//    @RequestMapping(value = "/{messageId}", method = GET)
+//    public ResponseEntity<Res_Message> find(@PathVariable("messageId") UUID messageId) {
+//        //💎
+//        return messageService.find(messageId);
+//    }
 }

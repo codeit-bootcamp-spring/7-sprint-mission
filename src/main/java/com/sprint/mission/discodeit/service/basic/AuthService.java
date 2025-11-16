@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_AuthService;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.dto.AuthServiceDto;
 import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceAuthService;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,11 +15,16 @@ public class AuthService implements InterfaceAuthService {
     private final InterfaceUserRepository userRepository;
 
     @Override
-    public Res_UserLogin isLogin(Dto_AuthService authService) {
-//    [ ] username, password과 일치하는 유저가 있는지 확인합니다.
-//    [ ] 일치하는 유저가 있는 경우: 유저 정보 반환
-//    [ ] 일치하는 유저가 없는 경우: 예외 발생
-//    [ ] DTO를 활용해 파라미터를 그룹화합니다.
-        return userRepository.isLogin(authService.userName(), authService.password());
+    public Res_UserLogin login(AuthServiceDto authServiceDto) {
+      User user = userRepository.findByName(authServiceDto.username())
+          .orElseThrow(
+              () -> new NoSuchElementException("🚨사용자를 [" + authServiceDto.username() + "] 찾을 수 없음"));
+
+      boolean equals = user.getPassword().equals(authServiceDto.password());
+      if (!equals) {
+        throw new IllegalArgumentException("🚨비밀번호["+ authServiceDto.password() + "]가 일치하지 않음");
+      }
+
+      return userRepository.isLogin(authServiceDto);
     }
 }

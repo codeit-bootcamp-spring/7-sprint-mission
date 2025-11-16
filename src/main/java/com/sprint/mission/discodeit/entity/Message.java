@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_Message;
+import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
 import lombok.Getter;
 
 import java.util.List;
@@ -13,24 +13,24 @@ public class Message extends BaseModel {
     private String message;
     private List<UUID> attachemntIds;
 
-    public Message(Dto_Message dtoMessage, List<UUID> attachemntIds) {
+    public Message(MessageCreateRequest dtoMessage, List<UUID> attachemntIds) {
         super();
         this.channelId = dtoMessage.channelId();
-        this.authorId = dtoMessage.authorid();
-        this.message = dtoMessage.message();
+        this.authorId = dtoMessage.authorId();
+        this.message = dtoMessage.content();
         this.attachemntIds = attachemntIds;
     }
 
     @Override
     public String toString() {
-        return "message {" +
+        return "content {" +
                 super.toString() +
-                "\n message = [" + message + "] }";
+                "\n content = [" + message + "] }";
     }
 
     public void updateMessage( String message) {
         this.message = message;
-        super.setUpdatedAt();
+        super.setUpdatedAtNow();
     }
 
 }
