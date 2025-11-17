@@ -17,12 +17,16 @@ public class UserStatus implements Serializable {
     private UUID userId;
     private Instant lastActiveAt;
 
-    public UserStatus(UUID userId, Instant lastActiveAt) {
+    private boolean isOnline;
+
+    public UserStatus(UUID userId, Instant lastActiveAt, boolean isOnline) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         //
         this.userId = userId;
         this.lastActiveAt = lastActiveAt;
+
+        this.isOnline = isOnline;
     }
 
     public void update(Instant lastActiveAt) {
@@ -37,9 +41,12 @@ public class UserStatus implements Serializable {
         }
     }
 
-    public Boolean isOnline() {
-        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    public boolean isRecentlyActive() {
+        Instant fiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+        return lastActiveAt != null && lastActiveAt.isAfter(fiveMinutesAgo);
+    }
 
-        return lastActiveAt.isAfter(instantFiveMinutesAgo);
+    public String getStatus() {
+        return isOnline ? "ONLINE" : "OFFLINE";
     }
 }

@@ -16,14 +16,4 @@ public record ChannelDto(
         List<UUID> participantIds,
         Instant lastMessageAt
 ) {
-    public static ChannelDto from(Channel channel) {
-        return new ChannelDto(
-                channel.getId(),
-                channel.getType(),
-                channel.getName(),
-                channel.getDescription(),
-                new ArrayList<>(), // 어뜨케 하는지 모루겠음
-                channel.getLastMessageAt()
-        );
-    }
 }
