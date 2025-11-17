@@ -33,6 +33,7 @@ public class ChannelCreationFacade {
   public ChannelInfoRes createPrivateChannel(@NonNull UUID managerId,
       @NonNull ChannelCreateSecReq req) {
     Channel channel = channelService.create(managerId, req);
+    readStatusService.create(ReadStatus.create(managerId, channel.getId()));
     req.userIds().forEach(userId -> readStatusService.create(
         ReadStatus.create(userId, channel.getId())
     ));
