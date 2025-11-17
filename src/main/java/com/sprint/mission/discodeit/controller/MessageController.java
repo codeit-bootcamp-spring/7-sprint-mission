@@ -55,12 +55,7 @@ public class MessageController implements MessageDoc {
         @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList) {
 
         //💎Message 생성
-        List<Dto_BinaryContent> collect = null;
-        if (fileList != null) {
-            collect = fileList.stream()
-                .map(Util::parsingMultipartFile)
-                .toList();
-        }
+        List<Dto_BinaryContent> collect = Util.parsingMultipartFileList(fileList);
 
         Res_Message resMessage
             = messageService.create(dtoMessage, Optional.ofNullable(collect));
