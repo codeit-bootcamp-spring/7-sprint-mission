@@ -77,8 +77,6 @@ public class ChannelService implements InterfaceChannelService {
             .orElse(null);
         Instant lastMessageAt = (message != null) ? message.getCreatedAt() : null;
 
-        //!!⭐️ ReadStatus = Private Channel 만 가능??
-        //!! PRIVATE 채널인 경우 참여한 User의 readStatusID 정보
         if (dtoChannel.channelType() == PRIVATE) {
             List<ReadStatus> readStatuses = readStatusRepository.findAll();
             List<UUID> userIdList = readStatuses.stream()

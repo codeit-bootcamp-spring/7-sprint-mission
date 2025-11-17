@@ -22,7 +22,9 @@ public class BinaryContentService implements InterfaceBinaryContentService {
     public Res_BinaryContent create(Dto_BinaryContent dtoBinaryContent) {
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
         BinaryContent binaryContent = new BinaryContent(dtoBinaryContent);
+
         binaryContentRepository.save(binaryContent);
+
         log.info("✅ BinaryContentService.create = [" + binaryContent.getId() + "]");
         return Res_BinaryContent.from(binaryContent);
     }
@@ -31,6 +33,7 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 //    [ ] id로 조회합니다.
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
             .orElseThrow(() -> new NoSuchElementException("🚨첨부파일[" + binaryContentId.toString() + "]을 찾을 수 없음"));
+
         log.info("✅ BinaryContentService.find.binaryContentId = [" + binaryContentId.toString() + "]");
         return Res_BinaryContent.from(binaryContent);
     }
