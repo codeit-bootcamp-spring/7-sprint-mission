@@ -20,9 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@RestController //👍 @controller + @responsebody
 @RequiredArgsConstructor
-@ResponseBody
 @RequestMapping("/api/readStatuses")
 public class ReadStatusController implements ReadStatusDoc {
     private final ReadStatusService readStatusService;

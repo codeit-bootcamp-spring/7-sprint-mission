@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@ResponseBody
+@RestController //👍 @controller + @responsebody
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController implements AuthDoc {

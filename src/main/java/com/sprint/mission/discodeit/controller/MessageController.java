@@ -28,9 +28,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@RestController
+@RestController //👍 @controller + @responsebody
 @RequiredArgsConstructor
-@ResponseBody
 @RequestMapping("/api/messages")
 @Slf4j
 public class MessageController implements MessageDoc {

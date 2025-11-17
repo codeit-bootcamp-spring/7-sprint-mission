@@ -33,9 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
-@RestController
+@RestController //👍 @controller + @responsebody
 @RequiredArgsConstructor
-@ResponseBody
 @RequestMapping("/api/users")
 public class UserController implements UserDoc {
     private final UserService userService;

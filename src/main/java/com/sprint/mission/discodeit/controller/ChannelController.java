@@ -26,8 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@RestController
-@ResponseBody
+@RestController //👍 @controller + @responsebody
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
 public class ChannelController implements ChannelDoc {
@@ -48,8 +47,8 @@ public class ChannelController implements ChannelDoc {
 
     //💎Private Channel 생성
     @RequestMapping(value = "/private", method = POST)
-    public ResponseEntity<Res_Channel> createPrivate(@
-        RequestBody Dto_CreateChannelPrivate dtoCreateChannel) {
+    public ResponseEntity<Res_Channel> createPrivate(
+        @RequestBody Dto_CreateChannelPrivate dtoCreateChannel) {
 
         Res_Channel channel
             = channelService.createPrivate(dtoCreateChannel);
