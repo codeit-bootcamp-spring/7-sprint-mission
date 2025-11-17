@@ -64,7 +64,7 @@ public class FileReadStatusRepository extends BaseFileRepository<ReadStatus>
   @Override
   public boolean existsByUserIdAndChannelId(UUID userId, UUID channelId) {
     return findAllFiles().stream().anyMatch(readStatus ->
-        readStatus.getUserId().equals(userId) && readStatus.getChannelId().equals(channelId)
+        userId.equals(readStatus.getUserId()) && channelId.equals(readStatus.getChannelId())
     );
   }
 }
