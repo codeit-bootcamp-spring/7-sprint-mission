@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.dto.update;
 
 import java.util.UUID;
 
-public record UpdateUserDto (
-    String username, // 유저 이름
-    String nickName, // 유저 닉네임
-    String email // 이메일
-) {}
+public record UpdateUserDto(
+    String newUsername, // 유저 이름
+    String newEmail, // 유저 닉네임
+    String newPassword // 비밀번호
+) {
+
+}

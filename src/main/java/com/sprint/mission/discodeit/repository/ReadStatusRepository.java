@@ -8,7 +8,11 @@ import java.util.UUID;
 
 public interface ReadStatusRepository extends Repository<ReadStatus, UUID> {
 
-    Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
-    List<ReadStatus> findAllByUserId (UUID userId);
-    void deleteChannelById(UUID channelId);
+  Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
+
+  List<ReadStatus> findAllByUserId(UUID userId);
+
+  List<ReadStatus> findAllByChannelId(UUID channelId);
+
+  void deleteChannelById(UUID channelId);
 }

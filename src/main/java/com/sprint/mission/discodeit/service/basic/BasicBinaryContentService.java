@@ -16,40 +16,34 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-    private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContentResponseDto createBinaryContent(CreateBinaryContentRequestDto CreateDto) {
+  @Override
+  public BinaryContent createBinaryContent(CreateBinaryContentRequestDto request) {
 
-        BinaryContent binaryContent = new BinaryContent(
-                CreateDto.data(),
-                CreateDto.fileName(),
-                CreateDto.fileType()
-        );
+    BinaryContent binaryContent = new BinaryContent(
+        request.fileName(),
+        request.contentType(),
+        request.bytes()
+    );
 
-        BinaryContent save = binaryContentRepository.save(binaryContent);
-        return BinaryContentResponseDto.from(save);
-    }
+    return binaryContentRepository.save(binaryContent);
+  }
 
-    @Override
-    public BinaryContentResponseDto find(UUID BinaryContentId) {
-        BinaryContent binaryContent = binaryContentRepository.findById(BinaryContentId)
-                .orElseThrow(() -> new IllegalArgumentException("BinaryContent를 찾을 수 없습니다."));
-        return BinaryContentResponseDto.from(binaryContent);
-    }
+  @Override
+  public BinaryContent find(UUID binaryContentId) {
+    return binaryContentRepository.findById(binaryContentId)
+        .orElseThrow(() -> new IllegalArgumentException("BinaryContent를 찾을 수 없습니다."));
+  }
 
-    @Override
-    public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> BinaryContentIds) {
-        List<BinaryContent> allByIdIn = binaryContentRepository.findAllByIdIn(BinaryContentIds);
-        List<BinaryContentResponseDto> dtoList = new ArrayList<>();
-        for(BinaryContent binaryContent : allByIdIn){
-            dtoList.add(BinaryContentResponseDto.from(binaryContent));
-        }
-        return dtoList;
-    }
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> BinaryContentIds) {
+    List<BinaryContent> allByIdIn = binaryContentRepository.findAllByIdIn(BinaryContentIds);
+    return allByIdIn;
+  }
 
-    @Override
-    public void delete(UUID BinaryContentId) {
-        binaryContentRepository.delete(BinaryContentId);
-    }
+  @Override
+  public void delete(UUID BinaryContentId) {
+    binaryContentRepository.delete(BinaryContentId);
+  }
 }

@@ -11,8 +11,12 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    MessageResponseDto createMessage(CreateMessageRequestDto request, List<CreateBinaryContentRequestDto> fileRequest); // 메시지 생성
-    List<MessageResponseDto> findAllByChannelId(UUID channelId); // 특정 채널 메시지 조회
-    MessageResponseDto updateMessage(UUID id, UpdateMessageDto newContents); //메시지 수정(업데이트)
-    void deleteMessage(UUID messageId); // 메시지 삭제
+  Message createMessage(CreateMessageRequestDto request,
+      List<CreateBinaryContentRequestDto> fileRequest); // 메시지 생성
+
+  List<Message> findAllByChannelId(UUID channelId); // 특정 채널 메시지 조회
+
+  Message updateMessage(UUID messageId, UpdateMessageDto MessageUpdateRequest); //메시지 수정(업데이트)
+
+  void deleteMessage(UUID messageId); // 메시지 삭제
 }

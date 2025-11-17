@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.response.UserStatusResponseDto;
-import com.sprint.mission.discodeit.dto.update.UpdateUserIdStatusDto;
 import com.sprint.mission.discodeit.dto.update.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.request.CreateUserStatusRequestDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -20,70 +19,69 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-    private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;
+  private final UserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
 
-    @Override
-    public UserStatusResponseDto createUserStatus(CreateUserStatusRequestDto requestDto) {
-        UUID userId = requestDto.userId();
-        if (userRepository.findById(userId).isEmpty()) {
-            throw new IllegalArgumentException("유저가 없습니다.");
-        }
-        if (userStatusRepository.findByUserId(userId).isPresent()) {
-            throw new IllegalArgumentException("이미 존재합니다.");
-        }
-
-        UserStatus newStatus = new UserStatus(requestDto.userId());
-        UserStatus userStatus = userStatusRepository.save(newStatus);
-
-        return UserStatusResponseDto.from(userStatus);
+  @Override
+  public UserStatusResponseDto createUserStatus(CreateUserStatusRequestDto requestDto) {
+    UUID userId = requestDto.userId();
+    if (userRepository.findById(userId).isEmpty()) {
+      throw new IllegalArgumentException("유저가 없습니다.");
+    }
+    if (userStatusRepository.findByUserId(userId).isPresent()) {
+      throw new IllegalArgumentException("이미 존재합니다.");
     }
 
-    @Override
-    public UserStatusResponseDto find(UUID userStatusId) {
+    UserStatus newStatus = new UserStatus(requestDto.userId());
+    UserStatus userStatus = userStatusRepository.save(newStatus);
 
-        UserStatus userStatus = getUserStatus(userStatusId);
-        return UserStatusResponseDto.from(userStatus);
-    }
+    return UserStatusResponseDto.from(userStatus);
+  }
 
-    @Override
-    public List<UserStatusResponseDto> findAll() {
-        List<UserStatus> userStatuses = userStatusRepository.findAll();
-        List<UserStatusResponseDto> dtoList = new ArrayList<>();
-        for(UserStatus userStatus : userStatuses){
-            dtoList.add(UserStatusResponseDto.from(userStatus));
-        }
-        return dtoList;
-    }
+  @Override
+  public UserStatusResponseDto find(UUID userStatusId) {
 
-    @Override
-    public UserStatusResponseDto updateUserStatus(UUID id) {
-        UserStatus userStatus = userStatusRepository.findByUserId(id)
-                        .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
-        userStatus.statusUpdate(Instant.now());
-        UserStatus userstatus = userStatusRepository.save(userStatus);
-        return UserStatusResponseDto.from(userstatus);
-    }
+    UserStatus userStatus = getUserStatus(userStatusId);
+    return UserStatusResponseDto.from(userStatus);
+  }
 
-    @Override
-    public UserStatusResponseDto updateByUserId(UpdateUserIdStatusDto updateDto) {
-        UserStatus user = userStatusRepository.findByUserId(updateDto.userId())
-                .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다."));
-        user.statusUpdate(Instant.now());
-        UserStatus userstatus = userStatusRepository.save(user);
-        return UserStatusResponseDto.from(userstatus);
+  @Override
+  public List<UserStatusResponseDto> findAll() {
+    List<UserStatus> userStatuses = userStatusRepository.findAll();
+    List<UserStatusResponseDto> dtoList = new ArrayList<>();
+    for (UserStatus userStatus : userStatuses) {
+      dtoList.add(UserStatusResponseDto.from(userStatus));
     }
+    return dtoList;
+  }
 
-    @Override
-    public void deleteUserStatus(UUID userStatusId) {
-        getUserStatus(userStatusId);
-        userStatusRepository.delete(userStatusId);
-    }
+  @Override
+  public UserStatus updateUserStatus(UUID id) {
+    UserStatus userStatus = userStatusRepository.findByUserId(id)
+        .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
+    userStatus.statusUpdate(Instant.now());
+    UserStatus userstatus = userStatusRepository.save(userStatus);
+    return userstatus;
+  }
 
-    // 중복 메서드 만들기
-    private UserStatus getUserStatus(UUID userStatusId) {
-        return userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
-    }
+  @Override
+  public UserStatus updateByUserId(UUID userId) {
+    UserStatus user = userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다."));
+    user.statusUpdate(Instant.now());
+    return userStatusRepository.save(user);
+  }
+
+  @Override
+  public void deleteUserStatus(UUID userStatusId) {
+    getUserStatus(userStatusId);
+    userStatusRepository.delete(userStatusId);
+  }
+
+  // 중복 메서드 만들기
+  private UserStatus getUserStatus(UUID userStatusId) {
+    return userStatusRepository.findById(userStatusId)
+        .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
+  }
 
 }

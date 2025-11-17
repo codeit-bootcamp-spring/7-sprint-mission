@@ -15,3 +15,14 @@ discodeit:
   repository:
     type: file # jcf | file
     file-directory: data
+
+
+springdoc:
+  swagger-ui:
+    path: /api-docs.html
+    tags-sorter: alpha
+    operations-sorter: method
+    display-request-duration: true
+    doc-expansion: list
+  api-docs:
+    path: /my-api
