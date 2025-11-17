@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,10 +14,13 @@ public interface ReadStatusRepository extends BaseRepository<ReadStatus> {
     // 유저의 모든 채널의 읽음 상태
     List<ReadStatus> findAllByUserId(UUID userId);
 
+    // 채널로 수신 상태 찾기
+    List<ReadStatus> findAllByChannelId(UUID channelId);
+
     // 채널의 모든 읽음 상태 제거
+
     void deleteAllByChannelId(UUID channelId);
-
     // 채널에서 한 유저의 읽음 상태 제거
-    void deleteAllByUserIdAndChannelId(UUID userId, UUID channelId);
 
+    void deleteAllByUserIdAndChannelId(UUID userId, UUID channelId);
 }

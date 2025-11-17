@@ -12,7 +12,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent save(BinaryContent b) {
-        data.put(b.getUserId(), b);
+        data.put(b.getId(), b);
         return b;
     }
 
@@ -33,45 +33,10 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     //====================================
 
-
-    // 유저 프로필 관련은 messageId가 null
-    @Override
-    public Optional<BinaryContent> findProfileImageByUserId(UUID userId) {
-        return data.values().stream()
-                .filter(content -> content.getMessageId() == null)
-                .filter(content -> content.getUserId().equals(userId))
-                .findFirst();
-    }
-
-    @Override
-    public void deleteProfileImageByUserId(UUID userId) {
-        data.values().removeIf(profile ->
-                profile.getUserId().equals(userId) && profile.getMessageId() == null);
-    }
-
-    @Override
-    public List<BinaryContent> findAllByMessageId(UUID messageId) {
-        return data.values().stream()
-                .filter(content -> messageId.equals(content.getMessageId()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<BinaryContent> findAllByMessageIdIn(List<UUID> messageIds) {
-        Set<UUID> idSet = new HashSet<>(messageIds);
-        return  data.values().stream()
-                .filter(content -> idSet.contains(content.getMessageId()))
-                .collect(Collectors.toList());
-    }
-
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
         return ids.stream().map(data::get)
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public void deleteAllByMessageId(UUID messageId) {
-        data.values().removeIf(content -> content.getMessageId().equals(messageId));
-    }
 }

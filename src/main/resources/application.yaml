@@ -16,3 +16,14 @@ discodeit:
     type: file   # jcf | file
     file-directory: /Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload
 
+springdoc:
+  swagger-ui:
+    path: /api-doc-ui.html  # UI page 경로
+    tags-sorter: alpha # 태그 정렬 방식(알파벳순)
+    operations-sorter: method # 메서드 정렬 방식 (GET -> POST -> PUT -> DELETE 순)
+    display-request-duration: true # 요청에 소요된 시간 표시
+    doc-expansion: none # 문서 펼침 상태 (none, list, full)
+
+  api-docs:
+    path: /my-api # Swagger가 우리 api의 정보를 얻어오기 위해 요청하는 url
+

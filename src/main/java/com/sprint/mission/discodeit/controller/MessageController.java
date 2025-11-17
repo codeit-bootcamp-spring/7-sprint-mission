@@ -1,20 +1,21 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.dto.messageDto.ChannelMessageRequestDto;
-import com.sprint.mission.discodeit.entity.dto.messageDto.MessageResponseDto;
-import com.sprint.mission.discodeit.entity.dto.messageDto.MessageUpdateDto;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageCreateRequest;
+import com.sprint.mission.discodeit.entity.dto.messageDto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/messages")
+@RequestMapping("/api/messages")
 @RequiredArgsConstructor
 public class MessageController {
 
@@ -23,38 +24,34 @@ public class MessageController {
     // --- 메시지 관리 ---
     // (채널)메시지 생성
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<MessageResponseDto> channelMessageCreate(@RequestBody ChannelMessageRequestDto channelMessageRequestDto) {
-        MessageResponseDto dto = messageService.createChannelMessage(channelMessageRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    public ResponseEntity<Message> channelMessageCreate(
+            @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageRequestDto,
+            @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(messageService.createMessage(messageRequestDto, attachments));
     }
 
     // 메시지 수정
-    // 비어있다면 삭제. 라는 기능을 넣고 싶어서 이렇게 했는데... 맞는건가
-    @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<MessageResponseDto> channelMessageUpdate(@RequestBody MessageUpdateDto updateDto) {
-        Optional<MessageResponseDto> messageOp = messageService.updateMessage(updateDto);
-        return messageOp.map(messageResponseDto
-                        -> ResponseEntity.status(HttpStatus.OK).body(messageResponseDto))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NO_CONTENT).build());
+    @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
+    public ResponseEntity<Message> channelMessageUpdate(
+            @PathVariable UUID messageId,
+            @Valid @RequestBody MessageUpdateRequest updateDto) {
+
+        return ResponseEntity.ok(messageService.updateMessage(messageId, updateDto));
     }
 
     // 메시지 삭제
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> channelMessageDelete(@PathVariable UUID id) {
-        messageService.deleteMessage(id);
+    @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> channelMessageDelete(@PathVariable UUID messageId) {
+        messageService.deleteMessage(messageId);
         return ResponseEntity.noContent().build();
     }
 
     // 특정 채널의 메시지 조회
-    @RequestMapping(value = "/{channelId}", method = RequestMethod.GET)
-    public List<MessageResponseDto> getAllByChannelId(@PathVariable UUID channelId) {
-        return messageService.findAllByChannelId(channelId);
-    }
-
-    // 테스트용 모든메시지 조회
     @RequestMapping(method = RequestMethod.GET)
-    public List<MessageResponseDto> getAll() {
-        return messageService.findAll();
+    public ResponseEntity<List<Message>> getAllByChannelId(@RequestParam UUID channelId) {
+        return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
     }
 }
 

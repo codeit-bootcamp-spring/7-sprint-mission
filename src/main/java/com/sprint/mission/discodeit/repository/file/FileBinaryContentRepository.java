@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     protected Map<UUID, BinaryContent> data = new HashMap<>();
 
     public FileBinaryContentRepository(String path) {
-        this.ROOT_PATH = path + BINARY_DATA_FILE;
+        this.ROOT_PATH = path + "/" + BINARY_DATA_FILE;
         File file = new File(ROOT_PATH).getParentFile();
         if (!file.exists()) {
             file.mkdir();       // 생성해야 할 폴더 경로가 하나일 때
@@ -54,6 +55,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         return binaryContent;
     }
 
+    // -------------------------------------------------------------------
+
     @Override
     public Optional<BinaryContent> findById(UUID id){
         return Optional.ofNullable(data.get(id));
@@ -72,41 +75,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public Optional<BinaryContent> findProfileImageByUserId(UUID userId) {
-        return data.values().stream()
-                .filter(content -> content.getMessageId() == null)
-                .filter(content -> content.getUserId().equals(userId))
-                .findFirst();
-    }
-
-    @Override
-    public void deleteProfileImageByUserId(UUID userId) {
-        data.values().removeIf(profile ->
-                profile.getUserId().equals(userId) && profile.getMessageId() == null);
-        saveData();
-    }
-
-    @Override
-    public List<BinaryContent> findAllByMessageId(UUID messageId) {
-        return data.values().stream()
-                .filter(content -> messageId.equals(content.getMessageId()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<BinaryContent> findAllByMessageIdIn(List<UUID> messageIds) {
-        return List.of();
-    }
-
-    @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
         return ids.stream().map(data::get)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteAllByMessageId(UUID messageId) {
-        data.values().removeIf(content -> content.getMessageId().equals(messageId));
-        saveData();
     }
 }

@@ -1,0 +1,6 @@
+package com.sprint.mission.discodeit.entity.dto.channelDto;
+
+import lombok.NonNull;
+
+public record PublicChannelUpdateRequest(String newName, String newDescription) {
+}

@@ -26,16 +26,6 @@ public class JCFChannelRepository implements ChannelRepository {
         return new ArrayList<>(data.values());
     }
 
-    public boolean existsByAdminId(UUID adminId) {
-        return data.values().stream()
-                .anyMatch(c -> c.getChannelAdmin().getId().equals(adminId));
-    }
-
-    @Override
-    public Optional<Channel> findByChannelName(String channelName) {
-        return data.values().stream().filter(c -> c.getChannelName().equals(channelName)).findFirst();
-    }
-
     @Override
     public void deleteById(UUID id) {
         data.remove(id);

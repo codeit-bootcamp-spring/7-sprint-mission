@@ -8,20 +8,16 @@ import java.util.Arrays;
 import java.util.UUID;
 
 @Builder
-public record BinaryContentResponseDto(
+public record BinaryContentDto(
         UUID id,
-        UUID userId,
-        UUID messageId,
         byte[] data,
         String dataName,
         String dataType,
         Instant createdAt) {
 
-    public static BinaryContentResponseDto from(BinaryContent binaryContent) {
-        return BinaryContentResponseDto.builder()
+    public static BinaryContentDto from(BinaryContent binaryContent) {
+        return BinaryContentDto.builder()
                 .id(binaryContent.getId())
-                .userId(binaryContent.getUserId())
-                .messageId(binaryContent.getMessageId())
                 .data(binaryContent.getBinaryData())
                 .dataName(binaryContent.getDataName())
                 .dataType(binaryContent.getDataType())

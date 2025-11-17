@@ -6,5 +6,5 @@ import lombok.NonNull;
 import java.util.UUID;
 
 @Builder
-public record UserStatusUpdateDto(@NonNull UUID userStatusId) {
+public record UserStatusCreateRequest(@NonNull UUID userId) {
 }

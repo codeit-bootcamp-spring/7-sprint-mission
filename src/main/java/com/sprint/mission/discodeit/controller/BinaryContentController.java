@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/binaries")
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
 public class BinaryContentController {
 
@@ -18,13 +18,13 @@ public class BinaryContentController {
 
     // 단일조회
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public BinaryContentResponseDto getById(@PathVariable UUID id) {
-        return binaryContentService.findBinaryContentById(id);
+    public ResponseEntity<BinaryContentDto> getById(@PathVariable UUID id) {
+        return ResponseEntity.ok(binaryContentService.findBinaryContentById(id));
     }
 
     // 하나 및 여러 개 조회
     @RequestMapping(method = RequestMethod.GET)
-    public List<BinaryContentResponseDto> getAllByIdIn(@RequestParam List<UUID> ids) {
-        return binaryContentService.findAllBinaryContentByIdIn(ids);
+    public ResponseEntity<List<BinaryContentDto>> getAllByIdIn(@RequestParam List<UUID> binaryContentIds) {
+        return ResponseEntity.ok(binaryContentService.findAllBinaryContentByIdIn(binaryContentIds));
     }
 }

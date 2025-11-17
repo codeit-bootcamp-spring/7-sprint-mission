@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.entity.dto.userStatusDto;
 import lombok.Builder;
 import lombok.NonNull;
 
-import java.util.UUID;
+import java.time.Instant;
 
 @Builder
-public record UserStatusRequestDto(@NonNull UUID userId) {
+public record UserStatusUpdateRequest(@NonNull Instant newLastActiveAt) {
 }

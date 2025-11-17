@@ -23,7 +23,7 @@ public class FileUserRepository extends FileBaseRepository<User> implements User
     @Override
     public Optional<User> findByUserName(String userName) {
         return data.values().stream()
-                .filter(user -> user.getEmail()
+                .filter(user -> user.getUsername()
                         .equals(userName)).findFirst();
     }
 }
