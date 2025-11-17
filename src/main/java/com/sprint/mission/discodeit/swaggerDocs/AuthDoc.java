@@ -12,8 +12,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
+//@Tag : API 그룹화, 일반적으로 Controller 클래스 단위로 정의
 @Tag(name="Auth", description="인증 API")
 public interface AuthDoc {
+    //@Operation : 엔드포인트에 대한 설명
     @Operation(summary = "로그인")
     @ApiResponses(value = {
         @ApiResponse(
