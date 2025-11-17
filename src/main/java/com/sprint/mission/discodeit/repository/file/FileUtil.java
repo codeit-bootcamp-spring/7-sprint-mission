@@ -129,7 +129,6 @@ public class FileUtil {
         return Files.exists(path);
     }
 
-
 //    @AfterAll
     public void cleanup() throws Exception {
         // 테스트 종료 후 남은 .ser 파일 제거

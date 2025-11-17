@@ -1,34 +1,31 @@
 package com.sprint.mission.discodeit.entity.dto;
 
 import com.sprint.mission.discodeit.entity.User;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
-
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Builder;
 
 @Builder
-// 🚫 편의상 변경. CamelCase 위반 -> 추후 수정 할꺼예용~
 public record Res_User( //all private final
-    @NotBlank(message = "userId is mandatory")
-    UUID userId,
+    //@NotBlank(message = "id is mandatory")
+    UUID id,
     Instant createdAt,
     Instant updatedAt,
 
-    String userName,
-    //        String password,
-    String eMail,
-    UUID profiledId
+    String username,
+    String email,
+    String password,
+    UUID profileId
 ) {
     public static Res_User from(User user) {
-        return Res_User.builder()
-                        .userId(user.getId())
-                        .createdAt(user.getCreatedAt())
-                        .updatedAt(user.getUpdatedAt())
-                        .userName(user.getUserName())
-//                        .password(user.getPassword())
-                        .eMail(user.getEMail())
-                        .profiledId(user.getProfileId())
-                        .build();
+        return new Res_User(
+            user.getId(),
+            user.getCreatedAt(),
+            user.getUpdatedAt(),
+            user.getUserName(),
+            user.getEMail(),
+            user.getPassword(),
+            user.getProfileId()
+        );
     }
 }
