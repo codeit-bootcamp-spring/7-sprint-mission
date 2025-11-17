@@ -12,20 +12,17 @@ import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 
 @Getter
 public class Channel extends BaseModel {
-//channelService -        [ ] PRIVATE 채널인 경우 참여한 User의 readStatusID 정보를 포함합니다.
     private ChannelType channelType;
     private String channelName;
     private String description;
-//    private List<UUID> participantIds; // PRIVATE 일 경우 사용
 
-    private Instant lastMessageAt; // [ ] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
+    private Instant lastMessageAt;
 
     public Channel(Dto_CreateChannelPublic dtoCreateChannel) {
         super();
         this.channelType = PUBLIC;
         this.channelName = dtoCreateChannel.name();
         this.description = dtoCreateChannel.description();
-//        this.participantIds = new ArrayList<>();
         this.lastMessageAt = null;
     }
 
@@ -34,7 +31,6 @@ public class Channel extends BaseModel {
         this.channelType = PRIVATE;
         this.channelName = "";
         this.description = "";
-//        this.participantIds = dtoCreateChannel.participantIds();
         this.lastMessageAt = null;
     }
 
@@ -44,7 +40,6 @@ public class Channel extends BaseModel {
                 super.toString() +
                 "\n name = [" + channelName +
                 "\n newDescription = [" + description + "]"   +
-//                "]\n participantIds = [" + participantIds + "]" +
                 "]\n lastMessageAt = [" + lastMessageAt + "]" +
                 "]\n channelType = [" + channelType + "] }";
     }
@@ -58,10 +53,6 @@ public class Channel extends BaseModel {
         this.channelName = dtoChannelUpdate.newName();
         this.description = dtoChannelUpdate.newDescription();
     }
-
-//    public void addUser(UUID userID) {
-//        this.participantIds.add(userID);
-//    }
 
     public void setLastMessageAt(Instant lastMessageAt) {
         this.lastMessageAt = lastMessageAt;
