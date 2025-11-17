@@ -9,7 +9,7 @@ import com.sprint.mission.discodeit.entity.dto.Res_ChannelFind;
 import java.util.List;
 import java.util.UUID;
 
-public interface InterfaceChannelService extends BaseInterfaceService {
+public interface InterfaceChannelService {
     Res_Channel createPrivate(Dto_CreateChannelPrivate dtoCreateChannel);
     Res_Channel createPublic(Dto_CreateChannelPublic dtoCreateChannel);   // 생성
     Res_ChannelFind find(ChannelDto dtoChannel);                        // 읽기

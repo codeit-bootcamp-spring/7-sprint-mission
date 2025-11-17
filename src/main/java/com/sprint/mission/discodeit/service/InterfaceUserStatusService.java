@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public interface InterfaceUserStatusService extends BaseInterfaceService {
+public interface InterfaceUserStatusService  {
     Res_UserUpdate create(UUID userID);
     Res_UserUpdate find(UUID statusID);
     List<Res_UserUpdate> findAll();

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface InterfaceUserService  extends BaseInterfaceService {
+public interface InterfaceUserService {
     Res_User create(Dto_UserCreate userDt, Optional<Dto_BinaryContent> content);
     UserDto find(UUID userID);      // 읽기
     List<UserDto> findAll();             // 모두 읽기

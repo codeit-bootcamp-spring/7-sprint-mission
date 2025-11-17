@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
 import java.util.List;
 import java.util.UUID;
 
-public interface InterfaceReadStatusService extends  BaseInterfaceService {
+public interface InterfaceReadStatusService  {
     void delete(UUID statusID);
     Res_ReadStatus update(UUID readStatusId, Dto_ReadStatusUpdate requestDto);
     List<Res_ReadStatus> findAllByUserId(UUID userID);

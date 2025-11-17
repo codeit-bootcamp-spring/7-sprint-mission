@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface InterfaceMessageService  extends BaseInterfaceService {
+public interface InterfaceMessageService {
     Res_Message create(MessageCreateRequest dtoMessage, Optional<List<Dto_BinaryContent>> requestDto);
     List<Res_Message> findAllByChannleId(UUID channelID);
 //    List<Message> getAllMessageInChannel(UUID channelID);
