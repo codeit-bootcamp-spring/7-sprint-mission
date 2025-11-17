@@ -30,8 +30,9 @@ public class SwaggerConfig {
   }
 
   private Info apiInfo() {
+
     return new Info()
-        .title("Discodeit REST API Documentation 입니다.")
+        .title("강유현의 Discodeit REST API Documentation 입니다.")
         .description("""
             Discodeit 프로젝트의 사용자, 채널, 메시지, 읽음 상태, 바이너리 파일 관련 REST API 문서입니다.
             
