@@ -131,28 +131,6 @@ public class ChannelService implements InterfaceChannelService {
         return resChannelFinds;
     }
 
-//    @Override
-//    public void updateChannelName(Channel channel, String reName) {
-//        String content = "updateChannelName = 채널이름을 [" + channel.getChannelName() + "] 에서 [" + reName + "] 로 변경";
-//        Channel findedChannel = channelRepository.findById(channel.getId()).orElseThrow(() -> new IllegalArgumentException("🚨updateChannelName. channel = [" + channel.getChannelName() + "] 없음 오류"));
-//        if (!channelRepository.existsByName(reName)) {
-//            Util.errMessage(content + " 오류");
-//        }
-//        else {
-//            findedChannel.updateChannelName(reName);
-//            channelRepository.save(findedChannel);
-//            log.info(content);
-//        }
-//    }
-//
-//    @Override
-//    public void updateChannelType(Channel channel, ChannelType channelType) {
-//        Channel findedChannel = channelRepository.findById(channel.getId()).orElseThrow(() -> new IllegalArgumentException("🚨updateChannelType 오류"));
-//        findedChannel.updateChannelType(channelType);
-//        channelRepository.save(findedChannel);
-//        log.info("✅ updateChannelType = [" + channel.getChannelName() + "] 채널 타입이 [" + channelType.name() + "] 으로 변경");
-//    }
-
     @Override
     public Res_Channel update(UUID channelId, ChannelDto_Update channelDtoUpdate) {
         Channel channel = channelRepository.findById(channelId)
