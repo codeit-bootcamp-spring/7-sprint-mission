@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.participation.dto.ParticipationRequestDTO;
 import com.sprint.mission.discodeit.user.dto.UserProfileUpdateDTO;
 import com.sprint.mission.discodeit.user.dto.UserRequestDTO;
 import com.sprint.mission.discodeit.user.dto.UserResponseDTO;
+import com.sprint.mission.discodeit.user.dto.UserUpdateRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -103,5 +104,26 @@ public class UserServiceImpl extends BaseServiceImpl<User, UUID, UserRepository>
   public boolean existsByUsernameNonDel(String username) {
     return repository.existsByUsernameNonDel(username);
   }
-  
+
+  /**
+   * 현재 프로젝트 api스펙에 맞춰 재 생성된 profileUpdate 매서드입니다
+   */
+  @Override
+  public UserResponseDTO tempUpdateProfile(UUID userId, UserUpdateRequest request) {
+    if (userId == null) {
+      throw new IllegalArgumentException("사용자 ID를 확인해주세요.");
+    }
+    User user = repository.findById(userId).orElseThrow(
+        () -> new NoSuchElementException("사용자를 찾을 수 없습니다.")
+    );
+
+    if (repository.existsByUsername(request.newUsername())) {
+      throw new IllegalArgumentException("중복된 사용자 아이디입니다.");
+    }
+
+    user.tempUpdateProfile(request.newUsername(), request.newEmail(),
+        passwordEncoder.encode(request.newPassword()));
+    return UserResponseDTO.fromEntity(save(user));
+  }
+
 }

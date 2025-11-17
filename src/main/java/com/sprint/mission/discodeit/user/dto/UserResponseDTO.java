@@ -6,29 +6,33 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record UserResponseDTO(
-        UUID userId,
+    UUID userId,
 
-        String username,
+    String username,
 
-        String email,
+    String email,
 
-        String nickname,
+    String nickname,
 
-        String phoneNum,
+    String phoneNum,
 
-        Instant createdAt,
+    Instant createdAt,
 
-        Instant updatedAt
+    Instant updatedAt,
+
+    String password
 ) {
-    public static UserResponseDTO fromEntity(User User) {
-        return new UserResponseDTO(
-                User.getId(),
-                User.getUsername(),
-                User.getEmail(),
-                User.getNickname(),
-                User.getPhoneNum(),
-                User.getCreatedAt(),
-                User.getUpdatedAt()
-        );
-    }
+
+  public static UserResponseDTO fromEntity(User user) {
+    return new UserResponseDTO(
+        user.getId(),
+        user.getUsername(),
+        user.getEmail(),
+        user.getNickname(),
+        user.getPhoneNum(),
+        user.getCreatedAt(),
+        user.getUpdatedAt(),
+        user.getPassword()
+    );
+  }
 }

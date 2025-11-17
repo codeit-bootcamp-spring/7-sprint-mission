@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.application.service.impl;
 
 import com.sprint.mission.discodeit.application.dto.ChannelSummary;
+import com.sprint.mission.discodeit.application.dto.ProfileUpdateResponse;
 import com.sprint.mission.discodeit.application.dto.SimpleChannel;
 import com.sprint.mission.discodeit.application.dto.UserDetailInfo;
 import com.sprint.mission.discodeit.application.service.UserManagementService;
@@ -9,7 +10,7 @@ import com.sprint.mission.discodeit.channel.ChannelService;
 import com.sprint.mission.discodeit.channel.dto.ChannelResponseDTO;
 import com.sprint.mission.discodeit.config.enums.ContentOwner;
 import com.sprint.mission.discodeit.config.enums.Status;
-import com.sprint.mission.discodeit.content.binary.BinaryContentResponse;
+import com.sprint.mission.discodeit.content.binary.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.content.binary.BinaryContentService;
 import com.sprint.mission.discodeit.message.channel.ChannelMessageService;
 import com.sprint.mission.discodeit.message.direct.DirectMessageService;
@@ -19,6 +20,7 @@ import com.sprint.mission.discodeit.user.User;
 import com.sprint.mission.discodeit.user.UserService;
 import com.sprint.mission.discodeit.user.dto.UserRequestDTO;
 import com.sprint.mission.discodeit.user.dto.UserResponseDTO;
+import com.sprint.mission.discodeit.user.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.user.state.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -139,9 +141,14 @@ public class UserManagementServiceImpl implements UserManagementService {
   }
 
   @Override
-  public BinaryContentResponse updateProfileImg(UUID userId, MultipartFile multipartFile) {
+  public ProfileUpdateResponse updateProfile(UUID userId, UserUpdateRequest request,
+      MultipartFile multipartFile) {
     try {
-      return binaryContentService.uploadFile(userId, ContentOwner.USER, multipartFile);
+      binaryContentService.deleteAllByOwnerId(userId);
+      BinaryContentResponse binaryContentResponse = binaryContentService.uploadFile(userId,
+          ContentOwner.USER, multipartFile);
+      UserResponseDTO responseDTO = userService.tempUpdateProfile(userId, request);
+      return ProfileUpdateResponse.from(responseDTO, binaryContentResponse);
 
     } catch (IOException e) {
       throw new RuntimeException("프로필 이미지 저장에 실패했습니다.");

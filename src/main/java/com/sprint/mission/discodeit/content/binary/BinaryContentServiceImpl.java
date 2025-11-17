@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.content.binary;
 
 import com.sprint.mission.discodeit.common.service.impl.BaseServiceImpl;
 import com.sprint.mission.discodeit.config.enums.ContentOwner;
+import com.sprint.mission.discodeit.content.binary.dto.BinaryContentResponse;
+import java.util.Arrays;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,9 +31,13 @@ public class BinaryContentServiceImpl extends
     String fileName = file.getOriginalFilename();
     String fileType = file.getContentType();
     Long fileSize = file.getSize();
-    BinaryContent content = BinaryContent.create(ownerId, owner, fileName, fileType, fileSize);
 
     String fileDirectoryPath = owner.getOwnerSpecificPath(ownerId);
+
+    String bytes = Arrays.toString(file.getBytes());
+
+    BinaryContent content = BinaryContent.create(ownerId, owner, fileName, fileType, fileSize,
+        bytes);
 
     String storedFileName = content.getId().toString();
     Path fullStoragePath = Paths.get(fileDirectoryPath + storedFileName);

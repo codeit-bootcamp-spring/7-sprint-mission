@@ -1,14 +1,16 @@
 package com.sprint.mission.discodeit.user.controller;
 
+import com.sprint.mission.discodeit.application.dto.ProfileUpdateResponse;
 import com.sprint.mission.discodeit.application.dto.UserDetailInfo;
 import com.sprint.mission.discodeit.application.service.UserManagementService;
-import com.sprint.mission.discodeit.config.enums.Status;
 import com.sprint.mission.discodeit.user.User;
 import com.sprint.mission.discodeit.user.UserService;
 import com.sprint.mission.discodeit.user.dto.*;
-import com.sprint.mission.discodeit.user.state.UserStatusRequestDTO;
-import com.sprint.mission.discodeit.user.state.UserStatusResponseDTO;
+import com.sprint.mission.discodeit.user.state.dto.UserStatusRequestDTO;
+import com.sprint.mission.discodeit.user.state.dto.UserStatusResponse;
+import com.sprint.mission.discodeit.user.state.dto.UserStatusResponseDTO;
 import com.sprint.mission.discodeit.user.state.UserStatusService;
+import com.sprint.mission.discodeit.user.state.dto.UserStatusUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,18 +50,17 @@ public class UserController {
   }
 
   @PatchMapping("/{userId}")
-  public ResponseEntity<UserDetailInfo> updateProfile(@PathVariable("userId") UUID userId,
+  public ResponseEntity<ProfileUpdateResponse> updateProfile(@PathVariable("userId") UUID userId,
 //      @RequestAttribute("userId") String userIdString,
-      @RequestPart(value = "userRequest") UserProfileUpdateDTO requestDTO,
+      @RequestPart(value = "userRequest") UserUpdateRequest requestDTO,
       @RequestPart(value = "profile", required = false) MultipartFile multipartFile) {
 //    UUID userId = UUID.fromString(userIdString);
-    userManagementService.updateProfileImg(userId, multipartFile);
-    userService.updateProfile(userId, requestDTO);
-    UserDetailInfo detailInfoDTO = userManagementService.getUserDetailInfo(userId);
-    return ResponseEntity.ok(detailInfoDTO);
+
+    return ResponseEntity.ok(
+        userManagementService.updateProfile(userId, requestDTO, multipartFile));
   }
 
-  @PutMapping("/changePassword")
+  @PatchMapping("/changePassword/{userId}")
   public ResponseEntity<String> changePassword(@PathVariable("userId") UUID userId,
 //      @RequestAttribute("userId") String userIdString,
       @RequestBody String newPassword) {
@@ -68,7 +69,7 @@ public class UserController {
     return ResponseEntity.ok("성공적으로 비밀번호가 변경되었습니다.");
   }
 
-  @GetMapping()
+  @GetMapping
   public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
     List<UserResponseDTO> users = userService.findAll().stream()
         .map(UserResponseDTO::fromEntity)
@@ -76,20 +77,22 @@ public class UserController {
     return ResponseEntity.ok(users);
   }
 
-  @PutMapping("/changeusername")
+  @PutMapping("/changeusername/{userId}")
   public ResponseEntity<?> changeUserName(
-      @RequestAttribute("userId") String userIdString,
+      @PathVariable("userId") UUID userId,
+//      @RequestAttribute("userId") String userIdString,
       @RequestBody @Valid ChangeUserNameRequest request) {
-    User user = userService.findById(UUID.fromString(userIdString));
+    User user = userService.findById(userId);
     UserResponseDTO responseDTO = userService.changeUserName(user.getId(), request.username());
     return ResponseEntity.ok(responseDTO);
   }
 
-  @GetMapping("/details")
+  @GetMapping("/details/{userId}")
   public ResponseEntity<UserDetailInfo> getUserDetailInfo(
-      @RequestAttribute("userId") String userIdString
+      @PathVariable("userId") UUID userId
+//      @RequestAttribute("userId") String userIdString
   ) {
-    UUID userId = UUID.fromString(userIdString);
+//    UUID userId = UUID.fromString(userIdString);
     UserDetailInfo detailInfoDTO = userManagementService.getUserDetailInfo(userId);
     return ResponseEntity.ok(detailInfoDTO);
   }
@@ -98,11 +101,18 @@ public class UserController {
   public ResponseEntity<?> updateUserStatus(
       @RequestAttribute("userId") String userIdString,
       @RequestBody UserStatusRequestDTO requestDTO) {
+
     UUID userId = UUID.fromString(userIdString);
     UserStatusResponseDTO responseDTO = processUserStatusUpdate(userId, requestDTO);
     return ResponseEntity.ok(responseDTO);
   }
 
+  @PatchMapping("/{userId}/userStatus")
+  public ResponseEntity<?> updateUserStatus(@PathVariable("userId") UUID userId,
+      UserStatusUpdateRequest requestDTO) {
+    UserStatusResponse response = userStatusService.updateLastOnline(userId, requestDTO);
+    return ResponseEntity.ok(response);
+  }
 
   private UserStatusResponseDTO processUserStatusUpdate(UUID userId,
       UserStatusRequestDTO requestDTO) {

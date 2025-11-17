@@ -1,9 +1,9 @@
-package com.sprint.mission.discodeit.user.state;
+package com.sprint.mission.discodeit.user.state.dto;
 
 import com.sprint.mission.discodeit.config.enums.Status;
 
+import com.sprint.mission.discodeit.user.state.UserStatus;
 import java.time.Instant;
-import java.util.UUID;
 
 public record UserStatusResponseDTO(
     String id,
