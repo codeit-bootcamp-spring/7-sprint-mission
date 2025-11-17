@@ -75,6 +75,9 @@ public class BasicUserService implements UserService {
 
   @Override
   public void updateProfileImage(UUID id, UUID profileId) {
+    if (!userRepository.existsById(id)) {
+      throw new CustomException(ErrorCode.USER_NOT_FOUND);
+    }
     userRepository.updateProfileImage(id, profileId);
   }
 

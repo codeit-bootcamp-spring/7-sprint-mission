@@ -35,6 +35,7 @@ public class UserUpdateFacade {
     //기존 프로필 사진 있으면 무조건 삭제
     if (user.getProfileId() != null) {
       binaryContentService.delete(user.getProfileId());
+      userService.updateProfileImage(userId, null);
     }
 
     //올라온 데이터가 있으면 무조건 만들어서 배정
@@ -48,6 +49,7 @@ public class UserUpdateFacade {
     userService.updateProfileImage(userId, profileId);
     userStatusService.updateByUserId(userId);
 
+    user = userService.findById(userId);    // file 환경 user 다시 읽기
     return UserDetailInfoRes.from(
         user,
         user.getProfileId() == null ?
