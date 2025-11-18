@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/read-status")
+@RequestMapping("/api/readStatuses")
 @RequiredArgsConstructor
 public class ReadStatusController {
     private final ReadStatusService readStatusService;
@@ -21,37 +21,27 @@ public class ReadStatusController {
     @RequestMapping(method = RequestMethod.POST)
     public ReadStatusResponseDto create(
             @Valid @RequestBody ReadStatusCreateRequestDto readStatusCreateRequestDto) {
-        ReadStatus readStatus = readStatusService.create(readStatusCreateRequestDto);
-        return ReadStatusResponseDto.from(readStatus);
+        return readStatusService.create(readStatusCreateRequestDto);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ReadStatusResponseDto update(@PathVariable UUID id,
+    @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
+    public ReadStatusResponseDto update(@PathVariable("readStatusId") UUID readStatusId,
                                         @Valid @RequestBody ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
-        if(readStatusUpdateRequestDto.id() == null
-        || !id.equals(readStatusUpdateRequestDto.id())) {
-            throw new IllegalArgumentException("Invalid id!");
-        }
-        ReadStatus readStatus = readStatusService.update(readStatusUpdateRequestDto);
-        return ReadStatusResponseDto.from(readStatus);
+        return readStatusService.update(readStatusId ,readStatusUpdateRequestDto);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ReadStatusResponseDto get(@PathVariable UUID id) {
-        ReadStatus readStatus = readStatusService.get(id);
-        return ReadStatusResponseDto.from(readStatus);
+    @RequestMapping(value = "/{readStatusId}", method = RequestMethod.GET)
+    public ReadStatusResponseDto get(@PathVariable("readStatusId") UUID readStatusId) {
+        return readStatusService.get(readStatusId);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public List<ReadStatusResponseDto> getAllByUserId(@RequestParam("userId") UUID userId) {
-        List<ReadStatus> all = readStatusService.getAllByUserId(userId);
-        return all.stream()
-                .map(rs -> ReadStatusResponseDto.from(rs))
-                .toList();
+        return readStatusService.getAllByUserId(userId);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public void delete(@PathVariable UUID id) {
-        readStatusService.delete(id);
+    @RequestMapping(value = "/{readStatusId}", method = RequestMethod.DELETE)
+    public void delete(@PathVariable(("readStatusId")) UUID readStatusId) {
+        readStatusService.delete(readStatusId);
     }
 }

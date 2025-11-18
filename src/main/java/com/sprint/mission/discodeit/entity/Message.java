@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Builder;
+import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,12 +19,12 @@ public class Message extends BaseEntity {
     private final List<UUID> attachmentIds;
     private boolean isDeleted;
 
-    public Message(String content, String userName, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
-        this.content = VerifiedUtils.verifyContent(content);
+    public Message(@Nonnull String content, String userName, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
+        this.content = content;
         this.userName = VerifiedUtils.verifyName(userName);
         this.authorId = VerifiedUtils.verifyNull(authorId);
         this.channelId = VerifiedUtils.verifyNull(channelId);
-        this.attachmentIds = attachmentIds;
+        this.attachmentIds = attachmentIds == null ? new ArrayList<>() : new ArrayList<>(attachmentIds);
         this.isDeleted = false;
     }
 
@@ -37,11 +38,10 @@ public class Message extends BaseEntity {
         }
     }
 
-    public void setContent(String content) {
+    public void setContent(@Nonnull String content) {
         if(isDeleted){ throw new IllegalStateException("Cannot set content on deleted Message"); }
-        String vn = VerifiedUtils.verifyContent(content);
-        if(!vn.equals(this.content)){
-            this.content = vn;
+        if(!content.equals(this.content)){
+            this.content = content;
             reUpdatedAt();
         }
     }

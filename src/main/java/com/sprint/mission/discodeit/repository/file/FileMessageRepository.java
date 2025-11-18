@@ -104,6 +104,7 @@ public class FileMessageRepository implements MessageRepository {
                 .stream()
                 .filter(m -> m.getChannelId().equals(channelId))
                 .filter(m -> !m.isDeleted())
+                .sorted(Comparator.comparing(message -> message.getCreatedAt()))
                 .toList();
     }
 

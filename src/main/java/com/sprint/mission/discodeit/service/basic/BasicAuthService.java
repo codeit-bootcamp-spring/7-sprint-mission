@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.auth.AuthLoginRequestDto;
-import com.sprint.mission.discodeit.dto.response.auth.AuthLoginResponseDto;
+import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 
@@ -23,7 +24,7 @@ public class BasicAuthService implements AuthService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User login(AuthLoginRequestDto authLoginRequestDto) {
+    public UserResponseDto login(AuthLoginRequestDto authLoginRequestDto) {
         if (authLoginRequestDto == null) {
             throw new IllegalArgumentException("Invalid request");
         }
@@ -32,15 +33,13 @@ public class BasicAuthService implements AuthService {
 
         List<User> users = userRepository.findByName(username);
         if(users == null || users.isEmpty()) {
-            throw new IllegalArgumentException("Invalid username or password.");
+            throw new NoSuchElementException("User not found");
         }
 
         User user = users.get(0);
 
-        String authPassword = user.getPassword();
-
-        if(authPassword == null || !authPassword.equals(password)) {
-            throw new IllegalArgumentException("Invalid username or password.");
+        if(user.getPassword() == null || !user.getPassword().equals(password)) {
+            throw new IllegalArgumentException("Wrong password.");
         }
 
         userStatusRepository.findByUserId(user.getId())
@@ -50,7 +49,7 @@ public class BasicAuthService implements AuthService {
                 }, () -> userStatusRepository.save(new UserStatus(user.getId()))
                 );
 
-        return user;
+        return UserResponseDto.from(user, true);
     }
 
     @Override

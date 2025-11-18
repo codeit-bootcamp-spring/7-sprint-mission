@@ -25,97 +25,143 @@ public class BasicChannelService implements ChannelService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Channel createPublic(PublicChannelCreateRequestDto channelCreateRequestDto) {
+    public ChannelResponseDto createPublic(PublicChannelCreateRequestDto channelCreateRequestDto) {
         int slowMode = channelCreateRequestDto.slowModeSeconds() == null
                 ? 0 :  channelCreateRequestDto.slowModeSeconds();
 
+        ChannelType channelType =
+                channelCreateRequestDto.type() == null ?
+                        ChannelType.PUBLIC : channelCreateRequestDto.type();
+
         Channel channel = new Channel(
-                channelCreateRequestDto.channelType(),
-                channelCreateRequestDto.channelName(),
+                channelType,
+                channelCreateRequestDto.name(),
                 false,
                 slowMode,
                 channelCreateRequestDto.description()
         );
 
-        return channelRepository.save(channel);
+        Channel save = channelRepository.save(channel);
+        Instant lastMessageAt = messageRepository.findByChannelId(save.getId())
+                .stream()
+                .map(message -> message.getCreatedAt())
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+
+        return ChannelResponseDto.from(save,lastMessageAt);
     }
 
     @Override
-    public Channel createPrivate(PrivateChannelCreateRequestDto channelCreateRequestDto) {
+    public ChannelResponseDto createPrivate(PrivateChannelCreateRequestDto channelCreateRequestDto) {
         int slowMode = channelCreateRequestDto.slowModeSeconds() == null
                 ? 0 :  channelCreateRequestDto.slowModeSeconds();
 
+        ChannelType channelType =
+                channelCreateRequestDto.type() == null ?
+                        ChannelType.PRIVATE : channelCreateRequestDto.type();
+
         Channel channel = new Channel(
-                channelCreateRequestDto.channelType(),
+                channelType,
                 null,
                 true,
                 slowMode,
                 null
         );
 
-        if (channelCreateRequestDto.userIds() != null) {
-            for(UUID id : channelCreateRequestDto.userIds()) {
+        if (channelCreateRequestDto.participantIds() != null) {
+            for(UUID id : channelCreateRequestDto.participantIds()) {
                 channel.join(id);
             }
         }
 
         channel = channelRepository.save(channel);
 
-        if(channelCreateRequestDto.userIds() != null) {
-            for(UUID id : channelCreateRequestDto.userIds()) {
+        if(channelCreateRequestDto.participantIds() != null) {
+            for(UUID id : channelCreateRequestDto.participantIds()) {
                 readStatusRepository.save(new ReadStatus(id, channel.getId(), channel.getCreatedAt()));
             }
         }
 
-        return channel;
+        Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
+                .stream()
+                .map(message -> message.getCreatedAt())
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+
+        return ChannelResponseDto.from(channel,lastMessageAt);
     }
 
     @Override
-    public Channel get(UUID channelId) {
-        return channelRepository.findById(Objects.requireNonNull(channelId))
+    public ChannelResponseDto get(UUID channelId) {
+        Channel channel = channelRepository.findById(Objects.requireNonNull(channelId))
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
+        Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
+                .stream()
+                .map(message -> message.getCreatedAt())
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+        return ChannelResponseDto.from(channel,lastMessageAt);
     }
 
     @Override
-    public List<Channel> getAll() {
-        return channelRepository.findAll();
-    }
-
-    @Override
-    public List<Channel> getAllByUserId(UUID userId) {
-        List<Channel> all = channelRepository.findAll();
-
-        return all.stream()
-                .filter(channel -> channel.getMembers().containsKey(userId))
+    public List<ChannelResponseDto> getAll() {
+        return channelRepository.findAll().stream()
+                .map(channel -> ChannelResponseDto.from(channel,
+                        messageRepository.findByChannelId(channel.getId())
+                                .stream()
+                                .map(message -> message.getCreatedAt())
+                                .max(Comparator.naturalOrder())
+                                .orElse(null)))
                 .toList();
     }
 
     @Override
-    public Channel update(ChannelUpdateRequestDto channelUpdateRequestDto) {
-        Channel channel = channelRepository.findById(Objects.requireNonNull(channelUpdateRequestDto.channelId()))
+    public List<ChannelResponseDto> getAllByUserId(UUID userId) {
+        return channelRepository.findAll()
+                .stream()
+                .filter(channel ->
+                        !channel.isPrivateChannel()
+                                ||(userId != null && channel.getMembers().containsKey(userId)))
+                .map(channel -> ChannelResponseDto.from(channel,
+                        messageRepository.findByChannelId(channel.getId())
+                                .stream()
+                                .map(message -> message.getCreatedAt())
+                                .max(Comparator.naturalOrder())
+                                .orElse(null)))
+                .toList();
+    }
+
+    @Override
+    public ChannelResponseDto update(UUID channelId, ChannelUpdateRequestDto channelUpdateRequestDto) {
+        Channel channel = channelRepository.findById(Objects.requireNonNull(channelId))
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
         if(channel.isPrivateChannel()) {
-            throw new UnsupportedOperationException("PRIVATE channel cannot be updated");
+            throw new IllegalArgumentException("Private channel is not allowed to update");
         }
-        if(channelUpdateRequestDto.channelName() != null) {
-            channel.rename(channelUpdateRequestDto.channelName());
+        if(channelUpdateRequestDto.newName() != null) {
+            channel.rename(channelUpdateRequestDto.newName());
         }
-        if(channelUpdateRequestDto.channelDescription() != null) {
-            channel.changeChannelDescription(channelUpdateRequestDto.channelDescription());
+        if(channelUpdateRequestDto.newDescription() != null) {
+            channel.changeChannelDescription(channelUpdateRequestDto.newDescription());
         }
         if(channelUpdateRequestDto.slowModeSeconds() != null) {
             channel.changeSlowModeSeconds(channelUpdateRequestDto.slowModeSeconds());
         }
 
-        return channelRepository.save(channel);
+        Channel save = channelRepository.save(channel);
+        Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
+                .stream()
+                .map(message -> message.getCreatedAt())
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+
+        return ChannelResponseDto.from(save,lastMessageAt);
     }
 
     @Override
-    public boolean delete(UUID channelId) {
-        Objects.requireNonNull(channelId);
-
+    public void delete(UUID channelId) {
         // 메세지 제거 + 첨부 파일 제거
-        List<Message> message = messageRepository.findByChannelId(channelId);
+        List<Message> message = messageRepository.findByChannelId(Objects.requireNonNull(channelId));
         for(Message m : message) {
             if(m.getAttachmentIds() != null) {
                 for(UUID attachmentId : m.getAttachmentIds()) {
@@ -128,7 +174,7 @@ public class BasicChannelService implements ChannelService {
         readStatusRepository.deleteAllByChannelId(channelId);
 
         // 채널 제거
-        return channelRepository.deleteById(channelId);
+        channelRepository.deleteById(channelId);
     }
 
 
@@ -163,17 +209,5 @@ public class BasicChannelService implements ChannelService {
                         .orElseThrow(() -> new NoSuchElementException("Channel not found"));
         channel.changeSlowModeSeconds(slowModeSeconds);
         channelRepository.save(channel);
-    }
-
-    @Override
-    public Instant getLastMessageAt(UUID channelId) {
-        Channel channel = channelRepository.findById(Objects.requireNonNull(channelId))
-                .orElseThrow(() -> new NoSuchElementException("Channel not found"));
-
-        return messageRepository.findByChannelId(channel.getId())
-                .stream()
-                .map(m -> m.getCreatedAt())
-                .max(Comparator.naturalOrder())
-                .orElse(null);
     }
 }

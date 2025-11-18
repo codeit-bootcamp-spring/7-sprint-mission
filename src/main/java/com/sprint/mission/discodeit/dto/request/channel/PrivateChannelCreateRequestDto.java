@@ -7,10 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record PrivateChannelCreateRequestDto(
-        @NotNull
-        List<UUID> userIds,
+        List<UUID> participantIds,
         Integer slowModeSeconds,
-
-        @NotNull
-        ChannelType channelType) {
+        ChannelType type) {
 }
