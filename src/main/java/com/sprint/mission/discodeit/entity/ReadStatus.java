@@ -8,9 +8,9 @@ import lombok.ToString;
 import java.time.Instant;
 import java.util.UUID;
 
-@Builder( toBuilder = true)
-@Getter
+@Builder
 @ToString
+@Getter
 @Setter
 public class ReadStatus extends Entity {
 

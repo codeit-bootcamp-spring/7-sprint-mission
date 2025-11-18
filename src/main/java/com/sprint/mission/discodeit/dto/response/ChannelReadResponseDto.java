@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.response;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entityElement.ChannelType;
 import lombok.*;
 
 import java.time.Instant;
@@ -16,22 +17,26 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChannelReadResponseDto {
-
-    private Instant recentPostTime;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
     private String name;
     private String description;
-    private boolean isTextChannel;
-    private boolean isPublic;
-    @Builder.Default
-    private HashSet<UUID> userIdList  = new HashSet<>();
+    private ChannelType type;
 
-    public static ChannelReadResponseDto from(Channel channel, ReadStatus readStatus) {
+    private boolean isTextChannel;
+    private HashSet<UUID> participantIds ;
+
+    public static ChannelReadResponseDto from(Channel channel) {
         return ChannelReadResponseDto.builder()
                 .name(channel.getName())
                 .description(channel.getDescription())
                 .isTextChannel(channel.isTextChannel())
-                .isPublic(channel.isPublic())
-                .recentPostTime(readStatus.getReadLastTime())
+                .type(channel.isPublic() ? ChannelType.PUBLIC : ChannelType.PRIVATE)
+                .id(channel.getId())
+                .createdAt(channel.getCreatedAt())
+                .updatedAt(channel.getUpdatedAt())
+                .participantIds(channel.getJoinUserList()==null? new HashSet<>():channel.getJoinUserList())
                 .build();
     }
 

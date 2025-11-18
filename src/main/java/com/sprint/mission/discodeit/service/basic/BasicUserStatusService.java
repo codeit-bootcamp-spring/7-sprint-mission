@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.userStatus.UserStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.request.userStatus.UserStatusPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.userStatus.UserStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.UserUserStatusPatchResponseDto;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -69,4 +72,23 @@ public class BasicUserStatusService implements UserStatusService {
     public List<UserStatus> findAll() {
        return userStatusRepository.readAllUserStatus();
     }
+
+    @Override
+    public UserUserStatusPatchResponseDto patchUserStatus(UUID userId, UserStatusPatchRequestDto dto) {
+        User user = userRepository.getUserById(userId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 User 입니다."));
+        UserStatus userStatus = userStatusRepository.readAllUserStatus().stream().filter(x->x.getUserId().equals(userId)).findFirst().orElseThrow(()->new IllegalArgumentException("존재하지 않는 UserStatus 입니다."));
+        userStatus.setLastOnlineTime(dto.newLastActiveAt());
+        user.setOnline(userStatus.isUserOnline());
+
+        userStatus.updateEntity();
+        user.updateEntity();
+
+        userStatusRepository.updateUserStatus(userStatus);
+        userRepository.updateUser(user);
+
+
+        return UserUserStatusPatchResponseDto.from(userStatus);
+    }
+
+
 }

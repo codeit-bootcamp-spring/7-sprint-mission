@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.binaryContent.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -16,25 +17,33 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
     @Override
-    public BinaryContent createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
+    public BinaryContentResponseDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
         BinaryContent binaryContent =BinaryContent.builder()
-                .binaryFile(binaryContentCreateRequestDto.getBinaryFile())
-                .binaryContentUsage(binaryContentCreateRequestDto.getBinaryContentUsage())
+                .bytes(binaryContentCreateRequestDto.getBytes())
+                .fileName(binaryContentCreateRequestDto.getFileName())
+                .size(binaryContentCreateRequestDto.getSize())
+                .contentType(binaryContentCreateRequestDto.getContentType())
                 .build();
-        return binaryContentRepository.createBinaryContent(binaryContent);
+        binaryContentRepository.createBinaryContent(binaryContent);
+        return BinaryContentResponseDto.from(binaryContent);
 
 
     }
 
     @Override
-    public BinaryContent find(UUID binaryContentID) {
+    public BinaryContentResponseDto find(UUID binaryContentID) {
 
-        return binaryContentRepository.readBinaryContent(binaryContentID).orElseThrow(()->new IllegalArgumentException("존재하지 않는 binaryContent 입니다."));
+        return  BinaryContentResponseDto.from(
+                binaryContentRepository.readBinaryContent(binaryContentID)
+                        .orElseThrow(
+                                ()->new IllegalArgumentException(
+                                        "존재하지 않는 binaryContent 입니다."))) ;
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIdList) {
-       return binaryContentIdList.stream().map(this::find).toList();
+    public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> binaryContentIdList) {
+       return binaryContentIdList.stream().map(this::find)
+               .toList();
 
     }
 

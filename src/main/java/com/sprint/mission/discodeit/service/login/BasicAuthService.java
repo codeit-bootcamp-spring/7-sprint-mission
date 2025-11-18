@@ -17,11 +17,19 @@ public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     @Override
     public LoginResponseDto checkLoginUser(LoginRequestDto loginRequestDto) {
-        String userName = loginRequestDto.getUserName();
+        String userName = loginRequestDto.getUsername();
         String password = loginRequestDto.getPassword();
         List<User> userList = userRepository.getAllUser();
         Optional<User> optionalUser = userList.stream().filter(x -> x.getUserName().equals(userName) && x.getPassword().equals(password)).findFirst();
         User existUser = optionalUser.orElseThrow(IllegalArgumentException::new);
-        return LoginResponseDto.of(existUser);
+        return LoginResponseDto.builder()
+                .id(existUser.getId())
+                .createdAt(existUser.getCreatedAt())
+                .updatedAt(existUser.getUpdatedAt())
+                .username(existUser.getUserName())
+                .email(existUser.getEmail())
+                .password(existUser.getPassword())
+                .profileId(existUser.getProfileId())
+                .build();
     }
 }
