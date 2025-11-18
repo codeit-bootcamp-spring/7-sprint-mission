@@ -20,4 +20,14 @@ spring:
       maxFileSize: 10MB
       maxRequestSize: 30MB
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+  # 서버 정보 지정
+  servers:
+    - url: http://localhost:8080
+      description: 로컬 서버
+
 

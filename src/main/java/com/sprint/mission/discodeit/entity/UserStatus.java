@@ -11,34 +11,37 @@ import java.util.UUID;
 
 @Getter
 public class UserStatus extends Common {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private Instant updateAt;
-    private final UUID userId;
-    private Instant loginAt;
 
-    public UserStatus(UUID userId, Instant loginAt) {
-        this.updateAt = Instant.now();
-        this.userId = userId;
-        this.loginAt = loginAt;
+  @Serial
+  private static final long serialVersionUID = 1L;
+  private Instant updateAt;
+  private final UUID userId;
+  private Instant lastActiveAt;
+
+  public UserStatus(UUID userId, Instant lastActiveAt) {
+    this.updateAt = Instant.now();
+    this.userId = userId;
+    this.lastActiveAt = lastActiveAt;
+  }
+
+  public void update(Instant lastActiveAt) {
+    boolean isUpdate = false;
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
+      isUpdate = true;
     }
 
-    public void update(Instant loginAt) {
-        boolean isUpdate = false;
-        if(this.loginAt != null && !this.loginAt.equals(loginAt)) {
-            this.loginAt = loginAt;
-            isUpdate = true;
-        }
-
-        if(isUpdate) updateAt = Instant.now();
+    if (isUpdate) {
+      updateAt = Instant.now();
     }
+  }
 
-    public UserStatusType isOnline() {
-        if(Duration.between(loginAt, Instant.now()).toSeconds() <= 300) {
-            return UserStatusType.ONLINE;
-        }
-        return UserStatusType.OFFLINE;
+  public UserStatusType isOnline() {
+    if (Duration.between(lastActiveAt, Instant.now()).toSeconds() <= 300) {
+      return UserStatusType.ONLINE;
     }
+    return UserStatusType.OFFLINE;
+  }
 
 
 }

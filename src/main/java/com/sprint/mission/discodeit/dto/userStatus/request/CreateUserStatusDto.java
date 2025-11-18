@@ -4,7 +4,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record CreateUserStatusDto(
-        UUID userId,
-        Instant loginAt
+    UUID userId,
+    Instant lastActiveAt
 ) {
+
 }

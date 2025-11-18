@@ -9,21 +9,24 @@ import java.util.UUID;
 
 @Builder
 public record MessageResponseDto(
-        UUID messageId,
-        Instant updateAt,
-        String content,
-        UUID channelId,
-        UUID userId,
-        List<UUID> attachmentIds
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    String content,
+    UUID channelId,
+    UUID authorId,
+    List<UUID> attachmentIds
 ) {
-    public static MessageResponseDto from(Message message) {
-        return MessageResponseDto.builder()
-                .messageId(message.getId())
-                .updateAt(message.getUpdateAt())
-                .content(message.getContent())
-                .channelId(message.getChannelId())
-                .userId(message.getUserId())
-                .attachmentIds(message.getAttachmentIds())
-                .build();
-    }
+
+  public static MessageResponseDto from(Message message) {
+    return MessageResponseDto.builder()
+        .id(message.getId())
+        .createdAt(message.getCreateAt())
+        .updatedAt(message.getUpdateAt())
+        .content(message.getContent())
+        .channelId(message.getChannelId())
+        .authorId(message.getUserId())
+        .attachmentIds(message.getAttachmentIds())
+        .build();
+  }
 }

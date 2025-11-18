@@ -8,21 +8,22 @@ import java.util.UUID;
 
 @Builder
 public record ReadStatusResponseDto(
-        UUID readStatusId,
-        Instant createdAt,
-        Instant updateAt,
-        UUID userId,
-        UUID channelId,
-        Instant lastReadAt
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    UUID userId,
+    UUID channelId,
+    Instant lastReadAt
 ) {
-    public static ReadStatusResponseDto from(ReadStatus readStatus) {
-        return ReadStatusResponseDto.builder()
-                .readStatusId(readStatus.getId())
-                .createdAt(readStatus.getCreateAt())
-                .updateAt(readStatus.getUpdateAt())
-                .userId(readStatus.getUserId())
-                .channelId(readStatus.getChannelId())
-                .lastReadAt(readStatus.getLastReadAt())
-                .build();
-    }
+
+  public static ReadStatusResponseDto from(ReadStatus readStatus) {
+    return ReadStatusResponseDto.builder()
+        .id(readStatus.getId())
+        .createdAt(readStatus.getCreateAt())
+        .updatedAt(readStatus.getUpdateAt())
+        .userId(readStatus.getUserId())
+        .channelId(readStatus.getChannelId())
+        .lastReadAt(readStatus.getLastReadAt())
+        .build();
+  }
 }

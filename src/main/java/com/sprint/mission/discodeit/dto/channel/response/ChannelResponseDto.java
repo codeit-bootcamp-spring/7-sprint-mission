@@ -11,10 +11,10 @@ import java.util.UUID;
 
 @Builder
 public record ChannelResponseDto(
-        UUID channelId,
-        ChannelType channelType,
-        String channelName,
-        String desc,
+        UUID id,
+        ChannelType type,
+        String name,
+        String description,
         List<UUID> participantIds,
         Instant lastMessageAt
 ) {
@@ -24,11 +24,11 @@ public record ChannelResponseDto(
                 .toList();
 
         return ChannelResponseDto.builder()
-                .channelId(channel.getId())
-                .channelName(channel.getChannelName())
-                .desc(channel.getDesc())
+                .id(channel.getId())
+                .type(channel.getChannelType())
+                .name(channel.getChannelName())
+                .description(channel.getDesc())
                 .participantIds(participantIds)
-                .channelType(channel.getChannelType())
                 .lastMessageAt(lastMessageAt)
                 .build();
     }
