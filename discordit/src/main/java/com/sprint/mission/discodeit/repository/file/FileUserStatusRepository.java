@@ -8,10 +8,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 @Primary
@@ -51,16 +48,15 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findById(UUID id) {
-        return data.get(id);
+    public Optional<UserStatus> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
-    public UserStatus findByUser(User user) {
+    public Optional<UserStatus> findByUserId(UUID uuid) {
         return data.values().stream()
-                .filter(u -> u.getUser().equals(user))
-                .findFirst()
-                .orElseThrow(() -> new UserStatusNotExistException(user));
+                .filter(u -> u.getUser().getUuid().equals(uuid))
+                .findFirst();
     }
 
     @Override

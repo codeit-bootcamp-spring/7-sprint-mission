@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.exceptions.user.UserStatusNotExistException;
+import com.sprint.mission.discodeit.dto.channel.response.DetailedChannelResponse;
 import com.sprint.mission.discodeit.dto.userStatus.request.*;
+import com.sprint.mission.discodeit.dto.userStatus.response.DetailedUserStatusResponse;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -33,38 +36,41 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusResponse get(UUID id) {
-        return UserStatusResponse.toDto(userStatusRepository.findById(id));
+        return UserStatusResponse.toDto(userStatusRepository.findById(id)
+                .orElseThrow(() -> new UserStatusNotExistException(id)));
     }
 
     @Override
-    public List<UserStatusResponse> getAll() {
+    public List<DetailedUserStatusResponse> getAll() {
         return userStatusRepository.findAll().stream()
-                .map(UserStatusResponse::toDto)
+                .map(DetailedUserStatusResponse::toDto)
                 .toList();
-    }
-
-    @Override
-    public UserStatusResponse update(UserStatusUpdateRequest dto) {
-        UserStatus userStatus = userStatusRepository.findById(dto.id());
-        userStatus.setOnlineStatus(dto.onlineStatus());
-        userStatusRepository.update(userStatus);
-        return UserStatusResponse.toDto(userStatus);
-    }
-
-    @Override
-    public UserStatusResponse updateByUser(UserStatusUpdateByUserRequest dto) {
-        UserStatus userStatus = userStatusRepository.findByUser(
-                userRepository.find(dto.userUuid())
-                        .orElseThrow(() -> new UserNotFoundException(dto.userUuid())));
-        userStatus.setOnlineStatus(dto.onlineStatus());
-        userStatusRepository.update(userStatus);
-        return UserStatusResponse.toDto(userStatus);
     }
 
     @Override
     public UserStatusResponse getByUser(UUID userUuid) {
         User user = userRepository.find(userUuid)
                 .orElseThrow(() -> new UserNotFoundException(userUuid));
-        return UserStatusResponse.toDto(userStatusRepository.findByUser(user));
+        return UserStatusResponse.toDto(userStatusRepository.findByUserId(userUuid)
+                .orElseThrow(() -> new UserStatusNotExistException(user)));
+    }
+
+    @Override
+    public UserStatusResponse updateByUser(UUID userId, UserStatusUpdateRequest dto) {
+        User user = userRepository.find(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseGet(() -> {
+                    UserStatus created = new UserStatus(user);
+                    userStatusRepository.save(created);
+                    return created;
+                });
+
+        if (dto.newLastActiveAt() != null) {
+            userStatus.setLastActiveAt(dto.newLastActiveAt());
+        }
+        userStatusRepository.update(userStatus);
+        return UserStatusResponse.toDto(userStatus);
     }
 }

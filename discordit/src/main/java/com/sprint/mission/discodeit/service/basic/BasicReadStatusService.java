@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponse;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.User;
@@ -16,7 +15,6 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,30 +28,26 @@ public class BasicReadStatusService implements ReadStatusService {
 
     public ReadStatusResponse create(ReadStatusCreateRequest dto) {
         ReadStatus readStatus = new ReadStatus(
-                userRepository.findByUserId(dto.userId())
+                userRepository.find(dto.userId())
                         .orElseThrow(() -> new UserNotFoundException(dto.userId())),
-                channelRepository.findById(dto.ChannelId())
-                        .orElseThrow(() -> new ChannelNotFoundException(dto.ChannelId()))
+                channelRepository.find(dto.channelId())
+                        .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
         );
         readStatusRepository.save(readStatus);
         return ReadStatusResponse.toDto(readStatus);
     }
 
     @Override
-    public ReadStatusResponse update(ReadStatusUpdateRequest dto) {
-        User user = userRepository.findByUserId(dto.userId())
-                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
-        Channel channel = channelRepository.findById(dto.channelId())
-                .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()));
-        ReadStatus readStatus = readStatusRepository.find(user, channel)
-                .orElseThrow(() -> new ReadStatusNotFoundException(user, channel));
-        readStatus.setLastReadAt(dto.readTime().atZone(ZoneId.of("UTC")).toInstant());
+    public ReadStatusResponse update(UUID id, ReadStatusUpdateRequest dto) {
+        ReadStatus readStatus = readStatusRepository.find(id)
+                .orElseThrow(() -> new ReadStatusNotFoundException(id));
+        readStatus.setLastReadAt(dto.newLastReadAt());
         readStatusRepository.update(readStatus);
         return ReadStatusResponse.toDto(readStatus);
     }
 
     public ReadStatusResponse get(UUID uuid) {
-        return ReadStatusResponse.toDto(readStatusRepository.findById(uuid)
+        return ReadStatusResponse.toDto(readStatusRepository.find(uuid)
                 .orElseThrow(() -> new ReadStatusNotFoundException(uuid)));
     }
 

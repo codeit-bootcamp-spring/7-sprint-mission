@@ -12,6 +12,7 @@ public interface UserRepository {
 
     Optional<User> find(UUID uuid);
     Optional<User> findByUserId(String userId);
+    Optional<User> findByDisplayName(String displayName);
 
     void delete(User user);
 

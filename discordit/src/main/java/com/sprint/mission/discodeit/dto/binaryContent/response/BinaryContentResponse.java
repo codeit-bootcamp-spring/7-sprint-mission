@@ -12,7 +12,7 @@ public record BinaryContentResponse (
 ) {
     public static BinaryContentResponse toDto(BinaryContent content) {
         return new BinaryContentResponse(
-                content.getId(),
+                content.getUuid(),
                 content.getUploadedAt(),
                 content.getFileUrl()
         );

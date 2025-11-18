@@ -6,8 +6,8 @@ import java.util.UUID;
 
 public record ReadStatusCreateRequest(
         @NotNull(message = "유저 id는 필수입니다.")
-        String userId,
+        UUID userId,
         @NotNull(message = "채널 id는 필수입니다.")
-        UUID ChannelId
+        UUID channelId
 ) {
 }

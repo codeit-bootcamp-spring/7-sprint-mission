@@ -20,25 +20,25 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void save(BinaryContent content) {
-        data.put(content.getId(), content);
+        data.put(content.getUuid(), content);
         write();
     }
 
     @Override
     public void saveAll(List<BinaryContent> contents) {
-        contents.forEach(c -> data.put(c.getId(), c));
+        contents.forEach(c -> data.put(c.getUuid(), c));
         write();
     }
 
     @Override
     public void delete(BinaryContent content) {
-        data.remove(content.getId());
+        data.remove(content.getUuid());
         write();
     }
 
     @Override
     public void deleteAll(List<BinaryContent> attachments) {
-        attachments.forEach(c -> data.remove(c.getId()));
+        attachments.forEach(c -> data.remove(c.getUuid()));
         write();
     }
 

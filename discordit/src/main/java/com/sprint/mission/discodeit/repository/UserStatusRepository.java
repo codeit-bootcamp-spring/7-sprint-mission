@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserStatusRepository {
@@ -11,8 +12,8 @@ public interface UserStatusRepository {
     void update(UserStatus userStatus);
     void deleteById(UUID id);
 
-    UserStatus findById(UUID id);
-    UserStatus findByUser(User user);
+    Optional<UserStatus> findById(UUID id);
+    Optional<UserStatus> findByUserId(UUID uuid);
 
     List<UserStatus> findAll();
 

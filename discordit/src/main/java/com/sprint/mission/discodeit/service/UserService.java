@@ -1,23 +1,21 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.request.UserDeleteRequest;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.user.response.UserResponse;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseV2;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponse get(UUID uuid);
-    List<UserResponse> getAllUsers();
-    List<UserResponse> getOnlineUsers();
+    UserResponseV2 get(UUID uuid);
+    List<UserResponseV2> getAllUsers();
+    List<UserResponseV2> getOnlineUsers();
 
-    UserResponse signIn(UserCreateRequest dto);
-    UserResponse update(UserUpdateRequest dto);
 
-    void delete(UserDeleteRequest dto);
+    UserResponseV2 signIn(UserCreateRequest dto);
+    UserResponseV2 update(UUID id, UserUpdateRequest dto, MultipartFile profile);
 
-    // TODO: Auth로 분리
-    UserResponse login(String id, String passwd);
+    void delete(UUID id);
 }

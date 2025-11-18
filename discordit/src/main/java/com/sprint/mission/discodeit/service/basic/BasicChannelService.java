@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.request.*;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseV2;
+import com.sprint.mission.discodeit.dto.channel.response.DetailedChannelResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.enums.ChannelScope;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,94 +32,87 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public ChannelResponse createPublicChannel(PublicChannelCreateRequest dto) {
-        Channel channel = new Channel(dto.channelName(),
-                dto.scope(),
-                dto.type(),
-                dto.moderatorIds().stream()
-                        .map(userId ->
-                                userRepository.findByUserId(userId)
-                                        .orElseThrow(() -> new UserNotFoundException(userId)))
-                        .collect(Collectors.toSet()));
-        channel.setDescription(dto.description());
+    public ChannelResponseV2 createPublicChannel(PublicChannelCreateRequest dto) {
+        Channel channel = Channel.newPublicChannel(
+                dto.name(),
+                dto.description()
+        );
         channelRepository.save(channel);
-        return toDto(channel);
+        return ChannelResponseV2.toDto(channel);
     }
 
     @Override
-    public ChannelResponse createPrivateChannel(PrivateChannelCreateRequest dto) {
-        Channel channel = new Channel("",
-                dto.scope(),
-                dto.type(),
-                dto.moderatorIds().stream()
-                        .map(userId ->
-                                userRepository.findByUserId(userId)
-                                        .orElseThrow(() -> new UserNotFoundException(userId)))
-                        .collect(Collectors.toSet()));
-        dto.memberIds().forEach(userId -> {
-            User user = userRepository.findByUserId(userId)
-                    .orElseThrow(() -> new UserNotFoundException(userId));
-            channel.addMember(user);
-            ReadStatus r = new ReadStatus(user, channel);
-            readStatusRepository.save(r);
-        });
-        return toDto(channel);
+    public ChannelResponseV2 createPrivateChannel(PrivateChannelCreateRequest dto) {
+        Channel channel = Channel.newPrivateChannel(
+                dto.participantIds().stream()
+                        .map(u -> userRepository.find(u)
+                                .orElseThrow(() -> new UserNotFoundException(u)))
+                        .collect(Collectors.toSet())
+        );
+        return ChannelResponseV2.toDto(channel);
     }
 
     @Override
-    public ChannelResponse update(ChannelUpdateRequest dto) {
-        Channel channel = channelRepository.findById(dto.id())
-                .orElseThrow(() -> new ChannelNotFoundException(dto.id()));
+    public ChannelResponseV2 update(UUID channelId, ChannelUpdateRequest dto) {
+        Channel channel = channelRepository.find(channelId)
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
         if (channel.getScope() == ChannelScope.PRIVATE) {
             throw new IllegalArgumentException("Private 채널은 수정할 수 없습니다.");
         }
 
-        if (dto.channelName() != null) {
-            channel.setChannelName(dto.channelName());
+        if (dto.newName() != null) {
+            channel.setChannelName(dto.newName());
         }
 
-        if (dto.description() != null) {
-            channel.setDescription(dto.description());
+        if (dto.newDescription() != null) {
+            channel.setDescription(dto.newDescription());
         }
 
         channelRepository.update(channel);
-        return toDto(channel);
+        return ChannelResponseV2.toDto(channel);
     }
 
     @Override
-    public void delete(ChannelRemoveRequest dto) {
-        Channel channel = channelRepository.findById(dto.id())
-                .orElseThrow(() -> new ChannelNotFoundException(dto.id()));
-        channelRepository.deleteById(dto.id());
+    public void delete(UUID channelId) {
+        Channel channel = channelRepository.find(channelId)
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
+        channelRepository.deleteById(channelId);
         messageRepository.deleteAllByReceiver(channel);
         readStatusRepository.deleteAllByChannel(channel);
     }
 
     @Override
-    public List<ChannelResponse> getAll() {
+    public List<ChannelResponseV2> getAll() {
         return channelRepository.findAll().stream()
-                .map(this::toDto)
+                .map(ChannelResponseV2::toDto)
                 .toList();
     }
 
     @Override
-    public List<ChannelResponse> getAllVisibleByUser(UUID userUuid) {
+    public List<DetailedChannelResponse> getAllVisibleByUser(UUID userUuid) {
         User user = userRepository.find(userUuid)
                 .orElseThrow(() -> new UserNotFoundException(userUuid));
         return Stream.concat(channelRepository.findAllPublic().stream(), channelRepository.findAllPrivateByUser(user).stream())
-                .map(this::toDto)
+                .map(c -> {
+                    Optional<Message> last = messageRepository.findLast(c);
+                    Instant lastMessageAt = null;
+                    if (last.isPresent()) {
+                        lastMessageAt = last.get().getCreatedAt();
+                    }
+                    return DetailedChannelResponse.toDto(c, lastMessageAt);
+                })
                 .toList();
     }
 
     @Override
-    public ChannelResponse getById(UUID uuid) {
-        return toDto(channelRepository.findById(uuid)
+    public ChannelResponseV2 getById(UUID uuid) {
+        return ChannelResponseV2.toDto(channelRepository.find(uuid)
                 .orElseThrow(() -> new ChannelNotFoundException(uuid)));
     }
 
     @Override
     public List<UserResponse> getAllMembers(UUID uuid) {
-        return channelRepository.findById(uuid)
+        return channelRepository.find(uuid)
                 .orElseThrow(() -> new ChannelNotFoundException(uuid)).getMembers().stream()
                 .map(UserResponse::toDto)
                 .toList();
@@ -125,7 +120,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<UserResponse> getAllModerators(UUID uuid) {
-        return channelRepository.findById(uuid)
+        return channelRepository.find(uuid)
                 .orElseThrow(() -> new ChannelNotFoundException(uuid)).getModerators().stream()
                 .map(UserResponse::toDto)
                 .toList();
@@ -134,7 +129,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void addMember(ChannelMemberRequest dto) {
         List<User> users = userRepository.findAllByUuids(dto.userUuids());
-        Channel channel = channelRepository.findById(dto.channelId())
+        Channel channel = channelRepository.find(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()));
         channel.addMembers(new HashSet<>(users));
         channelRepository.update(channel);
@@ -143,7 +138,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void addModerator(ChannelMemberRequest dto) {
         List<User> users = userRepository.findAllByUuids(dto.userUuids());
-        channelRepository.findById(dto.channelId())
+        channelRepository.find(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
                 .addModerators(new HashSet<>(users));
     }
@@ -151,7 +146,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void deleteMember(ChannelMemberRequest dto) {
         List<User> users = userRepository.findAllByUuids(dto.userUuids());
-        channelRepository.findById(dto.channelId())
+        channelRepository.find(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
                 .deleteMember(new HashSet<>(users));
     }
@@ -159,29 +154,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void deleteModerator(ChannelMemberRequest dto) {
         List<User> users = userRepository.findAllByUuids(dto.userUuids());
-        channelRepository.findById(dto.channelId())
+        channelRepository.find(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
                 .deleteModerator(new HashSet<>(users));
     }
-
-    private ChannelResponse toDto(Channel channel) {
-        return ChannelResponse.toDto(channel,
-                messageRepository.findLast(channel)
-                        .map(BaseEntity::getCreatedAt)
-                        .orElse(null));
-    }
-
-    /*
-    TODO: 예외처리 물어보기
-    private User findUserAndHandleConflict(String userUuid) {
-        return userRepository.findByUserId(userUuid)
-                .orElseThrow(() -> new UserNotFoundException(userUuid));
-    }
-
-    private Channel findAndHandleConflict(UUID id) {
-        return channelRepository.findById(id)
-                .orElseThrow(() -> new ChannelNotFoundException(id));
-    }
-     */
-
 }

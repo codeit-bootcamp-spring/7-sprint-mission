@@ -7,7 +7,7 @@ import java.util.UUID;
 public class BinaryContentNotFoundException extends RuntimeException {
     public BinaryContentNotFoundException(BinaryContent content) {
         super("존재하지 않는 파일입니다 : \n" +
-                "\tUUID: " + content.getId() +
+                "\tUUID: " + content.getUuid() +
                 "\turl: " + content.getFileUrl());
     }
 

@@ -6,20 +6,21 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class BinaryContent{
-    private UUID id;
+public class BinaryContent extends BaseEntity {
     private Instant uploadedAt;
     private String fileUrl;
 
     public BinaryContent(String fileUrl) {
-        this.id = UUID.randomUUID();
         this.uploadedAt = Instant.now();
         this.fileUrl = fileUrl;
     }
 
-    public static BinaryContent fromDto(UUID id, Instant uploadedAt, String fileUrl) {
+    public static BinaryContent fromDto(UUID id, Instant createdAt, Instant updatedAt,
+                                        Instant uploadedAt, String fileUrl) {
         BinaryContent c = new BinaryContent(fileUrl);
-        c.id = id;
+        c.uuid = id;
+        c.createdAt = createdAt;
+        c.updatedAt = updatedAt;
         c.uploadedAt = uploadedAt;
         return c;
     }

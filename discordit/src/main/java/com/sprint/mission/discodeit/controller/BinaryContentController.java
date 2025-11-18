@@ -12,20 +12,20 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/binaryContent")
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
 public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
-    @RequestMapping(value = "/get", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContentResponse> getContent(@Valid @RequestParam UUID id) {
-        return ResponseEntity.ok(binaryContentService.get(id));
+    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+    public ResponseEntity<BinaryContentResponse> getContent(@PathVariable UUID binaryContentId) {
+        return ResponseEntity.ok(binaryContentService.get(binaryContentId));
     }
 
-    @RequestMapping(value = "/getContents", method = RequestMethod.POST)
-    public ResponseEntity<List<BinaryContentResponse>> getContent(@Valid @RequestBody BinaryContentGetRequest request) {
-        return ResponseEntity.ok(binaryContentService.getAllById(request));
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<List<BinaryContentResponse>> getContents(@RequestParam List<UUID> binaryContentIds) {
+        return ResponseEntity.ok(binaryContentService.getAllById(binaryContentIds));
     }
 
     @RequestMapping(value = "/getAll", method = RequestMethod.GET)

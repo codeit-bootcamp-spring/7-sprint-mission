@@ -49,6 +49,13 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByDisplayName(String displayName) {
+        return data.values().stream()
+                .filter(u -> u.getDisplayName().equals(displayName))
+                .findFirst();
+    }
+
+    @Override
     public List<User> findAllByUuids(List<UUID> userUuids) {
         return data.values().stream()
                 .filter(u -> userUuids.contains(u.getUuid()))

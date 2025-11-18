@@ -35,7 +35,7 @@ final class MessageMapper {
         }
 
         List<UUID> attachmentIds = message.getAttachments().stream()
-                .map(BinaryContent::getId)
+                .map(BinaryContent::getUuid)
                 .toList();
 
         return new MessageIoDTO(
@@ -59,7 +59,7 @@ final class MessageMapper {
 
         Receivable receiver;
         switch (dto.getReceiverType()) {
-            case CHANNEL -> receiver = channelRepository.findById(dto.getReceiverUuid())
+            case CHANNEL -> receiver = channelRepository.find(dto.getReceiverUuid())
                     .orElseThrow(() -> new ChannelNotFoundException(dto.getReceiverUuid()));
             case USER -> receiver = userRepository.findAll().stream()
                     .filter(u -> u.getUuid().equals(dto.getReceiverUuid()))

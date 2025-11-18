@@ -18,7 +18,7 @@ public record UserResponse(
         Boolean online
 ) {
     public static UserResponse toDto(User user) {
-        UUID profileId = user.getProfileImage() != null ? user.getProfileImage().getId() : null;
+        UUID profileId = user.getProfileImage() != null ? user.getProfileImage().getUuid() : null;
         return new UserResponse(
                 user.getUuid(),
                 user.getUserId(),
