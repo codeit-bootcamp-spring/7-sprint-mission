@@ -23,7 +23,6 @@ public class UserStatus extends BaseModel {
         //[ ] 마지막 접속 시간을 기준으로 현재 로그인한 유저로 판단할 수 있는 메소드를 정의하세요.
         // 마지막 접속 시간이 현재 시간으로부터 5분 이내이면 현재 접속 중인 유저로 간주합니다.
         Duration duration = Duration.between(this.getUpdatedAt(), Instant.now());
-        boolean isOnline = duration.toMinutes() < 5;
-        return isOnline;
+        return duration.toMinutes() < 5;
     }
 }

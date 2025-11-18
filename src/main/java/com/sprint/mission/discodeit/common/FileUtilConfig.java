@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Slf4j
-@Configuration
+@Configuration(proxyBeanMethods = false) // 👍위의 설정 클래스에 대해서는 프록시가 적용되지 않으며 모든 @Bean 메소드 호출마다 새로운 객체를 생성해준다
 public class FileUtilConfig {
 
     @Bean
@@ -31,19 +31,4 @@ public class FileUtilConfig {
 
     @Bean
     public FileUtil binaryContentFileUtil()  { return new FileUtil(ModelType.BINARYCONTENT); }
-
-//    public static Dto_BinaryContent parsingMultipartFile(MultipartFile file) {
-//        Dto_BinaryContent dtoFile = null;
-//        try {
-//            dtoFile = Dto_BinaryContent.from(
-//                    file.getOriginalFilename(),
-//                    file.getContentType(),
-//                    file.getBytes(),
-//                    file.getSize());
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        log.info("✅ file.getOriginalFilename() = [" + file.getOriginalFilename() + "]");
-//        return dtoFile;
-//    }
 }

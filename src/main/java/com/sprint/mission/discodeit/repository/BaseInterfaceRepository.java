@@ -16,20 +16,16 @@ public interface BaseInterfaceRepository<T> {
     List<T> findAll();
 
     default Optional<UserStatus> findByUserId(UUID userID) {
-        System.out.println("🚨UserStatus.default findByUserId()");
         return Optional.empty();
     }
     default Optional<List<Message>> findAllMessageInChannel(UUID channelID) {
-        System.out.println("🚨default Message.findAllMessageInChannel()");
         return Optional.empty();
     }
     default Set<UUID> findAllUsersInChannel(List<Message> allMessageInChannel) {
-        System.out.println("🚨default Message.findAllUsersInChannel()");
         return new HashSet<>();
     }
 
     default Optional<ReadStatus> findByUserAndChannelId(UUID userID, UUID channelID) {
-        System.out.println("🚨default ReadStatus.findByUserAndChannelId()");
         return Optional.empty();
     }
 }

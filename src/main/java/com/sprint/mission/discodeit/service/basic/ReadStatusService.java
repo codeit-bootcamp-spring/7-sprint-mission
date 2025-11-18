@@ -46,7 +46,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
 
         ReadStatus newReadStatus = new ReadStatus(user.getId(), channel.getId());
         readStatusRepository.save(newReadStatus);
-        log.info("✅ 🍎🍎ReadStatusService.create = [" + newReadStatus + "]");
+        log.info("✅ ReadStatusService.create = [" + newReadStatus + "]");
 
         return Res_ReadStatus.from(newReadStatus);
     }
@@ -71,11 +71,9 @@ public class ReadStatusService implements InterfaceReadStatusService {
         readStatuses.forEach(resReadStatus -> log.info("❌ ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"));
 
         List<Res_ReadStatus> dtoList = readStatuses.stream()
-            .peek(resReadStatus -> log.info("🍏 ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"))
             .filter(readStatus -> readStatus.getUserId().equals(userID))
-            .peek(resReadStatus -> log.info("🍏🍏 ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"))
             .map(Res_ReadStatus::from)
-            .peek(resReadStatus -> log.info("🍏🍏🍏 ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"))
+            .peek(resReadStatus -> log.info("✅ ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"))
             .toList();
 
         return dtoList;

@@ -28,9 +28,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@RestController
+@RestController //👍 @controller + @responsebody
 @RequiredArgsConstructor
-@ResponseBody
 @RequestMapping("/api/messages")
 @Slf4j
 public class MessageController implements MessageDoc {
@@ -55,12 +54,7 @@ public class MessageController implements MessageDoc {
         @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList) {
 
         //💎Message 생성
-        List<Dto_BinaryContent> collect = null;
-        if (fileList != null) {
-            collect = fileList.stream()
-                .map(Util::parsingMultipartFile)
-                .toList();
-        }
+        List<Dto_BinaryContent> collect = Util.parsingMultipartFileList(fileList);
 
         Res_Message resMessage
             = messageService.create(dtoMessage, Optional.ofNullable(collect));

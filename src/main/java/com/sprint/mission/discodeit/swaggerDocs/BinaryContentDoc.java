@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,7 @@ public interface BinaryContentDoc {
     })
     // NOTE: Spring MVC에서 쿼리 파라미터로 UUID[]를 받을 때 @RequestParam을 명시하지 않는 경우도 있으나,
     // Swagger 문서화를 위해 @RequestParam을 생략하고 파라미터에 배열 타입을 그대로 사용합니다.
-    ResponseEntity<ArrayList<Res_BinaryContent>> find(
+    ResponseEntity<List<Res_BinaryContent>> find(
         @Parameter(description = "조회할 첨부 파일 ID 목록") UUID[] binaryContentIds);
 
 
