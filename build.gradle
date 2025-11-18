@@ -35,6 +35,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    // Caffeine Cache
+    implementation "com.github.ben-manes.caffeine:caffeine:3.1.8"
+
+    // Apache Commons Lang 최신 버전 강제
+    implementation 'org.apache.commons:commons-lang3:3.19.0'
+
+    // CVE 대응용 constraints (하위 라이브러리 버전 덮어쓰기)
+    constraints {
+        implementation('org.apache.commons:commons-lang3:3.19.0')
+    }
 
     // Swagger/OpenAPI 추가
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
