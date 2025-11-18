@@ -26,7 +26,7 @@ public class EmailAuthFacade {
   // 인증번호 발송
   public void sendEmailCode(String email) {
     // 가입 된 이메일인지 먼저 확인.
-    if (userService.isRegisteredEmail(email).available()) {
+    if (!userService.isRegisteredEmail(email).available()) {
       throw new CustomException(ErrorCode.EMAIL_NOT_FOUND);
     }
 
