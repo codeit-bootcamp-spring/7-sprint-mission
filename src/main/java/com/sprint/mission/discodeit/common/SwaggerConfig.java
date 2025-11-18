@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration(proxyBeanMethods = false) // 👍위의 설정 클래스에 대해서는 프록시가 적용되지 않으며 모든 @Bean 메소드 호출마다 새로운 객체를 생성해준다
+@Configuration(proxyBeanMethods = false) // 👍👍위의 설정 클래스에 대해서는 프록시가 적용되지 않으며 모든 @Bean 메소드 호출마다 새로운 객체를 생성해준다
 public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
