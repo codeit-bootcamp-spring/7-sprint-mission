@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,6 +14,6 @@ public interface UserStatusService {
     Optional<Instant> findLastSeenByUserId(UUID userId);
     List<UUID> findAllUserIdsOnlineWithinMinutes(int minutes);
     void update(UserStatusUpdateRequest request);
-    void updateByUserId(UUID userId, Instant lastSeenAt);
+    UserStatusDto updateByUserId(UUID userId, Instant lastSeenAt);
     void delete(UUID id);
 }

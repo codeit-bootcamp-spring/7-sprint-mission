@@ -1,45 +1,49 @@
 package com.sprint.mission.discodeit.controller;
 
-
-import com.sprint.mission.discodeit.dto.message.*;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
 
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/messages")
+@RequiredArgsConstructor
 public class MessageController {
-
 
     private final MessageService messageService;
 
-
-    public MessageController(MessageService messageService) {
-        this.messageService = messageService;
+    // ✅ 메시지 생성
+    @PostMapping
+    public ResponseEntity<MessageDto> create(@RequestBody MessageCreateRequest request) {
+        MessageDto created = messageService.create(request);
+        return ResponseEntity.status(201).body(created);
     }
 
-
-    @RequestMapping(method = RequestMethod.POST)
-    public MessageDto create(@RequestBody MessageCreateRequest request) {
-        return messageService.create(request);
+    // ✅ 채널별 메시지 조회
+    // 기존: /channel/{channelId} → 개선: /api/messages?channelId={id}
+    @GetMapping
+    public ResponseEntity<List<MessageDto>> findAllByChannel(@RequestParam UUID channelId) {
+        List<MessageDto> messages = messageService.findAllByChannelId(channelId);
+        return ResponseEntity.ok(messages);
     }
 
-
-    @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.GET)
-    public List<MessageDto> findAllByChannel(@PathVariable UUID channelId) {
-        return messageService.findAllByChannelId(channelId);
+    // ✅ 메시지 내용 수정
+    @PatchMapping
+    public ResponseEntity<MessageDto> update(@RequestBody MessageUpdateRequest request) {
+        MessageDto updated = messageService.update(request);
+        return ResponseEntity.ok(updated);
     }
 
-
-    @RequestMapping(method = RequestMethod.PUT)
-    public MessageDto update(@RequestBody MessageUpdateRequest request) {
-        return messageService.update(request);
-    }
-
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public void delete(@PathVariable UUID id) {
+    // ✅ 메시지 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         messageService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

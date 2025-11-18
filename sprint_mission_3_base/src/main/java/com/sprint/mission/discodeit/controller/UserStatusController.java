@@ -1,40 +1,42 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest; // ✅ 추가
+import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
-import java.time.Instant;
 
+import java.time.Instant;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/user-status")
+@RequestMapping("/api/user-statuses")
+@RequiredArgsConstructor
 public class UserStatusController {
-
 
     private final UserStatusService userStatusService;
 
-
-    public UserStatusController(UserStatusService userStatusService) {
-        this.userStatusService = userStatusService;
+    // ✅ 사용자 상태 생성
+    @PostMapping
+    public ResponseEntity<UUID> create(@RequestBody UserStatusCreateRequest request) {
+        UUID created = userStatusService.create(request);
+        return ResponseEntity.status(201).body(created);
     }
 
-
-    @RequestMapping(method = RequestMethod.POST)
-    public UUID create(@RequestBody UserStatusCreateRequest request) {
-        return userStatusService.create(request);
+    // ✅ 사용자 마지막 접속 시간 조회
+    @GetMapping("/{userId}")
+    public ResponseEntity<Instant> findLastSeen(@PathVariable UUID userId) {
+        return userStatusService.findLastSeenByUserId(userId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-
-    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public Instant findLastSeen(@PathVariable UUID userId) {
-        return userStatusService.findLastSeenByUserId(userId).orElse(null);
-    }
-
-
-    @RequestMapping(method = RequestMethod.PUT)
-    public void update(@RequestBody UserStatusUpdateByUserIdRequest request) {
-        userStatusService.updateByUserId(request.userId(), request.lastSeenAt());
+    // ✅ 사용자 상태 업데이트 (예: 마지막 접속 시간 갱신)
+    @PatchMapping
+    public ResponseEntity<UserStatusDto> update(@RequestBody UserStatusUpdateByUserIdRequest request) {
+        UserStatusDto updated = userStatusService.updateByUserId(request.userId(), request.lastSeenAt());
+        return ResponseEntity.ok(updated);
     }
 }
