@@ -7,13 +7,24 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
-    User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest);
-    UserDto find(UUID userId);
-    List<UserDto> findAll();
-    User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest);
-    void delete(UUID userId);
+
+  User create(UserCreateRequest userCreateRequest,
+      Optional<BinaryContentCreateRequest> profileCreateRequest);
+
+  UserDto find(UUID userId);
+
+  List<UserDto> findAll();
+
+  User update(UUID userId, UserUpdateRequest userUpdateRequest,
+      Optional<BinaryContentCreateRequest> profileCreateRequest);
+
+  void delete(UUID userId);
+
+  void updateStatus(UUID userId, Map<String, Object> statusReq);
 }
