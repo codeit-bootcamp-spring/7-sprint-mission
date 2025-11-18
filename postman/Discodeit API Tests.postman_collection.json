@@ -1,0 +1,215 @@
+{
+	"info": {
+		"_postman_id": "87fa57c4-9992-4815-a79c-2edac4adb4f6",
+		"name": "Discodeit API Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49391880",
+		"_collection_link": "https://chschs0617-6140296.postman.co/workspace/%EC%B5%9C%ED%98%84%EC%84%9D's-Workspace~949a8906-e2ae-4134-8992-96112559cf32/collection/49391880-87fa57c4-9992-4815-a79c-2edac4adb4f6?action=share&source=collection_link&creator=49391880"
+	},
+	"item": [
+		{
+			"name": "Get All Users",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Public Channel",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"general\",\r\n  \"description\": \"General discussion channel\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/channels/public",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels",
+						"public"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Channels",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/channels?userId=123e4567-e89b-12d3-a456-426614174000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "123e4567-e89b-12d3-a456-426614174000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Binary Contents",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/binaryContents?binaryContentIds=123e4567-e89b-12d3-a456-426614174000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"binaryContents"
+					],
+					"query": [
+						{
+							"key": "binaryContentIds",
+							"value": "123e4567-e89b-12d3-a456-426614174000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Messages",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/messages?channelId=123e4567-e89b-12d3-a456-426614174000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"messages"
+					],
+					"query": [
+						{
+							"key": "channelId",
+							"value": "123e4567-e89b-12d3-a456-426614174000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Channel",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"newName\": \"updated-general\",\r\n  \"newDescription\": \"This channel has been updated\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/channels/0a22f5f9-2835-40b5-a7df-3cd82dd12143",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels",
+						"0a22f5f9-2835-40b5-a7df-3cd82dd12143"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Channel",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"general\",\r\n  \"description\": \"General discussion channel\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/channels/a04ee1ec-8711-435d-a037-d97d964a8767",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels",
+						"a04ee1ec-8711-435d-a037-d97d964a8767"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
