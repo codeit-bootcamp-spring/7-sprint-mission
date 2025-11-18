@@ -65,11 +65,4 @@ public class ReadStatusController implements ReadStatusDoc {
             .status(HttpStatus.OK)
             .body(resReadStatus);
     }
-
-    
-//    @RequestMapping(value = "/delete/{userStatusId}", method = DELETE)
-//    public void delete(@PathVariable("userStatusId") UUID statusID) {}
-//
-//    @RequestMapping(value = "/find/{userStatusId}", method = GET)
-//    public Res_ReadStatus find(@PathVariable("userStatusId") UUID statusID) {}
 }

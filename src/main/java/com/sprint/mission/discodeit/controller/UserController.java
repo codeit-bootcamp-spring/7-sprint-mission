@@ -22,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,8 +70,7 @@ public class UserController implements UserDoc {
             .body(resUser);
     }
 
-
-    @RequestMapping(value = "/{userId}", method = DELETE)
+    @DeleteMapping("/{userId}")
     public ResponseEntity<Objects> delete(
         @PathVariable("userId") UUID userId) {
         //💎User 삭제
@@ -80,7 +81,7 @@ public class UserController implements UserDoc {
             .build();
     }
 
-    @RequestMapping(value = "/{userId}", method = PATCH)
+    @PatchMapping("/{userId}")
     public ResponseEntity<Res_User> update(
         @PathVariable("userId") UUID userId,
         @RequestPart(value = "userUpdateRequest") Dto_UserUpdate dtoUser,
@@ -96,7 +97,7 @@ public class UserController implements UserDoc {
             .body(resUser);
     }
 
-    @RequestMapping(value = "/{userId}/userStatus", method = PATCH)
+    @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<Res_UserUpdate> updateUserStatus(
         @PathVariable("userId") UUID userId,
         @RequestBody Dto_UserStatusUpdate userStatusUpdate) {

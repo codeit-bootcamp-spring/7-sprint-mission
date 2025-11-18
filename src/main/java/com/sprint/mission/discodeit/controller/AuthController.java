@@ -19,6 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController implements AuthDoc {
     private final AuthService authService;
 
+//👍- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                  : @RequestBody
+//👍- http://localhost:8000/board?page=1&listSize=10  : @RequestParam
+//👍- http://localhost:8000/board/1                   : @PathVariable
+
     @PostMapping(value = "/login")
     public ResponseEntity<Res_UserLogin> login(
         @RequestBody AuthServiceDto authServiceDto) {
