@@ -16,39 +16,53 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
 
-    private final ReadStatusRepository readStatusRepository;
+  private final ReadStatusRepository readStatusRepository;
 
-    // ===== 🏗️ Domain Logic (Facade 용)  =====
-    @Override
-    public ReadStatus create(ReadStatus readStatus) {
-        return readStatusRepository.save(readStatus);
+  // ===== 🏗️ Domain Logic (Facade 용)  =====
+  @Override
+  public ReadStatus create(ReadStatus readStatus) {
+    //유저id 랑 channel id 가 이미 있는 readStatus 가 있으면 에러
+    if (readStatusRepository.existsByUserIdAndChannelId(
+        readStatus.getUserId(), readStatus.getChannelId()
+    )) {
+      throw new CustomException(ErrorCode.READSTATUS_ALREADY_EXISTS);
     }
 
-    @Override
-    public void update(UUID id) {
-        readStatusRepository.update(id);
-    }
+    return readStatusRepository.save(readStatus);
+  }
 
-    @Override
-    public void delete(UUID id) {
-        readStatusRepository.delete(id);
-    }
+  @Override
+  public ReadStatus update(UUID id) {
+    ReadStatus readStatus = readStatusRepository.findById(id).orElseThrow(
+        () -> new CustomException(ErrorCode.READSTATUS_NOT_FOUND)
+    );
+    readStatusRepository.update(id);
+    return readStatus;
+  }
 
-    @Override
-    public List<ReadStatus> findAllByChannelId(UUID channelId){
-        return readStatusRepository.findAllByChannelId(channelId);
+  @Override
+  public void delete(UUID id) {
+    if (readStatusRepository.existsById(id)) {
+      throw new CustomException(ErrorCode.READSTATUS_NOT_FOUND);
     }
+    readStatusRepository.delete(id);
+  }
 
-    @Override
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
-    }
+  @Override
+  public List<ReadStatus> findAllByChannelId(UUID channelId) {
+    return readStatusRepository.findAllByChannelId(channelId);
+  }
 
-    // ===== 🎯 Controller Direct (DTO 반환) =====
-    @Override
-    public ReadStatusInfoRes findById(UUID id) {
-        ReadStatus readStatus=readStatusRepository.findById(id).orElseThrow(() ->
-                new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
-        return ReadStatusInfoRes.from(readStatus);
-    }
+  @Override
+  public List<ReadStatus> findAllByUserId(UUID userId) {
+    return readStatusRepository.findAllByUserId(userId);
+  }
+
+  // ===== 🎯 Controller Direct (DTO 반환) =====
+  @Override
+  public ReadStatusInfoRes findById(UUID id) {
+    ReadStatus readStatus = readStatusRepository.findById(id).orElseThrow(() ->
+        new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
+    return ReadStatusInfoRes.from(readStatus);
+  }
 }

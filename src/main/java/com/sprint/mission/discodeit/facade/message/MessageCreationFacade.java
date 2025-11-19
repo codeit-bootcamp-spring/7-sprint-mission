@@ -1,11 +1,16 @@
 package com.sprint.mission.discodeit.facade.message;
 
 import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
+import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.transactional.CustomTransactional;
 import lombok.NonNull;
@@ -19,24 +24,33 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class MessageCreationFacade {
-    private final MessageService messageService;
-    private final BinaryContentService binaryContentService;
 
-    //메세지 추가
-    @CustomTransactional
-    public Message createMessage(@NonNull UUID speakerId, @NonNull UUID channelId, @NonNull MessageCreateReq req){
-        List<UUID> attachments = new ArrayList<>();
-        
-        if(!req.attachmentIds().isEmpty()){
-            req.attachmentIds().forEach(BinaryContentReq ->{
-                BinaryContent newBinaryContent = binaryContentService.create(
-                        BinaryContentFactory.create(BinaryContentReq)
-                );
-                attachments.add(newBinaryContent.getId());
-            });
-        }
+  private final MessageService messageService;
+  private final BinaryContentService binaryContentService;
+  private final MessageMapper messageMapper;
+  private final ChannelService channelService;
 
-        return messageService.create(MessageFactory.create(speakerId, channelId, req, attachments));
+  //메세지 추가
+  @CustomTransactional
+  public MessageViewRes createMessage(@NonNull UUID speakerId, @NonNull UUID channelId,
+      @NonNull MessageCreateReq req) {
+    if (channelService.findById(channelId) == null) {
+      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
+
+    List<UUID> attachments = new ArrayList<>();
+
+    if (!req.attachmentIds().isEmpty()) {
+      req.attachmentIds().forEach(BinaryContentReq -> {
+        BinaryContent newBinaryContent = binaryContentService.create(
+            BinaryContentFactory.create(BinaryContentReq)
+        );
+        attachments.add(newBinaryContent.getId());
+      });
+    }
+    Message message = messageService.create(
+        MessageFactory.create(speakerId, channelId, req, attachments));
+    return messageMapper.mapToView(message);
+  }
 }
 
