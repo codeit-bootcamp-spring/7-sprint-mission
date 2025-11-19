@@ -1,24 +1,22 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.BasicUserService;
-import com.sprint.mission.discodeit.application.dto.login.LoginForm;
-import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.controller.docs.LoginControllerDocs;
+import com.sprint.mission.discodeit.service.BasicUserService;
+import com.sprint.mission.discodeit.service.dto.login.LoginForm;
+import com.sprint.mission.discodeit.service.dto.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/login")
-public class LoginController {
+@RequestMapping("/api/auth/login")
+public class LoginController implements LoginControllerDocs {
 
     private final BasicUserService userService;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public UserResponseDto login(@Valid @RequestBody LoginForm loginForm) {
-        return userService.login(loginForm.getLoginId(), loginForm.getPassword());
+    @PostMapping
+    public UserResponse login(@Valid @RequestBody LoginForm loginForm) {
+        return userService.login(loginForm.getUsername(), loginForm.getPassword());
     }
 }

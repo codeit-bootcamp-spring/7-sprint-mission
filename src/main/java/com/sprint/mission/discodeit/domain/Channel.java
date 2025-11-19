@@ -16,28 +16,27 @@ public class Channel implements Serializable {
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
-
-    private final UUID serverId;
     private String channelName;
-
+    private ChannelType type;
     private final List<UUID> members;
-    private final boolean isPrivate;
-    private final List<UUID> history = new ArrayList<>();
+    private final List<UUID> history=new ArrayList<>();
 
 
-    public Channel(String channelName,UUID serverId, List<UUID> membersId, boolean isPrivate) {
+    public Channel(String channelName, boolean isPrivate, List<UUID> members) {
         validateChannelName(channelName);
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt=Instant.now();
-        this.serverId=serverId;
         this.channelName=channelName;
-        this.isPrivate=isPrivate;
-        if (this.isPrivate){
+        if(isPrivate){
+            this.type=ChannelType.PRIVATE;
+        }else{
+            this.type=ChannelType.PUBLIC;
+        }
+        if(members==null){
             this.members=new ArrayList<>();
-            membersId.forEach(id-> members.add(id));
         } else {
-            this.members=null;
+            this.members=members;
         }
     }
 
@@ -54,10 +53,6 @@ public class Channel implements Serializable {
 
     public List<UUID> getHistory() {
         return List.copyOf(history);
-    }
-
-    public List<UUID> getChannelMember(){
-        return List.copyOf(members);
     }
 
 

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,27 +17,23 @@ public class Message implements Serializable {
     private final Instant updatedAt;
 
     private final UUID channelId;
-    private final UUID senderId;
+    private final UUID authorId;
 
     private String content;
-    private UUID image;
+    private List<UUID> attachmentIds;
 
 
-    public Message(UUID senderId, String content, UUID channelId, UUID image) {
+    public Message(UUID authorId, String content, UUID channelId, List<UUID> attachmentIds) {
         this.id=UUID.randomUUID();
         this.createdAt=Instant.now();
         this.updatedAt=Instant.now();
-        this.senderId = senderId;
+        this.authorId = authorId;
         this.content = content;
         this.channelId=channelId;
-        this.image= image;
+        this.attachmentIds = attachmentIds;
     }
 
     public void updateContent(String newContent){
         this.content=newContent;
-    }
-
-    public void updateImage(UUID newImage){
-        this.image=newImage;
     }
 }

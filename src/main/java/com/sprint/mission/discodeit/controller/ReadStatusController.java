@@ -1,42 +1,37 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.BasicReadStatusService;
-import com.sprint.mission.discodeit.application.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.application.dto.request.ReadStatusRequest;
-import com.sprint.mission.discodeit.application.dto.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.controller.docs.ReadStatusControllerDocs;
+import com.sprint.mission.discodeit.service.BasicReadStatusService;
+import com.sprint.mission.discodeit.service.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.service.dto.response.ReadStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/read-status")
-public class ReadStatusController {
+@RequestMapping("/api/readStatuses")
+public class ReadStatusController implements ReadStatusControllerDocs {
 
     private final BasicReadStatusService readStatusService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public String makeReadStatus(@ModelAttribute ReadStatusCreateRequest request){
-        readStatusService.createReadStatus(request.userId(),request.channelId());
-        return "메시지 수신 정보 생성 성공";
+    @GetMapping
+    public List<ReadStatusResponse> getReadStatus(@RequestParam UUID userId){
+        return readStatusService.getAllByUserId(userId);
     }
 
-    @RequestMapping(value = "/{id}",method = RequestMethod.GET)
-    public long checkLastTime(@PathVariable UUID id){
-        return readStatusService.getTimeSinceLastRead(id);
+    @PatchMapping("/{id}")
+    public ReadStatusResponse readChannel(@PathVariable UUID id) {
+        return readStatusService.updateReadStatus(id);
+
     }
 
-    @RequestMapping(value ="/read/{id}", method = RequestMethod.GET)
-    public String readChannel(@PathVariable UUID id) {
-        readStatusService.updateReadStatus(id);
-        return "읽음";
-    }
-
-    @RequestMapping(method = RequestMethod.POST)
-    public ReadStatusResponse getReadStatusByIds(@RequestBody ReadStatusRequest request){
-        return readStatusService.findReadStatusByIds(request);
+    @PostMapping
+    public ReadStatusResponse createReadStatus(@RequestBody ReadStatusCreateRequest request){
+        return readStatusService.createReadStatus(request);
     }
 }

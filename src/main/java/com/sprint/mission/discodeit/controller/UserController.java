@@ -1,57 +1,62 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.BasicUserService;
-import com.sprint.mission.discodeit.application.dto.request.UserCreateRequestDto;
-import com.sprint.mission.discodeit.application.dto.request.UserRequestDto;
-import com.sprint.mission.discodeit.application.dto.request.UserUpdateDto;
-import com.sprint.mission.discodeit.application.dto.response.UserDto;
-import com.sprint.mission.discodeit.application.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.controller.docs.UserControllerDocs;
+import com.sprint.mission.discodeit.service.BasicUserService;
+import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.service.dto.request.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.response.UserResponse;
+import com.sprint.mission.discodeit.service.dto.response.UserStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
 
     private final BasicUserService userService;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public List<UserResponseDto> getAllUsers() {
+    @GetMapping
+    public List<UserResponse> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public UserResponseDto createUser(@ModelAttribute UserCreateRequestDto requestDto) throws IOException {
-        UserResponseDto responseDto = userService.createUser(requestDto);
-        log.info("회원가입 성공: {}", responseDto.username());
-        return responseDto;
+    @PostMapping
+    public ResponseEntity<UserResponse> createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+                                     @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+
+        UserResponse response = userService.createUser(userCreateRequest, profileImage);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    public UserResponseDto updateUser(@ModelAttribute UserUpdateDto updateDto) throws IOException {
-        UserResponseDto userResponseDto = userService.updateUserInfo(updateDto);
-        log.info("회원 수정 성공: {}", userResponseDto.username());
-        return userResponseDto;
+    @PatchMapping("/{userId}")
+    public UserResponse updateUser(
+            @PathVariable UUID userId,
+            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @RequestPart(value = "profile",required = false) MultipartFile profile) {
+        UserResponse userResponse = userService.updateUserInfo(userId, userUpdateRequest, profile);
+        return userResponse;
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public String deleteUser(@RequestBody UserRequestDto requestDto) {
-        userService.delete(requestDto);
+
+    @DeleteMapping("/{userId}")
+    public String deleteUser(@PathVariable UUID userId) {
+        userService.delete(userId);
         return "삭제완료";
     }
 
-    @RequestMapping("/online")
-    public UserResponseDto markOnline(@RequestBody UserRequestDto requestDto) {
-        userService.markUserStatus(requestDto.username());
-        UserResponseDto responseDto = userService.getUser(requestDto);
-        return responseDto;
+    @PatchMapping("/{userId}/userStatus")
+    public UserStatusResponse markOnline(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request) {
+        return userService.markOnline(userId, request.newLastActiveAt());
     }
-
 
 }
