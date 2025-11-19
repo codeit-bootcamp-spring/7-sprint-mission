@@ -11,8 +11,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserStatus extends BaseEntity{
     private final UUID userId;
+    private Instant lastActiveAt;
 
-    public boolean isActiveUser() {
+    public void update(Instant lastActiveAt){
+        boolean flag = false;
+
+        if(lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)){
+            this.lastActiveAt = lastActiveAt;
+            flag = true;
+        }
+        if(flag){
+            this.setUpdatedAt();
+        }
+    }
+
+    public boolean isOnline() {
         Instant lastLogin = getUpdatedAt();
         Instant now = Instant.now();
         Duration duration = Duration.between(lastLogin, now);

@@ -15,6 +15,7 @@ public enum ErrorCode {
     // 409 CONFLICT
     NICKNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다."),
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
+    USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
 
     //===== CHANNEL =====//
     // 400 BAD REQUEST
@@ -26,6 +27,7 @@ public enum ErrorCode {
 
     // 403 FORBIDDEN
     PUBLIC_CHANNEL_MEMBER_ADD_FORBIDDEN(HttpStatus.FORBIDDEN, "공개 채널에는 멤버를 추가할 수 없습니다."),
+    PRIVATE_CHANNEL_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "비공개 채널은 수정이 불가합니다."),
     CANNOT_LEAVE_AS_CHANNEL_ADMIN(HttpStatus.FORBIDDEN, "당신은 관리자이므로 채널을 나갈 수 없습니다."),
 
     // 404 NOT FOUND
@@ -61,7 +63,8 @@ public enum ErrorCode {
     USER_STATUS_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 유저의 user status가 이미 존재합니다."),
 
     //===== READ_STATUS =====//
-    READSTATUS_NOT_FOUND(HttpStatus.BAD_REQUEST, "read status가 존재하지 않습니다."),
+    READSTATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "read status가 존재하지 않습니다."),
+    PUBLIC_CHANNEL_ADD_READSTATUS_FORBIDDEN(HttpStatus.FORBIDDEN, "공개 채널에는 read status를 생성할 수 없습니다."),
 
     //===== BINARY_CONTENT =====//
     BINARYCONTENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "파일이 존재하지 않습니다."),

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
@@ -25,7 +26,7 @@ import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
  * - users.sav : 메시지 객체들이 직렬화되어 저장되는 파일
  */
 public class FileUserRepository implements UserRepository {
-    private final Map<UUID, User> userStore = new HashMap<>();
+    private final Map<UUID, User> userStore = new ConcurrentHashMap<>();
     private final String filePath;
 
     public FileUserRepository(String filePath) {
@@ -59,9 +60,9 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByLoginId(String loginId) {
+    public Optional<User> findByUsername(String username) {
         return userStore.values().stream()
-                .filter(u -> u.getLoginId().equals(loginId))
+                .filter(u -> u.getUsername().equals(username))
                 .findFirst();
     }
 
@@ -80,20 +81,5 @@ public class FileUserRepository implements UserRepository {
     public void deleteById(UUID id) {
         userStore.remove(id);
         saveToFile(filePath, userStore);
-    }
-
-    @Override
-    public boolean isExist(UUID id) {
-        return userStore.containsKey(id);
-    }
-
-    @Override
-    public boolean existsByNickName(String NickName) {
-        return findAll().stream().anyMatch(u -> u.getNickName().equals(NickName));
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return findAll().stream().anyMatch(u -> u.getEmail().equals(email));
     }
 }

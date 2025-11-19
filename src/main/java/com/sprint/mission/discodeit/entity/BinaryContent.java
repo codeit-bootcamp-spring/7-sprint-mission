@@ -13,14 +13,16 @@ public class BinaryContent implements Serializable {
     private final UUID id;
     private final String name;
     private final Instant createdAt;
-    private final byte[] content; // 파일 데이터
+    private String contentType;
+    private final byte[] bytes; // 파일 데이터
 
-    public BinaryContent(String name, byte[] content) {
+    public BinaryContent(String name, String contentType, byte[] bytes) {
         Instant now = Instant.now();
         this.id = UUID.randomUUID(); // 랜덤 UUID로 초기화
         this.createdAt = now;
         this.name = name;
-        this.content = content;
+        this.contentType = contentType;
+        this.bytes = bytes;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class BinaryContent implements Serializable {
         return "BinaryContent{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", (" + content.length + " bytes)" +
+                ", (" + bytes.length + " bytes)" +
                 '}';
     }
 

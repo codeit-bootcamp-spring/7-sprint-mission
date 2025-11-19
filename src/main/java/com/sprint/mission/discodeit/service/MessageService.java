@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -21,7 +22,7 @@ import java.util.UUID;
 public interface MessageService {
 
     /** 새로운 메시지를 생성 */
-    void create(CreateMessageRequestDto request, List<MultipartFile> fileList);
+    Message create(CreateMessageRequestDto messageRequest, List<CreateBinaryContentRequestDto> binaryContentRequests);
 
     Message find(UUID messageId);
 
@@ -38,8 +39,8 @@ public interface MessageService {
     List<Message> findAllSentBetweenUsers(UUID senderId, UUID receiverId);
 
     /** 메시지 내용(content)을 수정 */
-    void update(UUID userId, UUID messageId, UpdateMessageRequestDto request);
+    Message update(UUID messageId, UpdateMessageRequestDto request);
 
     /** 특정 메시지를 UUID로 삭제 */
-    void delete(UUID userId, UUID messageId);
+    void delete(UUID messageId);
 }

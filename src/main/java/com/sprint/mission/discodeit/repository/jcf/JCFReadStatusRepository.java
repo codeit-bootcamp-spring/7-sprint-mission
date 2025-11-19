@@ -4,9 +4,10 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFReadStatusRepository implements ReadStatusRepository {
-    Map<UUID, ReadStatus> readStatusStore = new HashMap<>();
+    Map<UUID, ReadStatus> readStatusStore = new ConcurrentHashMap<>();
 
     @Override
     public void save(ReadStatus readStatus) {
@@ -48,16 +49,5 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     @Override
     public void deleteByChannelMember(UUID channelId, UUID memberId) {
         readStatusStore.values().removeIf(s -> s.getChannelId().equals(channelId) &&  s.getUserId().equals(memberId));
-    }
-
-    @Override
-    public boolean existsByUserIdAndChannelId(UUID userId, UUID channelId) {
-        return readStatusStore.values().stream()
-                .anyMatch(r -> userId.equals(r.getUserId()) && channelId.equals(r.getChannelId()));
-    }
-
-    @Override
-    public boolean isExist(UUID readStatusId) {
-        return readStatusStore.containsKey(readStatusId);
     }
 }

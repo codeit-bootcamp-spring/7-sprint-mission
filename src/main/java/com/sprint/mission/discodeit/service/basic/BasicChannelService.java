@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.request.*;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
+import com.sprint.mission.discodeit.dto.archive.response.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.archive.response.PrivateChannelResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
@@ -24,36 +25,60 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
 
+    // API 스펙에 맞는 공개 채널 및 비공개 채널 생성 메서드 추가
     @Override
-    public ChannelResponseDto create(UUID adminId, CreateChannelRequestDto request) {
+    public Channel create(CreatePublicChannelRequestDto request) {
+        String name = request.getName();
+        String description = request.getDescription();
+
         // 이름 중복 저장 불가
-        if(channelRepository.existsByName(request.getChannelName())) {
+        if(existsByName(name)) {
             throw new CustomException(ErrorCode.CHANNEL_NAME_ALREADY_EXISTS);
         }
 
-        Channel newChannel = new Channel(
-                request.getChannelType(),
-                request.getChannelVisibility(),
-                request.getChannelName(),
-                adminId);
-
-        channelRepository.save(newChannel);
-
-        // 비공개 채널의 경우 멤버 정보 저장
-        if (request.getChannelVisibility() == ChannelVisibility.PRIVATE) {
-            channelRepository.addChannelIdForUser(newChannel.getId(), adminId); // 유저 객체에 속한 채널 UUID 리스트 저장
-            readStatusRepository.save(new ReadStatus(adminId, newChannel.getId()));
-        }
-
-        return ChannelResponseDto.from(newChannel, newChannel.getCreatedAt());
+        Channel channel = new Channel(name, description);
+        channelRepository.save(channel);
+        return channel;
     }
 
     @Override
-    public void addMember(UUID channelId, UpdateChannelRequestDto request){
-        if(!userRepository.isExist(request.getUserId())) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
+    public Channel create(CreatePrivateChannelRequestDto request) {
+        // 비공개 채널 참가 유저 존재 여부 판단
+        request.getParticipantIds().forEach(participantId -> {
+            userRepository.findById(participantId)
+                    .orElseThrow(() -> new  CustomException(ErrorCode.USER_NOT_FOUND));
+        });
 
+        Channel channel = new Channel();
+        channelRepository.save(channel);
+
+        request.getParticipantIds().stream()
+                .forEach(userId ->
+                        addMember(channel.getId(), new UpdateChannelRequestDto(userId))
+                );
+        return channel;
+    }
+
+    @Override
+    public Channel update(UUID channelId, UpdatePublicChannelRequestDto request) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() ->  new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+
+        // 이름 중복 저장 불가
+        if(existsByName(request.getNewName())) {
+            throw new CustomException(ErrorCode.CHANNEL_NAME_ALREADY_EXISTS);
+        }
+        if (channel.getVisibility() ==  ChannelVisibility.PRIVATE) {
+            throw new CustomException(ErrorCode.PRIVATE_CHANNEL_UPDATE_FORBIDDEN);
+        }
+        channel.update(request.getNewName(), request.getNewDescription());
+        channelRepository.update(channel);
+        return channel;
+    }
+
+
+    @Override
+    public void addMember(UUID channelId, UpdateChannelRequestDto request){
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
@@ -67,7 +92,7 @@ public class BasicChannelService implements ChannelService {
             throw new CustomException(ErrorCode.PUBLIC_CHANNEL_MEMBER_ADD_FORBIDDEN);
         }
 
-        readStatusRepository.save(new ReadStatus(request.getUserId(), channelId));
+        readStatusRepository.save(new ReadStatus(request.getUserId(), channelId, Instant.now()));
         channel.addMember(request.getUserId());
         channelRepository.addChannelIdForUser(channel.getId(), request.getUserId()); // 유저 객체에 속한 채널 UUID 리스트 저장
         channelRepository.save(channel);
@@ -109,78 +134,19 @@ public class BasicChannelService implements ChannelService {
 
     // Public 채널 목록은 전체 조회 + Private 채널은 User가 참여한 채널만 조회
     @Override
-    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+    public List<ChannelDto> findAllByUserId(UUID userId) {
+        System.out.println(channelRepository.findAll());
         return channelRepository.findAll().stream()
                 .filter(c -> c.getVisibility() == ChannelVisibility.PUBLIC ||
                         (c.getVisibility() == ChannelVisibility.PRIVATE && c.getMemberIds().contains(userId)))
-                .map(c -> c.getVisibility() == ChannelVisibility.PRIVATE
-                                ? PrivateChannelResponseDto.from(c, messageRepository.searchLastedMessageTime(c.getId()))
-                                : ChannelResponseDto.from(c, messageRepository.searchLastedMessageTime(c.getId()))
-                )
-                .sorted(Comparator.comparing(ChannelResponseDto::getVisibility)
-                        .thenComparing(c -> c.getChannelType())
-                        .thenComparing(c -> c.getChannelName())
-                )
+                .map(c -> ChannelDto.from(c, messageRepository.searchLastedMessageTime(c.getId())))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void updateAdmin(UUID channelId, UpdateChannelAdminRequestDto request) {
-        if(!userRepository.isExist(request.getNewAdminId())) {
-            throw new CustomException(ErrorCode.NEW_ADMIN_USER_NOT_FOUND);
-        }
-
+    public void delete(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
-
-        // 관리자만 채널의 관리자 변경 가능
-        if(channel.getAdminId().equals(request.getAdminId())){
-            if(channel.getVisibility() == ChannelVisibility.PRIVATE){
-                // 새로운 관리자가 채널에 속하지 않은 경우 예외 발생
-                if (!channel.getMemberIds().contains(request.getNewAdminId())) {
-                    throw new CustomException(ErrorCode.NOT_CHANNEL_MEMBER);
-                }
-            // 관리자가 본인을 관리자를 변경하려 하는 경우 예외 발생
-            } else if (channel.getAdminId().equals(request.getNewAdminId())) {
-                throw new CustomException(ErrorCode.ALREADY_CHANNEL_ADMIN);
-            }
-
-            channel.setAdmin(request.getNewAdminId());
-            channelRepository.update(channel);
-        } else {
-            throw new CustomException(ErrorCode.NOT_CHANNEL_ADMIN);
-        }
-    }
-
-    @Override
-    public void updateName(UUID channelId, UpdateChannelNameRequestDto request) {
-        Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
-
-        // 관리자만 채널 이름 변경 가능
-        if(channel.getAdminId().equals(request.getAdminId())){
-            if (channelRepository.existsByName(request.getName())) {
-                throw new CustomException(ErrorCode.CHANNEL_NAME_ALREADY_EXISTS);
-            }
-
-            channel.setChannelName(request.getName());
-            channelRepository.update(channel);
-        } else {
-            throw new CustomException(ErrorCode.NOT_CHANNEL_ADMIN);
-        }
-    }
-
-    @Override
-    public void delete(UUID channelId, DeleteChannelRequestDto request) {
-        if(!userRepository.isExist(request.getUserId())) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
-        Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
-
-        if(!request.getUserId().equals(channel.getAdminId())) {
-            throw new CustomException(ErrorCode.NOT_CHANNEL_ADMIN);
-        }
 
         readStatusRepository.deleteByChannelId(channelId);
         List<UUID> binaryContentIds = messageRepository.deleteByChannelId(channelId); // 채널 메시지 삭제 및 연관 파일 UUID 저장
@@ -190,9 +156,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteChannelMember(UUID channelId, UUID requesterId, UUID targetId) {
-        if(!userRepository.isExist(targetId)) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
+        userRepository.findById(targetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
@@ -217,12 +183,17 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public boolean isChannelUnavailableForUser(UUID userId, UUID channelId) {
+        boolean channelExists = channelRepository.findById(channelId).isPresent();
+        boolean userJoined = channelRepository.findAllJoinedByUserId(userId).stream()
+                .anyMatch(id -> channelId.equals(id));
+
         // 채널이 존재하거나 유저가 채널에 속해있다면 false를 반환
-        if(channelRepository.existsById(channelId) || channelRepository.isUserJoinedChannel(userId, channelId)) {
-            return false;
-        }
-        return true;
+        return !(channelExists || userJoined);
     }
 
-
+    private boolean existsByName(String name) {
+        return channelRepository.findAll().stream()
+                .filter(c -> c.getChannelName() != null)
+                .anyMatch(c -> c.getChannelName().equals(name));
+    }
 }

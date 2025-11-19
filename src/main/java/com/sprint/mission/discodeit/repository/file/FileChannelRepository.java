@@ -6,13 +6,14 @@ import com.sprint.mission.discodeit.entity.ChannelVisibility;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.global.utils.FileIOHandler.*;
 
 public class FileChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channelStore = new HashMap<>();
-    private final Map<UUID, Set<UUID>> joinedChannels = new HashMap<>();
+    private final Map<UUID, Channel> channelStore = new ConcurrentHashMap<>();
+    private final Map<UUID, Set<UUID>> joinedChannels = new ConcurrentHashMap<>();
     private final String channelPath;
     private final String joinedPath;
 
@@ -116,23 +117,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return findAll().stream().anyMatch(c -> c.getChannelName().equals(name));
-    }
-
-    @Override
-    public boolean existsById(UUID channelId) {
-        return channelStore.containsKey(channelId);
-    }
-
-    @Override
-    public boolean isUserJoinedChannel(UUID userId, UUID channelId){
-        return joinedChannels.get(userId).stream()
-                .anyMatch(id -> channelId.equals(id));
-    }
-
-    @Override
-    public boolean isExist(UUID channelId) {
-        return channelStore.containsKey(channelId);
+    public List<UUID> findAllJoinedByUserId(UUID userId) {
+        return new ArrayList<>(joinedChannels.get(userId));
     }
 }

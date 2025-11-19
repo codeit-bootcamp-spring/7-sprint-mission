@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.auth.request.LoginUserDto;
+import com.sprint.mission.discodeit.dto.auth.request.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -19,30 +19,30 @@ public class BasicAuthService implements AuthService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserResponseDto login(LoginUserDto request) {
+    public User login(LoginRequestDto request) {
         // 아이디 또는 비밀번호를 입력하지 않은 경우 예외 발생
-        if (request.getLoginId() == null || request.getLoginId().isBlank() ||
+        if (request.getUsername() == null || request.getUsername().isBlank() ||
                 request.getPassword() == null || request.getPassword().isBlank()) {
             throw new CustomException(ErrorCode.INVALID_LOGIN_REQUEST);
         }
 
         // 아이디 또는 비밀번호 중 하나라도 일치하지 않으면 예외 발생
-        User user = userRepository.findByLoginId(request.getLoginId())
+        User user = userRepository.findByUsername(request.getUsername())
                 .filter(u -> u.getPassword().equals(request.getPassword()))
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_CREDENTIALS));
 
         // 유저 최근 접속 시간 변경
-        UserStatus status = userStatusRepository.findById(user.getId())
+        UserStatus status = userStatusRepository.findByUserId(user.getId())
                         .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
         status.setUpdatedAt();
         userStatusRepository.update(status);
 
-        return UserResponseDto.from(user, true);
+        return user;
     }
 
     @Override
     public boolean checkLoginInfo(String loginId, String password) {
-        return userRepository.findByLoginId(loginId)
+        return userRepository.findByUsername(loginId)
                 .filter(u -> u.getPassword().equals(password))
                 .isPresent();
     }

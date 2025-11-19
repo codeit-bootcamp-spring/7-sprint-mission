@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * JCFUserRepository
@@ -13,7 +14,7 @@ import java.util.*;
  * 실제 DB를 사용하지 않고 List<User>를 저장소로 활용합니다.
  */
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> userStore = new HashMap<>();
+    private final Map<UUID, User> userStore = new ConcurrentHashMap<>();
 
     @Override
     public void save(User user) {
@@ -40,9 +41,9 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByLoginId(String loginId) {
+    public Optional<User> findByUsername(String username) {
         return userStore.values().stream()
-                .filter(u -> u.getLoginId().equals(loginId))
+                .filter(u -> u.getUsername().equals(username))
                 .findFirst();
     }
 
@@ -59,20 +60,5 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public void deleteById(UUID id) {
         userStore.remove(id);
-    }
-
-    @Override
-    public boolean isExist(UUID id) {
-        return userStore.containsKey(id);
-    }
-
-    @Override
-    public boolean existsByNickName(String NickName) {
-        return findAll().stream().anyMatch(u -> u.getNickName().equals(NickName));
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return findAll().stream().anyMatch(u -> u.getEmail().equals(email));
     }
 }

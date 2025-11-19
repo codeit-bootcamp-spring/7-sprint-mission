@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.channel.request.*;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.response.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
+import com.sprint.mission.discodeit.dto.archive.response.ChannelResponseDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.List;
@@ -17,7 +18,10 @@ public interface ChannelService {
     /**
      * 새로운 채널 생성
      */
-    ChannelResponseDto create(UUID adminId, CreateChannelRequestDto request);
+    Channel create(CreatePublicChannelRequestDto request);
+    Channel create(CreatePrivateChannelRequestDto request);
+
+    Channel update(UUID channelId, UpdatePublicChannelRequestDto request);
 
     /**
      * 채널에 멤버 추가
@@ -42,22 +46,12 @@ public interface ChannelService {
     /**
      * 전체 채널 조회
      */
-    List<ChannelResponseDto> findAllByUserId(UUID userId);
-
-    /**
-     * 채널 관리자 변경
-     */
-    void updateAdmin(UUID channelId, UpdateChannelAdminRequestDto request);
-
-    /**
-     * 채널 이름 변경
-     */
-    void updateName(UUID channelId, UpdateChannelNameRequestDto request);
+    List<ChannelDto>  findAllByUserId(UUID userId);
 
     /**
      * 채널 삭제 (관리자 권한 필요)
      */
-    void delete(UUID channelId, DeleteChannelRequestDto request);
+    void delete(UUID channelId);
 
     /**
      * 채널 멤버 삭제

@@ -14,12 +14,12 @@ public interface UserStatusRepository {
 
     Optional<UserStatus> findById(UUID id);
 
+    Optional<UserStatus> findByUserId(UUID userId);
+
     List<UserStatus> findAll();
 
     // 유저가 로그인한 경우 시간 갱신
     void update(UserStatus status);
 
     void deleteById(UUID id);
-
-    boolean isExist(UUID userId);
 }

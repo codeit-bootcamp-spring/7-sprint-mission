@@ -4,9 +4,10 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFUserStatusRepository implements UserStatusRepository {
-    private final Map<UUID, UserStatus> userStatusStore = new HashMap<>();
+    private final Map<UUID, UserStatus> userStatusStore = new ConcurrentHashMap<>();
 
     @Override
     public void save(UserStatus userStatus) {
@@ -16,6 +17,13 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public Optional<UserStatus> findById(UUID id) {
         return Optional.ofNullable(userStatusStore.get(id));
+    }
+
+    @Override
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return userStatusStore.values().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst();
     }
 
     @Override
@@ -31,10 +39,5 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public void deleteById(UUID id) {
         userStatusStore.remove(id);
-    }
-
-    @Override
-    public boolean isExist(UUID userId) {
-        return userStatusStore.containsKey(userId);
     }
 }

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryConten
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
+import com.sprint.mission.discodeit.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface UserService {
     /**
      * 새로운 사용자 생성
      */
-    UserResponseDto create(CreateUserRequestDto userRequest, MultipartFile file);
+    User create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest);
 
     UserResponseDto find(UUID userId);
 
@@ -35,7 +36,7 @@ public interface UserService {
     /**
      * 사용자ID로 사용자 조회
      */
-    UserResponseDto findByLoginId(String loginId);
+    UserResponseDto findByUsername(String username);
 
     /**
      * 전체 사용자 목록 조회
@@ -50,7 +51,7 @@ public interface UserService {
     /**
      * 사용자 정보 업데이트
      */
-    void update(UUID userId, UpdateUserRequestDto request, MultipartFile file);
+    User update(UUID userId, UpdateUserRequestDto request, CreateBinaryContentRequestDto profileRequest);
 
     /**
      * 사용자 삭제

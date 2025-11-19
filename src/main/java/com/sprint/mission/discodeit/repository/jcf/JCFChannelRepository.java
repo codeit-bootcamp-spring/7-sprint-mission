@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -16,8 +17,8 @@ import java.util.stream.Collectors;
  * joinedChannels에 유저가 속한 채널 UUID를 저장합니다.
  */
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channelStore = new HashMap<>();
-    private final Map<UUID, Set<UUID>> joinedChannels = new HashMap<>();
+    private final Map<UUID, Channel> channelStore = new ConcurrentHashMap<>();
+    private final Map<UUID, Set<UUID>> joinedChannels = new ConcurrentHashMap<>();
 
     @Override
     public void addChannelIdForUser(UUID channelId, UUID userId) {
@@ -91,23 +92,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return findAll().stream().anyMatch(c -> c.getChannelName().equals(name));
-    }
-
-    @Override
-    public boolean existsById(UUID channelId) {
-        return channelStore.containsKey(channelId);
-    }
-
-    @Override
-    public boolean isUserJoinedChannel(UUID userId, UUID channelId){
-        return joinedChannels.get(userId).stream()
-                .anyMatch(id -> channelId.equals(id));
-    }
-
-    @Override
-    public boolean isExist(UUID channelId) {
-        return channelStore.containsKey(channelId);
+    public List<UUID> findAllJoinedByUserId(UUID userId) {
+        return new ArrayList<>(joinedChannels.get(userId));
     }
 }

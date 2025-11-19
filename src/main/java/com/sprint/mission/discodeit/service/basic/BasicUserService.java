@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
@@ -34,39 +35,37 @@ public class BasicUserService implements UserService{
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public UserResponseDto create(CreateUserRequestDto userRequest, MultipartFile file) {
-        // 1. nickname/email 중복 검사
-        if(userRepository.existsByNickName(userRequest.getNickName())){
-            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
-        } else if (userRepository.existsByEmail(userRequest.getEmail())) {
+    public User create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
+        // 1. username/nickname/email 중복 검사
+        if (existsByUsername(userRequest.getUsername())) {
+            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
+        } else if (existsByEmail(userRequest.getEmail())) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         // 2. 입력된 정보 형태 검증
-        Optional.ofNullable(userRequest.getNickName()).ifPresent(n -> UserVaildator.vaildateNickname(n));
         Optional.ofNullable(userRequest.getEmail()).ifPresent(e -> UserVaildator.vaildateEmail(e));
-        Optional.ofNullable(userRequest.getPhoneNum()).ifPresent(pn -> UserVaildator.vaildatePhoneNum(pn));
         Optional.ofNullable(userRequest.getPassword()).ifPresent(pw -> UserVaildator.vaildatePassword(pw));
 
         // 3. 선택적 프로필 이미지 처리
         UUID profileImageId = null;
 
-        if(file != null && !file.isEmpty()) {
-            try {
-                BinaryContent profileImage = new BinaryContent(file.getName(), file.getBytes());
-                binaryContentRepository.save(profileImage);
-                profileImageId = profileImage.getId();
-            } catch (IOException e){
-                throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
-            }
+        if (Optional.ofNullable(profileRequest).isPresent()) {
+            BinaryContent profileImage = new BinaryContent(
+                    profileRequest.getFileName(),
+                    profileRequest.getContentType(),
+                    profileRequest.getBytes()
+            );
+            binaryContentRepository.save(profileImage);
+            profileImageId = profileImage.getId();
         }
 
         User newUser  = new User(
-                userRequest.getUserName(),
-                userRequest.getNickName(),
+                userRequest.getUsername(),
+                userRequest.getUsername(),
                 userRequest.getEmail(),
-                userRequest.getPhoneNum(),
-                userRequest.getLoginId(),
+                "010-0000-0000",
+                userRequest.getUsername(),
                 userRequest.getPassword(),
                 profileImageId
         );
@@ -74,7 +73,7 @@ public class BasicUserService implements UserService{
         userStatusRepository.save(new UserStatus(newUser.getId()));
         userRepository.save(newUser);
 
-        return UserResponseDto.from(newUser, true);
+        return newUser;
     }
 
     @Override
@@ -84,7 +83,7 @@ public class BasicUserService implements UserService{
 
         boolean active = userStatusRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                .isActiveUser();
+                .isOnline();
 
         return UserResponseDto.from(user, active);
     }
@@ -96,7 +95,7 @@ public class BasicUserService implements UserService{
 
         boolean active = userStatusRepository.findById(user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                .isActiveUser();
+                .isOnline();
 
         return UserResponseDto.from(user, active);
     }
@@ -108,19 +107,19 @@ public class BasicUserService implements UserService{
 
         boolean active = userStatusRepository.findById(user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                .isActiveUser();
+                .isOnline();
 
         return UserResponseDto.from(user, active);
     }
 
     @Override
-    public UserResponseDto findByLoginId(String loginId) {
-        User user = userRepository.findByLoginId(loginId)
+    public UserResponseDto findByUsername(String username) {
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean active = userStatusRepository.findById(user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                .isActiveUser();
+                .isOnline();
 
         return UserResponseDto.from(user, active);
     }
@@ -130,9 +129,9 @@ public class BasicUserService implements UserService{
         return userRepository.findAll().stream()
                 .map(u -> UserResponseDto.from(
                         u,
-                        userStatusRepository.findById(u.getId())
+                        userStatusRepository.findByUserId(u.getId())
                                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                                .isActiveUser()))
+                                .isOnline()))
                 .collect(Collectors.toList());
     }
 
@@ -144,31 +143,30 @@ public class BasicUserService implements UserService{
     }
 
     @Override
-    public void update(UUID userId, UpdateUserRequestDto request, MultipartFile file) {
+    public User update(UUID userId, UpdateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        String userName = null;
+        String realName = null;
         String nickName = null;
         String email = null;
         String phoneNum = null;
+        String username = null;
         String password = null;
 
         // 프로필 이미지만 전달된 경우 null 참조 방지
-        if (Optional.ofNullable(request).isPresent()) {
-            userName = request.getNewUserName();
-            nickName = request.getNewNickName();
-            email = request.getNewEmail();
-            phoneNum = request.getNewPhoneNum();
-            password = request.getNewPassword();
+        if (Optional.ofNullable(userRequest).isPresent()) {
+            realName = userRequest.getNewUsername();
+            nickName = userRequest.getNewUsername();
+            email = userRequest.getNewEmail();
+            phoneNum = "010-0000-0000";
+            username = userRequest.getNewUsername();
+            password = userRequest.getNewPassword();
 
-            // 닉네임 중복 확인
-            if (userRepository.existsByNickName(nickName)) {
-                throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
-            }
-
-            // 이메일 중복 확인
-            if (userRepository.existsByEmail(email)) {
+            // 아이디와 닉네임, 이메일 중복 확인
+            if (existsByUsername(username)) {
+                throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
+            } else if (existsByEmail(email)) {
                 throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
             }
 
@@ -180,19 +178,21 @@ public class BasicUserService implements UserService{
         }
 
         UUID profileImageId = null;
-        if (file != null && !file.isEmpty()) {
-            try {
-                BinaryContent profileImage = new BinaryContent(file.getName(), file.getBytes());
-                binaryContentRepository.save(profileImage);
-                profileImageId = profileImage.getId();
-            } catch (IOException e) {
-                throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
-            }
+
+        if (Optional.ofNullable(profileRequest).isPresent()) {
+            BinaryContent profileImage = new BinaryContent(
+                    profileRequest.getFileName(),
+                    profileRequest.getContentType(),
+                    profileRequest.getBytes()
+            );
+            binaryContentRepository.save(profileImage);
+            profileImageId = profileImage.getId();
             binaryContentRepository.delete(user.getProfileId()); // 기존 프로필 이미지 삭제
         }
 
-        user.update(userName, nickName, email, phoneNum, password, profileImageId);
+        user.update(realName, nickName, email, phoneNum, username, password, profileImageId);
         userRepository.update(user);
+        return user;
     }
 
     @Override
@@ -210,5 +210,20 @@ public class BasicUserService implements UserService{
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
                 .getPassword().equals(password);
+    }
+
+    private boolean existsByUsername(String username) {
+        return userRepository.findAll().stream()
+                .anyMatch(u -> u.getUsername().equals(username));
+    }
+
+    private boolean existsByNickName(String NickName) {
+        return userRepository.findAll().stream().
+                anyMatch(u -> u.getNickName().equals(NickName));
+    }
+
+    private boolean existsByEmail(String email) {
+        return userRepository.findAll().stream().
+                anyMatch(u -> u.getEmail().equals(email));
     }
 }

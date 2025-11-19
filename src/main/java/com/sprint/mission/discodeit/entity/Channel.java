@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -11,26 +13,20 @@ public class Channel extends BaseEntity{
     private String channelName;
     private final ChannelType channelType;
     private final ChannelVisibility visibility;
-    private UUID adminId;
-    private List<UUID> memberIds;
+    private String description;
+    private UUID adminId; // 요구사항 API에 필요없는 필드로 제외하였습니다. 이후 사용해도 되면 관련해서 추가할 예정 입니다.
+    private List<UUID> memberIds = new ArrayList<>();
 
-    public Channel(ChannelType channelType, ChannelVisibility visibility, String channelName, UUID adminId) {
-        this.channelType = channelType;
-        this.visibility = visibility;
-        this.channelName = channelName;
-        this.adminId = adminId;
-        this.memberIds = new ArrayList<>();
-        this.memberIds.add(adminId);
+    public Channel() {
+        this.channelType = ChannelType.MESSAGE;
+        this.visibility = ChannelVisibility.PRIVATE;
     }
 
-    public void setChannelName(String channelName) {
-        this.setUpdatedAt();
+    public Channel(String channelName, String description) {
+        this.channelType = ChannelType.MESSAGE;
+        this.visibility = ChannelVisibility.PUBLIC;
         this.channelName = channelName;
-    }
-
-    public void setAdmin(UUID adminId) {
-        this.setUpdatedAt();
-        this.adminId = adminId;
+        this.description = description;
     }
 
     public List<UUID> getMemberIds() {
@@ -47,6 +43,21 @@ public class Channel extends BaseEntity{
         this.memberIds.remove(userId);
     }
 
+    public void update(String name, String description) {
+        boolean flag = false;
+        if(name != null && !name.isEmpty()){
+            this.channelName = name;
+            flag = true;
+        }
+        if(description != null && !description.isEmpty()){
+            this.description = description;
+            flag = true;
+        }
+        if(flag){
+           this.setUpdatedAt();
+        }
+    }
+
     @Override
     public String toString() {
         String str = super.toString();
@@ -55,7 +66,7 @@ public class Channel extends BaseEntity{
                 "channelName='" + channelName + '\'' +
                 ", channelType=" + channelType +
                 ", channelVisibility=" + visibility +
-                ", adminId=" + adminId +
+                ", description=" + description +
                 ", memberIds=" + memberIds +
                 str +
                 '}';

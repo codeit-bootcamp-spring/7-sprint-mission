@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -22,15 +23,13 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public void create(CreateBinaryContentRequestDto request) {
-        MultipartFile file = request.getFile();
-
-        if(file != null && !file.isEmpty()){
-            try {
-                BinaryContent bc = new BinaryContent(file.getName(), file.getBytes());
-                binaryContentRepository.save(bc);
-            } catch (IOException e) {
-                throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
-            }
+        if (Optional.ofNullable(request).isPresent()) {
+            BinaryContent file = new BinaryContent(
+                    request.getFileName(),
+                    request.getContentType(),
+                    request.getBytes()
+            );
+            binaryContentRepository.save(file);
         }
     }
 
@@ -49,9 +48,8 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public void delete(UUID binaryContentId) {
-        if(!binaryContentRepository.isExist(binaryContentId)){
-            throw new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND);
-        }
+        binaryContentRepository.findById(binaryContentId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND));
         binaryContentRepository.delete(binaryContentId);
     }
 }

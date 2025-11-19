@@ -27,7 +27,7 @@ public interface UserRepository {
     Optional<User> findByPhone(String phoneNum);
 
     /** 아이디로 유저를 조회 */
-    Optional<User> findByLoginId(String loginId);
+    Optional<User> findByUsername(String username);
 
     /** 모든 유저를 반환 */
     List<User> findAll();
@@ -37,12 +37,4 @@ public interface UserRepository {
 
     /** ID(UUID)로 유저를 삭제 */
     void deleteById(UUID userId);
-
-    /** ID(UUID)로 유저 존재 여부 확인*/
-    boolean isExist(UUID userId);
-
-    boolean existsByNickName(String NickName);
-
-    boolean existsByEmail(String email);
-
 }

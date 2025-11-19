@@ -4,9 +4,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFBinaryContentRepository implements BinaryContentRepository {
-    private final Map<UUID, BinaryContent> contentStore = new HashMap<>();
+    private final Map<UUID, BinaryContent> contentStore = new ConcurrentHashMap<>();
 
     @Override
     public void save(BinaryContent binaryContent) {
@@ -33,10 +34,5 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
         idList.forEach(id -> {
             contentStore.remove(id);
         });
-    }
-
-    @Override
-    public boolean isExist(UUID binaryContentId) {
-        return contentStore.containsKey(binaryContentId);
     }
 }
