@@ -34,7 +34,7 @@ public class ChannelController implements ChannelControllerDocs {
                 .body(createdChannel);
     }
     // [비공개 채널 생성]
-
+   
     @RequestMapping(path = "private", method = RequestMethod.POST)
     public ResponseEntity<Channel> create(@RequestBody PrivateChannelCreateRequest request) {
         Channel createdChannel = channelService.create(request);
