@@ -4,8 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record ChannelUpdateRequest(
-        UUID channelId,
-        String newChannelName,
+        String newName,
         String newDescription
 ) {
 }

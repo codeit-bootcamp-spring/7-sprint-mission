@@ -21,9 +21,8 @@ public class FileUserStatusRepository implements UserStatusRepository {
     private final String filename = "usersStatus";
 
     @Override
-    public UserStatus save(UUID UserUUID) {
-        UserStatus userStatus = new UserStatus(UserUUID);
-        FileIo.save(filename,userStatus);
+    public UserStatus save(UserStatus userStatus) {
+        FileIo.save(filename, userStatus, userStatus.getId());
         return userStatus;
     }
 
@@ -39,7 +38,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-      return   FileIo.readAll(filename, UserStatus.class).stream()
+        return FileIo.readAll(filename, UserStatus.class).stream()
                 .filter(us -> us.getUserId().equals(userId))
                 .findFirst();
 

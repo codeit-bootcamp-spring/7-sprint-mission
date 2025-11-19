@@ -20,9 +20,9 @@ public record UserDto(
                user.getId(),
                user.getCreatedAt(),
                user.getUpdatedAt(),
-                user.getUserName(),
-               user.getUserEmail(),
-               user.getProfileID(),
+                user.getUsername(),
+               user.getEmail(),
+               user.getProfileId(),
                status.isOnline()
         );
     }

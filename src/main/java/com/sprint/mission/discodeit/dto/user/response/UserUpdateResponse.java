@@ -9,18 +9,16 @@ public record UserUpdateResponse(
         String newUsername,          // null이면 변경 안 함
         String newEmail,
         String newPassword,
-        String newNickname,
         UUID newProfileImage
 
 ){
     public static UserUpdateResponse from(UUID uuid,User user) {
         return new UserUpdateResponse(
                 user.getId(),
-                user.getUserName(),
-                user.getUserEmail(),
+                user.getUsername(),
+                user.getEmail(),
                 user.getPassword(),
-                user.getUserNickname(),
-                user.getProfileID()
+                user.getProfileId()
         );
     }
 }

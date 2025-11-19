@@ -25,9 +25,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus save(UUID userId, UUID channelId) {
-        // 새로운 ReadStatus 생성 (ReadStatus에 생성자가 있다고 가정)
-        ReadStatus readStatus = new ReadStatus(userId,channelId);
+    public ReadStatus save(ReadStatus readStatus) {
+
+
         data.put(readStatus.getId(), readStatus);
         return readStatus;
     }
@@ -55,6 +55,13 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
         return data.values().stream()
                 .filter(rs -> rs.getUserId().equals(userId))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return this.data.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override

@@ -19,7 +19,10 @@ public interface BinaryRepository {
 
     Optional<BinaryContent> find(UUID binaryId);
 
+    List<BinaryContent> findAllByIdIn(List<UUID> ids);
+
     List<BinaryContent> findAll();
+
 
     void delete(UUID contentId);
 

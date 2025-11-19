@@ -5,16 +5,17 @@ import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusCreateReque
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusFindByUserRequest;
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusFindRequest;
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusUpdateReuqest;
+import com.sprint.mission.discodeit.entity.status.ReadStatus;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
 
-     ReadStatusResponse create(ReadStatusCreateRequest request);
-    ReadStatusResponse find(ReadStatusFindRequest request);
-     List<ReadStatusResponse> findAllByUserId(ReadStatusFindByUserRequest request);
-    ReadStatusResponse update(ReadStatusUpdateReuqest request);
+    ReadStatus create(ReadStatusCreateRequest request);
+    ReadStatus find(UUID readStatusId);
+     List<ReadStatus> findAllByUserId(UUID userId);
+    ReadStatus update(UUID readStatusId,ReadStatusUpdateReuqest request);
      void delete(UUID uuid);
 
 }

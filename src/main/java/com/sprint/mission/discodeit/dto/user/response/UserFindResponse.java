@@ -8,14 +8,12 @@ import java.util.UUID;
 public record UserFindResponse(
         UUID userId,
         String username,
-        String userNickname,
         UserStatus userStatus
 ) {
     public static UserFindResponse from(User user, UserStatus status) {
         return new UserFindResponse(
                 user.getId(),
-                user.getUserName(),
-                user.getUserNickname(),
+                user.getUsername(),
                 status
         );
     }

@@ -20,7 +20,7 @@ public record ChannelUpdateResponse(
 
         return new ChannelUpdateResponse(
                 channel.getId(),
-                channel.getChannelName(),
+                channel.getName(),
                 channel.getDescription(),
                 status
         );

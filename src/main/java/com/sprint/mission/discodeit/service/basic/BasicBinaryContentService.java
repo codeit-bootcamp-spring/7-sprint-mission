@@ -20,31 +20,35 @@ public class BasicBinaryContentService implements BinaryContentService {
     private  final BinaryRepository binaryRepository;
 
     @Override
-    public ResponseEntity<BinaryContentResponse> create(BinaryContentCreateRequest request) {
-        BinaryContent binaryContent = new BinaryContent(request.contentsType(), request.contentByte(),"null");
-        binaryRepository.save(binaryContent);
-
-        return  ResponseEntity.ok(BinaryContentResponse.from(binaryContent));
+    public BinaryContent create(BinaryContentCreateRequest request) {
+        String fileName = request.fileName();
+        byte[] bytes = request.bytes();
+        String contentType = request.contentType();
+        BinaryContent binaryContent = new BinaryContent(
+                fileName,
+                (long) bytes.length,
+                contentType,
+                bytes
+        );
+        return binaryRepository.save(binaryContent);
 
     }
 
     @Override
-    public BinaryContentResponse find(UUID BinaryContentId) {
-        BinaryContent binaryContent = binaryRepository.find(BinaryContentId)
+    public BinaryContent find(UUID BinaryContentId) {
+        return binaryRepository.find(BinaryContentId)
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + BinaryContentId));
-        return BinaryContentResponse.from(binaryContent);
+
     }
 
     @Override
-    public List<BinaryContentResponse> findAllByIn(UUID binaryContentId) {
-        return binaryRepository.findAll().stream()
-                .filter(binaryContent -> binaryContent.getId().equals(binaryContentId))
-                .map(BinaryContentResponse::from)
-                .toList();
+    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+        return binaryRepository.findAllByIdIn(binaryContentIds).stream().toList();
     }
 
     @Override
     public void delete(UUID BinaryContentId) {
+
         binaryRepository.delete(BinaryContentId);
     }
 }
