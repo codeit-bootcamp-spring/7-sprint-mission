@@ -5,6 +5,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import com.sprint.mission.discodeit.swaggerDocs.BinaryContentDoc;
 import com.sprint.mission.discodeit.entity.dto.Res_BinaryContent;
 import com.sprint.mission.discodeit.service.basic.BinaryContentService;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

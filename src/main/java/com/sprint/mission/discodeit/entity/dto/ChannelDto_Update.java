@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public record ChannelDto_Update( //all private final
-                                 String newName,
-                                 String newDescription
-) {
-}
+     @NotNull
+     String newName,
+     @NotNull
+     String newDescription
+) {}

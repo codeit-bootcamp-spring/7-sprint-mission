@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.dto.Res_Message;
 import com.sprint.mission.discodeit.service.basic.MessageService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,7 +54,7 @@ public class MessageController implements MessageDoc {
 
     @PostMapping
     public ResponseEntity<Res_Message> create(
-        @RequestPart("messageCreateRequest") MessageCreateRequest dtoMessage,
+        @Valid @RequestPart("messageCreateRequest") MessageCreateRequest dtoMessage,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList) {
 
         //💎Message 생성
@@ -81,7 +82,7 @@ public class MessageController implements MessageDoc {
     @PatchMapping("/{messageId}")
     public ResponseEntity<Res_Message> updateMessage(
         @PathVariable("messageId") UUID messageId,
-        @RequestBody Dto_MessageUpdate requestDto) {
+        @Valid @RequestBody Dto_MessageUpdate requestDto) {
         //💎Message 내용 수정
         Res_Message resMessage
             = messageService.updateMessage(messageId, requestDto);

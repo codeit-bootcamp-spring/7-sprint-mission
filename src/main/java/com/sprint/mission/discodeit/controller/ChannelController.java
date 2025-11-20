@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPublic;
 import com.sprint.mission.discodeit.entity.dto.Res_Channel;
 import com.sprint.mission.discodeit.entity.dto.Res_ChannelFind;
 import com.sprint.mission.discodeit.service.basic.ChannelService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class ChannelController implements ChannelDoc {
     //💎Public Channel 생성
     @PostMapping("/public")
     public ResponseEntity<Res_Channel> createPublic(
-        @RequestBody Dto_CreateChannelPublic dtoCreateChannel) {
+        @Valid @RequestBody Dto_CreateChannelPublic dtoCreateChannel) {
 
         Res_Channel aPublic
             = channelService.createPublic(dtoCreateChannel);
@@ -51,7 +52,7 @@ public class ChannelController implements ChannelDoc {
     //💎Private Channel 생성
     @PostMapping("/private")
     public ResponseEntity<Res_Channel> createPrivate(
-        @RequestBody Dto_CreateChannelPrivate dtoCreateChannel) {
+        @Valid @RequestBody Dto_CreateChannelPrivate dtoCreateChannel) {
 
         Res_Channel channel
             = channelService.createPrivate(dtoCreateChannel);
@@ -77,7 +78,7 @@ public class ChannelController implements ChannelDoc {
     @PatchMapping("/{channelId}")
     public ResponseEntity<Res_Channel> update(
         @PathVariable("channelId") UUID channelId,
-        @RequestBody ChannelDto_Update channelDtoUpdate) {
+        @Valid @RequestBody ChannelDto_Update channelDtoUpdate) {
 
         Res_Channel resChannel
             = channelService.update(channelId, channelDtoUpdate);

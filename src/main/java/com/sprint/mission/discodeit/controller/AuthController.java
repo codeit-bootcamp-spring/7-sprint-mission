@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.swaggerDocs.AuthDoc;
 import com.sprint.mission.discodeit.entity.dto.AuthServiceDto;
 import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.service.basic.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class AuthController implements AuthDoc {
 
     @PostMapping(value = "/login")
     public ResponseEntity<Res_UserLogin> login(
-        @RequestBody AuthServiceDto authServiceDto) {
+        @Valid @RequestBody AuthServiceDto authServiceDto) {
        //💎로그인
         Res_UserLogin resUserLogin
             = authService.login(authServiceDto);

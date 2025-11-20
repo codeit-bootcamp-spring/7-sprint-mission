@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.entity.dto.Res_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.UserDto;
 import com.sprint.mission.discodeit.service.basic.UserService;
 import com.sprint.mission.discodeit.service.basic.UserStatusService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,7 +59,7 @@ public class UserController implements UserDoc {
     @PostMapping
 //    @RequestMapping(method = POST)
     public ResponseEntity<Res_User> create(
-        @RequestPart("userCreateRequest") Dto_UserCreate dtoUser,
+        @Valid @RequestPart("userCreateRequest") Dto_UserCreate dtoUser,
         @RequestPart(value = "profile", required = false) MultipartFile file) {
         //💎User 등록
         Dto_BinaryContent dtoFile = parsingMultipartFile(file);
@@ -84,7 +85,7 @@ public class UserController implements UserDoc {
     @PatchMapping("/{userId}")
     public ResponseEntity<Res_User> update(
         @PathVariable("userId") UUID userId,
-        @RequestPart(value = "userUpdateRequest") Dto_UserUpdate dtoUser,
+        @Valid @RequestPart(value = "userUpdateRequest") Dto_UserUpdate dtoUser,
         @RequestPart(value = "profile", required = false) MultipartFile file) {
         //💎User 정보 수정
         Dto_BinaryContent dtoFile = parsingMultipartFile(file);
@@ -100,7 +101,7 @@ public class UserController implements UserDoc {
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<Res_UserUpdate> updateUserStatus(
         @PathVariable("userId") UUID userId,
-        @RequestBody Dto_UserStatusUpdate userStatusUpdate) {
+        @Valid @RequestBody Dto_UserStatusUpdate userStatusUpdate) {
 
         //💎User 온라인 상태 업데이트
         Res_UserUpdate resUserStatus

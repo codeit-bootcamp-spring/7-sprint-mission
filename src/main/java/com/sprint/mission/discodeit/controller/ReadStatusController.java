@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatusUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
 import com.sprint.mission.discodeit.service.basic.ReadStatusService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class ReadStatusController implements ReadStatusDoc {
 
     @PostMapping
     public ResponseEntity<Res_ReadStatus> create(
-        @RequestBody Dto_ReadStatus dtoReadStatus) {
+        @Valid @RequestBody Dto_ReadStatus dtoReadStatus) {
 
         //💎Message 읽음 상태 생성
         Res_ReadStatus resReadStatus
@@ -55,7 +56,7 @@ public class ReadStatusController implements ReadStatusDoc {
     @PatchMapping("/{readStatusId}")
     public ResponseEntity<Res_ReadStatus> update(
         @PathVariable("readStatusId") UUID readStatusId,
-        @RequestBody Dto_ReadStatusUpdate requestDto) {
+        @Valid @RequestBody Dto_ReadStatusUpdate requestDto) {
 
         //💎Message 읽음 상태 수정
         Res_ReadStatus resReadStatus
