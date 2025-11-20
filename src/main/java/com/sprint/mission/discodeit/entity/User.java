@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-@Builder(toBuilder = true)
+@Builder
 @Getter
 @Setter
 public class User extends Entity implements Serializable {

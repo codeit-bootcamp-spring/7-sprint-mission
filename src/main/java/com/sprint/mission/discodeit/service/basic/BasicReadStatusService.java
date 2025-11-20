@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -49,7 +50,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 .readLastTime(now())
                 .userId(readStatusCreateRequestDto.getUserId())
                 .channelId(readStatusCreateRequestDto.getChannelId())
-                .readLastTime(readStatusCreateRequestDto.getReadLastTime())
+                .readLastTime(readStatusCreateRequestDto.getLastReadAt())
                 .build();
         return ReadStatusResponseDto.from(
                 readStatusRepository.createReadStatus(readStatus)
@@ -93,7 +94,15 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public List<ReadStatusResponseDto> readAllReadStatus() {
-        readStatusRepository.readAllReadStatus().forEach(x-> System.out.println(x.getId()+": "+x.getUserId()+": "+x.getChannelId()));
         return readStatusRepository.readAllReadStatus().stream().map(ReadStatusResponseDto::from).toList();
+    }
+
+    @Override
+    public ReadStatusResponseDto patchReadStatus(UUID readStatusId, ReadStatusPatchRequestDto readStatusPatchRequestDto) {
+        ReadStatus readStatus = readStatusRepository.readReadStatus(readStatusId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 readStatus 입니다."));
+        readStatus.setReadLastTime(readStatusPatchRequestDto.newLastReadAt());
+        readStatus.updateEntity();
+        readStatusRepository.updateReadStatus(readStatus);
+        return ReadStatusResponseDto.from(readStatus);
     }
 }

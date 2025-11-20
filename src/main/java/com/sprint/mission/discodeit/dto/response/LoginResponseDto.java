@@ -5,20 +5,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.Instant;
+import java.util.UUID;
+
 @Builder
-@Getter
-@ToString
-public class LoginResponseDto {
 
-    private String name;
-    private String userName;
-    private String email;
+public record LoginResponseDto(
+        UUID id,
+        Instant createdAt,
+        Instant updatedAt,
+        String username,
+        String email,
+        String password,
+        UUID profileId
+) {
 
-    public static LoginResponseDto of(User user){
-        return LoginResponseDto.builder()
-                .name(user.getName())
-                .userName(user.getUserName())
-                .email(user.getEmail())
-                .build();
-    }
 }

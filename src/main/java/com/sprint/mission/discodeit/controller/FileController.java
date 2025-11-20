@@ -1,35 +1,44 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
-public class FileController {
+public class FileController implements FileControllerDocs {
 
     private final BinaryContentService binaryContentService;
-    @RequestMapping(value = "/read", method = RequestMethod.POST)
-    public List<BinaryContent> read(@RequestBody List<UUID> binaryContentIdList){
-        return binaryContentService.findAllByIdIn(binaryContentIdList);
+    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+    @Override
+    public ResponseEntity<BinaryContentResponseDto> read(@PathVariable UUID binaryContentId){
+        return new ResponseEntity<>(binaryContentService.find(binaryContentId), HttpStatus.OK);
     }
 
-    @RequestMapping("/readAll")
-    public List<BinaryContent> readAll(){
-        return binaryContentService.findAll();
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    @Override
+    public ResponseEntity<List<BinaryContentResponseDto>> readByIdList(@RequestParam List<UUID> binaryContentIds){
+        return new ResponseEntity<>(binaryContentService.findAllByIdIn(binaryContentIds), HttpStatus.OK);
     }
 
-    @RequestMapping("/reset")
+    @RequestMapping(value = "",method = RequestMethod.OPTIONS)
+    public ResponseEntity<List<BinaryContent>> readAll(){
+        return new ResponseEntity<>(binaryContentService.findAll(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/reset", method = RequestMethod.GET)
     public void reset(){
         binaryContentService.resetBinaryContentService();
     }
+
+/// /////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }

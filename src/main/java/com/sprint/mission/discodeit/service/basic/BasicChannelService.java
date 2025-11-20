@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 
+import com.sprint.mission.discodeit.dto.request.channel.ChannelPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
@@ -42,37 +43,31 @@ public class BasicChannelService implements ChannelService {
     public ChannelReadResponseDto createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
 
         List<User> userList = userRepository.getAllUser();
-        HashSet<UUID> userIdList = channelPrivateCreateRequestDto.getUserIdList();
+        HashSet<UUID> userIdList = channelPrivateCreateRequestDto.getParticipantIds();
 
-    Channel channel = Channel.builder()
+    Channel channel = channelRepository.saveChannel(Channel.builder()
             .name(channelPrivateCreateRequestDto.getName())
             .isTextChannel(channelPrivateCreateRequestDto.isTextChannel())
             .isPublic(false)
             .joinUserList(userIdList)
             .description(channelPrivateCreateRequestDto.getDescription())
-            .build();
+            .build());
     userList.forEach(x->x.addChannel(channel.getId()));
 
-       channelPrivateCreateRequestDto.getUserIdList().stream().map(
+       channelPrivateCreateRequestDto.getParticipantIds().forEach(
                 x ->
                 {
                     User tempUser = userRepository.getUserById(x).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
                     tempUser.addChannel(channel.getId());
                     userRepository.updateUser(tempUser);
-                    return ReadStatus.builder().userId(x).channelId(channel.getId()).build();
+                   readStatusRepository.createReadStatus(ReadStatus.builder()
+                           .userId(x)
+                           .channelId(channel.getId())
+                           .build());
                 }
-        ).forEach(readStatusRepository::createReadStatus);
-        Channel saveChannel = channelRepository.saveChannel(channel);
+        );
 
-        return ChannelReadResponseDto.builder()
-                .name(saveChannel.getName())
-                .isTextChannel(saveChannel.isTextChannel())
-                .isPublic(saveChannel.isPublic())
-                .description(saveChannel.getDescription())
-                .userIdList(
-                        saveChannel.isPublic()? new HashSet<>():saveChannel.getJoinUserList())
-                .recentPostTime(lastPostTime(saveChannel))
-                .build();
+        return ChannelReadResponseDto.from(channel);
 
     }
 
@@ -83,20 +78,12 @@ public class BasicChannelService implements ChannelService {
             .isTextChannel(channelPublicCreateRequestDto.isTextChannel)
             .isPublic(true)
             .description(channelPublicCreateRequestDto.getDescription())
-            .joinUserList(channelPublicCreateRequestDto.getUserIdList()==null
+            .joinUserList(channelPublicCreateRequestDto.getParticipantIds()==null
                     ? new HashSet<>()
-                    : channelPublicCreateRequestDto.getUserIdList())
+                    : channelPublicCreateRequestDto.getParticipantIds())
             .build());
 
-    return ChannelReadResponseDto.builder()
-            .name(channel.getName())
-            .isTextChannel(channel.isTextChannel())
-            .isPublic(channel.isPublic())
-            .description(channel.getDescription())
-            .userIdList(
-                    channel.isPublic()? new HashSet<>():channel.getJoinUserList())
-            .recentPostTime(lastPostTime(channel))
-            .build();
+    return ChannelReadResponseDto.from(channel);
 
 
     }
@@ -114,16 +101,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelReadResponseDto readChannel(UUID channelId) {
         Channel expectedChannel = channelRepository.getChannelById(channelId).orElseThrow(()->new IllegalArgumentException("Channel not found"));
         Instant max = lastPostTime(expectedChannel);
-        ChannelReadResponseDto channelReadResponseDto = ChannelReadResponseDto.builder()
-                .name(expectedChannel.getName())
-                .isTextChannel(expectedChannel.isTextChannel())
-                .isPublic(expectedChannel.isPublic())
-                .description(expectedChannel.getDescription())
-                .userIdList(
-                        expectedChannel.isPublic()? new HashSet<>():expectedChannel.getJoinUserList())
-                .recentPostTime(max)
-                .build();
-
+        ChannelReadResponseDto channelReadResponseDto = ChannelReadResponseDto.from(expectedChannel);
         return channelReadResponseDto;
     }
 
@@ -145,17 +123,8 @@ public class BasicChannelService implements ChannelService {
         List<Channel> userContainPrivateChannel = channelList.stream().filter(
                 x->x.getJoinUserList().stream().anyMatch(y->y.equals(userId))&&!x.isPublic()
         ).toList();
-        channelRepository.getAllChannel().forEach(x-> System.out.println(x.getName()+": "+x.getId()));
         return Stream.concat(publicChannelList.stream(),userContainPrivateChannel.stream())
-                .map(x->
-                        ChannelReadResponseDto.builder()
-                                .name(x.getName())
-                                .description(x.getDescription())
-                                .isTextChannel(x.isTextChannel())
-                                .isPublic(x.isPublic())
-                                .userIdList(x.isPublic()? new HashSet<>():x.getJoinUserList())
-                                .recentPostTime(lastPostTime(x))
-                        .build()
+                .map(ChannelReadResponseDto::from
                         ).toList();
 
     }
@@ -252,6 +221,16 @@ public class BasicChannelService implements ChannelService {
                         && x.getChannelId().equals(tempChannel.getId()))
                 .findFirst().orElseThrow().getId());
 
+    }
+
+    @Override
+    public ChannelReadResponseDto patchChannel(ChannelPatchRequestDto dto, UUID channelId) {
+        Channel channel = channelRepository.getChannelById(channelId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
+        channel.setDescription(dto.newDescription()==null?channel.getDescription():dto.newDescription());
+        channel.setName(dto.newName()==null?channel.getName():dto.newName());
+        channel.updateEntity();
+        channelRepository.updateChannel(channel);
+        return ChannelReadResponseDto.from(channel);
     }
 
     @Override
