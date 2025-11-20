@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.vaildator.UserVaildator;
+import com.sprint.mission.discodeit.entity.validator.UserValidator;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -17,9 +17,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,8 +42,8 @@ public class BasicUserService implements UserService{
         }
 
         // 2. 입력된 정보 형태 검증
-        Optional.ofNullable(userRequest.getEmail()).ifPresent(e -> UserVaildator.vaildateEmail(e));
-        Optional.ofNullable(userRequest.getPassword()).ifPresent(pw -> UserVaildator.vaildatePassword(pw));
+        Optional.ofNullable(userRequest.getEmail()).ifPresent(e -> UserValidator.validateEmail(e));
+        Optional.ofNullable(userRequest.getPassword()).ifPresent(pw -> UserValidator.validatePassword(pw));
 
         // 3. 선택적 프로필 이미지 처리
         UUID profileImageId = null;
@@ -171,10 +169,10 @@ public class BasicUserService implements UserService{
             }
 
             // 입력된 정보 형태 검증
-            Optional.ofNullable(nickName).ifPresent(n -> UserVaildator.vaildateNickname(n));
-            Optional.ofNullable(email).ifPresent(e -> UserVaildator.vaildateEmail(e));
-            Optional.ofNullable(phoneNum).ifPresent(pn -> UserVaildator.vaildatePhoneNum(pn));
-            Optional.ofNullable(password).ifPresent(pw -> UserVaildator.vaildatePassword(pw));
+            Optional.ofNullable(nickName).ifPresent(n -> UserValidator.validateNickname(n));
+            Optional.ofNullable(email).ifPresent(e -> UserValidator.validateEmail(e));
+            Optional.ofNullable(phoneNum).ifPresent(pn -> UserValidator.validatePhoneNum(pn));
+            Optional.ofNullable(password).ifPresent(pw -> UserValidator.validatePassword(pw));
         }
 
         UUID profileImageId = null;

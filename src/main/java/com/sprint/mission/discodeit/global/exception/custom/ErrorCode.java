@@ -17,6 +17,13 @@ public enum ErrorCode {
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
     USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
 
+    //===== USER VALIDATOR =====//
+    INVALID_NICKNAME_LENGTH(HttpStatus.BAD_REQUEST, "닉네임은 2자 이상 12자 이하로 입력해주세요."),
+    INVALID_NICKNAME_PATTERN(HttpStatus.BAD_REQUEST, "닉네임에 특수문자는 사용할 수 없습니다. 다시 입력해주세요."),
+    INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "이메일 형식에 맞지 않습니다. 다시 입력하세요."),
+    INVALID_PHONE_FORMAT(HttpStatus.BAD_REQUEST, "전화번호 형식에 맞지 않습니다. 다시 입력하세요."),
+    INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST, "비밀번호가 8자리보다 작거나 공백만 포함되어 있습니다. 다시 입력해주세요."),
+
     //===== CHANNEL =====//
     // 400 BAD REQUEST
     NEW_ADMIN_USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "새로운 관리자가 될 유저가 존재하지 않습니다."),
@@ -68,6 +75,9 @@ public enum ErrorCode {
 
     //===== BINARY_CONTENT =====//
     BINARYCONTENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "파일이 존재하지 않습니다."),
+
+    //==== NULL INPUT =====//
+    NULL_INPUT_VALUE(HttpStatus.BAD_REQUEST, "null 값은 입력할 수 없습니다."),
 
     // 500 INTERNAL SERVER ERROR
     FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
