@@ -24,7 +24,7 @@ public class MessageController implements MessageControllerDocs {
     private final MessageService messageService;
     private final ChannelService channelService;
 
-    @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Override
     public ResponseEntity<MessageReadResponseDto> createMessage(@Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
                                                                 @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
@@ -33,50 +33,33 @@ public class MessageController implements MessageControllerDocs {
         return new ResponseEntity<>(messageService.createMessage(dto, attachments), HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
+    @PatchMapping("/{messageId}")
     @Override
     public ResponseEntity<MessageReadResponseDto> patchMessage(@PathVariable UUID messageId, @Valid @RequestBody MessagePatchRequestDto dto){
         MessageReadResponseDto mRRDto = messageService.patchMessage(dto, messageId);
         return new ResponseEntity<>(mRRDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
+    @DeleteMapping("/{messageId}")
     @Override
     public void deleteMessage(@PathVariable UUID messageId){
         messageService.deleteMessage(messageId);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @GetMapping("")
     public ResponseEntity<List<MessageReadResponseDto>> readChannelMessage(@RequestParam UUID channelId){
         return new ResponseEntity<>(  messageService.findallByChannelId(channelId), HttpStatus.OK);
     }
-    @RequestMapping(value = "/reset", method = RequestMethod.GET)
+    @PostMapping( "/reset")
     @Override
     public void reset(){
         messageService.resetMessage();
     }
 
-    @RequestMapping(value = "", method = RequestMethod.OPTIONS)
+    @GetMapping("/all")
     @Override
     public ResponseEntity<List<MessageReadResponseDto>> readAll(){
         return new ResponseEntity<>(messageService.readAllMessage(), HttpStatus.OK);
     }
-
-///  ////////////////////////////////////////////////////////////////////
-
-//    @RequestMapping(value = "update", method = RequestMethod.POST)
-//    public <T>void updateMessage(@RequestBody MessageUpdateRequestDto<T> dto){
-//
-//        messageService.updateMessage(dto);
-//    }
-//
-//    @RequestMapping("/readUserMessage")
-//    public ResponseEntity<List<ApiResponseDto<MessageReadResponseDto>>> readUserMessage(@RequestParam UUID userId){
-//        List<ApiResponseDto<MessageReadResponseDto>> apiResponseDtoList = messageService.readAllMessageByUserId(userId).stream().map(ApiResponseDto::success).toList();
-//        return new ResponseEntity<List<ApiResponseDto<MessageReadResponseDto>>>(apiResponseDtoList, HttpStatus.OK );
-//    }
-
-//
-
 
 }

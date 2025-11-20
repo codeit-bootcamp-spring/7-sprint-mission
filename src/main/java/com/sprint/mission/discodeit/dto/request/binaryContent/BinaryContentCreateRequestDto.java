@@ -10,12 +10,16 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class BinaryContentCreateRequestDto {
+
     @NotNull(message = "Binary bytes")
     private final byte[] bytes;
+
     @NotBlank(message = "Binary filename")
     private String fileName;
+
     @NotNull(message = "Binary size")
     private Long size;
+
     @NotBlank(message = "Binary content type")
     private String contentType;
 }

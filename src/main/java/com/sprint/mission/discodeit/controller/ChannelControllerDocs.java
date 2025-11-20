@@ -21,14 +21,14 @@ description = "채널을 조회,생성, 삭제, 업데이트를 관리하는 API
 public interface ChannelControllerDocs {
 
     @Operation(
-            summary = "채널 생성(Create Channel)",
+            summary = "private 채널 생성(Create private Channel)",
             description = """
                     채널을 생성합니다.
     
                     - 성공시 생성한 채널의 정보를 반환합니다
                     """
     )
-    @ApiResponse(responseCode = "201", description = "채널 생성 성공",
+    @ApiResponse(responseCode = "201", description = "private 채널 생성 성공",
             content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ChannelReadResponseDto.class),

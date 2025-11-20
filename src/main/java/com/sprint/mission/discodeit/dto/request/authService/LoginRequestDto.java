@@ -7,8 +7,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class LoginRequestDto {
+
     @NotBlank(message = "Login UserName")
     String username;
+
     @NotBlank(message = "Login Password")
     String password;
 }

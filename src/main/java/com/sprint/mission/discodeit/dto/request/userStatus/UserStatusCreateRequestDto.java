@@ -11,7 +11,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 public class UserStatusCreateRequestDto {
+
    @NotNull(message = "UserStatus userId")
     private UUID userId;
+
     private Instant lastOnlineTime;
 }

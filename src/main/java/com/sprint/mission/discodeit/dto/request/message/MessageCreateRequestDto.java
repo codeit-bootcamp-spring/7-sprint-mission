@@ -16,10 +16,10 @@ import java.util.UUID;
 public class MessageCreateRequestDto {
 
     private String content;
+
     @NotNull (message = "message author id")
     private UUID authorId;
-    //private boolean isMarkDown;
+
     @NotNull(message = "message channel id")
     private UUID channelId;
-//    private Set<ProfileCreateRequestDto> attachments  = new HashSet<>();
 }

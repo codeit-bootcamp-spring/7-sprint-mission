@@ -20,7 +20,7 @@ public class ReadStatusController implements ReadStatusControllerDocs {
 
     private final ReadStatusService readStatusService;
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @PostMapping( "")
     @Override
     public ResponseEntity<ReadStatusResponseDto> createReadStatus(@Valid @RequestBody ReadStatusCreateRequestDto dto){
 
@@ -29,33 +29,27 @@ public class ReadStatusController implements ReadStatusControllerDocs {
         ), HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @GetMapping("")
     @Override
     public ResponseEntity<List<ReadStatusResponseDto>> readReadStatus(@RequestParam UUID userId){
         return new ResponseEntity<List<ReadStatusResponseDto>>(readStatusService.findAllyByUserId(userId), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
+    @PatchMapping("/{readStatusId}")
     @Override
     public ResponseEntity<ReadStatusResponseDto> patchReadStatus(@PathVariable UUID readStatusId, @Valid @RequestBody ReadStatusPatchRequestDto dto)
     {
      return new ResponseEntity<>(readStatusService.patchReadStatus(readStatusId, dto), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/reset",method = RequestMethod.GET)
+    @PostMapping( "/reset")
     public void resetReadStatus(){
         readStatusService.resetReadStatus();
     }
 
-    @RequestMapping(value = "",method = RequestMethod.OPTIONS)
+    @GetMapping(value = "/all")
     public ResponseEntity<List<ReadStatusResponseDto>> readAll(){
         return new ResponseEntity<>(readStatusService.readAllReadStatus(),HttpStatus.OK);
     }
-    /// ////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//    @RequestMapping(value = "/update", method = RequestMethod.POST)
-//    public <T>void updateReadStatus(@RequestBody ReadStatusUpdateRequestDto<T> dto){
-//        readStatusService.updateReadStatus(dto);
-//    }
 
 }

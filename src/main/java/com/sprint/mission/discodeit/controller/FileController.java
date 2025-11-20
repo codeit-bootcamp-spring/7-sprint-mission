@@ -17,28 +17,26 @@ import java.util.UUID;
 public class FileController implements FileControllerDocs {
 
     private final BinaryContentService binaryContentService;
-    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+    @GetMapping( "/{binaryContentId}")
     @Override
     public ResponseEntity<BinaryContentResponseDto> read(@PathVariable UUID binaryContentId){
         return new ResponseEntity<>(binaryContentService.find(binaryContentId), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @GetMapping("")
     @Override
     public ResponseEntity<List<BinaryContentResponseDto>> readByIdList(@RequestParam List<UUID> binaryContentIds){
         return new ResponseEntity<>(binaryContentService.findAllByIdIn(binaryContentIds), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "",method = RequestMethod.OPTIONS)
+    @GetMapping("/all")
     public ResponseEntity<List<BinaryContent>> readAll(){
         return new ResponseEntity<>(binaryContentService.findAll(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/reset", method = RequestMethod.GET)
+    @PostMapping("/reset")
     public void reset(){
         binaryContentService.resetBinaryContentService();
     }
-
-/// /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

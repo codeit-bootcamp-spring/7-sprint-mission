@@ -23,76 +23,47 @@ public class ChannelController implements ChannelControllerDocs{
     private final ChannelService channelService;
     private final ReadStatusService readStatusService;
 
-    @RequestMapping(value = "/private", method = RequestMethod.POST)
+    @PostMapping( "/private")
     @Override
     public ResponseEntity<ChannelReadResponseDto> createPrivateChannel(@Valid @RequestBody ChannelPrivateCreateRequestDto dto){
        ;
         return new ResponseEntity<>(channelService.createPrivateChannel(dto), HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/public", method = RequestMethod.POST)
+    @PostMapping( "/public")
     @Override
     public ResponseEntity<ChannelReadResponseDto> createPublicChannel(@Valid @RequestBody ChannelPublicCreateRequestDto dto){
        return new ResponseEntity<>(channelService.createPublicChannel(dto), HttpStatus.CREATED);
     }
 
 
-    @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
+    @DeleteMapping( "/{channelId}")
     @Override
     public void deleteChannel(@PathVariable UUID channelId){
         channelService.deleteChannel(channelId);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @GetMapping( "")
     @Override
     public ResponseEntity<List<ChannelReadResponseDto>> readChannelById(@RequestParam UUID userId){
         return new ResponseEntity<>(channelService.findAllByUserId(userId),HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
+    @PatchMapping( "/{channelId}")
     @Override
     public ResponseEntity<ChannelReadResponseDto> patchChannel(@PathVariable UUID channelId, @Valid @RequestBody ChannelPatchRequestDto dto){
         return new ResponseEntity<>(channelService.patchChannel(dto,channelId),HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/reset", method = RequestMethod.GET)
+    @PostMapping("/reset")
     @Override
     public void reset(){
         channelService.resetChannelRepository();
     }
 
-    @RequestMapping(value = "", method = RequestMethod.OPTIONS)
+    @GetMapping("/all")
     @Override
     public ResponseEntity<List<ChannelReadResponseDto>> readAll(){
         return new ResponseEntity<>(channelService.readAllChannel(),HttpStatus.OK);
     }
-
-/// //////////////////////////////////////////////////////////////////////////////////////////////////
-///
-//    private <ChannelResponseDto> ApiResponseDto<ChannelReadResponseDto> toApiResponseDto(ChannelReadResponseDto dto){
-//        return ApiResponseDto.success(dto);
-//    }
-//
-//    @RequestMapping(value = "/channels/{channelId}", method = RequestMethod.PATCH)
-//    public <T> void updateChannel(@RequestBody ChannelUpdateRequestDto<T>  dto, @PathVariable UUID channelId){
-//        channelService.updateChannel(dto);
-//    }
-//
-
-//
-//    @RequestMapping("/readAll")
-//    public ResponseEntity<List<ApiResponseDto<ChannelReadResponseDto>>> readAll(){
-//        List<ApiResponseDto<ChannelReadResponseDto>> responseDtoList = channelService.readAllChannel().stream().map(this::toApiResponseDto).toList();
-//        return new ResponseEntity<List<ApiResponseDto<ChannelReadResponseDto>>>(responseDtoList,HttpStatus.OK);
-//    }
-//
-//    @RequestMapping(value = "/userEnterChannel", method = RequestMethod.GET)
-//    public void userEnterChannel(@RequestParam UUID userId, @RequestParam UUID channelId){
-//        channelService.inviteUserToChannel(userId,channelId);
-//    }
-//
-//    @RequestMapping(value = "/userExitChannel", method = RequestMethod.GET)
-//    public void userExitChannel(@RequestParam UUID userId, @RequestParam UUID channelId){
-//        channelService.deleteUserFromChannel(userId,channelId);
-//    }
 }

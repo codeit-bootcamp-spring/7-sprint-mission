@@ -16,6 +16,7 @@ import static com.sprint.mission.discodeit.service.util.StaticString.*;
 public class ChannelPrivateCreateRequestDto {
     @NotNull(message = "ChannelPrivate participantIds")
     private final HashSet<UUID> participantIds;
+
     private String name = DEFAULT_CHANNEL_NAME;
     private String description = DEFAULT_CHANNEL_DESCRIPTION;
     private final boolean isTextChannel;
@@ -31,13 +32,4 @@ public class ChannelPrivateCreateRequestDto {
         this.description = (description != null) ? description : DEFAULT_CHANNEL_DESCRIPTION;
         this.isTextChannel = isTextChannel;
     }
-
-    // ✅ name, description 생략용 보조 생성자 (편의 생성자)
-    public ChannelPrivateCreateRequestDto(
-            HashSet<UUID> participantIds,
-            boolean isTextChannel
-    ) {
-        this(participantIds, null, null, isTextChannel);
-    }
-
 }

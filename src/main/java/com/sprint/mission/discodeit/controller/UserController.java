@@ -28,35 +28,20 @@ public class UserController implements UserControllerDocs {
 
     private final UserService userService;
     private final UserStatusService userStatusService;
-//    @RequestMapping(value =  "/register", method = RequestMethod.POST)
-//    public ResponseEntity<ApiResponseDto<UserReadResponseDto>> register(@RequestBody UserCreateRequestDto dto){
-//
-//        ApiResponseDto<UserReadResponseDto> apiResponseDto = ApiResponseDto.success(userService.createUser(dto));
-//        return new ResponseEntity<ApiResponseDto<UserReadResponseDto>>(apiResponseDto, HttpStatus.CREATED);
-//    }
-//
-//    @RequestMapping(value = "/registerWithProfile", method = RequestMethod.POST)
-//    public ResponseEntity<ApiResponseDto<UserReadResponseDto>> registerWithProfile(@RequestBody UserCreateWithProfileRequestDto dto){
-//        UserCreateRequestDto userCreateRequestDto = dto.userInfo();
-//        ProfileCreateRequestDto profileCreateRequestDto = dto.profileInfo();
-//        ApiResponseDto<UserReadResponseDto> apiResponseDto = ApiResponseDto.success(userService.createUser(userCreateRequestDto));
-//        return new ResponseEntity<ApiResponseDto<UserReadResponseDto>>(apiResponseDto, HttpStatus.CREATED);
-//    }
 
-
-    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+    @DeleteMapping("/{userId}")
     @Override
     public void delete(@PathVariable UUID userId){
         userService.deleteUser(userId);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @GetMapping("")
     @Override
     public ResponseEntity<List<UserDto>> readAll(){
         return new ResponseEntity<>( userService.advanceFindAllUser(),HttpStatus.OK);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Override
     public ResponseEntity<UserCreateResponseDto> createUser(
             @Valid @RequestPart("userCreateRequest") UserCreateRequestDto dto
@@ -65,7 +50,7 @@ public class UserController implements UserControllerDocs {
         return new ResponseEntity<UserCreateResponseDto>(userService.createUser(dto,profile),HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Override
     public ResponseEntity<UserCreateResponseDto> patchUser(@PathVariable UUID userId,
                                                            @Valid @RequestPart("userUpdateRequest") UserUpdateRequest dto,
@@ -74,37 +59,20 @@ public class UserController implements UserControllerDocs {
         return new ResponseEntity<>(userService.patchUser(userId, dto,profile), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
+    @PatchMapping(value = "/{userId}/userStatus")
     @Override
     public ResponseEntity<UserUserStatusPatchResponseDto> patchUserStatus(@PathVariable UUID userId, @Valid @RequestBody UserStatusPatchRequestDto dto){
 ;
         return new ResponseEntity<UserUserStatusPatchResponseDto>(userStatusService.patchUserStatus(userId, dto), HttpStatus.OK);
     }
-//SpringMission5 //////////////////////////////////////////////////////////////////////////////////////
-//    @RequestMapping(value = "/updateOnline", method = RequestMethod.GET)
-//    public void updateOnline(@RequestParam UUID userId){
-//        userService.updateUserOnlineStatus(userId);
-//    }
 
-    @RequestMapping(value = "/reset",method = RequestMethod.GET)
+    @PostMapping("/reset")
     public void reset(){
         userService.resetUserRepository();
     }
 
-    @RequestMapping(value = "/userStatus",method = RequestMethod.GET)
+    @GetMapping(value = "/userStatus")
     public ResponseEntity<List<UserStatus>> readAllUserStatus(){
         return new ResponseEntity<>(userStatusService.findAll(),HttpStatus.OK);
     }
-
-
-//
-//    @RequestMapping(value = "/update", method = RequestMethod.POST)
-//    public <T>void update(@RequestBody UserUpdateRequestDto<T> dto){
-//        userService.updateUser(dto);
-//    }
-//
-//
-
-
-
 }
