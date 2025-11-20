@@ -1,13 +1,13 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI definition",
-    "version": "v0"
+    "title": "🍊Discodeit API 문서",
+    "description": "🍊Discodeit 프로젝트의 Swagger API 문서입니다."
   },
   "servers": [
     {
       "url": "http://localhost:4444",
-      "description": "Generated server url"
+      "description": "로컬 서버"
     }
   ],
   "tags": [
@@ -836,21 +836,21 @@
         "summary": "여러 첨부 파일 조회",
         "description": "ID 목록을 통해 여러 개의 첨부 파일을 조회합니다.",
         "operationId": "find",
-        "parameters": [
-          {
-            "name": "binaryContentIds",
-            "in": "query",
-            "description": "조회할 첨부 파일 ID 목록",
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "description": "조회할 첨부 파일 ID 목록",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
               }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "첨부 파일 목록 조회 성공",
@@ -923,7 +923,12 @@
           "password": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "email",
+          "password",
+          "username"
+        ]
       },
       "Res_User": {
         "type": "object",
@@ -970,7 +975,12 @@
             "type": "string",
             "format": "date-time"
           }
-        }
+        },
+        "required": [
+          "channelId",
+          "lastReadAt",
+          "userId"
+        ]
       },
       "Res_ReadStatus": {
         "type": "object",
@@ -1016,7 +1026,12 @@
             "type": "string",
             "format": "uuid"
           }
-        }
+        },
+        "required": [
+          "authorId",
+          "channelId",
+          "content"
+        ]
       },
       "Res_Message": {
         "type": "object",
@@ -1062,7 +1077,11 @@
           "description": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "description",
+          "name"
+        ]
       },
       "Res_Channel": {
         "type": "object",
@@ -1104,7 +1123,10 @@
               "format": "uuid"
             }
           }
-        }
+        },
+        "required": [
+          "participantIds"
+        ]
       },
       "AuthServiceDto": {
         "type": "object",
@@ -1115,7 +1137,11 @@
           "password": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "password",
+          "username"
+        ]
       },
       "Res_UserLogin": {
         "type": "object",
@@ -1160,7 +1186,12 @@
           "newPassword": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "newEmail",
+          "newPassword",
+          "newUsername"
+        ]
       },
       "Dto_UserStatusUpdate": {
         "type": "object",
@@ -1169,7 +1200,10 @@
             "type": "string",
             "format": "date-time"
           }
-        }
+        },
+        "required": [
+          "newLastActiveAt"
+        ]
       },
       "Res_UserUpdate": {
         "type": "object",
@@ -1206,7 +1240,10 @@
             "type": "string",
             "format": "date-time"
           }
-        }
+        },
+        "required": [
+          "newLastReadAt"
+        ]
       },
       "Dto_MessageUpdate": {
         "type": "object",
@@ -1214,7 +1251,10 @@
           "newContent": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "newContent"
+        ]
       },
       "ChannelDto_Update": {
         "type": "object",
@@ -1225,7 +1265,11 @@
           "newDescription": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "newDescription",
+          "newName"
+        ]
       },
       "UserDto": {
         "type": "object",
