@@ -29,12 +29,12 @@ public interface ChannelControllerDocs {
             summary = "공개 채널 생성",
             description = """
                     공개(PUBLIC) 채널을 생성합니다.
-
+                    
                     **요청 데이터**
                     - name (채널명)
                     - description (설명, 선택)
                     - ownerId (채널 소유자 UUID)
-
+                    
                     **응답**
                     - 생성된 채널 정보가 반환됩니다.
                     """
@@ -87,12 +87,12 @@ public interface ChannelControllerDocs {
             summary = "비공개 채널 생성",
             description = """
                     비공개(PRIVATE) 채널을 생성합니다.
-
+                    
                     **요청 데이터**
                     - name (채널명)
                     - ownerId (소유자 UUID)
                     - participantIds (초대할 사용자 UUID 배열)
-
+                    
                     **응답**
                     - 생성된 채널 정보가 반환됩니다.
                     """
@@ -144,10 +144,10 @@ public interface ChannelControllerDocs {
             summary = "사용자별 채널 목록 조회",
             description = """
                     특정 사용자(userId)가 속한 채널 목록을 조회합니다.
-
+                    
                     **요청 데이터**
                     - userId (Query/Path Param, UUID)
-
+                    
                     **응답**
                     - ChannelDto 배열이 반환됩니다.
                     """
@@ -208,11 +208,11 @@ public interface ChannelControllerDocs {
             summary = "채널 정보 수정",
             description = """
                     채널 이름/설명/주제 등 메타데이터를 수정합니다.
-
+                    
                     **요청 데이터**
                     - channelId (Path/Query Param, UUID)
                     - name/description/topic 등 (Request Body)
-
+                    
                     **응답**
                     - 수정된 채널 정보가 반환됩니다.
                     """
@@ -264,10 +264,10 @@ public interface ChannelControllerDocs {
             summary = "채널 삭제",
             description = """
                     채널을 삭제합니다.
-
+                    
                     **요청 데이터**
                     - ChannelDeleteRequest (channelId 등)
-
+                    
                     **응답**
                     - 성공 시 본문 없는 204(No Content) 응답을 반환합니다.
                     """
