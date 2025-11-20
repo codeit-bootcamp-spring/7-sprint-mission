@@ -56,8 +56,7 @@ public class UserController implements UserDoc {
         .body(userDtoList);
     }
 
-    @PostMapping
-//    @RequestMapping(method = POST)
+    @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<Res_User> create(
         @Valid @RequestPart("userCreateRequest") Dto_UserCreate dtoUser,
         @RequestPart(value = "profile", required = false) MultipartFile file) {
@@ -82,7 +81,7 @@ public class UserController implements UserDoc {
             .build();
     }
 
-    @PatchMapping("/{userId}")
+    @PatchMapping(value = "/{userId}", consumes = "multipart/form-data")
     public ResponseEntity<Res_User> update(
         @PathVariable("userId") UUID userId,
         @Valid @RequestPart(value = "userUpdateRequest") Dto_UserUpdate dtoUser,

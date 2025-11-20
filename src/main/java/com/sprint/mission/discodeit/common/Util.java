@@ -13,7 +13,8 @@ import java.io.IOException;
 @UtilityClass //👍 ️static method만 제공하는 Util Class라면 @UtilityClass애너테이션을 이용해보세요
 @Slf4j
 public class Util {
-    public static Dto_BinaryContent parsingMultipartFile(MultipartFile file) {
+    public static Dto_BinaryContent
+    parsingMultipartFile(MultipartFile file) {
         if (file == null) {
           return null;
         }

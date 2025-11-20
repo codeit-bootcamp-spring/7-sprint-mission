@@ -52,7 +52,7 @@ public class MessageController implements MessageDoc {
     }
 
 
-    @PostMapping
+    @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<Res_Message> create(
         @Valid @RequestPart("messageCreateRequest") MessageCreateRequest dtoMessage,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList) {
