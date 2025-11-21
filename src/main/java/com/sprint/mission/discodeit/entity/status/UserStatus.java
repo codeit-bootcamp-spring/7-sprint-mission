@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity.status;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,20 +10,16 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
-public class UserStatus implements Serializable {
+public class UserStatus extends BaseUpdateEntity {
 
     private static final long serialVersionUID = 1L;
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+
     //
     private UUID userId;
     private Instant lastActiveAt;
 
     public UserStatus(UUID userId, Instant lastActiveAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+
         //
         this.userId = userId;
         this.lastActiveAt = lastActiveAt;
@@ -35,9 +32,7 @@ public class UserStatus implements Serializable {
             anyValueUpdated = true;
         }
 
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+
     }
 
     public Boolean isOnline() {

@@ -1,31 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.entity.common.Common;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import com.sprint.mission.discodeit.entity.content.BinaryContent;
+import com.sprint.mission.discodeit.entity.status.UserStatus;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@NoArgsConstructor
 @Getter
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdateEntity {
 
-public class User implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
+    @Column(name = "name", length = 50, nullable = false, unique = true)
     private String username;
+    @Column(name = "email", length = 100, nullable = false, unique = true)
     private String email;
+    @Column(name = "password", length = 60, nullable = false)
     private String password;
-    private UUID profileId;     // BinaryContent
+
+    // private UUID profileId;
+    @OneToOne
+    @JoinColumn(
+            name = "profile_id",
+            foreignKey = @ForeignKey(name = "fk_users_profile")
+    )
+    private BinaryContent profile;
+
+    private UserStatus status;
 
     public User(String username, String email, String password, UUID profileId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
         //
         this.username = username;
         this.email = email;
@@ -52,8 +63,6 @@ public class User implements Serializable {
             anyValueUpdated = true;
         }
 
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+
     }
 }

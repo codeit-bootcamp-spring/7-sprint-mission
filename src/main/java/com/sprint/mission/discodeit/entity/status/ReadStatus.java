@@ -1,30 +1,30 @@
 package com.sprint.mission.discodeit.entity.status;
 
-import com.sprint.mission.discodeit.entity.common.Common;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.nio.channels.Pipe;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
-public class ReadStatus implements Serializable {
+public class ReadStatus extends BaseUpdateEntity {
 
     private static final long serialVersionUID = 1L;
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+
     //
-    private UUID userId;
-    private UUID channelId;
+    private final UUID userId;
+    private final UUID channelId;
     private Instant lastReadAt;
 
+    //추가
+    User user;
+
+
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
         //
         this.userId = userId;
         this.channelId = channelId;
@@ -38,9 +38,6 @@ public class ReadStatus implements Serializable {
             anyValueUpdated = true;
         }
 
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
     }
 }
 

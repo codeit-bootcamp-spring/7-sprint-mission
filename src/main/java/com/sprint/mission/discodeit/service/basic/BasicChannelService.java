@@ -45,8 +45,12 @@ public class BasicChannelService implements ChannelService {
         Channel createdChannel = channelRepository.save(channel);
 
         request.participantIds().stream()
-                .map(userId -> new ReadStatus(userId, createdChannel.getId(), Instant.MIN))
-                .forEach(readStatusRepository::save);
+                .map(userId ->
+                        new ReadStatus(userId,
+                                createdChannel.getId(),
+                                channel.getCreatedAt())).
+                forEach(readStatusRepository::save);
+
 
         return createdChannel;
     }
@@ -127,14 +131,13 @@ public class BasicChannelService implements ChannelService {
                 .orElse(Instant.MIN);
 
         List<UUID> participantIds = new ArrayList<>();
-        System.out.println("이건하고있냐" + channel.getType());
+
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             readStatusRepository.findAllByChannelId(channel.getId())
                     .stream()
                     .map(ReadStatus::getUserId)
                     .forEach(participantIds::add);
         }
-        System.out.println("왜이걸못얻지" + participantIds.size());
         return new ChannelDto(
                 channel.getId(),
                 channel.getType(),

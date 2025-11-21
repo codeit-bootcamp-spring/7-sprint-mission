@@ -1,13 +1,14 @@
-package com.sprint.mission.discodeit.repository.file;
+package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.common.Common;
+import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import com.sprint.mission.discodeit.repository.file.Path;
 
 import java.io.*;
 import java.util.*;
 
 public class FileIo {
 
-    public static <T extends Serializable> void save(String folder, T type, UUID uuid) {
+    public static <T extends BaseUpdateEntity> void save(String folder, T type, UUID uuid) {
         //파일명 ->아래에 폴더명 아래에 UUID 객체저장
         String path = Path.RooT_PATH.getPath() + "/" + folder + "/" + uuid + ".sav";
 
@@ -70,7 +71,7 @@ public class FileIo {
         if (files == null || files.length == 0) {
             return List.of();
         }
-        System.out.println("ㅇㅇ");
+      
         return Arrays.stream(files)
                 .map(file -> file.getName().replace(".sav", ""))
                 .map(name -> {
