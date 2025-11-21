@@ -2,14 +2,16 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusPatchRequestDto;
-import com.sprint.mission.discodeit.dto.response.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.dto.response.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final ReadStatusMapper readStatusMapper;
 
     @Override
     public void resetReadStatus() {
@@ -32,7 +35,8 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResponseDto createReadStatus(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
+    @Transactional
+    public ReadStatusDto createReadStatus(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
 
         Channel targetChannel = channelRepository.findById(readStatusCreateRequestDto.getChannelId())
                 .orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
@@ -44,7 +48,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 .channel(targetChannel)
                 .readLastTime(readStatusCreateRequestDto.getLastReadAt())
                 .build();
-        return ReadStatusResponseDto.from(
+        return readStatusMapper.toDto(
                 readStatusRepository.save(readStatus)
         );
     }
@@ -57,23 +61,24 @@ public class BasicReadStatusService implements ReadStatusService {
 
 
     @Override
-    public List<ReadStatusResponseDto> findAllyByUserId(UUID userID) {
+    public List<ReadStatusDto> findAllyByUserId(UUID userID) {
         return
                 readStatusRepository.findAll().stream()
                         .filter(x->x.getUser().getId().equals(userID))
-                        .map(ReadStatusResponseDto::from).toList();
+                        .map(readStatusMapper::toDto).toList();
     }
 
     @Override
-    public List<ReadStatusResponseDto> readAllReadStatus() {
-        return readStatusRepository.findAll().stream().map(ReadStatusResponseDto::from).toList();
+    public List<ReadStatusDto> readAllReadStatus() {
+        return readStatusRepository.findAll().stream().map(readStatusMapper::toDto).toList();
     }
 
     @Override
-    public ReadStatusResponseDto patchReadStatus(UUID readStatusId, ReadStatusPatchRequestDto readStatusPatchRequestDto) {
+    @Transactional
+    public ReadStatusDto patchReadStatus(UUID readStatusId, ReadStatusPatchRequestDto readStatusPatchRequestDto) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 readStatus 입니다."));
         readStatus.setReadLastTime(readStatusPatchRequestDto.newLastReadAt());
         readStatusRepository.save(readStatus);
-        return ReadStatusResponseDto.from(readStatus);
+        return readStatusMapper.toDto(readStatus);
     }
 }

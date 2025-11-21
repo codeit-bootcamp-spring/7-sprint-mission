@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.response;
+package com.sprint.mission.discodeit.dto.response.message;
 
 import com.sprint.mission.discodeit.entity.Message;
 import lombok.Builder;
@@ -24,7 +24,7 @@ public class MessageReadResponseDto {
     public static MessageReadResponseDto from(Message message){
         return MessageReadResponseDto.builder()
                 .content(message.getContent())
-                .authorId(message.getUser().getId())
+                .authorId(message.getAuthor().getId())
                 .channelId(message.getChannel().getId())
                 .attachmentIds(new HashSet<>())
                 .id(message.getId())

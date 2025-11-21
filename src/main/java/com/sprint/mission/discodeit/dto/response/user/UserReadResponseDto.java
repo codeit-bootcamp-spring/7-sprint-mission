@@ -1,8 +1,7 @@
-package com.sprint.mission.discodeit.dto.response;
+package com.sprint.mission.discodeit.dto.response.user;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.service.util.StaticString;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;

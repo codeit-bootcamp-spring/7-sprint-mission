@@ -7,7 +7,6 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
 import static java.time.Instant.*;
 
@@ -27,10 +26,10 @@ public class UserStatus extends BaseUpdatableEntity {
     private User user;
 
     @Column(name = "last_active_at",nullable = false)
-    private Instant lastOnlineTime;
+    private Instant lastActiveAt;
 
     public boolean isUserOnline(){
-        Duration duration = Duration.between(this.lastOnlineTime, now());
+        Duration duration = Duration.between(this.lastActiveAt, now());
         return duration.getSeconds()<300;
     }
 }

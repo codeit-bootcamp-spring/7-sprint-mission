@@ -5,8 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,11 +22,16 @@ public class Message extends BaseUpdatableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id",nullable = false)
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    private User user;
+    private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Channel channel;
+
+    @Transient
+    List<BinaryContent> attachments;
+    /// // attachments 삭제했을때도 제대로 삭제되었는지 테스트 해봐야 함
+
 
 }

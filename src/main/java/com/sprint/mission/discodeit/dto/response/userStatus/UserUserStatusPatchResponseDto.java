@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.response;
+package com.sprint.mission.discodeit.dto.response.userStatus;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import lombok.Builder;
@@ -21,7 +21,7 @@ public record UserUserStatusPatchResponseDto(
                 .createdAt(userStatus.getCreatedAt())
                 .updatedAt(userStatus.getUpdatedAt())
                 .userId(userStatus.getUser().getId())
-                .lastActiveAt(userStatus.getLastOnlineTime())
+                .lastActiveAt(userStatus.getLastActiveAt())
                 .online(userStatus.isUserOnline())
                 .build();
     }

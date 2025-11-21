@@ -1,17 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
 
-import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileCreateRequestDto;
-import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.request.user.UserPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.request.userStatus.UserStatusPatchRequestDto;
-import com.sprint.mission.discodeit.dto.response.UserCreateResponseDto;
-import com.sprint.mission.discodeit.dto.response.UserDto;
-import com.sprint.mission.discodeit.dto.response.UserReadResponseDto;
-import com.sprint.mission.discodeit.dto.response.UserUserStatusPatchResponseDto;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,12 +12,12 @@ import java.util.UUID;
 
 public interface UserService {
 
-    UserCreateResponseDto createUser(UserCreateRequestDto userCreateRequestDtoDto, MultipartFile profile) throws IOException;
-    UserReadResponseDto readUser(UUID userId);
-    List<UserReadResponseDto> readAllUser();
+    UserDto createUser(UserCreateRequestDto userCreateRequestDtoDto, MultipartFile profile) throws IOException;
+    UserDto readUser(UUID userId);
+    List<UserDto> readAllUser();
     void deleteUser(UUID userId);
     void resetUserRepository();
     List<UserDto> advanceFindAllUser();
-    UserCreateResponseDto patchUser(UUID userId, UserUpdateRequest dto,MultipartFile profile) throws IOException;
+    UserDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile) throws IOException;
 
 }

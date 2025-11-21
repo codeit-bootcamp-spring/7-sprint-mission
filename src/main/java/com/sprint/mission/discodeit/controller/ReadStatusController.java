@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusPatchRequestDto;
-import com.sprint.mission.discodeit.dto.response.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.dto.response.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,22 +22,22 @@ public class ReadStatusController implements ReadStatusControllerDocs {
 
     @PostMapping( "")
     @Override
-    public ResponseEntity<ReadStatusResponseDto> createReadStatus(@Valid @RequestBody ReadStatusCreateRequestDto dto){
+    public ResponseEntity<ReadStatusDto> createReadStatus(@Valid @RequestBody ReadStatusCreateRequestDto dto){
 
-        return new ResponseEntity<ReadStatusResponseDto>(readStatusService.createReadStatus(
+        return new ResponseEntity<ReadStatusDto>(readStatusService.createReadStatus(
                 dto
         ), HttpStatus.CREATED);
     }
 
     @GetMapping("")
     @Override
-    public ResponseEntity<List<ReadStatusResponseDto>> readReadStatus(@RequestParam UUID userId){
-        return new ResponseEntity<List<ReadStatusResponseDto>>(readStatusService.findAllyByUserId(userId), HttpStatus.OK);
+    public ResponseEntity<List<ReadStatusDto>> readReadStatus(@RequestParam UUID userId){
+        return new ResponseEntity<List<ReadStatusDto>>(readStatusService.findAllyByUserId(userId), HttpStatus.OK);
     }
 
     @PatchMapping("/{readStatusId}")
     @Override
-    public ResponseEntity<ReadStatusResponseDto> patchReadStatus(@PathVariable UUID readStatusId, @Valid @RequestBody ReadStatusPatchRequestDto dto)
+    public ResponseEntity<ReadStatusDto> patchReadStatus(@PathVariable UUID readStatusId, @Valid @RequestBody ReadStatusPatchRequestDto dto)
     {
      return new ResponseEntity<>(readStatusService.patchReadStatus(readStatusId, dto), HttpStatus.OK);
     }
@@ -48,7 +48,7 @@ public class ReadStatusController implements ReadStatusControllerDocs {
     }
 
     @GetMapping(value = "/all")
-    public ResponseEntity<List<ReadStatusResponseDto>> readAll(){
+    public ResponseEntity<List<ReadStatusDto>> readAll(){
         return new ResponseEntity<>(readStatusService.readAllReadStatus(),HttpStatus.OK);
     }
 

@@ -3,7 +3,8 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateRequestDto;
-import com.sprint.mission.discodeit.dto.response.ChannelReadResponseDto;
+import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.response.channel.ChannelReadResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -51,7 +52,7 @@ public interface ChannelControllerDocs {
 
             )
     )
-    ResponseEntity<ChannelReadResponseDto> createPrivateChannel(@RequestBody ChannelPrivateCreateRequestDto dto);
+    ResponseEntity<ChannelDto> createPrivateChannel(@RequestBody ChannelPrivateCreateRequestDto dto);
     @Operation(
             summary = " Public 채널 생성",
             description = """
@@ -92,8 +93,7 @@ public interface ChannelControllerDocs {
 
         )
     )
-
-    ResponseEntity<ChannelReadResponseDto> createPublicChannel(@RequestBody ChannelPublicCreateRequestDto dto);
+    ResponseEntity<ChannelDto> createPublicChannel(@RequestBody ChannelPublicCreateRequestDto dto);
 
     @Operation(summary = "채널 삭제(Delete Channel)", description = "채널을 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "채널 삭제 성공",
@@ -124,7 +124,7 @@ public interface ChannelControllerDocs {
             """)
     )
     )
-    ResponseEntity<List<ChannelReadResponseDto>> readChannelById(@RequestParam UUID userId);
+    ResponseEntity<List<ChannelDto>> readChannelById(@RequestParam UUID userId);
 
     @Operation(summary = "채널 수정(Patch Channel)", description = "채널을 수정합니다.")
     @ApiResponse(responseCode = "200", description = "채널 수정 성공",
@@ -145,11 +145,11 @@ public interface ChannelControllerDocs {
             """)
     )
     )
-    ResponseEntity<ChannelReadResponseDto> patchChannel(@PathVariable UUID channelId, @RequestBody ChannelPatchRequestDto dto);
+    ResponseEntity<ChannelDto> patchChannel(@PathVariable UUID channelId, @RequestBody ChannelPatchRequestDto dto);
 
 
     void reset();
 
 
-    ResponseEntity<List<ChannelReadResponseDto>> readAll();
+    ResponseEntity<List<ChannelDto>> readAll();
 }

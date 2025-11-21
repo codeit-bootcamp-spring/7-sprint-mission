@@ -1,20 +1,20 @@
-package com.sprint.mission.discodeit.dto.response;
+package com.sprint.mission.discodeit.dto.response.binaryContent;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import lombok.Builder;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-public record BinaryContentResponseDto(
+public record BinaryContentDto(
         UUID id,
         String fileName,
         Long size,
-        String contentType
+        String contentType,
+        byte[] bytes
 ) {
-    public static BinaryContentResponseDto from(BinaryContent binaryContent){
-        return BinaryContentResponseDto.builder()
+    public static BinaryContentDto from(BinaryContent binaryContent){
+        return BinaryContentDto.builder()
                 .id(binaryContent.getId())
                 .fileName(binaryContent.getFileName())
                 .size(binaryContent.getSize())

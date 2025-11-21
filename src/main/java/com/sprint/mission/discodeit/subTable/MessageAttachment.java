@@ -32,4 +32,9 @@ public class MessageAttachment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private BinaryContent binaryContent;
 
+    public MessageAttachment(Message message, BinaryContent binaryContent){
+        this.message = message;
+        this.binaryContent = binaryContent;
+    }
+
 }

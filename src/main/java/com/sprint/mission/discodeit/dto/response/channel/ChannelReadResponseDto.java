@@ -1,14 +1,11 @@
-package com.sprint.mission.discodeit.dto.response;
+package com.sprint.mission.discodeit.dto.response.channel;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entityElement.ChannelType;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -30,7 +27,7 @@ public class ChannelReadResponseDto {
         return ChannelReadResponseDto.builder()
                 .name(channel.getName())
                 .description(channel.getDescription())
-                .type(channel.getChannelType())
+                .type(channel.getType())
                 .id(channel.getId())
                 .createdAt(channel.getCreatedAt())
                 .updatedAt(channel.getUpdatedAt())

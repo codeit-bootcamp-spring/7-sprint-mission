@@ -4,18 +4,18 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateRequestDto;
-import com.sprint.mission.discodeit.dto.response.ChannelReadResponseDto;
+import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entityElement.ChannelType;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,21 +28,23 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
-    private final MessageRepository messageRepository;
+    private final ChannelMapper channelMapper;
+
 
     @Override
-    public List<ChannelReadResponseDto> readAllChannel() {
-        return channelRepository.findAll().stream().map(x->readChannel(x.getId())).toList();
+    public List<ChannelDto> readAllChannel() {
+        return channelRepository.findAll().stream().map(x->channelMapper.toDto(x)).toList();
     }
 
 
 
     @Override
-    public ChannelReadResponseDto createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
+    @Transactional
+    public ChannelDto createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
 
         Channel channel = channelRepository.save(Channel.builder()
             .name(channelPrivateCreateRequestDto.getName())
-            .channelType(ChannelType.PRIVATE)
+            .type(ChannelType.PRIVATE)
             .description(channelPrivateCreateRequestDto.getDescription())
             .build());
        channelPrivateCreateRequestDto.getParticipantIds().forEach(
@@ -55,17 +57,18 @@ public class BasicChannelService implements ChannelService {
                            .build());
                 }
         );
-        return ChannelReadResponseDto.from(channel);
+        return channelMapper.toDto(channel);
     }
 
     @Override
-    public ChannelReadResponseDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
+    @Transactional
+    public ChannelDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
     Channel channel = channelRepository.save(Channel.builder()
             .name(channelPublicCreateRequestDto.getName())
-            .channelType(ChannelType.PUBLIC)
+            .type(ChannelType.PUBLIC)
             .description(channelPublicCreateRequestDto.getDescription())
             .build());
-    return ChannelReadResponseDto.from(channel);
+    return channelMapper.toDto(channel);
     }
 
 
@@ -76,38 +79,27 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelReadResponseDto readChannel(UUID channelId) {
+    @Transactional
+    public ChannelDto readChannel(UUID channelId) {
         Channel expectedChannel = channelRepository.findById(channelId).orElseThrow(()->new IllegalArgumentException("Channel not found"));
-        Instant max = lastPostTime(expectedChannel);
-        ChannelReadResponseDto channelReadResponseDto = ChannelReadResponseDto.from(expectedChannel);
-        return channelReadResponseDto;
+        return channelMapper.toDto(expectedChannel);
     }
 
-    private Instant lastPostTime(Channel channel){
-        List<Message> messageList = messageRepository.findAll();
-        if(messageList.stream().noneMatch(x->x.getChannel().getId().equals(channel.getId()))) return Instant.MIN;
 
-        return messageList.stream().
-                filter(x -> x.getChannel().getId().equals(channel.getId()))
-                .map(BaseUpdatableEntity::getUpdatedAt)
-                .max(Comparator.naturalOrder()).orElseThrow(()->new IllegalArgumentException("Message not found"));
-    }
 
     @Override
-    public List<ChannelReadResponseDto> findAllByUserId(UUID userId) {
+    public List<ChannelDto> findAllByUserId(UUID userId) {
         List<Channel> channelList = channelRepository.findAll();
         List<ReadStatus> readStatusList = readStatusRepository.findAll();
-       User targetUser = userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("User not found"));
-
         List<Channel> publicChannelList = channelList.stream().filter(x->
-                x.getChannelType()== ChannelType.PUBLIC).collect(Collectors.toList());
+                x.getType()== ChannelType.PUBLIC).collect(Collectors.toList());
 
         List<Channel> userContainPrivateChannel = readStatusList.stream().filter(
-                x->x.getUser().getId().equals(userId) && x.getChannel().getChannelType()== ChannelType.PRIVATE
+                x->x.getUser().getId().equals(userId) && x.getChannel().getType()== ChannelType.PRIVATE
         ).map(ReadStatus::getChannel).collect(Collectors.toList());
 
         return Stream.concat(publicChannelList.stream(),userContainPrivateChannel.stream())
-                .map(ChannelReadResponseDto::from
+                .map(channelMapper::toDto
                         ).toList();
     }
 
@@ -117,12 +109,13 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelReadResponseDto patchChannel(ChannelPatchRequestDto dto, UUID channelId) {
+    @Transactional
+    public ChannelDto patchChannel(ChannelPatchRequestDto dto, UUID channelId) {
         Channel channel = channelRepository.findById(channelId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
         channel.setDescription(dto.newDescription()==null?channel.getDescription():dto.newDescription());
         channel.setName(dto.newName()==null?channel.getName():dto.newName());
         channelRepository.save(channel);
-        return ChannelReadResponseDto.from(channel);
+        return channelMapper.toDto(channel);
     }
 
     @Override

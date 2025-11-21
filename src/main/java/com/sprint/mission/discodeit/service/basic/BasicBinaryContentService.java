@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.binaryContent.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +18,11 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentMapper binaryContentMapper;
+
     @Override
-    public BinaryContentResponseDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
+    @Transactional
+    public BinaryContentDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
         BinaryContent binaryContent =BinaryContent.builder()
                 .bytes(binaryContentCreateRequestDto.getBytes())
                 .fileName(binaryContentCreateRequestDto.getFileName())
@@ -25,15 +30,15 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .contentType(binaryContentCreateRequestDto.getContentType())
                 .build();
         binaryContentRepository.save(binaryContent);
-        return BinaryContentResponseDto.from(binaryContent);
+        return binaryContentMapper.toDto(binaryContent);
 
 
     }
 
     @Override
-    public BinaryContentResponseDto find(UUID binaryContentID) {
+    public BinaryContentDto find(UUID binaryContentID) {
 
-        return  BinaryContentResponseDto.from(
+        return  BinaryContentDto.from(
                 binaryContentRepository.findById(binaryContentID)
                         .orElseThrow(
                                 ()->new IllegalArgumentException(
@@ -41,7 +46,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> binaryContentIdList) {
+    public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIdList) {
        return binaryContentIdList.stream().map(this::find)
                .toList();
 

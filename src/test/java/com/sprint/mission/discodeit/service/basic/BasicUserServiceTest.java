@@ -4,7 +4,7 @@
 //import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileUpdateRequestDto;
 //import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 //import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
-//import com.sprint.mission.discodeit.dto.response.UserReadResponseDto;
+//import com.sprint.mission.discodeit.dto.response.user.UserReadResponseDto;
 //import com.sprint.mission.discodeit.entity.Channel;
 //import com.sprint.mission.discodeit.entity.User;
 //import com.sprint.mission.discodeit.entityElement.UserElement;

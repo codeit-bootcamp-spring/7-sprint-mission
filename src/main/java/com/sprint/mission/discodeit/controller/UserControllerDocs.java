@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.request.user.UserPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.userStatus.UserStatusPatchRequestDto;
-import com.sprint.mission.discodeit.dto.response.UserCreateResponseDto;
-import com.sprint.mission.discodeit.dto.response.UserDto;
-import com.sprint.mission.discodeit.dto.response.UserUserStatusPatchResponseDto;
+import com.sprint.mission.discodeit.dto.response.user.UserCreateResponseDto;
+import com.sprint.mission.discodeit.dto.response.user.UserDto;
+import com.sprint.mission.discodeit.dto.response.userStatus.UserStatusDto;
+import com.sprint.mission.discodeit.dto.response.userStatus.UserUserStatusPatchResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -71,7 +71,7 @@ public interface UserControllerDocs {
     )
     )
     @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<UserCreateResponseDto> createUser(
+    ResponseEntity<UserDto> createUser(
             @RequestPart("userCreateRequest") UserCreateRequestDto dto
             , @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException;
@@ -93,7 +93,7 @@ public interface UserControllerDocs {
     )
     )
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<UserCreateResponseDto> patchUser(@PathVariable UUID userId,
+    ResponseEntity<UserDto> patchUser(@PathVariable UUID userId,
                                                     @RequestPart("userUpdateRequest") UserUpdateRequest dto,
                                                     @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException;
     @Operation(summary = "유저 상태 수정(Patch User Status)", description = "유저 상태를 수정합니다.")
@@ -110,5 +110,5 @@ public interface UserControllerDocs {
             }
             """)))
     @RequestMapping(value = "/{userId}/userStatus",method = RequestMethod.PATCH)
-    ResponseEntity<UserUserStatusPatchResponseDto> patchUserStatus(@PathVariable UUID userId, @RequestBody UserStatusPatchRequestDto dto);
+    ResponseEntity<UserStatusDto> patchUserStatus(@PathVariable UUID userId, @RequestBody UserStatusPatchRequestDto dto);
 }

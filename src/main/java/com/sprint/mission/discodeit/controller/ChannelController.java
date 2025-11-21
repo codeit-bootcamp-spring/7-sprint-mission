@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateRequestDto;
-import com.sprint.mission.discodeit.dto.response.ChannelReadResponseDto;
+import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
@@ -25,14 +25,14 @@ public class ChannelController implements ChannelControllerDocs{
 
     @PostMapping( "/private")
     @Override
-    public ResponseEntity<ChannelReadResponseDto> createPrivateChannel(@Valid @RequestBody ChannelPrivateCreateRequestDto dto){
+    public ResponseEntity<ChannelDto> createPrivateChannel(@Valid @RequestBody ChannelPrivateCreateRequestDto dto){
        ;
         return new ResponseEntity<>(channelService.createPrivateChannel(dto), HttpStatus.CREATED);
     }
 
     @PostMapping( "/public")
     @Override
-    public ResponseEntity<ChannelReadResponseDto> createPublicChannel(@Valid @RequestBody ChannelPublicCreateRequestDto dto){
+    public ResponseEntity<ChannelDto> createPublicChannel(@Valid @RequestBody ChannelPublicCreateRequestDto dto){
        return new ResponseEntity<>(channelService.createPublicChannel(dto), HttpStatus.CREATED);
     }
 
@@ -45,13 +45,13 @@ public class ChannelController implements ChannelControllerDocs{
 
     @GetMapping( "")
     @Override
-    public ResponseEntity<List<ChannelReadResponseDto>> readChannelById(@RequestParam UUID userId){
+    public ResponseEntity<List<ChannelDto>> readChannelById(@RequestParam UUID userId){
         return new ResponseEntity<>(channelService.findAllByUserId(userId),HttpStatus.OK);
     }
 
     @PatchMapping( "/{channelId}")
     @Override
-    public ResponseEntity<ChannelReadResponseDto> patchChannel(@PathVariable UUID channelId, @Valid @RequestBody ChannelPatchRequestDto dto){
+    public ResponseEntity<ChannelDto> patchChannel(@PathVariable UUID channelId, @Valid @RequestBody ChannelPatchRequestDto dto){
         return new ResponseEntity<>(channelService.patchChannel(dto,channelId),HttpStatus.OK);
     }
 
@@ -63,7 +63,7 @@ public class ChannelController implements ChannelControllerDocs{
 
     @GetMapping("/all")
     @Override
-    public ResponseEntity<List<ChannelReadResponseDto>> readAll(){
+    public ResponseEntity<List<ChannelDto>> readAll(){
         return new ResponseEntity<>(channelService.readAllChannel(),HttpStatus.OK);
     }
 }

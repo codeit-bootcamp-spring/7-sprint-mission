@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entityElement.ChannelType;
-import com.sprint.mission.discodeit.service.util.StaticString;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.*;
 
 @Getter
 @Entity
@@ -26,7 +24,7 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
     private String description;
 
     @Column(name = "type",nullable = false,length = 10)
-    private ChannelType channelType;
+    private ChannelType type;
 
 
 }

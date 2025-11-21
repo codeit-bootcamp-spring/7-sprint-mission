@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
-import com.sprint.mission.discodeit.dto.response.MessageReadResponseDto;
+import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
@@ -26,17 +26,16 @@ public class MessageController implements MessageControllerDocs {
 
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Override
-    public ResponseEntity<MessageReadResponseDto> createMessage(@Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
-                                                                @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+    public ResponseEntity<MessageDto> createMessage(@Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
+                                                    @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ){
-
         return new ResponseEntity<>(messageService.createMessage(dto, attachments), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{messageId}")
     @Override
-    public ResponseEntity<MessageReadResponseDto> patchMessage(@PathVariable UUID messageId, @Valid @RequestBody MessagePatchRequestDto dto){
-        MessageReadResponseDto mRRDto = messageService.patchMessage(dto, messageId);
+    public ResponseEntity<MessageDto> patchMessage(@PathVariable UUID messageId, @Valid @RequestBody MessagePatchRequestDto dto){
+        MessageDto mRRDto = messageService.patchMessage(dto, messageId);
         return new ResponseEntity<>(mRRDto, HttpStatus.OK);
     }
 
@@ -47,7 +46,7 @@ public class MessageController implements MessageControllerDocs {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<MessageReadResponseDto>> readChannelMessage(@RequestParam UUID channelId){
+    public ResponseEntity<List<MessageDto>> readChannelMessage(@RequestParam UUID channelId){
         return new ResponseEntity<>(  messageService.findallByChannelId(channelId), HttpStatus.OK);
     }
     @PostMapping( "/reset")
@@ -58,7 +57,7 @@ public class MessageController implements MessageControllerDocs {
 
     @GetMapping("/all")
     @Override
-    public ResponseEntity<List<MessageReadResponseDto>> readAll(){
+    public ResponseEntity<List<MessageDto>> readAll(){
         return new ResponseEntity<>(messageService.readAllMessage(), HttpStatus.OK);
     }
 

@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.dto.response.DownloadResponseDto;
+import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.response.binaryContent.DownloadResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,18 +16,19 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
-public class FileController implements FileControllerDocs {
+public class BinaryContentController implements BinaryContentControllerDocs {
 
     private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
     @GetMapping( "/{binaryContentId}")
     @Override
-    public ResponseEntity<BinaryContentResponseDto> read(@PathVariable UUID binaryContentId){
+    public ResponseEntity<BinaryContentDto> read(@PathVariable UUID binaryContentId){
         return new ResponseEntity<>(binaryContentService.find(binaryContentId), HttpStatus.OK);
     }
 
     @GetMapping("")
     @Override
-    public ResponseEntity<List<BinaryContentResponseDto>> readByIdList(@RequestParam List<UUID> binaryContentIds){
+    public ResponseEntity<List<BinaryContentDto>> readByIdList(@RequestParam List<UUID> binaryContentIds){
         return new ResponseEntity<>(binaryContentService.findAllByIdIn(binaryContentIds), HttpStatus.OK);
     }
 
@@ -41,7 +43,8 @@ public class FileController implements FileControllerDocs {
     }
 
     @GetMapping("/{binaryContentId}/download")
-    public ResponseEntity<DownloadResponseDto> downloadBinaryContent(@RequestParam UUID binaryContentId){
+    public ResponseEntity<?> downloadBinaryContent(@RequestParam UUID binaryContentId){
+
         return null;
     }
 

@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
-import com.sprint.mission.discodeit.dto.response.MessageReadResponseDto;
+import com.sprint.mission.discodeit.dto.response.message.MessageDto;
+import com.sprint.mission.discodeit.dto.response.message.MessageReadResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.models.examples.Example;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +37,7 @@ public interface MessageControllerDocs {
     )
     )
     @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<MessageReadResponseDto> createMessage(@RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
+    ResponseEntity<MessageDto> createMessage(@RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
                                                          @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     );
 
@@ -59,7 +59,7 @@ public interface MessageControllerDocs {
     )
     )
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
-    ResponseEntity<MessageReadResponseDto> patchMessage(@PathVariable UUID messageId, @RequestBody MessagePatchRequestDto dto);
+    ResponseEntity<MessageDto> patchMessage(@PathVariable UUID messageId, @RequestBody MessagePatchRequestDto dto);
 
     @Operation(summary = "메세지 삭제(Delete Message)", description = "메세지를 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "메세지 삭제 성공",
@@ -75,5 +75,5 @@ public interface MessageControllerDocs {
     void reset();
 
     @RequestMapping(value = "", method = RequestMethod.OPTIONS)
-    ResponseEntity<List<MessageReadResponseDto>> readAll();
+    ResponseEntity<List<MessageDto>> readAll();
 }

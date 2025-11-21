@@ -18,6 +18,9 @@ discodeit:
   repository:
     type: file
     file-directory: .discodeit
+  storage:
+    local:
+      root-path: ./local-storage
 server:
   port: ${PORT:8080}
 

@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusPatchRequestDto;
-import com.sprint.mission.discodeit.dto.response.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.dto.response.readStatus.ReadStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -27,7 +27,7 @@ public interface ReadStatusControllerDocs {
     )
     )
     @RequestMapping(value = "", method = RequestMethod.POST)
-    ResponseEntity<ReadStatusResponseDto> createReadStatus(@RequestBody ReadStatusCreateRequestDto dto);
+    ResponseEntity<ReadStatusDto> createReadStatus(@RequestBody ReadStatusCreateRequestDto dto);
 
     @Operation(summary = "읽음 상태 조회(Read Read Status)", description = "읽음 상태를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "읽음 상태 조회 성공",
@@ -38,7 +38,7 @@ public interface ReadStatusControllerDocs {
     )
     )
     @RequestMapping(value = "", method = RequestMethod.GET)
-    ResponseEntity<List<ReadStatusResponseDto>> readReadStatus(@RequestParam UUID userId);
+    ResponseEntity<List<ReadStatusDto>> readReadStatus(@RequestParam UUID userId);
 
     @Operation(summary = "읽음 상태 수정(Patch Read Status)", description = "읽음 상태를 수정합니다.")
     @ApiResponse(responseCode = "200", description = "읽음 상태 수정 성공",
@@ -50,5 +50,5 @@ public interface ReadStatusControllerDocs {
     )
     )
     @RequestMapping(value = "/{readStatusId}",method = RequestMethod.PATCH)
-    ResponseEntity<ReadStatusResponseDto> patchReadStatus(@PathVariable UUID readStatusId, @RequestBody ReadStatusPatchRequestDto dto);
+    ResponseEntity<ReadStatusDto> patchReadStatus(@PathVariable UUID readStatusId, @RequestBody ReadStatusPatchRequestDto dto);
 }
