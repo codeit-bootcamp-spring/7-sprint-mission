@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller.openapi;
 
 import com.sprint.mission.discodeit.dto.readstatus.request.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.request.UpdateReadStatusRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -89,7 +90,7 @@ public interface ReadStatusControllerDocs {
                     )
             )
     })
-    ResponseEntity<ReadStatus> createReadStatus(CreateReadStatusRequestDto requestDto);
+    ResponseEntity<ReadStatusResponseDto> createReadStatus(CreateReadStatusRequestDto requestDto);
 
     @Operation(
             summary = "채널의 메시지 수신 정보 수정",
@@ -145,7 +146,7 @@ public interface ReadStatusControllerDocs {
                     )
             )
     })
-    ResponseEntity<ReadStatus> createReadStatus(UUID readStatusId, UpdateReadStatusRequestDto requestDto);
+    ResponseEntity<ReadStatusResponseDto> createReadStatus(UUID readStatusId, UpdateReadStatusRequestDto requestDto);
 
     @Operation(
             summary = "사용자의 메시지 수신 정보 조회",
@@ -193,5 +194,5 @@ public interface ReadStatusControllerDocs {
                     )
             )
     })
-    ResponseEntity<List<ReadStatus>> search(UUID userId);
+    ResponseEntity<List<ReadStatusResponseDto>> search(UUID userId);
 }

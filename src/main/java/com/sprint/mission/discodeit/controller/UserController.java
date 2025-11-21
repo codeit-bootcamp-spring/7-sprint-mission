@@ -2,14 +2,12 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.openapi.UserControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.converter.BinaryContentRequestDtoConverter;
+import com.sprint.mission.discodeit.dto.converter.BinaryContentDtoConverter;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userstatus.request.UpdateUserStatusRequestDto;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.global.dto.ApiResponse;
+import com.sprint.mission.discodeit.dto.userstatus.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -20,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,24 +31,24 @@ public class UserController implements UserControllerDocs {
 
     // 사용자 등록
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<User> createUser(
+    public ResponseEntity<UserResponseDto> createUser(
             @Valid @RequestPart("userCreateRequest") CreateUserRequestDto requestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        CreateBinaryContentRequestDto profileRequestDto = BinaryContentRequestDtoConverter.from(profile);
-        User createdUser = userService.create(requestDto, profileRequestDto);
+        CreateBinaryContentRequestDto profileRequestDto = BinaryContentDtoConverter.toRequestDto(profile);
+        UserResponseDto createdUser = userService.create(requestDto, profileRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     // 사용자 정보 수정
     @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<User> updateUser(
+    public ResponseEntity<UserResponseDto> updateUser(
             @PathVariable UUID userId,
             @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
             @RequestPart(name = "profile", required = false) MultipartFile profile
     ) {
-        CreateBinaryContentRequestDto profileRequestDto = BinaryContentRequestDtoConverter.from(profile);
-        User updatedUser = userService.update(userId, requestDto, profileRequestDto);
+        CreateBinaryContentRequestDto profileRequestDto = BinaryContentDtoConverter.toRequestDto(profile);
+        UserResponseDto updatedUser = userService.update(userId, requestDto, profileRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
@@ -71,11 +68,11 @@ public class UserController implements UserControllerDocs {
 
     // 사용자 온라인 업데이트
     @PostMapping("/{userId}/userStatus")
-    public ResponseEntity<UserStatus> onlineUser(
+    public ResponseEntity<UserStatusResponseDto> onlineUser(
             @PathVariable UUID userId,
             @RequestBody UpdateUserStatusRequestDto request
     ) {
-        UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
+        UserStatusResponseDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUserStatus);
     }
 }

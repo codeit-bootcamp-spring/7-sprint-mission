@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.converter.BinaryContentDtoConverter;
+import com.sprint.mission.discodeit.dto.converter.UserDtoConverter;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
@@ -33,7 +36,7 @@ public class BasicUserService implements UserService{
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
+    public UserResponseDto create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
         // 1. username/nickname/email 중복 검사
         if (existsByUsername(userRequest.username())) {
             throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
@@ -47,9 +50,10 @@ public class BasicUserService implements UserService{
 
         // 3. 선택적 프로필 이미지 처리
         UUID profileImageId = null;
+        BinaryContent profileImage = null;
 
         if (Optional.ofNullable(profileRequest).isPresent()) {
-            BinaryContent profileImage = new BinaryContent(
+            profileImage = new BinaryContent(
                     profileRequest.fileName(),
                     profileRequest.contentType(),
                     profileRequest.bytes()
@@ -68,10 +72,10 @@ public class BasicUserService implements UserService{
                 profileImageId
         );
 
-        userStatusRepository.save(new UserStatus(newUser.getId()));
+        userStatusRepository.save(new UserStatus(newUser.getId(), newUser.getCreatedAt()));
         userRepository.save(newUser);
 
-        return newUser;
+        return toDto(newUser);
     }
 
     @Override
@@ -79,11 +83,7 @@ public class BasicUserService implements UserService{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        boolean active = userStatusRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                .isOnline();
-
-        return UserResponseDto.from(user, active);
+        return toDto(user);
     }
 
     @Override
@@ -91,11 +91,7 @@ public class BasicUserService implements UserService{
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                .isOnline();
-
-        return UserResponseDto.from(user, active);
+        return toDto(user);
     }
 
     @Override
@@ -103,11 +99,7 @@ public class BasicUserService implements UserService{
         User user = userRepository.findByPhone(phoneNum)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                .isOnline();
-
-        return UserResponseDto.from(user, active);
+        return toDto(user);
     }
 
     @Override
@@ -115,21 +107,13 @@ public class BasicUserService implements UserService{
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        boolean active = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                .isOnline();
-
-        return UserResponseDto.from(user, active);
+        return toDto(user);
     }
 
     @Override
     public List<UserResponseDto> findAll() {
         return userRepository.findAll().stream()
-                .map(u -> UserResponseDto.from(
-                        u,
-                        userStatusRepository.findByUserId(u.getId())
-                                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                                .isOnline()))
+                .map(u -> toDto(u))
                 .collect(Collectors.toList());
     }
 
@@ -141,7 +125,7 @@ public class BasicUserService implements UserService{
     }
 
     @Override
-    public User update(UUID userId, UpdateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
+    public UserResponseDto update(UUID userId, UpdateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -190,7 +174,8 @@ public class BasicUserService implements UserService{
 
         user.update(realName, nickName, email, phoneNum, username, password, profileImageId);
         userRepository.update(user);
-        return user;
+
+        return toDto(user);
     }
 
     @Override
@@ -208,6 +193,28 @@ public class BasicUserService implements UserService{
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
                 .getPassword().equals(password);
+    }
+
+    @Override
+    public UserResponseDto toDto(User user) {
+
+        // 사용자 온라인 상태 저장
+        boolean online = userStatusRepository.findById(user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
+                .isOnline();
+
+        // 프로필 이미지 저장
+        UUID profileId = user.getProfileId();
+        BinaryContentResponseDto binaryContentResponseDto = null;
+
+        if (profileId != null) {
+            BinaryContent profile = binaryContentRepository.findById(user.getProfileId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND));
+
+            binaryContentResponseDto = BinaryContentDtoConverter.toResponseDto(profile);
+        }
+
+        return UserDtoConverter.toResponseDto(user, online, binaryContentResponseDto);
     }
 
     private boolean existsByUsername(String username) {

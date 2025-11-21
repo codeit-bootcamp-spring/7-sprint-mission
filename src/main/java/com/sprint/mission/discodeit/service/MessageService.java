@@ -3,10 +3,12 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReceiveType;
 import com.sprint.mission.discodeit.entity.User;
+import org.springdoc.core.converters.models.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
@@ -22,7 +24,7 @@ import java.util.UUID;
 public interface MessageService {
 
     /** 새로운 메시지를 생성 */
-    Message create(CreateMessageRequestDto messageRequest, List<CreateBinaryContentRequestDto> binaryContentRequests);
+    MessageResponseDto create(CreateMessageRequestDto messageRequest, List<CreateBinaryContentRequestDto> binaryContentRequests);
 
     Message find(UUID messageId);
 
@@ -33,13 +35,13 @@ public interface MessageService {
     List<Message> findBetweenUsers(UUID userId1, UUID userId2);
 
     /** 특정 채널에 포함된 모든 메시지 조회 */
-    List<Message> findAllByChannelId(UUID channelId);
+    List<Message> findAllByChannelId(UUID channelId, Pageable pageable);
 
     /** 유저가 특정 유저 또는 채널에게 보낸 모든 메시지 조회 */
     List<Message> findAllSentBetweenUsers(UUID senderId, UUID receiverId);
 
     /** 메시지 내용(content)을 수정 */
-    Message update(UUID messageId, UpdateMessageRequestDto request);
+    MessageResponseDto update(UUID messageId, UpdateMessageRequestDto request);
 
     /** 특정 메시지를 UUID로 삭제 */
     void delete(UUID messageId);

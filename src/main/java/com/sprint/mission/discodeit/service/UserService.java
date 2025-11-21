@@ -19,7 +19,7 @@ public interface UserService {
     /**
      * 새로운 사용자 생성
      */
-    User create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest);
+    UserResponseDto create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest);
 
     UserResponseDto find(UUID userId);
 
@@ -51,13 +51,15 @@ public interface UserService {
     /**
      * 사용자 정보 업데이트
      */
-    User update(UUID userId, UpdateUserRequestDto request, CreateBinaryContentRequestDto profileRequest);
+    UserResponseDto update(UUID userId, UpdateUserRequestDto request, CreateBinaryContentRequestDto profileRequest);
 
     /**
      * 사용자 삭제
      * @param userId 삭제할 User UUID
      */
     void delete(UUID userId);
+
+    UserResponseDto toDto(User user);
 
     boolean isPasswordMatch(UUID userId, String password);
 }

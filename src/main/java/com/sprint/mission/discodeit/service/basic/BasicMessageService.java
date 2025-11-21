@@ -1,21 +1,23 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.converter.BinaryContentDtoConverter;
+import com.sprint.mission.discodeit.dto.converter.MessageDtoConverter;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +36,8 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
+    private final UserService userService;
+
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
@@ -43,7 +47,7 @@ public class BasicMessageService implements MessageService {
      * 새로운 메시지를 생성하여 Repository에 저장
      */
     @Override
-    public Message create(CreateMessageRequestDto request, List<CreateBinaryContentRequestDto> binaryContentRequests) {
+    public MessageResponseDto create(CreateMessageRequestDto request, List<CreateBinaryContentRequestDto> binaryContentRequests) {
 
         Channel channel = channelRepository.findById(request.channelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
@@ -71,7 +75,8 @@ public class BasicMessageService implements MessageService {
         );
 
         messageRepository.save(newMessage);
-        return newMessage;
+
+        return toDto(newMessage);
     }
 
     @Override
@@ -138,7 +143,9 @@ public class BasicMessageService implements MessageService {
      * 특정 채널에 포함된 모든 메시지 조회
      */
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
+    public List<Message> findAllByChannelId(UUID channelId, Pageable pageable) {
+        // JPA로 변경 이후 pageable 추가 필요
+
         return messageRepository.findAll().stream()
                 .filter(m -> channelId.equals(m.getChannelId()))
                 .toList();
@@ -158,13 +165,13 @@ public class BasicMessageService implements MessageService {
      * 메시지 내용(content) 수정
      */
     @Override
-    public Message update(UUID messageId, UpdateMessageRequestDto request) {
+    public MessageResponseDto update(UUID messageId, UpdateMessageRequestDto request) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
 
         message.update(request.newContent());
         messageRepository.update(message);
-        return message;
+        return toDto(message);
     }
 
     /**
@@ -177,5 +184,32 @@ public class BasicMessageService implements MessageService {
 
         binaryContentRepository.deleteByIds(msg.getAttachmentIds()); // 메시지와 관련된 파일들 삭제
         messageRepository.deleteById(messageId);
+    }
+
+    private MessageResponseDto toDto(Message message) {
+
+        // userResponseDto 생성
+        User user = userRepository.findById(message.getAuthorId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // DTO 변환을 위해 UserService의 변환 메서드 사용
+        UserResponseDto userResponseDto = userService.toDto(user);
+
+        // binaryContentDto 생성
+        List<BinaryContent> attachments = null;
+        List<UUID> attachmentIds = message.getAttachmentIds();
+        List<BinaryContentResponseDto> binaryContentResponseDtos = null;
+
+        // 메시지에 첨부파일이 있다면 첨부파일 리스트 저장
+        if (attachmentIds != null && !attachmentIds.isEmpty()) {
+            attachments = message.getAttachmentIds().stream()
+                    .map(id -> binaryContentRepository.findById(id)
+                            .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND)))
+                    .toList();
+
+            binaryContentResponseDtos = BinaryContentDtoConverter.toResponseDto(attachments);
+        }
+
+        return MessageDtoConverter.toResponseDto(message, userResponseDto, binaryContentResponseDtos);
     }
 }

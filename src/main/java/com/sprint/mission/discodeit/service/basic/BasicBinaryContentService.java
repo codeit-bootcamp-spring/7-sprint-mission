@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.converter.BinaryContentDtoConverter;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
@@ -34,15 +36,18 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContent find(UUID binaryContentId) {
-        return binaryContentRepository.findById(binaryContentId)
+    public BinaryContentResponseDto find(UUID binaryContentId) {
+        BinaryContent content = binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND));
+
+        return toDto(content);
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+    public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> binaryContentIds) {
         return binaryContentRepository.findAll().stream().
-                filter(bc -> binaryContentIds.contains(bc.getId()))
+                filter(content -> binaryContentIds.contains(content.getId()))
+                .map(content -> toDto(content))
                 .collect(Collectors.toList());
     }
 
@@ -51,5 +56,9 @@ public class BasicBinaryContentService implements BinaryContentService {
         binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND));
         binaryContentRepository.delete(binaryContentId);
+    }
+
+    private BinaryContentResponseDto toDto(BinaryContent binaryContent) {
+        return BinaryContentDtoConverter.toResponseDto(binaryContent);
     }
 }

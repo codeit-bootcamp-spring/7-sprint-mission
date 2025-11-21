@@ -2,23 +2,26 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.openapi.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.converter.BinaryContentRequestDtoConverter;
+import com.sprint.mission.discodeit.dto.converter.BinaryContentDtoConverter;
+import com.sprint.mission.discodeit.dto.converter.PageDtoConverter;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.global.dto.ApiResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,22 +31,22 @@ public class MessageController implements MessageControllerDocs {
 
     // 메시지 생성
     @PostMapping
-    public ResponseEntity<Message> createMessage(
+    public ResponseEntity<MessageResponseDto> createMessage(
             @RequestPart("messageCreateRequest") CreateMessageRequestDto requestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
-        List<CreateBinaryContentRequestDto> attachmentRequests = BinaryContentRequestDtoConverter.from(attachments);
-        Message createdMessage = messageService.create(requestDto, attachmentRequests);
+        List<CreateBinaryContentRequestDto> attachmentRequests = BinaryContentDtoConverter.toRequestDto(attachments);
+        MessageResponseDto createdMessage = messageService.create(requestDto, attachmentRequests);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
     }
 
     // 메시지 수정
     @PatchMapping("/{messageId}")
-    public ResponseEntity<Message> updateMessage(
+    public ResponseEntity<MessageResponseDto> updateMessage(
             @PathVariable UUID messageId,
             @RequestBody UpdateMessageRequestDto requestDto
     ) {
-        Message updatedMessage = messageService.update(messageId, requestDto);
+        MessageResponseDto updatedMessage = messageService.update(messageId, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(updatedMessage);
     }
 
@@ -56,8 +59,17 @@ public class MessageController implements MessageControllerDocs {
 
     // 특정 채널 메시지 목록 조회
     @GetMapping
-    public ResponseEntity<List<Message>> searchMessage(@RequestParam UUID channelId) {
-        List<Message> messageList = messageService.findAllByChannelId(channelId);
-        return ResponseEntity.status(HttpStatus.OK).body(messageList);
+    public ResponseEntity<PageResponseDto<Message>> searchMessage(
+            @RequestParam UUID channelId,
+            @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ){
+
+        // JPA 추가시 변경 예정
+        List<Message> messageList = messageService.findAllByChannelId(channelId, pageable);
+        Page<Message> messageList2 = null;
+        PageResponseDto<Message> messageResponse = PageDtoConverter.toResponseDto(messageList2);
+
+        return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 }

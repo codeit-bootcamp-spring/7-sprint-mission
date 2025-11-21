@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller.openapi;
 
 import com.sprint.mission.discodeit.dto.auth.request.LoginRequestDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -72,5 +73,5 @@ public interface AuthControllerDocs {
                     )
             )
     })
-    ResponseEntity<User> login(LoginRequestDto loginRequestDto);
+    ResponseEntity<UserResponseDto> login(LoginRequestDto loginRequestDto);
 }

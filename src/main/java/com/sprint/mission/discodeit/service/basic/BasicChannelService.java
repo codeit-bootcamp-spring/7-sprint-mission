@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.channel.request.*;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
 import com.sprint.mission.discodeit.dto.archive.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.archive.response.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.converter.ChannelDtoConverter;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
@@ -27,7 +28,7 @@ public class BasicChannelService implements ChannelService {
 
     // API 스펙에 맞는 공개 채널 및 비공개 채널 생성 메서드 추가
     @Override
-    public Channel create(CreatePublicChannelRequestDto request) {
+    public ChannelDto create(CreatePublicChannelRequestDto request) {
         String name = request.name();
         String description = request.description();
 
@@ -38,11 +39,11 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = new Channel(name, description);
         channelRepository.save(channel);
-        return channel;
+        return toDto(channel);
     }
 
     @Override
-    public Channel create(CreatePrivateChannelRequestDto request) {
+    public ChannelDto create(CreatePrivateChannelRequestDto request) {
         // 비공개 채널 참가 유저 존재 여부 판단
         request.participantIds().forEach(participantId -> {
             userRepository.findById(participantId)
@@ -56,11 +57,11 @@ public class BasicChannelService implements ChannelService {
                 .forEach(userId ->
                         addMember(channel.getId(), new UpdateChannelRequestDto(userId))
                 );
-        return channel;
+        return toDto(channel);
     }
 
     @Override
-    public Channel update(UUID channelId, UpdatePublicChannelRequestDto request) {
+    public ChannelDto update(UUID channelId, UpdatePublicChannelRequestDto request) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() ->  new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
@@ -73,7 +74,7 @@ public class BasicChannelService implements ChannelService {
         }
         channel.update(request.newName(), request.newDescription());
         channelRepository.update(channel);
-        return channel;
+        return toDto(channel);
     }
 
 
@@ -139,7 +140,7 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findAll().stream()
                 .filter(c -> c.getVisibility() == ChannelVisibility.PUBLIC ||
                         (c.getVisibility() == ChannelVisibility.PRIVATE && c.getMemberIds().contains(userId)))
-                .map(c -> ChannelDto.from(c, messageRepository.searchLastedMessageTime(c.getId())))
+                .map(c -> toDto(c))
                 .collect(Collectors.toList());
     }
 
@@ -189,6 +190,11 @@ public class BasicChannelService implements ChannelService {
 
         // 채널이 존재하거나 유저가 채널에 속해있다면 false를 반환
         return !(channelExists || userJoined);
+    }
+
+    private ChannelDto toDto(Channel channel) {
+        Instant lastMessageAt = messageRepository.searchLastedMessageTime(channel.getId());
+        return ChannelDtoConverter.toResponseDto(channel, lastMessageAt);
     }
 
     private boolean existsByName(String name) {

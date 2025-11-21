@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.openapi.ChannelControllerDocs;
 import com.sprint.mission.discodeit.dto.channel.request.*;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,23 +21,23 @@ public class ChannelController implements ChannelControllerDocs {
 
     // 채널 생성
     @PostMapping("/public")
-    public ResponseEntity<Channel> createPublic(@Valid @RequestBody CreatePublicChannelRequestDto requestDto) {
-        Channel createdChannel = channelService.create(requestDto);
+    public ResponseEntity<ChannelDto> createPublic(@Valid @RequestBody CreatePublicChannelRequestDto requestDto) {
+        ChannelDto createdChannel = channelService.create(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
 
     @PostMapping("/private")
-    public ResponseEntity<Channel> createPrivate(@RequestBody CreatePrivateChannelRequestDto requestDto) {
-        Channel createdChannel = channelService.create(requestDto);
+    public ResponseEntity<ChannelDto> createPrivate(@RequestBody CreatePrivateChannelRequestDto requestDto) {
+        ChannelDto createdChannel = channelService.create(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
 
     // 채널 수정
     @PatchMapping("/{channelId}")
-    public ResponseEntity<Channel> update(@PathVariable UUID channelId,
-                                          @RequestBody UpdatePublicChannelRequestDto request) {
-        Channel udpatedChannel = channelService.update(channelId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(udpatedChannel);
+    public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
+                                             @RequestBody UpdatePublicChannelRequestDto request) {
+        ChannelDto updatedChannel = channelService.update(channelId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedChannel);
     }
 
     // 채널 삭제

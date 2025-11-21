@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.controller.openapi;
 
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
 import com.sprint.mission.discodeit.entity.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -11,7 +13,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.converters.models.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -83,7 +89,7 @@ public interface MessageControllerDocs {
                     )
             )
     })
-    ResponseEntity<Message> createMessage(CreateMessageRequestDto requestDto, List<MultipartFile> attachments);
+    ResponseEntity<MessageResponseDto> createMessage(CreateMessageRequestDto requestDto, List<MultipartFile> attachments);
 
     @Operation(
             summary = "메시지 수정",
@@ -143,7 +149,7 @@ public interface MessageControllerDocs {
                     )
             )
     })
-    ResponseEntity<Message> updateMessage(UUID messageId, UpdateMessageRequestDto requestDto);
+    ResponseEntity<MessageResponseDto> updateMessage(UUID messageId, UpdateMessageRequestDto requestDto);
 
     @Operation(
             summary = "메시지 삭제",
@@ -241,5 +247,9 @@ public interface MessageControllerDocs {
                     )
             )
     })
-    ResponseEntity<List<Message>> searchMessage(UUID channelId);
+    ResponseEntity<PageResponseDto<Message>> searchMessage(
+            @RequestParam UUID channelId,
+            @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    );
 }

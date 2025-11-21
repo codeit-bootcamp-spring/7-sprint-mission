@@ -18,10 +18,10 @@ public interface ChannelService {
     /**
      * 새로운 채널 생성
      */
-    Channel create(CreatePublicChannelRequestDto request);
-    Channel create(CreatePrivateChannelRequestDto request);
+    ChannelDto create(CreatePublicChannelRequestDto request);
+    ChannelDto create(CreatePrivateChannelRequestDto request);
 
-    Channel update(UUID channelId, UpdatePublicChannelRequestDto request);
+    ChannelDto update(UUID channelId, UpdatePublicChannelRequestDto request);
 
     /**
      * 채널에 멤버 추가

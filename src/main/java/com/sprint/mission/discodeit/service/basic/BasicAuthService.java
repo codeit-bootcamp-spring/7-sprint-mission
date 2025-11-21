@@ -9,17 +9,20 @@ import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
+    private final UserService userService;
+
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User login(LoginRequestDto request) {
+    public UserResponseDto login(LoginRequestDto request) {
         // 아이디 또는 비밀번호를 입력하지 않은 경우 예외 발생
         if (request.username() == null || request.username().isBlank() ||
                 request.password() == null || request.password().isBlank()) {
@@ -37,7 +40,7 @@ public class BasicAuthService implements AuthService {
         status.setUpdatedAt();
         userStatusRepository.update(status);
 
-        return user;
+        return userService.toDto(user);
     }
 
     @Override

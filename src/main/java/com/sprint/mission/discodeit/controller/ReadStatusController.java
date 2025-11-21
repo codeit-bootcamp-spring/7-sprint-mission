@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.openapi.ReadStatusControllerDocs;
 import com.sprint.mission.discodeit.dto.readstatus.request.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.request.UpdateReadStatusRequestDto;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.global.dto.ApiResponse;
+import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,22 +21,22 @@ public class ReadStatusController implements ReadStatusControllerDocs {
 
     // 특정 채널의 메시지 수신 정보 생성
     @PostMapping
-    public ResponseEntity<ReadStatus> createReadStatus(@RequestBody CreateReadStatusRequestDto requestDto) {
-        ReadStatus createdReadStatus = readStatusService.create(requestDto);
+    public ResponseEntity<ReadStatusResponseDto> createReadStatus(@RequestBody CreateReadStatusRequestDto requestDto) {
+        ReadStatusResponseDto createdReadStatus = readStatusService.create(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdReadStatus);
     }
 
     // 특정 채널의 메시지 수신 정보 수정
     @PatchMapping("/{readStatusId}")
-    public ResponseEntity<ReadStatus> createReadStatus(@PathVariable UUID readStatusId, @RequestBody UpdateReadStatusRequestDto requestDto) {
-        ReadStatus updatedReadStatus = readStatusService.update(readStatusId, requestDto);
+    public ResponseEntity<ReadStatusResponseDto> createReadStatus(@PathVariable UUID readStatusId, @RequestBody UpdateReadStatusRequestDto requestDto) {
+        ReadStatusResponseDto updatedReadStatus = readStatusService.update(readStatusId, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(updatedReadStatus);
     }
 
     // 특정 사용자의 메시지 수신 정보 조회
     @GetMapping
-    public ResponseEntity<List<ReadStatus>> search(@RequestParam UUID userId) {
-        List<ReadStatus> readStatusList = readStatusService.findAllByUserId(userId);
+    public ResponseEntity<List<ReadStatusResponseDto>> search(@RequestParam UUID userId) {
+        List<ReadStatusResponseDto> readStatusList = readStatusService.findAllByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(readStatusList);
     }
 }
