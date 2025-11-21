@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.openapi.UserControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.converter.BinaryContentRequestDtoConverter;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
@@ -37,7 +38,7 @@ public class UserController implements UserControllerDocs {
             @Valid @RequestPart("userCreateRequest") CreateUserRequestDto requestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        CreateBinaryContentRequestDto profileRequestDto = convertToRequestDto(profile);
+        CreateBinaryContentRequestDto profileRequestDto = BinaryContentRequestDtoConverter.from(profile);
         User createdUser = userService.create(requestDto, profileRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
@@ -49,7 +50,7 @@ public class UserController implements UserControllerDocs {
             @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
             @RequestPart(name = "profile", required = false) MultipartFile profile
     ) {
-        CreateBinaryContentRequestDto profileRequestDto = convertToRequestDto(profile);
+        CreateBinaryContentRequestDto profileRequestDto = BinaryContentRequestDtoConverter.from(profile);
         User updatedUser = userService.update(userId, requestDto, profileRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
@@ -76,23 +77,5 @@ public class UserController implements UserControllerDocs {
     ) {
         UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUserStatus);
-    }
-
-    private CreateBinaryContentRequestDto convertToRequestDto(MultipartFile file) {
-        CreateBinaryContentRequestDto profileRequestDto = null;
-
-        if(file != null && !file.isEmpty()) {
-            try {
-                profileRequestDto = new CreateBinaryContentRequestDto(
-                        file.getOriginalFilename(),
-                        file.getContentType(),
-                        file.getBytes()
-                );
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        return profileRequestDto;
     }
 }

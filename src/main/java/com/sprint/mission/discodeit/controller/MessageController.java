@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.openapi.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.converter.BinaryContentRequestDtoConverter;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
@@ -31,24 +32,7 @@ public class MessageController implements MessageControllerDocs {
             @RequestPart("messageCreateRequest") CreateMessageRequestDto requestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
-        List<CreateBinaryContentRequestDto> attachmentRequests;
-        if(attachments != null && !attachments.isEmpty()) {
-            attachmentRequests = attachments.stream()
-                .map(attachment -> {
-                        try {
-                            return new CreateBinaryContentRequestDto(
-                                    attachment.getOriginalFilename(),
-                                    attachment.getContentType(),
-                                    attachment.getBytes());
-                        } catch(IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                ).collect(Collectors.toList());
-        } else {
-            attachmentRequests = new ArrayList<>();
-        }
-
+        List<CreateBinaryContentRequestDto> attachmentRequests = BinaryContentRequestDtoConverter.from(attachments);
         Message createdMessage = messageService.create(requestDto, attachmentRequests);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
     }
