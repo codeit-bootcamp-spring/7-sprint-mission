@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto.loginDto;
+package com.sprint.mission.discodeit.dto.loginDto;
 
 import lombok.Builder;
 import lombok.NonNull;

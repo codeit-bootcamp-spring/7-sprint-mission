@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Getter
@@ -31,7 +30,8 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private BinaryContent profile;
 
-    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", orphanRemoval = true,
+            cascade = CascadeType.ALL, optional = false)
     private UserStatus status;
 
     // regular expression

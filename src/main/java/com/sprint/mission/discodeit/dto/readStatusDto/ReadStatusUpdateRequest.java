@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto.readStatusDto;
+package com.sprint.mission.discodeit.dto.readStatusDto;
 
 import lombok.Builder;
 import lombok.NonNull;

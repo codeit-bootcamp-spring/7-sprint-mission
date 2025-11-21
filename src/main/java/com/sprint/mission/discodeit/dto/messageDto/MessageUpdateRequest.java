@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto.messageDto;
+package com.sprint.mission.discodeit.dto.messageDto;
 
 import lombok.Builder;
 

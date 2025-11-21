@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channelDto.ChannelDto;
+import com.sprint.mission.discodeit.dto.channelDto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.entity.dto.channelDto.*;
 import com.sprint.mission.discodeit.entity.entityType.ChannelType;
 import com.sprint.mission.discodeit.exception.NotFoundChannelException;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;

@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.dto.readStatusDto.*;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

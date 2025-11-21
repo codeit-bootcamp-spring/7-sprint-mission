@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.ChannelDto;
+import com.sprint.mission.discodeit.dto.channelDto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -2,10 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequest;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserUpdateRequest;
-import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserDto;
+import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;

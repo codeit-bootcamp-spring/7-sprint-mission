@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

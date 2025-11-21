@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto.messageDto;
+package com.sprint.mission.discodeit.dto.messageDto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;

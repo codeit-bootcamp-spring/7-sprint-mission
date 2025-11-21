@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto.binaryContentDto;
+package com.sprint.mission.discodeit.dto.binaryContentDto;
 
 import lombok.*;
 
