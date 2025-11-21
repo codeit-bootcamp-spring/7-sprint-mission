@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
+import com.sprint.mission.discodeit.entity.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
 import com.sprint.mission.discodeit.entity.dto.UserDto;
@@ -38,19 +38,19 @@ public class UserService implements InterfaceUserService {
 //    3. 수정자 주입(Setter Injection) : 간단하지만 테스트 어려워서 지양
 
     @Override
-    public Res_User create(Dto_UserCreate dto_userCreate, Optional<Dto_BinaryContent> dto_binaryContent) {
+    public Res_User create(UserCreateRequest _userCreateRequest, Optional<Dto_BinaryContent> dto_binaryContent) {
 //    public User create(String newUsername, Optional<BufferedImage> profileImageBytes) {
 //        [ ] 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //                유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
 //        [ ] username과 email은 다른 유저와 같으면 안됩니다.
 //        [ ] UserStatus를 같이 생성합니다.
-        if (userRepository.isUsingName(dto_userCreate.username())) {
-            throw new IllegalArgumentException("🚨create : 동일한 newUsername [" + dto_userCreate.username() + "] 사용햐는 User 가 이미 존재함");
+        if (userRepository.isUsingName(_userCreateRequest.username())) {
+            throw new IllegalArgumentException("🚨create : 동일한 newUsername [" + _userCreateRequest.username() + "] 사용햐는 User 가 이미 존재함");
         }
 
-        if(userRepository.isUsingEmail(dto_userCreate.email())) {
-            throw new IllegalArgumentException("🚨create : 동일한 newEmail [" + dto_userCreate.email() + "] 사용햐는 User 가 이미 존재함");
+        if(userRepository.isUsingEmail(_userCreateRequest.email())) {
+            throw new IllegalArgumentException("🚨create : 동일한 newEmail [" + _userCreateRequest.email() + "] 사용햐는 User 가 이미 존재함");
         }
 
         UUID binaryContentId = null;
@@ -62,14 +62,14 @@ public class UserService implements InterfaceUserService {
             binaryContentRepository.save(binaryContent_I);
         }
 
-        User user = new User(dto_userCreate, binaryContentId);
+        User user = new User(_userCreateRequest, binaryContentId);
         Res_User resUser = Res_User.from(user);
         userRepository.save(user);
 
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
 
-        log.info("✅ create = [" + dto_userCreate.username() + "]");
+        log.info("✅ create = [" + _userCreateRequest.username() + "]");
 
         return resUser;
     }
@@ -85,7 +85,7 @@ public class UserService implements InterfaceUserService {
         UserStatus userStatus = userStatusRepository.findByUserId(userID)
             .orElseThrow(() -> new IllegalArgumentException(message));
 
-        log.info("✅ UserService.findAllByChannleId = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
+        log.info("✅ UserService.findAllByChannelId = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
 
         return UserDto.from(user, userStatus.isOnline());
     }

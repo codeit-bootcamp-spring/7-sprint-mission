@@ -63,11 +63,10 @@
           "User"
         ],
         "summary": "User 등록 (프로필 이미지 포함)",
-        "description": "**Content-Type: multipart/form-data** 요청입니다.",
         "operationId": "create",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -77,7 +76,7 @@
                   "profile": {
                     "type": "string",
                     "format": "binary",
-                    "description": "프로필 이미지 파일 (선택 사항)"
+                    "description": "User 프로필 이미지"
                   }
                 },
                 "required": [
@@ -226,11 +225,10 @@
           "Message"
         ],
         "summary": "Message 생성 (첨부 파일 포함)",
-        "description": "**Content-Type: multipart/form-data** 요청입니다. 여러 개의 파일을 첨부할 수 있습니다.",
         "operationId": "create_2",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -437,7 +435,6 @@
           "User"
         ],
         "summary": "User 정보 수정 (프로필 이미지 포함)",
-        "description": "**Content-Type: multipart/form-data** 요청입니다.",
         "operationId": "update",
         "parameters": [
           {
@@ -453,7 +450,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {

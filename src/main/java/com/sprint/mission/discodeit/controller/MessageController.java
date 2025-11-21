@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
 import com.sprint.mission.discodeit.common.Util;
+import com.sprint.mission.discodeit.entity.dto.FindAllByChannelIdDto;
 import com.sprint.mission.discodeit.swaggerDocs.MessageDoc;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
@@ -28,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,17 +36,16 @@ public class MessageController implements MessageDoc {
     private final MessageService messageService;
 
     @GetMapping
-    public ResponseEntity<List<Res_Message>> findAllByChannleId(
+    public ResponseEntity<List<Res_Message>> findAllByChannelId(
         @RequestParam("channelId") UUID channelID) {
-        //💎Channel의 Message 목록 조회
+        //💎♨️Channel의 Message 목록 조회
         List<Res_Message> allByChannleId
-            = messageService.findAllByChannleId(channelID);
+            = messageService.findAllByChannelId(channelID);
 
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(allByChannleId);
     }
-
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<Res_Message> create(

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatus;
+import com.sprint.mission.discodeit.entity.dto.ReadStatusCteateRequest;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatusUpdate;
-import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
+import com.sprint.mission.discodeit.entity.dto.ReadStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,11 +26,11 @@ public interface ReadStatusDoc {
             responseCode = "200",
             description = "Message 읽음 상태 목록 조회 성공",
             content = @Content(
-                schema = @Schema(implementation = Res_ReadStatus.class)
+                schema = @Schema(implementation = ReadStatusDto.class)
             )
         )
     })
-    ResponseEntity<List<Res_ReadStatus>> findAllByUserId(
+    ResponseEntity<List<ReadStatusDto>> findAllByUserId(
         @Parameter(description = "조회할 User ID")
         @RequestParam UUID userId);
 
@@ -41,7 +41,7 @@ public interface ReadStatusDoc {
             responseCode = "201",
             description = "Message 읽음 상태가 성공적으로 생성됨",
             content = @Content(
-                schema = @Schema(implementation = Res_ReadStatus.class)
+                schema = @Schema(implementation = ReadStatusDto.class)
             )
         ),
 
@@ -61,9 +61,9 @@ public interface ReadStatusDoc {
             )
         )
     })
-    ResponseEntity<Res_ReadStatus> create(
+    ResponseEntity<ReadStatusDto> create(
 //        @Parameter(description = "조회할 User ID")
-        @RequestBody Dto_ReadStatus dtoReadStatus);
+        @RequestBody ReadStatusCteateRequest dtoReadStatus);
 
     //===================================================
     @Operation(summary = "Message 읽음 상태 수정")
@@ -72,7 +72,7 @@ public interface ReadStatusDoc {
             responseCode = "200",
             description = "Message 읽음 상태가 성공적으로 수정됨",
             content = @Content(
-                schema = @Schema(implementation = Res_ReadStatus.class)
+                schema = @Schema(implementation = ReadStatusDto.class)
             )
         ),
 
@@ -84,7 +84,7 @@ public interface ReadStatusDoc {
             )
         )
     })
-    ResponseEntity<Res_ReadStatus> update(
+    ResponseEntity<ReadStatusDto> update(
         @Parameter(description = "수정할 읽음 상태 ID")
         @PathVariable("readStatusId") UUID readStatusId,
         @RequestBody Dto_ReadStatusUpdate requestDto);

@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatus;
+import com.sprint.mission.discodeit.entity.dto.ReadStatusCteateRequest;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatusUpdate;
-import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
+import com.sprint.mission.discodeit.entity.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceReadStatusService;
@@ -25,7 +25,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
     private final BaseInterfaceRepository<Channel> channelRepository;
     private final BaseInterfaceRepository<ReadStatus> readStatusRepository;
 
-    public Res_ReadStatus create(Dto_ReadStatus dtoReadStatus) {
+    public ReadStatusDto create(ReadStatusCteateRequest dtoReadStatus) {
         User user = userRepository.findById(dtoReadStatus.userId()).stream()
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("🚨User[" + dtoReadStatus.userId().toString() + "] 를 찾을 수 없음 "));
@@ -48,38 +48,38 @@ public class ReadStatusService implements InterfaceReadStatusService {
         readStatusRepository.save(newReadStatus);
         log.info("✅ ReadStatusService.create = [" + newReadStatus + "]");
 
-        return Res_ReadStatus.from(newReadStatus);
+        return ReadStatusDto.from(newReadStatus);
     }
 
-    public Res_ReadStatus find(UUID statusID) {
+    public ReadStatusDto find(UUID statusID) {
         //find
         //[ ] id로 조회합니다.
         ReadStatus readStatus = readStatusRepository.findById(statusID).stream()
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("🚨statusID = [" + statusID.toString() + "] 오류"));
 
-        Res_ReadStatus dto = Res_ReadStatus.from(readStatus);
+        ReadStatusDto dto = ReadStatusDto.from(readStatus);
         log.info("✅ ReadStatusService.find = [" + dto + "]");
 
         return dto;
     }
 
-    public List<Res_ReadStatus> findAllByUserId(UUID userID) {
+    public List<ReadStatusDto> findAllByUserId(UUID userID) {
         //findAllByUserId
         //[ ] userId를 조건으로 조회합니다.
         List<ReadStatus> readStatuses = readStatusRepository.findAll();
         readStatuses.forEach(resReadStatus -> log.info("❌ ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"));
 
-        List<Res_ReadStatus> dtoList = readStatuses.stream()
+        List<ReadStatusDto> dtoList = readStatuses.stream()
             .filter(readStatus -> readStatus.getUserId().equals(userID))
-            .map(Res_ReadStatus::from)
+            .map(ReadStatusDto::from)
             .peek(resReadStatus -> log.info("✅ ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"))
             .toList();
 
         return dtoList;
     }
 
-    public Res_ReadStatus update(UUID readStatusId, Dto_ReadStatusUpdate requestDto) {
+    public ReadStatusDto update(UUID readStatusId, Dto_ReadStatusUpdate requestDto) {
         //update
         //[ ] DTO를 활용해 파라미터를 그룹화합니다.
         //수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
@@ -91,7 +91,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
 
         log.info("✅ readStatusRepository.update = [" + readStatus + "]");
 
-        return Res_ReadStatus.from(readStatus);
+        return ReadStatusDto.from(readStatus);
     }
 
     public void delete(UUID statusID) {

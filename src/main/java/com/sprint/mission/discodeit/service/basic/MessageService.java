@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
+import com.sprint.mission.discodeit.entity.dto.FindAllByChannelIdDto;
 import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.dto.Res_Message;
 import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
@@ -71,7 +72,7 @@ public class MessageService implements InterfaceMessageService {
     }
 
     @Override
-    public List<Res_Message> findAllByChannleId(UUID channelID) {
+    public List<Res_Message> findAllByChannelId(UUID channelID) { //♨️
 //        [ ] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
         List<Message> messages = messageRepository.findAll();
 
@@ -80,7 +81,7 @@ public class MessageService implements InterfaceMessageService {
             .toList();
 
         resMessage.stream()
-            .forEach(message -> log.info("✅ findAllByChannleId = [" + channelID.toString() + "][" + message.content() + "]"));
+            .forEach(message -> log.info("✅ findAllByChannelId = [" + channelID.toString() + "][" + message.content() + "]"));
 
         return resMessage;
     }

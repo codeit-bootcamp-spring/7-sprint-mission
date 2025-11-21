@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
+import com.sprint.mission.discodeit.entity.dto.UserCreateRequest;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ public class User extends BaseModel {
     private String eMail;
     private UUID profileId;
 
-    public User(Dto_UserCreate dtoUser, UUID profileId) {
+    public User(UserCreateRequest dtoUser, UUID profileId) {
         super();
         this.userName = dtoUser.username();
         this.password = dtoUser.password();

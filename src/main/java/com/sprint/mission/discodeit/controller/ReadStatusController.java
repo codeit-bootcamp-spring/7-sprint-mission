@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.swaggerDocs.ReadStatusDoc;
-import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatus;
+import com.sprint.mission.discodeit.entity.dto.ReadStatusCteateRequest;
 import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatusUpdate;
-import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
+import com.sprint.mission.discodeit.entity.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.service.basic.ReadStatusService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController //👍 @controller + @responsebody
@@ -28,11 +27,11 @@ public class ReadStatusController implements ReadStatusDoc {
     private final ReadStatusService readStatusService;
 
     @GetMapping
-    public ResponseEntity<List<Res_ReadStatus>> findAllByUserId(
+    public ResponseEntity<List<ReadStatusDto>> findAllByUserId(
         @RequestParam UUID userId) {
 
-        //💎User의 Message 읽음 상태 목록 조회
-        List<Res_ReadStatus> allByUserId
+        //💎♨️User의 Message 읽음 상태 목록 조회
+        List<ReadStatusDto> allByUserId
             = readStatusService.findAllByUserId(userId);
 
         return ResponseEntity
@@ -41,11 +40,11 @@ public class ReadStatusController implements ReadStatusDoc {
     }
 
     @PostMapping
-    public ResponseEntity<Res_ReadStatus> create(
-        @Valid @RequestBody Dto_ReadStatus dtoReadStatus) {
+    public ResponseEntity<ReadStatusDto> create(
+        @Valid @RequestBody ReadStatusCteateRequest dtoReadStatus) {
 
         //💎Message 읽음 상태 생성
-        Res_ReadStatus resReadStatus
+        ReadStatusDto resReadStatus
             = readStatusService.create(dtoReadStatus);
 
         return ResponseEntity
@@ -54,12 +53,12 @@ public class ReadStatusController implements ReadStatusDoc {
     }
 
     @PatchMapping("/{readStatusId}")
-    public ResponseEntity<Res_ReadStatus> update(
+    public ResponseEntity<ReadStatusDto> update(
         @PathVariable("readStatusId") UUID readStatusId,
         @Valid @RequestBody Dto_ReadStatusUpdate requestDto) {
 
         //💎Message 읽음 상태 수정
-        Res_ReadStatus resReadStatus
+        ReadStatusDto resReadStatus
             = readStatusService.update(readStatusId, requestDto);
 
         return ResponseEntity

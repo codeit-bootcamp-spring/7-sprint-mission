@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.swaggerDocs;
 
 import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.entity.dto.Pageable;
 import com.sprint.mission.discodeit.entity.dto.Res_Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,15 +38,14 @@ public interface MessageDoc {
         )
     })
 
-    ResponseEntity<List<Res_Message>> findAllByChannleId(
-        @Parameter(description = "메시지를 조회할 Channel ID") @RequestParam("channelId") UUID channelID);
+    ResponseEntity<List<Res_Message>> findAllByChannelId(
+        @Parameter(description = "조회할 Channel ID") @RequestParam("channelId") UUID channelID);
     /**
      * POST /api/messages - Message 생성 (첨부 파일 포함)
      * Multipart 요청을 위한 문서화입니다.
      */
     @Operation(
-        summary = "Message 생성 (첨부 파일 포함)",
-        description = "**Content-Type: multipart/form-data** 요청입니다. 여러 개의 파일을 첨부할 수 있습니다."
+        summary = "Message 생성 (첨부 파일 포함)"
     )
     @ApiResponses(value = {
         @ApiResponse(

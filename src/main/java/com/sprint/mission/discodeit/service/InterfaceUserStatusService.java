@@ -12,6 +12,6 @@ public interface InterfaceUserStatusService  {
     List<Res_UserUpdate> findAll();
     void update(Dto_UserStatus dto);
     Res_UserUpdate updateUserStatus(UUID userId, Instant newLastActiveAt);
-//    void updateByUserID(UUID userID, Dto_UserCreate dtoUser, String<binary> profileImage);
+//    void updateByUserID(UUID userID, UserCreateRequest dtoUser, String<binary> profileImage);
     void delete(UUID statusID);
 }

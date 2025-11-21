@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
+import com.sprint.mission.discodeit.entity.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatusUpdate;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
@@ -45,8 +45,7 @@ public interface UserDoc {
      * Multipart 요청을 위한 문서화는 Object 타입으로 처리하고, @RequestBody 대신 @RequestPart에 대한 설명을 추가합니다.
      */
     @Operation(
-        summary = "User 등록 (프로필 이미지 포함)",
-        description = "**Content-Type: multipart/form-data** 요청입니다."
+        summary = "User 등록"
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -65,8 +64,8 @@ public interface UserDoc {
         )
     })
     ResponseEntity<Res_User> create(
-        @Parameter(description = "User 생성 정보 (JSON)") @RequestPart(value = "userCreateRequest") Dto_UserCreate dtoUser,
-        @Parameter(description = "프로필 이미지 파일 (선택 사항)") @RequestPart(value = "profile", required = false) MultipartFile file);
+        @Parameter(description = "User 생성 정보 (JSON)") @RequestPart(value = "userCreateRequest") UserCreateRequest dtoUser,
+        @Parameter(description = "User 프로필 이미지") @RequestPart(value = "profile", required = false) MultipartFile file);
 
 
     /**
@@ -95,8 +94,7 @@ public interface UserDoc {
      * Multipart 요청을 위한 문서화입니다.
      */
     @Operation(
-        summary = "User 정보 수정 (프로필 이미지 포함)",
-        description = "**Content-Type: multipart/form-data** 요청입니다."
+        summary = "User 정보 수정 (프로필 이미지 포함)"
     )
     @ApiResponses(value = {
         @ApiResponse(

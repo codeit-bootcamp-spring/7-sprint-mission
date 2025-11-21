@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import static com.sprint.mission.discodeit.common.Util.parsingMultipartFile;
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 
+import com.sprint.mission.discodeit.entity.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.swaggerDocs.UserDoc;
 import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserStatusUpdate;
 import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
 import com.sprint.mission.discodeit.entity.dto.Res_User;
@@ -31,7 +29,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,7 +44,7 @@ public class UserController implements UserDoc {
 
     @GetMapping
     public ResponseEntity<List<UserDto>> findAll() {
-    //💎 전체 User 목록 조회
+    //💎♨️ 전체 User 목록 조회
     List<UserDto> userDtoList
         = userService.findAll();
 
@@ -58,7 +55,7 @@ public class UserController implements UserDoc {
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<Res_User> create(
-        @Valid @RequestPart("userCreateRequest") Dto_UserCreate dtoUser,
+        @Valid @RequestPart("userCreateRequest") UserCreateRequest dtoUser,
         @RequestPart(value = "profile", required = false) MultipartFile file) {
         //💎User 등록
         Dto_BinaryContent dtoFile = parsingMultipartFile(file);
