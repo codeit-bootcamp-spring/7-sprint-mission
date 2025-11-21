@@ -20,7 +20,7 @@ public record UserUserStatusPatchResponseDto(
                 .id(userStatus.getId())
                 .createdAt(userStatus.getCreatedAt())
                 .updatedAt(userStatus.getUpdatedAt())
-                .userId(userStatus.getUserId())
+                .userId(userStatus.getUser().getId())
                 .lastActiveAt(userStatus.getLastOnlineTime())
                 .online(userStatus.isUserOnline())
                 .build();

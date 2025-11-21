@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.dto.response.DownloadResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -38,5 +39,11 @@ public class FileController implements FileControllerDocs {
     public void reset(){
         binaryContentService.resetBinaryContentService();
     }
+
+    @GetMapping("/{binaryContentId}/download")
+    public ResponseEntity<DownloadResponseDto> downloadBinaryContent(@RequestParam UUID binaryContentId){
+        return null;
+    }
+
 
 }

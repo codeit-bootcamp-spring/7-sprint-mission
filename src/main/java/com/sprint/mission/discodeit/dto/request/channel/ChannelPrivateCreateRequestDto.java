@@ -14,6 +14,7 @@ import static com.sprint.mission.discodeit.service.util.StaticString.*;
 
 @Getter
 public class ChannelPrivateCreateRequestDto {
+
     @NotNull(message = "ChannelPrivate participantIds")
     private final HashSet<UUID> participantIds;
 

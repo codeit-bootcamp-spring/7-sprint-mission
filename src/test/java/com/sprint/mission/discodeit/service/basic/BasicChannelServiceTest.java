@@ -1,33 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
-import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateRequestDto;
-import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entityElement.ChannelElement;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import org.assertj.core.api.Assertions;
-import org.instancio.Instancio;
-import org.junit.jupiter.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.lang.invoke.VarHandle;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
 import static org.instancio.Select.field;
-import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 class BasicChannelServiceTest {
 

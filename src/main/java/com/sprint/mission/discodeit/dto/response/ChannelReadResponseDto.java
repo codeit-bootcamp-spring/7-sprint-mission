@@ -24,19 +24,17 @@ public class ChannelReadResponseDto {
     private String description;
     private ChannelType type;
 
-    private boolean isTextChannel;
     private HashSet<UUID> participantIds ;
 
     public static ChannelReadResponseDto from(Channel channel) {
         return ChannelReadResponseDto.builder()
                 .name(channel.getName())
                 .description(channel.getDescription())
-                .isTextChannel(channel.isTextChannel())
-                .type(channel.isPublic() ? ChannelType.PUBLIC : ChannelType.PRIVATE)
+                .type(channel.getChannelType())
                 .id(channel.getId())
                 .createdAt(channel.getCreatedAt())
                 .updatedAt(channel.getUpdatedAt())
-                .participantIds(channel.getJoinUserList()==null? new HashSet<>():channel.getJoinUserList())
+                .participantIds(new HashSet<>())
                 .build();
     }
 

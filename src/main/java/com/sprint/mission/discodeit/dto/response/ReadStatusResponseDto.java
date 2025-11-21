@@ -20,8 +20,8 @@ public class ReadStatusResponseDto {
     public static ReadStatusResponseDto from(ReadStatus readStatus){
         return ReadStatusResponseDto.builder()
                 .id(readStatus.getId())
-                .userId(readStatus.getUserId())
-                .channelId(readStatus.getChannelId())
+                .userId(readStatus.getUser().getId())
+                .channelId(readStatus.getChannel().getId())
                 .lastReadAt(readStatus.getReadLastTime())
                 .createdAt(readStatus.getCreatedAt())
                 .updatedAt(readStatus.getUpdatedAt())

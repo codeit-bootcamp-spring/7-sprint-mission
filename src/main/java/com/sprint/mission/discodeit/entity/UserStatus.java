@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -12,12 +12,21 @@ import java.util.UUID;
 import static java.time.Instant.*;
 
 @Getter
-@Builder
 @ToString
 @Setter
-public class UserStatus extends Entity{
+@Entity
+@Builder
+@Table(name = "user_statuses")
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserStatus extends BaseUpdatableEntity {
 
-    private UUID userId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id",nullable = false,unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
+
+    @Column(name = "last_active_at",nullable = false)
     private Instant lastOnlineTime;
 
     public boolean isUserOnline(){

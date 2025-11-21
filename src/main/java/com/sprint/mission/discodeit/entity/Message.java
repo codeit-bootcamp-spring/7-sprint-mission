@@ -1,46 +1,33 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+
 @Getter
-@ToString
 @Setter
+@Entity
+@Table(name = "messages")
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class Message extends Entity{
+public class Message extends BaseUpdatableEntity {
 
+    @Column(name = "content",columnDefinition = "TEXT")
     private String content;
-    private UUID senderId;
-    private boolean isMarkDown;
-    private UUID channelId;
-    private HashSet<UUID> attachmentIdList;
 
-//    public Message(String content, UUID senderId, boolean isMarkDown, UUID channelId) {
-//        super();
-//        this.content = content;
-//        this.senderId = senderId;
-//        this.isMarkDown = isMarkDown;
-//        this.channelId = channelId;
-//    }
-//
-//    public Message(UUID id, String content, UUID senderId, boolean isMarkDown, UUID channelId) {
-//        super(id);
-//        this.content = content;
-//        this.senderId = senderId;
-//        this.isMarkDown = isMarkDown;
-//        this.channelId = channelId;
-//    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id",nullable = false)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private User user;
 
-
-
-
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Channel channel;
 
 }

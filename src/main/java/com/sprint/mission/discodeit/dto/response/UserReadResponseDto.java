@@ -19,7 +19,7 @@ public class UserReadResponseDto {
 
     public static UserReadResponseDto of(User user, UserStatus userStatus){
         return UserReadResponseDto.builder()
-                .name(user.getName())
+                .name(user.getUserName())
                 .userName(user.getUserName())
                 .isOnline(userStatus.isUserOnline())
                 .email(user.getEmail())

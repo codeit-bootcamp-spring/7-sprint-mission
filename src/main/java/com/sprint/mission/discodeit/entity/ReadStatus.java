@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -12,10 +12,23 @@ import java.util.UUID;
 @ToString
 @Getter
 @Setter
-public class ReadStatus extends Entity {
+@Entity
+@Table(name = "read_statuses",uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","channel_id"}))
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReadStatus extends BaseUpdatableEntity {
 
-    private UUID userId;
-    private UUID channelId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Channel channel;
+
+    @Column(nullable = false)
     private Instant readLastTime;
 
 }

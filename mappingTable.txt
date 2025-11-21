@@ -1,0 +1,9 @@
+| 엔티티 관계         | 다중성 | 방향성                  | 부모-자식 관계                  | 연관관계의 주인 |
+|--------------------|--------|-------------------------|---------------------------------|----------------|
+| User:ReadStatus     | 1:N    | User → ReadStatus 단방향 | 부모: User, 자식: ReadStatus    | ReadStatus     |
+| Channel:ReadStatus  | 1:N    | Channel → ReadStatus 단방향 | 부모: Channel, 자식: ReadStatus | ReadStatus     |
+| User:Message        | 1:N    | User → Message 단방향     | 부모: User, 자식: Message       | Message        |
+| Channel:Message     | 1:N    | Channel → Message 단방향  | 부모: Channel, 자식: Message    | Message        |
+| Message:BinaryContent | M:N  | BinaryContent → Message 단방향 | 부모: BinaryContent, 자식: Message | Message    |
+| User:ProfileImage   | 1:1    | BinaryContent → User 단방향 | 부모: BinaryContent, 자식: User | User           |
+| User:UserStatus     | 1:1    | User → UserStatus 단방향  | 부모: User, 자식: UserStatus   | User           |

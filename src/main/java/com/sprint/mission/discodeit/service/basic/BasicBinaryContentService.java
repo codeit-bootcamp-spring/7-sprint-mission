@@ -24,7 +24,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .size(binaryContentCreateRequestDto.getSize())
                 .contentType(binaryContentCreateRequestDto.getContentType())
                 .build();
-        binaryContentRepository.createBinaryContent(binaryContent);
+        binaryContentRepository.save(binaryContent);
         return BinaryContentResponseDto.from(binaryContent);
 
 
@@ -34,7 +34,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public BinaryContentResponseDto find(UUID binaryContentID) {
 
         return  BinaryContentResponseDto.from(
-                binaryContentRepository.readBinaryContent(binaryContentID)
+                binaryContentRepository.findById(binaryContentID)
                         .orElseThrow(
                                 ()->new IllegalArgumentException(
                                         "존재하지 않는 binaryContent 입니다."))) ;
@@ -49,17 +49,17 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public void deleteBinaryContent(UUID binaryContentId) {
-    binaryContentRepository.deleteBinaryContent(binaryContentId);
+    binaryContentRepository.deleteById(binaryContentId);
     }
 
 
     @Override
     public List<BinaryContent> findAll() {
-        return binaryContentRepository.readAllBinaryContent();
+        return binaryContentRepository.findAll();
     }
 
     @Override
     public void resetBinaryContentService() {
-        binaryContentRepository.resetBinaryContentRepository();
+        binaryContentRepository.deleteAll();
     }
 }

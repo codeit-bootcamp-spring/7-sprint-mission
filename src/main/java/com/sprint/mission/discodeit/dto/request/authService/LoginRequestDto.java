@@ -13,4 +13,5 @@ public class LoginRequestDto {
 
     @NotBlank(message = "Login Password")
     String password;
+
 }

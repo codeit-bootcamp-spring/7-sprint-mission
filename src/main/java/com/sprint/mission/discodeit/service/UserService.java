@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.request.binaryContent.ProfileUpdateReque
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.userStatus.UserStatusPatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.UserCreateResponseDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
@@ -21,21 +20,11 @@ import java.util.UUID;
 
 public interface UserService {
 
-    //UserCreateResponseDto createUser(UserCreateRequestDto userCreateRequestDtoDto);
     UserCreateResponseDto createUser(UserCreateRequestDto userCreateRequestDtoDto, MultipartFile profile) throws IOException;
     UserReadResponseDto readUser(UUID userId);
     List<UserReadResponseDto> readAllUser();
     void deleteUser(UUID userId);
-
-    <T> void updateUser(UserUpdateRequestDto<T> userUpdateRequestDto);
-    <T>void updateUser(UserUpdateRequestDto<T> userUpdateRequestDto, ProfileUpdateRequestDto profileUpdateRequestDto);
-    List<User> readUpdatedUser();
-   // void readDeletedUser();
-    void enterChannel(UUID userId, UUID channelId);
-    void exitChannel(UUID userId,UUID channelId);
-    void updateUserOnlineStatus(UUID userId);
     void resetUserRepository();
-
     List<UserDto> advanceFindAllUser();
     UserCreateResponseDto patchUser(UUID userId, UserUpdateRequest dto,MultipartFile profile) throws IOException;
 
