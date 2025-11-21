@@ -18,9 +18,9 @@ public record BinaryContentDto(
     public static BinaryContentDto from(BinaryContent binaryContent) {
         return BinaryContentDto.builder()
                 .id(binaryContent.getId())
-                .data(binaryContent.getBinaryData())
-                .dataName(binaryContent.getDataName())
-                .dataType(binaryContent.getDataType())
+                .data(binaryContent.getBytes())
+                .dataName(binaryContent.getFileName())
+                .dataType(binaryContent.getContentType())
                 .createdAt(binaryContent.getCreateAt())
                 .build();
     }

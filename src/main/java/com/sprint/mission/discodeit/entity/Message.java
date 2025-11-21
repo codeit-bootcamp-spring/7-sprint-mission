@@ -1,33 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-@Getter
-@ToString
-public class Message extends BaseEntity {
+@Getter @ToString
+@Entity
+@Table(name = "messages")
+@NoArgsConstructor
+public class Message extends BaseUpdatableEntity {
+
+    @Column(columnDefinition = "TEXT")
     private String content;
-    private final UUID channelId;
-    private final UUID authorId;
-    private final List<UUID> attachmentIds;
+
+    @JoinColumn(name = "channel_id",  nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Channel channel;
+
+    @JoinColumn(name = "author_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User author;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
+    private List<BinaryContent> attachments = new ArrayList<>();
 
     @Builder
-    public Message(UUID authorId, UUID channelId, String content, List<UUID> attachmentIds) {
+    public Message(User author, Channel channel, String content, List<BinaryContent> attachments) {
         super();
         this.content = content;
-        this.channelId = channelId;
-        this.authorId = authorId;
-        this.attachmentIds = attachmentIds != null ? attachmentIds : new ArrayList<>();
+        this.channel = channel;
+        this.author = author;
+        if (attachments != null) {
+            this.attachments.addAll(attachments);
+        }
     }
 
     public void updateContent(String content) {
         this.content = content;
-        updateTimestamp();
     }
 }
 

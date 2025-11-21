@@ -1,26 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.AllArgsConstructor;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import java.time.Instant;
-import java.util.UUID;
 
-@Getter
-public class ReadStatus extends BaseEntity {
+@Getter @ToString
+@Entity
+@Table(name = "read_statuses", uniqueConstraints = {
+        @UniqueConstraint(
+                name="read_statuses_user_id_channel_id_key",
+                columnNames={"user_id","channel_id"}
+        )})
+@NoArgsConstructor
+public class ReadStatus extends BaseUpdatableEntity {
 
-    private final UUID userId;
-    private final UUID channelId;
-    private final UUID lastReadAt;
+    @JoinColumn(name = "user_id",  nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
 
-    public ReadStatus(UUID userId, UUID channelId) {
+    @JoinColumn(name = "channel_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Channel channel;
+
+    @Column(nullable = false)
+    private Instant lastReadAt;
+
+    public ReadStatus(User user, Channel channel) {
         super();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.lastReadAt = UUID.randomUUID();
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = Instant.now();
     }
 
     public void updateReadStatus() {
-        updateTimestamp();
+        lastReadAt = Instant.now();
     }
 }
