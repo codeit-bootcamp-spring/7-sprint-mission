@@ -31,11 +31,11 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus status;
 
         // 유저가 존재하지 않으면 예외 발생
-        userRepository.findById(request.getUserId())
+        userRepository.findById(request.userId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 채널이 존재하지 않으면 예외 발생
-        Channel channel = channelRepository.findById(request.getChannelId())
+        Channel channel = channelRepository.findById(request.channelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
         // 공개 채널에 생성하는 경우 예외 발생
@@ -43,8 +43,8 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new CustomException(ErrorCode.PUBLIC_CHANNEL_ADD_READSTATUS_FORBIDDEN);
         }
 
-        if(!existsByUserIdAndChannelId(request.getUserId(),request.getChannelId())) {
-            status = new ReadStatus(request.getUserId(),request.getChannelId(), request.getLastReadAt());
+        if(!existsByUserIdAndChannelId(request.userId(),request.channelId())) {
+            status = new ReadStatus(request.userId(),request.channelId(), request.lastReadAt());
             readStatusRepository.save(status);
         } else {
             throw new CustomException(ErrorCode.CHANNEL_MEMBER_ALREADY_EXISTS);
@@ -70,7 +70,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatus update(UUID readStatusId, UpdateReadStatusRequestDto request) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
-        readStatus.update(request.getNewLastReadAt());
+        readStatus.update(request.newLastReadAt());
         readStatusRepository.update(readStatus);
         return readStatus;
     }

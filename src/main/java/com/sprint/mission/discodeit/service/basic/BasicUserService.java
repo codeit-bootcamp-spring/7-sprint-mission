@@ -35,36 +35,36 @@ public class BasicUserService implements UserService{
     @Override
     public User create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
         // 1. username/nickname/email 중복 검사
-        if (existsByUsername(userRequest.getUsername())) {
+        if (existsByUsername(userRequest.username())) {
             throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
-        } else if (existsByEmail(userRequest.getEmail())) {
+        } else if (existsByEmail(userRequest.email())) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         // 2. 입력된 정보 형태 검증
-        Optional.ofNullable(userRequest.getEmail()).ifPresent(e -> UserValidator.validateEmail(e));
-        Optional.ofNullable(userRequest.getPassword()).ifPresent(pw -> UserValidator.validatePassword(pw));
+        Optional.ofNullable(userRequest.email()).ifPresent(e -> UserValidator.validateEmail(e));
+        Optional.ofNullable(userRequest.password()).ifPresent(pw -> UserValidator.validatePassword(pw));
 
         // 3. 선택적 프로필 이미지 처리
         UUID profileImageId = null;
 
         if (Optional.ofNullable(profileRequest).isPresent()) {
             BinaryContent profileImage = new BinaryContent(
-                    profileRequest.getFileName(),
-                    profileRequest.getContentType(),
-                    profileRequest.getBytes()
+                    profileRequest.fileName(),
+                    profileRequest.contentType(),
+                    profileRequest.bytes()
             );
             binaryContentRepository.save(profileImage);
             profileImageId = profileImage.getId();
         }
 
         User newUser  = new User(
-                userRequest.getUsername(),
-                userRequest.getUsername(),
-                userRequest.getEmail(),
+                userRequest.username(),
+                userRequest.username(),
+                userRequest.email(),
                 "010-0000-0000",
-                userRequest.getUsername(),
-                userRequest.getPassword(),
+                userRequest.username(),
+                userRequest.password(),
                 profileImageId
         );
 
@@ -154,12 +154,12 @@ public class BasicUserService implements UserService{
 
         // 프로필 이미지만 전달된 경우 null 참조 방지
         if (Optional.ofNullable(userRequest).isPresent()) {
-            realName = userRequest.getNewUsername();
-            nickName = userRequest.getNewUsername();
-            email = userRequest.getNewEmail();
+            realName = userRequest.newUsername();
+            nickName = userRequest.newUsername();
+            email = userRequest.newEmail();
             phoneNum = "010-0000-0000";
-            username = userRequest.getNewUsername();
-            password = userRequest.getNewPassword();
+            username = userRequest.newUsername();
+            password = userRequest.newPassword();
 
             // 아이디와 닉네임, 이메일 중복 확인
             if (existsByUsername(username)) {
@@ -179,9 +179,9 @@ public class BasicUserService implements UserService{
 
         if (Optional.ofNullable(profileRequest).isPresent()) {
             BinaryContent profileImage = new BinaryContent(
-                    profileRequest.getFileName(),
-                    profileRequest.getContentType(),
-                    profileRequest.getBytes()
+                    profileRequest.fileName(),
+                    profileRequest.contentType(),
+                    profileRequest.bytes()
             );
             binaryContentRepository.save(profileImage);
             profileImageId = profileImage.getId();

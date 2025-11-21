@@ -24,13 +24,13 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void create(CreateUserStatusRequestDto request) {
-        userRepository.findById(request.getUserId())
+        userRepository.findById(request.userId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND_FOR_STATUS));
 
-        userStatusRepository.findById(request.getUserId())
+        userStatusRepository.findById(request.userId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_ALREADY_EXISTS));
 
-        UserStatus newUserStatus = new UserStatus(request.getUserId());
+        UserStatus newUserStatus = new UserStatus(request.userId());
         userStatusRepository.save(newUserStatus);
     }
 
@@ -56,7 +56,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus updateByUserId(UUID userId, UpdateUserStatusRequestDto request) {
-        Instant newLastActiveAt = request.getNewLastActiveAt();
+        Instant newLastActiveAt = request.newLastActiveAt();
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));

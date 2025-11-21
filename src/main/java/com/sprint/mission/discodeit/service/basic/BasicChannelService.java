@@ -28,8 +28,8 @@ public class BasicChannelService implements ChannelService {
     // API 스펙에 맞는 공개 채널 및 비공개 채널 생성 메서드 추가
     @Override
     public Channel create(CreatePublicChannelRequestDto request) {
-        String name = request.getName();
-        String description = request.getDescription();
+        String name = request.name();
+        String description = request.description();
 
         // 이름 중복 저장 불가
         if(existsByName(name)) {
@@ -44,7 +44,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel create(CreatePrivateChannelRequestDto request) {
         // 비공개 채널 참가 유저 존재 여부 판단
-        request.getParticipantIds().forEach(participantId -> {
+        request.participantIds().forEach(participantId -> {
             userRepository.findById(participantId)
                     .orElseThrow(() -> new  CustomException(ErrorCode.USER_NOT_FOUND));
         });
@@ -52,7 +52,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = new Channel();
         channelRepository.save(channel);
 
-        request.getParticipantIds().stream()
+        request.participantIds().stream()
                 .forEach(userId ->
                         addMember(channel.getId(), new UpdateChannelRequestDto(userId))
                 );
@@ -65,13 +65,13 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(() ->  new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
         // 이름 중복 저장 불가
-        if(existsByName(request.getNewName())) {
+        if(existsByName(request.newName())) {
             throw new CustomException(ErrorCode.CHANNEL_NAME_ALREADY_EXISTS);
         }
         if (channel.getVisibility() ==  ChannelVisibility.PRIVATE) {
             throw new CustomException(ErrorCode.PRIVATE_CHANNEL_UPDATE_FORBIDDEN);
         }
-        channel.update(request.getNewName(), request.getNewDescription());
+        channel.update(request.newName(), request.newDescription());
         channelRepository.update(channel);
         return channel;
     }
@@ -83,7 +83,7 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
         // 요청된 사용자가 이미 채널에 속해 있는 경우 예외 발생
-        if(channel.getMemberIds().contains(request.getUserId())){
+        if(channel.getMemberIds().contains(request.userId())){
             throw new CustomException(ErrorCode.CHANNEL_MEMBER_ALREADY_EXISTS);
         }
 
@@ -92,9 +92,9 @@ public class BasicChannelService implements ChannelService {
             throw new CustomException(ErrorCode.PUBLIC_CHANNEL_MEMBER_ADD_FORBIDDEN);
         }
 
-        readStatusRepository.save(new ReadStatus(request.getUserId(), channelId, Instant.now()));
-        channel.addMember(request.getUserId());
-        channelRepository.addChannelIdForUser(channel.getId(), request.getUserId()); // 유저 객체에 속한 채널 UUID 리스트 저장
+        readStatusRepository.save(new ReadStatus(request.userId(), channelId, Instant.now()));
+        channel.addMember(request.userId());
+        channelRepository.addChannelIdForUser(channel.getId(), request.userId()); // 유저 객체에 속한 채널 UUID 리스트 저장
         channelRepository.save(channel);
     }
 

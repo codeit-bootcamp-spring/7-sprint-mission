@@ -25,9 +25,9 @@ public class BasicBinaryContentService implements BinaryContentService {
     public void create(CreateBinaryContentRequestDto request) {
         if (Optional.ofNullable(request).isPresent()) {
             BinaryContent file = new BinaryContent(
-                    request.getFileName(),
-                    request.getContentType(),
-                    request.getBytes()
+                    request.fileName(),
+                    request.contentType(),
+                    request.bytes()
             );
             binaryContentRepository.save(file);
         }

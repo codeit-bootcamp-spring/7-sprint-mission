@@ -45,26 +45,26 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message create(CreateMessageRequestDto request, List<CreateBinaryContentRequestDto> binaryContentRequests) {
 
-        Channel channel = channelRepository.findById(request.getChannelId())
+        Channel channel = channelRepository.findById(request.channelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
         // 비공개 채널의 경우 유저가 채널에 속해 있는지 검증
         if (channel.getVisibility() == ChannelVisibility.PRIVATE &&
-                !channel.getMemberIds().contains(request.getAuthorId())) {
+                !channel.getMemberIds().contains(request.authorId())) {
             throw new CustomException(ErrorCode.NOT_CHANNEL_MEMBER);
         }
 
         Message newMessage = new Message(
-                request.getAuthorId(),
-                request.getChannelId(),
+                request.authorId(),
+                request.channelId(),
                 ReceiveType.CHANNEL,
-                request.getContent()
+                request.content()
         );
 
         // 메시지에 첨부된 파일이 있는 경우에만 파일 저장
         Optional.ofNullable(binaryContentRequests).ifPresent(
                 files -> files.forEach(file -> {
-                    BinaryContent fileBytes = new BinaryContent(file.getFileName(), file.getContentType(), file.getBytes());
+                    BinaryContent fileBytes = new BinaryContent(file.fileName(), file.contentType(), file.bytes());
                     newMessage.addAttachmentId(fileBytes.getId()); // 메시지에 파일 UUID 값 저장
                     binaryContentRepository.save(fileBytes);
                 })
@@ -162,7 +162,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
 
-        message.update(request.getNewContent());
+        message.update(request.newContent());
         messageRepository.update(message);
         return message;
     }
