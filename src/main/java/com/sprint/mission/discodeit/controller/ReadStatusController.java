@@ -21,21 +21,21 @@ public class ReadStatusController implements ReadStatusControllerDocs {
     private final ReadStatusService readStatusService;
 
     // 특정 채널의 메시지 수신 정보 생성
-    @RequestMapping(value = "/readStatuses", method = RequestMethod.POST)
+    @PostMapping("/readStatuses")
     public ResponseEntity<ReadStatus> createReadStatus(@RequestBody CreateReadStatusRequestDto requestDto) {
         ReadStatus createdReadStatus = readStatusService.create(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdReadStatus);
     }
 
     // 특정 채널의 메시지 수신 정보 수정
-    @RequestMapping(value = "/readStatuses/{readStatusId}", method = RequestMethod.PATCH)
+    @PatchMapping("/readStatuses/{readStatusId}")
     public ResponseEntity<ReadStatus> createReadStatus(@PathVariable UUID readStatusId, @RequestBody UpdateReadStatusRequestDto requestDto) {
         ReadStatus updatedReadStatus = readStatusService.update(readStatusId, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(updatedReadStatus);
     }
 
     // 특정 사용자의 메시지 수신 정보 조회
-    @RequestMapping(value = "/readStatuses", method = RequestMethod.GET)
+    @GetMapping("/readStatuses")
     public ResponseEntity<List<ReadStatus>> search(@RequestParam UUID userId) {
         List<ReadStatus> readStatusList = readStatusService.findAllByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(readStatusList);

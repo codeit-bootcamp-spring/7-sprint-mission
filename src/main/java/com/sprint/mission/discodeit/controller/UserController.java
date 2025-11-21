@@ -32,11 +32,7 @@ public class UserController implements UserControllerDocs {
     private final UserStatusService userStatusService;
 
     // 사용자 등록
-    @RequestMapping(
-            value = "/users",
-            method = RequestMethod.POST,
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
-    )
+    @PostMapping(value = "/users", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<User> createUser(
             @Valid @RequestPart("userCreateRequest") CreateUserRequestDto requestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
@@ -47,11 +43,7 @@ public class UserController implements UserControllerDocs {
     }
 
     // 사용자 정보 수정
-    @RequestMapping(
-            value = "/users/{userId}",
-            method = RequestMethod.PATCH,
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
-    )
+    @PatchMapping(value = "/users/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<User> updateUser(
             @PathVariable UUID userId,
             @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
@@ -63,21 +55,21 @@ public class UserController implements UserControllerDocs {
     }
 
     // 사용자 삭제
-    @RequestMapping(value = "/users/{userId}", method = RequestMethod.DELETE)
+    @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.delete(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     // 모든 사용자 조회
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @GetMapping("/users")
     public ResponseEntity<List<UserResponseDto>> searchUsers() {
         List<UserResponseDto> users = userService.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
     // 사용자 온라인 업데이트
-    @RequestMapping(value = "/users/{userId}/userStatus", method = RequestMethod.POST)
+    @PostMapping("/users/{userId}/userStatus")
     public ResponseEntity<UserStatus> onlineUser(
             @PathVariable UUID userId,
             @RequestBody UpdateUserStatusRequestDto request

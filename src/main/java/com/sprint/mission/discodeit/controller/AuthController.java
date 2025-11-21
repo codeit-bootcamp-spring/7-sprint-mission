@@ -9,10 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController implements AuthControllerDocs {
     private final AuthService authService;
 
-    @RequestMapping(value ="/auth/login",method = RequestMethod.POST)
+    @PostMapping("/auth/login")
     public ResponseEntity<User> login(@Valid @RequestBody LoginRequestDto loginRequestDto){
         User user = authService.login(loginRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(user);

@@ -21,17 +21,15 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class BinaryContentController implements BinaryContentControllerDocs {
-    private final UserService userService;
-    private final MessageService messageService;
     private final BinaryContentService binaryContentService;
 
-    @RequestMapping(value = "/binaryContents/{binaryContentId}", method = RequestMethod.GET)
+    @GetMapping("/binaryContents/{binaryContentId}")
     public ResponseEntity<BinaryContent> find(@PathVariable UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentService.find(binaryContentId);
         return ResponseEntity.status(HttpStatus.OK).body(binaryContent);
     }
 
-    @RequestMapping(value = "/binaryContents", method = RequestMethod.GET)
+    @GetMapping("/binaryContents")
     public ResponseEntity<List<BinaryContent>> findAllByIdIn(@RequestParam List<UUID> binaryContentIds) {
         List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
         return ResponseEntity.status(HttpStatus.OK).body(binaryContents);

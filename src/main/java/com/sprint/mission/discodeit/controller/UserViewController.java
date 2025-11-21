@@ -17,18 +17,19 @@ import java.util.UUID;
 @Hidden
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class UserViewController {
     private final UserService userService;
     private final BinaryContentService binaryContentService;
 
     // 유저 목록 조회
-    @RequestMapping(value = "/api/user/findAll", method = RequestMethod.GET)
+    @GetMapping("/user/findAll")
     public ResponseEntity<List<UserResponseDto>> searchUsers() {
         return ResponseEntity.ok().body(userService.findAll());
     }
 
     // binaryContentId로 파일 찾기
-    @RequestMapping(value = "/api/binaryContent/find", method = RequestMethod.GET)
+    @GetMapping("/binaryContent/find")
     public ResponseEntity<BinaryContent> searchProfileById(@RequestParam UUID binaryContentId) {
         BinaryContent content = binaryContentService.find(binaryContentId);
         return ResponseEntity.ok(content);
