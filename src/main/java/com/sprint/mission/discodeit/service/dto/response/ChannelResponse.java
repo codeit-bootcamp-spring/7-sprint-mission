@@ -18,6 +18,6 @@ public record ChannelResponse(
                 channel.getId(),
                 channel.getCreatedAt(),
                 channel.getUpdatedAt(),
-                channel.getChannelName());
+                channel.getName());
     }
 }

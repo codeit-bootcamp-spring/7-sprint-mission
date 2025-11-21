@@ -7,7 +7,7 @@ import java.time.Instant;
 
 
 @Getter
-public class UserStatus implements Serializable {
+public class UserStatus {
 
     private final Instant lastAt;
     private final OnlineStatus onlineStatus;

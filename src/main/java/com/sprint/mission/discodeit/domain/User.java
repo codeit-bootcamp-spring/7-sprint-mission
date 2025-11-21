@@ -4,16 +4,11 @@ import com.sprint.mission.discodeit.domain.exception.ErrorType;
 import com.sprint.mission.discodeit.domain.exception.ValidationException;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class User implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class User {
 
     private final UUID id;
     private final Instant createdAt;
@@ -23,9 +18,6 @@ public class User implements Serializable {
     private String password;
     private String email;
     private UserStatus userStatus;
-
-    private final List<UUID> receivedInvitations = new ArrayList<>();
-    private final List<UUID> friends = new ArrayList<>();
     private UUID profile;
 
 

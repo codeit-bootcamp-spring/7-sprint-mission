@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor
-public class Message implements Serializable {
+public class Message {
 
     private final UUID id;
     private final Instant createdAt;

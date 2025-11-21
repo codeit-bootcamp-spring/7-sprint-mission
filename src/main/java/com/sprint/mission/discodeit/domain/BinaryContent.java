@@ -3,14 +3,11 @@ package com.sprint.mission.discodeit.domain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 @Getter
 @RequiredArgsConstructor
-public class BinaryContent implements Serializable {
-
-    private static final long serialVersionUID = 7L;
+public class BinaryContent{
 
     private final UUID id;
     private final Instant createdAt;
