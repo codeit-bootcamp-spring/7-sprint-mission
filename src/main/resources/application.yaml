@@ -2,6 +2,36 @@ spring:
   application:
     name: discodeit
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database: postgresql
+    hibernate:
+      # DDL 자동 생성 옵션
+      # none: 아무것도 하지 않음 (운영 환경)
+      # create: 기존 테이블 삭제 후 새로 생성
+      # create-drop: 종료 시 테이블 삭제
+      # update: 변경된 스키마만 반영 (개발 환경)
+      # validate: 엔티티와 테이블이 정상 매핑되었는지만 확인
+      ddl-auto: validate
+
+    properties:
+      hibernate:
+        show_sql: true  # SQL 실행 콘솔 출력
+        format_sql: true # 출력을 보기 좋게 바꿔줌
+
+  logging:
+    level:
+      org:
+        hibernate:
+          orm:
+            jdbc:
+              bind: TRACE # 쿼리 로그 ?값을 보여줌
+
   servlet:
     multipart:
       max-file-size: 500MB    # 기본은 1MB
