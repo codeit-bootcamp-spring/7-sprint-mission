@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicMessageService implements MessageService {
 
     private final UserRepository userRepository;
@@ -28,38 +30,38 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
 
-    private List<UUID> saveAttachment(List<MultipartFile> attachments) {
-        if (attachments == null || attachments.isEmpty()) {
+    private List<BinaryContent> saveAttachment(List<MultipartFile> files) {
+        if (files == null || files.isEmpty()) {
             return new ArrayList<>();
         }
 
-        if (attachments.size() > 10) {
+        if (files.size() > 10) {
             throw new InvalidInputException("파일은 한번에 10개까지만 보낼 수 있습니다."); // 예외 임시
         }
 
-        List<UUID> ids = new ArrayList<>();
-
-        for (MultipartFile attachment : attachments) {
+        List<BinaryContent> attachments = new ArrayList<>();
+        for (MultipartFile file : files) {
             try {
                 BinaryContent binaryContent = BinaryContent.builder()
-                        .binaryData(attachment.getBytes())
-                        .dataName(attachment.getOriginalFilename())
-                        .dataType(attachment.getContentType())
+                        .bytes(file.getBytes())
+                        .fileName(file.getOriginalFilename())
+                        .contentType(file.getContentType())
                         .build();
 
                 binaryContentRepository.save(binaryContent);
-                ids.add(binaryContent.getId());
+                attachments.add(binaryContent);
 
             } catch (IOException e) {
                 throw new RuntimeException("오류가 발생", e);
             }
         }
-        return ids;
+        return attachments;
     }
 
-    public Message createMessage(MessageCreateRequest requestDto, List<MultipartFile> attachments) {
+    @Override
+    public Message createMessage(MessageCreateRequest requestDto, List<MultipartFile> files) {
         if ((requestDto.getContent() == null || requestDto.getContent().isBlank()) &&
-                (attachments == null || attachments.isEmpty())) {
+                (files == null || files.isEmpty())) {
             throw new InvalidInputException("공백을 보낼 수 없음");
         }
 
@@ -68,13 +70,13 @@ public class BasicMessageService implements MessageService {
         Channel channel = channelRepository.findById(requestDto.getChannelId())
                 .orElseThrow(() -> new NotFoundChannelException("메시지를 받을 채널을 찾을 수 없음"));
 
-        List<UUID> attachmentIds = saveAttachment(attachments);
+        List<BinaryContent> attachments = saveAttachment(files);
 
         Message message = Message.builder()
-                .authorId(requestDto.getAuthorId())
-                .channelId(requestDto.getChannelId())
+                .author(author)
+                .channel(channel)
                 .content(requestDto.getContent())
-                .attachmentIds(attachmentIds)
+                .attachments(attachments)
                 .build();
         messageRepository.save(message);
 
@@ -83,9 +85,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelId(channelId).stream()
-                .sorted(Comparator.comparing(Message::getCreatedAt))
-                .collect(Collectors.toList());
+        return messageRepository.findAllByChannelIdOrderByCreatedAtDesc(channelId);
     }
 
     // Message Update
@@ -107,14 +107,8 @@ public class BasicMessageService implements MessageService {
     // Message Delete
     @Override
     public void deleteMessage(UUID id) {
-        Message message = messageRepository.findById(id)
+        messageRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다."));
-
-        if (message.getAttachmentIds() != null && !message.getAttachmentIds().isEmpty()) {
-            for (UUID attachmentId : message.getAttachmentIds()) {
-                binaryContentRepository.deleteById(attachmentId);
-            }
-        }
 
         messageRepository.deleteById(id);
     }

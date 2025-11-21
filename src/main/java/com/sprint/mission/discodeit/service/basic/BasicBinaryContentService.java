@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentCre
 import com.sprint.mission.discodeit.entity.dto.binaryContentDto.BinaryContentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
@@ -23,9 +25,9 @@ public class BasicBinaryContentService implements BinaryContentService {
     public BinaryContentDto createBinaryContent(BinaryContentCreateRequest requestDto) {
 
         BinaryContent newContent = BinaryContent.builder()
-                .binaryData(requestDto.data())
-                .dataName(requestDto.dataName())
-                .dataType(requestDto.dataType())
+                .bytes(requestDto.data())
+                .fileName(requestDto.dataName())
+                .contentType(requestDto.dataType())
                 .build();
 
         binaryContentRepository.save(newContent);

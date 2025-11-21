@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -23,29 +24,31 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
 
     // 고도화 의존성 추가
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
+    private UserDto toDto(User user) {
+        boolean isOnline = userStatusRepository.findByUserId(user.getId())
+                .map(UserStatus::isOnline).orElse(false);
+        return UserDto.from(user, isOnline);
+    }
+
     // 생성
     @Override
     public User createUser(UserCreateRequest requestDto, MultipartFile profileImage) {
         userRepository.findByEmail(requestDto.email()).ifPresent(user
-                -> {
-            throw new DuplicateEmailException("이미 존재하는 이메일");
-        });
+                -> { throw new DuplicateEmailException("이미 존재하는 이메일"); });
 
-        userRepository.findByUserName(requestDto.username()).ifPresent(user
-                -> {
-            throw new DuplicateEmailException("이미 존재하는 닉네임");
-        });
+        userRepository.findByUsername(requestDto.username()).ifPresent(user
+                -> { throw new DuplicateEmailException("이미 존재하는 닉네임"); });
 
-        UUID profileId = saveProfileImage(profileImage);
+        BinaryContent profile = saveProfileImage(profileImage);
 
         // 유저 생성
         User newUser = User.builder()
@@ -54,36 +57,27 @@ public class BasicUserService implements UserService {
                 .password(requestDto.password())
                 .build();
 
-        newUser.updateProfileId(profileId);
+        newUser.updateProfile(profile);
         userRepository.save(newUser);
-        userStatusRepository.save(new UserStatus(newUser.getId()));
-
+        userStatusRepository.save(new UserStatus(newUser));
         return newUser;
     }
 
-    private UUID saveProfileImage(MultipartFile profileImage) {
+    private BinaryContent saveProfileImage(MultipartFile profileImage) {
         if (profileImage == null || profileImage.isEmpty()) {
             return null;
         }
         try {
             BinaryContent binaryContent = BinaryContent.builder()
-                    .binaryData(profileImage.getBytes())
-                    .dataName(profileImage.getOriginalFilename())
-                    .dataType(profileImage.getContentType())
+                    .bytes(profileImage.getBytes())
+                    .fileName(profileImage.getOriginalFilename())
+                    .contentType(profileImage.getContentType())
                     .build();
-            binaryContentRepository.save(binaryContent);
-            return binaryContent.getId();
+            return binaryContentRepository.save(binaryContent);
 
         } catch (IOException e) {
             throw new RuntimeException("오류가 발생", e);
         }
-    }
-
-    private UserDto toDto(User user) {
-
-        boolean isOnline = userStatusRepository.findStatusByUserId(user.getId())
-                .map(UserStatus::isOnline).orElse(false);
-        return UserDto.from(user, isOnline);
     }
 
     // --- 조회 ---
@@ -112,15 +106,19 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
 
         if (profileImage != null && !profileImage.isEmpty()) {
-            UUID oldProfileId = user.getProfileId();
-            user.updateProfileId(saveProfileImage(profileImage));
+            // 기존 프로필사진 확인
+            BinaryContent oldProfile = user.getProfile();
+            UUID oldProfileId = oldProfile != null ? user.getProfile().getId() : null;
+            // 업데이트
+            user.updateProfile(saveProfileImage(profileImage));
+            // 기존 프로필 삭제
             if (oldProfileId != null) {
                 binaryContentRepository.deleteById(oldProfileId);
             }
         }
 
         if (updateDto.newUsername() != null && !updateDto.newUsername().isBlank()) {
-            userRepository.findByUserName(updateDto.newUsername()).ifPresent(existingUser -> {
+            userRepository.findByUsername(updateDto.newUsername()).ifPresent(existingUser -> {
                 if (!existingUser.getId().equals(user.getId())) {
                     throw new DuplicateEmailException("이미 존재하는 닉네임");
                 }
@@ -134,7 +132,7 @@ public class BasicUserService implements UserService {
                     throw new DuplicateEmailException("이미 존재하는 이메일");
                 }
             });
-            user.updateEmail(updateDto.newUsername());
+            user.updateEmail(updateDto.newEmail());
         }
 
         if (updateDto.newPassword() != null && !updateDto.newPassword().isBlank()) {
@@ -146,20 +144,13 @@ public class BasicUserService implements UserService {
     }
 
 
-    // 논리 삭제
+    // 물리 삭제
     @Override
     public void deleteUser(UUID userId) {
 
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
 
-        // 상태 삭제
-        userStatusRepository.deleteStatusByUserId(userId);
-        // 이미지 삭제
-        if (user.getProfileId() != null)
-            binaryContentRepository.deleteById(user.getProfileId());
-
-        user.softDelete(); // 논리 삭제
-        userRepository.save(user);    // 유저만 저장해서, 재시작 시 채널이나 메시지에는 적용이 안됨;;
+        userRepository.deleteById(userId);
     }
 }

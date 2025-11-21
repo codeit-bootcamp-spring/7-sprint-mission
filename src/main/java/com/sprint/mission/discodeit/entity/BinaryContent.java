@@ -37,7 +37,7 @@ public class BinaryContent extends BaseEntity {
 
     @Lob
     @Column(nullable = false)
-    private transient byte[] bytes;
+    private byte[] bytes;
 
     @Builder
     public BinaryContent(byte[] bytes, String fileName, String contentType) {
