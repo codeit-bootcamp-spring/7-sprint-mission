@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/messages")
 public class MessageController implements MessageControllerDocs {
     private final MessageService messageService;
 
     // 메시지 생성
-    @PostMapping("/messages")
+    @PostMapping
     public ResponseEntity<Message> createMessage(
             @RequestPart("messageCreateRequest") CreateMessageRequestDto requestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
@@ -54,7 +54,7 @@ public class MessageController implements MessageControllerDocs {
     }
 
     // 메시지 수정
-    @PatchMapping("/messages/{messageId}")
+    @PatchMapping("/{messageId}")
     public ResponseEntity<Message> updateMessage(
             @PathVariable UUID messageId,
             @RequestBody UpdateMessageRequestDto requestDto
@@ -64,14 +64,14 @@ public class MessageController implements MessageControllerDocs {
     }
 
     // 메시지 삭제
-    @DeleteMapping("/messages/{messageId}")
+    @DeleteMapping("/{messageId}")
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
         messageService.delete(messageId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     // 특정 채널 메시지 목록 조회
-    @GetMapping("/messages")
+    @GetMapping
     public ResponseEntity<List<Message>> searchMessage(@RequestParam UUID channelId) {
         List<Message> messageList = messageService.findAllByChannelId(channelId);
         return ResponseEntity.status(HttpStatus.OK).body(messageList);

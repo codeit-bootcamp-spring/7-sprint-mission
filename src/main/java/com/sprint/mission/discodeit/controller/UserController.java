@@ -25,14 +25,14 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController implements UserControllerDocs {
 
     private final UserService userService;
     private final UserStatusService userStatusService;
 
     // 사용자 등록
-    @PostMapping(value = "/users", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<User> createUser(
             @Valid @RequestPart("userCreateRequest") CreateUserRequestDto requestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
@@ -43,7 +43,7 @@ public class UserController implements UserControllerDocs {
     }
 
     // 사용자 정보 수정
-    @PatchMapping(value = "/users/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<User> updateUser(
             @PathVariable UUID userId,
             @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
@@ -55,21 +55,21 @@ public class UserController implements UserControllerDocs {
     }
 
     // 사용자 삭제
-    @DeleteMapping("/users/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.delete(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     // 모든 사용자 조회
-    @GetMapping("/users")
+    @GetMapping
     public ResponseEntity<List<UserResponseDto>> searchUsers() {
         List<UserResponseDto> users = userService.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
     // 사용자 온라인 업데이트
-    @PostMapping("/users/{userId}/userStatus")
+    @PostMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatus> onlineUser(
             @PathVariable UUID userId,
             @RequestBody UpdateUserStatusRequestDto request

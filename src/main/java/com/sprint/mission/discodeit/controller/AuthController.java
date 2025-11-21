@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthController implements AuthControllerDocs {
     private final AuthService authService;
 
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     public ResponseEntity<User> login(@Valid @RequestBody LoginRequestDto loginRequestDto){
         User user = authService.login(loginRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(user);
