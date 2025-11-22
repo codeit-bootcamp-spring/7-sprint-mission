@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.messageDto.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.dto.messageDto.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.messageDto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,8 +53,8 @@ public class MessageController {
 
     // 특정 채널의 메시지 조회
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<Message>> getAllByChannelId(@RequestParam UUID channelId) {
-        return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
+    public ResponseEntity<PageResponse<MessageDto>> getAllByChannelId(@RequestParam UUID channelId, @RequestParam Pageable pageable) {
+        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, pageable));
     }
 }
 

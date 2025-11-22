@@ -16,17 +16,4 @@ public record MessageDto(UUID id,
                          UserDto author,
                          List<BinaryContentDto> attachments
 ) {
-    public static MessageDto from(Message message, List<BinaryContentDto> attachments) {
-        return new MessageDto(
-                message.getId(),
-                message.getCreatedAt(),
-                message.getUpdatedAt(),
-                message.getContent(),
-                message.getChannel().getId(),
-                UserDto.from(message.getAuthor(),
-                        message.getAuthor().getStatus().isOnline()),
-                attachments
-        );
-    }
-
 }

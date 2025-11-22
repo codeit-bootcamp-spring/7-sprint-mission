@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentCreateRequest;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentMapper binaryContentMapper;
 
     @Override
     public BinaryContentDto createBinaryContent(BinaryContentCreateRequest requestDto) {
@@ -31,20 +33,20 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .build();
 
         binaryContentRepository.save(newContent);
-        return BinaryContentDto.from(newContent);
+        return binaryContentMapper.toDto(newContent);
     }
 
     @Override
     public BinaryContentDto findBinaryContentById(UUID id) {
         BinaryContent content=  binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
-        return BinaryContentDto.from(content);
+        return binaryContentMapper.toDto(content);
     }
 
     @Override
     public List<BinaryContentDto> findAllBinaryContentByIdIn(List<UUID> ids) {
         return binaryContentRepository.findAllByIdIn(ids).stream()
-                .map(BinaryContentDto::from)
+                .map(binaryContentMapper::toDto)
                 .collect(Collectors.toList());
     }
 

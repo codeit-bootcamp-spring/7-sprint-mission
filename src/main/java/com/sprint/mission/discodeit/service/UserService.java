@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface UserService {
 
     // 생성
-    User createUser(UserCreateRequest requestDto, MultipartFile profileImage);
+    UserDto createUser(UserCreateRequest requestDto, MultipartFile profileImage);
 
     // 조회
     UserDto findUserById(UUID userId);
@@ -20,7 +20,7 @@ public interface UserService {
     List<UserDto> findAllUsers();
 
     // 수정
-    User updateUserInfo(UUID userId, UserUpdateRequest updateDto, MultipartFile profileImage);
+    UserDto updateUserInfo(UUID userId, UserUpdateRequest updateDto, MultipartFile profileImage);
 
     // 삭제
     void deleteUser(UUID userId); // 삭제 메서드 추가 (성공 여부 반환)

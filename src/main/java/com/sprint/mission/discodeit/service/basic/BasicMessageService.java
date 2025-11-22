@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.messageDto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageDto;
 import com.sprint.mission.discodeit.dto.messageDto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
 import com.sprint.mission.discodeit.exception.NotFoundChannelException;
@@ -13,12 +16,15 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +35,12 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final MessageMapper messageMapper;
 
     private List<BinaryContent> saveAttachment(List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
             return new ArrayList<>();
         }
-
         if (files.size() > 10) {
             throw new InvalidInputException("파일은 한번에 10개까지만 보낼 수 있습니다."); // 예외 임시
         }
@@ -59,7 +65,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(MessageCreateRequest requestDto, List<MultipartFile> files) {
+    public MessageDto createMessage(MessageCreateRequest requestDto, List<MultipartFile> files) {
         if ((requestDto.getContent() == null || requestDto.getContent().isBlank()) &&
                 (files == null || files.isEmpty())) {
             throw new InvalidInputException("공백을 보낼 수 없음");
@@ -80,17 +86,22 @@ public class BasicMessageService implements MessageService {
                 .build();
         messageRepository.save(message);
 
-        return message;
+        return messageMapper.toDto(message);
     }
 
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelIdOrderByCreatedAtDesc(channelId);
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+
+        Slice<Message> messagesSlice = messageRepository.findAllByChannelId(channelId, pageable);
+
+        Slice<MessageDto> dto = messagesSlice.map(messageMapper::toDto);
+
+        return PageResponse.from(dto);
     }
 
     // Message Update
     @Override
-    public Message updateMessage(UUID messageId, MessageUpdateRequest updateDto) {
+    public MessageDto updateMessage(UUID messageId, MessageUpdateRequest updateDto) {
 
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다."));
@@ -101,7 +112,7 @@ public class BasicMessageService implements MessageService {
 
         message.updateContent(updateDto.newContent());
         messageRepository.save(message);
-        return message;
+        return messageMapper.toDto(message);
     }
 
     // Message Delete

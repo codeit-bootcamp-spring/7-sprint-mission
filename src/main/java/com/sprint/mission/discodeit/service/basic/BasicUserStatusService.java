@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -26,9 +27,10 @@ public class BasicUserStatusService implements UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
+    private final UserStatusMapper userStatusMapper;
 
     @Override
-    public UserStatus createUserStatus(UserStatusCreateRequest requestDto) {
+    public UserStatusDto createUserStatus(UserStatusCreateRequest requestDto) {
 
         User user = userRepository.findById(requestDto.userId())
                         .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
@@ -39,7 +41,7 @@ public class BasicUserStatusService implements UserStatusService {
 
         UserStatus userStatus = new UserStatus(user);
         userStatusRepository.save(userStatus);
-        return userStatus;
+        return userStatusMapper.toDto(userStatus);
     }
 
     @Override
@@ -47,33 +49,33 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus status = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
 
-        return UserStatusDto.from(status);
+        return userStatusMapper.toDto(status);
     }
 
     @Override
-    public UserStatus updateStatusByUserId(UUID userId, UserStatusUpdateRequest requestDto) {
+    public UserStatusDto updateStatusByUserId(UUID userId, UserStatusUpdateRequest requestDto) {
         UserStatus status = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
 
         status.updateLastActiveAt(requestDto.newLastActiveAt());
         userStatusRepository.save(status);
-        return status;
+        return userStatusMapper.toDto(status);
     }
 
     @Override
     public List<UserStatusDto> findAllStatus() {
-        return userStatusRepository.findAll().stream().map(UserStatusDto::from)
+        return userStatusRepository.findAll().stream().map(userStatusMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public UserStatus updateStatusById(UUID id, UserStatusUpdateRequest updateDto) {
+    public UserStatusDto updateStatusById(UUID id, UserStatusUpdateRequest updateDto) {
         UserStatus status = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
 
         status.updateLastActiveAt(updateDto.newLastActiveAt());
         userStatusRepository.save(status);
-        return status;
+        return userStatusMapper.toDto(status);
 
     }
 

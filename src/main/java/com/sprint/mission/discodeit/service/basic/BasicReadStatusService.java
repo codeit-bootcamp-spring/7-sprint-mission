@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.exception.NotFoundChannelException;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
@@ -30,9 +31,10 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final ReadStatusMapper readStatusMapper;
 
     @Override
-    public ReadStatus createReadStatus(ReadStatusCreateRequest requestDto) {
+    public ReadStatusDto createReadStatus(ReadStatusCreateRequest requestDto) {
         // User, Channel Id 입력
         User user = userRepository.findById(requestDto.userId())
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없음"));
@@ -47,30 +49,30 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = new ReadStatus(user, channel);
         readStatusRepository.save(readStatus);
 
-        return readStatus;
+        return readStatusMapper.toDto(readStatus);
     }
 
     @Override
     public ReadStatusDto findReadStatusById(UUID id) {
         ReadStatus status = readStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
-        return ReadStatusDto.from(status);
+        return readStatusMapper.toDto(status);
     }
 
     @Override
     public List<ReadStatusDto> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId)
-                .stream().map(ReadStatusDto::from).collect(Collectors.toList());
+                .stream().map(readStatusMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public ReadStatus updateReadStatus(UUID id, ReadStatusUpdateRequest updateDto) {
+    public ReadStatusDto updateReadStatus(UUID id, ReadStatusUpdateRequest updateDto) {
         ReadStatus status = readStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
 
         status.updateReadStatus(updateDto.newLastReadAt());
         readStatusRepository.save(status);
-        return status;
+        return readStatusMapper.toDto(status);
     }
 
     @Override

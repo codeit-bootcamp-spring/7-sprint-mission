@@ -10,13 +10,13 @@ import java.util.UUID;
 
 public interface UserStatusService {
 
-    UserStatus createUserStatus(UserStatusCreateRequest requestDto);
+    UserStatusDto createUserStatus(UserStatusCreateRequest requestDto);
 
     UserStatusDto findStatusById(UUID id);
 
-    UserStatus updateStatusByUserId(UUID userId, UserStatusUpdateRequest requestDto);
+    UserStatusDto updateStatusByUserId(UUID userId, UserStatusUpdateRequest requestDto);
 
-    UserStatus updateStatusById(UUID id, UserStatusUpdateRequest updateDto);
+    UserStatusDto updateStatusById(UUID id, UserStatusUpdateRequest updateDto);
 
     List<UserStatusDto> findAllStatus();
 
