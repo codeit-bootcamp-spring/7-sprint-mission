@@ -27,13 +27,11 @@ public class User extends BaseUpdateEntity {
     private String password;
 
     // private UUID profileId;
+    //널러블이 디폴트여도  하나있고 없어도된다는 표현을 하고싶었다
     @OneToOne
-    @JoinColumn(
-            name = "profile_id",
-            foreignKey = @ForeignKey(name = "fk_users_profile")
-    )
+    @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_users_profile"), nullable = true)
     private BinaryContent profile;
-
+    @OneToOne(mappedBy = "user")
     private UserStatus status;
 
     public User(String username, String email, String password, UUID profileId) {

@@ -1,16 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
 
+@Entity
 @NoArgsConstructor
 @Getter
 public class Message extends BaseUpdateEntity {
-    private static final long serialVersionUID = 1L;
+
 
     private UUID authorId;
     private UUID channelId;

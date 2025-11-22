@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,11 +9,12 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
 @NoArgsConstructor
 @Getter
 public class Channel extends BaseUpdateEntity {
 
-    private static final long serialVersionUID = 1L;
+
     //
     private ChannelType type;
     private String name;

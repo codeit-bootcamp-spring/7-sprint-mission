@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.entity.status;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -10,9 +12,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Entity
+@NoArgsConstructor
 public class UserStatus extends BaseUpdateEntity {
 
-    private static final long serialVersionUID = 1L;
 
     //
     private UUID userId;

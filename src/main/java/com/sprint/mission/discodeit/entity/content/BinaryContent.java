@@ -2,16 +2,19 @@ package com.sprint.mission.discodeit.entity.content;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import jakarta.persistence.Entity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Entity
+@NoArgsConstructor
 public class BinaryContent extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
 
     //
     private String fileName;

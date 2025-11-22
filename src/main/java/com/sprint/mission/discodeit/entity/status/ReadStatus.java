@@ -3,21 +3,24 @@ package com.sprint.mission.discodeit.entity.status;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Entity
+@NoArgsConstructor
 public class ReadStatus extends BaseUpdateEntity {
 
-    private static final long serialVersionUID = 1L;
 
     //
-    private final UUID userId;
-    private final UUID channelId;
+    // private final UUID userId;
+    //  private final UUID channelId;
     private Instant lastReadAt;
 
     //추가
