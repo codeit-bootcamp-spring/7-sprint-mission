@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Channel", description = "Channel API")
 public interface ChannelControllerDocs {
@@ -76,7 +77,8 @@ public interface ChannelControllerDocs {
       }
   )
   ResponseEntity<Map<ChannelType, List<ChannelInfoRes>>> getAllChannels(
-      @RequestHeader("X-LOGINUSER-ID") UUID userId);
+      @RequestHeader("X-LOGINUSER-ID") UUID userId,
+      @RequestParam(required = false) String searchTxt);
 
   @Operation(summary = "Public Channel 생성")
   @ApiResponses(

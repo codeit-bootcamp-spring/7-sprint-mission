@@ -38,8 +38,9 @@ public class ChannelController implements ChannelControllerDocs {
   //채널 목록 조회 : 공개방은 전부, 비밀방은 내 기준 참여되어있는 것 기준
   @GetMapping
   public ResponseEntity<Map<ChannelType, List<ChannelInfoRes>>> getAllChannels(
-      @RequestHeader("X-LOGINUSER-ID") UUID userId) {
-    return ResponseEntity.ok(channelOverViewFacade.findAllMyChannels(userId));
+      @RequestHeader("X-LOGINUSER-ID") UUID userId,
+      @RequestParam(required = false) String searchTxt) {
+    return ResponseEntity.ok(channelOverViewFacade.findAllMyChannels(userId, searchTxt));
   }
 
   // 공개 채널 생성
