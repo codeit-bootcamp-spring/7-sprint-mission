@@ -28,4 +28,6 @@ public interface UserService {
   AvailabilityRes isRegisteredNickname(String nickname);
 
   AvailabilityRes isRegisteredEmail(String email);
+
+  void sendEmailId(String email);
 }

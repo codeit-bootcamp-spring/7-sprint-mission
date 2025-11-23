@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.email.EmailSender;
 import com.sprint.mission.discodeit.dto.auth.response.AvailabilityRes;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateReq;
 import com.sprint.mission.discodeit.entity.User;
@@ -19,6 +20,18 @@ public class BasicUserService implements UserService {
 
   //리포지토리
   private final UserRepository userRepository;
+  private final EmailSender emailSender;
+
+  // ===== 🎯 Controller Direct (DTO 반환) =====
+  //메일로 가입했던 아이디를 발송
+  public void sendEmailId(String email) {
+    User user = findByEmail(email);
+    emailSender.sendEmailAsync(
+        email,
+        "[ch-ah] 가입하신 아이디를 보내드립니다",
+        "nickname: " + user.getNickname()
+    );
+  }
 
   // ===== 🏗️ Domain Logic (Facade 용)  =====
   //유저 추가
