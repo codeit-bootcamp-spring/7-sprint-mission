@@ -40,7 +40,6 @@ public class BasicAuthService implements AuthService {
   // 인증번호 검증
   public VerifyCodeRes verifyEmailCode(String email, String code) {
     String auth = emailAuthCache.getIfPresent(email);
-    System.out.println(code + " : " + auth);
     if (auth == null || !auth.equals(code)) {
       return new VerifyCodeRes(false, "인증 코드가 일치하지 않거나 만료되었습니다."); // 5분 지나면 자동 삭제
     }
