@@ -8,13 +8,12 @@ import com.sprint.mission.discodeit.dto.auth.response.AvailabilityRes;
 import com.sprint.mission.discodeit.dto.auth.response.VerifyCodeRes;
 import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.facade.auth.AuthFacade;
-import com.sprint.mission.discodeit.facade.auth.EmailAuthFacade;
+import com.sprint.mission.discodeit.service.basic.BasicAuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController implements AuthControllerDocs {
 
   private final AuthFacade authFacade;
-  private final EmailAuthFacade emailAuthFacade;
+  private final BasicAuthService basicAuthService;
   private final UserService userService;
 
   //이메일 가입되어있는지
@@ -52,13 +51,13 @@ public class AuthController implements AuthControllerDocs {
   @PostMapping("/email-code")
   public ResponseEntity<Void> sendEmailAuthCode(@Valid @RequestBody EmailCheckReq req) {
     String email = req.email();
-    emailAuthFacade.sendEmailCode(email);
+    basicAuthService.sendEmailCode(email);
     return ResponseEntity.noContent().build();
   }
 
   //이메일 인증 결과 확인
   @PostMapping("/email-code/verify")
   public ResponseEntity<VerifyCodeRes> verifyEmailAuthCode(@Valid @RequestBody VerifyCodeReq req) {
-    return ResponseEntity.ok(emailAuthFacade.verifyEmailCode(req.email(), req.code()));
+    return ResponseEntity.ok(basicAuthService.verifyEmailCode(req.email(), req.code()));
   }
 }
