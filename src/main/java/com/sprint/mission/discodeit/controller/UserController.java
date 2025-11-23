@@ -72,9 +72,7 @@ public class UserController implements UserControllerDocs {
       @PathVariable UUID userId,
       @Valid @RequestPart("userInfoReq") UserInfoReq userInfoReq,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
-    System.out.println(profile);
     BinaryContentCreateReq binaryContentCreateReq = BinaryContentCreateReq.from(profile);
-    System.out.println(binaryContentCreateReq);
     UserUpdateReq req = UserUpdateReq.from(userInfoReq, binaryContentCreateReq);
     UserDetailInfoRes res = userUpdateFacade.updateUser(userId, req);
     return ResponseEntity.ok(res);
