@@ -81,12 +81,14 @@ public class BasicUserService implements UserService {
     userRepository.updateProfileImage(id, profileId);
   }
 
+  //해당 닉네임으로 가입된 사림이 있는지.
   @Override
   public AvailabilityRes isRegisteredNickname(String nickname) {
     return new AvailabilityRes(
         userRepository.existsByNickname(nickname));
   }
 
+  //해당 이메일로 가입된 사림이 있는지.
   @Override
   public AvailabilityRes isRegisteredEmail(String email) {
     return new AvailabilityRes(
