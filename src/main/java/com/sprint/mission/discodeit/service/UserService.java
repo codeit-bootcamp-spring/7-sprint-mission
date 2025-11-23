@@ -30,4 +30,6 @@ public interface UserService {
   AvailabilityRes isRegisteredEmail(String email);
 
   void sendEmailId(String email);
+
+  void sendEmailTemporaryPassword(String email, String nickname);
 }

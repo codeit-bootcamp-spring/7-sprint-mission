@@ -85,6 +85,8 @@ public enum ErrorCode {
       "이미 존재하는 닉네임으로 값을 지정할 수 없습니다."),
   EMAIL_NOT_FOUND("USER_004", HttpStatus.NOT_FOUND,
       "해당 이메일을 가진 유저가 존재하지 않습니다."),
+  INVALID_USER_NICKNAME("USER_005", HttpStatus.BAD_REQUEST,
+      "해당 이메일로 가입한 유저의 닉네임이 바르지 않습니다."),
 
   // UserStatus
   USERSTATUS_NOT_FOUND("USERSTATUS_001", HttpStatus.NOT_FOUND,

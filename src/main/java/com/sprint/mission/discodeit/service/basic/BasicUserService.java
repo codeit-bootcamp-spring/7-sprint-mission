@@ -33,6 +33,23 @@ public class BasicUserService implements UserService {
     );
   }
 
+  //메일로 임시 비밀번호 발송 및 임시 비밀번호 발급
+  public void sendEmailTemporaryPassword(String email, String nickname) {
+    User user = userRepository.findByEmail(email).orElseThrow(
+        () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+    );
+    if (!user.getNickname().equals(nickname)) {
+      throw new CustomException(ErrorCode.INVALID_USER_NICKNAME);
+    }
+    String passwordTemp = UUID.randomUUID().toString().replaceAll("-", "");
+    userRepository.updatePasswordTemporary(user.getId(), passwordTemp);
+    emailSender.sendEmailAsync(
+        email,
+        "[ch-at] 임시 비밀번호를 보내드립니다",
+        "임시 비밀번호: " + passwordTemp + "\n 반드시 이후에 비밀번호 변경을 해주세요."
+    );
+  }
+
   // ===== 🏗️ Domain Logic (Facade 용)  =====
   //유저 추가
   @Override

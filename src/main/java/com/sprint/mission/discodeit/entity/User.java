@@ -51,4 +51,11 @@ public class User extends BaseEntity {
     this.profileId = profileId;
     return this;
   }
+
+  //임시 비밀번호로 업데이트
+  public User updateTemporaryPassword(String password) {
+    super.update();
+    this.password = password;
+    return this;
+  }
 }

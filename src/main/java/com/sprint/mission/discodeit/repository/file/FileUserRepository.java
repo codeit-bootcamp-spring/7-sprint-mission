@@ -66,6 +66,14 @@ public class FileUserRepository extends BaseFileRepository<User> implements User
     });
   }
 
+  @Override
+  public void updatePasswordTemporary(UUID userId, String password) {
+    loadFromFile(userId).ifPresent(user -> {
+      user.updateTemporaryPassword(password);
+      saveToFile(userId, user);
+    });
+  }
+
   //유저 삭제
   @Override
   public void delete(UUID userId) {
