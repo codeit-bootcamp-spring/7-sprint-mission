@@ -6,20 +6,17 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record BinaryContentResponse(
-        UUID id,
-        Instant createAt,
+        String id,
         String fileName,
         long size,
-        String contentType,
-        byte[] bytes
+        String contentType
+
 
 ) {
-    public static BinaryContentResponse from(BinaryContent content,byte[] file){
-        return new BinaryContentResponse(content.getId(),
-                content.getCreatedAt(),
+    public static BinaryContentResponse from(BinaryContent content){
+        return new BinaryContentResponse(content.getId().toString(),
                 content.getFileName(),
                 content.getFileSize(),
-                content.getFileType(),
-                file);
+                content.getFileType());
     }
 }

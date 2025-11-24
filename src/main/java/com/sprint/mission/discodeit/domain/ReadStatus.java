@@ -7,21 +7,24 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
-//용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현. 사용자별 각 채널에 읽지 않은 메시지를 확인하기 위해 활용합니다.
+
 @Getter
 public class ReadStatus {
 
     private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
     private UUID userId;
     private UUID channelId;
     private Instant lastReadAt;
 
 
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        this.userId = userId;
         this.id = UUID.randomUUID();
-        this.lastReadAt = lastReadAt;
+        this.userId = userId;
         this.channelId = channelId;
+        this.lastReadAt = lastReadAt;
+
     }
 
     public void read(){

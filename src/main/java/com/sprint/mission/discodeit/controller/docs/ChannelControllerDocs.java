@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.service.dto.request.PrivateChannelCreateRequ
 import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ChannelResponse;
-import com.sprint.mission.discodeit.service.dto.response.ChannelListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,7 +33,7 @@ public interface ChannelControllerDocs {
     @Operation(summary = "채널 목록 조회", description = "Public 채널은 모두 조회, Private 채널은 채널 멤버만 조회가능")
     @ApiResponse(responseCode = "200", description = "채널 조회 성공"
             )
-    List<ChannelListResponse> getAllChannelByUserId(UUID userId);
+    List<ChannelResponse> getAllChannelByUserId(UUID userId);
 
 
     @Operation(summary = "채널 삭제")

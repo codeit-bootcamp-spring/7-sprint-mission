@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.service.dto.request.PrivateChannelCreateRequ
 import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ChannelResponse;
-import com.sprint.mission.discodeit.service.dto.response.ChannelListResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +34,7 @@ public class ChannelController implements ChannelControllerDocs {
     }
 
     @GetMapping
-    public List<ChannelListResponse> getAllChannelByUserId(@RequestParam UUID userId){
+    public List<ChannelResponse> getAllChannelByUserId(@RequestParam UUID userId){
         channelService.getAllByUser(userId);
         return channelService.getAllByUser(userId);
     }

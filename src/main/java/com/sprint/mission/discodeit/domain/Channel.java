@@ -8,67 +8,52 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Channel{
+public class Channel {
 
     private final UUID id;
-    private final Instant createdAt;
+    private Instant createdAt;
     private Instant updatedAt;
 
     private String name;
     private String description;
     private ChannelType type;
+    private final List<UUID> members;
 
-
-
-    public Channel(String name, boolean isPrivate) {
+    public Channel(String name, String description, boolean isPrivate, List<UUID> members) {
         validateChannelName(name);
+
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt=Instant.now();
         this.name = name;
-        if(isPrivate){
-            this.type=ChannelType.PRIVATE;
-        }else{
-            this.type=ChannelType.PUBLIC;
+        this.description = description;
+        if (isPrivate) {
+            this.type = ChannelType.PRIVATE;
+        } else {
+            this.type = ChannelType.PUBLIC;
         }
-//        if(members==null){
-//            this.members=new ArrayList<>();
-//        } else {
-//            this.members=members;
-//        }
+        if (members == null) {
+            this.members = new ArrayList<>();
+        } else {
+            this.members = members;
+        }
     }
 
-    public void updateChannelName(String name){
+    public void updateChannelName(String name) {
         validateChannelName(name);
-        this.name =name;
+        this.name = name;
     }
 
-    private void validateChannelName(String name){
-        if(name==null || name.length()<1){
+    private void validateChannelName(String name) {
+        if (name == null || name.length() < 1) {
             throw new IllegalArgumentException("채널 이름을 입력하세요");
         }
     }
 
-//    public List<UUID> getHistory() {
-//        return List.copyOf(history);
-//    }
-//
-//
-//    public void sendMessage(UUID messageId){
-//        history.add(messageId);
-//    }
-//
-//    public void deleteMessage(UUID messageId){
-//        history.remove(messageId);
-//    }
-//
-//    public void addChannelMember(UUID userId){
-//        if (members
-//                .stream()
-//                .anyMatch(uuid -> uuid.equals(userId))){
-//            throw new IllegalArgumentException("해당 유저는 이미 채널에 있습니다.");
-//        }
-//        members.add(userId);
-//
-//    }
+    public void addMember(UUID userId) {
+        if (members
+                .stream()
+                .anyMatch(uuid -> uuid.equals(userId))) {
+            throw new IllegalArgumentException("해당 유저는 이미 채널에 있습니다.");
+        }
+        members.add(userId);
+    }
 }

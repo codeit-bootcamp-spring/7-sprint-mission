@@ -21,7 +21,7 @@ public record MessageResponse(
                 message.getUpdatedAt(),
                 message.getContent(),
                 message.getChannelId(),
-                message.getAuthorId(),
+                message.getUserId(),
                 message.getAttachmentIds());
     }
 }

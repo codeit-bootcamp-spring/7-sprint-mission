@@ -4,18 +4,19 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "messages")
 public class MessageEntity extends BaseUpdatableEntity{
 
-    @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
-    private UserEntity userId;
 
-    @ManyToOne
-    @JoinColumn(name = "channel_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private ChannelEntity channelId;
+    @Column(name="user_id", nullable = false)
+    private UUID userId;
+
+
+    @Column(name = "channel_id", nullable = false)
+    private UUID channelId;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;

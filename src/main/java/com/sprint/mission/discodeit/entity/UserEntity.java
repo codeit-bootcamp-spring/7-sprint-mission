@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.domain.UserStatus;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -21,7 +20,6 @@ public class UserEntity extends BaseUpdatableEntity{
     @Column(nullable = false, name = "last_active_at")
     private Instant lastActiveAt;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name ="profile_id")
-    private BinaryContentEntity profileId;
+    @Column(name ="profile_id")
+    private UUID profileId;
 }

@@ -11,14 +11,16 @@ import java.util.UUID;
 public class User {
 
     private final UUID id;
-    private final Instant createdAt;
+    private Instant createdAt;
     private Instant updatedAt;
 
     private String username;
     private String password;
     private String email;
     private UserStatus userStatus;
-    private UUID profile;
+    private UUID profileId;
+
+    private Instant lastAt;
 
 
     public User(String email, String password, String username) {
@@ -27,8 +29,6 @@ public class User {
         validateUsername(username);
 
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
         this.username = username;
         this.password = password;
         this.email = email;
@@ -36,8 +36,8 @@ public class User {
 
     }
 
-    public void setProfile(UUID profile) {
-        this.profile = profile;
+    public void setProfile(UUID profileId) {
+        this.profileId = profileId;
     }
 
 
@@ -48,26 +48,26 @@ public class User {
     public void UpdatedPassword(String password) {
         validatePassword(password);
         this.password = password;
-        this.updatedAt = Instant.now();
+
     }
 
     public void updateUsername(String username) {
         validateUsername(username);
         this.username = username;
-        this.updatedAt = Instant.now();
+
     }
 
     public void updatePassword(String password) {
         validatePassword(password);
 
         this.password = password;
-        this.updatedAt = Instant.now();
+
     }
 
     public void updateEmail(String email) {
         validateEmail(email);
         this.email = email;
-        this.updatedAt = Instant.now();
+
     }
 
 
