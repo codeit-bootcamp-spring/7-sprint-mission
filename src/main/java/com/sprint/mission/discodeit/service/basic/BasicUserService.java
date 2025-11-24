@@ -96,11 +96,13 @@ public class BasicUserService implements UserService {
   //업데이트
   @Override
   public void update(UUID id, UserUpdateReq req) {
-    if (!userRepository.existsById(id)) {
-      throw new CustomException(ErrorCode.USER_NOT_FOUND);
+    String replacaPassword = req.password();
+    User user = findById(id);
+    if (req.password() == null) {
+      replacaPassword = user.getPassword();
     }
     validateDuplicate(id, req.email(), req.nickname());
-    userRepository.update(id, req.email(), req.nickname(), req.password());
+    userRepository.update(id, req.email(), req.nickname(), replacaPassword);
   }
 
   @Override
