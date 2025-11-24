@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserStatus;
-import com.sprint.mission.discodeit.entity.dto.Res_UserUpdate;
+import com.sprint.mission.discodeit.dto.Dto_UserStatus;
+import com.sprint.mission.discodeit.dto.Res_UserUpdate;
 import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserStatusService;
@@ -35,7 +35,7 @@ public class UserStatusService implements InterfaceUserStatusService {
         if (userStatus != null && userStatus.isPresent()) {
             userStatusRepository.save(userStatus.get());
 
-            log.info("✅ UserStatusService.create = [" + user.getUserName() + "]");
+            log.info("✅ UserStatusService.create = [" + user.getUsername() + "]");
             return Res_UserUpdate.from(userStatus.get());
         }
         else {
@@ -49,7 +49,7 @@ public class UserStatusService implements InterfaceUserStatusService {
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.find.statusID = [" + statusID.toString() + "] err"));
 
         userRepository.findById(userStatus.getUserId())
-            .ifPresent(user -> log.info("✅ UserStatusService.find = [" + user.getUserName() + "]"));
+            .ifPresent(user -> log.info("✅ UserStatusService.find = [" + user.getUsername() + "]"));
 
         return Res_UserUpdate.from(userStatus);
     }
@@ -64,7 +64,7 @@ public class UserStatusService implements InterfaceUserStatusService {
             log.info("✅ UserStatusService.findAll = ["
                 + userRepository.findById(resUserStatus.userId())
                                 .get()
-                                .getUserName()
+                                .getUsername()
                 + "]");
         }
 
@@ -85,7 +85,7 @@ public class UserStatusService implements InterfaceUserStatusService {
         User user = userRepository.findById(userStatus.getUserId())
             .orElseThrow(() -> new IllegalArgumentException(
                 "🚨UserStatusService.update.userStatus = [" + userStatus.getUserId().toString() + "]"));
-        String userName = user.getUserName();
+        String userName = user.getUsername();
         log.info("✅ UserStatusService.update = [" + userName + "]");
     }
 

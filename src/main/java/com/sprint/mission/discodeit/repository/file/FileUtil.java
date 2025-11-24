@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.*;
@@ -35,7 +36,7 @@ public class FileUtil {
         return DIRECTORY.resolve(modelID + EXTENSION);
     }
 
-    public void saveRepository(BaseModel model) {
+    public void saveRepository(BaseEntity model) {
         Path path = resolvePath(model.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile()); //✅ implements Serializable 필요!
@@ -62,8 +63,8 @@ public class FileUtil {
         }
     }
 
-    public Optional<BaseModel> findModel(UUID id) {
-        BaseModel model = null;
+    public Optional<BaseEntity> findModel(UUID id) {
+        BaseEntity model = null;
         Path path = resolvePath(id);
         if (Files.exists(path)) {
             try (
@@ -86,7 +87,7 @@ public class FileUtil {
         return Optional.ofNullable(model);
     }
 
-    public List<BaseModel> findAll() {
+    public List<BaseEntity> findAll() {
         try (Stream<Path> paths = Files.list(DIRECTORY)) {
             return paths
                     .filter(path -> path.toString().endsWith(EXTENSION))

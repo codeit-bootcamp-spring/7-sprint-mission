@@ -2,11 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
-import com.sprint.mission.discodeit.entity.dto.FindAllByChannelIdDto;
-import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.entity.dto.Res_Message;
+import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
+import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.Res_Message;
 import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class MessageService implements InterfaceMessageService {
         Message newMessage = new Message(dtoMessage, attachemntIds);
         messageRepository.save(newMessage);
 
-        log.info("✅ 💌 MessageService.create.content = [" + newMessage.getMessage() + "] 💬");
+        log.info("✅ 💌 MessageService.create.content = [" + newMessage.getContent() + "] 💬");
         return Res_Message.from(newMessage);
     }
 
@@ -59,7 +58,7 @@ public class MessageService implements InterfaceMessageService {
           .orElseThrow(() -> new NoSuchElementException("🚨Message [" + messageID.toString() + "] 를 찾을 수 없음"));
 
       messageRepository.deleteById(messageID);
-      log.info("✅ deleteMessage = [" + message.getMessage() + "]");
+      log.info("✅ deleteMessage = [" + message.getContent() + "]");
     }
 
     @Override
@@ -67,7 +66,7 @@ public class MessageService implements InterfaceMessageService {
         Message message = messageRepository.findById(messageID)
             .orElseThrow(() -> new IllegalArgumentException("🚨MessageService.find.messageID = [" + messageID.toString() + "] 오류"));
 
-        log.info("✅ MessageService.find = [" + message.getMessage() + "]");
+        log.info("✅ MessageService.find = [" + message.getContent() + "]");
         return Res_Message.from(message);
     }
 
@@ -96,7 +95,7 @@ public class MessageService implements InterfaceMessageService {
 
         message.updateMessage(requestDto.newContent());
         messageRepository.save(message);
-        log.info("✅ updateMessage = [" + message.getMessage() + "]");
+        log.info("✅ updateMessage = [" + message.getContent() + "]");
 
         return Res_Message.from(message);
     }

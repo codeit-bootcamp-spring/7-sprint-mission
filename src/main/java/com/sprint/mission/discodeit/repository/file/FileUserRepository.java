@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.AuthServiceDto;
-import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
+import com.sprint.mission.discodeit.dto.AuthServiceDto;
+import com.sprint.mission.discodeit.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import java.lang.module.FindException;
 import java.util.List;
@@ -33,20 +33,20 @@ public class FileUserRepository implements InterfaceUserRepository {
 
     @Override
     public boolean isUsingName(String name) {
-        boolean isExist = fileUtil.findAll().stream().map(user -> (User)user).anyMatch(user -> user.getUserName().equals(name));
+        boolean isExist = fileUtil.findAll().stream().map(user -> (User)user).anyMatch(user -> user.getUsername().equals(name));
         return isExist;
     }
 
     @Override
     public boolean isUsingEmail(String eMail) {
-        boolean isExist = fileUtil.findAll().stream().map(user -> (User)user).anyMatch(user -> user.getEMail().equals(eMail));
+        boolean isExist = fileUtil.findAll().stream().map(user -> (User)user).anyMatch(user -> user.getEmail().equals(eMail));
         return isExist;
     }
 
   @Override
   public Optional<User> findByName(String name) {
         return fileUtil.findAll().stream().map(user -> (User) user)
-        .filter(user -> user.getUserName().equals(name))
+        .filter(user -> user.getUsername().equals(name))
         .findFirst();
   }
 
@@ -65,10 +65,10 @@ public class FileUserRepository implements InterfaceUserRepository {
     public Res_UserLogin isLogin(AuthServiceDto authServiceDto) {
         User user1 = fileUtil.findAll().stream()
                             .map(user -> (User) user)
-                            .filter(user -> user.getUserName().equals(authServiceDto.username()) && user.getPassword().equals(authServiceDto.password()))
+                            .filter(user -> user.getUsername().equals(authServiceDto.username()) && user.getPassword().equals(authServiceDto.password()))
                             .findFirst()
                             .orElseThrow(() -> new FindException("AuthService.login.name = [" + authServiceDto.username() + "] 또는 newPassword 오류"));
-        log.info("✅ AuthService.login = [" + user1.getUserName() + "]");
+        log.info("✅ AuthService.login = [" + user1.getUsername() + "]");
         return Res_UserLogin.from(user1);
     }
 }

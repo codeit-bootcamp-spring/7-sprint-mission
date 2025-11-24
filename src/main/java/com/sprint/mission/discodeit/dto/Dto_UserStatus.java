@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 
 public record Dto_UserStatus( //all private final

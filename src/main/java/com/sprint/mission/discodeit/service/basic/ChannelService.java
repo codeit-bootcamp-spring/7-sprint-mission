@@ -6,12 +6,12 @@ import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.dto.ChannelDto;
-import com.sprint.mission.discodeit.entity.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPrivate;
-import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPublic;
-import com.sprint.mission.discodeit.entity.dto.Res_Channel;
-import com.sprint.mission.discodeit.entity.dto.Res_ChannelFind;
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.ChannelDto_Update;
+import com.sprint.mission.discodeit.dto.Dto_CreateChannelPrivate;
+import com.sprint.mission.discodeit.dto.Dto_CreateChannelPublic;
+import com.sprint.mission.discodeit.dto.Res_Channel;
+import com.sprint.mission.discodeit.dto.Res_ChannelFind;
 import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.service.InterfaceChannelService;
 import java.time.Instant;
@@ -88,7 +88,7 @@ public class ChannelService implements InterfaceChannelService {
             return Res_ChannelFind.from(dtoChannel, lastMessageAt, userIdList);
         }
         else {
-            log.info("✅ ChannelService.find <PUBLIC> = [" + channel.getChannelName() + "]");
+            log.info("✅ ChannelService.find <PUBLIC> = [" + channel.getName() + "]");
             return Res_ChannelFind.from(dtoChannel, lastMessageAt, null);
         }
     }
@@ -107,14 +107,14 @@ public class ChannelService implements InterfaceChannelService {
         List<Channel> allChannel = channelRepository.findAll();
 
         allChannel.stream()
-            .filter(channel -> channel.getChannelType() == PUBLIC)
-            .peek(channel -> log.info("✅ findAllByUserId.[✅ PUBLIC] = [" + channel.getChannelName() + "]"))
+            .filter(channel -> channel.getType() == PUBLIC)
+            .peek(channel -> log.info("✅ findAllByUserId.[✅ PUBLIC] = [" + channel.getName() + "]"))
             .forEach(channel -> resChannelFinds.add(this.find(ChannelDto.create(channel))));
 
         //[ ] 특정 User가 볼 수 있는 Channel 목록 조회
         //[ ] PRIVATE 채널인 경우 참여한 User의 readStatusID 정보를 포함합니다.
         List<Channel> privateChannels = allChannel.stream()
-            .filter(channel -> channel.getChannelType() == PRIVATE)
+            .filter(channel -> channel.getType() == PRIVATE)
             .toList();
 
         List<ReadStatus> readStatusInUserID = readStatusRepository.findAll().stream()
@@ -134,7 +134,7 @@ public class ChannelService implements InterfaceChannelService {
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> new NoSuchElementException("🚨Channel[" + channelId.toString() + "]을 찾을 수 없음"));
 
-        if (channel.getChannelType() == PRIVATE) {
+        if (channel.getType() == PRIVATE) {
             throw new IllegalArgumentException("🚨Private Channel은 수정할 수 없음");
         }
         else {
@@ -167,6 +167,6 @@ public class ChannelService implements InterfaceChannelService {
           .filter(Message -> Message.getChannelId() == channelID)
           .forEach(message -> messageRepository.deleteById(message.getId()));
 
-        log.info("✅ ChannelService.delete = [" + findedChannel.getChannelName() + "] 채널 삭제");
+        log.info("✅ ChannelService.delete = [" + findedChannel.getName() + "] 채널 삭제");
     }
 }

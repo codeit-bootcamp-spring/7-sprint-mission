@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
-import com.sprint.mission.discodeit.entity.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPrivate;
-import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPublic;
-import com.sprint.mission.discodeit.entity.dto.Res_Channel;
-import com.sprint.mission.discodeit.entity.dto.Res_ChannelFind;
+import com.sprint.mission.discodeit.dto.ChannelDto_Update;
+import com.sprint.mission.discodeit.dto.Dto_CreateChannelPrivate;
+import com.sprint.mission.discodeit.dto.Dto_CreateChannelPublic;
+import com.sprint.mission.discodeit.dto.Res_Channel;
+import com.sprint.mission.discodeit.dto.Res_ChannelFind;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -3,11 +3,11 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
-import com.sprint.mission.discodeit.entity.dto.Res_User;
-import com.sprint.mission.discodeit.entity.dto.UserDto;
+import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.Dto_UserUpdate;
+import com.sprint.mission.discodeit.dto.Res_User;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
@@ -85,7 +85,7 @@ public class UserService implements InterfaceUserService {
         UserStatus userStatus = userStatusRepository.findByUserId(userID)
             .orElseThrow(() -> new IllegalArgumentException(message));
 
-        log.info("✅ UserService.findAllByChannelId = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
+        log.info("✅ UserService.findAllByChannelId = [" + user.getUsername() + "] online = [" + userStatus.isOnline() + "]");
 
         return UserDto.from(user, userStatus.isOnline());
     }
@@ -109,7 +109,7 @@ public class UserService implements InterfaceUserService {
             if (userStatus != null) {
                 UserDto dto = UserDto.from(user, userStatus.isOnline());
                 dtoList.add(dto);
-                log.info("✅ UserService.findAll = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
+                log.info("✅ UserService.findAll = [" + user.getUsername() + "] online = [" + userStatus.isOnline() + "]");
             }
         }
 
@@ -127,7 +127,7 @@ public class UserService implements InterfaceUserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new NoSuchElementException("🚨User [" + userId.toString() + "]를 찾을 수 없음"));
 
-        String userName = user.getUserName();
+        String userName = user.getUsername();
 
         if (!userId.equals(user.getId())
                 && userRepository.isUsingName(dtoUserUpdate.newUsername())) {
@@ -165,7 +165,7 @@ public class UserService implements InterfaceUserService {
         Optional<UserStatus> optionalStatus = userStatusRepository.findByUserId(user.getId());
         if (optionalStatus.isPresent()) {
             userStatusRepository.deleteById(optionalStatus.get().getId());
-            log.info("✅ UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
+            log.info("✅ UserService.userStatusRepository.deleteById = [" + user.getUsername() + "]");
         }
 //        else {
 //            log.error("🚨UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
@@ -175,7 +175,7 @@ public class UserService implements InterfaceUserService {
             Optional<BinaryContent> optionalContents = binaryContentRepository.findById(user.getProfileId());
             if (optionalContents.isPresent()) {
                 binaryContentRepository.deleteById(optionalContents.get().getId());
-                log.info("✅ UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
+                log.info("✅ UserService.binaryContentRepository.deleteById = [" + user.getUsername() + "]");
             }
 //            else {
 //                log.error("🚨UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
@@ -183,6 +183,6 @@ public class UserService implements InterfaceUserService {
         }
 
         userRepository.deleteById(userID);
-        log.info("✅ ⛔️ UserService.userRepository.deleteById [" + user.getUserName() + "] 완료 ️⛔️");
+        log.info("✅ ⛔️ UserService.userRepository.deleteById [" + user.getUsername() + "] 완료 ️⛔️");
     }
 }

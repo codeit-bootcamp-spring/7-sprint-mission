@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.dto.ChannelDto;
-import com.sprint.mission.discodeit.entity.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPrivate;
-import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPublic;
-import com.sprint.mission.discodeit.entity.dto.Res_Channel;
-import com.sprint.mission.discodeit.entity.dto.Res_ChannelFind;
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.ChannelDto_Update;
+import com.sprint.mission.discodeit.dto.Dto_CreateChannelPrivate;
+import com.sprint.mission.discodeit.dto.Dto_CreateChannelPublic;
+import com.sprint.mission.discodeit.dto.Res_Channel;
+import com.sprint.mission.discodeit.dto.Res_ChannelFind;
 import java.util.List;
 import java.util.UUID;
 

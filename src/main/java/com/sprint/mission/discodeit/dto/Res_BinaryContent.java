@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 
 
@@ -18,8 +17,8 @@ public record Res_BinaryContent( //all private final
           binaryContent.getId(),
           binaryContent.getFileName(),
           binaryContent.getContentType(),
-          binaryContent.getData(),
-          binaryContent.getFileSize()
+          binaryContent.getBytes(),
+          binaryContent.getSize()
       );
     }
 }

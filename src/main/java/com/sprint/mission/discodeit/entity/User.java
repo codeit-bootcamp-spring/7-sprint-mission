@@ -1,43 +1,34 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.dto.UserCreateRequest;
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class User extends BaseModel {
-    private String userName;
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdatableEntity {
+    @Column(nullable = false, length = 50, unique = true)
+    private String username;
+
+    @Column(nullable = false, length = 100, unique = true)
+    private String email;
+
+    @Column(nullable = false, length = 60)
     private String password;
-    private String eMail;
-    private UUID profileId;
 
-    public User(UserCreateRequest dtoUser, UUID profileId) {
-        super();
-        this.userName = dtoUser.username();
-        this.password = dtoUser.password();
-        this.eMail = dtoUser.email();
-        this.profileId = profileId;
-    }
+    @OneToOne // (orphanRemoval = false) // ON DELETE SET NULL
+    @JoinColumn(name = "profile_id") // nullable = true
+    private BinaryContent profile;
 
-    @Override
-    public String toString() {
-        String strProfileId = (profileId == null) ? "null" : profileId.toString();
-        return "user {" +
-                super.toString() +
-                "\n name = [" + userName + "] " +
-                "\n newPassword = [" + password + "]"   +
-                "\n newEmail = [" + eMail + "]"   +
-                "\n profileId = [" + strProfileId + "]" + //❌ 생성자에서 제외
-                "}";
-    }
-
-    public void updateUser(String reName, String password, String reEmail, UUID profiledId) {
-        if (reName != null) this.userName = reName;
-        if (password != null) this.password = password;
-        if (reEmail != null) this.eMail = reEmail;
-        if (profiledId != null) this.profileId = profiledId;
-        super.setUpdatedAtNow();
-    }
+    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.REMOVE) // ON DELETE CASCADE
+    @JoinColumn(name = "status_id")
+    private UserStatus status;
 }

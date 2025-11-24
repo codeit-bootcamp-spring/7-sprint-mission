@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.controller;
 
 import static com.sprint.mission.discodeit.common.Util.parsingMultipartFile;
 
-import com.sprint.mission.discodeit.entity.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.swaggerDocs.UserDoc;
-import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserStatusUpdate;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
-import com.sprint.mission.discodeit.entity.dto.Res_User;
-import com.sprint.mission.discodeit.entity.dto.Res_UserUpdate;
-import com.sprint.mission.discodeit.entity.dto.UserDto;
+import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
+import com.sprint.mission.discodeit.dto.Dto_UserStatusUpdate;
+import com.sprint.mission.discodeit.dto.Dto_UserUpdate;
+import com.sprint.mission.discodeit.dto.Res_User;
+import com.sprint.mission.discodeit.dto.Res_UserUpdate;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.service.basic.UserService;
 import com.sprint.mission.discodeit.service.basic.UserStatusService;
 import jakarta.validation.Valid;

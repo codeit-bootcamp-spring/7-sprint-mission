@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.Message;
-import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -23,10 +22,10 @@ public record Res_Message( //all private final
             message.getId(),
             message.getCreatedAt(),
             message.getUpdatedAt(),
-            message.getMessage(),
+            message.getContent(),
             message.getChannelId(),
             message.getAuthorId(),
-            message.getAttachemntIds()
+            message.getAttachments()
         );
     }
 }

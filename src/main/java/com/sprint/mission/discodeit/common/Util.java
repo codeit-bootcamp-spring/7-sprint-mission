@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.common;
 
-import static java.util.stream.Collectors.toList;
-
-import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
+import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -18,8 +18,8 @@ public record Res_Channel( //all private final
             channel.getId(),
             channel.getCreatedAt(),
             channel.getUpdatedAt(),
-            channel.getChannelType(),
-            channel.getChannelName(),
+            channel.getType(),
+            channel.getName(),
             channel.getDescription()
         );
     }

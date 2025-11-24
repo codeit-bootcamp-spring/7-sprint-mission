@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
-import com.sprint.mission.discodeit.entity.dto.AuthServiceDto;
-import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
+import com.sprint.mission.discodeit.dto.AuthServiceDto;
+import com.sprint.mission.discodeit.dto.Res_UserLogin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;

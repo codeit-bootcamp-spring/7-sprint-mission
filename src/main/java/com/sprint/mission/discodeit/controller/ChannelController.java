@@ -1,15 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
 import com.sprint.mission.discodeit.swaggerDocs.ChannelDoc;
-import com.sprint.mission.discodeit.entity.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPrivate;
-import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPublic;
-import com.sprint.mission.discodeit.entity.dto.Res_Channel;
-import com.sprint.mission.discodeit.entity.dto.Res_ChannelFind;
+import com.sprint.mission.discodeit.dto.ChannelDto_Update;
+import com.sprint.mission.discodeit.dto.Dto_CreateChannelPrivate;
+import com.sprint.mission.discodeit.dto.Dto_CreateChannelPublic;
+import com.sprint.mission.discodeit.dto.Res_Channel;
+import com.sprint.mission.discodeit.dto.Res_ChannelFind;
 import com.sprint.mission.discodeit.service.basic.ChannelService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -26,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j

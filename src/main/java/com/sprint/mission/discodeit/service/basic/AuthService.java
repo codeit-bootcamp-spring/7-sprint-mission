@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.AuthServiceDto;
-import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
+import com.sprint.mission.discodeit.dto.AuthServiceDto;
+import com.sprint.mission.discodeit.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
 import com.sprint.mission.discodeit.service.InterfaceAuthService;
 import java.util.NoSuchElementException;

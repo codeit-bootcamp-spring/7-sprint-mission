@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
-import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.entity.dto.Pageable;
-import com.sprint.mission.discodeit.entity.dto.Res_Message;
+import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.Res_Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

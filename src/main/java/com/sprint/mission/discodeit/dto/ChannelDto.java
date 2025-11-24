@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -30,9 +30,9 @@ public record ChannelDto( //all private final
             .id(channel.getId())
             .createdAt(channel.getCreatedAt())
             .updatedAt(channel.getUpdatedAt())
-            .channelName(channel.getChannelName())
+            .channelName(channel.getName())
             .description(channel.getDescription())
-            .channelType(channel.getChannelType())
+            .channelType(channel.getType())
             .build();
     }
 //    public static ChannelDto update(String newName, String newDescription){

@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.Res_BinaryContent;
+import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
+import com.sprint.mission.discodeit.dto.Res_BinaryContent;
 import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
-import com.sprint.mission.discodeit.repository.file.FileBinaryContentRepository;
 import com.sprint.mission.discodeit.service.InterfaceBinaryContentService;
 import java.util.List;
 import java.util.NoSuchElementException;

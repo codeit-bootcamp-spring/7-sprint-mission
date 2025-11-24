@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.swaggerDocs.AuthDoc;
-import com.sprint.mission.discodeit.entity.dto.AuthServiceDto;
-import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
+import com.sprint.mission.discodeit.dto.AuthServiceDto;
+import com.sprint.mission.discodeit.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.service.basic.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController //👍 @controller + @responsebody

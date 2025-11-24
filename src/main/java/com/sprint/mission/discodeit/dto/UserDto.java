@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto;
+package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
@@ -27,8 +27,8 @@ public record UserDto( //all private final
             user.getId(),
             user.getCreatedAt(),
             user.getUpdatedAt(),
-            user.getUserName(),
-            user.getEMail(),
+            user.getUsername(),
+            user.getEmail(),
             user.getProfileId(),
             isOnline
         );

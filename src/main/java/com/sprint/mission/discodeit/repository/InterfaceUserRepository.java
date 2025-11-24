@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.AuthServiceDto;
-import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
+import com.sprint.mission.discodeit.dto.AuthServiceDto;
+import com.sprint.mission.discodeit.dto.Res_UserLogin;
 import java.util.Optional;
 
 public interface InterfaceUserRepository extends BaseInterfaceRepository<User> {

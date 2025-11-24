@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
-import com.sprint.mission.discodeit.entity.dto.FindAllByChannelIdDto;
-import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.entity.dto.Res_Message;
+import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
+import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.Res_Message;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
