@@ -91,15 +91,6 @@ public class UserController implements UserControllerDocs {
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
     public void delete(@PathVariable("userId") UUID userId) {
         UserResponseDto userResponseDto = userService.get(userId);
-        UUID profileId = userResponseDto.profileId();
-
-        if(profileId != null){
-            binaryContentService.delete(profileId);
-        }
-        boolean delete = userService.delete(userId);
-        if(!delete){
-            log.info("User not found");
-        }
     }
 
     // 모든 사용자 조회
