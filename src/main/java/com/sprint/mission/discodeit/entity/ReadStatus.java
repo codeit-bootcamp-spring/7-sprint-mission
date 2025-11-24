@@ -29,26 +29,4 @@ public class ReadStatus extends BaseUpdatableEntity {
 
     @Column(name = "last_read_at", nullable = false)
     private Instant lastReadAt;
-
-
-
-    public ReadStatus(UUID userId, UUID channelId) {
-        super();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.lastReadAt = Instant.now();
-    }
-
-    public void updateLastReadAt(Dto_ReadStatusUpdate requestDto) {
-        this.lastReadAt = requestDto.newLastReadAt(); // Instant.now();
-    }
-
-    @Override
-    public String toString() {
-        return "ReadStatus = "
-            + super.toString()
-            + "userId = [" + userId + "]\n"
-            + "channelId = [" + channelId + "]\n"
-            + "lastReadAt = [" + lastReadAt + "]";
-    }
 }
