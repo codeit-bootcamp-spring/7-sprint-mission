@@ -5,11 +5,27 @@ spring:
     multipart:
       enabled: true
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true # SQL 확인
+        format_sql: true # 읽기 쉽게
+
+  logging:
+    level:
+      org.hibernate.SQL: debug
+
 server:
   port: 7777
-
-# 심화, 레포지토리 종류로 bin 주입하기.
-# 클래스에서 직접 repository 제거.
 
 discodeit:
   repository:
