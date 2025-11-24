@@ -5,14 +5,17 @@ import lombok.Getter;
 import java.util.UUID;
 
 @Getter
-public class User extends BaseEntity{
+public class User extends BaseUpdatableEntity{
     private String realName;
     private String nickName;
     private String email;
     private String phoneNum;
     private String username;
     private String password;
-    private UUID profileId;
+    private UUID profileId; // 삭제 필요
+
+    private BinaryContent profile;
+    private UserStatus status;
 
     public User(String realName, String nickName, String email, String phoneNum, String username, String password) {
         this.realName = realName;
@@ -29,38 +32,26 @@ public class User extends BaseEntity{
     }
 
     public void update(String realName, String nickName, String email, String phoneNum, String username, String password, UUID profileId) {
-        boolean flag = false;
-
         if (realName != null && !realName.equals(this.realName)) {
             this.realName = realName;
-            flag = true;
         }
         if (nickName != null && !nickName.equals(this.nickName)) {
             this.nickName = nickName;
-            flag = true;
         }
         if (email != null && !email.equals(this.email)) {
             this.email = email;
-            flag = true;
         }
         if (phoneNum != null && !phoneNum.equals(this.phoneNum)) {
             this.phoneNum = formatPhoneNum(phoneNum);
-            flag = true;
         }
         if (username != null && !username.equals(this.username)) {
             this.username = username;
-            flag = true;
         }
         if (password != null && !password.equals(this.password)) {
             this.password = password;
-            flag = true;
         }
         if (profileId != null && !profileId.equals(this.profileId)) {
             this.profileId = profileId;
-            flag = true;
-        }
-        if(flag) {
-            this.setUpdatedAt();
         }
     }
 

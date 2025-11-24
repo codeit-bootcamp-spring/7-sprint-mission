@@ -1,36 +1,26 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.Getter;
+import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-public abstract class BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+@ToString
+public abstract class BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    public BaseEntity() {
-        Instant now = Instant.now();
-        this.id = UUID.randomUUID(); // 랜덤 UUID로 초기화
-        this.createdAt = now;
-        this.updatedAt = now;
-    }
+    @CreatedDate
+    private Instant createdAt;
 
-    public void setUpdatedAt() {
-        this.updatedAt = Instant.now();
-    }
-
-    @Override
-    public String toString() {
-        return  ", UUID=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt;
-    }
 
     //id를 통해서만 동일한 객체인지 비교
     @Override

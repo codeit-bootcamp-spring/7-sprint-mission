@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-public class Channel extends BaseEntity{
+public class Channel extends BaseUpdatableEntity{
     private String channelName;
     private final ChannelType channelType;
     private final ChannelVisibility visibility;
@@ -34,27 +34,19 @@ public class Channel extends BaseEntity{
     }
 
     public void addMember(UUID userId) {
-        this.setUpdatedAt();
         this.memberIds.add(userId);
     }
 
     public void deleteMember(UUID userId){
-        this.setUpdatedAt();
         this.memberIds.remove(userId);
     }
 
     public void update(String name, String description) {
-        boolean flag = false;
         if(name != null && !name.isEmpty()){
             this.channelName = name;
-            flag = true;
         }
         if(description != null && !description.isEmpty()){
             this.description = description;
-            flag = true;
-        }
-        if(flag){
-           this.setUpdatedAt();
         }
     }
 

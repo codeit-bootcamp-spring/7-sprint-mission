@@ -8,10 +8,13 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ReadStatus extends BaseEntity{
-    private final UUID userId;
-    private final UUID channelId;
+public class ReadStatus extends BaseUpdatableEntity{
+    private final UUID userId; // 삭제필요
+    private final UUID channelId; // 삭제필요
     private Instant lastReadAt;
+
+    private User user;
+    private Channel channel;
 
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
         this.userId = userId;
@@ -20,14 +23,8 @@ public class ReadStatus extends BaseEntity{
     }
 
     public void update(Instant lastReadAt) {
-        boolean flag = false;
-
         if(lastReadAt != null && !lastReadAt.equals(this.lastReadAt)){
             this.lastReadAt = lastReadAt;
-            flag = true;
-        }
-        if(flag){
-            this.setUpdatedAt();
         }
     }
 }

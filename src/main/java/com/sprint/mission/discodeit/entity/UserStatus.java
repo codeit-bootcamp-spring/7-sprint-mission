@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -10,19 +9,15 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class UserStatus extends BaseEntity{
-    private final UUID userId;
+public class UserStatus extends BaseUpdatableEntity{
+    private final UUID userId; // 삭제 필요
     private Instant lastActiveAt;
 
-    public void update(Instant lastActiveAt){
-        boolean flag = false;
+    private User user;
 
+    public void update(Instant lastActiveAt){
         if(lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)){
             this.lastActiveAt = lastActiveAt;
-            flag = true;
-        }
-        if(flag){
-            this.setUpdatedAt();
         }
     }
 
