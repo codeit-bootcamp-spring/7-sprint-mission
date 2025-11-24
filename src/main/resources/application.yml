@@ -2,6 +2,22 @@ spring:
   application:
     name: discodeit
 
+  # 데이터베이스 연결 설정값
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    properties: # SQL 로그 관련 설정 값
+      hibernate:
+        show_sql: true
+        format_sql: true
+
 discodeit:
   repository:
     type: file   # jcf | file
@@ -13,3 +29,4 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+
