@@ -32,9 +32,10 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public Optional<BinaryContentResponseDto> findById(UUID id) {
-        return binaryContentRepository.findById(Objects.requireNonNull(id))
-                .map(bc -> BinaryContentResponseDto.from(bc));
+    public BinaryContentResponseDto findById(UUID id) {
+        BinaryContent bc = binaryContentRepository.findById(Objects.requireNonNull(id))
+                .orElseThrow(() -> new NoSuchElementException("BinaryContent with id: " + id + " not found"));
+        return BinaryContentResponseDto.from(bc);
     }
 
     @Override
