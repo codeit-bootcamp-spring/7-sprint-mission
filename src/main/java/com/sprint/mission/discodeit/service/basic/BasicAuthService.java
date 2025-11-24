@@ -13,6 +13,8 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
@@ -37,7 +39,7 @@ public class BasicAuthService implements AuthService {
         // 유저 최근 접속 시간 변경
         UserStatus status = userStatusRepository.findByUserId(user.getId())
                         .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
-        status.setUpdatedAt();
+        status.update(Instant.now());
         userStatusRepository.update(status);
 
         return userService.toDto(user);
