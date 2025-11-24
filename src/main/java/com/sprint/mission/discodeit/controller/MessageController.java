@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +29,7 @@ public class MessageController {
     // --- 메시지 관리 ---
     // (채널)메시지 생성
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Message> channelMessageCreate(
+    public ResponseEntity<MessageDto> channelMessageCreate(
             @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageRequestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
@@ -37,7 +39,7 @@ public class MessageController {
 
     // 메시지 수정
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
-    public ResponseEntity<Message> channelMessageUpdate(
+    public ResponseEntity<MessageDto> channelMessageUpdate(
             @PathVariable UUID messageId,
             @Valid @RequestBody MessageUpdateRequest updateDto) {
 
@@ -53,7 +55,9 @@ public class MessageController {
 
     // 특정 채널의 메시지 조회
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<PageResponse<MessageDto>> getAllByChannelId(@RequestParam UUID channelId, @RequestParam Pageable pageable) {
+    public ResponseEntity<PageResponse<MessageDto>> getAllByChannelId
+    (@RequestParam UUID channelId,
+     @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(messageService.findAllByChannelId(channelId, pageable));
     }
 }

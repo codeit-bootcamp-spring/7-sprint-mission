@@ -23,21 +23,21 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @RequestMapping(value = "/public", method = RequestMethod.POST)
-    public ResponseEntity<Channel> channelCreate(
+    public ResponseEntity<ChannelDto> channelCreate(
             @Valid @RequestBody PublicChannelCreateRequest channelRequestDto) {
-        Channel channel = channelService.createPublicChannel(channelRequestDto);
+        ChannelDto channel = channelService.createPublicChannel(channelRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @RequestMapping(value = "/private", method = RequestMethod.POST)
-    public ResponseEntity<Channel> channelCreate(
+    public ResponseEntity<ChannelDto> channelCreate(
             @Valid @RequestBody PrivateChannelCreateRequest channelRequestDto) {
-        Channel channel = channelService.createPrivateChannel(channelRequestDto);
+        ChannelDto channel = channelService.createPrivateChannel(channelRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
-    public ResponseEntity<Channel> channelNameUpdate(
+    public ResponseEntity<ChannelDto> channelNameUpdate(
             @PathVariable UUID channelId,
             @Valid @RequestBody PublicChannelUpdateRequest channelUpdateDto) {
         return ResponseEntity.ok(channelService.updateChannel(channelId, channelUpdateDto));

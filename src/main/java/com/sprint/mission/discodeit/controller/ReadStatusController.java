@@ -23,14 +23,14 @@ public class ReadStatusController {
 
     // 수신 정보 생성
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ReadStatus> createReadStatus(
+    public ResponseEntity<ReadStatusDto> createReadStatus(
             @Valid @RequestBody ReadStatusCreateRequest readStatusRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(readStatusService.createReadStatus(readStatusRequestDto));
     }
 
     // 수신 정보 수정
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
-    public ResponseEntity<ReadStatus> readStatusUpdate(
+    public ResponseEntity<ReadStatusDto> readStatusUpdate(
             @PathVariable UUID readStatusId,
             @Valid @RequestBody ReadStatusUpdateRequest readStatusUpdateDto) {
 

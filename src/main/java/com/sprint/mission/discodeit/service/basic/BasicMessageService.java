@@ -47,19 +47,14 @@ public class BasicMessageService implements MessageService {
 
         List<BinaryContent> attachments = new ArrayList<>();
         for (MultipartFile file : files) {
-            try {
-                BinaryContent binaryContent = BinaryContent.builder()
-                        .bytes(file.getBytes())
-                        .fileName(file.getOriginalFilename())
-                        .contentType(file.getContentType())
-                        .build();
+            BinaryContent binaryContent = BinaryContent.builder()
+                    .fileName(file.getOriginalFilename())
+                    .size(file.getSize())
+                    .contentType(file.getContentType())
+                    .build();
 
-                binaryContentRepository.save(binaryContent);
-                attachments.add(binaryContent);
-
-            } catch (IOException e) {
-                throw new RuntimeException("오류가 발생", e);
-            }
+            binaryContentRepository.save(binaryContent);
+            attachments.add(binaryContent);
         }
         return attachments;
     }

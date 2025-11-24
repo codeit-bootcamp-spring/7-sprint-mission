@@ -35,28 +35,27 @@ public class BinaryContent extends BaseEntity {
     @Column(length = 100, nullable = false)
     private String contentType;
 
-    @Lob
-    @Column(nullable = false)
-    private byte[] bytes;
+//    @Lob
+//    @Column(nullable = false)
+//    private byte[] bytes;
 
     @Builder
-    public BinaryContent(byte[] bytes, String fileName, String contentType) {
+    public BinaryContent(String fileName, Long size, String contentType) {
         super();
 
-        validateData(bytes);
+        //validateData(bytes);
         this.fileName = fileName;
-        this.size = (long) bytes.length;
+        this.size = size;
         this.contentType = contentType;
-        this.bytes = bytes;
     }
 
-    private void validateData(byte[] binaryData) {
-        if (binaryData == null || binaryData.length == 0) {
-            throw new InvalidInputException("파일이 비었습니다.");
-        }
-        // Spring은 자체적으로 1MB 제한을 건대요 그래서 500MB로 늘림, 현재는 기본으로 제한
-        if (binaryData.length > BASIC_MAX_FILE_SIZE) {
-            throw new FileSizeLimitExceededException("파일용량은 10MB를 넘을 수 없습니다.");
-        }
-    }
+//    private void validateData(byte[] binaryData) {
+//        if (binaryData == null || binaryData.length == 0) {
+//            throw new InvalidInputException("파일이 비었습니다.");
+//        }
+//        // Spring은 자체적으로 1MB 제한을 건대요 그래서 500MB로 늘림, 현재는 기본으로 제한
+//        if (binaryData.length > BASIC_MAX_FILE_SIZE) {
+//            throw new FileSizeLimitExceededException("파일용량은 10MB를 넘을 수 없습니다.");
+//        }
+//    }
 }
