@@ -12,7 +12,7 @@ import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.binaryContent.LocalBinaryContentStorageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.subTable.MessageAttachment;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +61,6 @@ public class BasicMessageService implements MessageService {
                                             .fileName(x.getName())
                                             .contentType(x.getContentType())
                                             .size(x.getSize())
-                                            .bytes(x.getBytes())
                                     .build()
                             );
                            binaryContentList.add(binaryContent);

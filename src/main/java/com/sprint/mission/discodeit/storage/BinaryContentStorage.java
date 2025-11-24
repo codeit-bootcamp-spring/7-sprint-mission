@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository;
+package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import org.springframework.http.ResponseEntity;

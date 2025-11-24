@@ -5,11 +5,14 @@ import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,17 +22,18 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Override
     @Transactional
-    public BinaryContentDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
+    public BinaryContentDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) throws IOException {
         BinaryContent binaryContent =BinaryContent.builder()
-                .bytes(binaryContentCreateRequestDto.getBytes())
                 .fileName(binaryContentCreateRequestDto.getFileName())
                 .size(binaryContentCreateRequestDto.getSize())
                 .contentType(binaryContentCreateRequestDto.getContentType())
                 .build();
         binaryContentRepository.save(binaryContent);
+        binaryContentStorage.put(binaryContent.getId(),binaryContentCreateRequestDto.getBytes());
         return binaryContentMapper.toDto(binaryContent);
 
 
@@ -66,5 +70,13 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public void resetBinaryContentService() {
         binaryContentRepository.deleteAll();
+    }
+
+    @Override
+    public ResponseEntity<?> downloadFile(UUID binaryContentId) throws IOException {
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow();
+        BinaryContentDto binaryContentDto = binaryContentMapper.toDto(binaryContent);
+        return binaryContentStorage.download(binaryContentDto);
+
     }
 }

@@ -10,8 +10,7 @@ public record BinaryContentDto(
         UUID id,
         String fileName,
         Long size,
-        String contentType,
-        byte[] bytes
+        String contentType
 ) {
     public static BinaryContentDto from(BinaryContent binaryContent){
         return BinaryContentDto.builder()
@@ -19,7 +18,6 @@ public record BinaryContentDto(
                 .fileName(binaryContent.getFileName())
                 .size(binaryContent.getSize())
                 .contentType(binaryContent.getContentType())
-
                 .build();
     }
 }

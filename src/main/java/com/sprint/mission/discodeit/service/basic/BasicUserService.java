@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,6 @@ public class BasicUserService implements UserService {
                 .fileName(profile.getName())
                 .contentType(profile.getContentType())
                 .size(profile.getSize())
-                .bytes(profile.getBytes())
                 .build()
         );
         binaryContentStorage.put(binaryContent.getId(),profile.getBytes());
@@ -123,7 +123,6 @@ public class BasicUserService implements UserService {
         if(profile!=null) {
             binaryContentRepository.delete(user.getProfile());
             BinaryContent tmpBinaryContent = binaryContentRepository.save(BinaryContent.builder()
-                    .bytes(profile.getBytes())
                     .fileName(profile.getName())
                     .size(profile.getSize())
                     .contentType(profile.getContentType())
