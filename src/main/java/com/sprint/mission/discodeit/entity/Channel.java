@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -30,29 +32,45 @@ memberId :
     // 데이터 관리, 실제 변경 부분 구현!!
 @Getter
 @ToString
-public class Channel extends BaseEntity {
-    private String channelName; // 채널 명
-    private final ChannelType type; // 0: 음성채널, 1: 채팅채널
+@Entity
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity {
+    @Column(name = "name", length = 255)
+    private String name; // 채널 명
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, length = 20)
+    private ChannelType type; // 0: 음성채널, 1: 채팅채널
+
+//    @Column(name = "slow_mode_seconds", nullable = false)
+    @Transient
     private int slowModeSeconds; // 슬로우모드 초(s)
-    private final Map<UUID, UserRole> members = new HashMap<>();
-    private String channelDescription;
-    private final boolean privateChannel; // true: PRIVATE, false: PUBLIC
-   // private UUID ownerId; // 추후 채널 삭제/멤버 강퇴 등 권한적인 내용 사용시 사용
+
+//    @Transient
+//    private Map<UUID, UserRole> members = new HashMap<>();
+
+    @Column(name = "description", length = 500)
+    private String description;
+
+//    @Column(name = "private_channel", nullable = false)
+    @Transient
+    private boolean privateChannel; // true: PRIVATE, false: PUBLIC
+
+    protected Channel() {}
 
     public Channel(ChannelType type, String channelName, boolean privateChannel, int slowModeSeconds, String channelDescription) {
-       this.channelName = channelName;
+       this.name = channelName;
        if(type == null) { throw new IllegalArgumentException("type cannot be null"); }
        this.type = type;
        this.slowModeSeconds = slowModeSeconds;
-       this.channelDescription = channelDescription;
+       this.description = channelDescription;
        this.privateChannel = privateChannel;
     }
 
     public void rename(String channelName) {
        Objects.requireNonNull(channelName);
-        if(!channelName.equals(this.channelName)) {
-            this.channelName = channelName;
-            reUpdatedAt();
+        if(!channelName.equals(this.name)) {
+            this.name = channelName;
         }
     }
 
@@ -62,33 +80,29 @@ public class Channel extends BaseEntity {
         }
         if(this.slowModeSeconds != slowModeSeconds) {
             this.slowModeSeconds = slowModeSeconds;
-            reUpdatedAt();
         }
     }
-
+/*
     public boolean join(UUID memberId) {
         if(memberId == null) { throw new IllegalArgumentException("memberId cannot be null"); }
         // map.put은 이전값을 리턴한다!!
         // 이전값이 없다면 null을 리턴, 있다면 value를 리턴!
         // 그래서 null이면 멤버 추가, value가 있다면 변경!
-        boolean access = members.putIfAbsent(memberId,UserRole.MEMBER) == null;
-        if(access) reUpdatedAt();
-        return access;
+        return members.putIfAbsent(memberId,UserRole.MEMBER) == null;
     }
 
     public boolean leave(UUID memberId) {
         if(memberId == null) { throw new IllegalArgumentException("memberId cannot be null"); }
         // remove의 경우 멤버가 있다면 remove 가능 ! > true
         // member가 없으면 null을 리턴! remove가 안되니 > false
-        boolean access = members.remove(memberId) != null;
-        if(access) reUpdatedAt();
-        return access;
+        return members.remove(memberId) != null;
     }
 
+ */
+
     public void changeChannelDescription(String channelDescription) {
-        if(!channelDescription.equals(this.channelDescription)) {
-            this.channelDescription = channelDescription;
-            reUpdatedAt();
+        if(!channelDescription.equals(this.description)) {
+            this.description = channelDescription;
         }
     }
 }
