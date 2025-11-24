@@ -2,17 +2,22 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
+import com.sprint.mission.discodeit.dto.response.PageResponseDto;
 import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.binaryContent.LocalBinaryContentStorageService;
 import com.sprint.mission.discodeit.subTable.MessageAttachment;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +39,9 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final MessageAttachmentRepository messageAttachmentRepository;
     private final MessageMapper messageMapper;
+    private final BinaryContentStorage binaryContentStorage;
+    private final PageResponseMapper<Message> pageResponseMapper;
+
 
 
     @Transactional
@@ -57,7 +65,9 @@ public class BasicMessageService implements MessageService {
                                     .build()
                             );
                            binaryContentList.add(binaryContent);
+                           binaryContentStorage.put(binaryContent.getId(),x.getBytes());
                         }
+
                         catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -82,8 +92,9 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDto> findallByChannelId(UUID channelId) {
-        return messageRepository.findAll().stream().filter(x -> x.getChannel().equals(channelId)).map(messageMapper::toDto).toList();
+    public PageResponseDto<Message> findallByChannelId(UUID channelId, Pageable pageable) {
+        Page<Message> targetPage = messageRepository.findByChannelId(channelId,pageable);
+        return pageResponseMapper.fromPage(targetPage);
     }
 
     @Override

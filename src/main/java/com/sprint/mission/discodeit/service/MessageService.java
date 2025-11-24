@@ -3,7 +3,10 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
+import com.sprint.mission.discodeit.dto.response.PageResponseDto;
 import com.sprint.mission.discodeit.dto.response.message.MessageDto;
+import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -13,7 +16,7 @@ public interface MessageService {
 
     public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments);
     public List<MessageDto> readAllMessage();
-    public List<MessageDto> findallByChannelId(UUID channelId);
+    public PageResponseDto<Message> findallByChannelId(UUID channelId, Pageable pageable);
     public void deleteMessage(UUID messageId);
     public MessageDto patchMessage(MessagePatchRequestDto dto, UUID messageId);
     List<MessageDto> readAllMessageByUserId(UUID userId);

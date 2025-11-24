@@ -29,6 +29,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Override
     @Transactional
@@ -41,6 +42,7 @@ public class BasicUserService implements UserService {
                 .bytes(profile.getBytes())
                 .build()
         );
+        binaryContentStorage.put(binaryContent.getId(),profile.getBytes());
 
         User user = userRepository.save(User.builder()
                 .userName(userCreateRequestDto.getUsername())
