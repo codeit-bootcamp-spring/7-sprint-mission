@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import lombok.Getter;
 
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class User extends BasicEntity implements Serializable {
-
-  private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+public class User extends BaseUpdatableEntity {
 
   private String username; // 유저 이름
   private String email; // 이메일
@@ -17,22 +17,19 @@ public class User extends BasicEntity implements Serializable {
 
 
   public User(String username, String email, String password, UUID profileId) {
-    super();
     this.username = username;
     this.email = email;
     this.password = password;
     this.profileId = profileId;
   }
 
-  public void updateProfile(UUID NewProfileId) {
-    this.profileId = NewProfileId;
-    update();
+  public void updateProfile(UUID newProfileId) {
+    this.profileId = newProfileId;
   }
 
   public void updateInfo(String newUsername, String newEmail, String newPassword) {
     this.username = newUsername;
     this.email = newEmail;
     this.password = newPassword;
-    update();
   }
 }
