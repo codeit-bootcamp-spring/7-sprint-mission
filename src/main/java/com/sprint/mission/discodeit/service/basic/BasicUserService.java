@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.BinaryRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class BasicUserService implements UserService {
 
 
     @Override
+    @Transactional
     public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
 
         //이메일매칭
@@ -57,7 +59,6 @@ public class BasicUserService implements UserService {
                 userCreateRequest.username(),
                 userCreateRequest.email(),
                 userCreateRequest.password(),
-                uuid
 
         );
 
@@ -69,7 +70,7 @@ public class BasicUserService implements UserService {
         return save;
     }
 
-
+    @Transactional(readOnly = true)
     @Override
     public UserDto find(UUID userId) {
         System.out.println("서비스하나찾기");

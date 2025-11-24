@@ -22,7 +22,7 @@ public class Message extends BaseUpdateEntity {
     private User author;
 
     @ManyToOne
-    @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "messages_channel_id_fk"), nullable = false)
+    @JoinColumn(name = "channel_id", foreignKey = @ForeignKey(name = "messages_channel_id_fk"), nullable = false)
     private Channel channel;
 
     @Column(columnDefinition = "TEXT")

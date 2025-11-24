@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,27 +19,29 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 public class BasicUserStatusService implements UserStatusService {
 
-    private  final UserStatusRepository userStatusRepository;
+    private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public UserStatus create(UserStatusCreateRequest request) {
-        Optional<User> repoUser = userRepository.findById(request.userId());
-        Optional<UserStatus> statusUser = userStatusRepository.findByUserId(request.userId());
-        //관련된 user가 존재하지 않아?
-        if (repoUser.isEmpty()) {
-            throw new IllegalStateException("받은 uuid에 해당하는 유저가 없어 : " + request.userId());
+
+        User user = userRepository.findById(request.userId())
+                .orElseThrow(() ->
+                        new IllegalStateException("해당 유저가 없습니다: " + request.userId())
+                );
+
+        if (user.getStatus() != null) {
+            throw new IllegalStateException("이미 UserStatus가 존재합니다. userId: " + request.userId());
         }
-        //이미 관련 객체가 있어?
-        if(statusUser.isPresent()){
-            throw new IllegalStateException("이미 생성된 Userstatus가 있어 UUID 는 : " +statusUser.get().getUserId() );
-        }
+
         Instant lastActiveAt = request.lastActiveAt();
-        UserStatus userStatus = new UserStatus(request.userId(),lastActiveAt);
+        UserStatus userStatus = new UserStatus(user, lastActiveAt);
 
         return userStatusRepository.save(userStatus);
     }
