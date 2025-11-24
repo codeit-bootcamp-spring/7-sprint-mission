@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public record MessageViewRes(
     UUID messageId,
-    String speaker,     //화자 닉네임
+    UUID speakerId,     //화자 ID
     String content,     //메세지 내용
     List<BinaryContentInfoRes> attachmentDatas,   //첨부파일 내용들
     String createAt,       //메세지 작성 시간
@@ -18,11 +18,10 @@ public record MessageViewRes(
 
   public static MessageViewRes from(
       Message message,
-      String speaker,
       List<BinaryContentInfoRes> attachmentDatas) {
     return new MessageViewRes(
         message.getId(),
-        speaker,
+        message.getSpeakerId(),
         message.getContent(),
         attachmentDatas,
         DateTimeUtil.format(message.getCreatedAt()),

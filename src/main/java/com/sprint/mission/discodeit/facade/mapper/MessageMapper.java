@@ -14,20 +14,20 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class MessageMapper {
-    private final BinaryContentService binaryContentService;
-    private final UserService userService;
 
-    //변환 메소드
-    public MessageViewRes mapToView(@NonNull Message message){
-        List<BinaryContentInfoRes> imgs = message.getAttachmentIds().stream()
-                .map(binaryId -> BinaryContentInfoRes.from(
-                        binaryContentService.findById(binaryId))
-                ).toList();
+  private final BinaryContentService binaryContentService;
+  private final UserService userService;
 
-        return MessageViewRes.from(
-                message,
-                userService.findById(message.getSpeakerId()).getNickname(),
-                imgs
-        );
-    }
+  //변환 메소드
+  public MessageViewRes mapToView(@NonNull Message message) {
+    List<BinaryContentInfoRes> imgs = message.getAttachmentIds().stream()
+        .map(binaryId -> BinaryContentInfoRes.from(
+            binaryContentService.findById(binaryId))
+        ).toList();
+
+    return MessageViewRes.from(
+        message,
+        imgs
+    );
+  }
 }
