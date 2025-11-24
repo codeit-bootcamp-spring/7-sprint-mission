@@ -2,64 +2,61 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import org.springframework.context.annotation.Primary;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@Primary
 public class JCFUserRepository implements UserRepository {
 
-    // 메모리 기반 저장소
-    private final Map<UUID, User> store = new ConcurrentHashMap<>();
+  private final Map<UUID, User> data;
 
-    @Override
-    public User save(User user) {
-        store.put(user.getId(), user);
-        return user;
-    }
+  public JCFUserRepository() {
+    this.data = new HashMap<>();
+  }
 
-    @Override
-    public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(store.get(id));
-    }
+  @Override
+  public User save(User user) {
+    this.data.put(user.getId(), user);
+    return user;
+  }
 
-    @Override
-    public List<User> findAll() {
-        // ✅ null 방지: 항상 빈 리스트라도 반환
-        return new ArrayList<>(store.values());
-    }
+  @Override
+  public Optional<User> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return store.containsKey(id);
-    }
+  @Override
+  public Optional<User> findByUsername(String username) {
+    return this.findAll().stream()
+        .filter(user -> user.getUsername().equals(username))
+        .findFirst();
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        store.remove(id);
-    }
+  @Override
+  public List<User> findAll() {
+    return this.data.values().stream().toList();
+  }
 
-    @Override
-    public Optional<User> findByUsername(String username) {
-        return store.values().stream()
-                .filter(u -> u.getUsername().equals(username))
-                .findFirst();
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
 
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return store.values().stream()
-                .filter(u -> u.getEmail().equals(email))
-                .findFirst();
-    }
+  @Override
+  public void deleteById(UUID id) {
+    this.data.remove(id);
+  }
 
-    @Override
-    public Optional<User> findByUsernameAndPassword(String username, String password) {
-        return store.values().stream()
-                .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
-                .findFirst();
-    }
+  @Override
+  public boolean existsByEmail(String email) {
+    return this.findAll().stream().anyMatch(user -> user.getEmail().equals(email));
+  }
+
+  @Override
+  public boolean existsByUsername(String username) {
+    return this.findAll().stream().anyMatch(user -> user.getUsername().equals(username));
+  }
 }

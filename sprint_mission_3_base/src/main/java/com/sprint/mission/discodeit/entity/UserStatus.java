@@ -9,44 +9,38 @@ import java.util.UUID;
 
 @Getter
 public class UserStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    // 공통 필드
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+  private static final long serialVersionUID = 1L;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private UUID userId;
+  private Instant lastActiveAt;
 
-    // 도메인 필드
-    private UUID userId;
-    private Instant lastSeenAt;
+  public UserStatus(UUID userId, Instant lastActiveAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.userId = userId;
+    this.lastActiveAt = lastActiveAt;
+  }
 
-    // 생성자: userId만 주는 경우
-    public UserStatus(UUID userId) {
-        this(userId, Instant.now());
+  public void update(Instant lastActiveAt) {
+    boolean anyValueUpdated = false;
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
+      anyValueUpdated = true;
     }
 
-    // 생성자: userId, lastSeenAt 지정
-    public UserStatus(UUID userId, Instant lastSeenAt) {
-        this.id = UUID.randomUUID();
-        Instant now = Instant.now();
-        this.createdAt = now;
-        this.updatedAt = now;
-        this.userId = userId;
-        this.lastSeenAt = (lastSeenAt != null) ? lastSeenAt : now;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 
-    /**
-     * 서비스에서 기대하는 갱신 메서드
-     * (BasicUserStatusService에서 us.update(Instant) 호출)
-     */
-    public void update(Instant lastSeenAt) {
-        this.lastSeenAt = (lastSeenAt != null) ? lastSeenAt : Instant.now();
-        this.updatedAt = Instant.now();
-    }
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
-    /** 편의 메서드: 특정 기간 내 접속 여부 */
-    public boolean isOnlineWithin(Duration within, Instant now) {
-        Instant pivot = now.minus(within);
-        return !this.lastSeenAt.isBefore(pivot);
-    }
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 }

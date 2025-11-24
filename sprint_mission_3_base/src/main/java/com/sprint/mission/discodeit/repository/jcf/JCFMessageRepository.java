@@ -2,65 +2,51 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.springframework.context.annotation.Primary;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@Primary
 public class JCFMessageRepository implements MessageRepository {
 
-    private final Map<UUID, Message> store = new ConcurrentHashMap<>();
-    // channelId -> messageIds
-    private final Map<UUID, Set<UUID>> byChannel = new ConcurrentHashMap<>();
+  private final Map<UUID, Message> data;
 
-    @Override
-    public Message save(Message m) {
-        store.put(m.getId(), m);
-        byChannel.computeIfAbsent(m.getChannelId(), k -> new HashSet<>()).add(m.getId());
-        return m;
-    }
+  public JCFMessageRepository() {
+    this.data = new HashMap<>();
+  }
 
-    @Override
-    public Optional<Message> findById(UUID id) {
-        return Optional.ofNullable(store.get(id));
-    }
+  @Override
+  public Message save(Message message) {
+    this.data.put(message.getId(), message);
+    return message;
+  }
 
-    @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        Set<UUID> ids = byChannel.getOrDefault(channelId, Collections.emptySet());
-        return ids.stream()
-                .map(store::get)
-                .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(Message::getCreatedAt)) // 필요하면 정렬
-                .collect(Collectors.toList());
-    }
+  @Override
+  public Optional<Message> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        Message removed = store.remove(id);
-        if (removed == null) return;
-        Set<UUID> s = byChannel.get(removed.getChannelId());
-        if (s != null) {
-            s.remove(id);
-            if (s.isEmpty()) byChannel.remove(removed.getChannelId());
-        }
-    }
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    return this.data.values().stream().filter(message -> message.getChannelId().equals(channelId))
+        .toList();
+  }
 
-    @Override
-    public void deleteAllByChannelId(UUID channelId) {
-        Set<UUID> ids = byChannel.remove(channelId);
-        if (ids == null) return;
-        for (UUID id : ids) {
-            store.remove(id);
-        }
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return store.containsKey(id);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    this.data.remove(id);
+  }
+
+  @Override
+  public void deleteAllByChannelId(UUID channelId) {
+    this.findAllByChannelId(channelId)
+        .forEach(message -> this.deleteById(message.getId()));
+  }
 }

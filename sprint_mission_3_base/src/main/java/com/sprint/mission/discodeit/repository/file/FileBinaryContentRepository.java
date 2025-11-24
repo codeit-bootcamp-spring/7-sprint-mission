@@ -2,104 +2,110 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
-    private final Map<UUID, BinaryContent> storage = new HashMap<>();
-    private final Path filePath = Path.of("data/binary-content.dat");
 
-    public FileBinaryContentRepository() {
-        loadFromFile();
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
+
+  public FileBinaryContentRepository(
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        BinaryContent.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
+  }
 
-    private void saveToFile() {
-        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-            out.writeObject(storage);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save BinaryContent data", e);
-        }
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
+  }
+
+  @Override
+  public BinaryContent save(BinaryContent binaryContent) {
+    Path path = resolvePath(binaryContent.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(binaryContent);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+    return binaryContent;
+  }
 
-    @SuppressWarnings("unchecked")
-    private void loadFromFile() {
-        if (!Files.exists(filePath)) return;
-        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
-            Object obj = in.readObject();
-            if (obj instanceof Map) {
-                storage.clear();
-                storage.putAll((Map<UUID, BinaryContent>) obj);
+  @Override
+  public Optional<BinaryContent> findById(UUID id) {
+    BinaryContent binaryContentNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        binaryContentNullable = (BinaryContent) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return Optional.ofNullable(binaryContentNullable);
+  }
+
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (BinaryContent) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
             }
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Failed to load BinaryContent data", e);
-        }
+          })
+          .filter(content -> ids.contains(content.getId()))
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public BinaryContent save(BinaryContent content) {
-        storage.put(content.getId(), content);
-        saveToFile();
-        return content;
+  @Override
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    Path path = resolvePath(id);
+    try {
+      Files.delete(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
-
-    @Override
-    public Optional<BinaryContent> findById(UUID id) {
-        return Optional.ofNullable(storage.get(id));
-    }
-
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return storage.values().stream()
-                .filter(b -> ids.contains(b.getId()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<BinaryContent> findAllByMessageId(UUID messageId) {
-        return storage.values().stream()
-                .filter(b ->
-                        b.getOwnerType().name().equals("MESSAGE_ATTACHMENT") &&
-                                Objects.equals(b.getOwnerId(), messageId)
-                )
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        storage.remove(id);
-        saveToFile();
-    }
-
-    @Override
-    public void deleteByUserId(UUID userId) {
-        storage.values().removeIf(b ->
-                b.getOwnerType().name().equals("USER_PROFILE") &&
-                        Objects.equals(b.getOwnerId(), userId)
-        );
-        saveToFile();
-    }
-
-    @Override
-    public void deleteAllByMessageId(UUID messageId) {
-        storage.values().removeIf(b ->
-                b.getOwnerType().name().equals("MESSAGE_ATTACHMENT") &&
-                        Objects.equals(b.getOwnerId(), messageId)
-        );
-        saveToFile();
-    }
-
-    @Override
-    public Optional<BinaryContent> findByUserId(UUID userId) {
-        return storage.values().stream()
-                .filter(b ->
-                        b.getOwnerType().name().equals("USER_PROFILE") &&
-                                Objects.equals(b.getOwnerId(), userId)
-                )
-                .findFirst();
-    }
-
+  }
 }
