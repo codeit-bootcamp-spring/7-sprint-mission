@@ -16,7 +16,7 @@ public class MessageMapper {
     private final UserMapper userMapper;
 
     public MessageDto toDto(Message message){
-        List<BinaryContentDto> binaryContentDtos = message.getAttachments().stream().map(
+        List<BinaryContentDto> binaryContentDtos = message.getAttachments()==null?List.of():message.getAttachments().stream().map(
                 binaryContentMapper::toDto
         ).toList();
 

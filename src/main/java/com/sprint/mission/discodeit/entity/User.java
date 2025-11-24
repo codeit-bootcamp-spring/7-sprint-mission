@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -26,12 +27,12 @@ public class User extends BaseUpdatableEntity implements Serializable {
     @Column(name = "password",length = 60,nullable = false)
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "profile_id",nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "profile_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private BinaryContent profile;
 
-    @Transient
+    @OneToOne(mappedBy = "user")
     private UserStatus userStatus;
 
 }

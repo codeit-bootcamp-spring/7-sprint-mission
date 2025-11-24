@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -28,7 +29,7 @@ public class ReadStatus extends BaseUpdatableEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Channel channel;
 
-    @Column(nullable = false)
+    @Column(name="last_read_at",nullable = false) @CreationTimestamp
     private Instant readLastTime;
 
 }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entityElement.ChannelType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,9 @@ public class ChannelMapper {
     private final UserMapper userMapper;
     public ChannelDto toDto(Channel channel){
         List<ReadStatus> readStatusList = readStatusRepository.findByChannel(channel);
-        List<UserDto> participantsDto = readStatusList.stream().map(x->
+
+        List<UserDto> participantsDto;
+        participantsDto = readStatusList.stream().map(x->
                 userMapper.toDto(x.getUser())).toList();
         return new ChannelDto(
                 channel.getId(),

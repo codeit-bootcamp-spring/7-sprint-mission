@@ -29,7 +29,7 @@ public class BasicAuthService implements AuthService {
                 .username(existUser.getUserName())
                 .email(existUser.getEmail())
                 .password(existUser.getPassword())
-                .profileId(existUser.getProfile().getId())
+                .profileId(existUser.getProfile()==null?null:existUser.getProfile().getId())
                 .build();
     }
 }

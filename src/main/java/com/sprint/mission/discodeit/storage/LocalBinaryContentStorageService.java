@@ -18,8 +18,8 @@ import java.util.stream.Stream;
 
 @Service
 public class LocalBinaryContentStorageService implements BinaryContentStorage {
-    @Value( "${storage.root}")
-    private Path root;
+    @Value( "${discodeit.storage.local.root-path}")
+    private String root;
 
         @Override
     public UUID put(UUID id, byte[] bytes) throws IOException {
@@ -51,8 +51,9 @@ public class LocalBinaryContentStorageService implements BinaryContentStorage {
 
     @PostConstruct
     void init() throws IOException {
-            if(!Files.exists(root))Files.createDirectories(root);
-        Stream<Path> files = Files.list(root);
+        Path tempPath = Path.of(root);
+            if(!Files.exists(tempPath))Files.createDirectories(tempPath);
+        Stream<Path> files = Files.list(tempPath);
         files.forEach(x->
                 {
                     try {
@@ -65,7 +66,9 @@ public class LocalBinaryContentStorageService implements BinaryContentStorage {
     }
 
     Path resolvePath(UUID fileId){
-        return root.resolve(fileId.toString());
+
+            Path tempPath = Path.of(root);
+            return tempPath.resolve(fileId.toString());
         }
 
 }

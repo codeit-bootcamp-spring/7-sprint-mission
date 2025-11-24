@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.mapper;
 
 
 import com.sprint.mission.discodeit.dto.response.PageResponseDto;
-import io.swagger.v3.oas.annotations.media.Content;
+import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,6 @@ public PageResponseDto<T> fromPage(Page<T> page){
     int pageSize = page.getSize();
     boolean hasNext = page.hasNext();
     Long totalElements = page.getTotalElements();
-
 
     return new PageResponseDto<T>(
             pageContent,

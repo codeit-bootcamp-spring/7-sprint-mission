@@ -14,14 +14,17 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EXIST;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -63,11 +66,21 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
+
     Channel channel = channelRepository.save(Channel.builder()
             .name(channelPublicCreateRequestDto.getName())
             .type(ChannelType.PUBLIC)
             .description(channelPublicCreateRequestDto.getDescription())
             .build());
+        List<User> users = userRepository.findAll();
+        users.forEach(x->{readStatusRepository.save(ReadStatus.builder()
+                .user(x)
+                .channel(channel)
+                .build()
+        );
+        log.info("====================");
+        log.info(x.getUserStatus().getId().toString());
+        });
     return channelMapper.toDto(channel);
     }
 

@@ -49,7 +49,7 @@ public class MessageController implements MessageControllerDocs {
     }
 
     @GetMapping("")
-    public ResponseEntity<PageResponseDto<Message>> readChannelMessage(@RequestParam UUID channelId, @RequestParam Pageable pageable){
+    public ResponseEntity<PageResponseDto<MessageDto>> readChannelMessage(@RequestParam UUID channelId, @RequestParam (required = false)Pageable pageable){
         return new ResponseEntity<>(  messageService.findallByChannelId(channelId,pageable), HttpStatus.OK);
     }
     @PostMapping( "/reset")

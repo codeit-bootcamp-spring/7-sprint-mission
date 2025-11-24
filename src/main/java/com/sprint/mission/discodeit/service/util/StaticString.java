@@ -38,10 +38,6 @@ public abstract class StaticString {
     public static final String DATA_PATH = "src/main/java/com/sprint/mission/discodeit/data/";
     public static final String DEFAULT_CHANNEL_NAME = "defaultChannel";
     public static final String DEFAULT_CHANNEL_DESCRIPTION = "defaultChannel description";
-    public static final User DEFAULT_SENDER = User.builder().name("Default Sender").userName("DefaultSender")
-            .email("")
-            .isOnline(false)
-            .build();
     public static final String DISCODEIT_DIRECTORY = "discodeit.repository.file-directory";
 
 }

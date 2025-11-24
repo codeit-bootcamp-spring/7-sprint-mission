@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.service.util.StaticString.*;
 
@@ -40,7 +41,7 @@ public class BasicMessageService implements MessageService {
     private final MessageAttachmentRepository messageAttachmentRepository;
     private final MessageMapper messageMapper;
     private final BinaryContentStorage binaryContentStorage;
-    private final PageResponseMapper<Message> pageResponseMapper;
+    private final PageResponseMapper<MessageDto> pageResponseMapper;
 
 
 
@@ -49,11 +50,17 @@ public class BasicMessageService implements MessageService {
         //todo channel id 랑 sender id 관련 안전성 확인, 일단 지금은 안함
         Channel channel2 = channelRepository.findById(messageCreateRequestDto.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
         User targetUser = userRepository.findById(messageCreateRequestDto.getAuthorId()).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
-//        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(messageCreateRequestDto.getAuthorId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
-
+        
         List<BinaryContent> binaryContentList = new ArrayList<>();
         Message message;
+        message = messageRepository.save(Message.builder()
+                .content(messageCreateRequestDto.getContent())
+                .channel(channel2)
+                .author(targetUser)
+                .build());
+
         if(attachments!=null) {
+            List<MessageAttachment> messageAttachmentList = new ArrayList<>();
             attachments.forEach(
                     x-> {
                         try {
@@ -65,6 +72,8 @@ public class BasicMessageService implements MessageService {
                             );
                            binaryContentList.add(binaryContent);
                            binaryContentStorage.put(binaryContent.getId(),x.getBytes());
+                            MessageAttachment save = messageAttachmentRepository.save(new MessageAttachment(message, binaryContent));
+                            messageAttachmentList.add(save);
                         }
 
                         catch (IOException e) {
@@ -72,14 +81,9 @@ public class BasicMessageService implements MessageService {
                         }
                     }
             );
+            message.setMessageAttachment(messageAttachmentList);
         }
-        message = messageRepository.save(Message.builder()
-                .content(messageCreateRequestDto.getContent())
-                .channel(channel2)
-                .author(targetUser)
-                .attachments(binaryContentList)
-                .build());
-        binaryContentList.forEach(x->messageAttachmentRepository.save(new MessageAttachment(message, x)));
+
         return messageMapper.toDto(message);
     }
 
@@ -91,9 +95,12 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public PageResponseDto<Message> findallByChannelId(UUID channelId, Pageable pageable) {
+    public PageResponseDto<MessageDto> findallByChannelId(UUID channelId, Pageable pageable) {
         Page<Message> targetPage = messageRepository.findByChannelId(channelId,pageable);
-        return pageResponseMapper.fromPage(targetPage);
+        Message message = targetPage.getContent().get(0);
+        MessageDto messageDto = messageMapper.toDto(message);
+        Page<MessageDto> targetPageDto = targetPage.map(messageMapper::toDto);
+        return pageResponseMapper.fromPage(targetPageDto);
     }
 
     @Override

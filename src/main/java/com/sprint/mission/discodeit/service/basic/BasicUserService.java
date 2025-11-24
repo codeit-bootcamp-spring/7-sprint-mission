@@ -67,11 +67,11 @@ public class BasicUserService implements UserService {
                 .password(userCreateRequestDto.getPassword())
                 .build());
 
-        userStatusRepository.save(UserStatus.builder()
+        UserStatus targetUserStatus = userStatusRepository.save(UserStatus.builder()
                 .user(user)
                 .lastActiveAt(Instant.now())
                 .build());
-
+        user.setUserStatus(targetUserStatus);
         return userMapper.toDto(user);
     }
 

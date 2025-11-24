@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.sprint.mission.discodeit.subTable.MessageAttachment;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static java.time.Instant.*;
@@ -34,5 +35,9 @@ public class BinaryContent extends BaseEntity implements Serializable {
 
     @Column(name = "size",nullable = false,columnDefinition = "bigint")
     private Long size;
+
+    @OneToMany( mappedBy = "binaryContent",fetch = FetchType.LAZY)
+    private List<MessageAttachment> messageAttachment;
+
 
 }

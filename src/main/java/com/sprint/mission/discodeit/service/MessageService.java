@@ -16,7 +16,7 @@ public interface MessageService {
 
     public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments);
     public List<MessageDto> readAllMessage();
-    public PageResponseDto<Message> findallByChannelId(UUID channelId, Pageable pageable);
+    public PageResponseDto<MessageDto> findallByChannelId(UUID channelId, Pageable pageable);
     public void deleteMessage(UUID messageId);
     public MessageDto patchMessage(MessagePatchRequestDto dto, UUID messageId);
     List<MessageDto> readAllMessageByUserId(UUID userId);

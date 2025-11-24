@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.subTable.MessageAttachment;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -31,6 +32,9 @@ public class Message extends BaseUpdatableEntity {
 
     @Transient
     List<BinaryContent> attachments;
+
+    @OneToMany(mappedBy = "message")
+    private List<MessageAttachment> messageAttachment;
     /// // attachments 삭제했을때도 제대로 삭제되었는지 테스트 해봐야 함
 
 

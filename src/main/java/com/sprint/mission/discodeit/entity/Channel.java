@@ -23,6 +23,7 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
     @Column(name = "description",length = 500)
     private String description;
 
+
     @Column(name = "type",nullable = false,length = 10)
     private ChannelType type;
 
