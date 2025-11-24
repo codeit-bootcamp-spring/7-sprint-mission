@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 /*
     사용자 별 마지막으로 확인된 접속 시간을 표현하는 도메인 모델
     사용자의 온라인 상태를 확인하기 위해 활용
@@ -13,28 +14,34 @@ import java.util.UUID;
  */
 @Getter
 @ToString
-public class UserStatus extends BaseEntity {
-    private final UUID userId;
-    private Instant lastReadAt;
+@Entity
+@Table(name = "user_statuses")
+public class UserStatus extends BaseUpdatableEntity {
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 
-    public UserStatus(UUID userId) {
-        this.userId = VerifiedUtils.verifyNull(userId);
-        this.lastReadAt = Instant.now();
+    @Column(name = "last_active_at", nullable = false)
+    private Instant lastActiveAt;
+
+    protected UserStatus() {}
+
+    public UserStatus(User user) {
+        this.user = Objects.requireNonNull(user);
+        this.lastActiveAt = Instant.now();
     }
 
     public void timeUpdated() {
-        this.lastReadAt = Instant.now();
-        reUpdatedAt();
+        this.lastActiveAt = Instant.now();
     }
 
     public boolean isOnlineNow() {
         Instant time = Instant.now().minus(Duration.ofMinutes(5));
-        return lastReadAt.isAfter(time);
+        return lastActiveAt.isAfter(time);
     }
 
-    public void setLastReadAt(Instant lastReadAt) {
-        Objects.requireNonNull(lastReadAt);
-        this.lastReadAt = lastReadAt;
-        reUpdatedAt();
+    public void setLastActiveAt(Instant lastActiveAt) {
+        Objects.requireNonNull(lastActiveAt);
+        this.lastActiveAt = lastActiveAt;
     }
 }
