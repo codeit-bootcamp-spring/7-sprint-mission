@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,20 +15,22 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class Channel extends BaseUpdateEntity {
 
 
     //
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 10)
     private ChannelType type;
+
+    @Column(name = "name", length = 100)
     private String name;
+
+    @Column(name = "description", length = 500)
     private String description;
 
-    public Channel(ChannelType type, String name, String description) {
-        this.type = type;
-        this.name = name;
-        this.description = description;
-    }
 
     public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;

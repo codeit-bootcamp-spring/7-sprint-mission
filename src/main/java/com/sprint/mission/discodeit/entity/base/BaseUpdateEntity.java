@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity.base;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public abstract class BaseUpdateEntity extends BaseEntity {
 
     @LastModifiedDate
+    @Column(name = "updated_at")
     private Instant updatedAt;
 
 

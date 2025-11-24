@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
-import jakarta.persistence.Entity;
+import com.sprint.mission.discodeit.entity.content.BinaryContent;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,32 +12,37 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
+@Table(name = "messages")
 public class Message extends BaseUpdateEntity {
 
+    @ManyToOne
+    @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "messages_author_id_fk"))
+    private User author;
 
-    private UUID authorId;
-    private UUID channelId;
+    @ManyToOne
+    @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "messages_channel_id_fk"), nullable = false)
+    private Channel channel;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
-    private List<UUID> attachmentIds;
 
-    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "message_attachments",                    // 연결 테이블 이름
+            joinColumns = @JoinColumn(name = "message_id"),  // 내가 연결될 때 사용할 FK
+            inverseJoinColumns = @JoinColumn(name = "attachment_id") // 반대쪽 엔티티의 FK
+    )
+    private List<BinaryContent> attachments;
+
+/*    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         this.authorId = authorId;
         this.channelId = channelId;
         this.content = content;
         this.attachmentIds = attachmentIds;
-    }
+    }*/
 
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "채널 UUID =" + channelId +
-                ",발신자 UUID  =" + authorId +
-                ", 생성시간 =" + this.getCreatedAt() +
-                ",  내용 ='" + content + '\'' +
-                '}';
-    }
 
     public void update(String newContent) {
         boolean anyValueUpdated = false;

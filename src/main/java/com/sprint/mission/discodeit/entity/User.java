@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Entity
@@ -29,18 +30,18 @@ public class User extends BaseUpdateEntity {
     // private UUID profileId;
     //널러블이 디폴트여도  하나있고 없어도된다는 표현을 하고싶었다
     @OneToOne
-    @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_users_profile"), nullable = true)
+    @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_users_profile"), unique = true, nullable = true)
     private BinaryContent profile;
     @OneToOne(mappedBy = "user")
     private UserStatus status;
 
-    public User(String username, String email, String password, UUID profileId) {
+/*    public User(String username, String email, String password, UUID profileId) {
         //
         this.username = username;
         this.email = email;
         this.password = password;
         this.profileId = profileId;
-    }
+    }*/
 
     public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
         boolean anyValueUpdated = false;

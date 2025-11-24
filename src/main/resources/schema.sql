@@ -14,7 +14,8 @@ CREATE TABLE users
         CONSTRAINT users_email_uk UNIQUE,
     password   VARCHAR(60)
         CONSTRAINT users_password_nn_uniq NOT NULL,
-    profile_id UUID,
+    profile_id UUID
+        CONSTRAINT users_profile_id_uk UNIQUE,
     CONSTRAINT users_profile_id_fk
         FOREIGN KEY (profile_id)
             REFERENCES binary_content (id)
@@ -67,11 +68,11 @@ CREATE TABLE binary_content
     file_name    VARCHAR(255)
         CONSTRAINT users_password_nn NOT NULL,
     size         BIGINT
-        constraint binary_content_size_nn NOT NULL,
+        CONSTRAINT binary_content_size_nn NOT NULL,
     content_type VARCHAR(100)
         CONSTRAINT binary_content_contentType_nn NOT NULL,
     bytes        BYTEA
-        constraint binary_content_bytes_nn NOT NULL
+        CONSTRAINT binary_content_bytes_nn NOT NULL
 );
 
 CREATE TABLE user_status
