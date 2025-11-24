@@ -10,9 +10,9 @@ import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -58,6 +58,7 @@ public class BasicUserStatusService implements UserStatusService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserStatusDto> findAll() {
        return userStatusRepository.findAll().stream().map(userStatusMapper::toDto).toList();
     }

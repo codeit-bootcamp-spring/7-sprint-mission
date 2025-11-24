@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -24,8 +25,9 @@ public class ChannelMapper {
         List<ReadStatus> readStatusList = readStatusRepository.findByChannel(channel);
 
         List<UserDto> participantsDto;
-        participantsDto = readStatusList.stream().map(x->
-                userMapper.toDto(x.getUser())).toList();
+        List<UUID> userIds = readStatusList.stream().map(x->x.getUser().getId()).toList();
+        participantsDto = userMapper.idsToDto(userIds);
+
         return new ChannelDto(
                 channel.getId(),
                 channel.getType(),

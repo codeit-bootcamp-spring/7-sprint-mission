@@ -12,10 +12,10 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
@@ -64,7 +64,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public ChannelDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
 
     Channel channel = channelRepository.save(Channel.builder()
@@ -101,6 +101,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<ChannelDto> findAllByUserId(UUID userId) {
         List<Channel> channelList = channelRepository.findAll();
         List<ReadStatus> readStatusList = readStatusRepository.findAll();

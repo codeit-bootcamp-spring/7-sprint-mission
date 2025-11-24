@@ -7,10 +7,10 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,6 +40,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BinaryContentDto find(UUID binaryContentID) {
 
         return  BinaryContentDto.from(
@@ -50,6 +51,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIdList) {
        return binaryContentIdList.stream().map(this::find)
                .toList();

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 @Tag(name = "메시지 관리 API(Message Controller)",description = "메세지를 조회 생성 관리 하는 메세지 Controller입니다. ")
@@ -39,7 +40,7 @@ public interface MessageControllerDocs {
     @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<MessageDto> createMessage(@RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
                                                          @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
-    );
+    ) throws IOException;
 
     @Operation(summary = "메세지 변경(Patch Message)", description = "메세지를 변경합니다.")
     @ApiResponse(responseCode = "200", description = "메세지 변경 성공",
