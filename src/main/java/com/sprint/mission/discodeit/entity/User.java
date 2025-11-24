@@ -1,31 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.UUID;
+import java.util.Objects;
 
 @Getter
 @ToString
-public class User extends BaseEntity {
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdatableEntity {
+    @Column(name = "username", nullable = false, length = 50, unique = true)
     private String username; // 유저 이름 ( 별명 x)
-    private String password;
-    private String email;
-    private UUID profileId;
 
-    public User(String username, String password, String email, UUID profileId) {
-        this.username = VerifiedUtils.verifyName(username);
-        this.password = VerifiedUtils.verifyPassword(password);
-        this.email = VerifiedUtils.verifyEmail(email);
-        this.profileId = profileId;
+    @Column(name = "password", nullable = false, length = 60)
+    private String password;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserStatus status;
+
+    protected User() {}
+
+    public User(String username, String password, String email, BinaryContent profile) {
+        this.username = Objects.requireNonNull(username);
+        this.password = Objects.requireNonNull(password);
+        this.email = Objects.requireNonNull(email);
+        this.profile = profile;
     }
 
     public void setUsername(String username) {
         String v = VerifiedUtils.verifyName(username);
         if (!v.equals(this.username)) {
             this.username = v;
-            reUpdatedAt();
         }
     }
 
@@ -33,7 +49,6 @@ public class User extends BaseEntity {
         String v = VerifiedUtils.verifyPassword(password);
         if (!v.equals(this.password)) {
             this.password = v;
-            reUpdatedAt();
         }
     }
 
@@ -42,14 +57,12 @@ public class User extends BaseEntity {
         String v = VerifiedUtils.verifyEmail(email);
         if (!v.equals(this.email)) {
             this.email = v;
-            reUpdatedAt();
         }
     }
 
-    public void setProfileId(UUID profileId) {
-        if(profileId != this.profileId) {
-            this.profileId = profileId;
-            reUpdatedAt();
+    public void setProfile(BinaryContent profile) {
+        if(this.profile != profile) {
+            this.profile = profile;
         }
     }
 
