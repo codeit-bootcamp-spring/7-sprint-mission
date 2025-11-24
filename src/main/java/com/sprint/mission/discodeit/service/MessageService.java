@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.messageDto.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.messageDto.MessageDto;
 import com.sprint.mission.discodeit.dto.messageDto.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.page.PageResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 

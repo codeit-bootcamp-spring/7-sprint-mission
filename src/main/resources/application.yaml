@@ -25,6 +25,8 @@ spring:
         format_sql: true # 출력을 보기 좋게 바꿔줌
         default_batch_fetch_size: 100  # n+1 문제를 해결하진 않지만 size만큼 한번에 가져옴. 페이징을 위해 사용
 
+    open-in-view: false
+
   logging:
     level:
       org:

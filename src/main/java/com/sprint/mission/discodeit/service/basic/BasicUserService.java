@@ -13,8 +13,8 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +34,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
     // 생성
     @Override
@@ -63,17 +64,19 @@ public class BasicUserService implements UserService {
         if (profileImage == null || profileImage.isEmpty()) {
             return null;
         }
-        try {
-            BinaryContent binaryContent = BinaryContent.builder()
-                    .bytes(profileImage.getBytes())
-                    .fileName(profileImage.getOriginalFilename())
-                    .contentType(profileImage.getContentType())
-                    .build();
-            return binaryContentRepository.save(binaryContent);
+        BinaryContent binaryContent = BinaryContent.builder()
+                .fileName(profileImage.getOriginalFilename())
+                .size(profileImage.getSize())
+                .contentType(profileImage.getContentType())
+                .build();
+        binaryContentRepository.save(binaryContent);
 
+        try {
+            binaryContentStorage.put(binaryContent.getId(), profileImage.getBytes());
         } catch (IOException e) {
-            throw new RuntimeException("오류가 발생", e);
+            throw new RuntimeException("오류가 발생");
         }
+        return binaryContent;
     }
 
     // --- 조회 ---
@@ -90,7 +93,8 @@ public class BasicUserService implements UserService {
     // 전체출력
     @Override
     public List<UserDto> findAllUsers() {
-        return userRepository.findAll().stream().map(userMapper::toDto).collect(Collectors.toList());
+        return userRepository.findAllWithProfile().stream()
+                .map(userMapper::toDto).collect(Collectors.toList());
     }
 
     // --- 수정 ---
