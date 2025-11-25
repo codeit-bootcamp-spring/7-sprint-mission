@@ -3,12 +3,14 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.PageResponseDto;
+import com.sprint.mission.discodeit.dto.response.PageResponseDtoBasic;
 import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseBasicMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -47,6 +49,7 @@ public class BasicMessageService implements MessageService {
     private final MessageMapper messageMapper;
     private final BinaryContentStorage binaryContentStorage;
     private final PageResponseMapper<MessageDto> pageResponseMapper;
+    private final PageResponseBasicMapper<MessageDto> pageResponseBasicMapper;
 
 
 
@@ -103,13 +106,14 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponseDto<MessageDto> findallByChannelId(UUID channelId, Pageable pageable) {
+    public PageResponseDtoBasic<MessageDto> findallByChannelId(UUID channelId, Pageable pageable) {
 
         Page<Message> targetPage = messageRepository.findByChannelId(channelId,pageable);
+        if(targetPage.isEmpty()) return pageResponseBasicMapper.fromPage(Page.empty());
         Message message = targetPage.getContent().get(0);
         MessageDto messageDto = messageMapper.toDto(message);
         Page<MessageDto> targetPageDto = targetPage.map(messageMapper::toDto);
-        return pageResponseMapper.fromPage(targetPageDto);
+        return pageResponseBasicMapper.fromPage(targetPageDto);
     }
 
     @Override
@@ -123,6 +127,7 @@ public class BasicMessageService implements MessageService {
         else{
             targetSlice = messageRepository.findByChannelIdAndCreatedAtAfter(channelId,Instant.parse(cursor),pageable);
         }
+
         Object next = targetSlice.getContent().get(targetSlice.getContent().size()-1).getCreatedAt();
         Slice<MessageDto> targetSliceDto = targetSlice.map(messageMapper::toDto);
         return pageResponseMapper.fromSlice(targetSliceDto,next);

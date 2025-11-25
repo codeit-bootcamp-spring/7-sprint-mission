@@ -22,7 +22,7 @@ import static java.time.Instant.*;
 @AllArgsConstructor
 public class UserStatus extends BaseUpdatableEntity {
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",nullable = false,unique = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
@@ -31,7 +31,7 @@ public class UserStatus extends BaseUpdatableEntity {
     private Instant lastActiveAt;
 
     public boolean isUserOnline(){
-        Duration duration = Duration.between(this.lastActiveAt, now());
+        Duration duration = Duration.between(this.lastActiveAt, Instant.now());
         return duration.getSeconds()<300;
     }
 }

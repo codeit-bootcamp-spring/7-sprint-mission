@@ -4,6 +4,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.PageResponseDto;
+import com.sprint.mission.discodeit.dto.response.PageResponseDtoBasic;
 import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.data.domain.Pageable;
@@ -15,13 +16,13 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto
+    MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto
             , List<MultipartFile> attachments) throws IOException;
-    public List<MessageDto> readAllMessage();
-    public PageResponseDto<MessageDto> findallByChannelId(UUID channelId, Pageable pageable);
+     List<MessageDto> readAllMessage();
+     PageResponseDtoBasic<MessageDto> findallByChannelId(UUID channelId, Pageable pageable);
     PageResponseDto<MessageDto> findallByChannelIdWithCursor(UUID channelId, String cursor, Pageable pageable);
-    public void deleteMessage(UUID messageId);
-    public MessageDto patchMessage(MessagePatchRequestDto dto, UUID messageId);
+    void deleteMessage(UUID messageId);
+    MessageDto patchMessage(MessagePatchRequestDto dto, UUID messageId);
     List<MessageDto> readAllMessageByUserId(UUID userId);
     void resetMessage();
 }

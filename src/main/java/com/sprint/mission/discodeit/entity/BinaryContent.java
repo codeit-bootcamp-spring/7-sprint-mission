@@ -39,5 +39,4 @@ public class BinaryContent extends BaseEntity implements Serializable {
     @OneToMany( mappedBy = "binaryContent",fetch = FetchType.LAZY)
     private List<MessageAttachment> messageAttachment;
 
-
 }

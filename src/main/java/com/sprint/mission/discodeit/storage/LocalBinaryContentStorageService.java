@@ -55,16 +55,6 @@ public class LocalBinaryContentStorageService implements BinaryContentStorage {
     void init() throws IOException {
         Path tempPath = Path.of(root);
             if(!Files.exists(tempPath))Files.createDirectories(tempPath);
-        Stream<Path> files = Files.list(tempPath);
-        files.forEach(x->
-                {
-                    try {
-                        Files.deleteIfExists(x);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                );
     }
 
     Path resolvePath(UUID fileId){

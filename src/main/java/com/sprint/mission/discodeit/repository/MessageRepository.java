@@ -19,7 +19,5 @@ import java.util.UUID;
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     Page<Message> findByChannelId(UUID channelId, Pageable pageable);
-    Page<Message> findByChannelIdWithCursor(UUID channelId, Pageable pageable);
-
     Slice<Message> findByChannelIdAndCreatedAtAfter(UUID channelId, Instant cursor, Pageable pageable);
 }

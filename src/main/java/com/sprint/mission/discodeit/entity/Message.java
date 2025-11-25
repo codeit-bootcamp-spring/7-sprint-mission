@@ -30,7 +30,7 @@ public class Message extends BaseUpdatableEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Channel channel;
 
-    @Transient
+    @OneToMany(fetch = FetchType.LAZY)
     List<BinaryContent> attachments;
 
     @OneToMany(mappedBy = "message")

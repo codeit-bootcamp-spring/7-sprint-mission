@@ -17,6 +17,7 @@ public class UserMapper {
     private final BinaryContentMapper binaryContentMapper;
     private final UserRepository userRepository;
 
+
     public UserDto toDto(User user){
         BinaryContentDto binaryContentDto = user.getProfile()==null ?null:binaryContentMapper.toDto(user.getProfile());
         UUID binaryContentId = binaryContentDto==null?null:binaryContentDto.id();

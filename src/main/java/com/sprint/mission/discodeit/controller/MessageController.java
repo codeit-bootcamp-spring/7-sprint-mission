@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.docs.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.PageResponseDto;
+import com.sprint.mission.discodeit.dto.response.PageResponseDtoBasic;
 import com.sprint.mission.discodeit.dto.response.message.MessageDto;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
@@ -50,8 +51,8 @@ public class MessageController implements MessageControllerDocs {
     }
 
     @GetMapping("")
-    public ResponseEntity<PageResponseDto<MessageDto>> readChannelMessage(@RequestParam UUID channelId, @RequestParam (required = false)Pageable pageable){
-        return new ResponseEntity<>(  messageService.findallByChannelId(channelId,pageable), HttpStatus.OK);
+    public ResponseEntity<PageResponseDtoBasic<MessageDto>> readChannelMessage(@RequestParam UUID channelId, @RequestParam (required = false)Pageable pageable){
+        return new ResponseEntity<>( messageService.findallByChannelId(channelId,pageable), HttpStatus.OK);
     }
     @PostMapping( "/reset")
     @Override

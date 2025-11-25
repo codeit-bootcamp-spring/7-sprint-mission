@@ -23,7 +23,6 @@ public class ChannelMapper {
     private final UserMapper userMapper;
     public ChannelDto toDto(Channel channel){
         List<ReadStatus> readStatusList = readStatusRepository.findByChannel(channel);
-
         List<UserDto> participantsDto;
         List<UUID> userIds = readStatusList.stream().map(x->x.getUser().getId()).toList();
         participantsDto = userMapper.idsToDto(userIds);

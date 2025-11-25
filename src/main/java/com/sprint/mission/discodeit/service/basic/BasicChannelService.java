@@ -64,7 +64,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public ChannelDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
 
     Channel channel = channelRepository.save(Channel.builder()

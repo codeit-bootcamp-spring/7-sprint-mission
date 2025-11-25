@@ -106,14 +106,8 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> advanceFindAllUser(){
-        return userRepository.findAll().stream().map(
-        x-> UserDto.builder()
-                .id(x.getId())
-                .username(x.getUserName())
-                .email(x.getEmail())
-                .profileId(x.getProfile() == null? null: x.getProfile().getId())
-                .build()
-                ).toList();
+        List<User> userList = userRepository.findAll();
+        return userList.stream().map(userMapper::toDto).toList();
     }
 
     @Override
@@ -124,7 +118,7 @@ public class BasicUserService implements UserService {
         user.setPassword(dto.newPassword()==null?user.getPassword():dto.newPassword());
         user.setEmail(dto.newEmail()==null?user.getEmail():dto.newEmail());
         if(profile!=null) {
-            binaryContentRepository.delete(user.getProfile());
+            if(user.getProfile()!=null)  binaryContentRepository.delete(user.getProfile());
             BinaryContent tmpBinaryContent = binaryContentRepository.save(BinaryContent.builder()
                     .fileName(profile.getName())
                     .size(profile.getSize())

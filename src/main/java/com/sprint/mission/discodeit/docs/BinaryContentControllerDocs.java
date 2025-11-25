@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.docs;
 
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import io.swagger.v3.oas.annotations.Operation;
