@@ -34,8 +34,7 @@ public class BinaryContentController {
 
     @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
     public BinaryContentResponseDto get(@PathVariable("binaryContentId") UUID binaryContentId) {
-        return binaryContentService.findById(binaryContentId)
-                .orElseThrow(() -> new NoSuchElementException("binaryContent with id " + binaryContentId + " not found"));
+        return binaryContentService.findById(binaryContentId);
     }
 
     @RequestMapping(method = RequestMethod.GET)
