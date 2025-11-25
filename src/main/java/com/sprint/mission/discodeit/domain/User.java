@@ -16,7 +16,7 @@ import java.util.UUID;
 @Setter
 public class User {
 
-    private String id;
+    private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -41,18 +41,6 @@ public class User {
         this.updatedAt=Instant.now();
     }
 
-    public void setProfile(String profileId) {
-        this.profileId = profileId;
-    }
-
-
-
-
-    public void UpdatedPassword(String password) {
-        validatePassword(password);
-        this.password = password;
-
-    }
 
     public void updateUsername(String username) {
         validateUsername(username);
@@ -76,6 +64,7 @@ public class User {
     public void updateLastActiveAt(Instant lastActiveAt){
         this.lastActiveAt=lastActiveAt;
     }
+
     private void validateEmail(String email) {
         if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             throw new ValidationException(ErrorType.INVALID_EMAIL);

@@ -27,9 +27,7 @@ public class FileManager {
         } catch (IOException e) {
             throw new RuntimeException("유저의 폴더 생성이 실패", e);
         }
-
     }
-
     public Path saveUserProfile(String userId, MultipartFile profile) {
         createUserFolder(userId);
         String contentType = profile.getContentType();

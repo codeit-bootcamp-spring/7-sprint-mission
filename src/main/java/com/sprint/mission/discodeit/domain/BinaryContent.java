@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BinaryContent{
 
-    private String id;
+    private UUID id;
     private Instant createdAt;
 
     private String fileName;  // UUID.toString()

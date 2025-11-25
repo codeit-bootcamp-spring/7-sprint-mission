@@ -9,24 +9,24 @@ import java.util.UUID;
 @Getter
 public class Message {
 
-    private String id;
+    private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
 
-    private String channelId;
-    private String userId;
+    private UUID channelId;
+    private UUID userId;
 
     private String content;
-    private List<String> attachmentIds;
 
 
-    public Message(String userId, String content, String channelId, List<String> attachmentIds) {
-        this.id=UUID.randomUUID().toString();
+
+    public Message(UUID userId, String content, UUID channelId, List<String> attachmentIds) {
+
 
         this.userId = userId;
         this.content = content;
         this.channelId=channelId;
-        this.attachmentIds = attachmentIds;
+//        this.attachmentIds = attachmentIds;
     }
 
     public void updateContent(String newContent){

@@ -11,16 +11,16 @@ import java.util.UUID;
 @Getter
 public class ReadStatus {
 
-    private String id;
+    private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
-    private String userId;
-    private String channelId;
+    private UUID userId;
+    private UUID channelId;
     private Instant lastReadAt;
 
 
-    public ReadStatus(String userId, String channelId, Instant lastReadAt) {
-        this.id = UUID.randomUUID().toString();
+    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+
         this.userId = userId;
         this.channelId = channelId;
         this.lastReadAt = lastReadAt;

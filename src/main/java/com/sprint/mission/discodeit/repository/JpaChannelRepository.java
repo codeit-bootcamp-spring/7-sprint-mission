@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository.jpainterface;
+package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.ChannelEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
