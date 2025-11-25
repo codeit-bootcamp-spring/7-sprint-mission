@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.facade.channel.ChannelDeleteFacade;
 import com.sprint.mission.discodeit.facade.channel.ChannelDetailViewFacade;
 import com.sprint.mission.discodeit.facade.channel.ChannelOverViewFacade;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +48,7 @@ public class ChannelController implements ChannelControllerDocs {
   @PostMapping("/public")
   public ResponseEntity<ChannelPublicInfoRes> createPublicChannel(
       @RequestHeader("X-LOGINUSER-ID") UUID managerId,
-      @RequestBody ChannelCreateReq req) {
+      @Valid @RequestBody ChannelCreateReq req) {
     ChannelPublicInfoRes channel = (ChannelPublicInfoRes) channelCreationFacade.createPublicChannel(
         managerId, req);
     URI location = ServletUriComponentsBuilder
@@ -62,7 +63,7 @@ public class ChannelController implements ChannelControllerDocs {
   @PostMapping("/private")
   public ResponseEntity<ChannelPrivateInfoRes> createPrivateChannel(
       @RequestHeader("X-LOGINUSER-ID") UUID managerId,
-      @RequestBody ChannelCreateSecReq req) {
+      @Valid @RequestBody ChannelCreateSecReq req) {
     ChannelPrivateInfoRes channel = (ChannelPrivateInfoRes) channelCreationFacade.createPrivateChannel(
         managerId, req);
     URI location = ServletUriComponentsBuilder
