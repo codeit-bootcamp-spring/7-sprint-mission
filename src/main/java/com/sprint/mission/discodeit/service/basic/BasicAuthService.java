@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.auth.AuthLoginRequestDto;
 import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -23,6 +24,7 @@ import java.util.UUID;
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private final UserMapper userMapper;
 
     @Transactional
     @Override
@@ -48,7 +50,7 @@ public class BasicAuthService implements AuthService {
                 }, () -> userStatusRepository.save(new UserStatus(user))
                 );
 
-        return UserResponseDto.from(user, true);
+        return userMapper.toDto(user, true);
     }
 
     @Transactional
