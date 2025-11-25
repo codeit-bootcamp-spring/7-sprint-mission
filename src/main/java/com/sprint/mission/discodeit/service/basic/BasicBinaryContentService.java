@@ -11,14 +11,17 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
+  @Transactional
   public BinaryContent createBinaryContent(CreateBinaryContentRequestDto request) {
 
     BinaryContent binaryContent = new BinaryContent(
@@ -37,13 +40,15 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public List<BinaryContent> findAllByIdIn(List<UUID> BinaryContentIds) {
-    List<BinaryContent> allByIdIn = binaryContentRepository.findAllByIdIn(BinaryContentIds);
-    return allByIdIn;
+  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepository.findAllByIdIn(binaryContentIds);
   }
 
   @Override
+  @Transactional
   public void delete(UUID BinaryContentId) {
-    binaryContentRepository.delete(BinaryContentId);
+    BinaryContent binaryContent = binaryContentRepository.findById(BinaryContentId)
+        .orElseThrow(() -> new IllegalArgumentException("BinaryContent를 찾을 수 없습니다."));
+    binaryContentRepository.delete(binaryContent);
   }
 }

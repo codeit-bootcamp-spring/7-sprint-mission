@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.response.UserStatusResponseDto;
-import com.sprint.mission.discodeit.dto.update.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.request.CreateUserStatusRequestDto;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -11,28 +11,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
 
   @Override
+  @Transactional // user랑 1:1관계인데, 이 메서드가 필요할까..? 흠
   public UserStatusResponseDto createUserStatus(CreateUserStatusRequestDto requestDto) {
     UUID userId = requestDto.userId();
-    if (userRepository.findById(userId).isEmpty()) {
-      throw new IllegalArgumentException("유저가 없습니다.");
-    }
-    if (userStatusRepository.findByUserId(userId).isPresent()) {
-      throw new IllegalArgumentException("이미 존재합니다.");
-    }
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다."));
 
-    UserStatus newStatus = new UserStatus(requestDto.userId());
+    UserStatus newStatus = new UserStatus(user);
     UserStatus userStatus = userStatusRepository.save(newStatus);
 
     return UserStatusResponseDto.from(userStatus);
@@ -40,7 +38,6 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatusResponseDto find(UUID userStatusId) {
-
     UserStatus userStatus = getUserStatus(userStatusId);
     return UserStatusResponseDto.from(userStatus);
   }
@@ -48,34 +45,34 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   public List<UserStatusResponseDto> findAll() {
     List<UserStatus> userStatuses = userStatusRepository.findAll();
-    List<UserStatusResponseDto> dtoList = new ArrayList<>();
-    for (UserStatus userStatus : userStatuses) {
-      dtoList.add(UserStatusResponseDto.from(userStatus));
-    }
-    return dtoList;
+    return userStatuses.stream()
+        .map(userStatus -> UserStatusResponseDto.from(userStatus))
+        .toList();
   }
 
   @Override
+  @Transactional
   public UserStatus updateUserStatus(UUID id) {
     UserStatus userStatus = userStatusRepository.findByUserId(id)
         .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
     userStatus.statusUpdate(Instant.now());
-    UserStatus userstatus = userStatusRepository.save(userStatus);
-    return userstatus;
+    return userStatus;
   }
 
   @Override
+  @Transactional
   public UserStatus updateByUserId(UUID userId) {
     UserStatus user = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다."));
     user.statusUpdate(Instant.now());
-    return userStatusRepository.save(user);
+    return user;
   }
 
   @Override
+  @Transactional
   public void deleteUserStatus(UUID userStatusId) {
-    getUserStatus(userStatusId);
-    userStatusRepository.delete(userStatusId);
+    UserStatus userStatus = getUserStatus(userStatusId);
+    userStatusRepository.delete(userStatus);
   }
 
   // 중복 메서드 만들기

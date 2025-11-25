@@ -19,10 +19,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
@@ -30,6 +32,7 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
 
   @Override
+  @Transactional
   public User createUser(CreateUserCommand request) {
     // username, email 중복 체크
     if (userRepository.findByUsername(request.username()).isPresent()) {
@@ -40,42 +43,39 @@ public class BasicUserService implements UserService {
     }
 
     // 프로필 이미지 선택적 로직, ID로 체크해서. 컨텐츠 만들어서
-    UUID profileId = null;
+    BinaryContent saved = null;
     if (request.bytes() != null) {
       BinaryContent content = new BinaryContent(
           request.fileName(),
           request.contentType(),
           request.bytes()
       );
-
-      BinaryContent saved = binaryContentRepository.save(content);
-
-      profileId = saved.getId();
+      saved = binaryContentRepository.save(content);
     }
 
     // User 생성
     User user = new User(
         request.username(),
         request.email(),
-        request.password(),
-        profileId
+        request.password()
     );
 
-    User userCreated = userRepository.save(user);
+    if (saved != null) {
+      user.assignProfile(saved);
+    }
 
-    // UserStatus 생성
-    UserStatus status = new UserStatus(userCreated.getId());
-    userStatusRepository.save(status);
-    return userCreated;
+    UserStatus status = new UserStatus(user);
+
+    user.assignStatus(status);
+
+    return userRepository.save(user);
   }
 
   @Override
   public UserResponseDto find(UUID id) {
     User user = userRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-
-    UserStatus status = userStatusRepository.findByUserId(user.getId())
-        .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
+    UserStatus status = user.getStatus();
 
     return UserResponseDto.from(user, status);
   }
@@ -85,19 +85,15 @@ public class BasicUserService implements UserService {
     List<User> users = userRepository.findAll();
     List<UserResponseDto> dtos = new ArrayList<>();
     for (User user : users) {
-      UserStatus status = userStatusRepository.findByUserId(user.getId())
-          .orElseGet(() -> {
-            UserStatus userStatus = new UserStatus(user.getId());
-            return userStatusRepository.save(userStatus);
-          });
-
-      UserResponseDto dto = UserResponseDto.from(user, status);
+      UserStatus userStatus = user.getStatus();
+      UserResponseDto dto = UserResponseDto.from(user, userStatus);
       dtos.add(dto);
     }
     return dtos;
   }
 
   @Override
+  @Transactional
   public User updateUser(UUID userId, UpdateUserDto request, MultipartFile profile) {
     //유저 찾기
     User user = userRepository.findById(userId)
@@ -113,7 +109,7 @@ public class BasicUserService implements UserService {
         );
 
         BinaryContent saved = binaryContentRepository.save(content);
-        user.updateProfile(saved.getId());
+        user.updateProfile(saved);
       } catch (IOException e) {
         throw new IllegalArgumentException("이미지 등록 실패", e);
       }
@@ -124,23 +120,17 @@ public class BasicUserService implements UserService {
         request.newEmail(),
         request.newPassword()
     );
-
-    User updated = userRepository.save(user);
-
-    UserStatus status = userStatusRepository.findByUserId(updated.getId())
-        .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
-    userStatusRepository.save(status);
-
-    return updated;
+    return user;
   }
 
   @Override
+  @Transactional
   public void deleteUser(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-    UUID profileId = user.getProfileId();
-    binaryContentRepository.delete(profileId);
-    userStatusRepository.deleteByUserId(user.getId());
-    userRepository.delete(user.getId());
+    if (user.getProfile() != null) {
+      binaryContentRepository.delete(user.getProfile());
+    }
+    userRepository.delete(user);
   }
 }
