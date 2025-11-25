@@ -19,14 +19,13 @@ public class FileManager {
     private final Path rootDir = Paths.get("data/uploads"); // 루트 폴더
 
 
-    public Path put(String userId, MultipartFile file) {
+    public Path put(UUID userId, MultipartFile file) {
         String contentType = file.getContentType();
         validateContentType(contentType);
-
         Path userFolder = getUserFolder(userId);
 
         String filePath =
-                makeProfileName(file.getOriginalFilename() == null ? file.getContentType() : file.getOriginalFilename());
+                makeFileName(file.getOriginalFilename() == null ? file.getContentType() : file.getOriginalFilename());
         Path profilePath = userFolder.resolve(filePath);
 
         try {
@@ -38,32 +37,7 @@ public class FileManager {
         return profilePath;
     }
 
-    public void deleteUserFolder(String userId) {
-        Path userFolder = rootDir.resolve("user_" + userId);
-
-        try {
-            Files.walkFileTree(userFolder, new SimpleFileVisitor<>() {
-                // 파일 삭제
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                // 폴더 삭제 (하위 파일/폴더 삭제 후)
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
-                }
-
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteMessageImage(BinaryContent content) {
+    public void delete(BinaryContent content) {
         Path filePath = Paths.get(content.getFilePath());
         try {
             Files.deleteIfExists(filePath);
@@ -71,7 +45,9 @@ public class FileManager {
             throw new RuntimeException(e);
         }
     }
-    private Path getUserFolder(String userId) {
+
+
+    private Path getUserFolder(UUID userId) {
         Path userFolder;
         try {
             userFolder = Files.createDirectories(rootDir.resolve("user_" + userId));
@@ -90,11 +66,6 @@ public class FileManager {
         }
     }
 
-    private String makeProfileName(String originalName) {
-        int pos = originalName.lastIndexOf(".");
-        String ext = originalName.substring(pos + 1);
-        return "profile" + "." + ext;
-    }
 
 
     private String makeFileName(String originalName) {

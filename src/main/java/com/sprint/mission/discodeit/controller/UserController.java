@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserStatusUpdateRequest;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Slf4j
@@ -39,22 +41,22 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public UserDto updateUser(
-            @PathVariable String userId,
+            @PathVariable UUID userId,
             @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile) {
-        UserDto userDto = userService.updateUserInfo(userId, userUpdateRequest, profile);
-        return userDto;
+        User user = userService.updateUserInfo(userId, userUpdateRequest, profile);
+        return null;
     }
 
 
     @DeleteMapping("/{userId}")
-    public String deleteUser(@PathVariable String userId) {
+    public String deleteUser(@PathVariable UUID userId) {
         userService.delete(userId);
         return "삭제완료";
     }
 
     @PatchMapping("/{userId}/userStatus")
-    public UserStatusDto markOnline(@PathVariable String userId, @RequestBody UserStatusUpdateRequest request) {
+    public UserStatusDto markOnline(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request) {
         return userService.markOnline(userId, request.newLastActiveAt());
     }
 

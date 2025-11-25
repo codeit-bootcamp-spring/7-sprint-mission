@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -32,19 +33,19 @@ public class ChannelController {
     }
 
     @GetMapping
-    public List<ChannelDto> getAllChannelByUserId(@RequestParam String userId) {
+    public List<ChannelDto> getAllChannelByUserId(@RequestParam UUID userId) {
         channelService.getAllByUser(userId);
         return channelService.getAllByUser(userId);
     }
 
     @DeleteMapping("/{channelId}")
-    public String removeChannel(@PathVariable String channelId) {
+    public String removeChannel(@PathVariable UUID channelId) {
         channelService.deleteChannel(channelId);
         return "삭제 성공";
     }
 
     @PatchMapping("/{channelId}")
-    public ChannelDto updateChannel(@PathVariable String channelId, @RequestBody PublicChannelUpdateRequest request) {
+    public ChannelDto updateChannel(@PathVariable UUID channelId, @RequestBody PublicChannelUpdateRequest request) {
         return channelService.updateChannel(channelId, request);
     }
 

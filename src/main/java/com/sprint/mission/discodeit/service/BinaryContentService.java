@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.domain.BinaryContent;
 
+import com.sprint.mission.discodeit.entity.BinaryContentEntity;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,12 +22,12 @@ public final class BinaryContentService {
 
 
     private final FileManager fileManager;
+    private final BinaryContentMapper mapper;
     private final BinaryContentRepository binaryContentRepository;
 
 
-
-    public BinaryContent put(String userId, MultipartFile profile) {
-
+    //우선은 파일 이름은 fileManager에서 UUID 랜덤으로 생성, 그래서 binaryContent의 아이디와는 다름
+    public BinaryContent put(UUID userId, MultipartFile profile) {
         Path profilePath
                 = fileManager.put(userId, profile);
         BinaryContent content = new BinaryContent("profile",
@@ -33,59 +35,34 @@ public final class BinaryContentService {
                 profilePath.toString(),
                 profile.getSize()
         );
-        return binaryContentRepository.save(content);
+        BinaryContentEntity binaryContentEntity = mapper.toBinaryContentEntity(content);
+        BinaryContentEntity savedEntity = binaryContentRepository.save(binaryContentEntity);
+
+        return mapper.toBinaryContent(savedEntity);
     }
 
-    public BinaryContent saveMessageFile(String userId, MultipartFile file) {
 
-        Path filePath = fileManager.saveMessageFile(userId, file);
-        String fileName = makeFileName(file.getOriginalFilename() == null ? "" : file.getOriginalFilename());
-
-        BinaryContent content = new BinaryContent(
-                fileName,
-                file.getContentType(),
-                filePath.toString(),
-                file.getSize()
-        );
-        return binaryContentRepository.save(content);
+    public void deleteFile(UUID binaryContentId) {
+        BinaryContentEntity binaryContentEntity = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new NoSuchElementException("해당 파일이 존재하지 않습니다."));
+        binaryContentRepository.delete(binaryContentEntity);
+        fileManager.delete(mapper.toBinaryContent(binaryContentEntity));
     }
 
-    public void deleteMessageImage(String binaryContentId) {
-        BinaryContent content = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new NoSuchElementException("해당 파일이 존재하지 않습니다."));
-        fileManager.deleteMessageImage(content);
-    }
 
-    public void deleteUserFolder(String userId) {
-        fileManager.deleteUserFolder(userId);
-    }
+    public List<BinaryContent> getBinaryContents(List<UUID> ids) {
+        List<BinaryContent> result = new ArrayList<>();
 
-    public List<BinaryContentDto> getBinaryContents(List<String> ids) {
-        List<BinaryContentDto> result = new ArrayList<>();
-
-        for (String id : ids) {
-            BinaryContent content = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
-            result.add(BinaryContentDto.from(content));
+        for (UUID id : ids) {
+            BinaryContentEntity binaryContentEntity = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+            result.add(mapper.toBinaryContent(binaryContentEntity));
         }
 
         return result;
     }
 
-    public BinaryContentDto getBinaryContent(String id) {
-        BinaryContent content = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
-        return BinaryContentDto.from(content);
-    }
-
-
-    private String makeProfileName(String originalName) {
-        int pos = originalName.lastIndexOf(".");
-        String ext = originalName.substring(pos + 1);
-        return "profile" + "." + ext;
-    }
-    private String makeFileName(String originalName) {
-        int pos = originalName.lastIndexOf(".");
-        String Ext = originalName.substring(pos + 1);
-        String uuid = UUID.randomUUID().toString();
-        return "message_"+uuid + "." + Ext;
+    public BinaryContent getBinaryContent(UUID binaryContentId) {
+        BinaryContentEntity binaryContentEntity = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+        return mapper.toBinaryContent(binaryContentEntity);
     }
 
 

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,20 +26,20 @@ public class ReadStatusService {
         return ReadStatusDto.from(readStatus);
     }
 
-    public ReadStatusDto updateReadStatus(String id){
+    public ReadStatusDto updateReadStatus(UUID id){
         ReadStatus readStatus = getById(id);
         readStatus.read();
         readStatusRepository.save(readStatus);
         return ReadStatusDto.from(readStatus);
     }
 
-    public List<ReadStatusDto> getAllByUserId(String id){
+    public List<ReadStatusDto> getAllByUserId(UUID id){
         return readStatusRepository.findAll().stream()
                 .filter(rs-> rs.getUserId().equals(id))
                 .map(ReadStatusDto::from)
                 .toList();
     }
-    private ReadStatus getById(String id){
+    private ReadStatus getById(UUID id){
         return readStatusRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 메시지 수신 정보가 없습니다."));
     }
 }

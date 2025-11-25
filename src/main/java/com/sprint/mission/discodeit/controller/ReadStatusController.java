@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Slf4j
@@ -19,12 +20,12 @@ public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
     @GetMapping
-    public List<ReadStatusDto> getReadStatus(@RequestParam String userId) {
+    public List<ReadStatusDto> getReadStatus(@RequestParam UUID userId) {
         return readStatusService.getAllByUserId(userId);
     }
 
     @PatchMapping("/{id}")
-    public ReadStatusDto readChannel(@PathVariable String id) {
+    public ReadStatusDto readChannel(@PathVariable UUID id) {
         return readStatusService.updateReadStatus(id);
 
     }

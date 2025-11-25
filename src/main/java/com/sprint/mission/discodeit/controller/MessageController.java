@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -28,18 +29,18 @@ public class MessageController {
     }
 
     @PatchMapping("/{messageId}")
-    public MessageDto updateMessage(@PathVariable String messageId, @ModelAttribute MessageUpdateRequest messageUpdateRequest) {
+    public MessageDto updateMessage(@PathVariable UUID messageId, @ModelAttribute MessageUpdateRequest messageUpdateRequest) {
         return messageService.updateMessage(messageId, messageUpdateRequest);
     }
 
     @DeleteMapping("/{messageId}")
-    public String deleteMessage(@PathVariable String messageId) {
+    public String deleteMessage(@PathVariable UUID messageId) {
         messageService.deleteMessage(messageId);
         return "삭제 성공";
     }
 
     @GetMapping
-    public List<MessageDto> getAllMessageByChannelId(@RequestParam String channelId) {
+    public List<MessageDto> getAllMessageByChannelId(@RequestParam UUID channelId) {
         return messageService.getAllMessage(channelId);
     }
 

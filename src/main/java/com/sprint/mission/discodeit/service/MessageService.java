@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 
 @Slf4j
@@ -43,7 +44,7 @@ public class MessageService {
         return MessageDto.from(message);
     }
 
-    public MessageDto updateMessage(String messageId, MessageUpdateRequest messageUpdateRequest) {
+    public MessageDto updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("메세지가 없습니다."));
         if (messageUpdateRequest.newContent() != null) {
             message.updateContent(messageUpdateRequest.newContent());
@@ -53,11 +54,11 @@ public class MessageService {
         return MessageDto.from(message);
     }
 
-    public void deleteMessage(String messageId) {
+    public void deleteMessage(UUID messageId) {
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("메세지가 없습니다."));
         if (!message.getAttachmentIds().isEmpty()) {
             for (String attachmentId : message.getAttachmentIds()) {
-                binaryContentService.deleteMessageImage(attachmentId);
+                binaryContentService.deleteFile(attachmentId);
             }
         }
         messageRepository.delete(message);
@@ -65,7 +66,7 @@ public class MessageService {
     }
 
 
-    public List<MessageDto> getAllMessage(String channelId) {
+    public List<MessageDto> getAllMessage(UUID channelId) {
         return messageRepository.findByChannelId(channelId).stream().map(message -> MessageDto.from(message)).toList();
     }
 

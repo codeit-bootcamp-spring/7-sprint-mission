@@ -5,12 +5,14 @@ import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.domain.exception.DuplicateException;
 
+import com.sprint.mission.discodeit.entity.UserEntity;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.dto.response.UserDto;
 import com.sprint.mission.discodeit.service.dto.response.UserStatusDto;
+import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 
 @Slf4j
@@ -30,9 +33,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BinaryContentService binaryContentService;
+    private final UserMapper mapper;
 
     @Transactional
-    public UserDto createUser(UserCreateRequest requestDto, MultipartFile file) {
+    public User createUser(UserCreateRequest requestDto, MultipartFile file) {
 
         if (userRepository.existsByEmail(requestDto.email())) {
             throw new DuplicateException("이미 등록된 이메일입니다");
@@ -46,54 +50,61 @@ public class UserService {
                 requestDto.password(),
                 requestDto.username());
 
-        User save = userRepository.save(user);
 
-        BinaryContentDto binaryContentDto = null;
+        UserEntity userEntity = mapper.toUserEntity(user);
+        UserEntity savedEntity = userRepository.save(userEntity);
+        User savedUser = mapper.toUser(savedEntity);
+
+
         if (file != null && !file.isEmpty()) {
-            BinaryContent content = binaryContentService.put(save.getId(), file);
-            userRepository.updateProfileId(save.getId(), content.getId());
-            save.setProfile(content.getId());
-            binaryContentDto = BinaryContentDto.from(content);
+            BinaryContent content = binaryContentService.put(savedUser.getId(), file);
+            savedUser.setProfile(content);
         }
 
-        return UserDto.from(save, binaryContentDto);
+        return savedUser;
     }
 
-    public UserDto updateUserInfo(String id, UserUpdateRequest updateDto, MultipartFile file) {
+    @Transactional
+    public User updateUserInfo(UUID id, UserUpdateRequest updateDto, MultipartFile file) {
 
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+        UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
 
         if (updateDto.newUsername() != null) {
-            user.updateUsername(updateDto.newUsername());
+            userEntity.setUsername(updateDto.newUsername());
         }
         if (updateDto.newPassword() != null) {
-            user.updatePassword(updateDto.newPassword());
+            userEntity.setPassword(updateDto.newPassword());
         }
         if (updateDto.newEmail() != null) {
-            user.updateEmail(updateDto.newEmail());
+            userEntity.setPassword(updateDto.newEmail());
         }
-
+        User user = mapper.toUser(userEntity);
         if (file != null) {
-            BinaryContent content = binaryContentService.put(user.getId(), file);
-            user.setProfile(content.getId());
+            BinaryContent content = binaryContentService.put(userEntity.getId(), file);
+            userEntity.setProfileId(content.getId());
+            user.setProfile(content);
         }
-        BinaryContentDto binaryContent = binaryContentService.getBinaryContent(user.getProfileId());
-        User save = userRepository.save(user);
-        return UserDto.from(save, binaryContent);
+        return user;
     }
 
 
-    public void delete(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
-        userRepository.delete(user);
-        binaryContentService.deleteUserFolder(user.getId());
+    public void delete(UUID id) {
+        UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+        userRepository.delete(userEntity);
+        //우선은 프로필만 삭제. 메세지에 저장된 binaryContent는 어떻게 삭제할 지 생각좀 해보겠음
+        binaryContentService.deleteFile(userEntity.getId());
     }
 
-    public List<UserDto> getAllUsers() {
+    public List<User> getAllUsers() {
+
         return userRepository.findAll()
                 .stream()
-                .map(user ->
-                        UserDto.from(user, binaryContentService.getBinaryContent(user.getProfileId())))
+                .map(userEntity -> {
+                    User user = mapper.toUser(userEntity);
+                    BinaryContent binaryContent = binaryContentService.getBinaryContent(userEntity.getId());
+                    user.setProfile(binaryContent);
+                    return user;
+                })
                 .toList();
     }
 
@@ -111,7 +122,7 @@ public class UserService {
     }
 
 
-    public UserStatusDto markOnline(String id, Instant lastAt) {
+    public UserStatusDto markOnline(UUID id, Instant lastAt) {
         User user = userRepository
                 .findById(id)
                 .orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));

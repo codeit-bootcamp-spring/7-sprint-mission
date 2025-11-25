@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 
 @Service
@@ -41,7 +42,7 @@ public class ChannelService {
     }
 
 
-    public ChannelDto updateChannel(String channelId, PublicChannelUpdateRequest requestDto) {
+    public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest requestDto) {
         Channel channel = getById(channelId);
         if (requestDto.newName() != null) {
             channel.updateChannelName(requestDto.newName());
@@ -51,18 +52,18 @@ public class ChannelService {
     }
 
 
-    public void deleteChannel(String id) {
+    public void deleteChannel(UUID id) {
         Channel channel = getById(id);
         channelRepository.delete(channel);
     }
 
-    public List<ChannelDto> getAllByUser(String userId) {
+    public List<ChannelDto> getAllByUser(UUID userId) {
         return getAll().stream().filter(channel -> channel.getType() == ChannelType.PUBLIC || channel.getMembers().contains(userId))
                 .map(channel -> ChannelDto.from(channel))
                 .toList();
     }
 
-    private Channel getById(String channelId) {
+    private Channel getById(UUID channelId) {
         return channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다"));
     }
 
