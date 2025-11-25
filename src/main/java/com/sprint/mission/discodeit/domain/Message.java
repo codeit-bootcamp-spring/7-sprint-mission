@@ -9,19 +9,19 @@ import java.util.UUID;
 @Getter
 public class Message {
 
-    private final UUID id;
+    private String id;
     private Instant createdAt;
     private Instant updatedAt;
 
-    private final UUID channelId;
-    private final UUID userId;
+    private String channelId;
+    private String userId;
 
     private String content;
-    private List<UUID> attachmentIds;
+    private List<String> attachmentIds;
 
 
-    public Message(UUID userId, String content, UUID channelId, List<UUID> attachmentIds) {
-        this.id=UUID.randomUUID();
+    public Message(String userId, String content, String channelId, List<String> attachmentIds) {
+        this.id=UUID.randomUUID().toString();
 
         this.userId = userId;
         this.content = content;

@@ -4,19 +4,18 @@ import com.sprint.mission.discodeit.domain.Message;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
-public record MessageResponse(
-        UUID id,
+public record MessageDto(
+        String id,
         Instant createdAt,
         Instant updateAt,
         String content,
-        UUID channelId,
-        UUID authorId,
-        List<UUID> attachmentIds
+        String channelId,
+        String authorId,
+        List<String> attachmentIds
 ) {
-    public static MessageResponse from(Message message){
-        return new MessageResponse(message.getId(),
+    public static MessageDto from(Message message){
+        return new MessageDto(message.getId(),
                 message.getCreatedAt(),
                 message.getUpdatedAt(),
                 message.getContent(),

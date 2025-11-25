@@ -1,31 +1,30 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.docs.BinaryContentControllerDocs;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @RestController
 @Slf4j
 @RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
-public class BinaryContentController implements BinaryContentControllerDocs {
+public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
     @GetMapping
-    public List<BinaryContentResponse> getFile(@RequestParam List<UUID> binaryContentId) {
+    public List<BinaryContentDto> getFile(@RequestParam List<String> binaryContentId) {
 
         return binaryContentService.getBinaryContents(binaryContentId);
     }
 
     @GetMapping("/{binaryContentId}")
-    public BinaryContentResponse getFile(@PathVariable UUID binaryContentId) {
+    public BinaryContentDto getFile(@PathVariable String binaryContentId) {
         return binaryContentService.getBinaryContent(binaryContentId);
     }
 

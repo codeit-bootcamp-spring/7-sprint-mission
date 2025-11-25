@@ -8,7 +8,7 @@ import java.util.UUID;
 @Getter
 public class BinaryContent{
 
-    private final UUID id;
+    private String id;
     private Instant createdAt;
 
     private String fileName;  // UUID.toString()
@@ -17,7 +17,7 @@ public class BinaryContent{
     private long fileSize;    // 1024
 
     public BinaryContent(String fileName, String fileType, String filePath, long fileSize) {
-        this.id=UUID.randomUUID();
+
         this.fileName = fileName;
         this.fileType = fileType;
         this.filePath = filePath;

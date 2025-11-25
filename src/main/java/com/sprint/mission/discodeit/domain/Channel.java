@@ -10,19 +10,19 @@ import java.util.UUID;
 @Getter
 public class Channel {
 
-    private final UUID id;
+    private String id;
     private Instant createdAt;
     private Instant updatedAt;
 
     private String name;
     private String description;
     private ChannelType type;
-    private final List<UUID> members;
+    private final List<String> members;
 
-    public Channel(String name, String description, boolean isPrivate, List<UUID> members) {
+    public Channel(String name, String description, boolean isPrivate, List<String> members) {
         validateChannelName(name);
 
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.description = description;
         if (isPrivate) {
@@ -48,7 +48,7 @@ public class Channel {
         }
     }
 
-    public void addMember(UUID userId) {
+    public void addMember(String userId) {
         if (members
                 .stream()
                 .anyMatch(uuid -> uuid.equals(userId))) {

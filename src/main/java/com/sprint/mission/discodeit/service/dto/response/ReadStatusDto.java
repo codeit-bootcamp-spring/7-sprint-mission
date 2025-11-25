@@ -3,16 +3,15 @@ package com.sprint.mission.discodeit.service.dto.response;
 import com.sprint.mission.discodeit.domain.ReadStatus;
 
 import java.time.Instant;
-import java.util.UUID;
 
-public record ReadStatusResponse (
-        UUID id,
+public record ReadStatusDto(
+        String id,
         Instant lastReadAt,
-        UUID userId,
-        UUID channelId
+        String userId,
+        String channelId
 ){
-    public static ReadStatusResponse from(ReadStatus readStatus){
-        return new ReadStatusResponse(
+    public static ReadStatusDto from(ReadStatus readStatus){
+        return new ReadStatusDto(
                 readStatus.getId(),
                 readStatus.getLastReadAt(),
                 readStatus.getUserId(),

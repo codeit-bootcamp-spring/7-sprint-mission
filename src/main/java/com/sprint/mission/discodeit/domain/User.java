@@ -3,24 +3,30 @@ package com.sprint.mission.discodeit.domain;
 import com.sprint.mission.discodeit.domain.exception.ErrorType;
 import com.sprint.mission.discodeit.domain.exception.ValidationException;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@ToString
+@NoArgsConstructor
+@Setter
 public class User {
 
-    private final UUID id;
+    private String id;
     private Instant createdAt;
     private Instant updatedAt;
 
     private String username;
     private String password;
     private String email;
-    private UserStatus userStatus;
-    private UUID profileId;
 
-    private Instant lastAt;
+    private String profileId;
+
+    private Instant lastActiveAt;
 
 
     public User(String email, String password, String username) {
@@ -28,22 +34,20 @@ public class User {
         validatePassword(password);
         validateUsername(username);
 
-        this.id = UUID.randomUUID();
+
         this.username = username;
         this.password = password;
         this.email = email;
-        this.userStatus = new UserStatus(OnlineStatus.OFFLINE);
-
+        this.lastActiveAt=Instant.now();
+        this.updatedAt=Instant.now();
     }
 
-    public void setProfile(UUID profileId) {
+    public void setProfile(String profileId) {
         this.profileId = profileId;
     }
 
 
-    public boolean checkOnline() {
-        return userStatus.isOnline();
-    }
+
 
     public void UpdatedPassword(String password) {
         validatePassword(password);
@@ -70,16 +74,9 @@ public class User {
 
     }
 
-
-    public void markOnline(Instant lastAt) {
-        this.userStatus = new UserStatus(OnlineStatus.ONLINE, lastAt);
+    public void updateLastActiveAt(Instant lastActiveAt){
+        this.lastActiveAt=lastActiveAt;
     }
-
-    public void markOffline(Instant lastAt) {
-        this.userStatus = new UserStatus(OnlineStatus.OFFLINE, lastAt);
-    }
-
-
     private void validateEmail(String email) {
         if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             throw new ValidationException(ErrorType.INVALID_EMAIL);

@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "users")
-public class UserEntity extends BaseUpdatableEntity{
+public class UserEntity extends BaseUpdatableEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
@@ -17,9 +21,10 @@ public class UserEntity extends BaseUpdatableEntity{
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @Column(nullable = false, name = "last_active_at")
+    @Column( name = "last_active_at")
     private Instant lastActiveAt;
 
-    @Column(name ="profile_id")
+    @Column(name = "profile_id")
     private UUID profileId;
+
 }
