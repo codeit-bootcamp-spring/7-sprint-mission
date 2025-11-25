@@ -11,27 +11,12 @@ import java.util.UUID;
 public record ChannelResponseDto(
 
     UUID id,// 채널 ID
-    Instant createdAt,
-    Instant updatedAt,
     ChannelType type, //채널 타입
     String name, //채널 이름
     String description, //채널 설명
-    List<UUID> participantIds,
+    List<UserResponseDto> participants,
     Instant lastMessageAt // 메시지 시간 정보
 
 ) {
 
-  public static ChannelResponseDto from(Channel channel, List<UUID> participantIds,
-      Instant lastMessageAt) {
-    return new ChannelResponseDto(
-        channel.getId(),
-        channel.getCreatedAt(),
-        channel.getUpdatedAt(),
-        channel.getType(),
-        channel.getName(),
-        channel.getDescription(),
-        participantIds,
-        lastMessageAt
-    );
-  }
 }
