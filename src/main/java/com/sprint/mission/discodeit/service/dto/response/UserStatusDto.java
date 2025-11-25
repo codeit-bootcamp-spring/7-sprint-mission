@@ -3,9 +3,10 @@ package com.sprint.mission.discodeit.service.dto.response;
 import com.sprint.mission.discodeit.domain.User;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public record UserStatusDto(
-        String userId,
+        UUID userId,
         Instant lastActiveAt
 ) {
 }

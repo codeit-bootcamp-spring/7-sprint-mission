@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -8,6 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
+@Setter
 @Table(name = "read_statuses")
 public class ReadStatusEntity extends BaseUpdatableEntity{
 

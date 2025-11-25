@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.service.dto.response;
 
 import com.sprint.mission.discodeit.domain.User;
 
+import java.util.UUID;
+
 public record UserDto(
-        String id,
+        UUID id,
         String email,
         String username,
         BinaryContentDto profile,

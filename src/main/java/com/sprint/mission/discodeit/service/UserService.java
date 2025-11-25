@@ -88,6 +88,7 @@ public class UserService {
     }
 
 
+    @Transactional
     public void delete(UUID id) {
         UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
         userRepository.delete(userEntity);
@@ -95,6 +96,8 @@ public class UserService {
         binaryContentService.deleteFile(userEntity.getId());
     }
 
+
+    @Transactional
     public List<User> getAllUsers() {
 
         return userRepository.findAll()
@@ -109,26 +112,26 @@ public class UserService {
     }
 
 
-    public UserDto login(String loginId, String password) {
-        User user =
-                userRepository
-                        .findByUsername(loginId)
-                        .orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
-        if (!user.getPassword().equals(password)) {
+    public User login(String loginId, String password) {
+
+        UserEntity userEntity = userRepository
+                .findByUsername(loginId)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+        if (!userEntity.getPassword().equals(password)) {
             throw new IllegalArgumentException("비밀번호가 틀립니다");
         }
-        return UserDto.from(user, null);
+
+        return mapper.toUser(userEntity);
 
     }
 
 
-    public UserStatusDto markOnline(UUID id, Instant lastAt) {
-        User user = userRepository
+    public User markOnline(UUID id, Instant lastAt) {
+        UserEntity userEntity = userRepository
                 .findById(id)
                 .orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
-        user.updateLastActiveAt(lastAt);
-        userRepository.save(user);
-        return UserStatusDto.from(user);
+        userEntity.setUpdatedAt(Instant.now());
+        return mapper.toUser(userEntity);
     }
 
 

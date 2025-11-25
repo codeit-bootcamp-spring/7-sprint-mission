@@ -4,14 +4,15 @@ import com.sprint.mission.discodeit.domain.Message;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 public record MessageDto(
-        String id,
+        UUID id,
         Instant createdAt,
         Instant updateAt,
         String content,
-        String channelId,
-        String authorId,
+        UUID channelId,
+        UUID authorId,
         List<String> attachmentIds
 ) {
 
