@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.channel.PrivateChannelCreateRequ
 import com.sprint.mission.discodeit.dto.request.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,8 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
+    private final ChannelMapper channelMapper;
+    private final UserStatusRepository userStatusRepository;
 
     @Transactional
     @Override
@@ -42,14 +46,9 @@ public class BasicChannelService implements ChannelService {
         );
 
         Channel save = channelRepository.save(channel);
+        List<User> userList = participants(save);
 
-        Instant lastMessageAt = messageRepository.findByChannelId(save.getId())
-                .stream()
-                .map(message -> message.getCreatedAt())
-                .max(Comparator.naturalOrder())
-                .orElse(null);
-
-        return ChannelResponseDto.from(save,lastMessageAt);
+        return channelMapper.toDto(save,lastMessageAt(save),userList,userOnlineMap(userList));
     }
 
     @Transactional
@@ -87,7 +86,9 @@ public class BasicChannelService implements ChannelService {
                 .max(Comparator.naturalOrder())
                 .orElse(null);
 
-        return ChannelResponseDto.from(save,lastMessageAt);
+        List<User> userList = participants(save);
+
+        return channelMapper.toDto(save,lastMessageAt(save), userList, userOnlineMap(userList));
     }
 
     @Override
@@ -101,18 +102,17 @@ public class BasicChannelService implements ChannelService {
                 .max(Comparator.naturalOrder())
                 .orElse(null);
 
-        return ChannelResponseDto.from(channel,lastMessageAt);
+        List<User> userList = participants(channel);
+        return channelMapper.toDto(channel,lastMessageAt(channel), userList, userOnlineMap(userList));
     }
 
     @Override
     public List<ChannelResponseDto> getAll() {
         return channelRepository.findAll().stream()
-                .map(channel -> ChannelResponseDto.from(channel,
-                        messageRepository.findByChannelId(channel.getId())
-                                .stream()
-                                .map(message -> message.getCreatedAt())
-                                .max(Comparator.naturalOrder())
-                                .orElse(null)))
+                .map(channel -> channelMapper.toDto(channel,
+                        lastMessageAt(channel),
+                        participants(channel),
+                        userOnlineMap(participants(channel))))
                 .toList();
     }
 
@@ -131,12 +131,10 @@ public class BasicChannelService implements ChannelService {
                 .filter(channel ->
                         !channel.isPrivateChannel()
                                 || joinedChannelIds.contains(channel.getId()))
-                .map(channel -> ChannelResponseDto.from(channel,
-                        messageRepository.findByChannelId(channel.getId())
-                                .stream()
-                                .map(message -> message.getCreatedAt())
-                                .max(Comparator.naturalOrder())
-                                .orElse(null)))
+                .map(channel -> channelMapper.toDto(channel,
+                        lastMessageAt(channel),
+                        participants(channel),
+                        userOnlineMap(participants(channel))))
                 .toList();
     }
 
@@ -159,14 +157,9 @@ public class BasicChannelService implements ChannelService {
         }
 
         Channel save = channelRepository.save(channel);
+        List<User> userList = participants(channel);
 
-        Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
-                .stream()
-                .map(message -> message.getCreatedAt())
-                .max(Comparator.naturalOrder())
-                .orElse(null);
-
-        return ChannelResponseDto.from(save,lastMessageAt);
+        return channelMapper.toDto(save,lastMessageAt(save),userList,userOnlineMap(userList));
     }
 
     @Transactional
@@ -223,5 +216,42 @@ public class BasicChannelService implements ChannelService {
 
         channel.changeSlowModeSeconds(slowModeSeconds);
         channelRepository.save(channel);
+    }
+
+    private Instant lastMessageAt(Channel channel) {
+        return messageRepository.findByChannelId(channel.getId())
+                .stream()
+                .map(message -> message.getCreatedAt())
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+    }
+
+    private List<User> participants(Channel channel) {
+        return readStatusRepository.findAllByChannelId(channel.getId())
+                .stream()
+                .map(readStatus -> readStatus.getUser())
+                .filter(user -> user != null)
+                .distinct()
+                .toList();
+    }
+
+    private Map<UUID, Boolean> userOnlineMap(List<User> participants) {
+        if (participants == null || participants.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Set<UUID> userIds = participants.stream()
+                .map(user -> user.getId())
+                .collect(Collectors.toSet());
+
+        if (userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return userStatusRepository.findAllByUserId(userIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        userStatus -> userStatus.getId(),
+                        us -> us.isOnlineNow()
+                ));
     }
 }
