@@ -10,10 +10,4 @@ public record BinaryContentDto(
 
 
 ) {
-    public static BinaryContentDto from(BinaryContent content){
-        return new BinaryContentDto(content.getId(),
-                content.getFileName(),
-                content.getFileSize(),
-                content.getFileType());
-    }
 }

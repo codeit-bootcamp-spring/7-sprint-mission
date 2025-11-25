@@ -4,7 +4,8 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.domain.exception.DuplicateException;
-import com.sprint.mission.discodeit.domain.repository.UserRepository;
+
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
@@ -49,7 +50,7 @@ public class UserService {
 
         BinaryContentDto binaryContentDto = null;
         if (file != null && !file.isEmpty()) {
-            BinaryContent content = binaryContentService.setUserProfile(save.getId(), file);
+            BinaryContent content = binaryContentService.put(save.getId(), file);
             userRepository.updateProfileId(save.getId(), content.getId());
             save.setProfile(content.getId());
             binaryContentDto = BinaryContentDto.from(content);
@@ -73,7 +74,7 @@ public class UserService {
         }
 
         if (file != null) {
-            BinaryContent content = binaryContentService.setUserProfile(user.getId(), file);
+            BinaryContent content = binaryContentService.put(user.getId(), file);
             user.setProfile(content.getId());
         }
         BinaryContentDto binaryContent = binaryContentService.getBinaryContent(user.getProfileId());

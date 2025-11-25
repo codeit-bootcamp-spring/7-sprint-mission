@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface JpaChannelRepository extends JpaRepository<ChannelEntity, UUID> {
+public interface ChannelRepository extends JpaRepository<ChannelEntity, UUID> {
 
 }

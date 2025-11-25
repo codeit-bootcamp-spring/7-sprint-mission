@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface JpaBinaryContentRepository extends JpaRepository<BinaryContentEntity, UUID> {
+public interface BinaryContentRepository extends JpaRepository<BinaryContentEntity, UUID> {
 }

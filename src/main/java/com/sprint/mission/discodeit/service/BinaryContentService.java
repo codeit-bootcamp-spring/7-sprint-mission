@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.domain.BinaryContent;
-import com.sprint.mission.discodeit.domain.repository.BinaryContentRepository;
+
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,10 @@ public final class BinaryContentService {
 
 
 
-    public BinaryContent setUserProfile(String userId, MultipartFile profile) {
+    public BinaryContent put(String userId, MultipartFile profile) {
 
         Path profilePath
-                = fileManager.saveUserProfile(userId, profile);
+                = fileManager.put(userId, profile);
         BinaryContent content = new BinaryContent("profile",
                 profile.getContentType(),
                 profilePath.toString(),

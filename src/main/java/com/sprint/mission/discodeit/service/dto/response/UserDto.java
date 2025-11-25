@@ -9,12 +9,5 @@ public record UserDto(
         BinaryContentDto profile,
         boolean online
 ) {
-    public static UserDto from(User user, BinaryContentDto binaryContentDto) {
-        return new UserDto(user.getId(),
-                user.getEmail(),
-                user.getUsername(),
-                binaryContentDto,
-                user.isOnline()
-                );
-    }
+
 }

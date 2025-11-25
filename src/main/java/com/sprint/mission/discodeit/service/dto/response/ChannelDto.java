@@ -13,13 +13,5 @@ public record ChannelDto(
         List<String> participantIds,
         Instant lastMessageAt
 ) {
-    public static ChannelDto from(Channel channel){
-        return new ChannelDto(
-                channel.getId(),
-                channel.getType().toString(),
-                channel.getName(),
-                channel.getDescription(),
-                channel.getMembers(),
-                null);
-    }
+
 }

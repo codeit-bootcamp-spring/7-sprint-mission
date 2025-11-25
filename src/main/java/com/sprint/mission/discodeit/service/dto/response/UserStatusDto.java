@@ -8,9 +8,4 @@ public record UserStatusDto(
         String userId,
         Instant lastActiveAt
 ) {
-    public static UserStatusDto from(User user){
-        return new UserStatusDto(
-                user.getId(),
-                user.getLastActiveAt());
-    }
 }

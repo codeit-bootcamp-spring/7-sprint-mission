@@ -14,13 +14,5 @@ public record MessageDto(
         String authorId,
         List<String> attachmentIds
 ) {
-    public static MessageDto from(Message message){
-        return new MessageDto(message.getId(),
-                message.getCreatedAt(),
-                message.getUpdatedAt(),
-                message.getContent(),
-                message.getChannelId(),
-                message.getUserId(),
-                message.getAttachmentIds());
-    }
+
 }

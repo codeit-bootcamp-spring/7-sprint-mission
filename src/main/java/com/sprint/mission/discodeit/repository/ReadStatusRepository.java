@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface JpaReadStatusRepository extends JpaRepository<ReadStatusEntity, UUID> {
+public interface ReadStatusRepository extends JpaRepository<ReadStatusEntity, UUID> {
 
 }

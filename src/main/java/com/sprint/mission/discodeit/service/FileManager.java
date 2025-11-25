@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -19,55 +18,24 @@ public class FileManager {
 
     private final Path rootDir = Paths.get("data/uploads"); // 루트 폴더
 
-    private void createUserFolder(String userId) {
-        Path userFolder;
-        try {
-            userFolder = Files.createDirectories(rootDir.resolve("user_" + userId));
-            Files.createDirectories(userFolder.resolve("profile"));
-        } catch (IOException e) {
-            throw new RuntimeException("유저의 폴더 생성이 실패", e);
-        }
-    }
-    public Path saveUserProfile(String userId, MultipartFile profile) {
-        createUserFolder(userId);
-        String contentType = profile.getContentType();
+
+    public Path put(String userId, MultipartFile file) {
+        String contentType = file.getContentType();
         validateContentType(contentType);
-        Path userFolder = rootDir.resolve("user_" + userId);
-        Path profileFolder;
 
-        try {
-            profileFolder = Files.createDirectories(userFolder.resolve("profile"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Path userFolder = getUserFolder(userId);
 
-        String profileFilePath =
-                makeProfileName(profile.getOriginalFilename() == null ? profile.getContentType() : profile.getOriginalFilename());
-        Path profilePath = profileFolder.resolve(profileFilePath);
+        String filePath =
+                makeProfileName(file.getOriginalFilename() == null ? file.getContentType() : file.getOriginalFilename());
+        Path profilePath = userFolder.resolve(filePath);
 
         try {
             Files.deleteIfExists(profilePath);
-            profile.transferTo(profilePath);
+            file.transferTo(profilePath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return profileFolder;
-    }
-
-    public Path saveMessageFile(String userId, MultipartFile file) {
-         createUserFolder(userId);
-        Path userFolder = rootDir.resolve("user_" + userId);
-
-        String fileName = makeFileName(file.getOriginalFilename() == null ? "" : file.getOriginalFilename());
-        Path filePath = userFolder.resolve(fileName);
-
-        try {
-            file.transferTo(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return filePath;
+        return profilePath;
     }
 
     public void deleteUserFolder(String userId) {
@@ -102,6 +70,15 @@ public class FileManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    private Path getUserFolder(String userId) {
+        Path userFolder;
+        try {
+            userFolder = Files.createDirectories(rootDir.resolve("user_" + userId));
+        } catch (IOException e) {
+            throw new RuntimeException("유저의 폴더 생성이 실패", e);
+        }
+        return userFolder;
     }
 
     private void validateContentType(String contentType) {
