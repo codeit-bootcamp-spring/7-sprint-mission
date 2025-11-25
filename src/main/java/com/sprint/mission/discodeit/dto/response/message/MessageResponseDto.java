@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.dto.response.message;
 
+import com.sprint.mission.discodeit.dto.response.binarycontent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.time.Instant;
@@ -9,21 +11,9 @@ import java.util.UUID;
 public record MessageResponseDto(
         UUID id,
         String content,
-        UUID authorId,
+        UserResponseDto author,
         UUID channelId,
-        List<UUID> attachmentIds,
+        List<BinaryContentResponseDto> attachments,
         Instant createdAt,
         Instant updatedAt) {
-
-    public static MessageResponseDto from(Message message) {
-        return new MessageResponseDto(
-                message.getId(),
-                message.getContent(),
-                message.getAuthorId(),
-                message.getChannelId(),
-                message.getAttachmentIds(),
-                message.getCreatedAt(),
-                message.getUpdatedAt()
-        );
-    }
 }

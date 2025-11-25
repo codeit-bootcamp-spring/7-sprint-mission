@@ -5,5 +5,5 @@ import java.util.UUID;
 
 public record UserStatusUpdateRequestDto(
         UUID id,
-        Instant lastReadAt) {
+        Instant lastActiveAt) {
 }
