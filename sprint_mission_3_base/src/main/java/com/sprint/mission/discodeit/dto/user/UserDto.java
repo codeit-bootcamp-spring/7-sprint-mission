@@ -1,20 +1,29 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import java.time.Instant;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
 import java.util.UUID;
 
 public record UserDto(
         UUID id,
-        Instant createdAt,
-        Instant updatedAt,
         String username,
         String email,
-        UUID profileId,
-        Boolean online
+        String profileUrl
 ) {
-    public static record UserStatusUpdateRequest(
-            UUID id,
-            Instant lastSeenAt
-    ) {}
-}
+    public static UserDto from(User user) {
 
+        String profileUrl = null;
+
+        BinaryContent profile = user.getProfile();
+        if (profile != null) {
+            profileUrl = "/api/binaryContents/" + profile.getId() + "/download";
+        }
+
+        return new UserDto(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                profileUrl
+        );
+    }
+}

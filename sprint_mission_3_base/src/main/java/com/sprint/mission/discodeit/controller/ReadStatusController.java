@@ -1,47 +1,44 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
-import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/readStatuses")
-public class ReadStatusController implements ReadStatusApi {
+@RequiredArgsConstructor
+@RequestMapping("/api/read-status")
+public class ReadStatusController {
 
-  private final ReadStatusService readStatusService;
+    private final ReadStatusService readStatusService;
 
-  @PostMapping
-  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
-    ReadStatus createdReadStatus = readStatusService.create(request);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(createdReadStatus);
-  }
+    // 생성
+    @PostMapping
+    public ResponseEntity<ReadStatusDto> create(@RequestBody ReadStatusCreateRequest request) {
+        return ResponseEntity.ok(readStatusService.create(request));
+    }
 
-  @PatchMapping(path = "{readStatusId}")
-  public ResponseEntity<ReadStatus> update(@PathVariable("readStatusId") UUID readStatusId,
-      @RequestBody ReadStatusUpdateRequest request) {
-    ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(updatedReadStatus);
-  }
+    // 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<ReadStatusDto> find(@PathVariable("id") UUID id) {
+        return ResponseEntity.ok(readStatusService.find(id));
+    }
 
-  @GetMapping
-  public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam("userId") UUID userId) {
-    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(readStatuses);
-  }
+    // 특정 user의 모든 읽음 상태 조회
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@PathVariable("userId") UUID userId) {
+        return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
+    }
+
+    // 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
+        readStatusService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

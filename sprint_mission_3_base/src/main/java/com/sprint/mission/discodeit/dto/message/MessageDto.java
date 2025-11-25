@@ -1,15 +1,21 @@
 package com.sprint.mission.discodeit.dto.message;
 
-import java.time.Instant;
-import java.util.List;
+import com.sprint.mission.discodeit.entity.Message;
 import java.util.UUID;
-
 public record MessageDto(
         UUID id,
-        Instant createdAt,
-        Instant updatedAt,
         String content,
-        UUID authorId,
+        UUID userId,
         UUID channelId,
-        List<?> attachments   // ← 핵심: 와일드카드(or List<Object>)
-) {}
+        UUID binaryContentId
+) {
+    public static MessageDto from(Message m) {
+        return new MessageDto(
+                m.getId(),
+                m.getContent(),
+                m.getUser().getId(),
+                m.getChannel().getId(),
+                m.getBinaryContent() != null ? m.getBinaryContent().getId() : null
+        );
+    }
+}

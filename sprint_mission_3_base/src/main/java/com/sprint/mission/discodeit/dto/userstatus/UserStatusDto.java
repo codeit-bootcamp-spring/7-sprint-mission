@@ -1,11 +1,21 @@
 package com.sprint.mission.discodeit.dto.userstatus;
 
-import java.time.Instant;
+import com.sprint.mission.discodeit.entity.UserStatus;
+
 import java.util.UUID;
 
 public record UserStatusDto(
         UUID id,
         UUID userId,
-        Instant lastSeenAt,
-        boolean online // 5분 이내 접속 여부 계산값
-) {}
+        boolean online,
+        String lastActiveAt
+) {
+    public static UserStatusDto from(UserStatus status) {
+        return new UserStatusDto(
+                status.getId(),
+                status.getUser().getId(),
+                status.isOnline(),
+                status.getLastActiveAt().toString()
+        );
+    }
+}

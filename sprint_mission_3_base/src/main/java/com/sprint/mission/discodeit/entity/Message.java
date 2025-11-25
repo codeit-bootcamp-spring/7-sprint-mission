@@ -1,46 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 @Getter
-public class Message implements Serializable {
+@NoArgsConstructor
+@Entity
+@Table(name = "messages")
+public class Message extends BaseEntity {
 
-  private static final long serialVersionUID = 1L;
+    @Column(nullable = false, length = 1000)
+    private String content;
 
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
-  private String content;
-  //
-  private UUID channelId;
-  private UUID authorId;
-  private List<UUID> attachmentIds;
+    // User (N:1)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User user;
 
-  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
-    this.content = content;
-    this.channelId = channelId;
-    this.authorId = authorId;
-    this.attachmentIds = attachmentIds;
-  }
+    // Channel (N:1)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
 
-  public void update(String newContent) {
-    boolean anyValueUpdated = false;
-    if (newContent != null && !newContent.equals(this.content)) {
-      this.content = newContent;
-      anyValueUpdated = true;
+    // BinaryContent (1:1)
+    @OneToOne(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BinaryContent binaryContent;
+
+    @Builder
+    public Message(String content, User user, Channel channel) {
+        this.content = content;
+        this.user = user;
+        this.channel = channel;
     }
 
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+    public void update(String content) {
+        this.content = content;
     }
-  }
+
+    public void updateBinary(BinaryContent binaryContent) {
+        this.binaryContent = binaryContent;
+    }
+
 }

@@ -1,56 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
 @Getter
-public class User implements Serializable {
+@NoArgsConstructor
+@Table(name = "users")
+public class User extends BaseEntity {
 
-  private static final long serialVersionUID = 1L;
+    @Column(nullable = false)
+    private String name;
 
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
-  private String username;
-  private String email;
-  private String password;
-  private UUID profileId;     // BinaryContent
+    @Column(nullable = false, unique = true)
+    private String email;
 
-  public User(String username, String email, String password, UUID profileId) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
-    this.username = username;
-    this.email = email;
-    this.password = password;
-    this.profileId = profileId;
-  }
+    @Column(nullable = false)
+    private String password;
 
-  public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
-    boolean anyValueUpdated = false;
-    if (newUsername != null && !newUsername.equals(this.username)) {
-      this.username = newUsername;
-      anyValueUpdated = true;
-    }
-    if (newEmail != null && !newEmail.equals(this.email)) {
-      this.email = newEmail;
-      anyValueUpdated = true;
-    }
-    if (newPassword != null && !newPassword.equals(this.password)) {
-      this.password = newPassword;
-      anyValueUpdated = true;
-    }
-    if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-      this.profileId = newProfileId;
-      anyValueUpdated = true;
+    /* 🔥 추가: User ↔ BinaryContent (프로필 1:1 관계) */
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
+    private BinaryContent profile;
+
+    @Builder
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
     }
 
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+    public void update(String name) {
+        this.name = name;
     }
-  }
+
+    /* 🔥 프로필 업데이트 */
+    public void updateProfile(BinaryContent profile) {
+        this.profile = profile;
+    }
 }
