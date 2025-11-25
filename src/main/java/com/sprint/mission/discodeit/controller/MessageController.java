@@ -50,9 +50,17 @@ public class MessageController implements MessageControllerDocs {
         messageService.deleteMessage(messageId);
     }
 
+//    @GetMapping("")
+//    public ResponseEntity<PageResponseDtoBasic<MessageDto>> readChannelMessage(@RequestParam UUID channelId, @RequestParam (required = false)Pageable pageable){
+//        return new ResponseEntity<>( messageService.findallByChannelId(channelId,pageable), HttpStatus.OK);
+//    }
+
     @GetMapping("")
-    public ResponseEntity<PageResponseDtoBasic<MessageDto>> readChannelMessage(@RequestParam UUID channelId, @RequestParam (required = false)Pageable pageable){
-        return new ResponseEntity<>( messageService.findallByChannelId(channelId,pageable), HttpStatus.OK);
+    public ResponseEntity<PageResponseDto<MessageDto>> readChannelMessage(
+            @RequestParam UUID channelId, @RequestParam (required = false)Pageable pageable
+        , @RequestParam (required = false)String cursor
+    ){
+        return new ResponseEntity<>( messageService.findallByChannelIdWithCursor(channelId,cursor,pageable), HttpStatus.OK);
     }
     @PostMapping( "/reset")
     @Override
