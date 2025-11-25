@@ -8,6 +8,7 @@ import java.util.UUID;
 public record ChannelPublicInfoRes(
     UUID channelId,
     String type,
+    UUID managerId,
     String name,
     String description,
     Instant lastMessageTime
@@ -17,6 +18,7 @@ public record ChannelPublicInfoRes(
     return new ChannelPublicInfoRes(
         channel.getId(),
         channel.getPublicType().getValue(),
+        channel.getManagerId(),
         channel.getName(),
         channel.getDescription(),
         lastMessageTime
