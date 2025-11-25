@@ -4,10 +4,11 @@ import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MessageRepository extends Repository<Message, UUID> {
+public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-    // 공통 CRUD 메서드는 Repository에서 상속받음
-    List<Message> findByChannelId(UUID channelId);
-    void deleteByChannelId(UUID channelId);
+  List<Message> findByChannelId(UUID channelId);
+
+  void deleteByChannelId(UUID channelId);
 }
