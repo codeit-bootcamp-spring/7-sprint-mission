@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -24,6 +25,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final UserMapper userMapper;
 
     @Transactional
     @Override
@@ -58,7 +60,7 @@ public class BasicUserService implements UserService {
 
         boolean online = true;
 
-        return UserResponseDto.from(save, online);
+        return userMapper.toDto(save, online);
     }
 
     @Override
@@ -66,14 +68,14 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
         boolean online = isOnline(user.getId());
-        return UserResponseDto.from(user, online);
+        return userMapper.toDto(user, online);
     }
 
     @Override
     public List<UserResponseDto> getAll() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> UserResponseDto.from(user, isOnline(user.getId())))
+                .map(user -> userMapper.toDto(user, isOnline(user.getId())))
                 .toList();
     }
 
@@ -118,7 +120,7 @@ public class BasicUserService implements UserService {
         User save = userRepository.save(user);
         boolean online = isOnline(save.getId());
 
-        return UserResponseDto.from(save, online);
+        return userMapper.toDto(save, online);
     }
 
     @Transactional
@@ -137,7 +139,7 @@ public class BasicUserService implements UserService {
     public List<UserResponseDto> getUsersByName(String username) {
         return userRepository.findByUsername(Objects.requireNonNull(username))
                 .stream()
-                .map(user -> UserResponseDto.from(user, isOnline(user.getId())))
+                .map(user -> userMapper.toDto(user, isOnline(user.getId())))
                 .toList();
     }
 
@@ -145,7 +147,7 @@ public class BasicUserService implements UserService {
     @Override
     public Optional<UserResponseDto> getUsersByEmail(String email) {
         return userRepository.findByEmail(Objects.requireNonNull(email))
-                .map(user -> UserResponseDto.from(user, isOnline(user.getId())));
+                .map(user -> userMapper.toDto(user, isOnline(user.getId())));
     }
 
     // 로그인

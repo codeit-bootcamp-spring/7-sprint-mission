@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.response.readstatus.ReadStatusResponseDt
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -24,6 +25,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final ReadStatusMapper readStatusMapper;
 
     @Transactional
     @Override
@@ -48,21 +50,21 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readstatus = new ReadStatus(user, channel, readAt);
         ReadStatus save = readStatusRepository.save(readstatus);
 
-        return ReadStatusResponseDto.from(save);
+        return readStatusMapper.toDto(save);
     }
 
     @Override
     public ReadStatusResponseDto get(UUID id) {
         ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
-        return ReadStatusResponseDto.from(readStatus);
+        return readStatusMapper.toDto(readStatus);
     }
 
     @Override
     public List<ReadStatusResponseDto> getAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(Objects.requireNonNull(userId))
                 .stream()
-                .map(rs -> ReadStatusResponseDto.from(rs))
+                .map(rs -> readStatusMapper.toDto(rs))
                 .toList();
     }
 
@@ -80,7 +82,7 @@ public class BasicReadStatusService implements ReadStatusService {
         }
 
         ReadStatus save = readStatusRepository.save(readStatus);
-        return ReadStatusResponseDto.from(save);
+        return readStatusMapper.toDto(save);
     }
 
     @Transactional
