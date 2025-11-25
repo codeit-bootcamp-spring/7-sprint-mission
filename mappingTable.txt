@@ -6,4 +6,4 @@
 | Channel:Message     | 1:N    | Channel → Message 단방향  | 부모: Channel, 자식: Message    | Message        |
 | Message:BinaryContent | M:N  | BinaryContent → Message 단방향 | 부모: BinaryContent, 자식: Message | Message    |
 | User:ProfileImage   | 1:1    | BinaryContent → User 단방향 | 부모: BinaryContent, 자식: User | User           |
-| User:UserStatus     | 1:1    | User → UserStatus 단방향  | 부모: User, 자식: UserStatus   | User           |
+| User:UserStatus     | 1:1    | User → UserStatus 양뱡향  | 부모: User, 자식: UserStatus   | UserStatus           |

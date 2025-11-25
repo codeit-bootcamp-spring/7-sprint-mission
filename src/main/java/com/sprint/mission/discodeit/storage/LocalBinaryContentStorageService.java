@@ -7,10 +7,12 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -42,9 +44,9 @@ public class LocalBinaryContentStorageService implements BinaryContentStorage {
         String contentType = binaryContentDto.contentType();
         String fileName = binaryContentDto.fileName();
         Resource resource = new InputStreamResource(targetInput);
-
+        String encodeFile = UriUtils.encode(fileName, StandardCharsets.UTF_8);
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=\"" + fileName+ "\"")
+                .header("Content-Disposition", "attachment; filename=" + encodeFile)
                 .header("Content-Type",contentType)
                 .body(resource);
     }

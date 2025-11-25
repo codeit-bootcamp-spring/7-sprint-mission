@@ -19,11 +19,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,6 +65,7 @@ public class BasicMessageService implements MessageService {
 
         if(attachments!=null) {
             List<MessageAttachment> messageAttachmentList = new ArrayList<>();
+            List<BinaryContent> attachmentList = new ArrayList<>();
             attachments.forEach(
                     x-> {
                         try {
@@ -72,6 +75,7 @@ public class BasicMessageService implements MessageService {
                                             .size(x.getSize())
                                     .build()
                             );
+                           attachmentList.add(binaryContent);
                            binaryContentStorage.put(binaryContent.getId(),x.getBytes());
                             MessageAttachment save = messageAttachmentRepository.save(new MessageAttachment(message, binaryContent));
                             messageAttachmentList.add(save);
@@ -82,6 +86,7 @@ public class BasicMessageService implements MessageService {
                         }
                     }
             );
+            message.setAttachments(attachmentList);
             message.setMessageAttachment(messageAttachmentList);
         }
 
@@ -99,11 +104,28 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<MessageDto> findallByChannelId(UUID channelId, Pageable pageable) {
+
         Page<Message> targetPage = messageRepository.findByChannelId(channelId,pageable);
         Message message = targetPage.getContent().get(0);
         MessageDto messageDto = messageMapper.toDto(message);
         Page<MessageDto> targetPageDto = targetPage.map(messageMapper::toDto);
         return pageResponseMapper.fromPage(targetPageDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDto<MessageDto> findallByChannelIdWithCursor(UUID channelId, String cursor,Pageable pageable) {
+        Slice<Message> targetSlice ;
+        if(cursor == null) {
+          Instant tempTime = Instant.MIN;
+          targetSlice = messageRepository.findByChannelIdAndCreatedAtAfter(channelId,tempTime,pageable);
+        }
+        else{
+            targetSlice = messageRepository.findByChannelIdAndCreatedAtAfter(channelId,Instant.parse(cursor),pageable);
+        }
+        Object next = targetSlice.getContent().get(targetSlice.getContent().size()-1).getCreatedAt();
+        Slice<MessageDto> targetSliceDto = targetSlice.map(messageMapper::toDto);
+        return pageResponseMapper.fromSlice(targetSliceDto,next);
     }
 
     @Override

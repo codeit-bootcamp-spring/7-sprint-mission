@@ -15,9 +15,11 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments) throws IOException;
+    public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto
+            , List<MultipartFile> attachments) throws IOException;
     public List<MessageDto> readAllMessage();
     public PageResponseDto<MessageDto> findallByChannelId(UUID channelId, Pageable pageable);
+    PageResponseDto<MessageDto> findallByChannelIdWithCursor(UUID channelId, String cursor, Pageable pageable);
     public void deleteMessage(UUID messageId);
     public MessageDto patchMessage(MessagePatchRequestDto dto, UUID messageId);
     List<MessageDto> readAllMessageByUserId(UUID userId);

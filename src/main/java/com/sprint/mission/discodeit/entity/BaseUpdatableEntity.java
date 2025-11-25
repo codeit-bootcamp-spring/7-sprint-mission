@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
@@ -12,10 +13,11 @@ import java.time.Instant;
 
 @Getter
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class) //시간을 자동으로 기록하겠다.
 public abstract class BaseUpdatableEntity extends BaseEntity {
 
     @LastModifiedDate
+    @Column
     private Instant updatedAt;
 
 }
