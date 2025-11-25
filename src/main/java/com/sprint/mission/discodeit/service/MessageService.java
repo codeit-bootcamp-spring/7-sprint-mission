@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.Message;
 import com.sprint.mission.discodeit.domain.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.dto.request.MessageCreateRequest;
-import com.sprint.mission.discodeit.service.dto.request.MessageUpdate;
+import com.sprint.mission.discodeit.service.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.MessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BasicMessageService {
+public class MessageService {
 
     private final MessageRepository messageRepository;
     private final BinaryContentService binaryContentService;
@@ -42,10 +42,10 @@ public class BasicMessageService {
         return MessageDto.from(message);
     }
 
-    public MessageDto updateMessage(String messageId, MessageUpdate messageUpdate) {
+    public MessageDto updateMessage(String messageId, MessageUpdateRequest messageUpdateRequest) {
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("메세지가 없습니다."));
-        if (messageUpdate.newContent() != null) {
-            message.updateContent(messageUpdate.newContent());
+        if (messageUpdateRequest.newContent() != null) {
+            message.updateContent(messageUpdateRequest.newContent());
         }
 
         messageRepository.save(message);

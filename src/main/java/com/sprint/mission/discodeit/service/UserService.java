@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.domain.exception.DuplicateException;
 import com.sprint.mission.discodeit.domain.repository.UserRepository;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.dto.response.UserDto;
 import com.sprint.mission.discodeit.service.dto.response.UserStatusDto;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BasicUserService {
+public class UserService {
 
 
     private final UserRepository userRepository;
@@ -47,15 +47,15 @@ public class BasicUserService {
 
         User save = userRepository.save(user);
 
-        log.info(save.toString());
-        binaryContentService.createUserFolder(save.getId());
-        if (file != null) {
-            BinaryContent content = binaryContentService.saveUserProfile(save.getId(), file);
-            userRepository.updateProfileId(save.getId(), UUID.randomUUID().toString());
+        BinaryContentDto binaryContentDto = null;
+        if (file != null && !file.isEmpty()) {
+            BinaryContent content = binaryContentService.setUserProfile(save.getId(), file);
+            userRepository.updateProfileId(save.getId(), content.getId());
             save.setProfile(content.getId());
+            binaryContentDto = BinaryContentDto.from(content);
         }
 
-        return UserDto.from(save);
+        return UserDto.from(save, binaryContentDto);
     }
 
     public UserDto updateUserInfo(String id, UserUpdateRequest updateDto, MultipartFile file) {
@@ -73,11 +73,12 @@ public class BasicUserService {
         }
 
         if (file != null) {
-            BinaryContent content = binaryContentService.saveUserProfile(user.getId(), file);
+            BinaryContent content = binaryContentService.setUserProfile(user.getId(), file);
             user.setProfile(content.getId());
         }
-        userRepository.save(user);
-        return UserDto.from(user);
+        BinaryContentDto binaryContent = binaryContentService.getBinaryContent(user.getProfileId());
+        User save = userRepository.save(user);
+        return UserDto.from(save, binaryContent);
     }
 
 
@@ -88,7 +89,11 @@ public class BasicUserService {
     }
 
     public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream().map(UserDto::from).toList();
+        return userRepository.findAll()
+                .stream()
+                .map(user ->
+                        UserDto.from(user, binaryContentService.getBinaryContent(user.getProfileId())))
+                .toList();
     }
 
 
@@ -100,7 +105,7 @@ public class BasicUserService {
         if (!user.getPassword().equals(password)) {
             throw new IllegalArgumentException("비밀번호가 틀립니다");
         }
-        return UserDto.from(user);
+        return UserDto.from(user, null);
 
     }
 

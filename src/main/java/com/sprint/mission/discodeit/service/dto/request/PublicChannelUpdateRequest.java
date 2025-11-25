@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.dto.request;
 
-public record ChannelUpdateRequest(
+public record PublicChannelUpdateRequest(
         String newName,
         String newDescription
 ) {

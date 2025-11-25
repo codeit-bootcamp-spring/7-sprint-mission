@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.service.BasicChannelService;
-import com.sprint.mission.discodeit.service.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ChannelDto;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChannelController {
 
-    private final BasicChannelService channelService;
+    private final ChannelService channelService;
 
 
     @PostMapping("/public")
@@ -44,7 +44,7 @@ public class ChannelController {
     }
 
     @PatchMapping("/{channelId}")
-    public ChannelDto updateChannel(@PathVariable String channelId, @RequestBody ChannelUpdateRequest request) {
+    public ChannelDto updateChannel(@PathVariable String channelId, @RequestBody PublicChannelUpdateRequest request) {
         return channelService.updateChannel(channelId, request);
     }
 

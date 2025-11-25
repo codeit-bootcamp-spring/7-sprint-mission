@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BasicReadStatusService {
+public class ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
 

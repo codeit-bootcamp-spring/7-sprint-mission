@@ -4,7 +4,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.domain.ChannelType;
 import com.sprint.mission.discodeit.domain.repository.ChannelRepository;
-import com.sprint.mission.discodeit.service.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ChannelDto;
@@ -19,7 +19,7 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BasicChannelService {
+public class ChannelService {
 
     private final ChannelRepository channelRepository;
 
@@ -40,7 +40,7 @@ public class BasicChannelService {
     }
 
 
-    public ChannelDto updateChannel(String channelId, ChannelUpdateRequest requestDto) {
+    public ChannelDto updateChannel(String channelId, PublicChannelUpdateRequest requestDto) {
         Channel channel = getById(channelId);
         if (requestDto.newName() != null) {
             channel.updateChannelName(requestDto.newName());

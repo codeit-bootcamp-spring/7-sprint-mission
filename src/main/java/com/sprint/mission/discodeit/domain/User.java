@@ -25,9 +25,8 @@ public class User {
     private String email;
 
     private String profileId;
-
     private Instant lastActiveAt;
-
+    private boolean online=false;
 
     public User(String email, String password, String username) {
         validateEmail(email);

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.service.BasicReadStatusService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ReadStatusDto;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/api/readStatuses")
 public class ReadStatusController {
 
-    private final BasicReadStatusService readStatusService;
+    private final ReadStatusService readStatusService;
 
     @GetMapping
     public List<ReadStatusDto> getReadStatus(@RequestParam String userId) {

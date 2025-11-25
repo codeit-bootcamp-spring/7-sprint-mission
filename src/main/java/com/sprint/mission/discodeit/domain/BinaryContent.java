@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.domain;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.UUID;
 @Getter
+@Setter
+@NoArgsConstructor
 public class BinaryContent{
 
     private String id;

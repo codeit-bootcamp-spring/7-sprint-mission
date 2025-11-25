@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.service.BasicUserService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final BasicUserService userService;
+    private final UserService userService;
 
     @GetMapping
     public List<UserDto> getAllUsers() {
