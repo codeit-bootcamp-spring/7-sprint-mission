@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class UserStatus extends BaseUpdatableEntity {
 
   @OneToOne
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "user_id", unique = true)
   private User user;
 
 
