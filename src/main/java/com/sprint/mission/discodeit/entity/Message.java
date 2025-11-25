@@ -1,46 +1,54 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-
-import java.io.Serial;
-import java.time.Instant;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class Message extends Common {
+@NoArgsConstructor
+@Entity
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-  private Instant updateAt;
-
+  @Column(name = "content")
   private String content;
-  private final UUID channelId;
-  private final UUID userId;
-  private final List<UUID> attachmentIds;
 
-  public Message(String content, UUID channelId, UUID userId, List<UUID> attachmentIds) {
-    updateAt = Instant.now();
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  private User author;
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
+  private List<BinaryContent> attachments;
+
+  public Message(String content, Channel channel, User author) {
     this.content = content;
-    this.channelId = channelId;
-    this.userId = userId;
-    this.attachmentIds = attachmentIds;
+    this.channel = channel;
+    this.author = author;
+    this.attachments = new ArrayList<>();
   }
 
   public void messageUpdate(String content) {
-    boolean isUpdate = false;
     if (content != null && !content.equals(this.content)) {
       this.content = content;
-      isUpdate = true;
-    }
-
-    if (isUpdate) {
-      this.updateAt = Instant.now();
     }
   }
-
 }
