@@ -10,9 +10,10 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -27,8 +28,9 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
 
-    @Transactional
+
     @Override
+    @Transactional
     public UserStatus create(UserStatusCreateRequest request) {
 
         User user = userRepository.findById(request.userId())
@@ -46,48 +48,52 @@ public class BasicUserStatusService implements UserStatusService {
         return userStatusRepository.save(userStatus);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserStatus find(UUID userStatusId) {
-
         return userStatusRepository
                 .findByUserId(userStatusId).stream().findFirst()
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userStatusId));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserStatus> findAll() {
         return userStatusRepository.findAll().stream()
                 .toList();
-
     }
 
 
     @Override
+    @Transactional
     public UserStatus update(UUID userId, UserStatusUpdateRequest request) {
         Instant newLastActiveAt = request.newLastActiveAt();
-        UserStatus userStatus = userStatusRepository.findByUserId(userId).stream().findFirst()
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
+
         userStatus.update(newLastActiveAt);
 
-        return userStatusRepository.save(userStatus);
+        return userStatus;
     }
 
     @Override
+    @Transactional
     public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
         Instant newLastActiveAt = request.newLastActiveAt();
         UserStatus byUserId = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
+
         byUserId.update(newLastActiveAt);
 
-        return userStatusRepository.save(byUserId);
+        return byUserId;
     }
 
     @Override
     public void delete(UUID userStatusId) {
-        if (!userStatusRepository.findAll().stream().anyMatch(userStatus -> userStatus.getId().equals(userStatusId))) {
-            throw new NoSuchElementException("유저스타터스아이디못찾아" + userStatusId + "못찾아 ");
-        }
+        UserStatus userStatus = userStatusRepository
+                .findById(userStatusId)
+                .orElseThrow(() -> new NoSuchElementException("user status uuid못찾아용" + userStatusId));
 
-        userStatusRepository.deleteByUserId(userStatusId);
+        userStatusRepository.delete(userStatus);
     }
 }

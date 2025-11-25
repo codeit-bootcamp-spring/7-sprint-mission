@@ -15,7 +15,7 @@ import com.sprint.mission.discodeit.repository.BinaryRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,48 +41,45 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+        boolean existEmail = userRepository.existsByEmail(userCreateRequest.email());
+        boolean existName = userRepository.existsByUsername(userCreateRequest.username());
 
         //이메일매칭
-        if (userRepository.findAll().stream()
-                .anyMatch(user -> user.getEmail().equals(userCreateRequest.email()))) {
-            throw new IllegalArgumentException("이메일이 이미 존재합니다");
+        if (existEmail) {
+            throw new IllegalArgumentException("이메일이 이미 존재합니다" + userCreateRequest.email());
         }
         //닉네임매칭
-        if (userRepository.findAll().stream()
-                .anyMatch(user -> user.getUsername().equals(userCreateRequest.username()))) {
-            throw new IllegalArgumentException("이름 이미 존재합니다");
+        if (existName) {
+            throw new IllegalArgumentException("이름 이미 존재합니다" + userCreateRequest.username());
         }
 
-        UUID uuid = profileId(optionalProfileCreateRequest);
+        BinaryContent binaryContent = makeBinaryContent(optionalProfileCreateRequest);
         //유저정보
         User user = new User(
                 userCreateRequest.username(),
                 userCreateRequest.email(),
                 userCreateRequest.password(),
-
+                binaryContent
         );
 
         //유저정보저장
-        User save = userRepository.save(user);
 
-        UserStatus userStatus = new UserStatus(save.getId(), Instant.now());
-        userStatusRepository.save(userStatus);
-        return save;
+        UserStatus userStatus = new UserStatus(user, Instant.now());
+        user.setStatus(userStatus);
+        return userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
     @Override
     public UserDto find(UUID userId) {
-        System.out.println("서비스하나찾기");
         return userRepository.findById(userId)
                 .map(this::toDto)
                 .orElseThrow(() -> new NoSuchElementException("유저아이디로 찾을수없어"));
-
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserDto> findAll() {
-        System.out.println("서비스전체 찾기");
         return userRepository.findAll()
                 .stream()
                 .map(this::toDto)
@@ -90,43 +87,44 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
     public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("맞는 유저 ID가 없습니다 " + userId));
+
+
+        boolean emailMatch = userRepository.existsByEmailAndIdNot(userUpdateRequest.newEmail(), userId);
+        boolean nameMatch = userRepository.existsByUsernameAndIdNot(userUpdateRequest.newUsername(), userId);
         //이메일매칭
-        if (userRepository.findAll().stream()
-                .anyMatch(u -> u.getEmail().equals(userUpdateRequest.newEmail()))) {
+        if (emailMatch) {
             throw new IllegalArgumentException("이메일이 존재합니다 : " + userUpdateRequest.newEmail());
         }
         //네임매칭
-        if (userRepository.findAll().stream()
-                .anyMatch(u -> u.getUsername().equals(userUpdateRequest.newUsername()))) {
+        if (nameMatch) {
             throw new IllegalArgumentException("이름이 존재합니다 : " + userUpdateRequest.newUsername());
         }
 
+        BinaryContent binaryContent = makeBinaryContent(optionalProfileCreateRequest);
 
-        UUID uuid = profileId(optionalProfileCreateRequest);
-        user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword(), uuid);
+        user.update(userUpdateRequest.newUsername(),
+                userUpdateRequest.newEmail(),
+                userUpdateRequest.newPassword(),
+                binaryContent);
 
-/*        Instant now = Instant.now();
-        UserStatus userStatus = new UserStatus(user.getId(), now);*/
-        return userRepository.save(user);
+        return user;
     }
 
     @Override
+    @Transactional
     public void delete(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("유유아이디없어요" + userId + " 이걸 못찾았어요"));
 
-        Optional.ofNullable(user.getProfileId())
-                .ifPresent(binaryRepository::delete);
-        userStatusRepository.deleteByUserId(userId);
-
-        userRepository.deleteById(userId);
+        userRepository.delete(user);
     }
 
 
-    private UUID profileId(Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
+    private BinaryContent makeBinaryContent(Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
         return binaryContentCreateRequest
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
@@ -134,7 +132,7 @@ public class BasicUserService implements UserService {
                     byte[] bytes = profileRequest.bytes();
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                             contentType, bytes);
-                    return binaryRepository.save(binaryContent).getId();
+                    return binaryRepository.save(binaryContent);
                 })
                 .orElse(null);
     }
@@ -151,7 +149,7 @@ public class BasicUserService implements UserService {
                 user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfileId(),
+                user.getProfile().getId(),
                 online
         );
     }

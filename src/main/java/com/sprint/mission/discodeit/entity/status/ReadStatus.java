@@ -33,11 +33,11 @@ public class ReadStatus extends BaseUpdateEntity {
     // private final UUID userId;
     //  private final UUID channelId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "read_status_user_id_fk"), nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "channel_id", foreignKey = @ForeignKey(name = "read_status_user_id_fk"), nullable = false)
     private Channel channel;
 

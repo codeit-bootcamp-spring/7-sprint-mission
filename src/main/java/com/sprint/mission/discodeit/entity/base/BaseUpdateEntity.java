@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @MappedSuperclass
 public abstract class BaseUpdateEntity extends BaseEntity {

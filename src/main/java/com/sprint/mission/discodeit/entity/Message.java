@@ -6,13 +6,15 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.action.internal.OrphanRemovalAction;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
+
 @Getter
 @Table(name = "messages")
 public class Message extends BaseUpdateEntity {
@@ -28,21 +30,20 @@ public class Message extends BaseUpdateEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "message_attachments",                    // 연결 테이블 이름
-            joinColumns = @JoinColumn(name = "message_id"),  // 내가 연결될 때 사용할 FK
-            inverseJoinColumns = @JoinColumn(name = "attachment_id") // 반대쪽 엔티티의 FK
-    )
-    private List<BinaryContent> attachments;
 
-/*    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-        this.authorId = authorId;
-        this.channelId = channelId;
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<BinaryContent> attachments = new ArrayList<>();
+
+
+    public Message(User author, Channel channel, String content, List<BinaryContent> attachments) {
+        this.author = author;
         this.content = content;
-        this.attachmentIds = attachmentIds;
-    }*/
+        this.channel = channel;
 
+        if (attachments != null) {
+            attachments.forEach(this::addAttachment);
+        }
+    }
 
     public void update(String newContent) {
         boolean anyValueUpdated = false;
@@ -53,8 +54,12 @@ public class Message extends BaseUpdateEntity {
 
 
     }
+
     //첨부파일추가
    /* public void addAttachmentId(UUID attachmentId) {
         this.attachmentIds.add(attachmentId);
     }*/
+    public void addAttachment(BinaryContent file) {
+        this.attachments.add(file);
+    }
 }

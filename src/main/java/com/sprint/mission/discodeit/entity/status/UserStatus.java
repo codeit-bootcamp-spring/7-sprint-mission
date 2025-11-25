@@ -22,7 +22,7 @@ public class UserStatus extends BaseUpdateEntity {
 
     //
     // private UUID userId;
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "user_status_user_id_fk"), nullable = false, unique = true)
     private User user;
 
