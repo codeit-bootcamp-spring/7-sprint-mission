@@ -27,7 +27,7 @@ public class MessageController implements MessageControllerDocs {
 
   // 메시지를 보낼 수 있다.
   @PostMapping(consumes = "multipart/form-data")
-  public ResponseEntity<Message> createMessage(
+  public ResponseEntity<MessageResponseDto> createMessage(
       @RequestPart("messageCreateRequest") CreateMessageRequestDto messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
     List<CreateBinaryContentRequestDto> fileRequests = null;
@@ -46,16 +46,17 @@ public class MessageController implements MessageControllerDocs {
             }
           }).toList();
     }
-    Message message = messageService.createMessage(messageCreateRequest, fileRequests);
+    MessageResponseDto message = messageService.createMessage(messageCreateRequest, fileRequests);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
   //메시지를 수정할 수 있다.
   @PatchMapping(value = "/{messageId}")
-  public ResponseEntity<Message> updateMessage(
+  public ResponseEntity<MessageResponseDto> updateMessage(
       @PathVariable UUID messageId,
       @RequestBody UpdateMessageDto MessageUpdateRequest) {
-    Message response = messageService.updateMessage(messageId, MessageUpdateRequest);
+    MessageResponseDto response = messageService.updateMessage(messageId,
+        MessageUpdateRequest);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
@@ -70,9 +71,9 @@ public class MessageController implements MessageControllerDocs {
   //특정 채널의 메시지 목록을 조회할 수 있다.
   // api/messages?channelId=..
   @GetMapping
-  public ResponseEntity<List<Message>> findAllByChannelId(
+  public ResponseEntity<List<MessageResponseDto>> findAllByChannelId(
       @RequestParam UUID channelId) {
-    List<Message> response = messageService.findAllByChannelId(channelId);
+    List<MessageResponseDto> response = messageService.findAllByChannelId(channelId);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 

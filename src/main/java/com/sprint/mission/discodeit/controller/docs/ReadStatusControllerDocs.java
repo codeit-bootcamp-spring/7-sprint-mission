@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller.docs;
 
 import com.sprint.mission.discodeit.dto.request.CreateReadStatusRequestDto;
+import com.sprint.mission.discodeit.dto.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.update.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +28,7 @@ public interface ReadStatusControllerDocs {
           responseCode = "201",
           description = "Message 읽음 상태가 성공적으로 생성됨",
           content = @Content(
-              schema = @Schema(implementation = ReadStatus.class)
+              schema = @Schema(implementation = ReadStatusResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -49,7 +50,7 @@ public interface ReadStatusControllerDocs {
           )
       )
   })
-  ResponseEntity<ReadStatus> ChannelByCreateReadStatus(
+  ResponseEntity<ReadStatusResponseDto> ChannelByCreateReadStatus(
       @RequestBody CreateReadStatusRequestDto request);
 
 
@@ -59,7 +60,7 @@ public interface ReadStatusControllerDocs {
           responseCode = "200",
           description = "Message 읽음 상태가 성공적으로 수정됨",
           content = @Content(
-              schema = @Schema(implementation = ReadStatus.class)
+              schema = @Schema(implementation = ReadStatusResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -72,7 +73,7 @@ public interface ReadStatusControllerDocs {
           )
       )
   })
-  ResponseEntity<ReadStatus> ChannelByUpdateReadStatus(
+  ResponseEntity<ReadStatusResponseDto> ChannelByUpdateReadStatus(
       @Parameter(description = "수정할 읽음 상태 ID")
       @PathVariable UUID readStatusId,
       @RequestBody UpdateReadStatusDto request);
@@ -83,10 +84,10 @@ public interface ReadStatusControllerDocs {
       responseCode = "200",
       description = "Massage 읽음 상태 목록 조회 성공",
       content = @Content(
-          schema = @Schema(implementation = ReadStatus.class, type = "array")
+          schema = @Schema(implementation = ReadStatusResponseDto.class, type = "array")
       )
   )
-  ResponseEntity<List<ReadStatus>> UserByFindMessage(
+  ResponseEntity<List<ReadStatusResponseDto>> UserByFindMessage(
       @Parameter(description = "조회할 User ID")
       @RequestParam UUID userId);
 

@@ -30,7 +30,7 @@ public interface MessageControllerDocs {
           responseCode = "201",
           description = "Message가 성공적으로 생성됨",
           content = @Content(
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -43,7 +43,7 @@ public interface MessageControllerDocs {
           )
       )
   })
-  ResponseEntity<Message> createMessage(
+  ResponseEntity<MessageResponseDto> createMessage(
       @Parameter(description = "Message 생성 정보")
       @RequestPart("messageCreateRequest") CreateMessageRequestDto messageCreateRequest,
       @Parameter(description = "Message 첨부 파일들")
@@ -56,7 +56,7 @@ public interface MessageControllerDocs {
           responseCode = "200",
           description = "Message가 성공적으로 수정됨",
           content = @Content(
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -69,7 +69,7 @@ public interface MessageControllerDocs {
           )
       )
   })
-  ResponseEntity<Message> updateMessage(
+  ResponseEntity<MessageResponseDto> updateMessage(
       @Parameter(description = "수정할 Message ID")
       @PathVariable UUID messageId,
       @Parameter(description = "수정할 Message 내용")
@@ -102,11 +102,11 @@ public interface MessageControllerDocs {
           responseCode = "200",
           description = "Message 목록 조회 성공",
           content = @Content(
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageResponseDto.class)
           )
       )
   })
-  ResponseEntity<List<Message>> findAllByChannelId(
+  ResponseEntity<List<MessageResponseDto>> findAllByChannelId(
       @Parameter(description = "조회할 Channel Id")
       @RequestParam UUID channelId);
 

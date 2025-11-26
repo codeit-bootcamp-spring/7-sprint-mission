@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.docs;
 
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,7 +25,7 @@ public interface BinaryContentControllerDocs {
           responseCode = "200",
           description = "첨부 파일 조회 성공",
           content = @Content(
-              schema = @Schema(implementation = BinaryContent.class)
+              schema = @Schema(implementation = BinaryContentResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -37,7 +38,7 @@ public interface BinaryContentControllerDocs {
           )
       )
   })
-  ResponseEntity<BinaryContent> findByBinaryContent(
+  ResponseEntity<BinaryContentResponseDto> findByBinaryContent(
       @Parameter(description = "조회할 첨부 파일 ID")
       @PathVariable UUID binaryContentId);
 
@@ -46,10 +47,10 @@ public interface BinaryContentControllerDocs {
       responseCode = "200",
       description = "첨부 파일 목록 조회 성공",
       content = @Content(
-          schema = @Schema(implementation = BinaryContent.class)
+          schema = @Schema(implementation = BinaryContentResponseDto.class)
       )
   )
-  ResponseEntity<List<BinaryContent>> findAllByBinaryContent(
+  ResponseEntity<List<BinaryContentResponseDto>> findAllByBinaryContent(
       @Parameter(description = "조회할 첨부 파일 ID 목록")
       @RequestParam List<UUID> binaryContentIds);
 

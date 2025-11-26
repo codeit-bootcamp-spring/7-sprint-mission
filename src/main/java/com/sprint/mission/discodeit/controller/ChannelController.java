@@ -25,26 +25,26 @@ public class ChannelController implements ChannelControllerDocs {
 
   //공개 채널을 만들 수 있다.
   @PostMapping(value = "/public")
-  public ResponseEntity<Channel> createPublicChannel(
+  public ResponseEntity<ChannelResponseDto> createPublicChannel(
       @Valid @RequestBody CreatePublicChannelDto request) {
-    Channel publicChannel = channelService.createPublicChannel(request);
+    ChannelResponseDto publicChannel = channelService.createPublicChannel(request);
     return ResponseEntity.ok(publicChannel);
   }
 
   //비공개 채널을 만들 수 있다.
   @PostMapping(value = "/private")
-  public ResponseEntity<Channel> createPrivateChannel(
+  public ResponseEntity<ChannelResponseDto> createPrivateChannel(
       @Valid @RequestBody CreatePrivateChannelDto request) {
-    Channel privateChannel = channelService.createPrivateChannel(request);
+    ChannelResponseDto privateChannel = channelService.createPrivateChannel(request);
     return ResponseEntity.ok(privateChannel);
   }
 
   //공개 채널의 정보를 수정할 수 있다.
   @PatchMapping(value = "/{channelId}")
-  public ResponseEntity<Channel> updatePublicChannel(
+  public ResponseEntity<ChannelResponseDto> updatePublicChannel(
       @PathVariable UUID channelId,
       @RequestBody UpdateChannelDto request) {
-    Channel response = channelService.updateChannel(channelId, request);
+    ChannelResponseDto response = channelService.updateChannel(channelId, request);
     return ResponseEntity.ok(response);
   }
 

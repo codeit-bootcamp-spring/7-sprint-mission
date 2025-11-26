@@ -24,9 +24,9 @@ public class AuthController implements AuthControllerDocs {
 
   //사용자는 로그인할 수 있다.
   @PostMapping(value = "/login")
-  public ResponseEntity<User> login(
+  public ResponseEntity<LoginResponseDto> login(
       @Valid @RequestBody LoginRequestDto request) {
-    User login = authService.login(request);
+    LoginResponseDto login = authService.login(request);
     return ResponseEntity.status(HttpStatus.OK).body(login);
   }
 
