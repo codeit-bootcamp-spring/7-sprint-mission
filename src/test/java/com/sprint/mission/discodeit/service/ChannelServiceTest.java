@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -133,6 +134,18 @@ class ChannelServiceTest {
         assertTrue(expectedResult);
 
     }
+    @Test
+    @DisplayName("[예외 케이스] 존재하지 않는 유저 id 조회")
+    void illegalUserFind()
+    {
+        //given
+        UUID illegalUserId = UUID.randomUUID();
+        //when
+        List<ChannelDto> allByUserId = channelService.findAllByUserId(illegalUserId);
+        //then
+
+        assertTrue(allByUserId.isEmpty());
+    }
 
     @Test
     @DisplayName("[정상 케이스] 채널 삭제")
@@ -147,6 +160,16 @@ class ChannelServiceTest {
         var actualResult = channelRepository.findById(publicChannel.id()).isPresent();
         var expectedResult = false;
         assertEquals(expectedResult,actualResult);
+    }
+
+    @Test
+    @DisplayName("[예외 케이스] 존재하지 않는 채널 삭제")
+    void illegalChannelDelete(){
+        //given
+        UUID illegalChannelId = UUID.randomUUID();
+        // null 이 아니면 에러를 내뱉지 않는다.
+        //then
+        assertDoesNotThrow(()->channelService.deleteChannel(illegalChannelId));
     }
 
     @Test
