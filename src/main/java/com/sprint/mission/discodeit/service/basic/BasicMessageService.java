@@ -10,18 +10,20 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.CustomException;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -31,11 +33,15 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
 
+  private final MessageMapper messageMapper;
+
   @Override
   public MessageResponseDto createMessage(CreateMessageDto createMessageDto,
       List<CreateBinaryContentDto> createBinaryContentDtos) {
+
     User user = userRepository.findById(createMessageDto.authorId())
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
     Channel channel = channelRepository.findById(createMessageDto.channelId())
         .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
@@ -56,14 +62,10 @@ public class BasicMessageService implements MessageService {
       ).toList();
     }
 
-    Message message = new Message(createMessageDto.content(), createMessageDto.channelId(),
-        createMessageDto.authorId(), binaryContentIds);
+    Message message = new Message(createMessageDto.content(), channel, user);
     messageRepository.save(message);
 
-    channel.addParticipant(user);
-    user.joinChannel(channel);
-
-    return MessageResponseDto.from(message);
+    return messageMapper.toResponseDto(message);
   }
 
   @Override
@@ -71,20 +73,20 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
 
-    return MessageResponseDto.from(message);
+    return messageMapper.toResponseDto(message);
   }
 
   @Override
   public List<MessageResponseDto> getAllMessages() {
     return messageRepository.findAll().stream()
-        .map(MessageResponseDto::from)
+        .map(messageMapper::toResponseDto)
         .toList();
   }
 
   @Override
   public List<MessageResponseDto> getAllMessageByChannelId(UUID channelID) {
     return messageRepository.findAllByChannelId(channelID).stream()
-        .map(MessageResponseDto::from)
+        .map(messageMapper::toResponseDto)
         .toList();
   }
 
@@ -95,15 +97,13 @@ public class BasicMessageService implements MessageService {
     message.messageUpdate(updateMessageDto.newContent());
     messageRepository.save(message);
 
-    return MessageResponseDto.from(message);
+    return messageMapper.toResponseDto(message);
   }
 
   @Override
   public void deleteMessage(UUID messageId) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
-    message.getAttachmentIds().
-        forEach(binaryContentRepository::deleteById);
 
     messageRepository.deleteById(messageId);
   }
