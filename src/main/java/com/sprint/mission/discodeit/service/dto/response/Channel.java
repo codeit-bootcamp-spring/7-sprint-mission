@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.domain;
+package com.sprint.mission.discodeit.service.dto.response;
 
-import com.sprint.mission.discodeit.entity.ChannelType;
 import lombok.Getter;
 
 import java.time.Instant;

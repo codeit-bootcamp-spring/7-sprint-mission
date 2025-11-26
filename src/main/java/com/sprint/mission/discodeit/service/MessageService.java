@@ -3,16 +3,20 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.Message;
 
+import com.sprint.mission.discodeit.entity.MessageAttachmentEntity;
+import com.sprint.mission.discodeit.entity.MessageEntity;
+import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.response.MessageDto;
+import com.sprint.mission.discodeit.service.mapper.MessageMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -24,34 +28,46 @@ import java.util.UUID;
 public class MessageService {
 
     private final MessageRepository messageRepository;
+    private final MessageAttachmentRepository attachmentRepository;
+    private final MessageMapper mapper;
     private final BinaryContentService binaryContentService;
+    private final UserRepository userRepository;
 
 
-    public MessageDto sendMessage(MessageCreateRequest form, List<MultipartFile> attachments) {
-        Message message;
+    @Transactional
+    public Message sendMessage(MessageCreateRequest form, List<MultipartFile> attachments) {
 
-        if (attachments == null || attachments.isEmpty()) {
-            message = new Message(form.userId(), form.content(), form.channelId(), null);
-        } else {
-            List<String> attachmentsIds = new ArrayList<>();
+        Message message = new Message(
+                form.authorId(),
+                form.content(),
+                form.channelId());
+
+        MessageEntity messageEntity = mapper.toMessageEntity(message);
+        MessageEntity save = messageRepository.save(messageEntity);
+        Message saveMessage = mapper.toMessage(save);
+
+        if (!attachments.isEmpty()) {
             for (MultipartFile file : attachments) {
-                BinaryContent content = binaryContentService.saveMessageFile(form.userId(), file);
-                attachmentsIds.add(content.getId());
+                BinaryContent content = binaryContentService.put(form.authorId(), file);
+                MessageAttachmentEntity messageAttachmentEntity = new MessageAttachmentEntity();
+                messageAttachmentEntity.setMessageId(save.getId());
+                messageAttachmentEntity.setAttachmentId(content.getId());
+                attachmentRepository.save(messageAttachmentEntity);
+                saveMessage.addAttachment(content);
             }
-            message = new Message(form.userId(), form.content(), form.channelId(), attachmentsIds);
         }
-        messageRepository.save(message);
-        return MessageDto.from(message);
+
+        return saveMessage;
     }
 
-    public MessageDto updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
-        Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("메세지가 없습니다."));
+    public Message updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
+
         if (messageUpdateRequest.newContent() != null) {
-            message.updateContent(messageUpdateRequest.newContent());
+            MessageEntity messageEntity = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("수정하고자 하는 메세지를 찾을 수 없습니다."));
+            messageEntity.setContent(messageUpdateRequest.newContent());
         }
 
-        messageRepository.save(message);
-        return MessageDto.from(message);
+        return mapper
     }
 
     public void deleteMessage(UUID messageId) {

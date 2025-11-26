@@ -1,10 +1,6 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.service.dto.response;
 
-import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -12,19 +8,23 @@ import java.util.UUID;
 
 
 @Getter
-@Entity
-@Setter
-@Table(name = "read_statuses")
-public class ReadStatusEntity extends BaseUpdatableEntity{
+public class ReadStatus {
 
-    @Column(name = "user_id", nullable = false)
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
     private UUID userId;
-
-    @Column(name = "channel_id", nullable = false)
     private UUID channelId;
-
-    @Column(name = "last_read_at", nullable = false)
     private Instant lastReadAt;
+
+
+    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+
+        this.userId = userId;
+        this.channelId = channelId;
+        this.lastReadAt = lastReadAt;
+
+    }
 
     public void read(){
         this.lastReadAt=Instant.now();
@@ -37,4 +37,3 @@ public class ReadStatusEntity extends BaseUpdatableEntity{
         return Duration.between(lastReadAt, Instant.now()).toMinutes();
     }
 }
-

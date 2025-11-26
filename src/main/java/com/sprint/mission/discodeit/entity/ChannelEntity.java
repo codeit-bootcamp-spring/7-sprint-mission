@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.domain.ChannelType;
 import jakarta.persistence.*;
 
 @Entity

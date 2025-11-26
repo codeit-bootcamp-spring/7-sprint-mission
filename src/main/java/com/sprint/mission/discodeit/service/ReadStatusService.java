@@ -4,7 +4,6 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.entity.ReadStatusEntity;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.service.dto.response.ReadStatusDto;
 import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.service.mapper.ReadStatusMapper;
 import lombok.RequiredArgsConstructor;
@@ -46,10 +45,10 @@ public class ReadStatusService {
         return mapper.toReadStatus(readStatusEntity);
     }
 
-    public List<ReadStatusDto> getAllByUserId(UUID id){
-        return readStatusRepository.findAll().stream()
-                .filter(rs-> rs.getUserId().equals(id))
-                .map(ReadStatusDto::from)
+    public List<ReadStatus> getAllByUserId(UUID id){
+        return readStatusRepository.findAllByUserId(id)
+                .stream()
+                .map(mapper::toReadStatus)
                 .toList();
     }
 

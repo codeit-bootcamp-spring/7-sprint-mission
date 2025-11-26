@@ -1,5 +1,7 @@
-package com.sprint.mission.discodeit.domain;
+package com.sprint.mission.discodeit.service.dto.response;
 
+import com.sprint.mission.discodeit.entity.exception.ErrorType;
+import com.sprint.mission.discodeit.entity.exception.ValidationException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +24,6 @@ public class User {
     private String password;
     private String email;
 
-    private String profileId;
     private Instant lastActiveAt;
     private BinaryContent profile;
 
@@ -64,6 +65,22 @@ public class User {
         this.lastActiveAt=lastActiveAt;
     }
 
+    private void validateEmail(String email) {
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            throw new ValidationException(ErrorType.INVALID_EMAIL);
+        }
+    }
 
+    private void validatePassword(String password) {
+        if (password == null || password.length() < 4) {
+            throw new ValidationException(ErrorType.INVALID_PASSWORD);
+        }
+    }
+
+    private void validateUsername(String username) {
+        if (username == null || username.isBlank()) {
+            throw new ValidationException(ErrorType.INVALID_USERNAME);
+        }
+    }
 
 }

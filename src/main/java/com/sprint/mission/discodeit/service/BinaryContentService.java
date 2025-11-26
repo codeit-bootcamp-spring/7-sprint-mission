@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.domain.BinaryContent;
 
 import com.sprint.mission.discodeit.entity.BinaryContentEntity;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

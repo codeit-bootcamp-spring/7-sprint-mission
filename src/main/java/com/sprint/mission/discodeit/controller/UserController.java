@@ -5,8 +5,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.response.UserDto;
-import com.sprint.mission.discodeit.service.dto.response.UserStatusDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

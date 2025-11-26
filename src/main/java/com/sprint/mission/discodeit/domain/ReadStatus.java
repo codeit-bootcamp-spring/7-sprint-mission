@@ -27,14 +27,5 @@ public class ReadStatus {
 
     }
 
-    public void read(){
-        this.lastReadAt=Instant.now();
-    }
 
-    public Long timeSinceLastRead() {
-        if (lastReadAt == null) {
-            return null;
-        }
-        return Duration.between(lastReadAt, Instant.now()).toMinutes();
-    }
 }

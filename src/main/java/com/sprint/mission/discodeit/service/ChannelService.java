@@ -2,13 +2,12 @@ package com.sprint.mission.discodeit.service;
 
 
 import com.sprint.mission.discodeit.domain.Channel;
-import com.sprint.mission.discodeit.domain.ChannelType;
+import com.sprint.mission.discodeit.entity.ChannelType;
 
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.service.dto.response.ChannelDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

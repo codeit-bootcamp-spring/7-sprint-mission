@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.UUID;
 
+@Setter
 @Entity
 @Table(name = "messages")
 public class MessageEntity extends BaseUpdatableEntity{

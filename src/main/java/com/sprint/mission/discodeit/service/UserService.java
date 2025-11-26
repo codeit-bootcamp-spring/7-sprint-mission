@@ -3,15 +3,12 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
-import com.sprint.mission.discodeit.domain.exception.DuplicateException;
+import com.sprint.mission.discodeit.entity.exception.DuplicateException;
 
 import com.sprint.mission.discodeit.entity.UserEntity;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
-import com.sprint.mission.discodeit.service.dto.response.UserDto;
-import com.sprint.mission.discodeit.service.dto.response.UserStatusDto;
 import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain;
+package com.sprint.mission.discodeit.service.dto.response;
 
 import lombok.Getter;
 
