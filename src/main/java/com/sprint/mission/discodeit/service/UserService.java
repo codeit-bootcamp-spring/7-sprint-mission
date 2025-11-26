@@ -3,8 +3,9 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
-import com.sprint.mission.discodeit.entity.exception.DuplicateException;
 
+
+import com.sprint.mission.discodeit.domain.exception.DuplicateException;
 import com.sprint.mission.discodeit.entity.UserEntity;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;

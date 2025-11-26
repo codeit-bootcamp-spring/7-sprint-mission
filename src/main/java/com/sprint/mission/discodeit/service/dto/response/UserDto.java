@@ -7,11 +7,12 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class BinaryContent {
+public class UserDto {
 
     private UUID id;
-    private String fileName;  // UUID.toString()
-    private String contentType;  // image/png
-    private long size;    // 1024
+    private String username;
+    private String email;
+    private BinaryContent profile;
+    private boolean online;
 
 }
