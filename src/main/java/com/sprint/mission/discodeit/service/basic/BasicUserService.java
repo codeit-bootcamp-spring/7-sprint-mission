@@ -13,7 +13,9 @@ import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +30,12 @@ import java.util.stream.Collectors;
 public class BasicUserService implements UserService{
 
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
 
     private final UserMapper userMapper;
+
+    private final BinaryContentStorage binaryContentStorage;
 
     @Override
     @Transactional
@@ -53,9 +58,10 @@ public class BasicUserService implements UserService{
             profileImage = new BinaryContent(
                     profileRequest.fileName(),
                     profileRequest.size(),
-                    profileRequest.contentType(),
-                    profileRequest.bytes()
+                    profileRequest.contentType()
             );
+            binaryContentRepository.save(profileImage);
+            binaryContentStorage.put(profileImage.getId(), profileRequest.bytes());
         }
 
         User newUser  = new User(
@@ -69,6 +75,8 @@ public class BasicUserService implements UserService{
         newUser.setStatus(userStatus);
 
         userRepository.save(newUser);
+        userStatusRepository.save(userStatus);
+
         return userMapper.toResponseDto(newUser);
     }
 
@@ -120,15 +128,16 @@ public class BasicUserService implements UserService{
             profileImage = new BinaryContent(
                     profileRequest.fileName(),
                     profileRequest.size(),
-                    profileRequest.contentType(),
-                    profileRequest.bytes()
+                    profileRequest.contentType()
             );
-            binaryContentRepository.save(profileImage);
 
             // 기존 프로필 이미지 삭제(있는 경우)
             if(user.getProfile() != null) {
                 binaryContentRepository.deleteById(user.getProfile().getId());
             }
+
+            binaryContentRepository.save(profileImage);
+            binaryContentStorage.put(profileImage.getId(), profileRequest.bytes());
         }
 
         user.update(username, email, password, profileImage);
@@ -142,6 +151,15 @@ public class BasicUserService implements UserService{
     public void delete(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        BinaryContent profile = user.getProfile();
+        UserStatus userStatus = user.getStatus();
+
+        // 프로필 이미지 삭제(있는 경우)
+        if(user.getProfile() != null) {
+            binaryContentRepository.deleteById(profile.getId());
+        }
+
+        userStatusRepository.deleteById(userStatus.getId());
         userRepository.deleteById(id);
     }
 

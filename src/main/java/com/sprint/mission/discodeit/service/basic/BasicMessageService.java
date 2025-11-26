@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,8 +38,11 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     private final MessageMapper messageMapper;
+
+    private final BinaryContentStorage binaryContentStorage;
 
     /**
      * 새로운 메시지를 생성하여 Repository에 저장
@@ -67,10 +71,11 @@ public class BasicMessageService implements MessageService {
                     BinaryContent fileBytes = new BinaryContent(
                             file.fileName(),
                             file.size(),
-                            file.contentType(),
-                            file.bytes()
+                            file.contentType()
                     );
                     attachments.add(fileBytes);
+                    binaryContentRepository.save(fileBytes);
+                    binaryContentStorage.put(fileBytes.getId(), file.bytes());
                 })
         );
 
@@ -123,8 +128,15 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public void delete(UUID messageId) {
-        messageRepository.findById(messageId)
+        Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
+
+        List<BinaryContent> attachments = message.getAttachments();
+
+        // 메시지에 첨부 파일도 함께 삭제
+        attachments.forEach(attachment -> {
+            binaryContentRepository.deleteById(attachment.getId());
+        });
 
         messageRepository.deleteById(messageId);
     }

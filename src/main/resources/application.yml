@@ -18,6 +18,12 @@ spring:
         show_sql: true
         format_sql: true
 
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: C:/Users/user/Workspace/codeit-sprint-bootcamp/7-sprint-mission/image
+
 springdoc:
   api-docs:
     path: /api-docs

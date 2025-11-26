@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
-
+    private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
 
     @Override
@@ -31,10 +32,11 @@ public class BasicBinaryContentService implements BinaryContentService {
             BinaryContent file = new BinaryContent(
                     request.fileName(),
                     request.size(),
-                    request.contentType(),
-                    request.bytes()
+                    request.contentType()
             );
+
             binaryContentRepository.save(file);
+            binaryContentStorage.put(file.getId(), request.bytes());
         }
     }
 

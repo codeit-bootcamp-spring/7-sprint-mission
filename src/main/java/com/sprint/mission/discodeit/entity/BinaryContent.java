@@ -6,10 +6,12 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @AllArgsConstructor
+@ToString
 @Entity
 @Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
@@ -22,15 +24,4 @@ public class BinaryContent extends BaseEntity {
 
     @Column(name = "content_type", nullable = false)
     private String contentType;
-
-    @Column(nullable = false)
-    private byte[] bytes; // 파일 데이터
-
-    @Override
-    public String toString() {
-        return "BinaryContent{" +
-                "name='" + fileName + '\'' +
-                ", (" + bytes.length + " bytes)" +
-                '}';
-    }
 }
