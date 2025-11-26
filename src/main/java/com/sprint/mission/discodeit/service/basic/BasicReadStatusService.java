@@ -38,15 +38,15 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public ReadStatusDto createReadStatus(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
 
-        Channel targetChannel = channelRepository.findById(readStatusCreateRequestDto.getChannelId())
+        Channel targetChannel = channelRepository.findById(readStatusCreateRequestDto.channelId())
                 .orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
-        User targetUser = userRepository.findById(readStatusCreateRequestDto.getUserId())
+        User targetUser = userRepository.findById(readStatusCreateRequestDto.userId())
                 .orElseThrow(()->new IllegalArgumentException("존재하지 않는 User 입니다."));
         ReadStatus readStatus = ReadStatus.builder()
                 .readLastTime(now())
                 .user(targetUser)
                 .channel(targetChannel)
-                .readLastTime(readStatusCreateRequestDto.getLastReadAt())
+                .readLastTime(readStatusCreateRequestDto.lastReadAt())
                 .build();
         return readStatusMapper.toDto(
                 readStatusRepository.save(readStatus)
@@ -57,8 +57,6 @@ public class BasicReadStatusService implements ReadStatusService {
     public void deleteReadStatus(UUID readStatusID) {
         readStatusRepository.deleteById(readStatusID);
     }
-
-
 
     @Override
     @Transactional(readOnly = true)

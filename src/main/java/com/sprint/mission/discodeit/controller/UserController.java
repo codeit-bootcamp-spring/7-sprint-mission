@@ -37,7 +37,7 @@ public class UserController implements UserControllerDocs {
     @GetMapping("")
     @Override
     public ResponseEntity<List<UserDto>> readAll(){
-        return new ResponseEntity<>( userService.advanceFindAllUser(),HttpStatus.OK);
+        return new ResponseEntity<>( userService.findAllUsers(),HttpStatus.OK);
     }
 
     @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

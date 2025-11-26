@@ -23,12 +23,9 @@ import static java.time.Instant.now;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-
-
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final UserStatusMapper userStatusMapper;
-
 
     @Override
     public void updateByUserId(UUID userId) {

@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.docs.BinaryContentControllerDocs;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +19,7 @@ import java.util.UUID;
 public class BinaryContentController implements BinaryContentControllerDocs {
 
     private final BinaryContentService binaryContentService;
-    private final BinaryContentStorage binaryContentStorage;
+
     @GetMapping( "/{binaryContentId}")
     @Override
     public ResponseEntity<BinaryContentDto> read(@PathVariable UUID binaryContentId){

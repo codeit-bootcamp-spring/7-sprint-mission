@@ -14,4 +14,6 @@ public interface ReadStatusService {
     public void resetReadStatus();
     public List<ReadStatusDto> readAllReadStatus();
     ReadStatusDto patchReadStatus(UUID readStatusId, ReadStatusPatchRequestDto readStatusPatchRequestDto);
+
+
 }

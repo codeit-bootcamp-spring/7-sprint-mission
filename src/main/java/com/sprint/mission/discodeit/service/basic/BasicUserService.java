@@ -46,10 +46,10 @@ public class BasicUserService implements UserService {
         binaryContentStorage.put(binaryContent.getId(),profile.getBytes());
 
         User user = userRepository.save(User.builder()
-                .userName(userCreateRequestDto.getUsername())
-                .email(userCreateRequestDto.getEmail())
+                .userName(userCreateRequestDto.username())
+                .email(userCreateRequestDto.email())
                 .profile(binaryContent)
-                .password(userCreateRequestDto.getPassword())
+                .password(userCreateRequestDto.password())
                 .build());
 
         user.setUserStatus(userStatusRepository.save(UserStatus.builder()
@@ -63,9 +63,9 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
         User user = userRepository.save(User.builder()
-                .userName(userCreateRequestDto.getUsername())
-                .email(userCreateRequestDto.getEmail())
-                .password(userCreateRequestDto.getPassword())
+                .userName(userCreateRequestDto.username())
+                .email(userCreateRequestDto.email())
+                .password(userCreateRequestDto.password())
                 .build());
 
         UserStatus targetUserStatus = userStatusRepository.save(UserStatus.builder()
@@ -79,11 +79,6 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto readUser(UUID userID) {
         User user = userRepository.findById(userID).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
-        UserStatus userStatus = userStatusRepository.findAll()
-                .stream()
-                .filter(x -> x.getUser().getId().equals(userID)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
-
         return userMapper.toDto(user);
     }
 
@@ -105,9 +100,8 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserDto> advanceFindAllUser(){
-        List<User> userList = userRepository.findAll();
-        return userList.stream().map(userMapper::toDto).toList();
+    public List<UserDto> findAllUsers(){
+        return userRepository.findAll().stream().map(userMapper::toDto).toList();
     }
 
     @Override

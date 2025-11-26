@@ -56,13 +56,13 @@ public class BasicMessageService implements MessageService {
 
     @Transactional
     public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments   ) throws IOException {
-        //todo channel id 랑 sender id 관련 안전성 확인, 일단 지금은 안함
-        Channel channel2 = channelRepository.findById(messageCreateRequestDto.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
-        User targetUser = userRepository.findById(messageCreateRequestDto.getAuthorId()).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
+
+        Channel channel2 = channelRepository.findById(messageCreateRequestDto.channelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
+        User targetUser = userRepository.findById(messageCreateRequestDto.authorId()).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
 
         Message message;
         message = messageRepository.save(Message.builder()
-                .content(messageCreateRequestDto.getContent())
+                .content(messageCreateRequestDto.content())
                 .channel(channel2)
                 .author(targetUser)
                 .build());

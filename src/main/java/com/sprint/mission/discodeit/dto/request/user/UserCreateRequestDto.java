@@ -6,16 +6,17 @@ import lombok.Builder;
 import lombok.Getter;
 
 
-@Getter
-@AllArgsConstructor
-public class UserCreateRequestDto {
+public record UserCreateRequestDto(
 
-    @NotBlank(message = "User name")
-    private String username ;
+        @NotBlank(message = "User name")
+        String username,
 
-    @NotBlank(message = "User email")
-    private String email;
+        @NotBlank(message = "User email")
+        String email,
 
-    @NotBlank(message = "User password")
-    private String password;
+        @NotBlank(message = "User password")
+        String password
+) {
+
+
 }

@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.MessageAttachmentService;
 import com.sprint.mission.discodeit.subTable.MessageAttachment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -30,12 +31,14 @@ public class BasicMessageAttachmentService implements MessageAttachmentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MessageAttachment readByMessageId(UUID messageId) {
         Message targetMessage = messageRepository.findById(messageId).orElseThrow();
         return messageAttachmentRepository.findByMessage(targetMessage);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MessageAttachment readByBinaryContentId(UUID binaryContentId) {
         BinaryContent targetBinaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow();
         return messageAttachmentRepository.findByBinaryContent(targetBinaryContent);

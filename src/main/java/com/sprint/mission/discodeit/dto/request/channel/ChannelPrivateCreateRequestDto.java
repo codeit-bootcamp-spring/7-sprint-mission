@@ -12,25 +12,18 @@ import java.util.UUID;
 import static com.sprint.mission.discodeit.service.util.StaticString.*;
 
 
-@Getter
-public class ChannelPrivateCreateRequestDto {
+public record ChannelPrivateCreateRequestDto(
 
-    @NotNull(message = "ChannelPrivate participantIds")
-    private final HashSet<UUID> participantIds;
+        @NotNull(message = "ChannelPrivate participantIds")
+        HashSet<UUID> participantIds,
+        String name ,
+        String description ,
+        boolean isTextChannel
 
-    private String name = DEFAULT_CHANNEL_NAME;
-    private String description = DEFAULT_CHANNEL_DESCRIPTION;
-    private final boolean isTextChannel;
-
-    public ChannelPrivateCreateRequestDto(
-            HashSet<UUID> participantIds,
-            String name,
-            String description,
-            boolean isTextChannel
-    ) {
-        this.participantIds = participantIds;
-        this.name = (name != null) ? name : DEFAULT_CHANNEL_NAME;
-        this.description = (description != null) ? description : DEFAULT_CHANNEL_DESCRIPTION;
-        this.isTextChannel = isTextChannel;
+) {
+    public ChannelPrivateCreateRequestDto(HashSet<UUID> participantIds) {
+        this(participantIds,DEFAULT_CHANNEL_NAME,DEFAULT_CHANNEL_DESCRIPTION,true);
     }
+
+
 }

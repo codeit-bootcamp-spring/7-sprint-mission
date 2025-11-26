@@ -28,6 +28,7 @@ import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EX
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
+
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
@@ -46,11 +47,11 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
 
         Channel channel = channelRepository.save(Channel.builder()
-            .name(channelPrivateCreateRequestDto.getName())
+            .name(channelPrivateCreateRequestDto.name())
             .type(ChannelType.PRIVATE)
-            .description(channelPrivateCreateRequestDto.getDescription())
+            .description(channelPrivateCreateRequestDto.description())
             .build());
-       channelPrivateCreateRequestDto.getParticipantIds().forEach(
+       channelPrivateCreateRequestDto.participantIds().forEach(
                 x ->
                 {
                     User tempUser = userRepository.findById(x).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
@@ -68,9 +69,9 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
 
     Channel channel = channelRepository.save(Channel.builder()
-            .name(channelPublicCreateRequestDto.getName())
+            .name(channelPublicCreateRequestDto.name())
             .type(ChannelType.PUBLIC)
-            .description(channelPublicCreateRequestDto.getDescription())
+            .description(channelPublicCreateRequestDto.description())
             .build());
         List<User> users = userRepository.findAll();
         users.forEach(x->{readStatusRepository.save(ReadStatus.builder()
@@ -78,8 +79,6 @@ public class BasicChannelService implements ChannelService {
                 .channel(channel)
                 .build()
         );
-        log.info("====================");
-        log.info(x.getUserStatus().getId().toString());
         });
     return channelMapper.toDto(channel);
     }

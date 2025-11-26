@@ -25,4 +25,6 @@ public interface MessageService {
     MessageDto patchMessage(MessagePatchRequestDto dto, UUID messageId);
     List<MessageDto> readAllMessageByUserId(UUID userId);
     void resetMessage();
+
+
 }

@@ -17,7 +17,7 @@ public interface UserService {
     List<UserDto> readAllUser();
     void deleteUser(UUID userId);
     void resetUserRepository();
-    List<UserDto> advanceFindAllUser();
+    List<UserDto> findAllUsers();
     UserDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile) throws IOException;
 
 }

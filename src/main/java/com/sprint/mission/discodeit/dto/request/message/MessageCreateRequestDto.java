@@ -12,14 +12,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-@Getter
-public class MessageCreateRequestDto {
 
-    private String content;
+public record MessageCreateRequestDto(
 
-    @NotNull (message = "message author id")
-    private UUID authorId;
+        String content,
 
-    @NotNull(message = "message channel id")
-    private UUID channelId;
+        @NotNull(message = "message author id")
+        UUID authorId,
+
+        @NotNull(message = "message channel id")
+        UUID channelId
+) {
+
+
 }
