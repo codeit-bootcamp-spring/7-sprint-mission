@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.domain.BinaryContent;
 
 import com.sprint.mission.discodeit.entity.BinaryContentEntity;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public final class BinaryContentService {
 
 
     //우선은 파일 이름은 fileManager에서 UUID 랜덤으로 생성, 그래서 binaryContent의 아이디와는 다름
-    public BinaryContent put(UUID userId, MultipartFile profile) {
+    public BinaryContentDto put(UUID userId, MultipartFile profile) {
         Path profilePath
                 = fileManager.put(userId, profile);
         BinaryContent content = new BinaryContent("profile",
@@ -37,7 +38,13 @@ public final class BinaryContentService {
         BinaryContentEntity binaryContentEntity = mapper.toBinaryContentEntity(content);
         BinaryContentEntity savedEntity = binaryContentRepository.save(binaryContentEntity);
 
-        return mapper.toBinaryContent(savedEntity);
+        BinaryContentDto binaryContentDto = new BinaryContentDto();
+        binaryContentDto.setContentType(binaryContentEntity.getFileType());
+        binaryContentDto.setId(binaryContentEntity.getId());
+        binaryContentDto.setSize(binaryContentEntity.getFileSize());
+        binaryContentDto.setFileName(binaryContentEntity.getFileName());
+
+        return binaryContentDto;
     }
 
 
@@ -59,9 +66,16 @@ public final class BinaryContentService {
         return result;
     }
 
-    public BinaryContent getBinaryContent(UUID binaryContentId) {
+    public BinaryContentDto getBinaryContent(UUID binaryContentId) {
         BinaryContentEntity binaryContentEntity = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
-        return mapper.toBinaryContent(binaryContentEntity);
+
+        BinaryContentDto binaryContentDto = new BinaryContentDto();
+        binaryContentDto.setContentType(binaryContentEntity.getFileType());
+        binaryContentDto.setId(binaryContentEntity.getId());
+        binaryContentDto.setSize(binaryContentEntity.getFileSize());
+        binaryContentDto.setFileName(binaryContentEntity.getFileName());
+
+        return binaryContentDto;
     }
 
 

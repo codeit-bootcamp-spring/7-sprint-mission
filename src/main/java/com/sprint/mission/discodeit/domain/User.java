@@ -26,7 +26,6 @@ public class User {
 
     private String profileId;
     private Instant lastActiveAt;
-    private BinaryContent profile;
 
 
     public User(String email, String password, String username) {

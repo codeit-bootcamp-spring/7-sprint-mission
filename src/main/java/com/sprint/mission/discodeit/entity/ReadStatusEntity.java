@@ -17,24 +17,17 @@ import java.util.UUID;
 @Table(name = "read_statuses")
 public class ReadStatusEntity extends BaseUpdatableEntity{
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity userId;
 
-    @Column(name = "channel_id", nullable = false)
-    private UUID channelId;
+    @ManyToOne
+    @JoinColumn(name = "channel_id", nullable = false)
+    private ChannelEntity channelId;
 
     @Column(name = "last_read_at", nullable = false)
     private Instant lastReadAt;
 
-    public void read(){
-        this.lastReadAt=Instant.now();
-    }
 
-    public Long timeSinceLastRead() {
-        if (lastReadAt == null) {
-            return null;
-        }
-        return Duration.between(lastReadAt, Instant.now()).toMinutes();
-    }
 }
 

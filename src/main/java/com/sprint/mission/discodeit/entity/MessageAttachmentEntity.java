@@ -14,12 +14,12 @@ import java.util.UUID;
 @Entity
 public class MessageAttachmentEntity extends BaseEntity{
 
+    @ManyToOne
+    @JoinColumn(name = "message_id", nullable = false)
+    private MessageEntity messageId;
 
-    @Column(name = "message_id", nullable = false)
-    private UUID messageId;
-
-
+    @OneToOne
     @Column(name = "attachment_id", nullable = false)
-    private UUID attachmentId;
+    private BinaryContentEntity attachmentId;
 
 }

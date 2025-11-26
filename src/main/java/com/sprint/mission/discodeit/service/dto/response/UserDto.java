@@ -12,7 +12,7 @@ public class UserDto {
     private UUID id;
     private String username;
     private String email;
-    private BinaryContent profile;
+    private BinaryContentDto profile;
     private boolean online;
 
 }

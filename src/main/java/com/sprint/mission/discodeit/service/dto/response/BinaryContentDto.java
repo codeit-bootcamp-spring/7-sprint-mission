@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class BinaryContent {
+public class BinaryContentDto {
 
     private UUID id;
     private String fileName;  // UUID.toString()

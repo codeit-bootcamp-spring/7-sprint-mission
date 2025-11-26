@@ -17,6 +17,9 @@ public class MessageDto {
     private Instant updatedAt;
     private UUID channelId;
     private UserDto author;
-    private final List<BinaryContent> attachments = new ArrayList<>();
+    private final List<BinaryContentDto> attachments = new ArrayList<>();
 
+    public void addAttachment(BinaryContentDto binaryContentDto){
+        this.attachments.add(binaryContentDto);
+    }
 }

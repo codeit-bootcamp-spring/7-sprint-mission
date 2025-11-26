@@ -5,12 +5,16 @@ import com.sprint.mission.discodeit.domain.Message;
 
 import com.sprint.mission.discodeit.entity.MessageAttachmentEntity;
 import com.sprint.mission.discodeit.entity.MessageEntity;
+import com.sprint.mission.discodeit.entity.UserEntity;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.service.dto.response.MessageDto;
 import com.sprint.mission.discodeit.service.mapper.MessageMapper;
+import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,7 +39,7 @@ public class MessageService {
 
 
     @Transactional
-    public Message sendMessage(MessageCreateRequest form, List<MultipartFile> attachments) {
+    public MessageDto sendMessage(MessageCreateRequest form, List<MultipartFile> attachments) {
 
         Message message = new Message(
                 form.authorId(),
@@ -44,20 +48,24 @@ public class MessageService {
 
         MessageEntity messageEntity = mapper.toMessageEntity(message);
         MessageEntity save = messageRepository.save(messageEntity);
-        Message saveMessage = mapper.toMessage(save);
+
+        UserEntity userEntity = userRepository.findById(save.getUserId()).orElseThrow(() -> new NoSuchElementException("메세지의 유저를 찾을 수 없음"));
+
+
+        MessageDto messageDto = mapper.toMessageDto(save);
 
         if (!attachments.isEmpty()) {
             for (MultipartFile file : attachments) {
-                BinaryContent content = binaryContentService.put(form.authorId(), file);
+                BinaryContentDto content = binaryContentService.put(form.authorId(), file);
                 MessageAttachmentEntity messageAttachmentEntity = new MessageAttachmentEntity();
                 messageAttachmentEntity.setMessageId(save.getId());
                 messageAttachmentEntity.setAttachmentId(content.getId());
                 attachmentRepository.save(messageAttachmentEntity);
-                saveMessage.addAttachment(content);
+                messageDto.addAttachment(content);
             }
         }
 
-        return saveMessage;
+        return messageDto;
     }
 
     public Message updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {

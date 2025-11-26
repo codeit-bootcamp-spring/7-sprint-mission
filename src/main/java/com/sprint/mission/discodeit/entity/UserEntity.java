@@ -26,8 +26,9 @@ public class UserEntity extends BaseUpdatableEntity {
     @Column( name = "last_active_at")
     private Instant lastActiveAt;
 
-    @Column(name = "profile_id")
-    private UUID profileId;
+    @OneToOne
+    @JoinColumn(name = "profile_id")
+    private BinaryContentEntity profileId;
 
 
 

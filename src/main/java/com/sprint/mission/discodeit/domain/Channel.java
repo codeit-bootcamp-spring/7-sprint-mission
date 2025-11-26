@@ -16,9 +16,9 @@ public class Channel {
     private String name;
     private String description;
     private ChannelType type;
-//    private final List<String> members;
 
-    public Channel(String name, String description, boolean isPrivate, List<String> members) {
+
+    public Channel(String name, String description, boolean isPrivate) {
         this.name = name;
         this.description = description;
         if (isPrivate) {
@@ -26,12 +26,6 @@ public class Channel {
         } else {
             this.type = ChannelType.PUBLIC;
         }
-//        if (members == null) {
-//            this.members = new ArrayList<>();
-//        } else {
-//            this.members = members;
-//        }
-//    }
 
     }
 }

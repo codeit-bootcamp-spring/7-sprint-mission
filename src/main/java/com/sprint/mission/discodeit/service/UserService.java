@@ -10,6 +10,8 @@ import com.sprint.mission.discodeit.entity.UserEntity;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.service.dto.response.UserDto;
 import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +36,7 @@ public class UserService {
     private final UserMapper mapper;
 
     @Transactional
-    public User createUser(UserCreateRequest requestDto, MultipartFile file) {
+    public UserDto createUser(UserCreateRequest requestDto, MultipartFile file) {
 
         if (userRepository.existsByEmail(requestDto.email())) {
             throw new DuplicateException("이미 등록된 이메일입니다");
@@ -51,19 +53,18 @@ public class UserService {
 
         UserEntity userEntity = mapper.toUserEntity(user);
         UserEntity savedEntity = userRepository.save(userEntity);
-        User savedUser = mapper.toUser(savedEntity);
-
+        UserDto userDto = mapper.toUserDto(savedEntity);
 
         if (file != null && !file.isEmpty()) {
-            BinaryContent content = binaryContentService.put(savedUser.getId(), file);
-            savedUser.setProfile(content);
+            BinaryContentDto content = binaryContentService.put(savedEntity.getId(), file);
+            userDto.setProfile(content);
         }
 
-        return savedUser;
+        return userDto;
     }
 
     @Transactional
-    public User updateUserInfo(UUID id, UserUpdateRequest updateDto, MultipartFile file) {
+    public UserDto updateUserInfo(UUID id, UserUpdateRequest updateDto, MultipartFile file) {
 
         UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
 
@@ -76,13 +77,13 @@ public class UserService {
         if (updateDto.newEmail() != null) {
             userEntity.setPassword(updateDto.newEmail());
         }
-        User user = mapper.toUser(userEntity);
+        UserDto userDto = mapper.toUserDto(userEntity);
         if (file != null) {
-            BinaryContent content = binaryContentService.put(userEntity.getId(), file);
+            BinaryContentDto content = binaryContentService.put(userEntity.getId(), file);
             userEntity.setProfileId(content.getId());
-            user.setProfile(content);
+            userDto.setProfile(content);
         }
-        return user;
+        return userDto;
     }
 
 
@@ -96,21 +97,21 @@ public class UserService {
 
 
     @Transactional
-    public List<User> getAllUsers() {
+    public List<UserDto> getAllUsers() {
 
         return userRepository.findAll()
                 .stream()
                 .map(userEntity -> {
-                    User user = mapper.toUser(userEntity);
-                    BinaryContent binaryContent = binaryContentService.getBinaryContent(userEntity.getId());
-                    user.setProfile(binaryContent);
-                    return user;
+                    UserDto userDto = mapper.toUserDto(userEntity);
+                    BinaryContentDto binaryContent = binaryContentService.getBinaryContent(userEntity.getId());
+                    userDto.setProfile(binaryContent);
+                    return userDto;
                 })
                 .toList();
     }
 
 
-    public User login(String loginId, String password) {
+    public UserDto login(String loginId, String password) {
 
         UserEntity userEntity = userRepository
                 .findByUsername(loginId)
@@ -119,17 +120,17 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 틀립니다");
         }
 
-        return mapper.toUser(userEntity);
+        return mapper.toUserDto(userEntity);
 
     }
 
 
-    public User markOnline(UUID id, Instant lastAt) {
+    public UserDto markOnline(UUID id, Instant lastAt) {
         UserEntity userEntity = userRepository
                 .findById(id)
                 .orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
-        userEntity.setUpdatedAt(Instant.now());
-        return mapper.toUser(userEntity);
+        userEntity.setLastActiveAt(Instant.now());
+        return mapper.toUserDto(userEntity);
     }
 
 

@@ -18,18 +18,11 @@ public class Message {
     private UUID userId;
 
     private String content;
-    private final List<BinaryContent> attachments = new ArrayList<>();
 
 
     public Message(UUID userId, String content, UUID channelId) {
         this.userId = userId;
         this.content = content;
         this.channelId = channelId;
-    }
-
-    public void addAttachment(BinaryContent content) {
-        if (!this.attachments.contains(content)) {
-            this.attachments.add(content);
-        }
     }
 }

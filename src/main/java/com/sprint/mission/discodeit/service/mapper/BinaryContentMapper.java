@@ -9,4 +9,5 @@ public interface BinaryContentMapper {
 
     BinaryContent toBinaryContent(BinaryContentEntity binaryContentEntity);
     BinaryContentEntity toBinaryContentEntity(BinaryContent binaryContent);
+
 }
