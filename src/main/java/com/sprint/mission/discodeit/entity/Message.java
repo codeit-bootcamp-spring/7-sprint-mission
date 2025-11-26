@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,7 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.UUID;
 import lombok.Setter;
 
 @AllArgsConstructor
@@ -32,6 +32,6 @@ public class Message extends BaseUpdatableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "message_id")
-    private List<BinaryContent> attachments; //??
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "message", orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private List<MessageAttachments> attachments;
 }

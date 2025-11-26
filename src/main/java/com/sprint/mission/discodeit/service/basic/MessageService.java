@@ -1,23 +1,22 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.Res_Message;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.entity.MessageAttachments;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.dto.MessageDto;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
+import com.sprint.mission.discodeit.repository.jpa.MessageAttachmentsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
 import jakarta.transaction.Transactional;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -35,6 +34,7 @@ public class MessageService implements InterfaceMessageService {
     private final BinaryContentsRepository binaryContentRepository;
     private final ChannelsRepository channelRepository;
     private final UsersRepository userRepository;
+    private final MessageAttachmentsRepository messageAttachmentsRepository;
     private final MessageMapper messageMapper;
 
     @Override
@@ -47,26 +47,40 @@ public class MessageService implements InterfaceMessageService {
           throw new NoSuchElementException("🚨 User를 찾을 수 없음 :: " + dtoMessage.toString());
         }
 
-//        List<UUID> attachemntIds = new ArrayList<>();
-        List<BinaryContent> attachemntIds = null;
-
-        if (!dtoList.isEmpty()) {
-            //?? 🚨🚨🚨🚨🚨살려!!!!
-//            for (Dto_BinaryContent dtoBinaryContent : dtoList.get()) {
-//                BinaryContent binaryContent = new BinaryContent(dtoBinaryContent);
-//                attachemntIds.add(binaryContent.getId());
-//                binaryContentRepository.save(binaryContent);
-//            }
-        }
-
         Channel channel = channelRepository.findById(dtoMessage.channelId()).orElseThrow(() -> new IllegalArgumentException("🚨 noChannelId = [" + dtoMessage.channelId().toString() + "]"));
         User user = userRepository.findById(dtoMessage.authorId()).orElseThrow(() -> new IllegalArgumentException("🚨 noUserId = [" + dtoMessage.authorId().toString() + "]"));
 
+        List<MessageAttachments> attachmentsList = null;
         Message newMessage = new Message(dtoMessage.content(),
             channel,
             user,
-            attachemntIds);
-        messageRepository.save(newMessage);
+            attachmentsList);
+
+        if (!dtoList.isEmpty()) {
+            for (Dto_BinaryContent dtoBinaryContent : dtoList.get()) {
+                MessageAttachments messageAttachments = null;
+
+                BinaryContent binaryContent = new BinaryContent(dtoBinaryContent.fileName(),
+                    dtoBinaryContent.size(),
+                    dtoBinaryContent.contentType(),
+                    messageAttachments);
+
+                messageAttachments = new MessageAttachments(
+                    UUID.randomUUID(),
+                    newMessage,
+                    binaryContent
+                    );
+
+                messageAttachments.changeBinaryContent(binaryContent);
+                messageAttachments.changeMessage(newMessage);
+
+                attachmentsList.add(messageAttachments);
+
+                binaryContentRepository.save(binaryContent);
+                messageRepository.save(newMessage);
+                messageAttachmentsRepository.save(messageAttachments);
+            }
+        }
 
         log.info("✅ 💌 MessageService.create.content = [" + newMessage.getContent() + "] 💬");
         return messageMapper.toDto(newMessage);

@@ -4,10 +4,8 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record BinaryContentDto(
+public record MessageAttachmentsDto(
     UUID id,
-    String fileName,
-    Long size,
-    String contentType
-//    byte[] bytes
+    UUID messageId,
+    UUID attachments
 ) {}

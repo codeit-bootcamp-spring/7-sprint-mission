@@ -88,7 +88,6 @@ public class UserStatusService implements InterfaceUserStatusService {
     }
 
     public UserStatusDto updateUserStatus(UUID userId, Instant newLastActiveAt) {
-        //?? 있어도 그냥 save 하면 안되나???
         UserStatus userStatus = userStatusRepository.findUserStatusByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("🚨해당 User[" + userId.toString() + "]의 UserStatus를 찾을 수 없음"));
 

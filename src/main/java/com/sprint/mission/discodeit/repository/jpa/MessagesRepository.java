@@ -27,14 +27,14 @@ public interface MessagesRepository extends JpaRepository<Message, UUID> {
 //    """)
 //    Optional<Message> findLatestMessageByCreatedAt(@Param("channelId") UUID channelId);
 
-    @Query("""
-    SELECT m
-    FROM Message m
-    WHERE m.channelId = :channelId
-    ORDER BY m.createdAt DESC
-    """)
-    Optional<Message> findLatestMessage(@Param("channelId") UUID channelId, Pageable pageable);
-//    Optional<Message> findFirstByChannelIdOrderByCreatedAtDesc(UUID channelId); //?? Instant 하나만 리턴 가능??
+//    @Query("""
+//    SELECT m
+//    FROM Message m
+//    WHERE m.channelId = :channelId
+//    ORDER BY m.createdAt DESC
+//    """)
+//    Optional<Message> findLatestMessage(@Param("channelId") UUID channelId, Pageable pageable);
+    Optional<Message> findFirstByChannelIdOrderByCreatedAtDesc(UUID channelId);
 
     List<Message> findAllByChannelId(UUID channelID);
 //    List<Message> findAllByChannelIdOrderByUpdatedAtDesc(UUID channelID);

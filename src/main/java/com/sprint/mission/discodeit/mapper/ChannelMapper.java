@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
@@ -19,13 +20,14 @@ public class ChannelMapper {
     public ChannelDto toDto(Channel channel) {
 
         List<UserDto> userDtoList = readStatusRepository
-            .findUsersByChannelId(channel.getId())
+            .findAllByChannelId(channel.getId())
             .stream()
-            .map(user -> userMapper.toDto(user))
+            .map(readStatuses -> userMapper.toDto(readStatuses.getUser()))
             .toList();
 
         Message message = messageRepository
-            .findLatestMessage(channel.getId(), PageRequest.of(0, 1))
+//            .findLatestMessage(channel.getId(), PageRequest.of(0, 1))
+            .findFirstByChannelIdOrderByCreatedAtDesc(channel.getId())
             .stream()
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("🐳 messageRepository.findLatestMessage"));

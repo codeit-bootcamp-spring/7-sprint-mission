@@ -72,7 +72,7 @@ public class UserService implements InterfaceUserService {
         User newUser = new User(userCreateRequest.username(),
             userCreateRequest.email(),
             userCreateRequest.password(),
-            binaryContent,  //??🚨🚨🚨🚨🚨🚨살려!
+            binaryContent,  //??🚨🚨🚨🚨🚨🚨살려!!
             userStatus);
 
         userStatus = new UserStatus(newUser, Instant.now());
@@ -153,7 +153,7 @@ public class UserService implements InterfaceUserService {
             throw new IllegalArgumentException("🚨 같은 newEmail [" + dtoUserUpdate.newEmail() + "]을 사용하는 User가 이미 존재함");
         }
 
-        //!! 선택적으로 프로필 이미지를 대체할 수 있습니다. 🚨🚨🚨🚨🚨 살려!
+        //!! 선택적으로 프로필 이미지를 대체할 수 있습니다. //??🚨🚨🚨🚨🚨🚨살려!!
 //        if (dtoBinaryContent != null && dtoBinaryContent.isPresent()) {
 //            BinaryContent neoBinaryContent = binaryContentRepository.findById(userId).orElse(new BinaryContent(dtoBinaryContent.get()));
 //            binaryContentRepository.save(neoBinaryContent);

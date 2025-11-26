@@ -1,13 +1,16 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 
 @AllArgsConstructor
@@ -28,6 +31,8 @@ public class BinaryContent extends BaseEntity {
     @Column(name = "content_type", nullable = false, length = 100)
     private String contentType;
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "binaryContent", orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private MessageAttachments attachments;
 //    @Column(name = "bytes", nullable = false)
 //    private byte[] bytes;
 }
