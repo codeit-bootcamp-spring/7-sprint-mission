@@ -19,7 +19,7 @@ public class BasicAuthService implements AuthService {
 
   @Override
   @Transactional(readOnly = true)
-  public User login(LoginRequestDto request) {
+  public LoginResponseDto login(LoginRequestDto request) {
     String username = request.username();
     String password = request.password();
 
@@ -29,6 +29,6 @@ public class BasicAuthService implements AuthService {
     if (!user.getPassword().equals(password)) {
       throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
     }
-    return user;
+    return LoginResponseDto.from(user);
   }
 }

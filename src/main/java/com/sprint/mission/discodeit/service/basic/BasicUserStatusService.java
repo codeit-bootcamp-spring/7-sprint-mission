@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.request.CreateUserStatusRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -22,6 +23,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
+  private final UserStatusMapper userStatusMapper;
 
   @Override
   @Transactional // user랑 1:1관계인데, 이 메서드가 필요할까..? 흠
@@ -33,39 +35,30 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus newStatus = new UserStatus(user);
     UserStatus userStatus = userStatusRepository.save(newStatus);
 
-    return UserStatusResponseDto.from(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
   public UserStatusResponseDto find(UUID userStatusId) {
     UserStatus userStatus = getUserStatus(userStatusId);
-    return UserStatusResponseDto.from(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
   public List<UserStatusResponseDto> findAll() {
     List<UserStatus> userStatuses = userStatusRepository.findAll();
     return userStatuses.stream()
-        .map(userStatus -> UserStatusResponseDto.from(userStatus))
+        .map(userStatus -> userStatusMapper.toDto(userStatus))
         .toList();
   }
 
   @Override
   @Transactional
-  public UserStatus updateUserStatus(UUID id) {
-    UserStatus userStatus = userStatusRepository.findByUserId(id)
-        .orElseThrow(() -> new IllegalArgumentException("유저 상태를 찾을 수 없습니다."));
-    userStatus.statusUpdate(Instant.now());
-    return userStatus;
-  }
-
-  @Override
-  @Transactional
-  public UserStatus updateByUserId(UUID userId) {
+  public UserStatusResponseDto updateByUserId(UUID userId) {
     UserStatus user = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다."));
     user.statusUpdate(Instant.now());
-    return user;
+    return userStatusMapper.toDto(user);
   }
 
   @Override

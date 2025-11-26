@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -30,10 +31,11 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final MessageMapper messageMapper;
 
   @Override
   @Transactional
-  public Message createMessage(CreateMessageRequestDto request,
+  public MessageResponseDto createMessage(CreateMessageRequestDto request,
       List<CreateBinaryContentRequestDto> fileRequests) {
     User author = userRepository.findById(request.authorId())
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
@@ -46,8 +48,8 @@ public class BasicMessageService implements MessageService {
       for (CreateBinaryContentRequestDto fileRequest : fileRequests) {
         BinaryContent binaryContent = new BinaryContent(
             fileRequest.fileName(),
-            fileRequest.contentType(),
-            fileRequest.bytes()
+            (long) fileRequest.bytes().length,
+            fileRequest.contentType()
         );
         BinaryContents.add(binaryContent);
       }
@@ -60,21 +62,23 @@ public class BasicMessageService implements MessageService {
         BinaryContents
     );
 
-    return messageRepository.save(message);
+    Message saved = messageRepository.save(message);
+    return messageMapper.toDto(saved);
   }
 
   @Override
-  public List<Message> findAllByChannelId(UUID channelId) {
+  public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
       throw new IllegalArgumentException("채널이 존재하지 않습니다.");
     }
-
-    return messageRepository.findByChannelId(channelId);
+    return messageRepository.findByChannelId(channelId).stream()
+        .map(messageMapper::toDto)
+        .toList();
   }
 
   @Override
   @Transactional
-  public Message updateMessage(UUID messageId, UpdateMessageDto MessageUpdateRequest) {
+  public MessageResponseDto updateMessage(UUID messageId, UpdateMessageDto MessageUpdateRequest) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
 
@@ -82,7 +86,7 @@ public class BasicMessageService implements MessageService {
 
     message.updateContent(newContent);
 
-    return message;
+    return messageMapper.toDto(message);
   }
 
   @Override

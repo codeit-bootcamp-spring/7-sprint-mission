@@ -8,10 +8,12 @@ import com.sprint.mission.discodeit.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,10 +32,12 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
+  private final UserMapper userMapper;
+  private final BinaryContentStorage storage;
 
   @Override
   @Transactional
-  public User createUser(CreateUserCommand request) {
+  public UserResponseDto createUser(CreateUserCommand request) {
     // username, email 중복 체크
     if (userRepository.findByUsername(request.username()).isPresent()) {
       throw new IllegalArgumentException("이미 유저 이름이 있습니다.");
@@ -47,10 +51,11 @@ public class BasicUserService implements UserService {
     if (request.bytes() != null) {
       BinaryContent content = new BinaryContent(
           request.fileName(),
-          request.contentType(),
-          request.bytes()
+          (long) request.bytes().length,
+          request.contentType()
       );
       saved = binaryContentRepository.save(content);
+      storage.put(saved.getId(), request.bytes());
     }
 
     // User 생성
@@ -68,33 +73,27 @@ public class BasicUserService implements UserService {
 
     user.assignStatus(status);
 
-    return userRepository.save(user);
+    User saveUser = userRepository.save(user);
+    return userMapper.toDto(saveUser);
   }
 
   @Override
   public UserResponseDto find(UUID id) {
     User user = userRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-    UserStatus status = user.getStatus();
-
-    return UserResponseDto.from(user, status);
+    return userMapper.toDto(user);
   }
 
   @Override
   public List<UserResponseDto> findAll() {
-    List<User> users = userRepository.findAll();
-    List<UserResponseDto> dtos = new ArrayList<>();
-    for (User user : users) {
-      UserStatus userStatus = user.getStatus();
-      UserResponseDto dto = UserResponseDto.from(user, userStatus);
-      dtos.add(dto);
-    }
-    return dtos;
+    return userRepository.findAll().stream()
+        .map(user -> userMapper.toDto(user))
+        .toList();
   }
 
   @Override
   @Transactional
-  public User updateUser(UUID userId, UpdateUserDto request, MultipartFile profile) {
+  public UserResponseDto updateUser(UUID userId, UpdateUserDto request, MultipartFile profile) {
     //유저 찾기
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
@@ -104,12 +103,13 @@ public class BasicUserService implements UserService {
       try {
         BinaryContent content = new BinaryContent(
             profile.getOriginalFilename(),
-            profile.getContentType(),
-            profile.getBytes()
+            profile.getSize(),
+            profile.getContentType()
         );
 
         BinaryContent saved = binaryContentRepository.save(content);
         user.updateProfile(saved);
+        storage.put(saved.getId(), profile.getBytes());
       } catch (IOException e) {
         throw new IllegalArgumentException("이미지 등록 실패", e);
       }
@@ -120,7 +120,7 @@ public class BasicUserService implements UserService {
         request.newEmail(),
         request.newPassword()
     );
-    return user;
+    return userMapper.toDto(user);
   }
 
   @Override

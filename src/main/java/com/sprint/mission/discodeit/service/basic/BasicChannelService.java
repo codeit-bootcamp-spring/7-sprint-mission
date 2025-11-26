@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.enum_.ChannelType;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -32,11 +33,12 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
+  private final ChannelMapper channelMapper;
 
 
   @Override
   @Transactional
-  public Channel createPrivateChannel(CreatePrivateChannelDto request) {
+  public ChannelResponseDto createPrivateChannel(CreatePrivateChannelDto request) {
     if (request.participantIds() == null || request.participantIds().isEmpty()) {
       throw new IllegalArgumentException("최소 1명은 있어야 합니다.");
     }
@@ -58,12 +60,12 @@ public class BasicChannelService implements ChannelService {
       );
       readStatusRepository.save(readStatus);
     }
-    return savedChannel;
+    return channelMapper.toDto(savedChannel);
   }
 
   @Override
   @Transactional
-  public Channel createPublicChannel(CreatePublicChannelDto request) {
+  public ChannelResponseDto createPublicChannel(CreatePublicChannelDto request) {
     if (request.name() == null || request.name().isBlank()) {
       throw new IllegalArgumentException("채널 이름은 필수입니다.");
     }
@@ -78,7 +80,8 @@ public class BasicChannelService implements ChannelService {
         request.description()
     );
 
-    return channelRepository.save(channel);
+    Channel saved = channelRepository.save(channel);
+    return channelMapper.toDto(saved);
   }
 
   @Override
@@ -90,25 +93,13 @@ public class BasicChannelService implements ChannelService {
     return channelRepository.findAll().stream()
         .filter(channel -> channel.getType() == ChannelType.PUBLIC ||
             channelIds.contains(channel.getId()))
-        .map(channel -> {
-          List<UUID> participantIds = readStatusRepository.findAllByChannelId(channel.getId())
-              .stream()
-              .map(readStatus -> readStatus.getUser().getId())
-              .toList();
-
-          Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
-              .stream()
-              .map(message -> message.getCreatedAt())
-              .max(Instant::compareTo)
-              .orElse(null);
-          return ChannelResponseDto.from(channel, participantIds, lastMessageAt);
-        })
+        .map(channel -> channelMapper.toDto(channel))
         .toList();
   }
 
   @Override
   @Transactional
-  public Channel updateChannel(UUID id, UpdateChannelDto updateChannelDto) {
+  public ChannelResponseDto updateChannel(UUID id, UpdateChannelDto updateChannelDto) {
     Channel channel = channelRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
 
@@ -122,7 +113,7 @@ public class BasicChannelService implements ChannelService {
         updateChannelDto.newDescription()
     );
 
-    return channel;
+    return channelMapper.toDto(channel);
   }
 
   @Override

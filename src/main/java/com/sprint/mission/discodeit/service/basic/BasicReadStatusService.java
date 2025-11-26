@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -29,11 +30,12 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
+  private final ReadStatusMapper readStatusMapper;
 
 
   @Override
   @Transactional
-  public ReadStatus createReadStatus(CreateReadStatusRequestDto request) {
+  public ReadStatusResponseDto createReadStatus(CreateReadStatusRequestDto request) {
     Optional<ReadStatus> exist = readStatusRepository.findByUserIdAndChannelId(
         request.userId(),
         request.channelId()
@@ -54,30 +56,33 @@ public class BasicReadStatusService implements ReadStatusService {
         channel
     );
 
-    return readStatusRepository.save(readStatus);
+    ReadStatus saved = readStatusRepository.save(readStatus);
+    return readStatusMapper.toDto(saved);
   }
 
   @Override
   public ReadStatusResponseDto find(UUID userId) {
     ReadStatus readStatus = getReadStatus(userId);
-    return ReadStatusResponseDto.from(readStatus);
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
-  public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId);
+  public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
+    return readStatusRepository.findAllByUserId(userId).stream()
+        .map(readStatusMapper::toDto)
+        .toList();
   }
 
   @Override
   @Transactional
-  public ReadStatus updateReadStatus(UUID readStatusId,
+  public ReadStatusResponseDto updateReadStatus(UUID readStatusId,
       UpdateReadStatusDto request) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> new IllegalArgumentException("ReadStatus를 찾을 수 없습니다."));
 
     readStatus.updateReadTime(request.newLastReadAt());
 
-    return readStatus;
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
