@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.exception;
+package com.sprint.mission.discodeit.entity.exception;
 
 import lombok.Getter;
 

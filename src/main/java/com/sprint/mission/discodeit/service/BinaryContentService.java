@@ -1,81 +1,73 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.domain.BinaryContent;
-
-import com.sprint.mission.discodeit.entity.BinaryContentEntity;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.*;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public final class BinaryContentService {
+public class BinaryContentService {
 
 
     private final FileManager fileManager;
-    private final BinaryContentMapper mapper;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentMapper mapper;
 
 
-    //우선은 파일 이름은 fileManager에서 UUID 랜덤으로 생성, 그래서 binaryContent의 아이디와는 다름
-    public BinaryContentDto put(UUID userId, MultipartFile profile) {
-        Path profilePath
-                = fileManager.put(userId, profile);
-        BinaryContent content = new BinaryContent("profile",
-                profile.getContentType(),
-                profilePath.toString(),
-                profile.getSize()
-        );
-        BinaryContentEntity binaryContentEntity = mapper.toBinaryContentEntity(content);
-        BinaryContentEntity savedEntity = binaryContentRepository.save(binaryContentEntity);
+    @Transactional
+    public BinaryContent put(UUID userId, MultipartFile profile) {
 
-        BinaryContentDto binaryContentDto = new BinaryContentDto();
-        binaryContentDto.setContentType(binaryContentEntity.getFileType());
-        binaryContentDto.setId(binaryContentEntity.getId());
-        binaryContentDto.setSize(binaryContentEntity.getFileSize());
-        binaryContentDto.setFileName(binaryContentEntity.getFileName());
+        BinaryContent content =
+                new BinaryContent(
+                        null,
+                        profile.getContentType(),
+                        null,
+                        profile.getSize()
+                );
 
-        return binaryContentDto;
+        BinaryContent saved = binaryContentRepository.save(content);
+
+        Path filePath = fileManager.put(userId, profile, saved.getId().toString());
+        saved.setFileName(saved.getId().toString());
+        saved.setFilePath(filePath.toString());
+
+        return saved;
     }
 
 
     public void deleteFile(UUID binaryContentId) {
-        BinaryContentEntity binaryContentEntity = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new NoSuchElementException("해당 파일이 존재하지 않습니다."));
-        binaryContentRepository.delete(binaryContentEntity);
-        fileManager.delete(mapper.toBinaryContent(binaryContentEntity));
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new NoSuchElementException("해당 파일이 존재하지 않습니다."));
+        binaryContentRepository.delete(binaryContent);
+        fileManager.delete(Paths.get(binaryContent.getFilePath()));
     }
 
 
-    public List<BinaryContent> getBinaryContents(List<UUID> ids) {
-        List<BinaryContent> result = new ArrayList<>();
+    @Transactional
+    public List<BinaryContentDto> getBinaryContents(List<UUID> ids) {
 
-        for (UUID id : ids) {
-            BinaryContentEntity binaryContentEntity = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
-            result.add(mapper.toBinaryContent(binaryContentEntity));
-        }
+        return binaryContentRepository.findAllById(ids)
+                .stream()
+                .map(mapper::toDto)
+                .toList();
 
-        return result;
     }
 
     public BinaryContentDto getBinaryContent(UUID binaryContentId) {
-        BinaryContentEntity binaryContentEntity = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
 
-        BinaryContentDto binaryContentDto = new BinaryContentDto();
-        binaryContentDto.setContentType(binaryContentEntity.getFileType());
-        binaryContentDto.setId(binaryContentEntity.getId());
-        binaryContentDto.setSize(binaryContentEntity.getFileSize());
-        binaryContentDto.setFileName(binaryContentEntity.getFileName());
 
-        return binaryContentDto;
+        return mapper.toDto(binaryContent);
     }
 
 

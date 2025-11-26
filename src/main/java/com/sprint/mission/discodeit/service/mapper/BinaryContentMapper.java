@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.service.mapper;
 
-import com.sprint.mission.discodeit.domain.BinaryContent;
-import com.sprint.mission.discodeit.entity.BinaryContentEntity;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface BinaryContentMapper {
 
-    BinaryContent toBinaryContent(BinaryContentEntity binaryContentEntity);
-    BinaryContentEntity toBinaryContentEntity(BinaryContent binaryContent);
-
+    @Mapping(source = "fileType", target = "contentType")
+    @Mapping(source = "fileSize", target = "size")
+    BinaryContentDto toDto(BinaryContent binaryContent);
 }

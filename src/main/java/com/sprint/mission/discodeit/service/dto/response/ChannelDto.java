@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.dto.response;
 
-import com.sprint.mission.discodeit.domain.ChannelType;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import lombok.Getter;
 import lombok.Setter;
 

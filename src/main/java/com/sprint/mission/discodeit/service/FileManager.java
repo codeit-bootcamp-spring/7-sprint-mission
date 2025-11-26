@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.domain.BinaryContent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.UUID;
 
 @Service
@@ -19,14 +17,12 @@ public class FileManager {
     private final Path rootDir = Paths.get("data/uploads"); // 루트 폴더
 
 
-    public Path put(UUID userId, MultipartFile file) {
+    public Path put(UUID userId, MultipartFile file, String fileName) {
         String contentType = file.getContentType();
         validateContentType(contentType);
-        Path userFolder = getUserFolder(userId);
 
-        String filePath =
-                makeFileName(file.getOriginalFilename() == null ? file.getContentType() : file.getOriginalFilename());
-        Path profilePath = userFolder.resolve(filePath);
+        Path userFolder = getUserFolder(userId);
+        Path profilePath = userFolder.resolve(fileName);
 
         try {
             Files.deleteIfExists(profilePath);
@@ -37,8 +33,7 @@ public class FileManager {
         return profilePath;
     }
 
-    public void delete(BinaryContent content) {
-        Path filePath = Paths.get(content.getFilePath());
+    public void delete(Path filePath) {
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
@@ -68,12 +63,7 @@ public class FileManager {
 
 
 
-    private String makeFileName(String originalName) {
-        int pos = originalName.lastIndexOf(".");
-        String Ext = originalName.substring(pos + 1);
-        String uuid = UUID.randomUUID().toString();
-        return uuid + "." + Ext;
-    }
+
 
 //    public Resource getImageFile(String id) {
 //        BinaryContent content = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));

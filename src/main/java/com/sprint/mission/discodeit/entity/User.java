@@ -1,44 +1,47 @@
-package com.sprint.mission.discodeit.domain;
+package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.domain.exception.ErrorType;
-import com.sprint.mission.discodeit.domain.exception.ValidationException;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.exception.ErrorType;
+import com.sprint.mission.discodeit.entity.exception.ValidationException;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.Instant;
-import java.util.UUID;
 
+@Entity
 @Getter
-@ToString
-@NoArgsConstructor
 @Setter
-public class User {
-
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-
+@NoArgsConstructor
+@Table(name = "users")
+public class User extends BaseUpdatableEntity {
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
+
+    @Column(nullable = false, length = 50)
     private String password;
+
+    @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    private String profileId;
+    @Column( name = "last_active_at")
     private Instant lastActiveAt;
+
+    @OneToOne
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
+
 
 
     public User(String email, String password, String username) {
         validateEmail(email);
         validatePassword(password);
         validateUsername(username);
-
-
         this.username = username;
         this.password = password;
         this.email = email;
-        this.lastActiveAt=Instant.now();
-        this.updatedAt=Instant.now();
+
     }
 
 
@@ -82,5 +85,4 @@ public class User {
             throw new ValidationException(ErrorType.INVALID_USERNAME);
         }
     }
-
 }

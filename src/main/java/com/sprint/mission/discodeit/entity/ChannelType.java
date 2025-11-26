@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain;
+package com.sprint.mission.discodeit.entity;
 
 public enum ChannelType {
     PUBLIC, PRIVATE

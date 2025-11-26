@@ -40,7 +40,7 @@ public class MessageController {
 
     @GetMapping
     public List<MessageDto> getAllMessageByChannelId(@RequestParam UUID channelId) {
-        return messageService.getAllMessage(channelId);
+        return messageService.getAllByChannelId(channelId);
     }
 
 

@@ -13,6 +13,7 @@ public class UserDto {
     private String username;
     private String email;
     private BinaryContentDto profile;
+    //
     private boolean online;
 
 }

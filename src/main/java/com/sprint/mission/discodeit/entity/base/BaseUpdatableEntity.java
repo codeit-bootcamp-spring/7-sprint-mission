@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.base;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -14,7 +13,7 @@ import java.time.Instant;
 @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class BaseUpdatableEntity extends BaseEntity{
+public abstract class BaseUpdatableEntity extends BaseEntity {
 
     @LastModifiedDate
     private Instant updatedAt;

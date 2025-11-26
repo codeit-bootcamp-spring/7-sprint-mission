@@ -1,15 +1,13 @@
 package com.sprint.mission.discodeit.service.mapper;
 
-import com.sprint.mission.discodeit.domain.Message;
-import com.sprint.mission.discodeit.entity.MessageEntity;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.dto.response.MessageDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface MessageMapper {
-    Message toMessage(MessageEntity messageEntity);
 
-    MessageEntity toMessageEntity(Message message);
-
-    MessageDto toMessageDto(MessageEntity messageEntity);
+    @Mapping(source = "channel.id", target = "channelId")
+    MessageDto toDto(Message message);
 }
