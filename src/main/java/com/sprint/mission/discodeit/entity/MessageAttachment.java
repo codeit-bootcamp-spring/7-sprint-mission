@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
+
 @Getter
 @Table(name = "message_attachments")
 public class MessageAttachment extends BaseEntity {
@@ -29,5 +29,12 @@ public class MessageAttachment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "attachment_id", foreignKey = @ForeignKey(name = "message_attachments_attachment_id_fk"))
     private BinaryContent attachment;
+
+
+    public MessageAttachment(Message message, BinaryContent attachment) {
+        this.message = message;
+        this.attachment = attachment;
+    }
+
 
 }

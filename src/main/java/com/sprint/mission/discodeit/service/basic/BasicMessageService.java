@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.MessageAttachment;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.content.BinaryContent;
 import com.sprint.mission.discodeit.entity.content.ContentsType;
@@ -45,8 +46,6 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("유저UUID가 없어 :" + request.authorId());
         }
 
-        List<BinaryContent> binaryContents = makeBinaryContent(binaryContentCreateRequests);
-
 
         User author = userRepository.getReferenceById(request.authorId());
         Channel channel = channelRepository.getReferenceById(request.channelId());
@@ -54,9 +53,16 @@ public class BasicMessageService implements MessageService {
         Message message = new Message(
                 author,
                 channel,
-                request.content(),
-                binaryContents
+                request.content()
         );
+
+        if (binaryContentCreateRequests.isEmpty()) {
+            List<BinaryContent> binaryContents = makeBinaryContent(binaryContentCreateRequests);
+            binaryRepository.saveAll(binaryContents);
+            for (BinaryContent bc : binaryContents) {
+                message.addAttachment(bc);
+            }
+        }
 
         return messageRepository.save(message);
     }
@@ -96,11 +102,6 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("메시지 아이디가 없어: " + messageId));
 
-        List<BinaryContent> attachments = new ArrayList<>(message.getAttachments());
-
-        if (!attachments.isEmpty()) {
-            binaryRepository.deleteAll(attachments);
-        }
         messageRepository.deleteById(messageId);
     }
 

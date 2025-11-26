@@ -33,14 +33,14 @@ public class Channel extends BaseUpdateEntity {
 
 
     public void update(String newName, String newDescription) {
-        boolean anyValueUpdated = false;
+
         if (newName != null && !newName.equals(this.name)) {
             this.name = newName;
-            anyValueUpdated = true;
+
         }
         if (newDescription != null && !newDescription.equals(this.description)) {
             this.description = newDescription;
-            anyValueUpdated = true;
+
         }
 
     }

@@ -21,8 +21,6 @@ public class User extends BaseUpdateEntity {
     @Column(name = "password", length = 60, nullable = false)
     private String password;
 
-    // private UUID profileId;
-    //널러블이 디폴트여도  하나있고 없어도된다는 표현을 하고싶었다
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_users_profile"), unique = true, nullable = true)

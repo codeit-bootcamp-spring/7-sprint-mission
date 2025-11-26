@@ -29,10 +29,6 @@ import java.util.UUID;
 public class ReadStatus extends BaseUpdateEntity {
 
 
-    //
-    // private final UUID userId;
-    //  private final UUID channelId;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "read_status_user_id_fk"), nullable = false)
     private User user;
@@ -43,13 +39,6 @@ public class ReadStatus extends BaseUpdateEntity {
 
     @Column(name = "last_read_at", nullable = false)
     private Instant lastReadAt;
-
-/*    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        //
-        this.userId = userId;
-        this.channelId = channelId;
-        this.lastReadAt = lastReadAt;
-    }*/
 
 
     public void update(Instant newLastReadAt) {

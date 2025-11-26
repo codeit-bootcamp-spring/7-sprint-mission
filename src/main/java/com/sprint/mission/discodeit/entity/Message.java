@@ -32,24 +32,21 @@ public class Message extends BaseUpdateEntity {
 
 
     @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<BinaryContent> attachments = new ArrayList<>();
+    private final List<MessageAttachment> attachments = new ArrayList<>();
 
 
-    public Message(User author, Channel channel, String content, List<BinaryContent> attachments) {
+    public Message(User author, Channel channel, String content) {
         this.author = author;
         this.content = content;
         this.channel = channel;
 
-        if (attachments != null) {
-            attachments.forEach(this::addAttachment);
-        }
     }
 
     public void update(String newContent) {
-        boolean anyValueUpdated = false;
+
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
-            anyValueUpdated = true;
+
         }
 
 
@@ -59,7 +56,12 @@ public class Message extends BaseUpdateEntity {
    /* public void addAttachmentId(UUID attachmentId) {
         this.attachmentIds.add(attachmentId);
     }*/
-    public void addAttachment(BinaryContent file) {
-        this.attachments.add(file);
+    public void addAttachment(BinaryContent content) {
+        MessageAttachment ma = new MessageAttachment(this, content);
+        attachments.add(ma);
+    }
+
+    public void removeAttachment(BinaryContent content) {
+        attachments.removeIf(ma -> ma.getAttachment().equals(content));
     }
 }
