@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.binaryContent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.mapStruct.BinaryStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -21,7 +21,6 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentStorage binaryContentStorage;
 
     @Override
@@ -34,7 +33,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .build();
         binaryContentRepository.save(binaryContent);
         binaryContentStorage.put(binaryContent.getId(),binaryContentCreateRequestDto.getBytes());
-        return binaryContentMapper.toDto(binaryContent);
+        return BinaryStruct.INSTANCE.toDto(binaryContent);
 
 
     }
@@ -77,7 +76,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public ResponseEntity<?> downloadFile(UUID binaryContentId) throws IOException {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow();
-        BinaryContentDto binaryContentDto = binaryContentMapper.toDto(binaryContent);
+        BinaryContentDto binaryContentDto = BinaryStruct.INSTANCE.toDto(binaryContent);
         return binaryContentStorage.download(binaryContentDto);
 
     }

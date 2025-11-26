@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.mapper.mapStruct.BinaryStruct;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.subTable.MessageAttachment;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MessageMapper {
 
-    private final BinaryContentMapper binaryContentMapper;
     private final UserMapper userMapper;
     private final MessageAttachmentRepository messageAttachmentRepository;
 
@@ -22,7 +22,7 @@ public class MessageMapper {
 
         List<MessageAttachment> messageAttachmentList = message.getMessageAttachment();
         List<BinaryContentDto> binaryContentDtos = message.getAttachments()==null?List.of():messageAttachmentList.stream()
-                .map(x-> binaryContentMapper.toDto(x.getBinaryContent())
+                .map(x-> BinaryStruct.INSTANCE.toDto(x.getBinaryContent())
         ).toList();
 
         return new MessageDto(

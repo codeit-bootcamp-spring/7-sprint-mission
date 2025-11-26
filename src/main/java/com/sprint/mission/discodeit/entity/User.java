@@ -27,7 +27,7 @@ public class User extends BaseUpdatableEntity implements Serializable {
     @Column(name = "password",length = 60,nullable = false)
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private BinaryContent profile;

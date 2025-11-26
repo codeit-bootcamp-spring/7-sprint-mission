@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.mapStruct.BinaryStruct;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,12 +15,11 @@ import java.util.stream.Stream;
 @Component
 @RequiredArgsConstructor
 public class UserMapper {
-    private final BinaryContentMapper binaryContentMapper;
     private final UserRepository userRepository;
 
 
     public UserDto toDto(User user){
-        BinaryContentDto binaryContentDto = user.getProfile()==null ?null:binaryContentMapper.toDto(user.getProfile());
+        BinaryContentDto binaryContentDto = user.getProfile()==null ?null:BinaryStruct.INSTANCE.toDto(user.getProfile());
         UUID binaryContentId = binaryContentDto==null?null:binaryContentDto.id();
         return new UserDto(
                 user.getId(),

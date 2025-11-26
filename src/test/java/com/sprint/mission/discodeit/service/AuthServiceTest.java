@@ -51,16 +51,8 @@ class AuthServiceTest {
     @DisplayName("[예외 케이스] DB에 없는 유저 로그인")
     void checkLoginNotValidUser() throws IOException {
 
-        //given
-        UserCreateRequestDto userCreateRequestDto = fixture.userCreateFactory();
-        UserDto user = userService.createUser(userCreateRequestDto, null);
-
-        //when
-        LoginResponseDto loginResponseDto = authService.checkLoginUser(new LoginRequestDto(
-                        userCreateRequestDto.username(), userCreateRequestDto.password()
-                )
-        );
-        //then
+        assertThrows(IllegalArgumentException.class, () -> authService.checkLoginUser(new LoginRequestDto("notValidUser"
+                , "notValidPassword")));
 
     }
 }
