@@ -19,9 +19,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 @Getter @ToString
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class) // 날짜 찍어줌. 시간 기록 비서 @CreatedDate
 public abstract class BaseEntity {
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 

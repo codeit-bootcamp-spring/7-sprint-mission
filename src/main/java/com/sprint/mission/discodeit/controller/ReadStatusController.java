@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.swaggerDocs.ReadStatusDoc;
 import com.sprint.mission.discodeit.dto.ReadStatusCteateRequest;
 import com.sprint.mission.discodeit.dto.Dto_ReadStatusUpdate;
-import com.sprint.mission.discodeit.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.mapper.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.service.basic.ReadStatusService;
 import jakarta.validation.Valid;
 import java.util.List;

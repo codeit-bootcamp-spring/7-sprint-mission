@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 
 import java.util.UUID;

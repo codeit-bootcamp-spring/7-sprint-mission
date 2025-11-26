@@ -1,14 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 
-@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter @Setter
 @Entity
 @Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
@@ -24,6 +28,6 @@ public class BinaryContent extends BaseEntity {
     @Column(name = "content_type", nullable = false, length = 100)
     private String contentType;
 
-    @Column(name = "bytes", nullable = false)
-    private byte[] bytes;
+//    @Column(name = "bytes", nullable = false)
+//    private byte[] bytes;
 }

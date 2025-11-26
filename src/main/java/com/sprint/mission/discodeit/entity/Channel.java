@@ -1,23 +1,21 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.dto.Dto_CreateChannelPrivate;
-import com.sprint.mission.discodeit.dto.Dto_CreateChannelPublic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.time.Instant;
+import lombok.Setter;
 
 import static com.sprint.mission.discodeit.entity.ChannelType.PRIVATE;
 import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 
-@Getter
+@Getter @Setter
 @Entity
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity {
@@ -30,4 +28,8 @@ public class Channel extends BaseUpdatableEntity {
 
     @Column(name = "description", length = 500)
     private String description;
+
+    public Channel(ChannelType channelType, @NotNull String name, @NotNull String description) {
+        super();
+    }
 }

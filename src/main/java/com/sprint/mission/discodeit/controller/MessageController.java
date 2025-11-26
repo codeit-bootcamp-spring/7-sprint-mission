@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.common.Util;
+import com.sprint.mission.discodeit.mapper.dto.MessageDto;
 import com.sprint.mission.discodeit.swaggerDocs.MessageDoc;
 import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.Res_Message;
 import com.sprint.mission.discodeit.service.basic.MessageService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -35,11 +35,12 @@ public class MessageController implements MessageDoc {
     private final MessageService messageService;
 
     @GetMapping
-    public ResponseEntity<List<Res_Message>> findAllByChannelId(
+    public ResponseEntity<List<MessageDto>> findAllByChannelId(
         @RequestParam("channelId") UUID channelID) {
+
         //💎♨️Channel의 Message 목록 조회
-        List<Res_Message> allByChannleId
-            = messageService.findAllByChannelId(channelID);
+
+        List<MessageDto> allByChannleId = messageService.findAllByChannelId(channelID);
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -47,15 +48,14 @@ public class MessageController implements MessageDoc {
     }
 
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<Res_Message> create(
+    public ResponseEntity<MessageDto> create(
         @Valid @RequestPart("messageCreateRequest") MessageCreateRequest dtoMessage,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList) {
 
         //💎Message 생성
         List<Dto_BinaryContent> collect = Util.parsingMultipartFileList(fileList);
 
-        Res_Message resMessage
-            = messageService.create(dtoMessage, Optional.ofNullable(collect));
+        MessageDto resMessage = messageService.create(dtoMessage, Optional.ofNullable(collect));
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -74,12 +74,12 @@ public class MessageController implements MessageDoc {
     }
 
     @PatchMapping("/{messageId}")
-    public ResponseEntity<Res_Message> updateMessage(
+    public ResponseEntity<MessageDto> updateMessage(
         @PathVariable("messageId") UUID messageId,
         @Valid @RequestBody Dto_MessageUpdate requestDto) {
+
         //💎Message 내용 수정
-        Res_Message resMessage
-            = messageService.updateMessage(messageId, requestDto);
+        MessageDto resMessage = messageService.updateMessage(messageId, requestDto);
 
         return ResponseEntity
             .status(HttpStatus.OK)

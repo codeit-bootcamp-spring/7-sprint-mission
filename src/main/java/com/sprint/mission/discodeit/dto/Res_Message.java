@@ -23,9 +23,9 @@ public record Res_Message( //all private final
             message.getCreatedAt(),
             message.getUpdatedAt(),
             message.getContent(),
-            message.getChannelId(),
-            message.getAuthorId(),
-            message.getAttachments()
+            message.getChannel().getId(),
+            message.getAuthor().getId(),
+            message.getAttachments().stream().map(attachment -> attachment.getId()).toList()
         );
     }
 }

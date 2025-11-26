@@ -1,20 +1,21 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.dto.Dto_ReadStatusUpdate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Setter;
 
-@Getter
+@Getter @Setter
+@AllArgsConstructor
 @Entity
 @Table(name = "read_statuses")
 public class ReadStatus extends BaseUpdatableEntity {

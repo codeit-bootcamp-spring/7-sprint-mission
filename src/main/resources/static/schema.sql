@@ -42,6 +42,7 @@ CREATE TABLE users(
 	CONSTRAINT users_pk PRIMARY KEY (id),
 	CONSTRAINT users_username_uk UNIQUE (username),
 	CONSTRAINT users_email_uk UNIQUE (email),
+    CONSTRAINT users_profile_id_uk UNIQUE (profile_id),
 	CONSTRAINT users_profile_id_fk FOREIGN KEY (profile_id) REFERENCES public.binary_contents(id) ON DELETE SET NULL
 );
 

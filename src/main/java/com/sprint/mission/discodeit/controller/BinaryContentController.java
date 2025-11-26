@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.swaggerDocs.BinaryContentDoc;
-import com.sprint.mission.discodeit.dto.Res_BinaryContent;
 import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +23,10 @@ public class BinaryContentController implements BinaryContentDoc {
 
     //💎 여러 첨부 파일 조회
     @GetMapping
-    public ResponseEntity<List<Res_BinaryContent>> find(
+    public ResponseEntity<List<BinaryContentDto>> find(
         @RequestBody UUID[] binaryContentIds) {
 
-        List<Res_BinaryContent> arrayList
+        List<BinaryContentDto> arrayList
             = new ArrayList<>(binaryContentService.findAllByIdIn(binaryContentIds));
 
         return ResponseEntity
@@ -36,14 +36,26 @@ public class BinaryContentController implements BinaryContentDoc {
 
     //💎 첨부 파일 조회
     @GetMapping("/{binaryContentId}")
-    public ResponseEntity<Res_BinaryContent> find(
+    public ResponseEntity<BinaryContentDto> find(
         @PathVariable("binaryContentId") UUID binaryContentId) {
 
-        Res_BinaryContent resBinaryContent
+        BinaryContentDto resBinaryContent
             = binaryContentService.find(binaryContentId);
 
         return ResponseEntity
               .status(HttpStatus.OK)
               .body(resBinaryContent);
+    }
+
+    //💎🌱 파일 다운로드
+    @GetMapping("/{binaryContentId}/download")
+    public ResponseEntity<BinaryContentDto> download(
+        @PathVariable("binaryContentId") UUID binaryContentId) {
+
+        binaryContentService.download(binaryContentId);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .build();
     }
 }

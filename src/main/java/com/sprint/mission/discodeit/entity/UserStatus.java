@@ -4,15 +4,16 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
-@Getter
+@AllArgsConstructor
+@Getter @Setter
 @Entity
 @Table(name = "user_statuses")
 public class UserStatus extends BaseUpdatableEntity {
@@ -25,4 +26,17 @@ public class UserStatus extends BaseUpdatableEntity {
 
     @Column(name = "last_active_at", nullable = false)
     private Instant lastActiveAt;
+
+    public boolean isOnline() {
+        //[ ] 마지막 접속 시간을 기준으로 현재 로그인한 유저로 판단할 수 있는 메소드를 정의하세요.
+        // 마지막 접속 시간이 현재 시간으로부터 5분 이내이면 현재 접속 중인 유저로 간주합니다.
+        Duration duration = Duration.between(this.getUpdatedAt(), Instant.now());
+        return duration.toMinutes() < 5;
+    }
+
+    // 연관관계 편의 메서드(양방향일 경우. 필요하면)
+    public void changeUser(User user) {
+        this.user = user;
+        user.setStatus(this);
+    }
 }

@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.mapper.dto.ChannelDto;
 import com.sprint.mission.discodeit.swaggerDocs.ChannelDoc;
 import com.sprint.mission.discodeit.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.dto.Dto_CreateChannelPrivate;
-import com.sprint.mission.discodeit.dto.Dto_CreateChannelPublic;
-import com.sprint.mission.discodeit.dto.Res_Channel;
-import com.sprint.mission.discodeit.dto.Res_ChannelFind;
+import com.sprint.mission.discodeit.mapper.dto.Dto_CreateChannelPrivate;
+import com.sprint.mission.discodeit.mapper.dto.Dto_CreateChannelPublic;
 import com.sprint.mission.discodeit.service.basic.ChannelService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -33,11 +32,10 @@ public class ChannelController implements ChannelDoc {
 
     //💎Public Channel 생성
     @PostMapping("/public")
-    public ResponseEntity<Res_Channel> createPublic(
+    public ResponseEntity<ChannelDto> createPublic(
         @Valid @RequestBody Dto_CreateChannelPublic dtoCreateChannel) {
 
-        Res_Channel aPublic
-            = channelService.createPublic(dtoCreateChannel);
+        ChannelDto aPublic = channelService.createPublic(dtoCreateChannel);
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -46,11 +44,10 @@ public class ChannelController implements ChannelDoc {
 
     //💎Private Channel 생성
     @PostMapping("/private")
-    public ResponseEntity<Res_Channel> createPrivate(
+    public ResponseEntity<ChannelDto> createPrivate(
         @Valid @RequestBody Dto_CreateChannelPrivate dtoCreateChannel) {
 
-        Res_Channel channel
-            = channelService.createPrivate(dtoCreateChannel);
+        ChannelDto channel  = channelService.createPrivate(dtoCreateChannel);
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -71,12 +68,11 @@ public class ChannelController implements ChannelDoc {
 
     //💎Channel 정보 수정
     @PatchMapping("/{channelId}")
-    public ResponseEntity<Res_Channel> update(
+    public ResponseEntity<ChannelDto> update(
         @PathVariable("channelId") UUID channelId,
         @Valid @RequestBody ChannelDto_Update channelDtoUpdate) {
 
-        Res_Channel resChannel
-            = channelService.update(channelId, channelDtoUpdate);
+        ChannelDto resChannel  = channelService.update(channelId, channelDtoUpdate);
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -85,11 +81,10 @@ public class ChannelController implements ChannelDoc {
 
     //💎User가 참여 중인 Channel 목록 조회
     @GetMapping
-    public ResponseEntity<List<Res_ChannelFind>> findAllByUserId(
+    public ResponseEntity<List<ChannelDto>> findAllByUserId(
         @RequestParam("userId") UUID userId) {
 
-        List<Res_ChannelFind> allByUserId
-            = channelService.findAllByUserId(userId);
+        List<ChannelDto> allByUserId  = channelService.findAllByUserId(userId);
 
         return ResponseEntity
             .status(HttpStatus.OK)

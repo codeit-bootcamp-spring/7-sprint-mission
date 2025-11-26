@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.swaggerDocs.AuthDoc;
 import com.sprint.mission.discodeit.dto.AuthServiceDto;
-import com.sprint.mission.discodeit.dto.Res_UserLogin;
 import com.sprint.mission.discodeit.service.basic.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +24,14 @@ public class AuthController implements AuthDoc {
 //👍- http://localhost:8000/board/1                   : @PathVariable
 
     @PostMapping(value = "/login")
-    public ResponseEntity<Res_UserLogin> login(
+    public ResponseEntity<UserDto> login(
         @Valid @RequestBody AuthServiceDto authServiceDto) {
        //💎로그인
-        Res_UserLogin resUserLogin
+        UserDto userDto
             = authService.login(authServiceDto);
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(resUserLogin);
+            .body(userDto);
     }
 }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.swaggerDocs;
 import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Res_Message;
+import com.sprint.mission.discodeit.mapper.dto.MessageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,12 +33,12 @@ public interface MessageDoc {
             responseCode = "200",
             description = "Message 목록 조회 성공",
             content = @Content(
-                schema = @Schema(implementation = Res_Message.class, type = "array")
+                schema = @Schema(implementation = MessageDto.class, type = "array")
             )
         )
     })
 
-    ResponseEntity<List<Res_Message>> findAllByChannelId(
+    ResponseEntity<List<MessageDto>> findAllByChannelId(
         @Parameter(description = "조회할 Channel ID") @RequestParam("channelId") UUID channelID);
     /**
      * POST /api/messages - Message 생성 (첨부 파일 포함)
@@ -51,7 +52,7 @@ public interface MessageDoc {
             responseCode = "201",
             description = "Message가 성공적으로 생성됨",
             content = @Content(
-                schema = @Schema(implementation = Res_Message.class)
+                schema = @Schema(implementation = MessageDto.class)
             )
         ),
         @ApiResponse(
@@ -62,7 +63,7 @@ public interface MessageDoc {
             )
         )
     })
-    ResponseEntity<Res_Message> create(
+    ResponseEntity<MessageDto> create(
         @Parameter(description = "Message 생성 정보 (JSON)") @RequestPart(value = "messageCreateRequest") MessageCreateRequest dtoMessage,
         @Parameter(description = "첨부 파일 목록 (선택 사항)") @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList);
 
@@ -97,7 +98,7 @@ public interface MessageDoc {
             responseCode = "200",
             description = "Message가 성공적으로 수정됨",
             content = @Content(
-                schema = @Schema(implementation = Res_Message.class)
+                schema = @Schema(implementation = MessageDto.class)
             )
         ),
         @ApiResponse(
@@ -108,7 +109,7 @@ public interface MessageDoc {
             )
         )
     })
-    ResponseEntity<Res_Message> updateMessage(
+    ResponseEntity<MessageDto> updateMessage(
         @Parameter(description = "수정할 Message ID") @PathVariable("messageId") UUID messageId,
         @RequestBody Dto_MessageUpdate requestDto);
 }

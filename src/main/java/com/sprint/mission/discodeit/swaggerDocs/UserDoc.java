@@ -3,9 +3,8 @@ package com.sprint.mission.discodeit.swaggerDocs;
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.Dto_UserStatusUpdate;
 import com.sprint.mission.discodeit.dto.Dto_UserUpdate;
-import com.sprint.mission.discodeit.dto.Res_User;
-import com.sprint.mission.discodeit.dto.Res_UserUpdate;
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.mapper.dto.UserStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -52,7 +51,7 @@ public interface UserDoc {
             responseCode = "201",
             description = "User가 성공적으로 생성됨",
             content = @Content(
-                schema = @Schema(implementation = Res_User.class)
+                schema = @Schema(implementation = UserDto.class)
             )
         ),
         @ApiResponse(
@@ -63,7 +62,7 @@ public interface UserDoc {
             )
         )
     })
-    ResponseEntity<Res_User> create(
+    ResponseEntity<UserDto> create(
         @Parameter(description = "User 생성 정보 (JSON)") @RequestPart(value = "userCreateRequest") UserCreateRequest dtoUser,
         @Parameter(description = "User 프로필 이미지") @RequestPart(value = "profile", required = false) MultipartFile file);
 
@@ -101,7 +100,7 @@ public interface UserDoc {
             responseCode = "200",
             description = "User 정보가 성공적으로 수정됨",
             content = @Content(
-                schema = @Schema(implementation = Res_User.class)
+                schema = @Schema(implementation = UserDto.class)
             )
         ),
         @ApiResponse(
@@ -119,7 +118,7 @@ public interface UserDoc {
             )
         )
     })
-    ResponseEntity<Res_User> update(
+    ResponseEntity<UserDto> update(
         @Parameter(description = "수정할 User ID") @PathVariable("userId") UUID userId,
         @Parameter(description = "User 업데이트 정보 (JSON)") @RequestPart(value = "userUpdateRequest") Dto_UserUpdate dtoUser,
         @Parameter(description = "새로운 프로필 이미지 파일 (선택 사항)") @RequestPart(value = "profile", required = false) MultipartFile file);
@@ -134,7 +133,7 @@ public interface UserDoc {
             responseCode = "200",
             description = "User 온라인 상태가 성공적으로 업데이트됨",
             content = @Content(
-                schema = @Schema(implementation = Res_UserUpdate.class)
+                schema = @Schema(implementation = UserDto.class)
             )
         ),
         @ApiResponse(
@@ -145,7 +144,7 @@ public interface UserDoc {
             )
         )
     })
-    ResponseEntity<Res_UserUpdate> updateUserStatus(
+    ResponseEntity<UserStatusDto> updateUserStatus(
         @Parameter(description = "상태를 변경할 User ID") @PathVariable("userId") UUID userId,
         @org.springframework.web.bind.annotation.RequestBody Dto_UserStatusUpdate userStatusUpdate);
 }

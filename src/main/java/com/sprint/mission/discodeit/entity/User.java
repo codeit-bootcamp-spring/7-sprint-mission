@@ -9,9 +9,10 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
-@Getter
+@Getter @Setter
 @Entity
 @Table(name = "users")
 public class User extends BaseUpdatableEntity {
@@ -28,7 +29,8 @@ public class User extends BaseUpdatableEntity {
     @JoinColumn(name = "profile_id") // nullable = true
     private BinaryContent profile;
 
+    @Setter
     @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.REMOVE) // ON DELETE CASCADE
-    @JoinColumn(name = "status_id")
     private UserStatus status;
+
 }
