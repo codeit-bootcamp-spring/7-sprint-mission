@@ -8,12 +8,14 @@ import lombok.Getter;
 import java.time.Instant;
 import java.util.UUID;
 
-@AllArgsConstructor
-@Getter
-public class UserStatusCreateRequestDto {
 
-   @NotNull(message = "UserStatus userId")
-    private UUID userId;
+public record UserStatusCreateRequestDto(
 
-    private Instant lastOnlineTime;
+        @NotNull(message = "UserStatus userId")
+        UUID userId,
+
+        Instant lastOnlineTime
+) {
+
+
 }

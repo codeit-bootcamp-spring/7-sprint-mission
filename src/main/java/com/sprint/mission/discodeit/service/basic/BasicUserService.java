@@ -110,6 +110,7 @@ public class BasicUserService implements UserService {
             BinaryContent tmpBinaryContent = binaryContentRepository.save(
                     new BinaryContent(profile.getName(), profile.getContentType(), profile.getSize())
             );
+            binaryContentStorage.put(tmpBinaryContent.getId(),profile.getBytes());
             user.setProfile(tmpBinaryContent);
         }
         userRepository.save(user);

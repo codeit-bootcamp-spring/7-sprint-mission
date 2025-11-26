@@ -32,7 +32,7 @@ public class BinaryContent extends BaseEntity implements Serializable {
     @Column(name = "size",nullable = false,columnDefinition = "bigint")
     private Long size;
 
-    @OneToMany( mappedBy = "binaryContent",fetch = FetchType.LAZY)
+    @OneToMany( mappedBy = "binaryContent",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<MessageAttachment> messageAttachment;
 
     public BinaryContent(String fileName, String contentType, Long size){

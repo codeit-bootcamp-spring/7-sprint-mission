@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.docs.ReadStatusControllerDocs;
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusPatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.readStatus.ReadStatusDto;
@@ -17,12 +16,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/readStatuses")
 @RequiredArgsConstructor
-public class ReadStatusController implements ReadStatusControllerDocs {
+public class ReadStatusController {
 
     private final ReadStatusService readStatusService;
 
     @PostMapping( "")
-    @Override
     public ResponseEntity<ReadStatusDto> createReadStatus(@Valid @RequestBody ReadStatusCreateRequestDto dto){
 
         return new ResponseEntity<ReadStatusDto>(readStatusService.createReadStatus(
@@ -31,13 +29,11 @@ public class ReadStatusController implements ReadStatusControllerDocs {
     }
 
     @GetMapping("")
-    @Override
     public ResponseEntity<List<ReadStatusDto>> readReadStatus(@RequestParam UUID userId){
         return new ResponseEntity<List<ReadStatusDto>>(readStatusService.findAllyByUserId(userId), HttpStatus.OK);
     }
 
     @PatchMapping("/{readStatusId}")
-    @Override
     public ResponseEntity<ReadStatusDto> patchReadStatus(@PathVariable UUID readStatusId, @Valid @RequestBody ReadStatusPatchRequestDto dto)
     {
      return new ResponseEntity<>(readStatusService.patchReadStatus(readStatusId, dto), HttpStatus.OK);

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.docs.ChannelControllerDocs;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateRequestDto;
@@ -19,51 +18,44 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
-public class ChannelController implements ChannelControllerDocs {
+public class ChannelController {
 
     private final ChannelService channelService;
     private final ReadStatusService readStatusService;
 
     @PostMapping( "/private")
-    @Override
     public ResponseEntity<ChannelDto> createPrivateChannel(@Valid @RequestBody ChannelPrivateCreateRequestDto dto){
        ;
         return new ResponseEntity<>(channelService.createPrivateChannel(dto), HttpStatus.CREATED);
     }
 
     @PostMapping( "/public")
-    @Override
     public ResponseEntity<ChannelDto> createPublicChannel(@Valid @RequestBody ChannelPublicCreateRequestDto dto){
        return new ResponseEntity<>(channelService.createPublicChannel(dto), HttpStatus.CREATED);
     }
 
 
     @DeleteMapping( "/{channelId}")
-    @Override
     public void deleteChannel(@PathVariable UUID channelId){
         channelService.deleteChannel(channelId);
     }
 
     @GetMapping( "")
-    @Override
     public ResponseEntity<List<ChannelDto>> readChannelById(@RequestParam UUID userId){
         return new ResponseEntity<>(channelService.findAllByUserId(userId),HttpStatus.OK);
     }
 
     @PatchMapping( "/{channelId}")
-    @Override
     public ResponseEntity<ChannelDto> patchChannel(@PathVariable UUID channelId, @Valid @RequestBody ChannelPatchRequestDto dto){
         return new ResponseEntity<>(channelService.patchChannel(dto,channelId),HttpStatus.OK);
     }
 
     @PostMapping("/reset")
-    @Override
     public void reset(){
         channelService.resetChannelRepository();
     }
 
     @GetMapping("/all")
-    @Override
     public ResponseEntity<List<ChannelDto>> readAll(){
         return new ResponseEntity<>(channelService.readAllChannel(),HttpStatus.OK);
     }

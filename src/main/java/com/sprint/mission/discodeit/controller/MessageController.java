@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.docs.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.PageResponseDto;
-import com.sprint.mission.discodeit.dto.response.PageResponseDtoBasic;
 import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -24,13 +22,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
-public class MessageController implements MessageControllerDocs {
+public class MessageController {
 
     private final MessageService messageService;
     private final ChannelService channelService;
 
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Override
     public ResponseEntity<MessageDto> createMessage(@Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
                                                     @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) throws IOException {
@@ -38,22 +35,15 @@ public class MessageController implements MessageControllerDocs {
     }
 
     @PatchMapping("/{messageId}")
-    @Override
     public ResponseEntity<MessageDto> patchMessage(@PathVariable UUID messageId, @Valid @RequestBody MessagePatchRequestDto dto){
         MessageDto mRRDto = messageService.patchMessage(dto, messageId);
         return new ResponseEntity<>(mRRDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{messageId}")
-    @Override
     public void deleteMessage(@PathVariable UUID messageId){
         messageService.deleteMessage(messageId);
     }
-
-//    @GetMapping("")
-//    public ResponseEntity<PageResponseDtoBasic<MessageDto>> readChannelMessage(@RequestParam UUID channelId, @RequestParam (required = false)Pageable pageable){
-//        return new ResponseEntity<>( messageService.findallByChannelId(channelId,pageable), HttpStatus.OK);
-//    }
 
     @GetMapping("")
     public ResponseEntity<PageResponseDto<MessageDto>> readChannelMessage(
@@ -63,13 +53,11 @@ public class MessageController implements MessageControllerDocs {
         return new ResponseEntity<>( messageService.findallByChannelIdWithCursor(channelId,cursor,pageable), HttpStatus.OK);
     }
     @PostMapping( "/reset")
-    @Override
     public void reset(){
         messageService.resetMessage();
     }
 
     @GetMapping("/all")
-    @Override
     public ResponseEntity<List<MessageDto>> readAll(){
         return new ResponseEntity<>(messageService.readAllMessage(), HttpStatus.OK);
     }

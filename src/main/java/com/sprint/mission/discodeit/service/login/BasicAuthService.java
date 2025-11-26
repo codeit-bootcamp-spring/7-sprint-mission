@@ -17,8 +17,8 @@ public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     @Override
     public LoginResponseDto checkLoginUser(LoginRequestDto loginRequestDto) {
-        String userName = loginRequestDto.getUsername();
-        String password = loginRequestDto.getPassword();
+        String userName = loginRequestDto.username();
+        String password = loginRequestDto.password();
         List<User> userList = userRepository.findAll();
         Optional<User> optionalUser = userList.stream().filter(x -> x.getUserName().equals(userName) && x.getPassword().equals(password)).findFirst();
         User existUser = optionalUser.orElseThrow(IllegalArgumentException::new);

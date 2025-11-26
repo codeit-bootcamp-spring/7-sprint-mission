@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.docs.BinaryContentControllerDocs;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -16,18 +15,16 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
-public class BinaryContentController implements BinaryContentControllerDocs {
+public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
     @GetMapping( "/{binaryContentId}")
-    @Override
     public ResponseEntity<BinaryContentDto> read(@PathVariable UUID binaryContentId){
         return new ResponseEntity<>(binaryContentService.find(binaryContentId), HttpStatus.OK);
     }
 
     @GetMapping("")
-    @Override
     public ResponseEntity<List<BinaryContentDto>> readByIdList(@RequestParam List<UUID> binaryContentIds){
         return new ResponseEntity<>(binaryContentService.findAllByIdIn(binaryContentIds), HttpStatus.OK);
     }

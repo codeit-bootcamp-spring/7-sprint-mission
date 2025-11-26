@@ -37,9 +37,9 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     @Transactional
     public UserStatusDto createUserStatus(UserStatusCreateRequestDto userStatusCreateRequestDto) {
-       User targetUser = userRepository.findById(userStatusCreateRequestDto.getUserId()).orElseThrow(()->new IllegalArgumentException("존재하지 않는 User 입니다."));
+       User targetUser = userRepository.findById(userStatusCreateRequestDto.userId()).orElseThrow(()->new IllegalArgumentException("존재하지 않는 User 입니다."));
 
-        UserStatus userStatus = new UserStatus(targetUser,userStatusCreateRequestDto.getLastOnlineTime());
+        UserStatus userStatus = new UserStatus(targetUser,userStatusCreateRequestDto.lastOnlineTime());
 
         return userStatusMapper.toDto(userStatusRepository.save(userStatus));
 

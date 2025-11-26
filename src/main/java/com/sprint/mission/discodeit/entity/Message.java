@@ -25,7 +25,7 @@ public class Message extends BaseUpdatableEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private User author;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Channel channel;
