@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.converter.UserStatusDtoConverter;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.dto.userstatus.request.CreateUserStatusRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.request.UpdateUserStatusRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.response.UserStatusResponseDto;
@@ -25,6 +25,8 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+
+    private final UserStatusMapper userStatusMapper;
 
     @Override
     @Transactional
@@ -59,7 +61,7 @@ public class BasicUserStatusService implements UserStatusService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
         userStatus.update(newLastActiveAt);
         userStatusRepository.save(userStatus);
-        return toDto(userStatus);
+        return userStatusMapper.toResponseDto(userStatus);
     }
 
     @Override
@@ -71,7 +73,7 @@ public class BasicUserStatusService implements UserStatusService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
         userStatus.update(newLastActiveAt);
         userStatusRepository.save(userStatus);
-        return toDto(userStatus);
+        return userStatusMapper.toResponseDto(userStatus);
     }
 
     @Override
@@ -81,9 +83,5 @@ public class BasicUserStatusService implements UserStatusService {
                 .orElseThrow(() ->  new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
 
         userStatusRepository.deleteById(userStatusId);
-    }
-
-    private UserStatusResponseDto toDto(UserStatus userStatus) {
-        return UserStatusDtoConverter.toResponseDto(userStatus);
     }
 }

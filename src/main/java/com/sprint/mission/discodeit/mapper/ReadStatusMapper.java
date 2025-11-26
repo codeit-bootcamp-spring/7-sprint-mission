@@ -1,12 +1,11 @@
-package com.sprint.mission.discodeit.dto.converter;
+package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import lombok.experimental.UtilityClass;
+import org.springframework.stereotype.Component;
 
-@UtilityClass
-public class ReadStatusDtoConverter {
-
+@Component
+public class ReadStatusMapper {
     public ReadStatusResponseDto toResponseDto(ReadStatus readStatus) {
         return new ReadStatusResponseDto(
                 readStatus.getId(),

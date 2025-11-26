@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.converter.BinaryContentDtoConverter;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
@@ -11,9 +11,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,6 +21,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
+
+    private final BinaryContentMapper binaryContentMapper;
 
     @Override
     @Transactional
@@ -43,15 +43,16 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent content = binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND));
 
-        return toDto(content);
+        return binaryContentMapper.toResponseDto(content);
     }
 
     @Override
     public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> binaryContentIds) {
-        return binaryContentRepository.findAll().stream().
+        List<BinaryContent> contents = binaryContentRepository.findAll().stream().
                 filter(content -> binaryContentIds.contains(content.getId()))
-                .map(content -> toDto(content))
                 .collect(Collectors.toList());
+
+        return binaryContentMapper.toResponseDto(contents);
     }
 
     @Override
@@ -62,7 +63,4 @@ public class BasicBinaryContentService implements BinaryContentService {
         binaryContentRepository.deleteById(binaryContentId);
     }
 
-    private BinaryContentResponseDto toDto(BinaryContent binaryContent) {
-        return BinaryContentDtoConverter.toResponseDto(binaryContent);
-    }
 }

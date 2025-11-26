@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.openapi.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.converter.BinaryContentDtoConverter;
-import com.sprint.mission.discodeit.dto.converter.PageDtoConverter;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.PageMapper;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
@@ -28,13 +28,16 @@ import java.util.UUID;
 public class MessageController implements MessageControllerDocs {
     private final MessageService messageService;
 
+    private final BinaryContentMapper binaryContentMapper;
+    private final PageMapper pageMapper;
+
     // 메시지 생성
     @PostMapping
     public ResponseEntity<MessageResponseDto> createMessage(
             @RequestPart("messageCreateRequest") CreateMessageRequestDto requestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
-        List<CreateBinaryContentRequestDto> attachmentRequests = BinaryContentDtoConverter.toRequestDto(attachments);
+        List<CreateBinaryContentRequestDto> attachmentRequests = binaryContentMapper.toRequestDto(attachments);
         MessageResponseDto createdMessage = messageService.create(requestDto, attachmentRequests);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
     }
@@ -64,7 +67,7 @@ public class MessageController implements MessageControllerDocs {
             Pageable pageable
     ){
         Page<MessageResponseDto> messageList = messageService.findAllByChannelId(channelId, pageable);
-        PageResponseDto<MessageResponseDto> messageResponse = PageDtoConverter.toResponseDto(messageList);
+        PageResponseDto<MessageResponseDto> messageResponse = pageMapper.toResponseDto(messageList);
 
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }

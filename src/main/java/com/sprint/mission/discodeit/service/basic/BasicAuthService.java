@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -19,10 +20,10 @@ import java.time.Instant;
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
-    private final UserService userService;
-
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -44,7 +45,7 @@ public class BasicAuthService implements AuthService {
         status.update(Instant.now());
         userStatusRepository.save(status);
 
-        return userService.toDto(user);
+        return userMapper.toResponseDto(user);
     }
 
     @Override

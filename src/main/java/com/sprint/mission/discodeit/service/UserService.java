@@ -38,6 +38,4 @@ public interface UserService {
      * @param userId 삭제할 User UUID
      */
     void delete(UUID userId);
-
-    UserResponseDto toDto(User user);
 }

@@ -1,22 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.converter.BinaryContentDtoConverter;
-import com.sprint.mission.discodeit.dto.converter.MessageDtoConverter;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * BasicMessageService
@@ -40,12 +33,12 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private final UserService userService;
-
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
+
+    private final MessageMapper messageMapper;
 
     /**
      * 새로운 메시지를 생성하여 Repository에 저장
@@ -90,7 +83,7 @@ public class BasicMessageService implements MessageService {
 
         messageRepository.save(newMessage);
 
-        return toDto(newMessage);
+        return messageMapper.toResponseDto(newMessage);
     }
 
     @Override
@@ -98,7 +91,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId).
                 orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
 
-        return toDto(message);
+        return messageMapper.toResponseDto(message);
     }
 
     /**
@@ -107,7 +100,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Page<MessageResponseDto> findAllByChannelId(UUID channelId, Pageable pageable) {
         return messageRepository.findAllByChannelId(channelId, pageable)
-                .map(message -> toDto(message));
+                .map(message -> messageMapper.toResponseDto(message));
     }
 
     /**
@@ -121,7 +114,7 @@ public class BasicMessageService implements MessageService {
 
         message.update(request.newContent());
         messageRepository.save(message);
-        return toDto(message);
+        return messageMapper.toResponseDto(message);
     }
 
     /**
@@ -134,26 +127,5 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
 
         messageRepository.deleteById(messageId);
-    }
-
-    private MessageResponseDto toDto(Message message) {
-
-        // userResponseDto 생성
-        User user = userRepository.findById(message.getAuthor().getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        // DTO 변환을 위해 UserService의 변환 메서드 사용
-        UserResponseDto userResponseDto = userService.toDto(user);
-
-        // binaryContentDto 생성
-        List<BinaryContent> attachments = message.getAttachments();
-        List<BinaryContentResponseDto> binaryContentResponseDtos = null;
-
-        // 메시지에 첨부파일이 있다면 첨부파일 리스트 저장
-        if (attachments != null && !attachments.isEmpty()) {
-            binaryContentResponseDtos = BinaryContentDtoConverter.toResponseDto(attachments);
-        }
-
-        return MessageDtoConverter.toResponseDto(message, userResponseDto, binaryContentResponseDtos);
     }
 }

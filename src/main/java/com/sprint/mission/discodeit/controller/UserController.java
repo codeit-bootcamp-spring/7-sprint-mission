@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.openapi.UserControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.converter.BinaryContentDtoConverter;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
@@ -29,13 +29,15 @@ public class UserController implements UserControllerDocs {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
+    private final BinaryContentMapper binaryContentMapper;
+
     // 사용자 등록
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserResponseDto> createUser(
             @Valid @RequestPart("userCreateRequest") CreateUserRequestDto requestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        CreateBinaryContentRequestDto profileRequestDto = BinaryContentDtoConverter.toRequestDto(profile);
+        CreateBinaryContentRequestDto profileRequestDto = binaryContentMapper.toRequestDto(profile);
         UserResponseDto createdUser = userService.create(requestDto, profileRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
@@ -47,7 +49,7 @@ public class UserController implements UserControllerDocs {
             @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
             @RequestPart(name = "profile", required = false) MultipartFile profile
     ) {
-        CreateBinaryContentRequestDto profileRequestDto = BinaryContentDtoConverter.toRequestDto(profile);
+        CreateBinaryContentRequestDto profileRequestDto = binaryContentMapper.toRequestDto(profile);
         UserResponseDto updatedUser = userService.update(userId, requestDto, profileRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }

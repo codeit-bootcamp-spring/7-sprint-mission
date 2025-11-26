@@ -2,14 +2,12 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.request.*;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
-import com.sprint.mission.discodeit.dto.converter.ChannelDtoConverter;
-import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +19,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
-    private final UserService userService;
-
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+
+    private final ChannelMapper channelMapper;
 
     // API 스펙에 맞는 공개 채널 및 비공개 채널 생성 메서드 추가
     @Override
@@ -43,7 +41,7 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = new Channel(name, ChannelType.PUBLIC, description);
         channelRepository.save(channel);
-        return toDto(channel);
+        return channelMapper.toResponseDto(channel);
     }
 
     @Override
@@ -62,7 +60,7 @@ public class BasicChannelService implements ChannelService {
                 readStatusRepository.save(
                         new ReadStatus(user, channel, Instant.now())
                 ));
-        return toDto(channel);
+        return channelMapper.toResponseDto(channel);
     }
 
     @Override
@@ -83,14 +81,14 @@ public class BasicChannelService implements ChannelService {
 
         channel.update(request.newName(), request.newDescription());
         channelRepository.save(channel);
-        return toDto(channel);
+        return channelMapper.toResponseDto(channel);
     }
 
     @Override
     public ChannelDto find(UUID channelId){
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
-        return toDto(channel);
+        return channelMapper.toResponseDto(channel);
     }
 
     // Public 채널 목록은 전체 조회 + Private 채널은 User가 참여한 채널만 조회
@@ -101,7 +99,7 @@ public class BasicChannelService implements ChannelService {
                         (c.getChannelType() == ChannelType.PRIVATE &&
                                 readStatusRepository.existsByUserIdAndChannelId(userId, c.getId()))
                 )
-                .map(c -> toDto(c))
+                .map(c -> channelMapper.toResponseDto(c))
                 .collect(Collectors.toList());
     }
 
@@ -119,23 +117,6 @@ public class BasicChannelService implements ChannelService {
                 .toList();
         binaryContentRepository.deleteByIdIn(binaryContentIds); // 채널 메시지 연관 파일들 삭제
         channelRepository.deleteById(channelId); // 채널 삭제
-    }
-
-    private ChannelDto toDto(Channel channel) {
-        Message message = messageRepository.findTop1ByChannelIdOrderByCreatedAtDesc(channel.getId())
-                .orElse(null);
-
-        Instant lastMessageAt = null;
-
-        if(message != null) {
-            lastMessageAt = message.getCreatedAt();
-        }
-
-        List<UserResponseDto> participants = readStatusRepository.findAllByChannel(channel).stream()
-                .map(rs -> userService.toDto(rs.getUser()))
-                .toList();
-
-        return ChannelDtoConverter.toResponseDto(channel, participants, lastMessageAt);
     }
 
     private boolean existsByName(String name) {

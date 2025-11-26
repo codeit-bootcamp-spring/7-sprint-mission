@@ -1,11 +1,11 @@
-package com.sprint.mission.discodeit.dto.converter;
+package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
-import lombok.experimental.UtilityClass;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
 
-@UtilityClass
-public class PageDtoConverter {
+@Component
+public class PageMapper {
     public <T> PageResponseDto<T> toResponseDto(Page<T> page) {
         return new PageResponseDto<>(
                 page.getContent(),

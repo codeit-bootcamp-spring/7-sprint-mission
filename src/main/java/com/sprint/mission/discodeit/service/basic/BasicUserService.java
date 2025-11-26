@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.converter.BinaryContentDtoConverter;
-import com.sprint.mission.discodeit.dto.converter.UserDtoConverter;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
@@ -14,9 +12,7 @@ import com.sprint.mission.discodeit.entity.validator.UserValidator;
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,6 +29,8 @@ public class BasicUserService implements UserService{
 
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -71,7 +69,7 @@ public class BasicUserService implements UserService{
         newUser.setStatus(userStatus);
 
         userRepository.save(newUser);
-        return toDto(newUser);
+        return userMapper.toResponseDto(newUser);
     }
 
     @Override
@@ -79,13 +77,13 @@ public class BasicUserService implements UserService{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return toDto(user);
+        return userMapper.toResponseDto(user);
     }
 
     @Override
     public List<UserResponseDto> findAll() {
         return userRepository.findAll().stream()
-                .map(u -> toDto(u))
+                .map(u -> userMapper.toResponseDto(u))
                 .collect(Collectors.toList());
     }
 
@@ -136,7 +134,7 @@ public class BasicUserService implements UserService{
         user.update(username, email, password, profileImage);
         userRepository.save(user);
 
-        return toDto(user);
+        return userMapper.toResponseDto(user);
     }
 
     @Override
@@ -145,23 +143,6 @@ public class BasicUserService implements UserService{
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         userRepository.deleteById(id);
-    }
-
-    @Override
-    public UserResponseDto toDto(User user) {
-
-        // 사용자 온라인 상태 저장
-        boolean online = user.getStatus().isOnline();
-
-        // 프로필 이미지 저장
-        BinaryContent profile = user.getProfile();
-        BinaryContentResponseDto binaryContentResponseDto = null;
-
-        if (profile != null) {
-            binaryContentResponseDto = BinaryContentDtoConverter.toResponseDto(profile);
-        }
-
-        return UserDtoConverter.toResponseDto(user, online, binaryContentResponseDto);
     }
 
     private boolean existsByUsername(String username) {

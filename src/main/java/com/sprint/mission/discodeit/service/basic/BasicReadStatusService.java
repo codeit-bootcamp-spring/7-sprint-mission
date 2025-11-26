@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.converter.ReadStatusDtoConverter;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.dto.readstatus.request.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.request.UpdateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusResponseDto;
@@ -28,6 +28,8 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
 
+    private final ReadStatusMapper readStatusMapper;
+
     @Override
     @Transactional
     public ReadStatusResponseDto create(CreateReadStatusRequestDto request) {
@@ -48,7 +50,7 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new CustomException(ErrorCode.CHANNEL_MEMBER_ALREADY_EXISTS);
         }
 
-        return toDto(newStatus);
+        return readStatusMapper.toResponseDto(newStatus);
     }
 
     @Override
@@ -61,7 +63,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
         return readStatusRepository.findAll().stream()
                 .filter(r -> userId.equals(r.getUser().getId()))
-                .map(r -> toDto(r))
+                .map(r -> readStatusMapper.toResponseDto(r))
                 .collect(Collectors.toList());
     }
 
@@ -72,7 +74,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(() -> new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
         readStatus.update(request.newLastReadAt());
         readStatusRepository.save(readStatus);
-        return toDto(readStatus);
+        return readStatusMapper.toResponseDto(readStatus);
     }
 
     @Override
@@ -81,10 +83,6 @@ public class BasicReadStatusService implements ReadStatusService {
         readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
         readStatusRepository.deleteById(readStatusId);
-    }
-
-    private ReadStatusResponseDto toDto(ReadStatus readStatus) {
-        return ReadStatusDtoConverter.toResponseDto(readStatus);
     }
 
     private boolean existsByUserIdAndChannelId(UUID userId, UUID channelId) {
