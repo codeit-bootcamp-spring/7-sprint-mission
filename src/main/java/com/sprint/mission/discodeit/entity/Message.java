@@ -15,7 +15,6 @@ import java.util.List;
 @Table(name = "messages")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Message extends BaseUpdatableEntity {
 
     @Column(name = "content",columnDefinition = "TEXT")
@@ -36,6 +35,10 @@ public class Message extends BaseUpdatableEntity {
 
     @OneToMany(mappedBy = "message", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<MessageAttachment> messageAttachment;
+
+    public static Message createMessageFactory(String content, User author, Channel channel){
+        return new Message(content,author,channel,null,null);
+    }
     /// // attachments 삭제했을때도 제대로 삭제되었는지 테스트 해봐야 함
 
 

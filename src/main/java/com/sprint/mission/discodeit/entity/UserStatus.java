@@ -16,7 +16,6 @@ import static java.time.Instant.*;
 @ToString
 @Setter
 @Entity
-@Builder
 @Table(name = "user_statuses")
 @NoArgsConstructor
 @AllArgsConstructor

@@ -6,10 +6,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
-@Builder
 @ToString
 @Getter
 @Setter
@@ -31,5 +31,14 @@ public class ReadStatus extends BaseUpdatableEntity {
 
     @Column(name="last_read_at",nullable = false) @CreationTimestamp
     private Instant readLastTime;
+
+    public static ReadStatus createReadStatusFactory(User user,Channel channel){
+        return new ReadStatus(user,channel
+                ,Instant.now().minus(Duration.ofDays(1)));
+    }
+    public static ReadStatus createReadStatusWithDtoFactory(User user,Channel channel,Instant readLastTime){
+        return new ReadStatus(user,channel
+                ,readLastTime);
+    }
 
 }

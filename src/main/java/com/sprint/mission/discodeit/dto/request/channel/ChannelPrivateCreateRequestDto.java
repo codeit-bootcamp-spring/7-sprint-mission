@@ -22,7 +22,7 @@ public record ChannelPrivateCreateRequestDto(
 
 ) {
     public ChannelPrivateCreateRequestDto(HashSet<UUID> participantIds) {
-        this(participantIds,DEFAULT_CHANNEL_NAME,DEFAULT_CHANNEL_DESCRIPTION,true);
+        this(new HashSet<>(participantIds),DEFAULT_CHANNEL_NAME,DEFAULT_CHANNEL_DESCRIPTION,true);
     }
 
 

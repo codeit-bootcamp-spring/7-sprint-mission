@@ -26,11 +26,11 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     @Transactional
     public BinaryContentDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) throws IOException {
-        BinaryContent binaryContent =BinaryContent.builder()
-                .fileName(binaryContentCreateRequestDto.getFileName())
-                .size(binaryContentCreateRequestDto.getSize())
-                .contentType(binaryContentCreateRequestDto.getContentType())
-                .build();
+        BinaryContent binaryContent = new BinaryContent(
+                binaryContentCreateRequestDto.getFileName(),
+                binaryContentCreateRequestDto.getContentType(),
+                binaryContentCreateRequestDto.getSize()
+        );
         binaryContentRepository.save(binaryContent);
         binaryContentStorage.put(binaryContent.getId(),binaryContentCreateRequestDto.getBytes());
         return BinaryStruct.INSTANCE.toDto(binaryContent);

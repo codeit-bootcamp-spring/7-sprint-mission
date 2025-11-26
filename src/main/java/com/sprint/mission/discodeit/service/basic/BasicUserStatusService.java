@@ -39,10 +39,8 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatusDto createUserStatus(UserStatusCreateRequestDto userStatusCreateRequestDto) {
        User targetUser = userRepository.findById(userStatusCreateRequestDto.getUserId()).orElseThrow(()->new IllegalArgumentException("존재하지 않는 User 입니다."));
 
-        UserStatus userStatus = UserStatus.builder()
-                .user(targetUser)
-                .lastActiveAt(userStatusCreateRequestDto.getLastOnlineTime())
-                .build();
+        UserStatus userStatus = new UserStatus(targetUser,userStatusCreateRequestDto.getLastOnlineTime());
+
         return userStatusMapper.toDto(userStatusRepository.save(userStatus));
 
     }

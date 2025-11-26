@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -15,7 +14,6 @@ import java.io.Serializable;
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class User extends BaseUpdatableEntity implements Serializable {
 
     @Column(name = "username",nullable = false, unique = true,length = 50)
@@ -34,5 +32,17 @@ public class User extends BaseUpdatableEntity implements Serializable {
 
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     private UserStatus userStatus;
+
+    public static User createUserWithProfileFactory(String userName, String email, String password, BinaryContent profile){
+
+        return new User(userName,email,password,profile,null);
+    }
+
+    public static User createUserFactory(String userName, String email, String password){
+
+        return new User(userName,email,password,null,null);
+    }
+
+
 
 }

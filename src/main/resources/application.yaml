@@ -32,4 +32,3 @@ springdoc:
     enabled: true
   api-docs:
     path: /api-docs
-

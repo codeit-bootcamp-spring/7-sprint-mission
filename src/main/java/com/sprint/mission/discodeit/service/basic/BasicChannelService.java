@@ -46,19 +46,12 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelDto createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
 
-        Channel channel = channelRepository.save(Channel.builder()
-            .name(channelPrivateCreateRequestDto.name())
-            .type(ChannelType.PRIVATE)
-            .description(channelPrivateCreateRequestDto.description())
-            .build());
+        Channel channel = channelRepository.save(Channel.privateChannelFactory(channelPrivateCreateRequestDto.name(),channelPrivateCreateRequestDto.description()));
        channelPrivateCreateRequestDto.participantIds().forEach(
                 x ->
                 {
                     User tempUser = userRepository.findById(x).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
-                   readStatusRepository.save(ReadStatus.builder()
-                           .user(tempUser)
-                           .channel(channel)
-                           .build());
+                   readStatusRepository.save(ReadStatus.createReadStatusFactory(tempUser,channel));
                 }
         );
         return channelMapper.toDto(channel);
@@ -68,18 +61,15 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
 
-    Channel channel = channelRepository.save(Channel.builder()
-            .name(channelPublicCreateRequestDto.name())
-            .type(ChannelType.PUBLIC)
-            .description(channelPublicCreateRequestDto.description())
-            .build());
+    Channel channel = channelRepository.save(Channel.publicChannelFactory(
+            channelPublicCreateRequestDto.name(),
+            channelPublicCreateRequestDto.description()
+    ));
         List<User> users = userRepository.findAll();
-        users.forEach(x->{readStatusRepository.save(ReadStatus.builder()
-                .user(x)
-                .channel(channel)
-                .build()
+        users.forEach(x->
+            readStatusRepository.save(ReadStatus.createReadStatusFactory(x,channel)
+        )
         );
-        });
     return channelMapper.toDto(channel);
     }
 

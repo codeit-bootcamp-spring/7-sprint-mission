@@ -37,41 +37,35 @@ public class BasicUserService implements UserService {
     @Transactional
     public UserDto createUser(UserCreateRequestDto userCreateRequestDto, MultipartFile profile) throws IOException {
     if(profile!=null) {
-        BinaryContent binaryContent = binaryContentRepository.save(BinaryContent.builder()
-                .fileName(profile.getName())
-                .contentType(profile.getContentType())
-                .size(profile.getSize())
-                .build()
+        BinaryContent binaryContent = binaryContentRepository.save(
+                new BinaryContent(profile.getName(), profile.getContentType(), profile.getSize())
         );
+
         binaryContentStorage.put(binaryContent.getId(),profile.getBytes());
 
-        User user = userRepository.save(User.builder()
-                .userName(userCreateRequestDto.username())
-                .email(userCreateRequestDto.email())
-                .profile(binaryContent)
-                .password(userCreateRequestDto.password())
-                .build());
+        User user = userRepository.save(User.createUserWithProfileFactory(
+                userCreateRequestDto.username(),
+                userCreateRequestDto.email(),
+                userCreateRequestDto.password(),
+                binaryContent
+        ));
 
-        user.setUserStatus(userStatusRepository.save(UserStatus.builder()
-                .user(user)
-                .lastActiveAt(Instant.now())
-                .build()
-                )
-        );
+        user.setUserStatus(userStatusRepository.save(
+                new UserStatus(user,Instant.now())
+        ));
 
 
         return userMapper.toDto(user);
     }
-        User user = userRepository.save(User.builder()
-                .userName(userCreateRequestDto.username())
-                .email(userCreateRequestDto.email())
-                .password(userCreateRequestDto.password())
-                .build());
+        User user = userRepository.save(
+                User.createUserFactory(userCreateRequestDto.username()
+                        , userCreateRequestDto.email()
+                        , userCreateRequestDto.password())
+        );
 
-        UserStatus targetUserStatus = userStatusRepository.save(UserStatus.builder()
-                .user(user)
-                .lastActiveAt(Instant.now())
-                .build());
+        UserStatus targetUserStatus = userStatusRepository.save(
+                new UserStatus(user,Instant.now())
+        );
         user.setUserStatus(targetUserStatus);
         return userMapper.toDto(user);
     }
@@ -113,11 +107,9 @@ public class BasicUserService implements UserService {
         user.setEmail(dto.newEmail()==null?user.getEmail():dto.newEmail());
         if(profile!=null) {
             if(user.getProfile()!=null)  binaryContentRepository.delete(user.getProfile());
-            BinaryContent tmpBinaryContent = binaryContentRepository.save(BinaryContent.builder()
-                    .fileName(profile.getName())
-                    .size(profile.getSize())
-                    .contentType(profile.getContentType())
-                    .build());
+            BinaryContent tmpBinaryContent = binaryContentRepository.save(
+                    new BinaryContent(profile.getName(), profile.getContentType(), profile.getSize())
+            );
             user.setProfile(tmpBinaryContent);
         }
         userRepository.save(user);

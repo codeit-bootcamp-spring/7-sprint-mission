@@ -19,9 +19,7 @@ import com.sprint.mission.discodeit.subTable.MessageAttachment;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,11 +59,11 @@ public class BasicMessageService implements MessageService {
         User targetUser = userRepository.findById(messageCreateRequestDto.authorId()).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
 
         Message message;
-        message = messageRepository.save(Message.builder()
-                .content(messageCreateRequestDto.content())
-                .channel(channel2)
-                .author(targetUser)
-                .build());
+        message = messageRepository.save(Message.createMessageFactory(
+                messageCreateRequestDto.content(),
+                targetUser,
+                channel2
+        ));
 
         if(attachments!=null) {
             List<MessageAttachment> messageAttachmentList = new ArrayList<>();
@@ -73,11 +71,8 @@ public class BasicMessageService implements MessageService {
             attachments.forEach(
                     x-> {
                         try {
-                           BinaryContent binaryContent = binaryContentRepository.save(BinaryContent.builder()
-                                            .fileName(x.getName())
-                                            .contentType(x.getContentType())
-                                            .size(x.getSize())
-                                    .build()
+                           BinaryContent binaryContent = binaryContentRepository.save(
+                                   new BinaryContent(x.getOriginalFilename(),x.getContentType(),x.getSize())
                             );
                            attachmentList.add(binaryContent);
                            binaryContentStorage.put(binaryContent.getId(),x.getBytes());

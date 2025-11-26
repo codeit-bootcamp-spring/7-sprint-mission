@@ -16,7 +16,6 @@ import java.util.UUID;
 
 import static java.time.Instant.*;
 
-@Builder
 @Getter
 @Entity
 @Table(name = "binary_contents")
@@ -35,5 +34,11 @@ public class BinaryContent extends BaseEntity implements Serializable {
 
     @OneToMany( mappedBy = "binaryContent",fetch = FetchType.LAZY)
     private List<MessageAttachment> messageAttachment;
+
+    public BinaryContent(String fileName, String contentType, Long size){
+        this.fileName = fileName;
+        this.contentType = contentType;
+        this.size = size;
+    }
 
 }

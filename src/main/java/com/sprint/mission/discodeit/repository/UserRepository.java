@@ -13,6 +13,6 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    @Query("select user from User user join fetch user.userStatus join fetch user.profile where user.id in ?1")
+    @Query("select user from User user join fetch user.userStatus left join fetch user.profile where user.id in ?1")
     List<User> findOneUser(List<UUID> userIds);
 }

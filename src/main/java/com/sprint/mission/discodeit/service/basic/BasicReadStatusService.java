@@ -42,12 +42,8 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
         User targetUser = userRepository.findById(readStatusCreateRequestDto.userId())
                 .orElseThrow(()->new IllegalArgumentException("존재하지 않는 User 입니다."));
-        ReadStatus readStatus = ReadStatus.builder()
-                .readLastTime(now())
-                .user(targetUser)
-                .channel(targetChannel)
-                .readLastTime(readStatusCreateRequestDto.lastReadAt())
-                .build();
+        ReadStatus readStatus = ReadStatus.createReadStatusWithDtoFactory
+                (targetUser,targetChannel,readStatusCreateRequestDto.lastReadAt());
         return readStatusMapper.toDto(
                 readStatusRepository.save(readStatus)
         );
