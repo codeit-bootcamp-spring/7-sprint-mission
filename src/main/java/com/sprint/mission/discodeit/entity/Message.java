@@ -52,10 +52,6 @@ public class Message extends BaseUpdateEntity {
 
     }
 
-    //첨부파일추가
-   /* public void addAttachmentId(UUID attachmentId) {
-        this.attachmentIds.add(attachmentId);
-    }*/
     public void addAttachment(BinaryContent content) {
         MessageAttachment ma = new MessageAttachment(this, content);
         attachments.add(ma);

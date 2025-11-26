@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.Docs;
 
+import com.sprint.mission.discodeit.dto.Binarycontent.response.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.content.BinaryContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -22,10 +23,10 @@ public interface BinaryContentServiceDocs {
             summary = "단일 이진 콘텐츠 조회",
             description = """
                     특정 binaryContentId를 사용하여 저장된 이진 콘텐츠(파일)를 조회합니다.
-
+                    
                     **요청 데이터**
                     - binaryContentId (UUID)
-
+                    
                     **응답**
                     - BinaryContent 객체 (파일 바이트 배열 및 메타정보)
                     """
@@ -59,17 +60,17 @@ public interface BinaryContentServiceDocs {
                     )
             )
     })
-    ResponseEntity<BinaryContent> find(UUID binaryContentId);
+    ResponseEntity<BinaryContentDto> find(UUID binaryContentId);
 
 
     @Operation(
             summary = "여러 이진 콘텐츠 일괄 조회",
             description = """
                     여러 binaryContentId를 한 번에 조회합니다.
-
+                    
                     **요청 데이터**
                     - binaryContentIds (UUID 배열)
-
+                    
                     **응답**
                     - BinaryContent 객체 리스트 반환
                     """
@@ -119,5 +120,5 @@ public interface BinaryContentServiceDocs {
                     )
             )
     })
-    ResponseEntity<List<BinaryContent>> findAllByIdIn(List<UUID> binaryContentIds);
+    ResponseEntity<List<BinaryContentDto>> findAllByIdIn(List<UUID> binaryContentIds);
 }

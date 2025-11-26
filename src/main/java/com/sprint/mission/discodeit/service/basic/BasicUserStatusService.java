@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatustUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -27,11 +29,12 @@ public class BasicUserStatusService implements UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
+    private final UserStatusMapper userStatusMapper;
 
 
     @Override
     @Transactional
-    public UserStatus create(UserStatusCreateRequest request) {
+    public UserStatusDto create(UserStatusCreateRequest request) {
 
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() ->
@@ -45,47 +48,51 @@ public class BasicUserStatusService implements UserStatusService {
         Instant lastActiveAt = request.lastActiveAt();
         UserStatus userStatus = new UserStatus(user, lastActiveAt);
 
-        return userStatusRepository.save(userStatus);
+        userStatusRepository.save(userStatus);
+        return userStatusMapper.toDto(userStatus);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public UserStatus find(UUID userStatusId) {
-        return userStatusRepository
-                .findByUserId(userStatusId).stream().findFirst()
-                .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userStatusId));
+    public UserStatusDto find(UUID userStatusId) {
+
+        return userStatusRepository.findById(userStatusId)
+                .map(userStatusMapper::toDto)
+                .orElseThrow(() -> new NoSuchElementException("유저아이디로 찾을수없어"));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<UserStatus> findAll() {
-        return userStatusRepository.findAll().stream()
+    public List<UserStatusDto> findAll() {
+        return userStatusRepository.findAll()
+                .stream()
+                .map(userStatusMapper::toDto)
                 .toList();
     }
 
 
     @Override
     @Transactional
-    public UserStatus update(UUID userId, UserStatusUpdateRequest request) {
+    public UserStatusDto update(UUID userId, UserStatusUpdateRequest request) {
         Instant newLastActiveAt = request.newLastActiveAt();
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
 
         userStatus.update(newLastActiveAt);
 
-        return userStatus;
+        return userStatusMapper.toDto(userStatus);
     }
 
     @Override
     @Transactional
-    public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+    public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
         Instant newLastActiveAt = request.newLastActiveAt();
         UserStatus byUserId = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("유저uuid못찾아용" + userId));
 
         byUserId.update(newLastActiveAt);
 
-        return byUserId;
+        return userStatusMapper.toDto(byUserId);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller.Docs;
 
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusUpdateReuqest;
+import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -13,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -77,7 +77,7 @@ public interface ReadStatusControllerDocs {
                     )
             )
     })
-    ResponseEntity<ReadStatus> createStatus(ReadStatusCreateRequest request);
+    ResponseEntity<ReadStatusDto> createStatus(ReadStatusCreateRequest request);
 
 
     // 2) 수정
@@ -132,7 +132,7 @@ public interface ReadStatusControllerDocs {
                     )
             )
     })
-    ResponseEntity<ReadStatus> updateStatus(
+    ResponseEntity<ReadStatusDto> updateStatus(
             UUID readStatusId,
             ReadStatusUpdateReuqest request
     );
@@ -198,7 +198,7 @@ public interface ReadStatusControllerDocs {
                     )
             )
     })
-    ResponseEntity<List<ReadStatus>> findStatusByUserId(
+    ResponseEntity<List<ReadStatusDto>> findStatusByUserId(
             @RequestParam("userId") UUID userId
     );
 }

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller.Docs;
 
-import com.sprint.mission.discodeit.dto.channel.request.ChannelDeleteRequest;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.request.PublicChannelCreateRequest;
@@ -15,8 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.UUID;
@@ -79,7 +76,7 @@ public interface ChannelControllerDocs {
                     )
             )
     })
-    ResponseEntity<Channel> create(PublicChannelCreateRequest request);
+    ResponseEntity<ChannelDto> create(PublicChannelCreateRequest request);
 
 
     // ---------- 비공개 채널 생성 ----------
@@ -136,7 +133,7 @@ public interface ChannelControllerDocs {
                     )
             )
     })
-    ResponseEntity<Channel> create(PrivateChannelCreateRequest request);
+    ResponseEntity<ChannelDto> create(PrivateChannelCreateRequest request);
 
 
     // ---------- 사용자별 채널 조회 ----------
@@ -256,7 +253,7 @@ public interface ChannelControllerDocs {
                     )
             )
     })
-    ResponseEntity<Channel> update(UUID channelId, ChannelUpdateRequest request);
+    ResponseEntity<ChannelDto> update(UUID channelId, ChannelUpdateRequest request);
 
 
     // ---------- 채널 삭제 ----------

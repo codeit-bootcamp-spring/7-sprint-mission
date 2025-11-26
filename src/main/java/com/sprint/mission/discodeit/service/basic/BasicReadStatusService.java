@@ -1,14 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusFindByUserRequest;
-import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusFindRequest;
 import com.sprint.mission.discodeit.dto.readstatus.requset.ReadStatusUpdateReuqest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -20,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -28,11 +27,12 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
     private final ChannelRepository channelRepository;
+    private final ReadStatusMapper readStatusMapper;
 
 
     @Override
     @Transactional
-    public ReadStatus create(ReadStatusCreateRequest request) {
+    public ReadStatusDto create(ReadStatusCreateRequest request) {
 
         //request에 받은 Channel이나 User의 uuid가 존재하냐
 
@@ -55,31 +55,37 @@ public class BasicReadStatusService implements ReadStatusService {
 
         ReadStatus createReadStatus = new ReadStatus(user, channel, request.lastReadAt());
 
-        return readStatusRepository.save(createReadStatus);
+        readStatusRepository.save(createReadStatus);
+        return readStatusMapper.toDto(createReadStatus);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ReadStatusDto find(UUID readStatusId) {
+
+        return readStatusRepository.findById(readStatusId)
+                .map(readStatusMapper::toDto)
+                .orElseThrow(() -> new NoSuchElementException("readStatusId로 찾을수없어"));
 
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ReadStatus find(UUID userStatusId) {
-        return readStatusRepository.find(userStatusId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId).stream()
+    public List<ReadStatusDto> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAll()
+                .stream()
+                .map(readStatusMapper::toDto)
                 .toList();
     }
 
     @Override
     @Transactional
-    public ReadStatus update(UUID readStatusId, ReadStatusUpdateReuqest request) {
+    public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateReuqest request) {
         Instant newLastReadAt = request.newLastReadAt();
         ReadStatus readStatus = readStatusRepository.find(readStatusId);
         //업데이트자체가 시간만 있는게아닌가 시간초기화
         readStatus.update(newLastReadAt);
-        return readStatus;
+        return readStatusMapper.toDto(readStatus);
 
     }
 

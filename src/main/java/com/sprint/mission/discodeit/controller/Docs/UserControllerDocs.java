@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserDto;
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "사용자 관리 (UserController)",description ="사용자 생성,사용자업데이트,사용자조회,사용자삭제,유저아이디로유저상태 업데이트")
+@Tag(name = "사용자 관리 (UserController)", description = "사용자 생성,사용자업데이트,사용자조회,사용자삭제,유저아이디로유저상태 업데이트")
 public interface UserControllerDocs {
 
     @Operation(
@@ -32,7 +33,7 @@ public interface UserControllerDocs {
                     
                     **요청 데이터**
                     - 이름, 이메일, 비밀번호,프로필사진(필수x)
-                   
+                    
                     
                     
                     **응답**
@@ -49,16 +50,16 @@ public interface UserControllerDocs {
                             schema = @Schema(implementation = User.class),
                             examples = @ExampleObject(
                                     value = """
-                                         {
-                                            "username": "멀티못해",
-                                            "email": "nomulti@naver.multi",
-                                            "password": "1231234",
-                                            "profileId": null,
-                                            "id": "6c79fd36-db32-46f2-bf46-f5bf66310691",
-                                            "createdAt": "2025-11-12T07:44:54.752022800Z",
-                                            "updatedAt": null
-                                         }
-                                         """
+                                            {
+                                               "username": "멀티못해",
+                                               "email": "nomulti@naver.multi",
+                                               "password": "1231234",
+                                               "profileId": null,
+                                               "id": "6c79fd36-db32-46f2-bf46-f5bf66310691",
+                                               "createdAt": "2025-11-12T07:44:54.752022800Z",
+                                               "updatedAt": null
+                                            }
+                                            """
                             )
                     )
             ),
@@ -71,20 +72,21 @@ public interface UserControllerDocs {
                             schema = @Schema(implementation = User.class),
                             examples = @ExampleObject(
                                     value = """
-                                            [
-                                              "이름이 이미 존재합니다.",
-                                              "이메일이 이미 존재합니다."
-                                            ]
-                                         """
+                                               [
+                                                 "이름이 이미 존재합니다.",
+                                                 "이메일이 이미 존재합니다."
+                                               ]
+                                            """
                             )
                     )
             )
     })
-    ResponseEntity<User> create(
+    ResponseEntity<UserDto> create(
             UserCreateRequest request,
-             MultipartFile profile
+            MultipartFile profile
 
     );
+
     @Operation(
             summary = "유저 업데이트",
             description = """
@@ -92,7 +94,7 @@ public interface UserControllerDocs {
                     
                     **수정 요청 데이터**
                     - 이름, 이메일, 비밀번호,이미지(필수x)
-                  
+                    
                     **응답**
                     - 성공 시 저장된 회원 정보가 반환됩니다.
                     """
@@ -107,16 +109,16 @@ public interface UserControllerDocs {
                             schema = @Schema(implementation = User.class),
                             examples = @ExampleObject(
                                     value = """
-                                         {
-                                            "username": "수정값",
-                                            "email": "수정값@naver.multi",
-                                            "password": "1231234",
-                                            "profileId": null,
-                                            "id": "6c79fd36-db32-46f2-bf46-f5bf66310691",
-                                            "createdAt": "2025-11-12T07:44:54.752022800Z",
-                                            "updatedAt": null
-                                         }
-                                         """
+                                            {
+                                               "username": "수정값",
+                                               "email": "수정값@naver.multi",
+                                               "password": "1231234",
+                                               "profileId": null,
+                                               "id": "6c79fd36-db32-46f2-bf46-f5bf66310691",
+                                               "createdAt": "2025-11-12T07:44:54.752022800Z",
+                                               "updatedAt": null
+                                            }
+                                            """
                             )
                     )
             ),
@@ -129,19 +131,19 @@ public interface UserControllerDocs {
                             schema = @Schema(implementation = User.class),
                             examples = @ExampleObject(
                                     value = """
-                                            [ 
-                                              "맞는 유저 ID가 없습니다 f832e547-4b4f-4b31-a690-a4c6f441429b",
-                                              "이름이 이미 존재합니다.",
-                                              "이메일이 이미 존재합니다."
-                                            ]
-                                         """
+                                               [ 
+                                                 "맞는 유저 ID가 없습니다 f832e547-4b4f-4b31-a690-a4c6f441429b",
+                                                 "이름이 이미 존재합니다.",
+                                                 "이메일이 이미 존재합니다."
+                                               ]
+                                            """
                             )
                     )
             )
     })
-    ResponseEntity<User> update (UUID userId,
-                                 UserUpdateRequest request,
-                                 MultipartFile profile) throws IOException;
+    ResponseEntity<UserDto> update(UUID userId,
+                                   UserUpdateRequest request,
+                                   MultipartFile profile) throws IOException;
 
 
     @Operation(
@@ -150,7 +152,7 @@ public interface UserControllerDocs {
                     사용자 정보 수정.
                     
                     **수정 요청 데이터**
-        
+                    
                     **응답**
                     - 성공 시 유저정보+유저상태.
                     """
@@ -165,42 +167,41 @@ public interface UserControllerDocs {
                             array = @ArraySchema(schema = @Schema(implementation = UserDto.class)),
                             examples = @ExampleObject(
                                     value = """
-                                            [
-                                            {
-                                              "id": "62792ad2-4c6f-4bd8-a05a-b86224417134",
-                                              "createdAt": "2025-11-12T08:47:51.451453600Z",
-                                              "updatedAt": null,
-                                              "username": "string2",
-                                              "email": "string2",
-                                              "profileId": null,
-                                              "online": true
-                                            },
-                                            {
-                                              "id": "320f602a-542d-4f14-8f40-d0674eb5f65c",
-                                              "createdAt": "2025-11-12T08:47:55.539346200Z",
-                                              "updatedAt": null,
-                                              "username": "strin32",
-                                              "email": "strin3",
-                                              "profileId": null,
-                                              "online": true
-                                            },
-                                            {
-                                              "id": "81e104dc-47c6-4252-8ae9-decfaa6138a7",
-                                              "createdAt": "2025-11-12T08:47:47.911774100Z",
-                                              "updatedAt": null,
-                                              "username": "string",
-                                              "email": "string",
-                                              "profileId": null,
-                                              "online": true
-                                            }
-                                                        ]
-                                         """
+                                               [
+                                               {
+                                                 "id": "62792ad2-4c6f-4bd8-a05a-b86224417134",
+                                                 "createdAt": "2025-11-12T08:47:51.451453600Z",
+                                                 "updatedAt": null,
+                                                 "username": "string2",
+                                                 "email": "string2",
+                                                 "profileId": null,
+                                                 "online": true
+                                               },
+                                               {
+                                                 "id": "320f602a-542d-4f14-8f40-d0674eb5f65c",
+                                                 "createdAt": "2025-11-12T08:47:55.539346200Z",
+                                                 "updatedAt": null,
+                                                 "username": "strin32",
+                                                 "email": "strin3",
+                                                 "profileId": null,
+                                                 "online": true
+                                               },
+                                               {
+                                                 "id": "81e104dc-47c6-4252-8ae9-decfaa6138a7",
+                                                 "createdAt": "2025-11-12T08:47:47.911774100Z",
+                                                 "updatedAt": null,
+                                                 "username": "string",
+                                                 "email": "string",
+                                                 "profileId": null,
+                                                 "online": true
+                                               }
+                                                           ]
+                                            """
                             )
                     )
             )
     })
     ResponseEntity<List<UserDto>> findAll();
-
 
 
     @Operation(
@@ -210,7 +211,7 @@ public interface UserControllerDocs {
                     
                     **수정 요청 데이터**
                     - 유저UUID ,Instant
-                   
+                    
                     **응답**
                     - 성공 시 저장된 회원 정보가 반환됩니다.
                     """
@@ -225,15 +226,15 @@ public interface UserControllerDocs {
                             schema = @Schema(implementation = UserStatus.class),
                             examples = @ExampleObject(
                                     value = """
-                                            {
-                                              "id": "9ad6a5ef-1bd3-408c-bc0d-debdb7f9a5e5",
-                                              "createdAt": "2025-11-12T09:13:30.002493100Z",
-                                              "updatedAt": "2025-11-12T09:14:51.586209300Z",
-                                              "userId": "6f01be3c-e8f9-4597-a5b1-02e348db7d36",
-                                              "lastActiveAt": "2025-11-12T09:13:43.140Z",
-                                              "online": true
-                                            }
-                                         """
+                                               {
+                                                 "id": "9ad6a5ef-1bd3-408c-bc0d-debdb7f9a5e5",
+                                                 "createdAt": "2025-11-12T09:13:30.002493100Z",
+                                                 "updatedAt": "2025-11-12T09:14:51.586209300Z",
+                                                 "userId": "6f01be3c-e8f9-4597-a5b1-02e348db7d36",
+                                                 "lastActiveAt": "2025-11-12T09:13:43.140Z",
+                                                 "online": true
+                                               }
+                                            """
                             )
                     )
             ),
@@ -246,15 +247,14 @@ public interface UserControllerDocs {
                             schema = @Schema(implementation = UserStatus.class),
                             examples = @ExampleObject(
                                     value = """
-                                           유저uuid못찾아용   (유저 UUId..)
-                                         """
+                                              유저uuid못찾아용   (유저 UUId..)
+                                            """
                             )
                     )
             )
     })
-    ResponseEntity<UserStatus> updateUserStatusByUserId( UUID userId,
-                                                        UserStatusUpdateRequest request);
-
+    ResponseEntity<UserStatusDto> updateUserStatusByUserId(UUID userId,
+                                                           UserStatusUpdateRequest request);
 
 
     @Operation(
@@ -264,7 +264,7 @@ public interface UserControllerDocs {
                     
                     **수정 요청 데이터**
                     - 유저UUID
-                  
+                    
                     **응답**
                     - 성공 시 끝
                     """
@@ -279,8 +279,8 @@ public interface UserControllerDocs {
                             schema = @Schema(implementation = ResponseEntity.class),
                             examples = @ExampleObject(
                                     value = """
-                                         아무것도 없으요
-                                         """
+                                            아무것도 없으요
+                                            """
                             )
                     )
             ),
@@ -293,8 +293,8 @@ public interface UserControllerDocs {
                             schema = @Schema(implementation = ResponseEntity.class),
                             examples = @ExampleObject(
                                     value = """
-                                           유저uuid못찾아용   (유저 UUId..)
-                                         """
+                                              유저uuid못찾아용   (유저 UUId..)
+                                            """
                             )
                     )
             )

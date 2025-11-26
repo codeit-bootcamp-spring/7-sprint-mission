@@ -28,16 +28,16 @@ public class BinaryContent extends BaseEntity {
     @Column(name = "content_type", length = 100, nullable = false)
     private String contentType;
 
-    @Lob//jpa표준방식 이진데이터 표시
+   /* @Lob//jpa표준방식 이진데이터 표시
     @Column(name = "bytes", nullable = false)
-    private byte[] bytes;
+    private byte[] bytes;*/
 
-    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
+    public BinaryContent(String fileName, Long size, String contentType) {
 
         //
         this.fileName = fileName;
         this.size = size;
         this.contentType = contentType;
-        this.bytes = bytes;
+        //     this.bytes = bytes;
     }
 }

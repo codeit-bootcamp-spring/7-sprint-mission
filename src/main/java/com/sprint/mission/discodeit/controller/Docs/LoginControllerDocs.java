@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller.Docs;
 
 import com.sprint.mission.discodeit.dto.user.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.user.response.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,11 +19,11 @@ public interface LoginControllerDocs {
             summary = "사용자 로그인",
             description = """
                     사용자가 이메일과 비밀번호를 통해 로그인합니다.
-
+                    
                     **요청 데이터**
                     - email (사용자 이메일)
                     - password (비밀번호)
-
+                    
                     **응답**
                     - 로그인 성공 시 사용자 정보와 함께 인증 성공 상태를 반환합니다.
                     - 비밀번호 또는 이메일이 일치하지 않으면 401 오류를 반환합니다.
@@ -81,5 +82,5 @@ public interface LoginControllerDocs {
                     )
             )
     })
-    ResponseEntity<User> login(LoginRequest req);
+    ResponseEntity<UserDto> login(LoginRequest req);
 }
