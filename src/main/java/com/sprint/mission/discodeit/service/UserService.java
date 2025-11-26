@@ -13,13 +13,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
-  User createUser(CreateUserCommand request); // 유저 생성
+  UserResponseDto createUser(CreateUserCommand request); // 유저 생성
 
   UserResponseDto find(UUID id); //유저 조회
 
   List<UserResponseDto> findAll(); // 모든 유저 조회
 
-  User updateUser(UUID userId, UpdateUserDto request, MultipartFile profile);
+  UserResponseDto updateUser(UUID userId, UpdateUserDto request, MultipartFile profile);
 
   void deleteUser(UUID userId); // 유저 삭제
 }
