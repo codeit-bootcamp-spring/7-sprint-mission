@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @UtilityClass
@@ -24,6 +23,7 @@ public class BinaryContentDtoConverter {
             try {
                 profileRequest = new CreateBinaryContentRequestDto(
                         attachment.getOriginalFilename(),
+                        attachment.getSize(),
                         attachment.getContentType(),
                         attachment.getBytes()
                 );
@@ -45,6 +45,7 @@ public class BinaryContentDtoConverter {
                                 try {
                                     return new CreateBinaryContentRequestDto(
                                             attachment.getOriginalFilename(),
+                                            attachment.getSize(),
                                             attachment.getContentType(),
                                             attachment.getBytes());
                                 } catch(IOException e) {
@@ -64,7 +65,7 @@ public class BinaryContentDtoConverter {
 
         return new BinaryContentResponseDto(
                 attachment.getId(),
-                attachment.getName(),
+                attachment.getFileName(),
                 (long)attachment.getBytes().length,
                 attachment.getContentType(),
                 attachment.getBytes()
@@ -79,7 +80,7 @@ public class BinaryContentDtoConverter {
         return attachments.stream()
                 .map(attachment -> new BinaryContentResponseDto(
                         attachment.getId(),
-                        attachment.getName(),
+                        attachment.getFileName(),
                         (long)attachment.getBytes().length,
                         attachment.getContentType(),
                         attachment.getBytes()

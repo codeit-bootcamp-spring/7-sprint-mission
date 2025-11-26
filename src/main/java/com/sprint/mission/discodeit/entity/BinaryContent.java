@@ -1,30 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.Objects;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
-@EqualsAndHashCode
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Entity
+@Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
-    private final String name;
-    private String contentType;
-    private final byte[] bytes; // 파일 데이터
 
-    public BinaryContent(String name, String contentType, byte[] bytes) {
-        this.name = name;
-        this.contentType = contentType;
-        this.bytes = bytes;
-    }
+    @Column(name = "file_name", nullable = false)
+    private String fileName;
+
+    @Column(nullable = false)
+    private Long size;
+
+    @Column(name = "content_type", nullable = false)
+    private String contentType;
+
+    @Column(nullable = false)
+    private byte[] bytes; // 파일 데이터
 
     @Override
     public String toString() {
         return "BinaryContent{" +
-                ", name='" + name + '\'' +
+                "name='" + fileName + '\'' +
                 ", (" + bytes.length + " bytes)" +
                 '}';
     }

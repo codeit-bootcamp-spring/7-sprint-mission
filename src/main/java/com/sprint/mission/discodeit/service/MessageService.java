@@ -4,16 +4,10 @@ import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryConten
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.ReceiveType;
-import com.sprint.mission.discodeit.entity.User;
-import org.springdoc.core.converters.models.Pageable;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -26,19 +20,10 @@ public interface MessageService {
     /** 새로운 메시지를 생성 */
     MessageResponseDto create(CreateMessageRequestDto messageRequest, List<CreateBinaryContentRequestDto> binaryContentRequests);
 
-    Message find(UUID messageId);
-
-    /** 두 유저 또는 채널 간의 최신 메시지(가장 마지막 메시지)를 가져옴 */
-    Message findLastestMessage(UUID senderId, UUID receiverId, ReceiveType receiverType);
-
-    /** 두 유저 간의 전체 메시지 목록을 조회 */
-    List<Message> findBetweenUsers(UUID userId1, UUID userId2);
+    MessageResponseDto find(UUID messageId);
 
     /** 특정 채널에 포함된 모든 메시지 조회 */
-    List<Message> findAllByChannelId(UUID channelId, Pageable pageable);
-
-    /** 유저가 특정 유저 또는 채널에게 보낸 모든 메시지 조회 */
-    List<Message> findAllSentBetweenUsers(UUID senderId, UUID receiverId);
+    Page<MessageResponseDto> findAllByChannelId(UUID channelId, Pageable pageable);
 
     /** 메시지 내용(content)을 수정 */
     MessageResponseDto update(UUID messageId, UpdateMessageRequestDto request);

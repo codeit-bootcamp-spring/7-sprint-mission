@@ -17,7 +17,7 @@ public class MessageDtoConverter {
                 message.getCreatedAt(),
                 message.getUpdatedAt(),
                 message.getContent(),
-                message.getChannelId(),
+                message.getChannel().getId(),
                 userResponseDto,
                 binaryContentResponseDtos
         );

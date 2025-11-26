@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -24,6 +25,7 @@ public class BasicAuthService implements AuthService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
+    @Transactional
     public UserResponseDto login(LoginRequestDto request) {
         // 아이디 또는 비밀번호를 입력하지 않은 경우 예외 발생
         if (request.username() == null || request.username().isBlank() ||
@@ -40,7 +42,7 @@ public class BasicAuthService implements AuthService {
         UserStatus status = userStatusRepository.findByUserId(user.getId())
                         .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
         status.update(Instant.now());
-        userStatusRepository.update(status);
+        userStatusRepository.save(status);
 
         return userService.toDto(user);
     }

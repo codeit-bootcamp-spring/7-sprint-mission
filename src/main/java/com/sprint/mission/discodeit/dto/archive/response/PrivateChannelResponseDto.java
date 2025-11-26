@@ -23,9 +23,6 @@ public class PrivateChannelResponseDto extends ChannelResponseDto {
                 .id(channel.getId())
                 .channelName(channel.getChannelName())
                 .channelType(channel.getChannelType())
-                .visibility(channel.getVisibility())
-                .adminId(channel.getAdminId())
-                .memberIds(channel.getMemberIds())
                 .lastedMessageAt(lastedMessageAt)
                 .build();
     }

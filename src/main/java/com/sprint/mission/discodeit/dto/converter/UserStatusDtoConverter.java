@@ -10,7 +10,7 @@ public class UserStatusDtoConverter {
     public UserStatusResponseDto toResponseDto(UserStatus userStatus){
         return new UserStatusResponseDto(
                 userStatus.getId(),
-                userStatus.getUserId(),
+                userStatus.getUser().getId(),
                 userStatus.getLastActiveAt()
         );
     }

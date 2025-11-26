@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,10 +25,12 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
+    @Transactional
     public void create(CreateBinaryContentRequestDto request) {
         if (Optional.ofNullable(request).isPresent()) {
             BinaryContent file = new BinaryContent(
                     request.fileName(),
+                    request.size(),
                     request.contentType(),
                     request.bytes()
             );
@@ -52,10 +55,11 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID binaryContentId) {
         binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND));
-        binaryContentRepository.delete(binaryContentId);
+        binaryContentRepository.deleteById(binaryContentId);
     }
 
     private BinaryContentResponseDto toDto(BinaryContent binaryContent) {

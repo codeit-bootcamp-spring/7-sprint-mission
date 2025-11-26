@@ -7,5 +7,5 @@ import java.util.UUID;
 public record UserStatusResponseDto(
         UUID id,
         UUID userId,
-        Instant newLastActiveAt
+        Instant lastActiveAt
 ) { }

@@ -67,7 +67,7 @@ public class UserController implements UserControllerDocs {
     }
 
     // 사용자 온라인 업데이트
-    @PostMapping("/{userId}/userStatus")
+    @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatusResponseDto> onlineUser(
             @PathVariable UUID userId,
             @RequestBody UpdateUserStatusRequestDto request

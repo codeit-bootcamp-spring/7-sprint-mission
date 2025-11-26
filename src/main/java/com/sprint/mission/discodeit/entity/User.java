@@ -1,71 +1,66 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
-
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "users")
 public class User extends BaseUpdatableEntity{
-    private String realName;
-    private String nickName;
-    private String email;
-    private String phoneNum;
-    private String username;
-    private String password;
-    private UUID profileId; // 삭제 필요
 
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    // 프로필 삭제시 profile_id 컬럼을 null로 세팅
+    // 유저 삭제시 프로필은 함께 삭제
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(
+            name = "profile_id",
+            unique = true,
+            foreignKey = @ForeignKey(
+                    name = "fk_user_profile",
+                    foreignKeyDefinition = "FOREIGN KEY (profile_id) REFERENCES binary_contents(id) ON DELETE SET NULL"
+            )
+    )
     private BinaryContent profile;
+
+    // DB 테이블에 저장하지 않는 필드
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserStatus status;
 
-    public User(String realName, String nickName, String email, String phoneNum, String username, String password) {
-        this.realName = realName;
-        this.nickName = nickName;
-        this.email = email;
-        this.phoneNum = formatPhoneNum(phoneNum);
+    public User(String username, String email, String password, BinaryContent profile) {
         this.username = username;
+        this.email = email;
         this.password = password;
+        this.profile = profile;
     }
 
-    public User(String realName, String nickName, String email, String phoneNum, String username, String password, UUID profileId) {
-        this(realName, nickName, email, phoneNum, username, password);
-        this.profileId = profileId;
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
-    public void update(String realName, String nickName, String email, String phoneNum, String username, String password, UUID profileId) {
-        if (realName != null && !realName.equals(this.realName)) {
-            this.realName = realName;
-        }
-        if (nickName != null && !nickName.equals(this.nickName)) {
-            this.nickName = nickName;
+    public void update(String username, String email, String password, BinaryContent profile) {
+        if (username != null && !username.equals(this.username)) {
+            this.username = username;
         }
         if (email != null && !email.equals(this.email)) {
             this.email = email;
         }
-        if (phoneNum != null && !phoneNum.equals(this.phoneNum)) {
-            this.phoneNum = formatPhoneNum(phoneNum);
-        }
-        if (username != null && !username.equals(this.username)) {
-            this.username = username;
-        }
         if (password != null && !password.equals(this.password)) {
             this.password = password;
         }
-        if (profileId != null && !profileId.equals(this.profileId)) {
-            this.profileId = profileId;
+        if (profile != null && !profile.equals(this.profile)) {
+            this.profile = profile;
         }
-    }
-
-    private String formatPhoneNum(String phoneNum){
-        phoneNum = phoneNum.replaceAll("[^0-9]", ""); //숫자를 제외한 나머지 문자열 삭제
-        if (phoneNum.matches("^010\\d{8}$")) {
-            phoneNum = phoneNum.replaceFirst("^(010)(\\d{4})(\\d{4})$", "$1-$2-$3");
-        }
-        else if (phoneNum.matches("^01[1-9]\\d{7}$")) { // 10자리 번호 (일부 구형 011, 016 등)
-            phoneNum = phoneNum.replaceFirst("^(01[1-9])(\\d{3,4})(\\d{4})$", "$1-$2-$3");
-        } else {
-            throw new IllegalArgumentException("전화번호 형식이 맞지 않습니다.");
-        }
-        return phoneNum;
     }
 
     @Override
@@ -73,11 +68,8 @@ public class User extends BaseUpdatableEntity{
         String str = super.toString();
 
         return "User{" +
-                "realName='" + realName + '\'' +
-                ", nickName='" + nickName + '\'' +
+                "userId='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", phoneNum='" + phoneNum + '\'' +
-                ", userId='" + username + '\'' +
                 ", password='" + password + '\'' +
                 str +
                 '}';

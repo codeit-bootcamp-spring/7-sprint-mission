@@ -8,11 +8,10 @@ import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.converters.models.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -59,16 +58,13 @@ public class MessageController implements MessageControllerDocs {
 
     // 특정 채널 메시지 목록 조회
     @GetMapping
-    public ResponseEntity<PageResponseDto<Message>> searchMessage(
+    public ResponseEntity<PageResponseDto<MessageResponseDto>> searchMessage(
             @RequestParam UUID channelId,
             @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ){
-
-        // JPA 추가시 변경 예정
-        List<Message> messageList = messageService.findAllByChannelId(channelId, pageable);
-        Page<Message> messageList2 = null;
-        PageResponseDto<Message> messageResponse = PageDtoConverter.toResponseDto(messageList2);
+        Page<MessageResponseDto> messageList = messageService.findAllByChannelId(channelId, pageable);
+        PageResponseDto<MessageResponseDto> messageResponse = PageDtoConverter.toResponseDto(messageList);
 
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }

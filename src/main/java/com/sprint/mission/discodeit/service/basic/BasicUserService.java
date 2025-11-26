@@ -20,6 +20,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,11 +32,10 @@ import java.util.stream.Collectors;
 public class BasicUserService implements UserService{
 
     private final UserRepository userRepository;
-    private final MessageRepository messageRepository;
-    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
+    @Transactional
     public UserResponseDto create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
         // 1. username/nickname/email 중복 검사
         if (existsByUsername(userRequest.username())) {
@@ -49,62 +49,34 @@ public class BasicUserService implements UserService{
         Optional.ofNullable(userRequest.password()).ifPresent(pw -> UserValidator.validatePassword(pw));
 
         // 3. 선택적 프로필 이미지 처리
-        UUID profileImageId = null;
         BinaryContent profileImage = null;
 
         if (Optional.ofNullable(profileRequest).isPresent()) {
             profileImage = new BinaryContent(
                     profileRequest.fileName(),
+                    profileRequest.size(),
                     profileRequest.contentType(),
                     profileRequest.bytes()
             );
-            binaryContentRepository.save(profileImage);
-            profileImageId = profileImage.getId();
         }
 
         User newUser  = new User(
                 userRequest.username(),
-                userRequest.username(),
                 userRequest.email(),
-                "010-0000-0000",
-                userRequest.username(),
                 userRequest.password(),
-                profileImageId
+                profileImage
         );
 
-        userStatusRepository.save(new UserStatus(newUser.getId(), newUser.getCreatedAt()));
-        userRepository.save(newUser);
+        UserStatus userStatus = new UserStatus(newUser);
+        newUser.setStatus(userStatus);
 
+        userRepository.save(newUser);
         return toDto(newUser);
     }
 
     @Override
     public UserResponseDto find(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        return toDto(user);
-    }
-
-    @Override
-    public UserResponseDto findByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        return toDto(user);
-    }
-
-    @Override
-    public UserResponseDto findByPhoneNum(String phoneNum) {
-        User user = userRepository.findByPhone(phoneNum)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        return toDto(user);
-    }
-
-    @Override
-    public UserResponseDto findByUsername(String username) {
-        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return toDto(user);
@@ -118,31 +90,19 @@ public class BasicUserService implements UserService{
     }
 
     @Override
-    public String findNickNameById(UUID userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
-                .getNickName();
-    }
-
-    @Override
+    @Transactional
     public UserResponseDto update(UUID userId, UpdateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        String realName = null;
-        String nickName = null;
-        String email = null;
-        String phoneNum = null;
         String username = null;
+        String email = null;
         String password = null;
 
         // 프로필 이미지만 전달된 경우 null 참조 방지
         if (Optional.ofNullable(userRequest).isPresent()) {
-            realName = userRequest.newUsername();
-            nickName = userRequest.newUsername();
-            email = userRequest.newEmail();
-            phoneNum = "010-0000-0000";
             username = userRequest.newUsername();
+            email = userRequest.newEmail();
             password = userRequest.newPassword();
 
             // 아이디와 닉네임, 이메일 중복 확인
@@ -153,64 +113,51 @@ public class BasicUserService implements UserService{
             }
 
             // 입력된 정보 형태 검증
-            Optional.ofNullable(nickName).ifPresent(n -> UserValidator.validateNickname(n));
             Optional.ofNullable(email).ifPresent(e -> UserValidator.validateEmail(e));
-            Optional.ofNullable(phoneNum).ifPresent(pn -> UserValidator.validatePhoneNum(pn));
             Optional.ofNullable(password).ifPresent(pw -> UserValidator.validatePassword(pw));
         }
-
-        UUID profileImageId = null;
+        BinaryContent profileImage = null;
 
         if (Optional.ofNullable(profileRequest).isPresent()) {
-            BinaryContent profileImage = new BinaryContent(
+            profileImage = new BinaryContent(
                     profileRequest.fileName(),
+                    profileRequest.size(),
                     profileRequest.contentType(),
                     profileRequest.bytes()
             );
             binaryContentRepository.save(profileImage);
-            profileImageId = profileImage.getId();
-            binaryContentRepository.delete(user.getProfileId()); // 기존 프로필 이미지 삭제
+
+            // 기존 프로필 이미지 삭제(있는 경우)
+            if(user.getProfile() != null) {
+                binaryContentRepository.deleteById(user.getProfile().getId());
+            }
         }
 
-        user.update(realName, nickName, email, phoneNum, username, password, profileImageId);
-        userRepository.update(user);
+        user.update(username, email, password, profileImage);
+        userRepository.save(user);
 
         return toDto(user);
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        messageRepository.deleteByUser(id);
-        userStatusRepository.deleteById(user.getId());
-        binaryContentRepository.delete(user.getProfileId());
         userRepository.deleteById(id);
-    }
-
-    @Override
-    public boolean isPasswordMatch(UUID userId, String password) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
-                .getPassword().equals(password);
     }
 
     @Override
     public UserResponseDto toDto(User user) {
 
         // 사용자 온라인 상태 저장
-        boolean online = userStatusRepository.findById(user.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND))
-                .isOnline();
+        boolean online = user.getStatus().isOnline();
 
         // 프로필 이미지 저장
-        UUID profileId = user.getProfileId();
+        BinaryContent profile = user.getProfile();
         BinaryContentResponseDto binaryContentResponseDto = null;
 
-        if (profileId != null) {
-            BinaryContent profile = binaryContentRepository.findById(user.getProfileId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND));
-
+        if (profile != null) {
             binaryContentResponseDto = BinaryContentDtoConverter.toResponseDto(profile);
         }
 
@@ -220,11 +167,6 @@ public class BasicUserService implements UserService{
     private boolean existsByUsername(String username) {
         return userRepository.findAll().stream()
                 .anyMatch(u -> u.getUsername().equals(username));
-    }
-
-    private boolean existsByNickName(String NickName) {
-        return userRepository.findAll().stream().
-                anyMatch(u -> u.getNickName().equals(NickName));
     }
 
     private boolean existsByEmail(String email) {

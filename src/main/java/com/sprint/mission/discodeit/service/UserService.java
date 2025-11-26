@@ -24,29 +24,9 @@ public interface UserService {
     UserResponseDto find(UUID userId);
 
     /**
-     * 이메일로 사용자 조회
-     */
-    UserResponseDto findByEmail(String email);
-
-    /**
-     * 전화번호로 사용자 조회
-     */
-    UserResponseDto findByPhoneNum(String phoneNum);
-
-    /**
-     * 사용자ID로 사용자 조회
-     */
-    UserResponseDto findByUsername(String username);
-
-    /**
      * 전체 사용자 목록 조회
      */
     List<UserResponseDto> findAll();
-
-    /**
-     * UUID로 사용자 닉네임 조회
-     */
-    String findNickNameById(UUID userId);
 
     /**
      * 사용자 정보 업데이트
@@ -60,6 +40,4 @@ public interface UserService {
     void delete(UUID userId);
 
     UserResponseDto toDto(User user);
-
-    boolean isPasswordMatch(UUID userId, String password);
 }
