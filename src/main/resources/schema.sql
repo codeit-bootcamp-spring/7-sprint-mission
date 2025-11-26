@@ -55,13 +55,14 @@ CREATE TABLE read_statuses (
 	id           uuid,
 	created_at   timestamptz NOT NULL,
 	updated_at   timestamptz,
-	user_id      uuid NOT NULL UNIQUE,
-	channel_id   uuid NOT NULL UNIQUE,
+	user_id      uuid NOT NULL,
+	channel_id   uuid NOT NULL,
 	last_read_at timestamptz NOT NULL,
 
 	PRIMARY KEY (id),
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-	FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE
+	FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE,
+	UNIQUE (user_id, channel_id)
 );
 
 -- messages 테이블 생성
