@@ -89,6 +89,7 @@ public class BasicChannelService implements ChannelService {
       throw new CustomException(ErrorCode.CHANNEL_PRIVATE_CANNOT_MODIFY);
     }
     channelRepository.update(id, req.name(), req.description());
+    channel = findById(id); //file 환경 channel 다시읽기
     return (ChannelPublicInfoRes) channelMapper.toInfoRes(channel);
   }
 }
