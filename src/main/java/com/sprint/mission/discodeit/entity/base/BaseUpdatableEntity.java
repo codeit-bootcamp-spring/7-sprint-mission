@@ -9,11 +9,19 @@ import lombok.ToString;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Getter @ToString
+@Getter
 @MappedSuperclass
 public abstract class BaseUpdatableEntity extends BaseEntity {
 
     @Column(name = "updated_at")
     @LastModifiedBy
     private Instant updatedAt;
+
+    @Override
+    public String toString() {
+        return "✅ BaseUpdatableEntity{" +
+             super.toString() +
+            "updatedAt=" + updatedAt +
+            '}';
+    }
 }

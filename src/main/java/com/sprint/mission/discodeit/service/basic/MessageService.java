@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -67,12 +68,18 @@ public class MessageService implements InterfaceMessageService {
         List<BinaryContent> dtoList = fileList
             .stream()
             .map(file -> {
-                BinaryContent binaryContent = new BinaryContent(
-                    file.getOriginalFilename(),
-                    file.getSize(),
-                    file.getContentType(),
-                    null
-                );
+                BinaryContent binaryContent = null;
+                try {
+                    binaryContent = new BinaryContent(
+                        file.getOriginalFilename(),
+                        file.getSize(),
+                        file.getContentType(),
+                        null,
+                        file.getBytes()
+                    );
+                } catch (IOException e) {
+                    throw new RuntimeException("🚨MessageDto create.err = " + e);
+                }
 
                 MessageAttachments messageAttachments = new MessageAttachments(
                     UUID.randomUUID(),

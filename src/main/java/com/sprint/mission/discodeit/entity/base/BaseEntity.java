@@ -26,7 +26,7 @@ public abstract class BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false) // , updatable = false ??? 이것땜시 에러! 왜 넣었을까?!!!!!
     @CreatedDate
     private Instant createdAt;
 }

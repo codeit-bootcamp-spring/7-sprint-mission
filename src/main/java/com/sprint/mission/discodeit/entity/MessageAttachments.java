@@ -32,6 +32,14 @@ public class MessageAttachments {
     @JoinColumn(name = "attachment_id", nullable = false)
     BinaryContent binaryContent;
 
+
+
+//    public MessageAttachments(UUID id, Message message, BinaryContent binaryContent) {
+//        this.id = id;
+//        this.message = message;
+//        this.binaryContent = binaryContent;
+//    }
+
     public void changeMessage(Message message) {
         this.message = message;
         message.getAttachments().add(this);

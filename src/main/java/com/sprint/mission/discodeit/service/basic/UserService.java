@@ -12,7 +12,9 @@ import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +38,9 @@ public class UserService implements InterfaceUserService {
     private final BinaryContentsRepository binaryContentRepository;
     private final BinaryContentStorageService binaryContentStorageService;
     private final UserMapper userMapper;
+
+//    @Autowired
+//    EntityManager em;
 
 //    public UserService(FileUserRepository fileUserRepository) {
 //        this.fileUserRepository = fileUserRepository;
@@ -62,12 +68,18 @@ public class UserService implements InterfaceUserService {
 
         BinaryContent profile = optionalProfileFile
             .map(file -> {
-                BinaryContent binaryContent = new BinaryContent(
-                    file.getOriginalFilename(),
-                    file.getSize(),
-                    file.getContentType(),
-                    null
-                );
+                BinaryContent binaryContent = null;
+                try {
+                    binaryContent = new BinaryContent(
+                        file.getOriginalFilename(),
+                        file.getSize(),
+                        file.getContentType(),
+                        null,
+                        file.getBytes()
+                    );
+                } catch (IOException e) {
+                    throw new RuntimeException("🚨UserDto create.err = " + e);
+                }
 
                 // 파일 저장 + DB 저장
                  return binaryContentStorageService.put(file, binaryContent);
@@ -86,9 +98,10 @@ public class UserService implements InterfaceUserService {
         userStatus.changeUser(newUser);
 
         userRepository.save(newUser);
-        userStatusRepository.save(userStatus);
 
-        log.info("✅ create = [" + userCreateRequest.username() + "]");
+        UserStatus tempUserStatus = userStatusRepository.save(userStatus);
+
+        log.info("✅ tempUserStatus = [" + tempUserStatus+ "]");
 
         return userMapper.toDto(newUser);
     }
@@ -161,14 +174,20 @@ public class UserService implements InterfaceUserService {
         }
 
         BinaryContent profile = optionalProfileFile.map(file -> {
-                BinaryContent neoBinaryContent = binaryContentRepository
-                    .findById(userId)
-                    .orElse(new BinaryContent(
-                        file.getOriginalFilename(),
-                        file.getSize(),
-                        file.getContentType(),
-                        null
-                    ));
+                BinaryContent neoBinaryContent = null;
+                try {
+                    neoBinaryContent = binaryContentRepository
+                        .findById(userId)
+                        .orElse(new BinaryContent(
+                            file.getOriginalFilename(),
+                            file.getSize(),
+                            file.getContentType(),
+                            null,
+                            file.getBytes()
+                        ));
+                } catch (IOException e) {
+                    throw new RuntimeException("🚨UserDto update.err = " + e);
+                }
 
                 // 파일 저장
                 binaryContentStorageService.put(file, neoBinaryContent);

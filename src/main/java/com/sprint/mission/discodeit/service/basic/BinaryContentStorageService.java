@@ -37,16 +37,16 @@ public class BinaryContentStorageService implements BinaryContentStorage {
     @Override
     public BinaryContent put(MultipartFile file, BinaryContent binaryContent) {
 
-        Path filePath = root.resolve(binaryContent.getId().toString());
-
         try {
+            // DB 저장
+            BinaryContent newBinaryContent = binaryContentRepository.save(binaryContent);
+
+            Path filePath = root.resolve(newBinaryContent.getId().toString());
+
             // 파일 저장
             Files.write(filePath, file.getBytes());  // byte[] -> 실제 파일로 저장
-
-            // DB 저장
-            binaryContentRepository.save(binaryContent);
         } catch (IOException e) {
-            throw new RuntimeException("🚨파일 저장 실패 I: " + filePath, e);
+            throw new RuntimeException("🚨파일 저장 실패 I: " + e);
         }
 
         return binaryContent;

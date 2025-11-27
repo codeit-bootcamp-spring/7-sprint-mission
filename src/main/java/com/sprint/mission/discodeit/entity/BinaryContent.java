@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter @Setter
 @Entity
 @Table(name = "binary_contents")
@@ -33,6 +32,15 @@ public class BinaryContent extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "binaryContent", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private MessageAttachments attachments;
-//    @Column(name = "bytes", nullable = false)
-//    private byte[] bytes;
+
+    @Column(name = "bytes", nullable = false)
+    private byte[] bytes;
+
+
+//    public BinaryContent(String fileName, Long size, String contentType, MessageAttachments attachments) {
+//        this.fileName = fileName;
+//        this.size = size;
+//        this.contentType = contentType;
+//        this.attachments = attachments;
+//    }
 }

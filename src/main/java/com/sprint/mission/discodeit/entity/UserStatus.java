@@ -11,6 +11,7 @@ import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @AllArgsConstructor
 @Getter @Setter
@@ -27,10 +28,15 @@ public class UserStatus extends BaseUpdatableEntity {
     @Column(name = "last_active_at", nullable = false)
     private Instant lastActiveAt;
 
+//    public UserStatus(User user, Instant lastActiveAt) {
+//        this.user = user;
+//        this.lastActiveAt = lastActiveAt;
+//    }
+
     public boolean isOnline() {
         //[ ] 마지막 접속 시간을 기준으로 현재 로그인한 유저로 판단할 수 있는 메소드를 정의하세요.
         // 마지막 접속 시간이 현재 시간으로부터 5분 이내이면 현재 접속 중인 유저로 간주합니다.
-        Duration duration = Duration.between(this.getUpdatedAt(), Instant.now());
+        Duration duration = Duration.between(lastActiveAt, Instant.now());
         return duration.toMinutes() < 5;
     }
 
@@ -38,5 +44,14 @@ public class UserStatus extends BaseUpdatableEntity {
     public void changeUser(User user) {
         this.user = user;
         user.setStatus(this);
+    }
+
+    @Override
+    public String toString() {
+        return "✅ UserStatus{" +
+            super.toString() +
+            "user=" + user +
+            ", lastActiveAt=" + lastActiveAt +
+            '}';
     }
 }

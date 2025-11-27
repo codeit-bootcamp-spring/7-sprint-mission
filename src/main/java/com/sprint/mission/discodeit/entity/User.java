@@ -33,4 +33,11 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.REMOVE) // ON DELETE CASCADE
     private UserStatus status;
 
+//    public User(String username, String email, String password, BinaryContent profile, UserStatus status) {
+//        this.username = username;
+//        this.email = email;
+//        this.password = password;
+//        this.profile = profile;
+//        this.status = status;
+//    }
 }

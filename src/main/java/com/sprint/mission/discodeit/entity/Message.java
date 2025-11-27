@@ -34,4 +34,11 @@ public class Message extends BaseUpdatableEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "message", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<MessageAttachments> attachments;
+
+//    public Message(String content, Channel channel, User author, List<MessageAttachments> attachments) {
+//        this.content = content;
+//        this.channel = channel;
+//        this.author = author;
+//        this.attachments = attachments;
+//    }
 }
