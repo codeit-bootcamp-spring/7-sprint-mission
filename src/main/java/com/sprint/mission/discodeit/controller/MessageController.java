@@ -59,12 +59,7 @@ public class MessageController implements MessageControllerDocs {
     MessageCreateReq req = MessageCreateReq.from(messageInfoReq, binaryContentCreateReqs);
     MessageViewRes message = messageCreationFacade.createMessage(speakerId, channelId, req);
 
-    URI location = ServletUriComponentsBuilder
-        .fromCurrentRequestUri()
-        .path("/{id}")
-        .buildAndExpand(message.messageId())
-        .toUri();
-    return ResponseEntity.created(location).body(message);
+    return ResponseEntity.created(URI.create("/api/messages/" + message.messageId())).body(message);
   }
 
   //메세지 수정

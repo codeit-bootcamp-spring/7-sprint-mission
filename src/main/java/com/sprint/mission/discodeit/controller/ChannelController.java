@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateReq;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelPrivateInfoRes;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelPublicInfoRes;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.facade.channel.ChannelCreationFacade;
 import com.sprint.mission.discodeit.facade.channel.ChannelDeleteFacade;
@@ -15,15 +14,23 @@ import com.sprint.mission.discodeit.facade.channel.ChannelDetailViewFacade;
 import com.sprint.mission.discodeit.facade.channel.ChannelOverViewFacade;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
-import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/channels")
@@ -32,7 +39,6 @@ public class ChannelController implements ChannelControllerDocs {
 
   private final ChannelCreationFacade channelCreationFacade;
   private final ChannelOverViewFacade channelOverViewFacade;
-  private final ChannelDetailViewFacade channelDetailViewFacade;
   private final ChannelDeleteFacade channelDeleteFacade;
   private final ChannelService channelService;
 
@@ -51,12 +57,7 @@ public class ChannelController implements ChannelControllerDocs {
       @Valid @RequestBody ChannelCreateReq req) {
     ChannelPublicInfoRes channel = (ChannelPublicInfoRes) channelCreationFacade.createPublicChannel(
         managerId, req);
-    URI location = ServletUriComponentsBuilder
-        .fromCurrentRequestUri()
-        .path("/{id}")
-        .buildAndExpand(channel.channelId())
-        .toUri();
-    return ResponseEntity.created(location).body(channel);
+    return ResponseEntity.created(URI.create("/api/channels/" + channel.channelId())).body(channel);
   }
 
   //비밀 채널 생성

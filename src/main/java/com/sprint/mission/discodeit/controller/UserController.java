@@ -16,7 +16,6 @@ import com.sprint.mission.discodeit.facade.user.UserDetailViewFacade;
 import com.sprint.mission.discodeit.facade.user.UserOverviewFacade;
 import com.sprint.mission.discodeit.facade.user.UserUpdateFacade;
 import com.sprint.mission.discodeit.facade.userstatus.UserStatusUpdateFacade;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -37,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/users")
@@ -50,7 +48,6 @@ public class UserController implements UserControllerDocs {
   private final UserUpdateFacade userUpdateFacade;
   private final UserDeletionFacade userDeletionFacade;
   private final UserStatusUpdateFacade userStatusUpdateFacade;
-  private final BinaryContentService binaryContentService;
   private final UserService userService;
 
   //사용자 목록 조회
@@ -73,12 +70,7 @@ public class UserController implements UserControllerDocs {
     BinaryContentCreateReq binaryContentCreateReq = BinaryContentCreateReq.from(profileFile);
     UserDetailInfoRes user = userCreationFacade.createUser(
         UserCreateReq.from(userInfoReq, binaryContentCreateReq));
-    URI location = ServletUriComponentsBuilder
-        .fromCurrentRequestUri()
-        .path("/{id}")
-        .buildAndExpand(user.userId())
-        .toUri();
-    return ResponseEntity.created(location).body(user);
+    return ResponseEntity.created(URI.create("/api/users/" + user.userId())).body(user);
   }
 
   // 회원 수정
