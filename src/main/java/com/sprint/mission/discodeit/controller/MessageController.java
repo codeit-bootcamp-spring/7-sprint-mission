@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.messageDto.MessageDto;
-import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.dto.messageDto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageDto;
 import com.sprint.mission.discodeit.dto.messageDto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,12 +53,20 @@ public class MessageController {
         return ResponseEntity.noContent().build();
     }
 
-    // 특정 채널의 메시지 조회
+    // 특정 채널의 메시지 조회(오프셋 기반 페이징)
+//    @RequestMapping(method = RequestMethod.GET)
+//    public ResponseEntity<PageResponse<MessageDto>> getAllByChannelId
+//    (@RequestParam UUID channelId,
+//     @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+//        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, pageable));
+//    }
+
+    // 특정 채널의 메시지 조회(커서 기반 페이징)
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<PageResponse<MessageDto>> getAllByChannelId
-    (@RequestParam UUID channelId,
+    (@RequestParam UUID channelId, @RequestParam(required = false) Instant cursor,
      @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, pageable));
+        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, cursor, pageable));
     }
 }
 

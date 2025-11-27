@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,6 @@ public class Message extends BaseUpdatableEntity {
 
     @Builder
     public Message(User author, Channel channel, String content, List<BinaryContent> attachments) {
-        super();
         this.content = content;
         this.channel = channel;
         this.author = author;

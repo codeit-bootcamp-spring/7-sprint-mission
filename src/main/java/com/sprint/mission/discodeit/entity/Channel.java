@@ -33,7 +33,6 @@ public class Channel extends BaseUpdatableEntity {
 
     // PUBLIC
     public Channel(String name, String description, ChannelType type) {
-        super();
         this.name = name;
         this.description = description;
         this.type = type;

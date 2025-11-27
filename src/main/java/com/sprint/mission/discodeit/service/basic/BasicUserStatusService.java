@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
-import com.sprint.mission.discodeit.mapper.UserStatusMapper;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class BasicUserStatusService implements UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
@@ -30,6 +30,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusMapper userStatusMapper;
 
     @Override
+    @Transactional
     public UserStatusDto createUserStatus(UserStatusCreateRequest requestDto) {
 
         User user = userRepository.findById(requestDto.userId())
@@ -53,6 +54,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    @Transactional
     public UserStatusDto updateStatusByUserId(UUID userId, UserStatusUpdateRequest requestDto) {
         UserStatus status = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
@@ -69,6 +71,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    @Transactional
     public UserStatusDto updateStatusById(UUID id, UserStatusUpdateRequest updateDto) {
         UserStatus status = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
@@ -80,6 +83,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    @Transactional
     public void deleteUserStatusById(UUID id) {
         userStatusRepository.deleteById(id);
     }

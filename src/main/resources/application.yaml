@@ -27,18 +27,18 @@ spring:
 
     open-in-view: false
 
-  logging:
-    level:
-      org:
-        hibernate:
-          orm:
-            jdbc:
-              bind: TRACE # 쿼리 로그 ?값을 보여줌
-
   servlet:
     multipart:
       max-file-size: 500MB    # 기본은 1MB
       max-request-size: 500MB
+
+logging:
+  level:
+    org:
+      hibernate:
+        orm:
+          jdbc:
+            bind: TRACE # 쿼리 로그 ?값을 보여줌
 
 
 server:
@@ -46,6 +46,7 @@ server:
 # application.yaml
 discodeit:
     storage:
+      type: local
       local:
         root-path: /Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload
 

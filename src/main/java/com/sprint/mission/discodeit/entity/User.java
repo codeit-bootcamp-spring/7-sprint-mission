@@ -42,8 +42,6 @@ public class User extends BaseUpdatableEntity {
 
     @Builder
     public User(String email, String password, String username) {
-        super();
-
         validateEmail(email);
         validatePassword(password);
         validateUserName(username);

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.dto.userDto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.Builder;
 
 @Builder
 public record UserCreateRequest(

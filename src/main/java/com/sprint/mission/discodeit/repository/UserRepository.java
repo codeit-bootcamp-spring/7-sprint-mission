@@ -16,6 +16,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // 닉네임 중복 확인용
     Optional<User> findByUsername(String userName);
 
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.profile")
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.profile " +
+            "LEFT JOIN FETCH u.status")
     List<User> findAllWithProfile();
 }

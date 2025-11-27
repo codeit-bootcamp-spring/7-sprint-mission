@@ -55,6 +55,7 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> exceptionHandler(Exception e) {
+        e.printStackTrace();
         return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

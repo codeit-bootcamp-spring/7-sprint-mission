@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.exception.FileSizeLimitExceededException;
-import com.sprint.mission.discodeit.exception.InvalidInputException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,8 +38,6 @@ public class BinaryContent extends BaseEntity {
 
     @Builder
     public BinaryContent(String fileName, Long size, String contentType) {
-        super();
-
         //validateData(bytes);
         this.fileName = fileName;
         this.size = size;

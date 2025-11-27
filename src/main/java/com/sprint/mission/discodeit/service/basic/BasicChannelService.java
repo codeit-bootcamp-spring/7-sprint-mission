@@ -4,23 +4,29 @@ import com.sprint.mission.discodeit.dto.channelDto.ChannelDto;
 import com.sprint.mission.discodeit.dto.channelDto.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channelDto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channelDto.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.entityType.ChannelType;
 import com.sprint.mission.discodeit.exception.NotFoundChannelException;
-import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
-import com.sprint.mission.discodeit.repository.*;
-import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class BasicChannelService implements ChannelService {
 
     private final UserRepository userRepository;
@@ -30,6 +36,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelMapper channelMapper;
 
     @Override
+    @Transactional
     public ChannelDto createPublicChannel(PublicChannelCreateRequest requestDto) {
 
         Channel newChannel = new Channel(
@@ -43,6 +50,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest requestDto) {
 
         Channel newChannel = new Channel(ChannelType.PRIVATE);
@@ -94,6 +102,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest updateDto) {
 
         Channel channel = channelRepository.findById(channelId)
@@ -111,6 +120,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public void deleteChannel(UUID id) {
 
         channelRepository.findById(id)

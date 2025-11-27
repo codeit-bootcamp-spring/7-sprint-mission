@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
-import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
@@ -26,6 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentStorage binaryContentStorage;
 
     @Override
+    @Transactional
     public BinaryContentDto createBinaryContent(BinaryContentCreateRequest requestDto) {
 
         BinaryContent newContent = BinaryContent.builder()
@@ -54,6 +55,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
+    @Transactional
     public void deleteBinaryContentById(UUID id) {
         binaryContentRepository.deleteById(id);
     }

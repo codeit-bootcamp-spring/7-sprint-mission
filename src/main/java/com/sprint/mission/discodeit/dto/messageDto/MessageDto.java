@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto.messageDto;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
 

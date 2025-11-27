@@ -1,18 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserDto;
+import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.userDto.UserDto;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,12 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
@@ -38,6 +39,7 @@ public class BasicUserService implements UserService {
 
     // 생성
     @Override
+    @Transactional
     public UserDto createUser(UserCreateRequest requestDto, MultipartFile profileImage) {
         userRepository.findByEmail(requestDto.email()).ifPresent(user
                 -> { throw new DuplicateEmailException("이미 존재하는 이메일"); });
@@ -55,8 +57,10 @@ public class BasicUserService implements UserService {
                 .build();
 
         newUser.updateProfile(profile);
+        UserStatus status = new UserStatus(newUser);
+        newUser.updateStatus(status);
+
         userRepository.save(newUser);
-        userStatusRepository.save(new UserStatus(newUser));
         return userMapper.toDto(newUser);
     }
 
@@ -69,12 +73,12 @@ public class BasicUserService implements UserService {
                 .size(profileImage.getSize())
                 .contentType(profileImage.getContentType())
                 .build();
-        binaryContentRepository.save(binaryContent);
+        binaryContent = binaryContentRepository.save(binaryContent);
 
         try {
             binaryContentStorage.put(binaryContent.getId(), profileImage.getBytes());
         } catch (IOException e) {
-            throw new RuntimeException("오류가 발생");
+            throw new RuntimeException("파일 저장 실패");
         }
         return binaryContent;
     }
@@ -100,6 +104,7 @@ public class BasicUserService implements UserService {
     // --- 수정 ---
 
     @Override
+    @Transactional
     public UserDto updateUserInfo(UUID userId, UserUpdateRequest updateDto, MultipartFile profileImage) {
 
         User user = userRepository.findById(userId)
@@ -146,6 +151,7 @@ public class BasicUserService implements UserService {
 
     // 물리 삭제
     @Override
+    @Transactional
     public void deleteUser(UUID userId) {
 
         userRepository.findById(userId)

@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.dto.readStatusDto;
 
-import com.sprint.mission.discodeit.entity.ReadStatus;
-
 import java.time.Instant;
 import java.util.UUID;
 

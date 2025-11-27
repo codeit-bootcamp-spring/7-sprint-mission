@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;

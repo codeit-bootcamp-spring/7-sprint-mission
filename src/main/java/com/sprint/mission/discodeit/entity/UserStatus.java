@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
 
@@ -22,14 +21,8 @@ public class UserStatus extends BaseUpdatableEntity {
     private Instant lastActiveAt;
 
     public UserStatus(User user) {
-        super();
         this.user = user;
         this.lastActiveAt = Instant.now();
-    }
-
-    // 연관관계 편의 메서드
-    public void setUser(User user){
-        this.user = user;
     }
 
     public void updateLastActiveAt(Instant lastActiveAt){

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
 import java.time.Instant;
 
 @Getter @ToString
@@ -29,7 +30,6 @@ public class ReadStatus extends BaseUpdatableEntity {
     private Instant lastReadAt;
 
     public ReadStatus(User user, Channel channel) {
-        super();
         this.user = user;
         this.channel = channel;
         this.lastReadAt = Instant.now();

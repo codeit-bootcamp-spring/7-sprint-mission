@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundChannelException;
 import com.sprint.mission.discodeit.exception.NotFoundUserException;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sun.jdi.request.DuplicateRequestException;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class BasicReadStatusService implements ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
@@ -34,6 +34,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusMapper readStatusMapper;
 
     @Override
+    @Transactional
     public ReadStatusDto createReadStatus(ReadStatusCreateRequest requestDto) {
         // User, Channel Id 입력
         User user = userRepository.findById(requestDto.userId())
@@ -66,6 +67,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    @Transactional
     public ReadStatusDto updateReadStatus(UUID id, ReadStatusUpdateRequest updateDto) {
         ReadStatus status = readStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
@@ -76,6 +78,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    @Transactional
     public void deleteReadStatus(UUID id) {
         readStatusRepository.deleteById(id);
     }
