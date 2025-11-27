@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 
 import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.UUID;
 

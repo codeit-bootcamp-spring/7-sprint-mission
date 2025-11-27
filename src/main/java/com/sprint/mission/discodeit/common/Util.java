@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.common;
 
 import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import java.util.List;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,8 +12,7 @@ import java.io.IOException;
 @UtilityClass //👍 ️static method만 제공하는 Util Class라면 @UtilityClass애너테이션을 이용해보세요
 @Slf4j
 public class Util {
-    public static Dto_BinaryContent
-    parsingMultipartFile(MultipartFile file) {
+    public static Dto_BinaryContent parsingMultipartFile(MultipartFile file) {
         if (file == null) {
           return null;
         }
@@ -35,7 +35,7 @@ public class Util {
 
         List<Dto_BinaryContent> dtoFiles = null;
 
-        if (fileList != null) {
+        if (null != fileList) {
             dtoFiles = fileList.stream()
                 .map(Util::parsingMultipartFile)
                 .toList();

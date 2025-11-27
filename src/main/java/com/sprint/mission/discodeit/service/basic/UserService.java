@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.Dto_UserUpdate;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -22,6 +22,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -32,6 +33,7 @@ public class UserService implements InterfaceUserService {
     private final UsersRepository userRepository;
     private final UserStatusesRepository userStatusRepository;
     private final BinaryContentsRepository binaryContentRepository;
+    private final BinaryContentStorageService binaryContentStorageService;
     private final UserMapper userMapper;
 
 //    public UserService(FileUserRepository fileUserRepository) {
@@ -43,7 +45,7 @@ public class UserService implements InterfaceUserService {
 //    3. 수정자 주입(Setter Injection) : 간단하지만 테스트 어려워서 지양
 
     @Override
-    public UserDto create(UserCreateRequest userCreateRequest, Optional<Dto_BinaryContent> dto_binaryContent) {
+    public UserDto create(UserCreateRequest userCreateRequest, Optional<MultipartFile> optionalProfileFile) {
 //    public User create(String newUsername, Optional<BufferedImage> profileImageBytes) {
 //        [ ] 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
@@ -58,21 +60,26 @@ public class UserService implements InterfaceUserService {
             throw new IllegalArgumentException("🚨create : 동일한 newEmail [" + userCreateRequest.email() + "] 사용햐는 User 가 이미 존재함");
         }
 
-        BinaryContent binaryContent = null;
+        BinaryContent profile = optionalProfileFile
+            .map(file -> {
+                BinaryContent binaryContent = new BinaryContent(
+                    file.getOriginalFilename(),
+                    file.getSize(),
+                    file.getContentType(),
+                    null
+                );
 
-//        if (dto_binaryContent.isPresent()) {
-//            Dto_BinaryContent dtoBinaryContent = dto_binaryContent.get();
-//            BinaryContent binaryContent_I = new BinaryContent(dtoBinaryContent);
-//            binaryContentId = binaryContent_I.getId();
-//            binaryContentRepository.save(binaryContent_I);
-//        }
+                // 파일 저장 + DB 저장
+                 return binaryContentStorageService.put(file, binaryContent);
+            })
+            .orElse(null);
 
         UserStatus userStatus = null;
 
         User newUser = new User(userCreateRequest.username(),
             userCreateRequest.email(),
             userCreateRequest.password(),
-            binaryContent,  //??🚨🚨🚨🚨🚨🚨살려!!
+            profile ,
             userStatus);
 
         userStatus = new UserStatus(newUser, Instant.now());
@@ -131,7 +138,7 @@ public class UserService implements InterfaceUserService {
     }
 
     @Override
-    public UserDto update(UUID userId, Dto_UserUpdate dtoUserUpdate, Optional<Dto_BinaryContent> dtoBinaryContent) {
+    public UserDto update(UUID userId, Dto_UserUpdate dtoUserUpdate, Optional<MultipartFile> optionalProfileFile) {
 //        [ ] 선택적으로 프로필 이미지를 대체할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //        수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
@@ -153,16 +160,28 @@ public class UserService implements InterfaceUserService {
             throw new IllegalArgumentException("🚨 같은 newEmail [" + dtoUserUpdate.newEmail() + "]을 사용하는 User가 이미 존재함");
         }
 
-        //!! 선택적으로 프로필 이미지를 대체할 수 있습니다. //??🚨🚨🚨🚨🚨🚨살려!!
-//        if (dtoBinaryContent != null && dtoBinaryContent.isPresent()) {
-//            BinaryContent neoBinaryContent = binaryContentRepository.findById(userId).orElse(new BinaryContent(dtoBinaryContent.get()));
-//            binaryContentRepository.save(neoBinaryContent);
-//            //!! 순서 유의_I
-//            user.updateUser(dtoUserUpdate.newUsername(), dtoUserUpdate.newPassword(), dtoUserUpdate.newEmail(), neoBinaryContent.getId());
-//        }
-//        else {
-//            user.updateUser(dtoUserUpdate.newUsername(), dtoUserUpdate.newPassword(), dtoUserUpdate.newEmail(), null);
-//        }
+        BinaryContent profile = optionalProfileFile.map(file -> {
+                BinaryContent neoBinaryContent = binaryContentRepository
+                    .findById(userId)
+                    .orElse(new BinaryContent(
+                        file.getOriginalFilename(),
+                        file.getSize(),
+                        file.getContentType(),
+                        null
+                    ));
+
+                // 파일 저장
+                binaryContentStorageService.put(file, neoBinaryContent);
+
+                // DB 저장
+                return binaryContentRepository.save(neoBinaryContent);
+            })
+            .orElse(null);
+
+        user.setProfile(profile);
+        user.setUsername(dtoUserUpdate.newUsername());
+        user.setEmail(dtoUserUpdate.newEmail());
+        user.setPassword(dtoUserUpdate.newPassword());
 
         //!! 순서 유의_II
         userRepository.save(user);

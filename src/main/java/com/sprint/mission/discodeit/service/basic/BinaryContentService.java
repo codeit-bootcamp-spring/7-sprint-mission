@@ -1,17 +1,26 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.service.InterfaceBinaryContentService;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -32,7 +41,7 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 //        log.info("✅ BinaryContentService.create = [" + binaryContent.getId() + "]");
 //        return binaryContentMapper.toDto(binaryContent);
 //    }
-
+    @Override
     public  BinaryContentDto find(UUID binaryContentId) {
 //    [ ] id로 조회합니다.
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
@@ -41,7 +50,7 @@ public class BinaryContentService implements InterfaceBinaryContentService {
         log.info("✅ BinaryContentService.find.binaryContentId = [" + binaryContentId.toString() + "]");
         return binaryContentMapper.toDto(binaryContent);
     }
-
+    @Override
     public List<BinaryContentDto> findAllByIdIn(UUID[] binaryContentIds) {
         List<BinaryContentDto> dtoList = binaryContentRepository.findAll().stream()
             .filter(content -> List.of(binaryContentIds).contains(content.getId()))
@@ -58,8 +67,9 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 //        binaryContentRepository.deleteById(binaryContentId);
 //        log.info("✅ BinaryContentService.delete.readStatusID = [" + binaryContentId.toString() + "]");
 //    }
-
+    @Override
     public void download(UUID binaryContentId) {
         //💎🌱 파일 다운로드
     }
+
 }

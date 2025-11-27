@@ -26,7 +26,7 @@ public class User extends BaseUpdatableEntity {
     private String password;
 
     @OneToOne(fetch = FetchType.LAZY) // (orphanRemoval = false) // ON DELETE SET NULL
-    @JoinColumn(name = "profile_id") // nullable = true
+    @JoinColumn(name = "profile_id", nullable = true)
     private BinaryContent profile;
 
     @Setter

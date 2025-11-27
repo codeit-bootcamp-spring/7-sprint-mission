@@ -8,9 +8,10 @@ import com.sprint.mission.discodeit.mapper.dto.MessageDto;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface InterfaceMessageService {
-    MessageDto create(MessageCreateRequest dtoMessage, Optional<List<Dto_BinaryContent>> requestDto);
+    MessageDto create(MessageCreateRequest dtoMessage, List<MultipartFile> fileList);
     List<MessageDto> findAllByChannelId(UUID channelID);
 //    List<Message> getAllMessageInChannel(UUID channelID);
 //    List<Message> getAllMessageOfUser(UUID userID);

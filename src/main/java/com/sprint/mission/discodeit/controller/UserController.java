@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
-import static com.sprint.mission.discodeit.common.Util.parsingMultipartFile;
-
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.dto.UserStatusDto;
+import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import com.sprint.mission.discodeit.swaggerDocs.UserDoc;
-import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.dto.Dto_UserStatusUpdate;
 import com.sprint.mission.discodeit.dto.Dto_UserUpdate;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
@@ -38,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/users")
 public class UserController implements UserDoc {
     private final UserService userService;
+    private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
     private final UserMapper userMapper;
 
@@ -57,9 +56,9 @@ public class UserController implements UserDoc {
     public ResponseEntity<UserDto> create(
         @Valid @RequestPart("userCreateRequest") UserCreateRequest dtoUser,
         @RequestPart(value = "profile", required = false) MultipartFile file) {
+
         //💎User 등록
-        Dto_BinaryContent dtoFile = parsingMultipartFile(file);
-        UserDto resUser = userService.create(dtoUser, Optional.ofNullable(dtoFile));
+        UserDto resUser = userService.create(dtoUser, Optional.ofNullable(file));
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -83,9 +82,7 @@ public class UserController implements UserDoc {
         @Valid @RequestPart(value = "userUpdateRequest") Dto_UserUpdate dtoUser,
         @RequestPart(value = "profile", required = false) MultipartFile file) {
         //💎User 정보 수정
-        Dto_BinaryContent dtoFile = parsingMultipartFile(file);
-
-        UserDto resUser = userService.update(userId, dtoUser, Optional.ofNullable(dtoFile));
+        UserDto resUser = userService.update(userId, dtoUser, Optional.ofNullable(file));
 
         return ResponseEntity
             .status(HttpStatus.OK)

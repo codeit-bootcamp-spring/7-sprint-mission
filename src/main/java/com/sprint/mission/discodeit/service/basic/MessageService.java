@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -24,6 +25,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -31,14 +33,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 public class MessageService implements InterfaceMessageService {
     private final MessagesRepository messageRepository;
-    private final BinaryContentsRepository binaryContentRepository;
     private final ChannelsRepository channelRepository;
     private final UsersRepository userRepository;
     private final MessageAttachmentsRepository messageAttachmentsRepository;
+    private final BinaryContentStorageService binaryContentStorageService;
     private final MessageMapper messageMapper;
 
     @Override
-    public MessageDto create(MessageCreateRequest dtoMessage, Optional<List<Dto_BinaryContent>> dtoList) {
+    public MessageDto create(MessageCreateRequest dtoMessage, List<MultipartFile> fileList) {
         if (dtoMessage.channelId() == null) {
             throw new NoSuchElementException("🚨 Channel를 찾을 수 없음 :: " + dtoMessage.toString());
         }
@@ -47,40 +49,47 @@ public class MessageService implements InterfaceMessageService {
           throw new NoSuchElementException("🚨 User를 찾을 수 없음 :: " + dtoMessage.toString());
         }
 
-        Channel channel = channelRepository.findById(dtoMessage.channelId()).orElseThrow(() -> new IllegalArgumentException("🚨 noChannelId = [" + dtoMessage.channelId().toString() + "]"));
-        User user = userRepository.findById(dtoMessage.authorId()).orElseThrow(() -> new IllegalArgumentException("🚨 noUserId = [" + dtoMessage.authorId().toString() + "]"));
+        Channel channel = channelRepository
+            .findById(dtoMessage.channelId())
+            .orElseThrow(() -> new IllegalArgumentException("🚨 noChannelId = [" + dtoMessage.channelId().toString() + "]"));
 
-        List<MessageAttachments> attachmentsList = null;
+        User user = userRepository
+            .findById(dtoMessage.authorId())
+            .orElseThrow(() -> new IllegalArgumentException("🚨 noUserId = [" + dtoMessage.authorId().toString() + "]"));
+
+        List<MessageAttachments> attachments = new ArrayList<>();
         Message newMessage = new Message(dtoMessage.content(),
-            channel,
-            user,
-            attachmentsList);
+                                        channel,
+                                        user,
+                                        attachments);
 
-        if (!dtoList.isEmpty()) {
-            for (Dto_BinaryContent dtoBinaryContent : dtoList.get()) {
-                MessageAttachments messageAttachments = null;
 
-                BinaryContent binaryContent = new BinaryContent(dtoBinaryContent.fileName(),
-                    dtoBinaryContent.size(),
-                    dtoBinaryContent.contentType(),
-                    messageAttachments);
+        List<BinaryContent> dtoList = fileList
+            .stream()
+            .map(file -> {
+                BinaryContent binaryContent = new BinaryContent(
+                    file.getOriginalFilename(),
+                    file.getSize(),
+                    file.getContentType(),
+                    null
+                );
 
-                messageAttachments = new MessageAttachments(
+                MessageAttachments messageAttachments = new MessageAttachments(
                     UUID.randomUUID(),
                     newMessage,
                     binaryContent
-                    );
-
-                messageAttachments.changeBinaryContent(binaryContent);
-                messageAttachments.changeMessage(newMessage);
-
-                attachmentsList.add(messageAttachments);
-
-                binaryContentRepository.save(binaryContent);
-                messageRepository.save(newMessage);
+                );
+                attachments.add(messageAttachments);
                 messageAttachmentsRepository.save(messageAttachments);
-            }
-        }
+
+                // 파일 저장 + DB 저장
+                binaryContent.setAttachments(messageAttachments);
+                return binaryContentStorageService.put(file, binaryContent);
+            })
+            .toList();
+
+        newMessage.setAttachments(attachments);
+        messageRepository.save(newMessage);
 
         log.info("✅ 💌 MessageService.create.content = [" + newMessage.getContent() + "] 💬");
         return messageMapper.toDto(newMessage);

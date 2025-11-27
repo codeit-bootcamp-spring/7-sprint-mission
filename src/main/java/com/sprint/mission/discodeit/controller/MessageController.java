@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.Util;
 import com.sprint.mission.discodeit.mapper.dto.MessageDto;
 import com.sprint.mission.discodeit.swaggerDocs.MessageDoc;
-import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.basic.MessageService;
@@ -53,9 +51,7 @@ public class MessageController implements MessageDoc {
         @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList) {
 
         //💎Message 생성
-        List<Dto_BinaryContent> collect = Util.parsingMultipartFileList(fileList);
-
-        MessageDto resMessage = messageService.create(dtoMessage, Optional.ofNullable(collect));
+        MessageDto resMessage = messageService.create(dtoMessage, fileList);
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
