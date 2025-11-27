@@ -75,7 +75,7 @@ public class ChannelController implements ChannelControllerDocs {
   }
 
   //공개 채널 수정
-  @PutMapping("/{channelId}")
+  @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelPublicInfoRes> updatePublicChannel(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateReq req) {
     return ResponseEntity.ok(channelService.update(channelId, req));
