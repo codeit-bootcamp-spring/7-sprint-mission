@@ -37,7 +37,7 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryRepository binaryRepository;
     private final UserMapper userMapper;
-    //private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentStorage binaryContentStorage;
 
     private final BinaryContentService binaryContentService;
 

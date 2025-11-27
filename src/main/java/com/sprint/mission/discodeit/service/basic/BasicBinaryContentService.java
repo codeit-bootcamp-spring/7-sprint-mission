@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.BinaryRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +27,6 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     @Transactional
     public BinaryContent create(BinaryContentCreateRequest request) {
-        //  String fileName = request.fileName();
-        //   byte[] bytes = request.bytes();
-        //     String contentType = request.contentType();
         BinaryContent binaryContent = new BinaryContent(
                 request.fileName(),
                 (long) request.bytes().length,
@@ -65,4 +63,13 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         binaryRepository.deleteById(BinaryContentId);
     }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<?> download(UUID id) {
+        BinaryContentDto dto = find(id);
+
+        return binaryContentStorage.download(dto);
+    }
+
+
 }
