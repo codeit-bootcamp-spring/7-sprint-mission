@@ -27,19 +27,6 @@ public class AuthController implements AuthControllerDocs {
 
   private final AuthFacade authFacade;
   private final BasicAuthService basicAuthService;
-  private final UserService userService;
-
-  //이메일 가입되어있는지
-  @GetMapping("/duplication/email")
-  public ResponseEntity<AvailabilityRes> isRegisteredEmail(@RequestParam String email) {
-    return ResponseEntity.ok(userService.isRegisteredEmail(email));
-  }
-
-  //닉네임 가입되어있는지
-  @GetMapping("/duplication/nickname")
-  public ResponseEntity<AvailabilityRes> isRegisteredNickname(@RequestParam String nickname) {
-    return ResponseEntity.ok(userService.isRegisteredNickname(nickname));
-  }
 
   // 로그인
   @PostMapping("/login")

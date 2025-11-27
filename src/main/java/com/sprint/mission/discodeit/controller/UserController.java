@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.docs.UserControllerDocs;
+import com.sprint.mission.discodeit.dto.auth.response.AvailabilityRes;
 import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreateReq;
 import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
 import com.sprint.mission.discodeit.dto.user.request.UserFindPasswordReq;
@@ -103,6 +104,18 @@ public class UserController implements UserControllerDocs {
   @PatchMapping("/{userId}/status")
   public ResponseEntity<UserStatusSimpleViewRes> updateUserStatus(@PathVariable UUID userId) {
     return ResponseEntity.ok(userStatusUpdateFacade.update(userId));
+  }
+
+  //이메일 가입되어있는지
+  @GetMapping("/duplication/email")
+  public ResponseEntity<AvailabilityRes> isRegisteredEmail(@RequestParam String email) {
+    return ResponseEntity.ok(userService.isRegisteredEmail(email));
+  }
+
+  //닉네임 가입되어있는지
+  @GetMapping("/duplication/nickname")
+  public ResponseEntity<AvailabilityRes> isRegisteredNickname(@RequestParam String nickname) {
+    return ResponseEntity.ok(userService.isRegisteredNickname(nickname));
   }
 
   //메일로 가입했던 아이디 발송
