@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.loggin;
 
+import com.sprint.mission.discodeit.dto.common.Sanitizable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -82,7 +83,7 @@ public class LoggingAspect {
   }
 
   //매개변수 있는지 검사 해서 있으면 매개변수 처리 함수 호출
-  private Object sanitizeArgs(Object[] args) {
+  private List<?> sanitizeArgs(Object[] args) {
     if (args == null || args.length == 0) {
       return List.of();
     }
@@ -93,10 +94,15 @@ public class LoggingAspect {
 
   //매개변수 처리 함수 : multipartfile, password 관련 필드 없애기
   private Object sanitizeArg(Object arg) {
-    return sanitizers.stream()
-        .filter(s -> s.isFilterCase(arg))
-        .findFirst()
-        .map(s -> s.sanitize(arg))
-        .orElse(arg);
+    if (arg instanceof Sanitizable<?> s) {
+      return s.toLoggingDTO();
+    }
+    for (ArgSanitizer sanitizer : sanitizers) {
+      if (sanitizer.isFilterCase(arg)) {
+        return sanitizer.sanitize(arg);
+      }
+    }
+
+    return arg;
   }
 }
