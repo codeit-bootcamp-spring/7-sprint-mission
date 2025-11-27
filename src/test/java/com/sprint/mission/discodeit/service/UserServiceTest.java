@@ -6,11 +6,15 @@ import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.util.TestFixture;
+import jakarta.persistence.EntityManager;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.Constants;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -31,6 +35,8 @@ class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    EntityManager em;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -52,6 +58,23 @@ class UserServiceTest {
         var expectedResult = userRepository.findById(userDto.id()).isPresent();
         assertTrue(expectedResult);
     }
+
+    @Test
+    @DisplayName("[예외 케이스] null 유저 생성")
+    void createNullUser() {
+        UserCreateRequestDto userCreateRequestDto = new UserCreateRequestDto(
+                null,
+                null,
+                null
+        );
+
+        assertThrows( NullPointerException.class,()->userService.createUser(null,null));
+        assertThrows(ConstraintViolationException.class,()-> {
+            userService.createUser(userCreateRequestDto, null);
+            em.flush();
+        });
+        };
+
 
 
     @Test

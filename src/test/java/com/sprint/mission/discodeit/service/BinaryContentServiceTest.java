@@ -128,4 +128,13 @@ class BinaryContentServiceTest {
         assertEquals(true,actualResult);
 
     }
+
+    @Test
+    @DisplayName("[예외 케이스] 파일 값에 null 입력")
+    void downloadNullFile() throws IOException {
+        var userDto = userService.createUser(fixture.userCreateFactory(),null);
+
+        assertThrows(NullPointerException.class,()->binaryContentService.downloadFile(userDto.profile().id()));
+
+    }
 }

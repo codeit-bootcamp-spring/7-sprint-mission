@@ -49,6 +49,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentStorage binaryContentStorage;
     private final PageResponseMapper<MessageDto> pageResponseMapper;
     private final PageResponseBasicMapper<MessageDto> pageResponseBasicMapper;
+    private final ReadStatusRepository readStatusRepository;
 
 
 
@@ -57,6 +58,7 @@ public class BasicMessageService implements MessageService {
 
         Channel channel2 = channelRepository.findById(messageCreateRequestDto.channelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
         User targetUser = userRepository.findById(messageCreateRequestDto.authorId()).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
+        if(readStatusRepository.findReadStatusByChannelAndUser(channel2,targetUser)== null) throw(new IllegalArgumentException(USER_NOT_JOINED));
 
         Message message;
         message = messageRepository.save(Message.createMessageFactory(

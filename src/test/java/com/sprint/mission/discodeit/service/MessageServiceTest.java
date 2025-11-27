@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
@@ -15,14 +16,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -74,6 +78,38 @@ class MessageServiceTest {
     }
 
     @Test
+    @DisplayName("[예외 케이스] null 값 넣기")
+    void createInvalidChannel() throws IOException {
+
+        MessageCreateRequestDto messageCreateRequestDto1 = fixture.messageCreateFactory(null, null);
+
+        assertThrows(InvalidDataAccessApiUsageException.class,()->messageService.createMessage(messageCreateRequestDto1,
+                null));
+
+    }
+
+    @Test
+    @DisplayName("[예외 케이스] 채널에 없는 유저 메세지 생성")
+    void createMessageWithNotJoinUser() throws IOException {
+
+        UserDto user = userService.createUser(fixture.userCreateFactory(), null);
+        UserDto user2 = userService.createUser(fixture.userCreateFactory(), null);
+        ChannelDto privateChannel = channelService.createPrivateChannel(
+                new ChannelPrivateCreateRequestDto(new HashSet<>(List.of(user2.id())))
+
+        );
+
+        MessageCreateRequestDto messageCreateRequestDto2 = fixture.messageCreateFactory(user.id(), privateChannel.id());
+
+        assertThrows(IllegalArgumentException.class,()->messageService.createMessage(
+                        messageCreateRequestDto2,
+                        null
+                )
+        );
+    }
+
+
+    @Test
     @DisplayName("[정상 케이스] 메세지 전체 조회")
     void readAllMessage() {
         //given
@@ -104,6 +140,8 @@ class MessageServiceTest {
         var expectedResult = false;
         assertEquals(expectedResult,actualResult);
     }
+
+
 
     @Test
     @DisplayName("[정상 케이스] 메세지 변경")
@@ -150,5 +188,13 @@ class MessageServiceTest {
         var expectedResult = true;
         assertEquals(expectedResult,actualResult);
 
+    }
+
+    @Test
+    @DisplayName("[예외 케이스] 존재하지 않는 메세지 삭제")
+    void deleteNotMessage() throws IOException {
+
+        //delete 는 기본적으로 에러를 뱉지 않는다.
+        assertDoesNotThrow( () ->messageService.deleteMessage(UUID.randomUUID()));
     }
 }

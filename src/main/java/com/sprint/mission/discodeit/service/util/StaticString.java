@@ -34,6 +34,7 @@ public abstract class StaticString {
     public static final String USER_EMPTY ="user is empty create user";
     public static final String MESSAGE_EMPTY ="message is empty create message";
     public static final String VALIDATE_FAIL ="validate test fail";
+    public static final String USER_NOT_JOINED ="user is not joined channel";
 
     public static final String DATA_PATH = "src/main/java/com/sprint/mission/discodeit/data/";
     public static final String DEFAULT_CHANNEL_NAME = "defaultChannel";
