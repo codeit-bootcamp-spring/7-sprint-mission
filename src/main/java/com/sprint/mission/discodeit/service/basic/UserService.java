@@ -54,7 +54,7 @@ public class UserService implements InterfaceUserService {
             throw new IllegalArgumentException("🚨create : 동일한 newUsername [" + userCreateRequest.username() + "] 사용햐는 User 가 이미 존재함");
         }
 
-        if(userRepository.findUserByUsername(userCreateRequest.email()).isPresent()) {
+        if(userRepository.findUserByEmail(userCreateRequest.email()).isPresent()) {
             throw new IllegalArgumentException("🚨create : 동일한 newEmail [" + userCreateRequest.email() + "] 사용햐는 User 가 이미 존재함");
         }
 

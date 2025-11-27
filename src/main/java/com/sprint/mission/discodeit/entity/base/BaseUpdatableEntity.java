@@ -11,7 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter @ToString
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseUpdatableEntity extends BaseEntity {
 
     @Column(name = "updated_at")

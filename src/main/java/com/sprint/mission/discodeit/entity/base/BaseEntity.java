@@ -18,15 +18,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Getter @ToString
-@MappedSuperclass
 @EntityListeners(AuditingEntityListener.class) // 날짜 찍어줌. 시간 기록 비서 @CreatedDate
+@MappedSuperclass
 public abstract class BaseEntity {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
     @CreatedDate
-    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 }

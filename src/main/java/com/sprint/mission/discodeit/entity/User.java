@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -13,8 +14,7 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @Getter @Setter
-@Entity
-@Table(name = "users")
+@Entity@Table(name = "users")
 public class User extends BaseUpdatableEntity {
     @Column(nullable = false, length = 50, unique = true)
     private String username;
@@ -25,7 +25,7 @@ public class User extends BaseUpdatableEntity {
     @Column(nullable = false, length = 60)
     private String password;
 
-    @OneToOne // (orphanRemoval = false) // ON DELETE SET NULL
+    @OneToOne(fetch = FetchType.LAZY) // (orphanRemoval = false) // ON DELETE SET NULL
     @JoinColumn(name = "profile_id") // nullable = true
     private BinaryContent profile;
 
