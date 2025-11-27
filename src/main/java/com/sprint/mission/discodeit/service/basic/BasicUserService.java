@@ -46,7 +46,9 @@ public class BasicUserService implements UserService {
     emailSender.sendEmailAsync(
         email,
         "[ch-at] 임시 비밀번호를 보내드립니다",
-        "임시 비밀번호: " + passwordTemp + "\n 반드시 이후에 비밀번호 변경을 해주세요."
+        String.format("""
+            임시 비밀번호: %s
+            반드시 이후에 비밀번호 변경을 해주세요.""", passwordTemp)
     );
   }
 

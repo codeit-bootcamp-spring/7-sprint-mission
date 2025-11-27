@@ -31,9 +31,11 @@ public class BasicAuthService implements AuthService {
     emailSender.sendEmailAsync(
         email,
         "[ch-at] 이메일 인증코드",
-        "이메일 인증 신청을 하지 않으신 경우 이 메일을 무시해주세요.\n" +
-            "인증 코드: " + code + "\n" +
-            "유효시간: 5분"
+        String.format("""
+            이메일 인증 신청을 하지 않으신 경우 이 메일을 무시해주세요.
+            인증 코드: %s
+            유효시간: 5분
+            """, code)
     );
   }
 
