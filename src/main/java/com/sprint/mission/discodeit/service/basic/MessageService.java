@@ -3,25 +3,22 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.MessageAttachments;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.dto.MessageDto;
-import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessageAttachmentsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +34,7 @@ public class MessageService implements InterfaceMessageService {
     private final ChannelsRepository channelRepository;
     private final UsersRepository userRepository;
     private final MessageAttachmentsRepository messageAttachmentsRepository;
-    private final BinaryContentStorageService binaryContentStorageService;
+    private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
 
     @Override
@@ -69,17 +66,12 @@ public class MessageService implements InterfaceMessageService {
             .stream()
             .map(file -> {
                 BinaryContent binaryContent = null;
-                try {
-                    binaryContent = new BinaryContent(
-                        file.getOriginalFilename(),
-                        file.getSize(),
-                        file.getContentType(),
-                        null,
-                        file.getBytes()
-                    );
-                } catch (IOException e) {
-                    throw new RuntimeException("🚨MessageDto create.err = " + e);
-                }
+                binaryContent = new BinaryContent(
+                    file.getOriginalFilename(),
+                    file.getSize(),
+                    file.getContentType(),
+                    null
+                );
 
                 MessageAttachments messageAttachments = new MessageAttachments(
                     UUID.randomUUID(),
@@ -91,7 +83,7 @@ public class MessageService implements InterfaceMessageService {
 
                 // 파일 저장 + DB 저장
                 binaryContent.setAttachments(messageAttachments);
-                return binaryContentStorageService.put(file, binaryContent);
+                return binaryContentStorage.put(file, binaryContent);
             })
             .toList();
 

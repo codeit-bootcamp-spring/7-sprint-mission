@@ -30,11 +30,11 @@ public class BinaryContent extends BaseEntity {
     @Column(name = "content_type", nullable = false, length = 100)
     private String contentType;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "binaryContent", orphanRemoval = true, cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "binaryContent", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private MessageAttachments attachments;
 
-    @Column(name = "bytes", nullable = false)
-    private byte[] bytes;
+//    @Column(name = "bytes", nullable = false)
+//    private byte[] bytes;
 
 
 //    public BinaryContent(String fileName, Long size, String contentType, MessageAttachments attachments) {

@@ -12,7 +12,7 @@ spring:
     show-sql: true # System.out을 통해 SQL 출력. 운영 환경에서는 권장하지 않음
     properties:
       hibernate: # JPA 인터페이스를 구현
-        ddl-auto: update # 변경된 스키마 적용. 컬럼 추가만 반영. 삭제x
+        ddl-auto: create  #update # 변경된 스키마 적용. 컬럼 추가만 반영. 삭제x
         format_sql: true # SQL을 보기 좋게 포맷팅 (들여쓰기 등)
         # use_sql_comments: true # SQL에 주석 추가 (필요 시)
 

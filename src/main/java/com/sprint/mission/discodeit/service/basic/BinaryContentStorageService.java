@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
@@ -14,10 +13,6 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.file.ConfigurationSource.Resource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,6 +37,8 @@ public class BinaryContentStorageService implements BinaryContentStorage {
             BinaryContent newBinaryContent = binaryContentRepository.save(binaryContent);
 
             Path filePath = root.resolve(newBinaryContent.getId().toString());
+//            log.info("✅ " + filePath.toString());
+//            log.info("✅ length = " + file.getBytes().length);
 
             // 파일 저장
             Files.write(filePath, file.getBytes());  // byte[] -> 실제 파일로 저장
