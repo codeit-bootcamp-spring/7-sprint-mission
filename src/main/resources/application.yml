@@ -15,6 +15,12 @@ spring:
         show_sql: true
         format_sql: true
 
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: ./binary-storage
+
 
 #discodeit:
 #  repository:
