@@ -52,8 +52,8 @@ DROP TABLE users;
 
 CREATE TABLE user_statuses(
 	id UUID,
-	create_at timestamptz NOT NULL,
-	update_at timestamptz,
+    created_at timestamptz NOT NULL,
+    updated_at timestamptz,
 	user_id UUID NOT NULL,
 	last_active_at timestamptz NOT NULL,
 	CONSTRAINT user_statuses_pk PRIMARY KEY (id),
@@ -68,8 +68,8 @@ DROP TABLE user_statuses;
 
 CREATE TABLE channels(
 	id UUID,
-	create_at timestamptz NOT NULL,
-	update_at timestamptz,
+    created_at timestamptz NOT NULL,
+    updated_at timestamptz,
 	name varchar(10),
 	description varchar(500),
 	type varchar(10) NOT NULL CHECK (TYPE IN ('PUBLIC', 'PRIVATE')),
