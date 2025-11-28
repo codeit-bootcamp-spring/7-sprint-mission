@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.status.UserStatus;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserStatusMapper {
 
     UserStatusDto toDto(UserStatus entity);

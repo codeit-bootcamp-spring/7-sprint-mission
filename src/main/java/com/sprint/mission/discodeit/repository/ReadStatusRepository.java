@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,7 +16,7 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
     ReadStatus save(ReadStatus readStatus);
 
-    ReadStatus find(UUID readStatusId);
+    Optional<ReadStatus> findById(UUID readStatusId);
 
     List<ReadStatus> findAll();
 

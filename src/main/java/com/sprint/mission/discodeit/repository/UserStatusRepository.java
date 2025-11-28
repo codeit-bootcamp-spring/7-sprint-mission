@@ -13,7 +13,6 @@ public interface UserStatusRepository extends JpaRepository<UserStatus, UUID> {
 
     Optional<UserStatus> findById(UUID id);
 
-    Optional<UserStatus> find(UUID binaryId);
 
     Optional<UserStatus> findByUserId(UUID userId);
 

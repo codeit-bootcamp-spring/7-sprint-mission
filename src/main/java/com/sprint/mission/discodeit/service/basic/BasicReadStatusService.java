@@ -59,9 +59,9 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusMapper.toDto(createReadStatus);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public ReadStatusDto find(UUID readStatusId) {
+    @Override
+    public ReadStatusDto findById(UUID readStatusId) {
 
         return readStatusRepository.findById(readStatusId)
                 .map(readStatusMapper::toDto)
@@ -82,7 +82,8 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateReuqest request) {
         Instant newLastReadAt = request.newLastReadAt();
-        ReadStatus readStatus = readStatusRepository.find(readStatusId);
+        ReadStatus readStatus = readStatusRepository
+                .findById(readStatusId).orElseThrow(() -> new NoSuchElementException("맞는 readstatus가없어요"));
         //업데이트자체가 시간만 있는게아닌가 시간초기화
         readStatus.update(newLastReadAt);
         return readStatusMapper.toDto(readStatus);
