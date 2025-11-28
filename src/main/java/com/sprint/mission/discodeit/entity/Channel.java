@@ -7,19 +7,22 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.Instant;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import static com.sprint.mission.discodeit.entity.ChannelType.PRIVATE;
 import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 
-@AllArgsConstructor
-@Getter @Setter
 @Entity
 @Table(name = "channels")
+@Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 🔥 추가 필수
+@AllArgsConstructor
 public class Channel extends BaseUpdatableEntity {
 
     @Enumerated(EnumType.STRING)

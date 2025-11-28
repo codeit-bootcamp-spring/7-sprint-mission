@@ -7,17 +7,20 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.Instant;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@Getter @Setter
 @Entity
 @Table(name = "read_statuses")
+@Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 🔥 추가 필수
+@AllArgsConstructor
 public class ReadStatus extends BaseUpdatableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

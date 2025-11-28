@@ -31,7 +31,7 @@ public class BinaryContentStorageService implements BinaryContentStorage {
 
     @Override
     public BinaryContent put(MultipartFile file, BinaryContent binaryContent) {
-
+        log.info("🩷 BinaryContent put");
         try {
             // DB 저장
             BinaryContent newBinaryContent = binaryContentRepository.save(binaryContent);
@@ -51,6 +51,8 @@ public class BinaryContentStorageService implements BinaryContentStorage {
 
     @Override
     public InputStream get(UUID binaryContentId) {
+        log.info("🩷 InputStream get");
+
         if (binaryContentId == null) {
             throw new IllegalArgumentException("binaryContentId is null");
         }
@@ -70,6 +72,7 @@ public class BinaryContentStorageService implements BinaryContentStorage {
 
     @Override
     public void download(UUID binaryContentId) {
+        log.info("🩷 download");
         //??🚨🚨🚨🚨살려!
 //        BinaryContent content = binaryContentRepository.findById(binaryContentId)
 //            .orElseThrow(() -> new NoSuchElementException("🚨binaryContentRepository.findById = [" + binaryContentDto.id() + "]err "));

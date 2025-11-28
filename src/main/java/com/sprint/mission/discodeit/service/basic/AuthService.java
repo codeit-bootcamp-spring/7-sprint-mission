@@ -9,8 +9,10 @@ import com.sprint.mission.discodeit.service.InterfaceAuthService;
 import jakarta.transaction.Transactional;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @Transactional // 영속성 컨텍스트
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class AuthService implements InterfaceAuthService {
 
     @Override
     public UserDto login(AuthServiceDto authServiceDto) {
+        log.info("🩷UserDto login");
         User user = userRepository
           .findUserByUsername(authServiceDto.username())
           .orElseThrow(() -> new NoSuchElementException("🚨사용자를 [" + authServiceDto.username() + "] 찾을 수 없음"));

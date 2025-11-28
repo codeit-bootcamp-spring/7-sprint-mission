@@ -8,13 +8,16 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@Getter @Setter
 @Entity@Table(name = "users")
+@Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 🔥 추가 필수
+@AllArgsConstructor
 public class User extends BaseUpdatableEntity {
     @Column(nullable = false, length = 50, unique = true)
     private String username;
@@ -29,15 +32,25 @@ public class User extends BaseUpdatableEntity {
     @JoinColumn(name = "profile_id", nullable = true)
     private BinaryContent profile;
 
+//    @Setter
+//    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.REMOVE) // ON DELETE CASCADE
+//    private UserStatus status;
+
     @Setter
-    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.REMOVE) // ON DELETE CASCADE
+    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL) // ON DELETE CASCADE
     private UserStatus status;
 
-//    public User(String username, String email, String password, BinaryContent profile, UserStatus status) {
-//        this.username = username;
-//        this.email = email;
-//        this.password = password;
-//        this.profile = profile;
-//        this.status = status;
-//    }
+    public void initStatus() {
+        if (this.status == null) {
+            this.status = new UserStatus(this, java.time.Instant.now());
+        }
+    }
+
+    public User(String username, String email, String password, BinaryContent profile) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.profile = profile;
+    }
+
 }

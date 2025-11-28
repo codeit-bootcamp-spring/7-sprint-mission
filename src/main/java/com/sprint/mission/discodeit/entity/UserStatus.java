@@ -8,15 +8,18 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@AllArgsConstructor
-@Getter @Setter
 @Entity
 @Table(name = "user_statuses")
+@Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 🔥 추가 필수
+@AllArgsConstructor
 public class UserStatus extends BaseUpdatableEntity {
 //    사용자 별 마지막으로 확인된 접속 시간을 표현하는 도메인 모델입니다. 사용자의 온라인 상태를 확인하기 위해 활용합니다.
 

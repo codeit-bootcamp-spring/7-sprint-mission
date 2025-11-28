@@ -28,6 +28,7 @@ public class UserStatusService implements InterfaceUserStatusService {
     private final UserStatusMapper userStatusMapper;
 
     public UserStatusDto create(UUID userId) {
+        log.info("🩷 UserStatus create");
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //    [ ] 관련된 User가 존재하지 않으면 예외를 발생시킵니다.
         User user = userRepository.findById(userId)
@@ -48,6 +49,7 @@ public class UserStatusService implements InterfaceUserStatusService {
     }
 
     public UserStatusDto find(UUID statusID) {
+        log.info("🩷 UserStatus find");
 //      [ ] id로 조회합니다.
         UserStatus userStatus = userStatusRepository.findById(statusID)
                 .orElseThrow(() -> new IllegalArgumentException("🚨UserStatusService.find.statusID = [" + statusID.toString() + "] err"));
@@ -59,6 +61,7 @@ public class UserStatusService implements InterfaceUserStatusService {
     }
 
     public List<UserStatusDto> findAll() {
+        log.info("🩷 UserStatus findAll");
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //    수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
         List<UserStatusDto> userStatusDtoList = userStatusRepository
@@ -72,6 +75,7 @@ public class UserStatusService implements InterfaceUserStatusService {
     }
 
     public void update(Dto_UserStatus dto) {
+        log.info("🩷 UserStatus update");
 //    [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //    수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
         UserStatus userStatus = userStatusRepository.findById(dto.userStatusId())
@@ -88,6 +92,7 @@ public class UserStatusService implements InterfaceUserStatusService {
     }
 
     public UserStatusDto updateUserStatus(UUID userId, Instant newLastActiveAt) {
+        log.info("🩷 UserStatus updateUserStatus");
         UserStatus userStatus = userStatusRepository.findUserStatusByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("🚨해당 User[" + userId.toString() + "]의 UserStatus를 찾을 수 없음"));
 
@@ -95,11 +100,11 @@ public class UserStatusService implements InterfaceUserStatusService {
         userStatus.setLastActiveAt(newLastActiveAt);
         userStatusRepository.save(userStatus);
 
-        log.info("✅ UserStatusService.userStatus = [" + userStatus + "]");
         return userStatusMapper.toDto(userStatus);
     }
 
     public void delete(UUID statusID) {
+        log.info("🩷 UserStatus delete");
 //      [ ] id로 삭제합니다.
         userStatusRepository.deleteById(statusID);
         log.info("✅ UserStatusService.delete = [" + statusID.toString() + "]");
