@@ -1,3 +1,17 @@
+server:
+  port: 4444
+
+discodeit:
+  repository:
+    type: file   # jcf | file
+    file-directory: .discodeit
+
+blog:
+  file-directory: /Users/my05030/Desktop/장미연/7-sprint-mission
+
+
+
+
 spring:
   application:
     name: discodeit
@@ -26,18 +40,6 @@ logging:
         orm:
           jdbc:
             bind: TRACE # Spring Boot 3.0+ 파라미터 값 확인
-
-
-server:
-  port: 4444
-
-discodeit:
-  repository:
-    type: file   # jcf | file
-    file-directory: .discodeit
-
-blog:
-  file-directory: /Users/my05030/Desktop/장미연/7-sprint-mission
 
 
 #logging:

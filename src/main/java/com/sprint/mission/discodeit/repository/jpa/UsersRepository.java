@@ -11,7 +11,7 @@ public interface UsersRepository extends JpaRepository<User, UUID> {
 //    Optional<T> findById(UUID id);
 //    List<T> findAll();
 
-//    Res_UserLogin isLogin(AuthServiceDto authServiceDto);
+//    Res_UserLogin isLogin(LoginRequest authServiceDto);
     Optional<User> findUserByEmail(String email);
     Optional<User> findUserByUsername(String username);
 }

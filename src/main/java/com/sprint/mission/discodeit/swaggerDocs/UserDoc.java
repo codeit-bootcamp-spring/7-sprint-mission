@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.swaggerDocs;
 
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.Dto_UserStatusUpdate;
-import com.sprint.mission.discodeit.dto.Dto_UserUpdate;
+import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.mapper.dto.UserStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -120,7 +120,7 @@ public interface UserDoc {
     })
     ResponseEntity<UserDto> update(
         @Parameter(description = "수정할 User ID") @PathVariable("userId") UUID userId,
-        @Parameter(description = "User 업데이트 정보 (JSON)") @RequestPart(value = "userUpdateRequest") Dto_UserUpdate dtoUser,
+        @Parameter(description = "User 업데이트 정보 (JSON)") @RequestPart(value = "userUpdateRequest") UserUpdateRequest dtoUser,
         @Parameter(description = "새로운 프로필 이미지 파일 (선택 사항)") @RequestPart(value = "profile", required = false) MultipartFile file);
 
 

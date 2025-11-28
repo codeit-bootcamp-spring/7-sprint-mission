@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.dto.ReadStatusCteateRequest;
+import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.Dto_ReadStatusUpdate;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.mapper.dto.ReadStatusDto;
@@ -31,7 +31,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
     private final ReadStatusesRepository readStatusRepository;
     private final ReadStatusMapper readStatusMapper;
 
-    public ReadStatusDto create(ReadStatusCteateRequest dtoReadStatus) {
+    public ReadStatusDto create(ReadStatusCreateRequest dtoReadStatus) {
         log.info("🩷 ReadStatusService create");
         User user = userRepository.findById(dtoReadStatus.userId()).stream()
             .findFirst()

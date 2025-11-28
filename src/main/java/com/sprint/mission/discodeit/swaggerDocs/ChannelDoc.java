@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
 import com.sprint.mission.discodeit.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.mapper.dto.Dto_CreateChannelPrivate;
-import com.sprint.mission.discodeit.mapper.dto.Dto_CreateChannelPublic;
+import com.sprint.mission.discodeit.mapper.dto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.mapper.dto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.mapper.dto.ChannelDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,7 +52,7 @@ public interface ChannelDoc {
         )
     })
     ResponseEntity<ChannelDto> createPublic(
-        @RequestBody Dto_CreateChannelPublic dtoCreateChannel);
+        @RequestBody PublicChannelCreateRequest dtoCreateChannel);
 
     /**
      * POST /api/channels/private - Private Channel 생성
@@ -75,7 +75,7 @@ public interface ChannelDoc {
         )
     })
     ResponseEntity<ChannelDto> createPrivate(
-        @RequestBody Dto_CreateChannelPrivate dtoCreateChannel);
+        @RequestBody PrivateChannelCreateRequest dtoCreateChannel);
 
     /**
      * DELETE /api/channels/{channelId} - Channel 삭제

@@ -23,7 +23,7 @@ public class BinaryContentController implements BinaryContentDoc {
 
     //💎 여러 첨부 파일 조회
     @GetMapping
-    public ResponseEntity<List<BinaryContentDto>> find(
+    public ResponseEntity<List<BinaryContentDto>> find( //??❌❌❌❌❌❌
         @RequestBody UUID[] binaryContentIds) {
 
         List<BinaryContentDto> arrayList
@@ -36,7 +36,7 @@ public class BinaryContentController implements BinaryContentDoc {
 
     //💎 첨부 파일 조회
     @GetMapping("/{binaryContentId}")
-    public ResponseEntity<BinaryContentDto> find(
+    public ResponseEntity<BinaryContentDto> find(  //??❌❌❌❌❌❌
         @PathVariable("binaryContentId") UUID binaryContentId) {
 
         BinaryContentDto resBinaryContent

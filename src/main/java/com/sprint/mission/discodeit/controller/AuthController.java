@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.swaggerDocs.AuthDoc;
-import com.sprint.mission.discodeit.dto.AuthServiceDto;
+import com.sprint.mission.discodeit.mapper.dto.LoginRequest;
 import com.sprint.mission.discodeit.service.basic.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +25,10 @@ public class AuthController implements AuthDoc {
 
     @PostMapping(value = "/login")
     public ResponseEntity<UserDto> login(
-        @Valid @RequestBody AuthServiceDto authServiceDto) {
+        @Valid @RequestBody LoginRequest loginRequest) {
        //💎로그인
         UserDto userDto
-            = authService.login(authServiceDto);
+            = authService.login(loginRequest);
 
         return ResponseEntity
             .status(HttpStatus.OK)

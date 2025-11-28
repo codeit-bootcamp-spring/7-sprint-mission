@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.mapper.dto;
 
 import jakarta.validation.constraints.NotNull;
 
-public record Dto_UserUpdate(
+public record UserUpdateRequest(
     @NotNull
     String newUsername,
 //        @NotBlank(message = "Email is mandatory")

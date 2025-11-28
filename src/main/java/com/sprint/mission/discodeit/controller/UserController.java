@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.mapper.dto.UserStatusDto;
 import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import com.sprint.mission.discodeit.swaggerDocs.UserDoc;
 import com.sprint.mission.discodeit.dto.Dto_UserStatusUpdate;
-import com.sprint.mission.discodeit.dto.Dto_UserUpdate;
+import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.service.basic.UserService;
 import com.sprint.mission.discodeit.service.basic.UserStatusService;
@@ -54,7 +54,7 @@ public class UserController implements UserDoc {
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<UserDto> create(
-        @Valid @RequestPart("userCreateRequest") UserCreateRequest dtoUser,
+        @Valid @RequestPart("userCreateRequest") UserCreateRequest dtoUser, //?? ❌❌❌
         @RequestPart(value = "profile", required = false) MultipartFile file) {
 
         //💎User 등록
@@ -79,7 +79,7 @@ public class UserController implements UserDoc {
     @PatchMapping(value = "/{userId}", consumes = "multipart/form-data")
     public ResponseEntity<UserDto> update(
         @PathVariable("userId") UUID userId,
-        @Valid @RequestPart(value = "userUpdateRequest") Dto_UserUpdate dtoUser,
+        @Valid @RequestPart(value = "userUpdateRequest") UserUpdateRequest dtoUser,
         @RequestPart(value = "profile", required = false) MultipartFile file) {
         //💎User 정보 수정
         UserDto resUser = userService.update(userId, dtoUser, Optional.ofNullable(file));

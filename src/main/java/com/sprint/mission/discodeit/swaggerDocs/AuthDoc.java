@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
-import com.sprint.mission.discodeit.dto.AuthServiceDto;
+import com.sprint.mission.discodeit.mapper.dto.LoginRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -42,5 +42,5 @@ public interface AuthDoc {
             )
         )
     })
-    ResponseEntity<UserDto> login(@RequestBody AuthServiceDto authServiceDto);
+    ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest);
 }

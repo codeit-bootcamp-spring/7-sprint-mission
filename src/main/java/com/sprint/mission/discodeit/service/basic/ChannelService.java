@@ -4,14 +4,13 @@ import static com.sprint.mission.discodeit.entity.ChannelType.PRIVATE;
 import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.mapper.dto.Dto_CreateChannelPrivate;
-import com.sprint.mission.discodeit.mapper.dto.Dto_CreateChannelPublic;
+import com.sprint.mission.discodeit.mapper.dto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.mapper.dto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
@@ -20,10 +19,8 @@ import com.sprint.mission.discodeit.service.InterfaceChannelService;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +38,7 @@ public class ChannelService implements InterfaceChannelService {
     private final ChannelMapper channelMapper;
 
     @Override
-    public ChannelDto createPublic(Dto_CreateChannelPublic dtoCreateChannel) {
+    public ChannelDto createPublic(PublicChannelCreateRequest dtoCreateChannel) {
         log.info("🩷 Channel createPublic");
 
         Channel channel = new Channel(PUBLIC
@@ -56,7 +53,7 @@ public class ChannelService implements InterfaceChannelService {
     }
 
     @Override
-    public ChannelDto createPrivate(Dto_CreateChannelPrivate dtoCreateChannel) {
+    public ChannelDto createPrivate(PrivateChannelCreateRequest dtoCreateChannel) {
         log.info("🩷 Channel createPrivate");
 //        PRIVATE 채널과 PUBLIC 채널을 생성하는 메소드를 분리합니다.
 //        [ ] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
-import com.sprint.mission.discodeit.dto.ReadStatusCteateRequest;
+import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.Dto_ReadStatusUpdate;
 import com.sprint.mission.discodeit.mapper.dto.ReadStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,7 +63,7 @@ public interface ReadStatusDoc {
     })
     ResponseEntity<ReadStatusDto> create(
 //        @Parameter(description = "조회할 User ID")
-        @RequestBody ReadStatusCteateRequest dtoReadStatus);
+        @RequestBody ReadStatusCreateRequest dtoReadStatus);
 
     //===================================================
     @Operation(summary = "Message 읽음 상태 수정")

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.swaggerDocs.ReadStatusDoc;
-import com.sprint.mission.discodeit.dto.ReadStatusCteateRequest;
+import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.Dto_ReadStatusUpdate;
 import com.sprint.mission.discodeit.mapper.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.service.basic.ReadStatusService;
@@ -41,7 +41,7 @@ public class ReadStatusController implements ReadStatusDoc {
 
     @PostMapping
     public ResponseEntity<ReadStatusDto> create(
-        @Valid @RequestBody ReadStatusCteateRequest dtoReadStatus) {
+        @Valid @RequestBody ReadStatusCreateRequest dtoReadStatus) {
 
         //💎Message 읽음 상태 생성
         ReadStatusDto resReadStatus

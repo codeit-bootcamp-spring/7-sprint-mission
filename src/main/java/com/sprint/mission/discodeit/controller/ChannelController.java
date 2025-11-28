@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.mapper.dto.ChannelDto;
 import com.sprint.mission.discodeit.swaggerDocs.ChannelDoc;
 import com.sprint.mission.discodeit.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.mapper.dto.Dto_CreateChannelPrivate;
-import com.sprint.mission.discodeit.mapper.dto.Dto_CreateChannelPublic;
+import com.sprint.mission.discodeit.mapper.dto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.mapper.dto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.service.basic.ChannelService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -33,7 +33,7 @@ public class ChannelController implements ChannelDoc {
     //💎Public Channel 생성
     @PostMapping("/public")
     public ResponseEntity<ChannelDto> createPublic(
-        @Valid @RequestBody Dto_CreateChannelPublic dtoCreateChannel) {
+        @Valid @RequestBody PublicChannelCreateRequest dtoCreateChannel) {
 
         ChannelDto aPublic = channelService.createPublic(dtoCreateChannel);
 
@@ -45,7 +45,7 @@ public class ChannelController implements ChannelDoc {
     //💎Private Channel 생성
     @PostMapping("/private")
     public ResponseEntity<ChannelDto> createPrivate(
-        @Valid @RequestBody Dto_CreateChannelPrivate dtoCreateChannel) {
+        @Valid @RequestBody PrivateChannelCreateRequest dtoCreateChannel) {
 
         ChannelDto channel  = channelService.createPrivate(dtoCreateChannel);
 
@@ -70,7 +70,7 @@ public class ChannelController implements ChannelDoc {
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> update(
         @PathVariable("channelId") UUID channelId,
-        @Valid @RequestBody ChannelDto_Update channelDtoUpdate) {
+        @Valid @RequestBody ChannelDto_Update channelDtoUpdate) { //??❌
 
         ChannelDto resChannel  = channelService.update(channelId, channelDtoUpdate);
 

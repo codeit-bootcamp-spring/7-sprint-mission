@@ -62,7 +62,7 @@
         "tags": [
           "User"
         ],
-        "summary": "User 등록 (프로필 이미지 포함)",
+        "summary": "User 등록",
         "operationId": "create",
         "requestBody": {
           "content": {
@@ -71,7 +71,7 @@
                 "type": "object",
                 "properties": {
                   "userCreateRequest": {
-                    "$ref": "#/components/schemas/Dto_UserCreate"
+                    "$ref": "#/components/schemas/UserCreateRequest"
                   },
                   "profile": {
                     "type": "string",
@@ -92,7 +92,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_User"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -133,7 +133,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_ReadStatus"
+                  "$ref": "#/components/schemas/ReadStatusDto"
                 }
               }
             }
@@ -150,7 +150,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Dto_ReadStatus"
+                "$ref": "#/components/schemas/ReadStatusCteateRequest"
               }
             }
           },
@@ -162,7 +162,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_ReadStatus"
+                  "$ref": "#/components/schemas/ReadStatusDto"
                 }
               }
             }
@@ -193,12 +193,12 @@
         ],
         "summary": "Channel의 Message 목록 조회",
         "description": "특정 Channel에 속한 Message들을 조회합니다.",
-        "operationId": "findAllByChannleId",
+        "operationId": "findAllByChannelId",
         "parameters": [
           {
             "name": "channelId",
             "in": "query",
-            "description": "메시지를 조회할 Channel ID",
+            "description": "조회할 Channel ID",
             "required": true,
             "schema": {
               "type": "string",
@@ -213,7 +213,7 @@
               "*/*": {
                 "schema": {
                   "type": "array",
-                  "$ref": "#/components/schemas/Res_Message"
+                  "$ref": "#/components/schemas/MessageDto"
                 }
               }
             }
@@ -257,7 +257,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_Message"
+                  "$ref": "#/components/schemas/MessageDto"
                 }
               }
             }
@@ -296,7 +296,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_Channel"
+                  "$ref": "#/components/schemas/ChannelDto"
                 }
               }
             }
@@ -327,7 +327,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_Channel"
+                  "$ref": "#/components/schemas/ChannelDto"
                 }
               }
             }
@@ -366,7 +366,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_UserLogin"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -476,7 +476,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_User"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -535,7 +535,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_UserUpdate"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -586,7 +586,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_ReadStatus"
+                  "$ref": "#/components/schemas/ReadStatusDto"
                 }
               }
             }
@@ -676,7 +676,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_Message"
+                  "$ref": "#/components/schemas/MessageDto"
                 }
               }
             }
@@ -766,7 +766,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_Channel"
+                  "$ref": "#/components/schemas/ChannelDto"
                 }
               }
             }
@@ -817,7 +817,7 @@
               "*/*": {
                 "schema": {
                   "type": "array",
-                  "$ref": "#/components/schemas/Res_ChannelFind"
+                  "$ref": "#/components/schemas/ChannelDto"
                 }
               }
             }
@@ -855,7 +855,7 @@
               "*/*": {
                 "schema": {
                   "type": "array",
-                  "$ref": "#/components/schemas/Res_BinaryContent"
+                  "$ref": "#/components/schemas/BinaryContentDto"
                 }
               }
             }
@@ -888,7 +888,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Res_BinaryContent"
+                  "$ref": "#/components/schemas/BinaryContentDto"
                 }
               }
             }
@@ -903,11 +903,42 @@
           }
         }
       }
+    },
+    "/api/binaryContents/{binaryContentId}/download": {
+      "get": {
+        "tags": [
+          "BinaryContent"
+        ],
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "binaryContentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinaryContentDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
-      "Dto_UserCreate": {
+      "UserCreateRequest": {
         "type": "object",
         "description": "User 생성 정보 (JSON)",
         "properties": {
@@ -927,20 +958,31 @@
           "username"
         ]
       },
-      "Res_User": {
+      "BinaryContentDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
+          "fileName": {
+            "type": "string"
           },
-          "updatedAt": {
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "contentType": {
+            "type": "string"
+          }
+        }
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
             "type": "string",
-            "format": "date-time"
+            "format": "uuid"
           },
           "username": {
             "type": "string"
@@ -948,16 +990,15 @@
           "email": {
             "type": "string"
           },
-          "password": {
-            "type": "string"
+          "profile": {
+            "$ref": "#/components/schemas/BinaryContentDto"
           },
-          "profileId": {
-            "type": "string",
-            "format": "uuid"
+          "online": {
+            "type": "boolean"
           }
         }
       },
-      "Dto_ReadStatus": {
+      "ReadStatusCteateRequest": {
         "type": "object",
         "properties": {
           "userId": {
@@ -979,20 +1020,12 @@
           "userId"
         ]
       },
-      "Res_ReadStatus": {
+      "ReadStatusDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
           },
           "userId": {
             "type": "string",
@@ -1030,7 +1063,24 @@
           "content"
         ]
       },
-      "Res_Message": {
+      "MessageAttachmentsDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "messageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attachments": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "MessageDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -1052,15 +1102,13 @@
             "type": "string",
             "format": "uuid"
           },
-          "authorId": {
-            "type": "string",
-            "format": "uuid"
+          "author": {
+            "$ref": "#/components/schemas/UserDto"
           },
-          "attachmentIds": {
+          "attachments": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/MessageAttachmentsDto"
             }
           }
         }
@@ -1080,20 +1128,12 @@
           "name"
         ]
       },
-      "Res_Channel": {
+      "ChannelDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
           },
           "type": {
             "type": "string",
@@ -1107,6 +1147,16 @@
           },
           "description": {
             "type": "string"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDto"
+            }
+          },
+          "lastMessageAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -1140,36 +1190,6 @@
           "username"
         ]
       },
-      "Res_UserLogin": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "username": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "profileId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
       "Dto_UserUpdate": {
         "type": "object",
         "description": "User 업데이트 정보 (JSON)",
@@ -1201,34 +1221,6 @@
         "required": [
           "newLastActiveAt"
         ]
-      },
-      "Res_UserUpdate": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "lastActiveAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "isOnline": {
-            "type": "boolean"
-          }
-        }
       },
       "Dto_ReadStatusUpdate": {
         "type": "object",
@@ -1267,92 +1259,6 @@
           "newDescription",
           "newName"
         ]
-      },
-      "UserDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "username": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "profileId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "online": {
-            "type": "boolean"
-          }
-        }
-      },
-      "Res_ChannelFind": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "PRIVATE",
-              "PUBLIC"
-            ]
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "participantIds": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "lastMessageAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "Res_BinaryContent": {
-        "type": "object",
-        "properties": {
-          "binaryContentId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "fileName": {
-            "type": "string"
-          },
-          "contentType": {
-            "type": "string"
-          },
-          "bytes": {
-            "type": "string",
-            "format": "byte"
-          },
-          "fileSize": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
       }
     }
   }
