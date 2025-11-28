@@ -14,7 +14,7 @@ import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +80,7 @@ public class UserService implements InterfaceUserService {
                 // 파일 저장 + DB 저장
                  return binaryContentStorage.put(file, binaryContent);
             })
-            .orElse(null);
+            .orElse(null); //!! err
 
         User newUser = new User(userCreateRequest.username(),
             userCreateRequest.email(),

@@ -7,15 +7,18 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
+import java.time.Instant;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class ChannelMapper {
-    private MessagesRepository messageRepository;
-    private ReadStatusesRepository readStatusRepository;
-    private UserMapper userMapper;
+    private final MessagesRepository messageRepository;
+    private final ReadStatusesRepository readStatusRepository;
+    private final UserMapper userMapper;
 
     public ChannelDto toDto(Channel channel) {
 
@@ -30,7 +33,9 @@ public class ChannelMapper {
             .findFirstByChannelIdOrderByCreatedAtDesc(channel.getId())
             .stream()
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("🐳 messageRepository.findLatestMessage"));
+            .orElse(null);
+
+        Instant lastMessageAt = (null == message) ? null : message.getUpdatedAt();
 
         return ChannelDto.builder()
             .id(channel.getId())
@@ -38,7 +43,7 @@ public class ChannelMapper {
             .name(channel.getName())
             .description(channel.getDescription())
             .participants(userDtoList)
-            .lastMessageAt(message.getUpdatedAt())
+            .lastMessageAt(lastMessageAt)
             .build();
     }
 }

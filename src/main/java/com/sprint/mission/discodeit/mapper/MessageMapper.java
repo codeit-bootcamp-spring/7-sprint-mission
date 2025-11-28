@@ -7,13 +7,15 @@ import com.sprint.mission.discodeit.mapper.dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class MessageMapper {
-    private MessageAttachmentsMapper attachmentsMapper;
+    private final MessageAttachmentsMapper attachmentsMapper;
 
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     public MessageDto toDto(Message message) {
         UserDto author = userMapper.toDto(message.getAuthor());

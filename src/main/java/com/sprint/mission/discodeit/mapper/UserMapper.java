@@ -12,15 +12,15 @@ public class UserMapper {
     private final BinaryContentMapper binaryContentMapper;
 
     public UserDto toDto(User user) {
-        BinaryContentDto profile = binaryContentMapper.toDto(user.getProfile());
-            Boolean isOnline = user.getStatus().isOnline();
+
+        BinaryContentDto profile = (null != user.getProfile()) ? binaryContentMapper.toDto(user.getProfile()) :  null;
 
         return UserDto.builder()
             .id(user.getId())
             .username(user.getUsername())
             .email(user.getEmail())
             .profile(profile)
-            .online(isOnline)
+            .online(user.getStatus().isOnline())
             .build();
     }
 }

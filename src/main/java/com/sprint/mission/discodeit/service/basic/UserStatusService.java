@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.mapper.dto.UserStatusDto;
 import com.sprint.mission.discodeit.repository.jpa.UserStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserStatusService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -68,7 +68,7 @@ public class UserStatusService implements InterfaceUserStatusService {
             .findAll()
             .stream()
             .map(userStatusMapper::toDto)
-            .peek(userStatusDto -> log.info("✅ UserStatusService.findAll = [" + userStatusDto.user().getUsername() + "]"))
+            .peek(userStatusDto -> log.info("✅ UserStatusService.findAll"))
             .toList();
 
         return userStatusDtoList;
