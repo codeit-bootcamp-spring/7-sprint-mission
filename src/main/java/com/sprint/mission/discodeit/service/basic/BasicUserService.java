@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -34,6 +35,8 @@ public class BasicUserService implements UserService {
   }
 
   //메일로 임시 비밀번호 발송 및 임시 비밀번호 발급
+  @Override
+  @Transactional
   public void sendEmailTemporaryPassword(String email, String nickname) {
     User user = userRepository.findByEmail(email).orElseThrow(
         () -> new CustomException(ErrorCode.USER_NOT_FOUND)
@@ -42,7 +45,7 @@ public class BasicUserService implements UserService {
       throw new CustomException(ErrorCode.INVALID_USER_NICKNAME);
     }
     String passwordTemp = UUID.randomUUID().toString().replaceAll("-", "");
-    userRepository.updatePasswordTemporary(user.getId(), passwordTemp);
+    user.updateTemporaryPassword(passwordTemp);
     emailSender.sendEmailAsync(
         email,
         "[ch-at] 임시 비밀번호를 보내드립니다",
@@ -92,27 +95,28 @@ public class BasicUserService implements UserService {
     if (!userRepository.existsById(id)) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    userRepository.delete(id);
+    userRepository.deleteById(id);
   }
 
   //업데이트
   @Override
+  @Transactional
   public void update(UUID id, UserUpdateReq req) {
-    String replacaPassword = req.password();
     User user = findById(id);
+    //기존 비밀번호를 클라이언트 쪽에서 알 수 없기 때문에, 새로 올라온 비밀번호가 없으면 비밀번호 변경X
+    String replacaPassword = req.password() == null ? user.getPassword() : req.password();
     if (req.password() == null) {
       replacaPassword = user.getPassword();
     }
     validateDuplicate(id, req.email(), req.nickname());
-    userRepository.update(id, req.email(), req.nickname(), replacaPassword);
+    user.update(req.email(), req.nickname(), replacaPassword);
   }
 
   @Override
+  @Transactional
   public void updateProfileImage(UUID id, UUID profileId) {
-    if (!userRepository.existsById(id)) {
-      throw new CustomException(ErrorCode.USER_NOT_FOUND);
-    }
-    userRepository.updateProfileImage(id, profileId);
+    User user = findById(id);
+    user.updateProfile(user.getProfile());
   }
 
   //해당 닉네임으로 가입된 사림이 있는지.
@@ -143,10 +147,10 @@ public class BasicUserService implements UserService {
 
   //기존 유저 회원 정보 수정 시 중복 검사
   private void validateDuplicate(UUID userId, String email, String nickname) {
-    if (userRepository.existsByEmailAndIdNot(email, userId)) {
+    if (!userRepository.existsByIdAndEmail(userId, email)) {
       throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
     }
-    if (userRepository.existsByNicknameAndIdNot(nickname, userId)) {
+    if (!userRepository.existsByIdAndNickname(userId, nickname)) {
       throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
     }
   }

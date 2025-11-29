@@ -40,7 +40,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     if (!binaryContentRepository.existsById(id)) {
       throw new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUNT);
     }
-    binaryContentRepository.delete(id);
+    binaryContentRepository.deleteById(id);
   }
 
   // ===== 🎯 Controller Direct (DTO 반환) ======

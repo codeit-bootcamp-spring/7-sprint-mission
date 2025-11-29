@@ -11,57 +11,62 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
 public class BasicUserStatusService implements UserStatusService {
-    private final UserStatusRepository userStatusRepository;
 
-    // ===== 🏗️ Domain Logic (Facade 용)  =====
-    @Override
-    public UserStatus create(UserStatus userStatus) {
-        return userStatusRepository.save(userStatus);
-    }
+  private final UserStatusRepository userStatusRepository;
 
-    @Override
-    public UserStatus findByUserId(UUID userId) {
-        return userStatusRepository.findByUserId(userId).orElseThrow(
-                ()-> new CustomException(ErrorCode.USER_STATUS_MISSING)
-        );
-    }
+  // ===== 🏗️ Domain Logic (Facade 용)  =====
+  @Override
+  public UserStatus create(UserStatus userStatus) {
+    return userStatusRepository.save(userStatus);
+  }
 
-    // ===== 🎯 Controller Direct (DTO 반환) =====
-    @Override
-    public UserStatusViewRes findById(@NonNull UUID id) {
-        UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(
-                ()-> new CustomException(ErrorCode.USERSTATUS_NOT_FOUND)
-        );
-        return UserStatusViewRes.from(userStatus);
-    }
+  @Override
+  public UserStatus findByUserId(UUID userId) {
+    return userStatusRepository.findByUser_Id(userId).orElseThrow(
+        () -> new CustomException(ErrorCode.USER_STATUS_MISSING)
+    );
+  }
 
-    // ===== 🔧 Controller Direct (단일 도메인 / void) =====
-    @Override
-    public void updateOnlineAt(@NonNull UUID id) {
-        userStatusRepository.updateOnlineAt(id);
-    }
+  // ===== 🎯 Controller Direct (DTO 반환) =====
+  @Override
+  public UserStatusViewRes findById(@NonNull UUID id) {
+    UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(
+        () -> new CustomException(ErrorCode.USERSTATUS_NOT_FOUND)
+    );
+    return UserStatusViewRes.from(userStatus);
+  }
 
-    @Override
-    public void updateOfflineAt(@NonNull UUID id) {
-        userStatusRepository.updateOfflineAt(id);
-    }
+  // ===== 🔧 Controller Direct (단일 도메인 / void) =====
+  @Override
+  @Transactional
+  public void updateOfflineAt(@NonNull UUID id) {
+    UserStatus userStatus = findByUserId(id);
+    userStatus.updateOfflineAt();
+  }
 
-    @Override
-    public void update(@NonNull UUID id) {
-        userStatusRepository.update(id);
-    }
+  @Override
+  @Transactional
+  public void update(@NonNull UUID id) {
+    UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(
+        () -> new CustomException(ErrorCode.USERSTATUS_NOT_FOUND)
+    );
+    userStatus.update();
+  }
 
-    @Override
-    public void updateByUserId(@NonNull UUID userId) {
-        userStatusRepository.updateByUserId(userId);
-    }
+  @Override
+  @Transactional
+  public void updateByUserId(@NonNull UUID userId) {
+    UserStatus userStatus = findByUserId(userId);
+    findByUserId(userId).update();
+  }
 
-    @Override
-    public void delete(@NonNull UUID id) {
-        userStatusRepository.delete(id);
-    }
+  @Override
+  public void delete(@NonNull UUID id) {
+    userStatusRepository.deleteById(id);
+  }
 }

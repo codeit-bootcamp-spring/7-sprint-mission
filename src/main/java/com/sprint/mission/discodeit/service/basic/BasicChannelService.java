@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -49,7 +50,7 @@ public class BasicChannelService implements ChannelService {
     if (!channelRepository.existsById(id)) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
-    channelRepository.delete(id);
+    channelRepository.deleteById(id);
   }
 
   //채널 목록 : Public 인 경우 전부, Private 인 경우 자신이 참여한 채널만
@@ -59,14 +60,14 @@ public class BasicChannelService implements ChannelService {
             channel.getManagerId().equals(userId) ||
                 channel.getPublicType() == ChannelType.PUBLIC ||
                 (channel.getPublicType() == ChannelType.PRIVATE &&
-                    channelRepository.isMember(userId, channel.getId())))
+                    channelRepository.existsByIdAndUser_id(channel.getId(), userId)))
         .collect(Collectors.groupingBy(Channel::getPublicType));
   }
 
   //채널명으로 찾기
   @Override
   public Channel findByName(String name) {
-    Optional<Channel> channel = channelRepository.findByName(name);
+    Optional<Channel> channel = channelRepository.findByNameContaining(name);
     return channel.orElse(null);
   }
 
@@ -81,6 +82,7 @@ public class BasicChannelService implements ChannelService {
   // ===== 🔧 Controller Direct (단일 도메인 / void) =====
   //채널 수정
   @Override
+  @Transactional
   public ChannelPublicInfoRes update(@NonNull UUID id, @NonNull ChannelUpdateReq req) {
     Channel channel = channelRepository.findById(id).orElseThrow(
         () -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND)
@@ -88,8 +90,7 @@ public class BasicChannelService implements ChannelService {
     if (channel.getPublicType() == ChannelType.PRIVATE) {
       throw new CustomException(ErrorCode.CHANNEL_PRIVATE_CANNOT_MODIFY);
     }
-    channelRepository.update(id, req.name(), req.description());
-    channel = findById(id); //file 환경 channel 다시읽기
+    channel.update(req.name(), req.description());
     return (ChannelPublicInfoRes) channelMapper.toInfoRes(channel);
   }
 }

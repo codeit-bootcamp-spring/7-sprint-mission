@@ -16,7 +16,5 @@ public interface ReadStatusService {
 
   List<ReadStatus> findAllByChannelId(UUID channelId);
 
-  List<ReadStatus> findAllByUserId(UUID userId);
-
   ReadStatusInfoRes findById(UUID id);
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +23,8 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   public ReadStatus create(ReadStatus readStatus) {
     //유저id 랑 channel id 가 이미 있는 readStatus 가 있으면 에러
-    if (readStatusRepository.existsByUserIdAndChannelId(
-        readStatus.getUserId(), readStatus.getChannelId()
+    if (readStatusRepository.existsByUser_idAndChannel_Id(
+        readStatus.getUser().getId(), readStatus.getChannel().getId()
     )) {
       throw new CustomException(ErrorCode.READSTATUS_ALREADY_EXISTS);
     }
@@ -32,11 +33,12 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional
   public ReadStatus update(UUID id) {
     ReadStatus readStatus = readStatusRepository.findById(id).orElseThrow(
         () -> new CustomException(ErrorCode.READSTATUS_NOT_FOUND)
     );
-    readStatusRepository.update(id);
+    readStatus.updateReadAt();
     return readStatus;
   }
 
@@ -45,17 +47,12 @@ public class BasicReadStatusService implements ReadStatusService {
     if (readStatusRepository.existsById(id)) {
       throw new CustomException(ErrorCode.READSTATUS_NOT_FOUND);
     }
-    readStatusRepository.delete(id);
+    readStatusRepository.deleteById(id);
   }
 
   @Override
   public List<ReadStatus> findAllByChannelId(UUID channelId) {
-    return readStatusRepository.findAllByChannelId(channelId);
-  }
-
-  @Override
-  public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId);
+    return readStatusRepository.findAllByChannel_id(channelId);
   }
 
   // ===== 🎯 Controller Direct (DTO 반환) =====
