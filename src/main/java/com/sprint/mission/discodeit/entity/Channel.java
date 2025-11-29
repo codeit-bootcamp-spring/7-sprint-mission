@@ -22,20 +22,20 @@ public class Channel extends BaseUpdatableEntity {
   private ChannelType type;
 
   @Column(name = "name", length = 100)
-  private String channelName;
+  private String name;
 
   @Column(name = "description", length = 500)
   private String description;
 
-  public Channel(ChannelType type, String channelName, String description) {
+  public Channel(ChannelType type, String name, String description) {
     this.type = type;
-    this.channelName = channelName;
+    this.name = name;
     this.description = description;
   }
 
   public void updateChannel(String channelName, String description) {
-    if (channelName != null && !channelName.equals(this.channelName)) {
-      this.channelName = channelName;
+    if (channelName != null && !channelName.equals(this.name)) {
+      this.name = channelName;
     }
     if (description != null && !description.equals(this.description)) {
       this.description = description;
