@@ -21,22 +21,18 @@ public class BinaryContent extends BaseEntity {
     @Column(name = "content_type", nullable = false, length = 100)
     private String contentType;
 
-    @Column(name = "bytes", nullable = false)
-    private byte[] bytes;
-
     @Column(name = "size", nullable = false)
     private Long size;
 
     protected BinaryContent() {}
 
-    public BinaryContent(String fileName, String contentType, byte[] data) {
+    public BinaryContent(String fileName, String contentType, long size) {
         super();
         this.fileName = Objects.requireNonNull(fileName).trim();
         if(this.fileName.isEmpty() || this.fileName.length() > 255) {
             throw new IllegalArgumentException("invalid file name");
         }
         this.contentType = Objects.requireNonNull(contentType);
-        this.bytes = Objects.requireNonNull(data);
-        this.size = (long) this.bytes.length;
+        this.size = (long) size;
     }
 }
