@@ -60,9 +60,10 @@ public class Message extends BaseUpdatableEntity {
   }
 
   //메세지 수정
-  public Message update(String content) {
+  public Message update(String content, List<BinaryContent> attachments) {
     super.update();
     this.content = content;
+    this.attachments = attachments;
     return this;
   }
 }
