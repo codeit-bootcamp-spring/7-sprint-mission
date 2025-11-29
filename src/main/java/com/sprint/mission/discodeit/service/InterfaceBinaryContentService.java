@@ -10,5 +10,5 @@ public interface InterfaceBinaryContentService {
     BinaryContentDto find(UUID binaryContentId);
     List<BinaryContentDto> findAllByIdIn(UUID[] binaryContentIds);
 //    public void delete(UUID binaryContentId);
-    void download(UUID binaryContentId);
+    String download(UUID binaryContentId);
 }

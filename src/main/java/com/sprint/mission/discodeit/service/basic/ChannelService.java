@@ -47,7 +47,7 @@ public class ChannelService implements InterfaceChannelService {
                     .orElseThrow(() -> new IllegalArgumentException("createPrivate::해당 user[" + userId.toString() + "] 없음"));
                     return new ReadStatus(user, channel, Instant.now());
                 })
-                .peek(readStatusRepository::save)
+                .map(readStatusRepository::save)
                 .toList();
         }
 

@@ -7,6 +7,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,18 +18,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "read_statuses")
+@Table(name = "read_statuses",
+    uniqueConstraints = @UniqueConstraint(
+        name = "ux_read_user_channel",
+        columnNames = {"user_id", "channel_id"}
+    ))
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 🔥 추가 필수
 @AllArgsConstructor
 public class ReadStatus extends BaseUpdatableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "channel_id", nullable = false, unique = true)
+    @JoinColumn(name = "channel_id", nullable = false) // , unique = true
     private Channel channel;
 
     @Column(name = "last_read_at", nullable = false)

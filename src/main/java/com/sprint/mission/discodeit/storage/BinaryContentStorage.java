@@ -8,5 +8,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface BinaryContentStorage {
     BinaryContent put(MultipartFile file, BinaryContent binaryContent);
     InputStream get(UUID bianryContentId);
-    void download(UUID binaryContentId); // HTTP API로 다운로드 기능을 제공
+    String download(UUID binaryContentId); // HTTP API로 다운로드 기능을 제공
 }

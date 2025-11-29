@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
@@ -35,10 +36,7 @@ public class BinaryContentStorageService implements BinaryContentStorage {
         try {
             // DB 저장
             BinaryContent newBinaryContent = binaryContentRepository.save(binaryContent);
-
             Path filePath = root.resolve(newBinaryContent.getId().toString());
-//            log.info("✅ " + filePath.toString());
-//            log.info("✅ length = " + file.getBytes().length);
 
             // 파일 저장
             Files.write(filePath, file.getBytes());  // byte[] -> 실제 파일로 저장
@@ -71,23 +69,18 @@ public class BinaryContentStorageService implements BinaryContentStorage {
     }
 
     @Override
-    public void download(UUID binaryContentId) {
+    public String download(UUID binaryContentId) {
+        return "";
         //log.info("🩷 download");
         //??🚨🚨🚨🚨살려!
 //        BinaryContent content = binaryContentRepository.findById(binaryContentId)
-//            .orElseThrow(() -> new NoSuchElementException("🚨binaryContentRepository.findById = [" + binaryContentDto.id() + "]err "));
+//            .orElseThrow(() -> new NoSuchElementException("🚨binaryContentRepository.findById err"));
 //
 //        InputStream fileStream = get(binaryContentId);
-
+//
 //        try {
 //            byte[] bytes = fileStream.readAllBytes(); // InputStream → byte[]
-//            return new BinaryContentDto(
-//                content.getId(),
-//                content.getFileName(),
-//                content.getContentType(),
-//                content.getFileSize(),
-//                bytes
-//            );
+//            return BinaryContentDto.from(content);
 //        } catch (IOException e) {
 //            throw new RuntimeException("파일 읽기 실패", e);
 //        }

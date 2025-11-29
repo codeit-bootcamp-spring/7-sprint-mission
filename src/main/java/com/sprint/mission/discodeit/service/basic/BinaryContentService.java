@@ -5,22 +5,12 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.service.InterfaceBinaryContentService;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -66,14 +56,17 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 
     //?? 안쓰남??
 //    public void delete(UUID binaryContentId) {
-////    [ ] id로 삭제합니다.
+/// /    [] id로 삭제합니다.
+///
+/// @return
 //        binaryContentRepository.deleteById(binaryContentId);
 //        log.info("✅ BinaryContentService.delete.readStatusID = [" + binaryContentId.toString() + "]");
 //    }
     @Override
-    public void download(UUID binaryContentId) {
+    public String download(UUID binaryContentId) {
         //log.info("🩷 BinaryContent download");
         //💎🌱 파일 다운로드
+        return null;
     }
 
 }

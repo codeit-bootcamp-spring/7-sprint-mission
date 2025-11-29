@@ -49,13 +49,13 @@ public class BinaryContentController implements BinaryContentDoc {
 
     //💎🌱 파일 다운로드
     @GetMapping("/{binaryContentId}/download")
-    public ResponseEntity<BinaryContentDto> download(
+    public ResponseEntity<String> download(
         @PathVariable("binaryContentId") UUID binaryContentId) {
 
-        binaryContentService.download(binaryContentId);
+        String file =  binaryContentService.download(binaryContentId);
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .build();
+            .body(file);
     }
 }
