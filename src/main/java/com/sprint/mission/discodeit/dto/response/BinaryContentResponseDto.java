@@ -7,8 +7,7 @@ public record BinaryContentResponseDto(
     UUID id,
     String fileName,
     Long size,
-    String contentType,
-    byte[] bytes//표준 데이터
+    String contentType
 ) {
 
 }

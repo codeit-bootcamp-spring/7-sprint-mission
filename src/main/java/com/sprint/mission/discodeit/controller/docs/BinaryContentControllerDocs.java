@@ -12,7 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -53,5 +55,16 @@ public interface BinaryContentControllerDocs {
   ResponseEntity<List<BinaryContentResponseDto>> findAllByBinaryContent(
       @Parameter(description = "조회할 첨부 파일 ID 목록")
       @RequestParam List<UUID> binaryContentIds);
+
+
+  @Operation(summary = "파일 다운로드")
+  @ApiResponse(
+      responseCode = "200",
+      description = "파일 다운로드 성공",
+      content = @Content(schema = @Schema(type = "string", format = "binary"))
+  )
+  ResponseEntity<Resource> download(
+      @Parameter(description = "다운로드할 파일 ID")
+      @PathVariable UUID binaryContentId);
 
 }
