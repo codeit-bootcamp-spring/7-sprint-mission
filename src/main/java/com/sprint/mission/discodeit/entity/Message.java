@@ -14,6 +14,7 @@ import lombok.Getter;
 
 import java.util.List;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @NoArgsConstructor

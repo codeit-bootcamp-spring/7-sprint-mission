@@ -4,10 +4,13 @@ import com.sprint.mission.discodeit.controller.docs.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.response.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDto;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,9 +74,14 @@ public class MessageController implements MessageControllerDocs {
   //특정 채널의 메시지 목록을 조회할 수 있다.
   // api/messages?channelId=..
   @GetMapping
-  public ResponseEntity<List<MessageResponseDto>> findAllByChannelId(
-      @RequestParam UUID channelId) {
-    List<MessageResponseDto> response = messageService.findAllByChannelId(channelId);
+  public ResponseEntity<PageResponse<MessageResponseDto>> findAllByChannelId(
+      @RequestParam UUID channelId,
+      @PageableDefault(
+          size = 50,
+          sort = "createdAt",
+          direction = Sort.Direction.DESC) Pageable pageable) {
+    PageResponse<MessageResponseDto> response = messageService.findAllByChannelId(channelId,
+        pageable);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 

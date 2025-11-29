@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller.docs;
 
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.response.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +15,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -106,9 +110,13 @@ public interface MessageControllerDocs {
           )
       )
   })
-  ResponseEntity<List<MessageResponseDto>> findAllByChannelId(
+  ResponseEntity<PageResponse<MessageResponseDto>> findAllByChannelId(
       @Parameter(description = "조회할 Channel Id")
-      @RequestParam UUID channelId);
+      @RequestParam UUID channelId,
+      @PageableDefault(
+          size = 50,
+          sort = "createdAt",
+          direction = Sort.Direction.DESC) Pageable pageable);
 
 
 }
