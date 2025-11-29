@@ -14,23 +14,25 @@ spring:
   jpa:
     database: postgresql
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true # SQL 확인
         format_sql: true # 읽기 쉽게
 
-  logging:
-    level:
-      org.hibernate.SQL: debug
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.springframework.web: DEBUG
 
 server:
   port: 7777
 
 discodeit:
-  repository:
-    type: file # jcf | file
-    file-directory: data
+  storage:
+    type: local
+    local:
+      root-path: ./downloads
 
 
 springdoc:

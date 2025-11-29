@@ -14,14 +14,16 @@ import com.sprint.mission.discodeit.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
 @SpringBootApplication
+@EnableJpaAuditing
 public class DiscodeitApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(DiscodeitApplication.class, args);
+  public static void main(String[] args) {
+    SpringApplication.run(DiscodeitApplication.class, args);
 
-    }
+  }
 }
