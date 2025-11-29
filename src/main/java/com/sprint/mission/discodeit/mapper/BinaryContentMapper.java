@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.response.binarycontent.BinaryContentResp
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import org.springframework.stereotype.Component;
 
-import java.util.Base64;
 import java.util.List;
 
 @Component
@@ -14,13 +13,12 @@ public class BinaryContentMapper {
             return null;
         }
 
-        String encodedString = Base64.getEncoder().encodeToString(binaryContent.getBytes());
+//        String encodedString = Base64.getEncoder().encodeToString(binaryContent.getBytes());
 
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
                 binaryContent.getFileName(),
                 binaryContent.getContentType(),
-                encodedString,
                 binaryContent.getSize()
         );
     }
