@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +24,7 @@ public interface MessageService {
     MessageResponseDto find(UUID messageId);
 
     /** 특정 채널에 포함된 모든 메시지 조회 */
-    Page<MessageResponseDto> findAllByChannelId(UUID channelId, Pageable pageable);
+    Slice<MessageResponseDto> findAllByChannelId(UUID channelId, Pageable pageable);
 
     /** 메시지 내용(content)을 수정 */
     MessageResponseDto update(UUID messageId, UpdateMessageRequestDto request);

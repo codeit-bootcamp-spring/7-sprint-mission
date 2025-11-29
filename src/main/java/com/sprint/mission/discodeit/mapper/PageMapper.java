@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.mapper;
 
+import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
@@ -9,9 +10,19 @@ import org.springframework.stereotype.Component;
 public class PageMapper {
 
     public <T> PageResponseDto<T> toResponseDto(Slice<T> slice){
+        Object nextCursor = null;
+
+        if(slice.getContent().get(0) instanceof MessageResponseDto){
+            MessageResponseDto lastMessage = (MessageResponseDto) slice.getContent()
+                    .get(slice.getContent().size() - 1);
+            nextCursor = lastMessage.createdAt();
+        }
+
+        System.out.println(nextCursor);
+
         return new PageResponseDto<>(
                 slice.getContent(),
-                slice.getNumber(),
+                nextCursor,
                 slice.getSize(),
                 slice.hasNext(),
                 null
