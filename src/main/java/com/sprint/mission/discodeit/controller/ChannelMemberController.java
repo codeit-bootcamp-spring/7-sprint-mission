@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.docs.ReadStateControllerDocs;
 import com.sprint.mission.discodeit.dto.readstatus.request.ReadStatusCreateReq;
 import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusInfoRes;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.facade.readstatus.ReadStatusCreateFacade;
-import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.service.ChannerlMemberService;
 import java.net.URI;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -19,32 +19,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/read-statuses")
+@RequestMapping("/api/channel-members")
 @RequiredArgsConstructor
-public class ReadStatusController implements ReadStateControllerDocs {
+public class ChannelMemberController implements ReadStateControllerDocs {
 
   private final ReadStatusCreateFacade readStatusCreateFacade;
-  private final ReadStatusService readStatusService;
+  private final ChannerlMemberService channerlMemberService;
 
   //메세지 수신 정보 생성
   @PostMapping
   public ResponseEntity<ReadStatusInfoRes> createReadStatus(@RequestBody ReadStatusCreateReq req) {
-    ReadStatus readStatus = readStatusCreateFacade.create(req);
-    
-    return ResponseEntity.created(URI.create("/api/read-statuses/" + readStatus.getId()))
-        .body(ReadStatusInfoRes.from(readStatus));
+    ChannelMember channelMember = readStatusCreateFacade.create(req);
+
+    return ResponseEntity.created(URI.create("/api/channel-members" + channelMember.getId()))
+        .body(ReadStatusInfoRes.from(channelMember));
   }
 
   //메세지 수신 정보 업데이트
   @PatchMapping("/{readStatusId}")
   public ResponseEntity<ReadStatusInfoRes> updateReadStatus(@PathVariable UUID readStatusId) {
-    ReadStatus readStatus = readStatusService.update(readStatusId);
-    return ResponseEntity.ok(ReadStatusInfoRes.from(readStatus));
+    ChannelMember channelMember = channerlMemberService.update(readStatusId);
+    return ResponseEntity.ok(ReadStatusInfoRes.from(channelMember));
   }
 
   //메세지 수신 정보 조회
   @GetMapping("/{readStatusId}")
   public ResponseEntity<ReadStatusInfoRes> getReadStatus(@PathVariable UUID readStatusId) {
-    return ResponseEntity.ok(readStatusService.findById(readStatusId));
+    return ResponseEntity.ok(channerlMemberService.findById(readStatusId));
   }
 }

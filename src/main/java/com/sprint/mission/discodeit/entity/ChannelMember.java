@@ -15,7 +15,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,7 +26,7 @@ import java.util.UUID;
         columnNames = {"user_id", "channel_id"}
     )
 )
-public class ReadStatus extends BaseUpdatableEntity {
+public class ChannelMember extends BaseUpdatableEntity {
 
   private static final long serialVersionUID = 1L;
 
@@ -51,15 +50,15 @@ public class ReadStatus extends BaseUpdatableEntity {
   private ChannelMemberRole role;
 
   //Constructor
-  private ReadStatus(User user, Channel channel, ChannelMemberRole role) {
+  private ChannelMember(User user, Channel channel, ChannelMemberRole role) {
     this.user = user;
     this.channel = channel;
     this.role = role;
   }
 
   //Factory Method
-  public static ReadStatus create(User user, Channel channel, ChannelMemberRole role) {
-    return new ReadStatus(user, channel, role);
+  public static ChannelMember create(User user, Channel channel, ChannelMemberRole role) {
+    return new ChannelMember(user, channel, role);
   }
 
   //사용자가 채널을 읽음.
