@@ -1,5 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,28 +15,39 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseEntity {
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdatableEntity {
 
   private static final long serialVersionUID = 1L;
 
   //Field
+  @Column(name = "email", length = 100, unique = true, nullable = false)
   private String email;               //이메일
+
+  @Column(name = "username", length = 50, unique = true, nullable = false)
   private String nickname;            //닉네임
+
+  @Column(name = "password", length = 60, nullable = false)
   private String password;            //비밀번호
-  private UUID profileId;             //프로필 이미지 UUID
+
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id", unique = true,
+      foreignKey = @ForeignKey(name = "fk_profile"))
+  private BinaryContent profile;             //프로필 이미지 UUID
 
   //Constructor
-  private User(String email, String nickname, String password, UUID profileId) {
+  private User(String email, String nickname, String password, BinaryContent profile) {
     this.email = email;
     this.nickname = nickname;
     this.password = password;
-    this.profileId = profileId;
+    this.profile = profile;
   }
 
   //Factory Method
   public static User createWithProfile(String email, String nickname, String password,
-      UUID profileId) {
-    return new User(email, nickname, password, profileId);
+      BinaryContent profile) {
+    return new User(email, nickname, password, profile);
   }
 
   public static User createWithoutProfile(String email, String nickname, String password) {
@@ -46,9 +64,9 @@ public class User extends BaseEntity {
   }
 
   //profile update
-  public User updateProfile(UUID profileId) {
+  public User updateProfile(BinaryContent profile) {
     super.update();
-    this.profileId = profileId;
+    this.profile = profile;
     return this;
   }
 

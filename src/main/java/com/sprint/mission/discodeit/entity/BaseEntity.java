@@ -1,27 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity implements Serializable {
-    //Field
-    private final UUID id;              //각 객체 UUID
-    private final Instant createdAt;       //객체 생성 일시
-    private Instant updatedAt;             //객체 변경 일시
 
-    //Constructor
-    BaseEntity() {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-    }
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID) // UUID 자동 생성
+  @Column(updatable = false, nullable = false)
+  private UUID id;
 
-    //객체 변경시 변경 일시 업데이트
-    public void update(){
-        this.updatedAt = Instant.now();
-    }
+  @CreatedDate
+  @Column(updatable = false, nullable = false)
+  private Instant createdAt;
 }
