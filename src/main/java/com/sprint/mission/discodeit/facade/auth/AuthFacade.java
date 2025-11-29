@@ -32,12 +32,10 @@ public class AuthFacade {
       throw new CustomException(ErrorCode.INVALID_PASSWORD);
     }
     UserStatus userStatus = userStatusService.findByUserId(user.getId());
-    userStatusService.updateOnlineAt(userStatus.getId());
     userStatusService.updateOfflineAt(userStatus.getId());
-
     return UserDetailInfoRes.from(user,
-        user.getProfileId() == null ? null
-            : binaryContentService.getBinaryContent(user.getProfileId()),
+        user.getProfile() == null ? null
+            : binaryContentService.getBinaryContent(user.getProfile().getId()),
         true);
   }
 
