@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.factory.ChannelMemberFactory;
+import com.sprint.mission.discodeit.service.ChannelMemberService;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ChannerlMemberService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ChannerMemberCreateFacade {
 
-  private final ChannerlMemberService channerlMemberService;
+  private final ChannelMemberService channelMemberService;
   private final ChannelService channelService;
   private final UserService userService;
   private final ChannelMemberFactory channelMemberFactory;
@@ -28,6 +28,6 @@ public class ChannerMemberCreateFacade {
     if (userService.findById(req.userId()) == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    return channerlMemberService.create(channelMemberFactory.create(req));
+    return channelMemberService.create(channelMemberFactory.create(req));
   }
 }

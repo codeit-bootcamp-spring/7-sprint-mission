@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.entity.ChannelMemberRole;
 import com.sprint.mission.discodeit.facade.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.factory.ChannelMemberFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ChannerlMemberService;
+import com.sprint.mission.discodeit.service.ChannelMemberService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.UUID;
 import lombok.NonNull;
@@ -22,7 +22,7 @@ public class ChannelCreationFacade {
 
   private final UserService userService;
   private final ChannelService channelService;
-  private final ChannerlMemberService channerlMemberService;
+  private final ChannelMemberService channelMemberService;
   private final ChannelMapper channelMapper;
   private final ChannelMemberFactory channelMemberFactory;
 
@@ -37,12 +37,12 @@ public class ChannelCreationFacade {
   public ChannelInfoRes createPrivateChannel(@NonNull UUID managerId,
       @NonNull ChannelCreateSecReq req) {
     Channel channel = channelService.create(managerId, req);
-    channerlMemberService.create(
+    channelMemberService.create(
         channelMemberFactory.create(
             managerId,
             channel.getId(),
             ChannelMemberRole.MANAGER));
-    req.userIds().forEach(userId -> channerlMemberService.create(
+    req.userIds().forEach(userId -> channelMemberService.create(
         channelMemberFactory.create(
             userId,
             channel.getId(),

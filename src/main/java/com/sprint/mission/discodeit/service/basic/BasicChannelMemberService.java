@@ -2,20 +2,20 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channelmember.response.ChannelMemberInfoRes;
 import com.sprint.mission.discodeit.entity.ChannelMember;
+import com.sprint.mission.discodeit.entity.ChannelMemberRole;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.ChannelMemberRepository;
-import com.sprint.mission.discodeit.service.ChannerlMemberService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
+import com.sprint.mission.discodeit.service.ChannelMemberService;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class BasicChannerlMemberService implements ChannerlMemberService {
+public class BasicChannelMemberService implements ChannelMemberService {
 
   private final ChannelMemberRepository channelMemberRepository;
 
@@ -48,6 +48,20 @@ public class BasicChannerlMemberService implements ChannerlMemberService {
       throw new CustomException(ErrorCode.READSTATUS_NOT_FOUND);
     }
     channelMemberRepository.deleteById(id);
+  }
+
+  @Override
+  public ChannelMember findManagerByChannelId(UUID channelId) {
+    return channelMemberRepository.findByChannel_IdAndRole(channelId, ChannelMemberRole.MANAGER)
+        .stream().findFirst().orElseThrow(
+            () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+  }
+
+  @Override
+  public List<ChannelMember> findMembersByChannelId(UUID channelId) {
+    return channelMemberRepository.findByChannel_IdAndRole(channelId, ChannelMemberRole.MEMBER)
+        .stream().toList();
   }
 
   @Override
