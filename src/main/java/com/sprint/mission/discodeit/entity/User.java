@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,9 +27,13 @@ public class User extends BaseUpdatableEntity {
   @Column(name = "password", nullable = false, length = 60)
   private String password;
 
+  // CascadeType.REMOVE는 부모가 삭제될 때만 작동
+  // orphanRemoval은 부모와의 관계가 끊기면 작동
+
   @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
   @JoinColumn(name = "profile_id", unique = true)
   private BinaryContent profile;
+
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserStatus userStatus;
@@ -38,6 +43,7 @@ public class User extends BaseUpdatableEntity {
     this.email = email;
     this.password = password;
     this.profile = profile;
+    this.userStatus = new UserStatus(this, Instant.now()); // 영속성 전이로, UserStatus 생성
   }
 
   // equals에서 발생할 npe에 대한 문제
@@ -57,4 +63,6 @@ public class User extends BaseUpdatableEntity {
       this.profile = profile;
     }
   }
+
+
 }

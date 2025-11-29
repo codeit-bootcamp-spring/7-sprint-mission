@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.enums.UserStatusType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 /***
@@ -21,7 +23,14 @@ public interface UserMapper {
 
   //  source = from (입력)
   //  target = to (출력)
-  @Mapping(target = "online", source = "user")
+  @Mapping(target = "online", source = ".", qualifiedByName = "isOnline")
   UserResponseDto toResponseDto(User user);
 
+  @Named("isOnline")
+  default boolean isOnline(User user) {
+    if (user == null || user.getUserStatus() == null) {
+      return false;
+    }
+    return user.getUserStatus().isOnline() == UserStatusType.ONLINE;
+  }
 }

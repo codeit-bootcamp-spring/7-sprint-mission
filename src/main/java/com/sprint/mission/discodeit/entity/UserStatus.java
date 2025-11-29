@@ -23,7 +23,6 @@ public class UserStatus extends BaseUpdatableEntity {
   @JoinColumn(name = "user_id", unique = true)
   private User user;
 
-
   @Column(name = "last_active_at", nullable = false)
   private Instant lastActiveAt;
 
