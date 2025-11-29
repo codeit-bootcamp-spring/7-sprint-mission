@@ -15,29 +15,22 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserOverviewFacade {
-    private final UserService userService;
-    private final BinaryContentService binaryContentService;
-    private final UserStatusService userStatusService;
 
-    //유저 전체 조회
-    public List<UserSimpleInfoRes> findAll(){
-        return userService.findAll().stream()
-                .map(this::mapToSimpleInfo).toList();
-    }
+  private final UserService userService;
+  private final BinaryContentService binaryContentService;
+  private final UserStatusService userStatusService;
 
-    //변환 메소드
-    private UserSimpleInfoRes mapToSimpleInfo(User user) {
-        BinaryContentInfoRes profileImg;
+  //유저 전체 조회
+  public List<UserSimpleInfoRes> findAll() {
+    return userService.findAll().stream()
+        .map(this::mapToSimpleInfo).toList();
+  }
 
-        if(user.getProfileId() != null){
-            profileImg = BinaryContentInfoRes.from(
-                    binaryContentService.findById(user.getProfileId())
-            );
-        }else{
-            profileImg = null;
-        }
-        UserStatus userStatus = userStatusService.findByUserId(user.getId());
-        userStatus.updateOnline();
-        return UserSimpleInfoRes.from(user, profileImg, userStatus.isOnline());
-    }
+  //변환 메소드
+  private UserSimpleInfoRes mapToSimpleInfo(User user) {
+    BinaryContentInfoRes profileImg;
+    profileImg = BinaryContentInfoRes.from(user.getProfile());
+    UserStatus userStatus = userStatusService.findByUserId(user.getId());
+    return UserSimpleInfoRes.from(user, profileImg, userStatus.isOnline());
+  }
 }

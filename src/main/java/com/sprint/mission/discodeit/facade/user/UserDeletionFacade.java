@@ -15,24 +15,25 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserDeletionFacade {
-    private final UserService userService;
-    private final BinaryContentService binaryContentService;
-    private final UserStatusService userStatusService;
 
-    //유저 삭제
-    @CustomTransactional
-    public void deleteUser(@NonNull UUID userId){
-        User user =userService.findById(userId);
-        UserStatus userStatus = userStatusService.findByUserId(userId);
+  private final UserService userService;
+  private final BinaryContentService binaryContentService;
+  private final UserStatusService userStatusService;
 
-        if(user.getProfileId() != null){
-            binaryContentService.delete(user.getProfileId());
-        }
-        if(userStatus != null) {
-            userStatusService.delete(userStatus.getId());
-        }
-        userService.delete(userId);
+  //유저 삭제
+  @CustomTransactional
+  public void deleteUser(@NonNull UUID userId) {
+    User user = userService.findById(userId);
+    UserStatus userStatus = userStatusService.findByUserId(userId);
 
-
+    if (user.getProfile() != null) {
+      binaryContentService.delete(user.getProfile().getId());
     }
+    if (userStatus != null) {
+      userStatusService.delete(userStatus.getId());
+    }
+    userService.delete(userId);
+
+
+  }
 }

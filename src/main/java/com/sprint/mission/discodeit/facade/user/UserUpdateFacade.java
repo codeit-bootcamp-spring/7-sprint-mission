@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.facade.user;
 
+import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateReq;
 import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class UserUpdateFacade {
   private final UserStatusService userStatusService;
 
   //유저 수정
-  @CustomTransactional
+  @Transactional
   public UserDetailInfoRes updateUser(@NonNull UUID userId, @NonNull UserUpdateReq req) {
     User user = userService.findById(userId);
     UUID profileId = null;
@@ -33,27 +35,25 @@ public class UserUpdateFacade {
     userService.update(userId, req);
 
     //기존 프로필 사진 있으면 무조건 삭제
-    if (user.getProfileId() != null) {
-      binaryContentService.delete(user.getProfileId());
+    if (user.getProfile() != null) {
+      binaryContentService.delete(user.getProfile().getId());
       userService.updateProfileImage(userId, null);
     }
 
     //올라온 데이터가 있으면 무조건 만들어서 배정
-    if (req.profileImage().data() != null) {
+    if (req.profileImage() != null) {
       BinaryContent profileImg = binaryContentService.create(
           BinaryContentFactory.create(req.profileImage())
       );
       profileId = profileImg.getId();
     }
-
     userService.updateProfileImage(userId, profileId);
     userStatusService.updateByUserId(userId);
 
-    user = userService.findById(userId);    // file 환경 user 다시 읽기
     return UserDetailInfoRes.from(
         user,
-        user.getProfileId() == null ?
-            null : binaryContentService.getBinaryContent(user.getProfileId()),
+        user.getProfile() == null ?
+            null : BinaryContentInfoRes.from(user.getProfile()),
         true
     );
   }

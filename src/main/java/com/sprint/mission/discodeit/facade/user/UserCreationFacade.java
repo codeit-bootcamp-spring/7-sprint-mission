@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.facade.user;
 
 
+import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.user.request.UserCreateReq;
 import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -25,6 +26,7 @@ public class UserCreationFacade {
   private final UserService userService;
   private final BinaryContentService binaryContentService;
   private final UserStatusService userStatusService;
+  private final UserFactory userFactory;
 
   //유저 추가
   @CustomTransactional
@@ -39,12 +41,12 @@ public class UserCreationFacade {
 
       profileId = profile.getId();
     }
-    User user = userService.create(UserFactory.create(req, profileId));
-    userStatusService.create(UserStatus.create(user.getId()));
+    User user = userService.create(userFactory.create(req, profileId));
+    userStatusService.create(UserStatus.create(user));
     return UserDetailInfoRes.from(
         user,
-        user.getProfileId() == null ?
-            null : binaryContentService.getBinaryContent(user.getProfileId()),
+        user.getProfile() == null ?
+            null : BinaryContentInfoRes.from(user.getProfile()),
         true
     );
   }

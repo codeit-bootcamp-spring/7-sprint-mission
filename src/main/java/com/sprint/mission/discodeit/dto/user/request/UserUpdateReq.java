@@ -9,12 +9,6 @@ public record UserUpdateReq(
     BinaryContentCreateReq profileImage
 ) {
 
-  public UserUpdateReq {
-    if (profileImage == null) {
-      profileImage = new BinaryContentCreateReq(null, null, null);
-    }
-  }
-
   public static UserUpdateReq from(UserInfoReq infoReq, BinaryContentCreateReq profileImage) {
     return new UserUpdateReq(infoReq.email(), infoReq.nickname(), infoReq.password(), profileImage);
   }

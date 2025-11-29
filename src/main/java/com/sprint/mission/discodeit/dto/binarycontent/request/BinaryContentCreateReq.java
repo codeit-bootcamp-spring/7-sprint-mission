@@ -14,7 +14,7 @@ public record BinaryContentCreateReq(
 
   public static BinaryContentCreateReq from(MultipartFile file) {
     if (file == null || file.isEmpty()) {
-      return new BinaryContentCreateReq(null, null, null);
+      return null;
     }
     try {
       return new BinaryContentCreateReq(
