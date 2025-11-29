@@ -83,7 +83,8 @@ public class UserService implements InterfaceUserService {
             userCreateRequest.email(),
             userCreateRequest.password(),
             profile);
-        newUser.initStatus();
+
+        newUser.initUserStatus();
 
         userRepository.save(newUser);
 

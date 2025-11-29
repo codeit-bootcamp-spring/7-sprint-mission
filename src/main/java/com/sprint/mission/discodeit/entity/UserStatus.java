@@ -13,7 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Table(name = "user_statuses")
@@ -46,7 +45,7 @@ public class UserStatus extends BaseUpdatableEntity {
     // 연관관계 편의 메서드(양방향일 경우. 필요하면)
     public void changeUser(User user) {
         this.user = user;
-        user.setStatus(this);
+        user.setUserStatus(this);
     }
 
     @Override

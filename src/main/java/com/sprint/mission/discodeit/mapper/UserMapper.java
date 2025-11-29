@@ -20,7 +20,7 @@ public class UserMapper {
             .username(user.getUsername())
             .email(user.getEmail())
             .profile(profile)
-            .online(user.getStatus().isOnline())
+            .online(user.getUserStatus().isOnline())
             .build();
     }
 }

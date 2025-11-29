@@ -40,12 +40,12 @@ public class User extends BaseUpdatableEntity {
 
     @Setter
     @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL) // ON DELETE CASCADE
-    private UserStatus status;
+    private UserStatus userStatus;
 
-    public void initStatus() {
-        if (this.status == null) {
-            this.status = new UserStatus(this, java.time.Instant.now());
-            log.info("✅✅✅status = [" + this.status.toString() + "]");
+    public void initUserStatus() {
+        if (this.userStatus == null) {
+            this.userStatus = new UserStatus(this, java.time.Instant.now());
+            log.info("✅✅✅status = [" + this.userStatus.toString() + "]");
         }
     }
 

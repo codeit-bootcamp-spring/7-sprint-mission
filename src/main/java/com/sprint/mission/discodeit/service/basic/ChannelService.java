@@ -37,6 +37,23 @@ public class ChannelService implements InterfaceChannelService {
     private final UsersRepository userRepository;
     private final ChannelMapper channelMapper;
 
+    private List<ReadStatus> getReadStatusList( Channel channel, List<UUID> participantIds) {
+
+        List<ReadStatus> readStatusList = new ArrayList<>();
+
+        if (channel.getType() != PRIVATE) { // private 일때만 readStatus 생성 //?????🚨🚨🚨🚨
+            readStatusList = participantIds.stream()
+                .map(userId -> { User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("createPrivate::해당 user[" + userId.toString() + "] 없음"));
+                    return new ReadStatus(user, channel, Instant.now());
+                })
+                .peek(readStatusRepository::save)
+                .toList();
+        }
+
+        return readStatusList;
+    }
+
     @Override
     public ChannelDto createPublic(PublicChannelCreateRequest dtoCreateChannel) {
         //log.info("🩷 Channel createPublic");
@@ -46,6 +63,8 @@ public class ChannelService implements InterfaceChannelService {
                                     , dtoCreateChannel.description());
 
         channelRepository.save(channel);
+
+//        List<ReadStatus> list = getReadStatusList(channel, dtoCreateChannel.participantIds());
 
         log.info("✅ createPublic = [" + dtoCreateChannel.name() + "] 채널 생성");
 
@@ -67,13 +86,17 @@ public class ChannelService implements InterfaceChannelService {
 
         channelRepository.save(channel);
 
-        List<ReadStatus> list = dtoCreateChannel.participantIds().stream()
-            .map(userId -> { User user = userRepository.findById(userId)
-                                            .orElseThrow(() -> new IllegalArgumentException("createPrivate::해당 user[" + userId.toString() + "] 없음"));
-                return new ReadStatus(user, channel, Instant.now());
-            })
-            .peek(readStatusRepository::save)
-            .toList();
+//        List<ReadStatus> list = dtoCreateChannel.participantIds().stream()
+//            .map(userId -> { User user = userRepository.findById(userId)
+//                                            .orElseThrow(() -> new IllegalArgumentException("createPrivate::해당 user[" + userId.toString() + "] 없음"));
+//                return new ReadStatus(user, channel, Instant.now());
+//            })
+//            .peek(readStatusRepository::save)
+//            .toList();
+
+        List<ReadStatus> list = getReadStatusList(channel, dtoCreateChannel.participantIds());
+
+        log.info("✅ createPrivate 채널 생성");
 
         return channelMapper.toDto(channel);
     }
@@ -86,7 +109,6 @@ public class ChannelService implements InterfaceChannelService {
 //        [ ] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
 //        [ ] PUBLIC 채널 목록은 전체 조회합니다.
 //        [ ] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
-
         List<Channel> allChannel = channelRepository.findAll();
         List<ChannelDto> resChannelFinds = new ArrayList<>();
 
