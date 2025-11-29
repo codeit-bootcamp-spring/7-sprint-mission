@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.Dto_UserStatusUpdate;
+import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.mapper.dto.UserStatusDto;
@@ -144,7 +144,7 @@ public interface UserDoc {
             )
         )
     })
-    ResponseEntity<UserStatusDto> updateUserStatus(
+    ResponseEntity<UserStatusDto> updateUserStatusByUserId(
         @Parameter(description = "상태를 변경할 User ID") @PathVariable("userId") UUID userId,
-        @org.springframework.web.bind.annotation.RequestBody Dto_UserStatusUpdate userStatusUpdate);
+        @org.springframework.web.bind.annotation.RequestBody UserStatusUpdateRequest userStatusUpdate);
 }

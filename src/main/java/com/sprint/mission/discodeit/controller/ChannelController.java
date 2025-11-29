@@ -70,7 +70,7 @@ public class ChannelController implements ChannelDoc {
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> update(
         @PathVariable("channelId") UUID channelId,
-        @Valid @RequestBody ChannelDto_Update channelDtoUpdate) { //??❌
+        @Valid @RequestBody ChannelDto_Update channelDtoUpdate) {
 
         ChannelDto resChannel  = channelService.update(channelId, channelDtoUpdate);
 

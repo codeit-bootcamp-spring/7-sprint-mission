@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.dto.UserStatusDto;
 import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import com.sprint.mission.discodeit.swaggerDocs.UserDoc;
-import com.sprint.mission.discodeit.dto.Dto_UserStatusUpdate;
+import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.service.basic.UserService;
@@ -90,12 +90,12 @@ public class UserController implements UserDoc {
     }
 
     @PatchMapping("/{userId}/userStatus")
-    public ResponseEntity<UserStatusDto> updateUserStatus(
+    public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
         @PathVariable("userId") UUID userId,
-        @Valid @RequestBody Dto_UserStatusUpdate userStatusUpdate) { //??❌
+        @Valid @RequestBody UserStatusUpdateRequest lastActiveAtRequest) {
 
         //💎User 온라인 상태 업데이트
-        UserStatusDto userStatusDto = userStatusService.updateUserStatus(userId, userStatusUpdate.newLastActiveAt());
+        UserStatusDto userStatusDto = userStatusService.updateUserStatus(userId, lastActiveAtRequest.newLastActiveAt());
 
         return ResponseEntity
             .status(HttpStatus.OK)

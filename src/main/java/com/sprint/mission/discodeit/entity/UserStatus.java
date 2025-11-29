@@ -53,7 +53,7 @@ public class UserStatus extends BaseUpdatableEntity {
     public String toString() {
         return "✅ UserStatus{" +
             super.toString() +
-            "user=" + user +
+            "user=" + user.getId() + "/ " + user.getUsername() +
             ", lastActiveAt=" + lastActiveAt +
             '}';
     }

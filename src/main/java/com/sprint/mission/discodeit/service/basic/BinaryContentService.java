@@ -43,7 +43,7 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 //    }
     @Override
     public  BinaryContentDto find(UUID binaryContentId) {
-        log.info("🩷 BinaryContent find");
+        //log.info("🩷 BinaryContent find");
 //    [ ] id로 조회합니다.
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
             .orElseThrow(() -> new NoSuchElementException("🚨첨부파일[" + binaryContentId.toString() + "]을 찾을 수 없음"));
@@ -53,7 +53,7 @@ public class BinaryContentService implements InterfaceBinaryContentService {
     }
     @Override
     public List<BinaryContentDto> findAllByIdIn(UUID[] binaryContentIds) {
-        log.info("🩷 BinaryContent findAllByIdIn");
+        //log.info("🩷 BinaryContent findAllByIdIn");
 
         List<BinaryContentDto> dtoList = binaryContentRepository.findAll().stream()
             .filter(content -> List.of(binaryContentIds).contains(content.getId()))
@@ -72,7 +72,7 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 //    }
     @Override
     public void download(UUID binaryContentId) {
-        log.info("🩷 BinaryContent download");
+        //log.info("🩷 BinaryContent download");
         //💎🌱 파일 다운로드
     }
 

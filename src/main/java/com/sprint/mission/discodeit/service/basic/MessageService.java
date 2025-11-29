@@ -39,7 +39,7 @@ public class MessageService implements InterfaceMessageService {
 
     @Override
     public MessageDto create(MessageCreateRequest dtoMessage, List<MultipartFile> fileList) {
-        log.info("🩷 Message create");
+        //log.info("🩷 Message create");
         if (dtoMessage.channelId() == null) {
             throw new NoSuchElementException("🚨 Channel를 찾을 수 없음 :: " + dtoMessage.toString());
         }
@@ -62,31 +62,32 @@ public class MessageService implements InterfaceMessageService {
                                         user,
                                         attachments);
 
+        if (null != fileList) {
+            List<BinaryContent> dtoList = fileList
+                .stream()
+                .map(file -> {
+                    BinaryContent binaryContent = null;
+                    binaryContent = new BinaryContent(
+                        file.getOriginalFilename(),
+                        file.getSize(),
+                        file.getContentType(),
+                        null
+                    );
 
-        List<BinaryContent> dtoList = fileList
-            .stream()
-            .map(file -> {
-                BinaryContent binaryContent = null;
-                binaryContent = new BinaryContent(
-                    file.getOriginalFilename(),
-                    file.getSize(),
-                    file.getContentType(),
-                    null
-                );
+                    MessageAttachments messageAttachments = new MessageAttachments(
+                        UUID.randomUUID(),
+                        newMessage,
+                        binaryContent
+                    );
+                    attachments.add(messageAttachments);
+                    messageAttachmentsRepository.save(messageAttachments);
 
-                MessageAttachments messageAttachments = new MessageAttachments(
-                    UUID.randomUUID(),
-                    newMessage,
-                    binaryContent
-                );
-                attachments.add(messageAttachments);
-                messageAttachmentsRepository.save(messageAttachments);
-
-                // 파일 저장 + DB 저장
-                binaryContent.setAttachments(messageAttachments);
-                return binaryContentStorage.put(file, binaryContent);
-            })
-            .toList();
+                    // 파일 저장 + DB 저장
+                    binaryContent.setAttachments(messageAttachments);
+                    return binaryContentStorage.put(file, binaryContent);
+                })
+                .toList();
+        }
 
         newMessage.setMessageAttachmentList(attachments);
         messageRepository.save(newMessage);
@@ -97,7 +98,7 @@ public class MessageService implements InterfaceMessageService {
 
     @Override
     public void deleteMessage(UUID messageID) {
-        log.info("🩷 Message deleteMessage");
+        //log.info("🩷 Message deleteMessage");
       Message message = messageRepository
           .findById(messageID)
           .map(model -> (Message)model)
@@ -109,7 +110,7 @@ public class MessageService implements InterfaceMessageService {
 
     @Override
     public MessageDto find(UUID messageID) {
-        log.info("🩷 Message find");
+        //log.info("🩷 Message find");
         Message message = messageRepository
             .findById(messageID)
             .orElseThrow(() -> new IllegalArgumentException("🚨MessageService.find.messageID = [" + messageID.toString() + "] 오류"));
@@ -121,7 +122,7 @@ public class MessageService implements InterfaceMessageService {
     @Override
 //        [ ] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
     public List<MessageDto> findAllByChannelId(UUID channelID) { //♨️
-        log.info("🩷 Message findAllByChannelId");
+        //log.info("🩷 Message findAllByChannelId");
         List<Message> messageList = messageRepository.findAll();
         List<MessageDto> resMessage = messageList
             .stream()
@@ -134,7 +135,7 @@ public class MessageService implements InterfaceMessageService {
 
     @Override
     public MessageDto updateMessage(UUID messageId, Dto_MessageUpdate requestDto) {
-        log.info("🩷 Message updateMessage");
+        //log.info("🩷 Message updateMessage");
         // [ ] DTO를 활용해 파라미터를 그룹화합니다.
         // 수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
         Message message = messageRepository

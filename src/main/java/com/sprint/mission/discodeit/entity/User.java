@@ -13,7 +13,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Entity@Table(name = "users")
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 🔥 추가 필수
@@ -43,6 +45,7 @@ public class User extends BaseUpdatableEntity {
     public void initStatus() {
         if (this.status == null) {
             this.status = new UserStatus(this, java.time.Instant.now());
+            log.info("✅✅✅status = [" + this.status.toString() + "]");
         }
     }
 

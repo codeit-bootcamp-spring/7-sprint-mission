@@ -32,7 +32,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
     private final ReadStatusMapper readStatusMapper;
 
     public ReadStatusDto create(ReadStatusCreateRequest dtoReadStatus) {
-        log.info("🩷 ReadStatusService create");
+        //log.info("🩷 ReadStatusService create");
         User user = userRepository.findById(dtoReadStatus.userId()).stream()
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("🚨User[" + dtoReadStatus.userId().toString() + "] 를 찾을 수 없음 "));
@@ -62,7 +62,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
     }
 
     public ReadStatusDto find(UUID statusID) {
-        log.info("🩷 ReadStatusService find");
+        //log.info("🩷 ReadStatusService find");
         //find
         //[ ] id로 조회합니다.
         ReadStatus readStatus = readStatusRepository.findById(statusID).stream()
@@ -76,11 +76,11 @@ public class ReadStatusService implements InterfaceReadStatusService {
     }
 
     public List<ReadStatusDto> findAllByUserId(UUID userID) {
-        log.info("🩷 ReadStatusService findAllByUserId");
+        //log.info("🩷 ReadStatusService findAllByUserId");
         //findAllByUserId
         //[ ] userId를 조건으로 조회합니다.
         List<ReadStatus> readStatuses = readStatusRepository.findAll();
-        readStatuses.forEach(resReadStatus -> log.info("❌ ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"));
+//        readStatuses.forEach(resReadStatus -> log.info("❌ ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"));
 
         List<ReadStatusDto> dtoList = readStatuses.stream()
             .filter(readStatus -> readStatus.getUser().getId().equals(userID))
@@ -92,7 +92,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
     }
 
     public ReadStatusDto update(UUID readStatusId, Dto_ReadStatusUpdate requestDto) {
-        log.info("🩷 ReadStatusService update");
+        log.info("🩷🩷🩷🩷 ReadStatusService update");
         //update
         //[ ] DTO를 활용해 파라미터를 그룹화합니다.
         //수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
@@ -102,13 +102,13 @@ public class ReadStatusService implements InterfaceReadStatusService {
         readStatus.setLastReadAt(requestDto.newLastReadAt());
         readStatusRepository.save(readStatus);
 
-        log.info("✅ readStatusRepository.update = [" + readStatus + "]");
+        log.info("🩷🩷🩷🩷 readStatusRepository.update = [" + readStatus + "]");
 
         return readStatusMapper.toDto(readStatus);
     }
 
     public void delete(UUID statusID) {
-        log.info("🩷 ReadStatusService delete");
+        //log.info("🩷 ReadStatusService delete");
         //delete
         //[ ] id로 삭제합니다.
         readStatusRepository.deleteById(statusID);

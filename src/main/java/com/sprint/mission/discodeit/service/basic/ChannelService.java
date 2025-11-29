@@ -39,7 +39,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Override
     public ChannelDto createPublic(PublicChannelCreateRequest dtoCreateChannel) {
-        log.info("🩷 Channel createPublic");
+        //log.info("🩷 Channel createPublic");
 
         Channel channel = new Channel(PUBLIC
                                     , dtoCreateChannel.name()
@@ -54,7 +54,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Override
     public ChannelDto createPrivate(PrivateChannelCreateRequest dtoCreateChannel) {
-        log.info("🩷 Channel createPrivate");
+        //log.info("🩷 Channel createPrivate");
 //        PRIVATE 채널과 PUBLIC 채널을 생성하는 메소드를 분리합니다.
 //        [ ] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
 //                        PRIVATE 채널을 생성할 때:
@@ -80,7 +80,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Override
     public List<ChannelDto> findAllByUserId(UUID userID) {
-        log.info("🩷 Channel findAllByUserId");
+        //log.info("🩷 Channel findAllByUserId");
 //        [ ] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
 //        [ ] PRIVATE 채널인 경우 참여한 User의 readStatusID 정보를 포함합니다.
 //        [ ] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
@@ -106,7 +106,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Override
     public ChannelDto update(UUID channelId, ChannelDto_Update channelDtoUpdate) {
-        log.info("🩷 Channel update");
+        //log.info("🩷 Channel update");
         Channel channel = channelRepository
             .findById(channelId)
             .orElseThrow(() -> new NoSuchElementException("🚨Channel[" + channelId.toString() + "]을 찾을 수 없음"));
@@ -132,7 +132,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Override
     public void delete(UUID channelID) {
-        log.info("🩷 Channel delete");
+        //log.info("🩷 Channel delete");
 //        [ ] 관련된 도메인도 같이 삭제합니다.
 //        Message, ReadStatus
         Channel findedChannel = channelRepository.findById(channelID)
