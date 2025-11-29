@@ -20,7 +20,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "read_statuses",
     uniqueConstraints = @UniqueConstraint(
-        name = "ux_read_user_channel",
+        name = "read_statuses_user_id_N_channel_id_uk",
         columnNames = {"user_id", "channel_id"}
     ))
 @Getter @Setter
