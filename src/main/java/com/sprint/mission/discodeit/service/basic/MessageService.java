@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
+import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import org.springframework.data.domain.Pageable;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -39,6 +40,7 @@ public class MessageService implements InterfaceMessageService {
     private final UsersRepository userRepository;
     private final MessageAttachmentsRepository messageAttachmentsRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentsRepository binaryContentRepository;
     private final ReadStatusesRepository readStatusRepository;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
@@ -92,9 +94,12 @@ public class MessageService implements InterfaceMessageService {
                     attachments.add(messageAttachments);
                     messageAttachmentsRepository.save(messageAttachments);
 
-                    // 파일 저장 + DB 저장
+                    // 파일 저장
                     binaryContent.setAttachments(messageAttachments);
-                    return binaryContentStorage.put(file, binaryContent);
+                    binaryContentStorage.put(file, binaryContent);
+
+                    // DB 저장
+                    return binaryContentRepository.save(binaryContent);
                 })
                 .toList();
         }

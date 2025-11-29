@@ -74,8 +74,11 @@ public class UserService implements InterfaceUserService {
                     null
                 );
 
-                // 파일 저장 + DB 저장
-                 return binaryContentStorage.put(file, binaryContent);
+                // 파일 저장
+                binaryContentStorage.put(file, binaryContent);
+
+                // DB 저장
+                return binaryContentRepository.save(binaryContent);
             })
             .orElse(null);
 
