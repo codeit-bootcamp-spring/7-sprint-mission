@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
@@ -44,15 +46,20 @@ public class ReadStatus extends BaseUpdatableEntity {
   @Column(name = "last_read_at", nullable = false)
   private Instant readAt;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role", length = 20, nullable = false)
+  private ChannelMemberRole role;
+
   //Constructor
-  private ReadStatus(User user, Channel channel) {
+  private ReadStatus(User user, Channel channel, ChannelMemberRole role) {
     this.user = user;
     this.channel = channel;
+    this.role = role;
   }
 
   //Factory Method
-  public static ReadStatus create(User user, Channel channel) {
-    return new ReadStatus(user, channel);
+  public static ReadStatus create(User user, Channel channel, ChannelMemberRole role) {
+    return new ReadStatus(user, channel, role);
   }
 
   //사용자가 채널을 읽음.

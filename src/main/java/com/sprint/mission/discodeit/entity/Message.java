@@ -6,8 +6,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class Message extends BaseUpdatableEntity {
   @Column(name = "content", columnDefinition = "TEXT")
   private String content;                   //메세지 내용
 
-  @ManyToMany
+  @OneToMany
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id", foreignKey = @ForeignKey(name = "fk_msg_attachment_msg")),

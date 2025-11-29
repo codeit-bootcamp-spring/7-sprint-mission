@@ -5,13 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import java.util.List;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
-import java.util.UUID;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,26 +28,16 @@ public class Channel extends BaseUpdatableEntity {
   @Column(name = "description", length = 500)
   private String description;
 
-  // 생성자 UUID
-  @Column(name = "manager_id", nullable = false)
-  private UUID managerId;
-
   // 공개/비공개 타입
   @Enumerated(EnumType.STRING)
   @Column(name = "type", length = 10, nullable = false)
   private ChannelType publicType;
 
-  @Transient
-  private List<UUID> userIds;               //채널 참가자
-
-
   //Constructor
   private Channel(UUID managerId, String name, String description, List<UUID> userIds,
       ChannelType publicType) {
-    this.managerId = managerId;
     this.name = name;
     this.description = description;
-    this.userIds = userIds;
     this.publicType = publicType;
   }
 
