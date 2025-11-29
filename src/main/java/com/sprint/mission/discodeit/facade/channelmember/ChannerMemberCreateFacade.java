@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.dto.channelmember.request.ReadStatusCreateRe
 import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.factory.ReadStatusFactory;
+import com.sprint.mission.discodeit.factory.ChannelMemberFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ChannerlMemberService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -19,8 +19,8 @@ public class ChannerMemberCreateFacade {
   private final ChannerlMemberService channerlMemberService;
   private final ChannelService channelService;
   private final UserService userService;
+  private final ChannelMemberFactory channelMemberFactory;
 
-  //유저 채널 읽음 상태 추가
   public ChannelMember create(@NonNull ReadStatusCreateReq req) {
     if (channelService.findById(req.channelId()) == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -28,6 +28,6 @@ public class ChannerMemberCreateFacade {
     if (userService.findById(req.userId()) == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    return channerlMemberService.create(ReadStatusFactory.create(req));
+    return channerlMemberService.create(channelMemberFactory.create(req));
   }
 }
