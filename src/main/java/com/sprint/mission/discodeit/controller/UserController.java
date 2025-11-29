@@ -33,31 +33,36 @@ public class UserController implements UserControllerDocs {
     private final UserStatusService userStatusService;
 
     // 사용자 등록
+    /*
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     public UserResponseDto create(@Valid @RequestBody UserCreateRequestDto userCreateRequestDto) {
         return userService.create(userCreateRequestDto, null);
     }
+
+     */
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseDto createMultipart(
             @Valid @RequestPart("userCreateRequest") UserCreateRequestDto userCreateRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile) {
-        UUID profileId = null;
+        BinaryContentCreateRequestDto profileDto = null;
         if(profile != null && !profile.isEmpty()) {
-            BinaryContentCreateRequestDto profileDto = BinaryContentCreateRequestDto.from(profile);
-            BinaryContentResponseDto binaryContentResponseDto = binaryContentService.create(profileDto);
-            profileId = binaryContentResponseDto.id();
+            profileDto = BinaryContentCreateRequestDto.from(profile);
         }
-        return userService.create(userCreateRequestDto, profileId);
+        return userService.create(userCreateRequestDto, profileDto);
     }
 
     // 사용자 정보 수정
+    /*
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponseDto update(@Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto,
                                   @PathVariable("userId") UUID userId) {
         return userService.update(userId, userUpdateRequestDto, null);
     }
+
+     */
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserResponseDto updateMultipart(
@@ -65,32 +70,18 @@ public class UserController implements UserControllerDocs {
             @Valid @RequestPart("userUpdateRequest") UserUpdateRequestDto userUpdateRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        UserResponseDto userResponseDto = userService.get(userId);
-        UUID profileId = userResponseDto.profileId();
-
+        BinaryContentCreateRequestDto profileDto = null;
         if(profile != null && !profile.isEmpty()) {
-            BinaryContentCreateRequestDto profileDto
-                    = BinaryContentCreateRequestDto.from(profile);
-            BinaryContentResponseDto binaryContentResponseDto = binaryContentService.create(profileDto);
-            UUID newProfileId = binaryContentResponseDto.id();
-
-            if(profileId != null){
-                boolean delete = binaryContentService.delete(profileId);
-                if(!delete){
-                    throw new NoSuchElementException("BinaryContent not found");
-                }
-            }
-
-            profileId = newProfileId;
+            profileDto = BinaryContentCreateRequestDto.from(profile);
         }
-
-        return userService.update(userId, userUpdateRequestDto, profileId);
+        return userService.update(userId, userUpdateRequestDto, profileDto);
     }
 
     // 사용자 삭제
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
     public void delete(@PathVariable("userId") UUID userId) {
-        UserResponseDto userResponseDto = userService.get(userId);
+        userService.delete(userId);
     }
 
     // 모든 사용자 조회
@@ -98,13 +89,15 @@ public class UserController implements UserControllerDocs {
     public List<UserResponseDto> getAll() {
         return userService.getAll();
     }
-
+/*
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     public ResponseEntity<List<UserResponseDto>> findAll() {
         List<UserResponseDto> all = userService.getAll();
 
         return ResponseEntity.ok(all);
     }
+
+ */
 
     @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
     public UserStatusResponseDto updateUserStatusByUserId(
