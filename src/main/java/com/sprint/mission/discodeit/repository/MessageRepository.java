@@ -1,20 +1,22 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
-
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface MessageRepository {
-    List<Message> findAll();
-    List<Message> findAllByUserId(UUID userId);
-    List<Message> findAllByChannelId(UUID channelId);
-    List<Message> findByContentContaining(String searchText);
-    Optional<Message> findById(UUID id);
-    Message save(Message message);
-    void update(UUID id, String content, List<UUID> attachmentIds);
-    void delete(UUID id);
-    Optional<Message> findLastMessageByChannelId(UUID channelId);
-    boolean existsById(UUID id);
+public interface MessageRepository extends JpaRepository<Message, UUID> {
+
+  List<Message> findAllByChannelId(UUID channelId);
+
+  @Query("""
+        SELECT MAX(m.createdAt)
+        FROM Message m
+        WHERE m.channel.id = :channelId
+      """)
+  Optional<Instant> findLatestCreatedAt(@Param("channelId") UUID channelId);
 }
