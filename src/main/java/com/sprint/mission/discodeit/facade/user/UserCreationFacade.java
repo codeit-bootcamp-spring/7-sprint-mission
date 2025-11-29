@@ -12,12 +12,11 @@ import com.sprint.mission.discodeit.factory.UserFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.transactional.CustomTransactional;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +28,7 @@ public class UserCreationFacade {
   private final UserFactory userFactory;
 
   //유저 추가
-  @CustomTransactional
+  @Transactional
   public UserDetailInfoRes createUser(@NonNull UserCreateReq req) {
     UUID profileId = null;
 

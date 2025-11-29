@@ -3,12 +3,11 @@ package com.sprint.mission.discodeit.facade.channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ChannerlMemberService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.transactional.CustomTransactional;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -18,7 +17,7 @@ public class ChannelDeleteFacade {
   private final MessageService messageService;
   private final ChannerlMemberService channerlMemberService;
 
-  @CustomTransactional
+  @Transactional
   public void deleteChannel(@NonNull UUID channelId) {
     channerlMemberService.findAllByChannelId(channelId)
         .forEach(readStatus -> channerlMemberService.delete(readStatus.getId()));

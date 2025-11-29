@@ -11,7 +11,7 @@ import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.dto.user.response.UserSimpleInfoRes;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusSimpleViewRes;
 import com.sprint.mission.discodeit.facade.user.UserCreationFacade;
-import com.sprint.mission.discodeit.facade.user.UserDeletionFacade;
+import com.sprint.mission.discodeit.facade.user.UserDeleteFacade;
 import com.sprint.mission.discodeit.facade.user.UserDetailViewFacade;
 import com.sprint.mission.discodeit.facade.user.UserOverviewFacade;
 import com.sprint.mission.discodeit.facade.user.UserUpdateFacade;
@@ -46,7 +46,7 @@ public class UserController implements UserControllerDocs {
   private final UserOverviewFacade userOverviewFacade;
   private final UserDetailViewFacade userDetailViewFacade;
   private final UserUpdateFacade userUpdateFacade;
-  private final UserDeletionFacade userDeletionFacade;
+  private final UserDeleteFacade userDeleteFacade;
   private final UserStatusUpdateFacade userStatusUpdateFacade;
   private final UserService userService;
 
@@ -88,7 +88,7 @@ public class UserController implements UserControllerDocs {
   // 회원 삭제
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
-    userDeletionFacade.deleteUser(userId);
+    userDeleteFacade.deleteUser(userId);
     return ResponseEntity.noContent().build();
   }
 

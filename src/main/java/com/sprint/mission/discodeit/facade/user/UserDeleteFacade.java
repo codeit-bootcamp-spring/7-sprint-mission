@@ -5,23 +5,22 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.transactional.CustomTransactional;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserDeletionFacade {
+public class UserDeleteFacade {
 
   private final UserService userService;
   private final BinaryContentService binaryContentService;
   private final UserStatusService userStatusService;
 
   //유저 삭제
-  @CustomTransactional
+  @Transactional
   public void deleteUser(@NonNull UUID userId) {
     User user = userService.findById(userId);
     UserStatus userStatus = userStatusService.findByUserId(userId);
@@ -33,7 +32,5 @@ public class UserDeletionFacade {
       userStatusService.delete(userStatus.getId());
     }
     userService.delete(userId);
-
-
   }
 }
