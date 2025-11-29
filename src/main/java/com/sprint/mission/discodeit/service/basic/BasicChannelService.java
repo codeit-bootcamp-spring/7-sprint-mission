@@ -49,6 +49,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public ChannelResponseDto createChannel(CreatePrivateChannelDto createPrivateChannelDto) {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+    channelRepository.save(channel);
 
     createPrivateChannelDto.participantIds().forEach(userId -> {
       User user = userRepository.findById(userId)
@@ -57,8 +58,6 @@ public class BasicChannelService implements ChannelService {
       ReadStatus readStatus = new ReadStatus(user, channel, channel.getCreatedAt());
       readStatusRepository.save(readStatus);
     });
-
-    channelRepository.save(channel);
 
     return channelMapper.toResponseDto(channel);
   }

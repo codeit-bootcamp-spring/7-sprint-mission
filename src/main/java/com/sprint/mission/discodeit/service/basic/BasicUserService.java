@@ -63,9 +63,6 @@ public class BasicUserService implements UserService {
         createUserDto.username(), createUserDto.email(), createUserDto.password(), profile);
     UserStatus userStatus = new UserStatus(user, Instant.now());
     userRepository.save(user);
-    userStatusRepository.save(userStatus);
-
-    log.info(userStatus.toString());
 
     return userMapper.toResponseDto(user);
   }
