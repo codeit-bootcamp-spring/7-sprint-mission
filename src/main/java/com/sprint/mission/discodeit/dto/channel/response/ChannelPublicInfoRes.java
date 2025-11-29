@@ -14,11 +14,12 @@ public record ChannelPublicInfoRes(
     Instant lastMessageTime
 ) implements ChannelInfoRes {
 
-  public static ChannelPublicInfoRes from(Channel channel, Instant lastMessageTime) {
+  public static ChannelPublicInfoRes from(Channel channel, UUID managerId,
+      Instant lastMessageTime) {
     return new ChannelPublicInfoRes(
         channel.getId(),
         channel.getPublicType().getValue(),
-        channel.getManagerId(),
+        managerId,
         channel.getName(),
         channel.getDescription(),
         lastMessageTime

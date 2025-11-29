@@ -21,7 +21,7 @@ public record MessageViewRes(
       List<BinaryContentInfoRes> attachmentDatas) {
     return new MessageViewRes(
         message.getId(),
-        message.getSpeakerId(),
+        message.getSpeaker().getId(),
         message.getContent(),
         attachmentDatas,
         DateTimeUtil.format(message.getCreatedAt()),
