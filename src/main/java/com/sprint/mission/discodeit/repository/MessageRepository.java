@@ -15,7 +15,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   Slice<Message> findByChannelId(UUID channelId, Pageable pageable);
 
-  @Query("SELECT m FROM Message m WHERE m.channel.id = :channelId ORDER BY m.createdAt DESC LIMIT 1")
+  @Query("SELECT m.createdAt FROM Message m WHERE m.channel.id = :channelId ORDER BY m.createdAt DESC LIMIT 1")
   Optional<Instant> findLastMessageAtByChannelId(UUID channelId);
 
   void deleteByChannelId(UUID channelId);
