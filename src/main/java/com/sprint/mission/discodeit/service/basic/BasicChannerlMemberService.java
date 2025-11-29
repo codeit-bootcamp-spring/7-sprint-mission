@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channelmember.response.ReadStatusInfoRes;
+import com.sprint.mission.discodeit.dto.channelmember.response.ChannelMemberInfoRes;
 import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -57,9 +57,9 @@ public class BasicChannerlMemberService implements ChannerlMemberService {
 
   // ===== 🎯 Controller Direct (DTO 반환) =====
   @Override
-  public ReadStatusInfoRes findById(UUID id) {
+  public ChannelMemberInfoRes findById(UUID id) {
     ChannelMember channelMember = channelMemberRepository.findById(id).orElseThrow(() ->
         new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
-    return ReadStatusInfoRes.from(channelMember);
+    return ChannelMemberInfoRes.from(channelMember);
   }
 }

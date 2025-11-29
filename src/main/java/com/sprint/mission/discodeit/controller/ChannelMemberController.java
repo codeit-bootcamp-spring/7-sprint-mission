@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.docs.ReadStateControllerDocs;
-import com.sprint.mission.discodeit.dto.channelmember.request.ReadStatusCreateReq;
-import com.sprint.mission.discodeit.dto.channelmember.response.ReadStatusInfoRes;
+import com.sprint.mission.discodeit.dto.channelmember.request.ChannelMemberCreateReq;
+import com.sprint.mission.discodeit.dto.channelmember.response.ChannelMemberInfoRes;
 import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.facade.channelmember.ChannerMemberCreateFacade;
 import com.sprint.mission.discodeit.service.ChannerlMemberService;
@@ -28,23 +28,24 @@ public class ChannelMemberController implements ReadStateControllerDocs {
 
   //메세지 수신 정보 생성
   @PostMapping
-  public ResponseEntity<ReadStatusInfoRes> createReadStatus(@RequestBody ReadStatusCreateReq req) {
+  public ResponseEntity<ChannelMemberInfoRes> createReadStatus(
+      @RequestBody ChannelMemberCreateReq req) {
     ChannelMember channelMember = channerMemberCreateFacade.create(req);
 
     return ResponseEntity.created(URI.create("/api/channel-members" + channelMember.getId()))
-        .body(ReadStatusInfoRes.from(channelMember));
+        .body(ChannelMemberInfoRes.from(channelMember));
   }
 
   //메세지 수신 정보 업데이트
   @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatusInfoRes> updateReadStatus(@PathVariable UUID readStatusId) {
+  public ResponseEntity<ChannelMemberInfoRes> updateReadStatus(@PathVariable UUID readStatusId) {
     ChannelMember channelMember = channerlMemberService.update(readStatusId);
-    return ResponseEntity.ok(ReadStatusInfoRes.from(channelMember));
+    return ResponseEntity.ok(ChannelMemberInfoRes.from(channelMember));
   }
 
   //메세지 수신 정보 조회
   @GetMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatusInfoRes> getReadStatus(@PathVariable UUID readStatusId) {
+  public ResponseEntity<ChannelMemberInfoRes> getReadStatus(@PathVariable UUID readStatusId) {
     return ResponseEntity.ok(channerlMemberService.findById(readStatusId));
   }
 }

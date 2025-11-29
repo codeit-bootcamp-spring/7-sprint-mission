@@ -5,19 +5,19 @@ import com.sprint.mission.discodeit.util.DateTimeUtil;
 
 import java.util.UUID;
 
-public record ReadStatusInfoRes(
+public record ChannelMemberInfoRes(
     String createdAt,
     String updatedAt,
     UUID userId,
     UUID channelId
 ) {
 
-  public static ReadStatusInfoRes from(ChannelMember channelMember) {
-    return new ReadStatusInfoRes(
+  public static ChannelMemberInfoRes from(ChannelMember channelMember) {
+    return new ChannelMemberInfoRes(
         DateTimeUtil.format(channelMember.getCreatedAt()),
         DateTimeUtil.format(channelMember.getUpdatedAt()),
-        channelMember.getUserId(),
-        channelMember.getChannelId()
+        channelMember.getUser().getId(),
+        channelMember.getChannel().getId()
     );
   }
 }

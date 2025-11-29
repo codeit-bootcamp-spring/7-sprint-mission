@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.factory;
 
-import com.sprint.mission.discodeit.dto.channelmember.request.ReadStatusCreateReq;
+import com.sprint.mission.discodeit.dto.channelmember.request.ChannelMemberCreateReq;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.entity.ChannelMemberRole;
@@ -25,7 +25,7 @@ public class ChannelMemberFactory {
     return ChannelMember.create(user, channel, role);
   }
 
-  public ChannelMember create(ReadStatusCreateReq req) {
+  public ChannelMember create(ChannelMemberCreateReq req) {
     return create(req.userId(), req.channelId(), req.role());
   }
 }

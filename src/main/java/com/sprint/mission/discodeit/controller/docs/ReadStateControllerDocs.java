@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.docs;
 
-import com.sprint.mission.discodeit.dto.channelmember.request.ReadStatusCreateReq;
-import com.sprint.mission.discodeit.dto.channelmember.response.ReadStatusInfoRes;
+import com.sprint.mission.discodeit.dto.channelmember.request.ChannelMemberCreateReq;
+import com.sprint.mission.discodeit.dto.channelmember.response.ChannelMemberInfoRes;
 import com.sprint.mission.discodeit.exception.ErrorInfoRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,7 +25,7 @@ public interface ReadStateControllerDocs {
               description = "Message 읽음 상태가 성공적으로 생성됨",
               content = @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = ReadStatusInfoRes.class),
+                  schema = @Schema(implementation = ChannelMemberInfoRes.class),
                   examples = @ExampleObject(
                       name = "Message 읽음 상태가 성공적으로 생성 예시",
                       value = """
@@ -95,7 +95,7 @@ public interface ReadStateControllerDocs {
           )
       }
   )
-  ResponseEntity<ReadStatusInfoRes> createReadStatus(@RequestBody ReadStatusCreateReq req);
+  ResponseEntity<ChannelMemberInfoRes> createReadStatus(@RequestBody ChannelMemberCreateReq req);
 
   @Operation(summary = "Message 읽음 상태 수정")
   @ApiResponses(
@@ -105,7 +105,7 @@ public interface ReadStateControllerDocs {
               description = "Message 읽음 상태가 성공적으로 수정됨",
               content = @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = ReadStatusInfoRes.class),
+                  schema = @Schema(implementation = ChannelMemberInfoRes.class),
                   examples = @ExampleObject(
                       name = "Message 읽음 상태가 성공적으로 수정됨 예시",
                       value = """
@@ -139,7 +139,7 @@ public interface ReadStateControllerDocs {
           )
       }
   )
-  ResponseEntity<ReadStatusInfoRes> updateReadStatus(@PathVariable UUID readStatusId);
+  ResponseEntity<ChannelMemberInfoRes> updateReadStatus(@PathVariable UUID readStatusId);
 
   @Operation(summary = "User의 Message 읽음 상태 목록 조회")
   @ApiResponses(
@@ -149,7 +149,7 @@ public interface ReadStateControllerDocs {
               description = "Message 읽음 상태 목록 조회 성공",
               content = @Content(
                   mediaType = "application/json",
-                  schema = @Schema(implementation = ReadStatusInfoRes.class),
+                  schema = @Schema(implementation = ChannelMemberInfoRes.class),
                   examples = @ExampleObject(
                       name = "Message 읽음 상태 목록 조회 성공 예시",
                       value = """
@@ -165,5 +165,5 @@ public interface ReadStateControllerDocs {
           )
       }
   )
-  ResponseEntity<ReadStatusInfoRes> getReadStatus(@PathVariable UUID readStatusId);
+  ResponseEntity<ChannelMemberInfoRes> getReadStatus(@PathVariable UUID readStatusId);
 }

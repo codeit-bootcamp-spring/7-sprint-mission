@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.channelmember.response.ReadStatusInfoRes;
+import com.sprint.mission.discodeit.dto.channelmember.response.ChannelMemberInfoRes;
 import com.sprint.mission.discodeit.entity.ChannelMember;
 
 import java.util.List;
@@ -16,5 +16,5 @@ public interface ChannerlMemberService {
 
   List<ChannelMember> findAllByChannelId(UUID channelId);
 
-  ReadStatusInfoRes findById(UUID id);
+  ChannelMemberInfoRes findById(UUID id);
 }

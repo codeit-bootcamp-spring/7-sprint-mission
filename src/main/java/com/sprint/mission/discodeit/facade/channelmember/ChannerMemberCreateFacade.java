@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.facade.channelmember;
 
-import com.sprint.mission.discodeit.dto.channelmember.request.ReadStatusCreateReq;
+import com.sprint.mission.discodeit.dto.channelmember.request.ChannelMemberCreateReq;
 import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -21,7 +21,7 @@ public class ChannerMemberCreateFacade {
   private final UserService userService;
   private final ChannelMemberFactory channelMemberFactory;
 
-  public ChannelMember create(@NonNull ReadStatusCreateReq req) {
+  public ChannelMember create(@NonNull ChannelMemberCreateReq req) {
     if (channelService.findById(req.channelId()) == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
