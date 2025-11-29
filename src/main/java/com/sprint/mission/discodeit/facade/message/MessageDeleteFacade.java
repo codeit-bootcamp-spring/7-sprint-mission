@@ -20,7 +20,8 @@ public class MessageDeleteFacade {
   @Transactional
   public void deleteMessage(@NonNull UUID messageId) {
     Message message = messageService.findById(messageId);
-    message.getAttachmentIds().forEach(binaryContentService::delete);
+    message.getAttachments().forEach(
+        attachment -> binaryContentService.delete(attachment.getId()));
     messageService.delete(messageId);
   }
 }

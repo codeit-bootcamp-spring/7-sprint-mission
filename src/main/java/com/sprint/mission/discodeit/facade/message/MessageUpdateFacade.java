@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.facade.message;
 
 import com.sprint.mission.discodeit.dto.message.request.MessageUpdateReq;
 import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -24,17 +25,21 @@ public class MessageUpdateFacade {
 
   @Transactional
   public MessageViewRes updateMessage(@NonNull UUID messageId, @NonNull MessageUpdateReq req) {
-    List<UUID> oldIds = messageService.findById(messageId).getAttachmentIds();
-    List<UUID> updatedIds = new ArrayList<>(req.keepAttachmentIds());
+    List<BinaryContent> oldAttachments = messageService.findById(messageId).getAttachments();
+    List<BinaryContent> updateAttachments = new ArrayList<>(
+        req.keepAttachmentIds().stream().map(binaryContentService::findById).toList()
+    );
+
     //새로운 첨부파일 파일 생성 : 파일 생성 및 updateIds 에 id 넣기
     req.newAttachmentReqs().forEach(r ->
-        updatedIds.add(binaryContentService.create(BinaryContentFactory.create(r)).getId()));
-    //파일 유지 UUID 에 없으면, 파일 삭제. 있으면 유지이므로, updateIds 에 id 넣기
-    oldIds.stream()
-        .filter(id -> !req.keepAttachmentIds().contains(id))
-        .forEach(binaryContentService::delete);
+        updateAttachments.add(binaryContentService.create(BinaryContentFactory.create(r))));
 
-    messageService.update(messageId, req.content(), updatedIds);
+    //기존 파일들 중 keep 배열에 없으면 삭제.
+    oldAttachments.stream()
+        .filter(binaryContent -> !req.keepAttachmentIds().contains(binaryContent.getId()))
+        .forEach(binaryContent -> binaryContentService.delete(binaryContent.getId()));
+
+    messageService.update(messageId, req.content(), updateAttachments);
     return messageMapper.mapToView(messageService.findById(messageId));
   }
 }

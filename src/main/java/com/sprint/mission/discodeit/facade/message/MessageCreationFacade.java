@@ -12,14 +12,13 @@ import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.transactional.CustomTransactional;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,27 +28,28 @@ public class MessageCreationFacade {
   private final BinaryContentService binaryContentService;
   private final MessageMapper messageMapper;
   private final ChannelService channelService;
+  private final MessageFactory messageFactory;
 
   //메세지 추가
-  @CustomTransactional
+  @Transactional
   public MessageViewRes createMessage(@NonNull UUID speakerId, @NonNull UUID channelId,
       @NonNull MessageCreateReq req) {
     if (channelService.findById(channelId) == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
-
-    List<UUID> attachments = new ArrayList<>();
+    
+    List<BinaryContent> attachments = new ArrayList<>();
 
     if (!req.attachmentIds().isEmpty()) {
       req.attachmentIds().forEach(BinaryContentReq -> {
         BinaryContent newBinaryContent = binaryContentService.create(
             BinaryContentFactory.create(BinaryContentReq)
         );
-        attachments.add(newBinaryContent.getId());
+        attachments.add(newBinaryContent);
       });
     }
     Message message = messageService.create(
-        MessageFactory.create(speakerId, channelId, req, attachments));
+        messageFactory.create(speakerId, channelId, req, attachments));
     return messageMapper.mapToView(message);
   }
 }
