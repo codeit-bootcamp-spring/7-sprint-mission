@@ -93,6 +93,7 @@ public class BasicChannelService implements ChannelService {
 
     // Public 채널 목록은 전체 조회 + Private 채널은 User가 참여한 채널만 조회
     @Override
+    @Transactional(readOnly = true)
     public List<ChannelDto> findAllByUserId(UUID userId) {
         // 공개 채널 조회
         List<Channel> publicChannels = channelRepository.findAllByChannelType(ChannelType.PUBLIC);

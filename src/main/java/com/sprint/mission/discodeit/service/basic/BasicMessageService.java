@@ -103,6 +103,7 @@ public class BasicMessageService implements MessageService {
      * 특정 채널에 포함된 모든 메시지 조회
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<MessageResponseDto> findAllByChannelId(UUID channelId, Pageable pageable) {
         return messageRepository.findAllByChannelId(channelId, pageable)
                 .map(message -> messageMapper.toResponseDto(message));
