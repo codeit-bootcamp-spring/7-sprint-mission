@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusInfoRes;
+import com.sprint.mission.discodeit.dto.channelmember.response.ReadStatusInfoRes;
 import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;

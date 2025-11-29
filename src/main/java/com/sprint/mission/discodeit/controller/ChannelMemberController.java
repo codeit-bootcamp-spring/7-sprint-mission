@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.docs.ReadStateControllerDocs;
-import com.sprint.mission.discodeit.dto.readstatus.request.ReadStatusCreateReq;
-import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusInfoRes;
+import com.sprint.mission.discodeit.dto.channelmember.request.ReadStatusCreateReq;
+import com.sprint.mission.discodeit.dto.channelmember.response.ReadStatusInfoRes;
 import com.sprint.mission.discodeit.entity.ChannelMember;
-import com.sprint.mission.discodeit.facade.readstatus.ReadStatusCreateFacade;
+import com.sprint.mission.discodeit.facade.channelmember.ChannerMemberCreateFacade;
 import com.sprint.mission.discodeit.service.ChannerlMemberService;
 import java.net.URI;
 import java.util.UUID;
@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChannelMemberController implements ReadStateControllerDocs {
 
-  private final ReadStatusCreateFacade readStatusCreateFacade;
+  private final ChannerMemberCreateFacade channerMemberCreateFacade;
   private final ChannerlMemberService channerlMemberService;
 
   //메세지 수신 정보 생성
   @PostMapping
   public ResponseEntity<ReadStatusInfoRes> createReadStatus(@RequestBody ReadStatusCreateReq req) {
-    ChannelMember channelMember = readStatusCreateFacade.create(req);
+    ChannelMember channelMember = channerMemberCreateFacade.create(req);
 
     return ResponseEntity.created(URI.create("/api/channel-members" + channelMember.getId()))
         .body(ReadStatusInfoRes.from(channelMember));

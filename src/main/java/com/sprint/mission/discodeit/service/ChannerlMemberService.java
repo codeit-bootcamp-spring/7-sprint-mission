@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusInfoRes;
+import com.sprint.mission.discodeit.dto.channelmember.response.ReadStatusInfoRes;
 import com.sprint.mission.discodeit.entity.ChannelMember;
 
 import java.util.List;

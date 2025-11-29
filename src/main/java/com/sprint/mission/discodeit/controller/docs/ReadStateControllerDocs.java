@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.controller.docs;
 
-import com.sprint.mission.discodeit.dto.channel.response.ChannelPublicInfoRes;
-import com.sprint.mission.discodeit.dto.readstatus.request.ReadStatusCreateReq;
-import com.sprint.mission.discodeit.dto.readstatus.response.ReadStatusInfoRes;
+import com.sprint.mission.discodeit.dto.channelmember.request.ReadStatusCreateReq;
+import com.sprint.mission.discodeit.dto.channelmember.response.ReadStatusInfoRes;
 import com.sprint.mission.discodeit.exception.ErrorInfoRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
