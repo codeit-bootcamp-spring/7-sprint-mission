@@ -150,7 +150,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReadStatusCteateRequest"
+                "$ref": "#/components/schemas/ReadStatusCreateRequest"
               }
             }
           },
@@ -235,7 +235,7 @@
                   "messageCreateRequest": {
                     "$ref": "#/components/schemas/MessageCreateRequest"
                   },
-                  "attachments": {
+                  "attachmentId": {
                     "type": "array",
                     "description": "첨부 파일 목록 (선택 사항)",
                     "items": {
@@ -284,7 +284,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Dto_CreateChannelPublic"
+                "$ref": "#/components/schemas/PublicChannelCreateRequest"
               }
             }
           },
@@ -315,7 +315,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Dto_CreateChannelPrivate"
+                "$ref": "#/components/schemas/PrivateChannelCreateRequest"
               }
             }
           },
@@ -354,7 +354,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AuthServiceDto"
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           },
@@ -455,7 +455,7 @@
                 "type": "object",
                 "properties": {
                   "userUpdateRequest": {
-                    "$ref": "#/components/schemas/Dto_UserUpdate"
+                    "$ref": "#/components/schemas/UserUpdateRequest"
                   },
                   "profile": {
                     "type": "string",
@@ -506,7 +506,7 @@
           "User"
         ],
         "summary": "User 온라인 상태 업데이트",
-        "operationId": "updateUserStatus",
+        "operationId": "updateUserStatusByUserId",
         "parameters": [
           {
             "name": "userId",
@@ -523,7 +523,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Dto_UserStatusUpdate"
+                "$ref": "#/components/schemas/UserStatusUpdateRequest"
               }
             }
           },
@@ -998,7 +998,7 @@
           }
         }
       },
-      "ReadStatusCteateRequest": {
+      "ReadStatusCreateRequest": {
         "type": "object",
         "properties": {
           "userId": {
@@ -1063,23 +1063,6 @@
           "content"
         ]
       },
-      "MessageAttachmentsDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "messageId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "attachments": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
       "MessageDto": {
         "type": "object",
         "properties": {
@@ -1108,12 +1091,12 @@
           "attachments": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MessageAttachmentsDto"
+              "$ref": "#/components/schemas/BinaryContentDto"
             }
           }
         }
       },
-      "Dto_CreateChannelPublic": {
+      "PublicChannelCreateRequest": {
         "type": "object",
         "properties": {
           "name": {
@@ -1160,7 +1143,7 @@
           }
         }
       },
-      "Dto_CreateChannelPrivate": {
+      "PrivateChannelCreateRequest": {
         "type": "object",
         "properties": {
           "participantIds": {
@@ -1175,7 +1158,7 @@
           "participantIds"
         ]
       },
-      "AuthServiceDto": {
+      "LoginRequest": {
         "type": "object",
         "properties": {
           "username": {
@@ -1190,7 +1173,7 @@
           "username"
         ]
       },
-      "Dto_UserUpdate": {
+      "UserUpdateRequest": {
         "type": "object",
         "description": "User 업데이트 정보 (JSON)",
         "properties": {
@@ -1210,7 +1193,7 @@
           "newUsername"
         ]
       },
-      "Dto_UserStatusUpdate": {
+      "UserStatusUpdateRequest": {
         "type": "object",
         "properties": {
           "newLastActiveAt": {

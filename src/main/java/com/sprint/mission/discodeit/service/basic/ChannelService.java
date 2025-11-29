@@ -41,7 +41,7 @@ public class ChannelService implements InterfaceChannelService {
 
         List<ReadStatus> readStatusList = new ArrayList<>();
 
-        if (channel.getType() != PRIVATE) { // private 일때만 readStatus 생성 //?????🚨🚨🚨🚨
+        if (channel.getType() == PRIVATE) { // private 일때만 readStatus 생성 //?????🚨🚨🚨🚨
             readStatusList = participantIds.stream()
                 .map(userId -> { User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("createPrivate::해당 user[" + userId.toString() + "] 없음"));

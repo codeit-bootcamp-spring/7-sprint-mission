@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
+import org.springframework.data.domain.Pageable;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -9,13 +11,15 @@ import com.sprint.mission.discodeit.entity.MessageAttachments;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.dto.MessageDto;
+import com.sprint.mission.discodeit.page.PageResponseDto;
 import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessageAttachmentsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
+import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Slice;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -27,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
-@Transactional // 영속성 컨텍스트
+//@Transactional // 영속성 컨텍스트
 @RequiredArgsConstructor //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 public class MessageService implements InterfaceMessageService {
     private final MessagesRepository messageRepository;
@@ -35,7 +39,9 @@ public class MessageService implements InterfaceMessageService {
     private final UsersRepository userRepository;
     private final MessageAttachmentsRepository messageAttachmentsRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final ReadStatusesRepository readStatusRepository;
     private final MessageMapper messageMapper;
+    private final PageResponseMapper pageResponseMapper;
 
     @Override
     public MessageDto create(MessageCreateRequest dtoMessage, List<MultipartFile> fileList) {
@@ -56,11 +62,15 @@ public class MessageService implements InterfaceMessageService {
             .findById(dtoMessage.authorId())
             .orElseThrow(() -> new IllegalArgumentException("🚨 noUserId = [" + dtoMessage.authorId().toString() + "]"));
 
+
+        log.info("❌❌❌ newMessage  ");
         List<MessageAttachments> attachments = new ArrayList<>();
         Message newMessage = new Message(dtoMessage.content(),
                                         channel,
                                         user,
                                         attachments);
+        log.info("❌❌❌❌❌❌ newMessage = " + newMessage.toString());
+
 
         if (null != fileList) {
             List<BinaryContent> dtoList = fileList
@@ -92,6 +102,7 @@ public class MessageService implements InterfaceMessageService {
         newMessage.setMessageAttachmentList(attachments);
         messageRepository.save(newMessage);
 
+        log.info("❌❌❌❌❌❌❌❌❌❌❌❌ newMessage = " + newMessage.toString());
         log.info("✅ 💌 MessageService.create.content = [" + newMessage.getContent() + "] 💬");
         return messageMapper.toDto(newMessage);
     }
@@ -121,16 +132,12 @@ public class MessageService implements InterfaceMessageService {
 
     @Override
 //        [ ] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
-    public List<MessageDto> findAllByChannelId(UUID channelID) { //♨️
+    public PageResponseDto<MessageDto> findAllByChannelId(UUID channelID, Pageable pageable) { //♨️
         //log.info("🩷 Message findAllByChannelId");
-        List<Message> messageList = messageRepository.findAll();
-        List<MessageDto> resMessage = messageList
-            .stream()
-            .filter(msg -> msg.getChannel().getId().equals(channelID))
-            .map(messageMapper::toDto)
-            .peek(message -> log.info("✅ findAllByChannelId = [" + channelID.toString() + "][" + message.content() + "]"))
-            .toList();
-        return resMessage;
+        Slice<Message> slice = messageRepository.findByChannelId(channelID, pageable);
+
+        Slice<MessageDto> sliceDto = slice.map(messageMapper::toDto);
+        return pageResponseMapper.fromSlice(sliceDto);
     }
 
     @Override

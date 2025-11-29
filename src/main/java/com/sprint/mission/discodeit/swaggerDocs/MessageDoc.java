@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Res_Message;
 import com.sprint.mission.discodeit.mapper.dto.MessageDto;
+import com.sprint.mission.discodeit.page.PageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,6 +15,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,8 +42,14 @@ public interface MessageDoc {
         )
     })
 
-    ResponseEntity<List<MessageDto>> findAllByChannelId(
-        @Parameter(description = "조회할 Channel ID") @RequestParam("channelId") UUID channelID);
+    ResponseEntity<PageResponseDto<MessageDto>> findAllByChannelId(
+        @Parameter(description = "조회할 Channel ID")
+        @RequestParam("channelId") UUID channelID,
+
+        @Parameter(description = "조회할 PageableDefault")
+        @PageableDefault(size = 50,
+                        sort = "createdAt, desc",
+                        direction = Direction.DESC) Pageable pageable);
     /**
      * POST /api/messages - Message 생성 (첨부 파일 포함)
      * Multipart 요청을 위한 문서화입니다.
