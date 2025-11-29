@@ -20,10 +20,8 @@ public class MessageMapper {
 
   //변환 메소드
   public MessageViewRes mapToView(@NonNull Message message) {
-    List<BinaryContentInfoRes> imgs = message.getAttachmentIds().stream()
-        .map(binaryId -> BinaryContentInfoRes.from(
-            binaryContentService.findById(binaryId))
-        ).toList();
+    List<BinaryContentInfoRes> imgs = message.getAttachments().stream()
+        .map(BinaryContentInfoRes::from).toList();
 
     return MessageViewRes.from(
         message,
