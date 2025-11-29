@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import java.util.*;
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Transactional
     @Override
@@ -25,18 +27,21 @@ public class BasicBinaryContentService implements BinaryContentService {
         if(binaryContentCreateRequestDto.contentType() == null) {
             throw new IllegalArgumentException("contentType must not be null");
         }
+        byte[] data = Objects.requireNonNull(binaryContentCreateRequestDto.data());
+
         BinaryContent bc = new BinaryContent(
                 binaryContentCreateRequestDto.fileName(),
                 binaryContentCreateRequestDto.contentType(),
-                binaryContentCreateRequestDto.data()
+                data.length
         );
 
         BinaryContent save = binaryContentRepository.save(bc);
+        binaryContentStorage.put(save.getId(), data);
+
 
         return binaryContentMapper.toDto(save);
     }
 
-    @Transactional
     @Override
     public BinaryContentResponseDto findById(UUID id) {
         BinaryContent bc = binaryContentRepository.findById(Objects.requireNonNull(id))
@@ -44,7 +49,6 @@ public class BasicBinaryContentService implements BinaryContentService {
         return binaryContentMapper.toDto(bc);
     }
 
-    @Transactional
     @Override
     public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> id) {
         return binaryContentRepository.findAllByIdIn(Objects.requireNonNull(id))
@@ -53,12 +57,15 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public boolean delete(UUID id) {
-        if(!binaryContentRepository.existsById(Objects.requireNonNull(id))) {
-            return false;
-        }
-        binaryContentRepository.deleteById(id);
+        BinaryContent binaryContent = binaryContentRepository.findById(Objects.requireNonNull(id))
+                .orElseThrow(() -> new NoSuchElementException("BinaryContent with id: " + id + " not found"));
+
+        binaryContentStorage.delete(binaryContent.getId());
+        binaryContentRepository.delete(binaryContent);
+
         return true;
     }
 }

@@ -1,17 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.response.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -26,10 +30,12 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapper userMapper;
+    private final BinaryContentService binaryContentService;
 
     @Transactional
     @Override
-    public UserResponseDto create(UserCreateRequestDto userCreateRequestDto, UUID profileId) {
+    public UserResponseDto create(UserCreateRequestDto userCreateRequestDto,
+                                  BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
         // 요구사항 - 유저 이름과 이메일은 다른 유저와 같으면 안된다.
         if (userRepository.existsByUsername(userCreateRequestDto.username())) {
             throw new IllegalArgumentException("존재하는 유저입니다!");
@@ -40,9 +46,10 @@ public class BasicUserService implements UserService {
         }
 
         BinaryContent profile = null;
-        if (profileId != null) {
-            profile = binaryContentRepository.findById(profileId)
-                    .orElseThrow(() -> new NoSuchElementException("프로필을 찾을 수 없습니다."));
+        if (binaryContentCreateRequestDto != null) {
+            BinaryContentResponseDto binaryContentResponseDto =
+                    binaryContentService.create(binaryContentCreateRequestDto);
+            profile = binaryContentRepository.getReferenceById(binaryContentResponseDto.id());
         }
 
         User user = new User(
@@ -81,7 +88,8 @@ public class BasicUserService implements UserService {
 
     @Transactional
     @Override
-    public UserResponseDto update(UUID userId, UserUpdateRequestDto userUpdateRequestDto, UUID profileId) {
+    public UserResponseDto update(UUID userId, UserUpdateRequestDto userUpdateRequestDto,
+                                  BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
         User user = userRepository.findById(Objects.requireNonNull(userId))
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
@@ -111,10 +119,15 @@ public class BasicUserService implements UserService {
             user.setPassword(userUpdateRequestDto.newPassword());
         }
 
-        if(profileId != null){
-            BinaryContent profile = binaryContentRepository.findById(profileId)
-                    .orElseThrow(() -> new NoSuchElementException("프로필을 찾을 수 없습니다."));
-            user.setProfile(profile);
+        if(binaryContentCreateRequestDto != null){
+            UUID oldProfileId = (user.getProfile()) != null ? user.getProfile().getId() : null;
+            BinaryContentResponseDto binaryContentResponseDto = binaryContentService.create(binaryContentCreateRequestDto);
+            BinaryContent newProfile = binaryContentRepository.getReferenceById(binaryContentResponseDto.id());
+            user.setProfile(newProfile);
+
+            if(oldProfileId != null) {
+                binaryContentService.delete(oldProfileId);
+            }
         }
 
         User save = userRepository.save(user);

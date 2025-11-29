@@ -247,7 +247,7 @@ public class BasicChannelService implements ChannelService {
             return Collections.emptyMap();
         }
 
-        return userStatusRepository.findAllByUserId(userIds)
+        return userStatusRepository.findAllByUserIdIn(userIds)
                 .stream()
                 .collect(Collectors.toMap(
                         userStatus -> userStatus.getId(),

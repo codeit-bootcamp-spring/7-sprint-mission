@@ -5,12 +5,18 @@ import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.response.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.response.page.PageResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +38,7 @@ public class BasicMessageService implements MessageService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageMapper messageMapper;
     private final UserStatusRepository userStatusRepository;
+    private final PageResponseMapper pageResponseMapper;
 
     @Transactional
     @Override
@@ -173,8 +180,20 @@ public class BasicMessageService implements MessageService {
     // 특정 키워드 검색
     @Override
     public List<MessageResponseDto> searchByKeyword(String keyword) {
-        List<Message> messages = messageRepository.searchByKeyword(Objects.requireNonNull(keyword));
+        List<Message> messages = messageRepository
+                .findByContentContainingIgnoreCase(Objects.requireNonNull(keyword));
         return messageMapper.toDtoList(messages, authorOnlineMap(messages));
+    }
+
+    @Override
+    public PageResponseDto<MessageResponseDto> getPageByChannelId(UUID ChannelId, Pageable pageable) {
+        Objects.requireNonNull(ChannelId);
+
+        Slice<Message> slice = messageRepository.findByChannelIdOrderByCreatedAtDesc(ChannelId, pageable);
+
+        Slice<MessageResponseDto> sliceDto = slice.map(message -> messageMapper.toDto(message, isAuthorOnline(message.getAuthor())));
+
+        return pageResponseMapper.fromSlice(sliceDto);
     }
 
     ///////////// HELPER ///////////////////////////
@@ -189,7 +208,7 @@ public class BasicMessageService implements MessageService {
             return Collections.emptyMap();
         }
 
-        List<UserStatus> statuses = userStatusRepository.findAllByUserId(authorIds);
+        List<UserStatus> statuses = userStatusRepository.findAllByUserIdIn(authorIds);
 
         return statuses.stream()
                 .collect(Collectors.toMap(
