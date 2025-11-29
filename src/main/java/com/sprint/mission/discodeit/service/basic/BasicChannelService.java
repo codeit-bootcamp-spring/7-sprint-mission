@@ -94,11 +94,21 @@ public class BasicChannelService implements ChannelService {
     // Public 채널 목록은 전체 조회 + Private 채널은 User가 참여한 채널만 조회
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
-        return channelRepository.findAll().stream()
-                .filter(c -> c.getChannelType() == ChannelType.PUBLIC ||
-                        (c.getChannelType() == ChannelType.PRIVATE &&
-                                readStatusRepository.existsByUserIdAndChannelId(userId, c.getId()))
-                )
+        // 공개 채널 조회
+        List<Channel> publicChannels = channelRepository.findAllByChannelType(ChannelType.PUBLIC);
+
+        // 비공개 채널 조회
+        // fetch join 적용
+        List<Channel> privateChannels = readStatusRepository.findAllByUserIdWithChannel(userId).stream()
+                .map(rc -> rc.getChannel())
+                .filter(c -> c.getChannelType() == ChannelType.PRIVATE)
+                .collect(Collectors.toList());
+
+        List<Channel> channels = new ArrayList<>();
+        channels.addAll(publicChannels);
+        channels.addAll(privateChannels);
+
+        return channels.stream()
                 .map(c -> channelMapper.toResponseDto(c))
                 .collect(Collectors.toList());
     }
@@ -109,12 +119,14 @@ public class BasicChannelService implements ChannelService {
         channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
-        readStatusRepository.deleteByChannelId(channelId);
-        // 채널 메시지 삭제 및 연관 파일 UUID 저장
-        List<UUID> binaryContentIds = messageRepository.deleteByChannelId(channelId).stream()
+        // 채널 메시지 연관 파일 UUID 저장
+        List<UUID> binaryContentIds = messageRepository.findAllByChannelId(channelId).stream()
                 .flatMap(message -> message.getAttachments().stream())
                 .map(attachment -> attachment.getId())
                 .toList();
+
+        readStatusRepository.deleteByChannelId(channelId); // 채널의 모든 read status 삭제
+        messageRepository.deleteAllByChannelId(channelId); // 채널의 모든 메시지 삭제
         binaryContentRepository.deleteByIdIn(binaryContentIds); // 채널 메시지 연관 파일들 삭제
         channelRepository.deleteById(channelId); // 채널 삭제
     }

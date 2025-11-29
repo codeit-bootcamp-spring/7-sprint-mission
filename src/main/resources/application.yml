@@ -13,6 +13,7 @@ spring:
     database: postgresql
     hibernate:
       ddl-auto: update
+      default_batch_fetch_size: 100
     properties: # SQL 로그 관련 설정 값
       hibernate:
         show_sql: true

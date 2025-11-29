@@ -131,13 +131,12 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
 
-        List<BinaryContent> attachments = message.getAttachments();
+        List<UUID> attachmentIds = message.getAttachments().stream()
+                .map(attachment -> attachment.getId())
+                .toList();
 
         // 메시지에 첨부 파일도 함께 삭제
-        attachments.forEach(attachment -> {
-            binaryContentRepository.deleteById(attachment.getId());
-        });
-
+        binaryContentRepository.deleteByIdIn(attachmentIds);
         messageRepository.deleteById(messageId);
     }
 }

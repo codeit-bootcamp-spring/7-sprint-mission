@@ -42,14 +42,19 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus find(UUID userStatusId) {
-        return userStatusRepository.findById(userStatusId)
+    public UserStatusResponseDto find(UUID userStatusId) {
+        UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+
+        return userStatusMapper.toResponseDto(userStatus);
     }
 
     @Override
-    public List<UserStatus> findAll() {
-        return new ArrayList<>(userStatusRepository.findAll());
+    public List<UserStatusResponseDto> findAll() {
+        // fetch join 적용
+        return new ArrayList<>(userStatusRepository.findAllWithUser()).stream()
+                .map(userStatus -> userStatusMapper.toResponseDto(userStatus))
+                .toList();
     }
 
     @Override

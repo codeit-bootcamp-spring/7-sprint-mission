@@ -90,7 +90,8 @@ public class BasicUserService implements UserService{
 
     @Override
     public List<UserResponseDto> findAll() {
-        return userRepository.findAll().stream()
+        // fetch join 적용
+        return userRepository.findAllWithProfileAndStatus().stream()
                 .map(u -> userMapper.toResponseDto(u))
                 .collect(Collectors.toList());
     }

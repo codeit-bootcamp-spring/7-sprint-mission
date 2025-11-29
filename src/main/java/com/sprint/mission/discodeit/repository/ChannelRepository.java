@@ -17,4 +17,5 @@ import java.util.UUID;
  * (실제 데이터 저장소는 메모리, DB 등 다양하게 구현될 수 있습니다.)
  */
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
+    List<Channel> findAllByChannelType(ChannelType channelType);
 }

@@ -1,11 +1,16 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,9 +22,12 @@ import java.util.UUID;
  * (실제 데이터 저장소는 메모리, DB 등 다양하게 구현될 수 있습니다.)
  */
 public interface MessageRepository extends JpaRepository<Message, UUID> {
-    List<Message> deleteByChannelId(UUID channelId);
-
     Optional<Message> findTop1ByChannelIdOrderByCreatedAtDesc(UUID channelId);
 
+    List<Message> findAllByChannelId(UUID channelId);
+
+    @EntityGraph(attributePaths = {"author"})
     Page<Message> findAllByChannelId(UUID channelId, Pageable pageable);
+
+    void deleteAllByChannelId(UUID channelId);
 }

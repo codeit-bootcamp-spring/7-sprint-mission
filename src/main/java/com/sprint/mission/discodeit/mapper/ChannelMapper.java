@@ -30,7 +30,8 @@ public class ChannelMapper {
             lastMessageAt = message.getCreatedAt();
         }
 
-        List<UserResponseDto> participants = readStatusRepository.findAllByChannel(channel).stream()
+        // fetch join 적용
+        List<UserResponseDto> participants = readStatusRepository.findAllByChannelWithUser(channel).stream()
                 .map(rs -> userMapper.toResponseDto(rs.getUser()))
                 .toList();
 
