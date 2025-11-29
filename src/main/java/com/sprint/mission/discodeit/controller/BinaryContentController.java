@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,13 +51,9 @@ public class BinaryContentController implements BinaryContentDoc {
 
     //💎🌱 파일 다운로드
     @GetMapping("/{binaryContentId}/download")
-    public ResponseEntity<String> download(
+    public ResponseEntity<Resource> download(
         @PathVariable("binaryContentId") UUID binaryContentId) {
 
-        String file =  binaryContentService.download(binaryContentId);
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(file);
+        return binaryContentService.download(binaryContentId);
     }
 }

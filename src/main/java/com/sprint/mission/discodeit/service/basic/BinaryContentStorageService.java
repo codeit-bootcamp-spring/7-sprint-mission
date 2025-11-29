@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +16,11 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +41,7 @@ public class BinaryContentStorageService implements BinaryContentStorage {
     public BinaryContent put(MultipartFile file, BinaryContent binaryContent) {
         //log.info("🩷 BinaryContent put");
         try {
-            // DB 저장
+            // DB 저장 -> id 찾기 위함. 실제 저장 안되니 put 후에 실제 DB 저장 필요!
             BinaryContent newBinaryContent = binaryContentRepository.save(binaryContent);
             Path filePath = root.resolve(newBinaryContent.getId().toString());
 
@@ -69,20 +76,27 @@ public class BinaryContentStorageService implements BinaryContentStorage {
     }
 
     @Override
-    public String download(UUID binaryContentId) {
-        return "";
+    public ResponseEntity<Resource> download(UUID binaryContentId) {
         //log.info("🩷 download");
         //??🚨🚨🚨🚨살려!
-//        BinaryContent content = binaryContentRepository.findById(binaryContentId)
-//            .orElseThrow(() -> new NoSuchElementException("🚨binaryContentRepository.findById err"));
-//
-//        InputStream fileStream = get(binaryContentId);
-//
-//        try {
-//            byte[] bytes = fileStream.readAllBytes(); // InputStream → byte[]
-//            return BinaryContentDto.from(content);
-//        } catch (IOException e) {
-//            throw new RuntimeException("파일 읽기 실패", e);
-//        }
+        try {
+            Path filePath = root.resolve(binaryContentId.toString());
+
+            BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElse(null);
+
+            InputStream inputStream = get(binaryContentId);
+
+            MediaType mediaType = MediaType.parseMediaType((null == binaryContent.getContentType()) ? MediaType.APPLICATION_OCTET_STREAM_VALUE : binaryContent.getContentType());
+            String fileName = (null == binaryContent.getFileName()) ? binaryContentId.toString() : binaryContent.getFileName();
+            String encoded = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+
+            return ResponseEntity.ok()
+                .contentType(mediaType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encoded + "\"; filename*=UTF-8''" + encoded)
+                .contentLength((null == binaryContent.getSize()) ? Files.size(filePath) : binaryContent.getSize())
+                .body(new InputStreamResource(inputStream));
+        } catch (IOException e) {
+            throw new IllegalArgumentException("🚨download err");
+        }
     }
 }

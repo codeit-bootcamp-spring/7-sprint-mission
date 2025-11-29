@@ -66,8 +66,7 @@ public class UserService implements InterfaceUserService {
 
         BinaryContent profile = optionalProfileFile
             .map(file -> {
-                BinaryContent binaryContent = null;
-                binaryContent = new BinaryContent(
+                BinaryContent binaryContent = new BinaryContent(
                     file.getOriginalFilename(),
                     file.getSize(),
                     file.getContentType(),

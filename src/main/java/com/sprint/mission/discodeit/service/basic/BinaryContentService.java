@@ -5,6 +5,9 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.service.InterfaceBinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class BinaryContentService implements InterfaceBinaryContentService {
     private final BinaryContentsRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
     //?? 안쓰남??
 //    public BinaryContentDto create(Dto_BinaryContent dtoBinaryContent) {
@@ -63,10 +67,10 @@ public class BinaryContentService implements InterfaceBinaryContentService {
 //        log.info("✅ BinaryContentService.delete.readStatusID = [" + binaryContentId.toString() + "]");
 //    }
     @Override
-    public String download(UUID binaryContentId) {
+    public ResponseEntity<Resource> download(UUID binaryContentId) {
         //log.info("🩷 BinaryContent download");
         //💎🌱 파일 다운로드
-        return null;
+        return binaryContentStorage.download(binaryContentId);
     }
 
 }
