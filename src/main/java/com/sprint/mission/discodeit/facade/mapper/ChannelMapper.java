@@ -18,16 +18,16 @@ import java.time.Instant;
 @Component
 @RequiredArgsConstructor
 public class ChannelMapper {
-    private final MessageService messageService;
 
-    public ChannelInfoRes toInfoRes(@NonNull Channel channel) {
-        Message lastMessage = messageService.findLastMessageByChannelId(channel.getId());
-        Instant lastMessageTime = lastMessage == null ? null : lastMessage.getCreatedAt();
+  private final MessageService messageService;
 
-        return switch (channel.getPublicType()) {
-            case PUBLIC -> ChannelPublicInfoRes.from(channel, lastMessageTime);
-            case PRIVATE -> ChannelPrivateInfoRes.from(channel, lastMessageTime);
-            default -> throw new CustomException(ErrorCode.INVALID_CHANNEL_TYPE);
-        };
-    }
+  public ChannelInfoRes toInfoRes(@NonNull Channel channel) {
+    Instant lastMessageTime = messageService.getListMessageTime(channel.getId());
+
+    return switch (channel.getPublicType()) {
+      case PUBLIC -> ChannelPublicInfoRes.from(channel, lastMessageTime);
+      case PRIVATE -> ChannelPrivateInfoRes.from(channel, lastMessageTime);
+      default -> throw new CustomException(ErrorCode.INVALID_CHANNEL_TYPE);
+    };
+  }
 }
