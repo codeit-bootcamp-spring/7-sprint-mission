@@ -3,10 +3,10 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.readstatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.readstatus.ReadStatusResponseDto;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +19,7 @@ public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
     @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
     public ReadStatusResponseDto create(
             @Valid @RequestBody ReadStatusCreateRequestDto readStatusCreateRequestDto) {
         return readStatusService.create(readStatusCreateRequestDto);
@@ -40,6 +41,7 @@ public class ReadStatusController {
         return readStatusService.getAllByUserId(userId);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.DELETE)
     public void delete(@PathVariable(("readStatusId")) UUID readStatusId) {
         readStatusService.delete(readStatusId);
