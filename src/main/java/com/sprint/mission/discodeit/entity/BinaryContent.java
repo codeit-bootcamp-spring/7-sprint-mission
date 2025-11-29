@@ -39,10 +39,10 @@ public class BinaryContent extends BaseEntity {
 //    private byte[] bytes;
 
 
-//    public BinaryContent(String fileName, Long size, String contentType, MessageAttachments attachments) {
+//    public BinaryContent(String fileName, Long size, String contentType, MessageAttachments attachmentId) {
 //        this.fileName = fileName;
 //        this.size = size;
 //        this.contentType = contentType;
-//        this.attachments = attachments;
+//        this.attachmentId = attachmentId;
 //    }
 }

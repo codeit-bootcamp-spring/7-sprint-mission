@@ -7,5 +7,5 @@ import lombok.Builder;
 public record MessageAttachmentsDto(
     UUID id,
     UUID messageId,
-    UUID attachments
+    UUID attachmentId
 ) {}

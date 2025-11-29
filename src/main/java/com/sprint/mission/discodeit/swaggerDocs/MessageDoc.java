@@ -65,7 +65,7 @@ public interface MessageDoc {
     })
     ResponseEntity<MessageDto> create(
         @Parameter(description = "Message 생성 정보 (JSON)") @RequestPart(value = "messageCreateRequest") MessageCreateRequest dtoMessage,
-        @Parameter(description = "첨부 파일 목록 (선택 사항)") @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList);
+        @Parameter(description = "첨부 파일 목록 (선택 사항)") @RequestPart(value = "attachmentId", required = false) List<MultipartFile> fileList);
 
 
     /**

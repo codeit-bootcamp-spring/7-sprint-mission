@@ -12,7 +12,7 @@ public class MessageAttachmentsMapper {
         return MessageAttachmentsDto.builder()
             .id(attachments.getId())
             .messageId(attachments.getMessage().getId())
-            .attachments(attachments.getBinaryContent().getId())
+            .attachmentId(attachments.getBinaryContent().getId())
             .build();
     }
 }

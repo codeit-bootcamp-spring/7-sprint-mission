@@ -13,7 +13,6 @@ public record MessageDto(
     String content,
     UUID channelId,
     UserDto author,
-    List<MessageAttachmentsDto> attachments
+    List<BinaryContentDto> attachments
 ) {
-
 }

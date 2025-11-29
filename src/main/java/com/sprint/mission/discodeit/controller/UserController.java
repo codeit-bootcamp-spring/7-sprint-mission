@@ -92,7 +92,7 @@ public class UserController implements UserDoc {
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatusDto> updateUserStatus(
         @PathVariable("userId") UUID userId,
-        @Valid @RequestBody Dto_UserStatusUpdate userStatusUpdate) {
+        @Valid @RequestBody Dto_UserStatusUpdate userStatusUpdate) { //??❌
 
         //💎User 온라인 상태 업데이트
         UserStatusDto userStatusDto = userStatusService.updateUserStatus(userId, userStatusUpdate.newLastActiveAt());

@@ -45,7 +45,7 @@ public class MessageAttachments {
 
     public void changeMessage(Message message) {
         this.message = message;
-        message.getAttachments().add(this);
+        message.getMessageAttachmentList().add(this);
     }
 
     public void changeBinaryContent(BinaryContent binaryContent) {

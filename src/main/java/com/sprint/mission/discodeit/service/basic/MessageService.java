@@ -88,7 +88,7 @@ public class MessageService implements InterfaceMessageService {
             })
             .toList();
 
-        newMessage.setAttachments(attachments);
+        newMessage.setMessageAttachmentList(attachments);
         messageRepository.save(newMessage);
 
         log.info("✅ 💌 MessageService.create.content = [" + newMessage.getContent() + "] 💬");

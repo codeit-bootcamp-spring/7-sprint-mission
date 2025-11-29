@@ -25,7 +25,7 @@ public record Res_Message( //all private final
             message.getContent(),
             message.getChannel().getId(),
             message.getAuthor().getId(),
-            message.getAttachments().stream().map(attachment -> attachment.getId()).toList()
+            message.getMessageAttachmentList().stream().map(attachment -> attachment.getId()).toList()
         );
     }
 }

@@ -36,12 +36,12 @@ public class Message extends BaseUpdatableEntity {
     private User author;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "message", orphanRemoval = true, cascade = CascadeType.REMOVE)
-    private List<MessageAttachments> attachments;
+    private List<MessageAttachments> messageAttachmentList;
 
-//    public Message(String content, Channel channel, User author, List<MessageAttachments> attachments) {
+//    public Message(String content, Channel channel, User author, List<MessageAttachments> attachmentId) {
 //        this.content = content;
 //        this.channel = channel;
 //        this.author = author;
-//        this.attachments = attachments;
+//        this.attachmentId = attachmentId;
 //    }
 }
