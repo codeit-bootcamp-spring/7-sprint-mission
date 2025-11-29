@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusCreateReque
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateByUserIdRequestDto;
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.userstatus.UserStatusResponseDto;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
