@@ -184,7 +184,10 @@ public class UserService implements InterfaceUserService {
         user.setProfile(profile);
         user.setUsername(dtoUserUpdate.newUsername());
         user.setEmail(dtoUserUpdate.newEmail());
-        user.setPassword(dtoUserUpdate.newPassword());
+
+        if (null != dtoUserUpdate.newPassword()) {
+            user.setPassword(dtoUserUpdate.newPassword());
+        }
 
         //!! 순서 유의_II
         userRepository.save(user);

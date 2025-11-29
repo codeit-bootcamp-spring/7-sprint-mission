@@ -10,6 +10,6 @@ public record UserUpdateRequest(
 //        @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$", content = "Email is invalid")
     @NotNull
     String newEmail,
-    @NotNull
+
     String newPassword) {
 }
