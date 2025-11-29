@@ -39,7 +39,6 @@ public class BinaryContentStorageService implements BinaryContentStorage {
 
     @Override
     public BinaryContent put(MultipartFile file, BinaryContent binaryContent) {
-        //log.info("🩷 BinaryContent put");
         try {
             // DB 저장 -> id 찾기 위함. 실제 저장 안되니 put 후에 실제 DB 저장 필요!
             BinaryContent newBinaryContent = binaryContentRepository.save(binaryContent);
@@ -56,7 +55,6 @@ public class BinaryContentStorageService implements BinaryContentStorage {
 
     @Override
     public InputStream get(UUID binaryContentId) {
-        //log.info("🩷 InputStream get");
 
         if (binaryContentId == null) {
             throw new IllegalArgumentException("binaryContentId is null");
@@ -77,7 +75,6 @@ public class BinaryContentStorageService implements BinaryContentStorage {
 
     @Override
     public ResponseEntity<Resource> download(UUID binaryContentId) {
-        //log.info("🩷 download");
         //??🚨🚨🚨🚨살려!
         try {
             Path filePath = root.resolve(binaryContentId.toString());

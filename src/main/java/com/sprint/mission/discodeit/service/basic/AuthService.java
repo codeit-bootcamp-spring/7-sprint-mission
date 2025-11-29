@@ -22,7 +22,6 @@ public class AuthService implements InterfaceAuthService {
 
     @Override
     public UserDto login(LoginRequest loginRequest) {
-        //log.info("🩷UserDto login");
         User user = userRepository
           .findUserByUsername(loginRequest.username())
           .orElseThrow(() -> new NoSuchElementException("🚨사용자를 [" + loginRequest.username() + "] 찾을 수 없음"));

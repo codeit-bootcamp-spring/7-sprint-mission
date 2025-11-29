@@ -25,19 +25,8 @@ public class BinaryContentService implements InterfaceBinaryContentService {
     private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentStorage binaryContentStorage;
 
-    //?? 안쓰남??
-//    public BinaryContentDto create(Dto_BinaryContent dtoBinaryContent) {
-////    [ ] DTO를 활용해 파라미터를 그룹화합니다.
-//        BinaryContent binaryContent = new BinaryContent(dtoBinaryContent.);
-//
-//        binaryContentRepository.save(binaryContent);
-//
-//        log.info("✅ BinaryContentService.create = [" + binaryContent.getId() + "]");
-//        return binaryContentMapper.toDto(binaryContent);
-//    }
     @Override
     public  BinaryContentDto find(UUID binaryContentId) {
-        //log.info("🩷 BinaryContent find");
 //    [ ] id로 조회합니다.
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
             .orElseThrow(() -> new NoSuchElementException("🚨첨부파일[" + binaryContentId.toString() + "]을 찾을 수 없음"));
@@ -47,8 +36,6 @@ public class BinaryContentService implements InterfaceBinaryContentService {
     }
     @Override
     public List<BinaryContentDto> findAllByIdIn(UUID[] binaryContentIds) {
-        //log.info("🩷 BinaryContent findAllByIdIn");
-
         List<BinaryContentDto> dtoList = binaryContentRepository.findAll().stream()
             .filter(content -> List.of(binaryContentIds).contains(content.getId()))
             .map(binaryContentMapper::toDto)
@@ -58,17 +45,8 @@ public class BinaryContentService implements InterfaceBinaryContentService {
         return dtoList;
     }
 
-    //?? 안쓰남??
-//    public void delete(UUID binaryContentId) {
-/// /    [] id로 삭제합니다.
-///
-/// @return
-//        binaryContentRepository.deleteById(binaryContentId);
-//        log.info("✅ BinaryContentService.delete.readStatusID = [" + binaryContentId.toString() + "]");
-//    }
     @Override
     public ResponseEntity<Resource> download(UUID binaryContentId) {
-        //log.info("🩷 BinaryContent download");
         //💎🌱 파일 다운로드
         return binaryContentStorage.download(binaryContentId);
     }

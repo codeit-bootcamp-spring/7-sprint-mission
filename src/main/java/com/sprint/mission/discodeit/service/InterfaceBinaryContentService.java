@@ -8,9 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 
 public interface InterfaceBinaryContentService {
-//    BinaryContentDto create(Dto_BinaryContent dtoBinaryContent);
     BinaryContentDto find(UUID binaryContentId);
     List<BinaryContentDto> findAllByIdIn(UUID[] binaryContentIds);
-//    public void delete(UUID binaryContentId);
     ResponseEntity<Resource> download(UUID binaryContentId);
 }
