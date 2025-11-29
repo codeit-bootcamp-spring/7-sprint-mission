@@ -14,11 +14,6 @@ spring:
   config:
     import: "classpath:application-secret.yml"
 
-discodeit:
-  repository:
-    type: file   # jcf | file
-    file-directory: .discodeit
-
 springdoc:
   swagger-ui:
     path: /api-docs-ui.html
