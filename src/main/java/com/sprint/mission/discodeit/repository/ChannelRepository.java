@@ -7,7 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-  boolean existsByIdAndUser_id(UUID id, UUID userId);
-
   Optional<Channel> findByNameContaining(String name);
 }

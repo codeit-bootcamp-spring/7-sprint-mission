@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.facade.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ChannelMemberRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class BasicChannelService implements ChannelService {
   //레포지토리
   private final ChannelRepository channelRepository;
   private final ChannelMapper channelMapper;
+  private final ChannelMemberRepository channelMemberRepository;
 
   // ===== 🏗️ Domain Logic (Facade 용)  =====
   //채널 생성
@@ -57,11 +59,10 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Map<ChannelType, List<Channel>> findAllByUserId(UUID userId) {
     return channelRepository.findAll().stream().filter(channel ->
-            channel.getManagerId().equals(userId) ||
-                channel.getPublicType() == ChannelType.PUBLIC ||
-                (channel.getPublicType() == ChannelType.PRIVATE &&
-                    channelRepository.existsByIdAndUser_id(channel.getId(), userId)))
-        .collect(Collectors.groupingBy(Channel::getPublicType));
+        channel.getPublicType() == ChannelType.PUBLIC ||
+            (channel.getPublicType() == ChannelType.PRIVATE &&
+                channelMemberRepository.existsByChannel_IdAndUser_Id(channel.getId(), userId)
+            )).collect(Collectors.groupingBy(Channel::getPublicType));
   }
 
   //채널명으로 찾기
