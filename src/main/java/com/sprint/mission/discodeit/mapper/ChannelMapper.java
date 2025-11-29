@@ -20,7 +20,8 @@ public class ChannelMapper {
 
   public ChannelResponseDto toDto(Channel channel) {
     List<User> participants = readStatusRepository.findUsersByChannelId(channel.getId());
-    Instant lastMessageAt = messageRepository.findLastMessageAtByChannelId(channel.getId());
+    Instant lastMessageAt = messageRepository.findLastMessageAtByChannelId(channel.getId())
+        .orElse(null);
 
     return new ChannelResponseDto(
         channel.getId(),
