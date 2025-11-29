@@ -220,5 +220,5 @@ public interface MessageControllerDocs {
                     )
             )
     })
-    ResponseEntity<List<MessageDto>> findAllByChannelId(UUID channelId);
+    ResponseEntity<List<MessageDto>> findAllByChannelId(UUID channelId, int page);
 }

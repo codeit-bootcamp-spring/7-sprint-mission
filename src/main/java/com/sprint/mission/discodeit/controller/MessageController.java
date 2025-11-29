@@ -67,7 +67,7 @@ public class MessageController implements MessageControllerDocs {
                 .status(HttpStatus.OK)
                 .body(update);
     }
-    // [ ] 메시지를 삭제할 수 있다.
+
 
     @RequestMapping(path = "{messageId}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
@@ -79,10 +79,10 @@ public class MessageController implements MessageControllerDocs {
                 .build();
     }
 
-    // [ ] 특정 채널의 메시지 목록을 조회할 수 있다.
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<MessageDto>> findAllByChannelId(@RequestParam("channelId") UUID channelId) {
+    public ResponseEntity<List<MessageDto>> findAllByChannelId(@RequestParam("channelId") UUID channelId, @RequestParam(defaultValue = "0") int page) {
+
 
         List<MessageDto> allByChannelId = messageService.findAllByChannelId(channelId);
 
