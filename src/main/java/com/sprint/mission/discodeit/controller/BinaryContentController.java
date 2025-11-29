@@ -3,14 +3,16 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
@@ -18,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public BinaryContentResponseDto create(
@@ -45,11 +48,13 @@ public class BinaryContentController {
     @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.DELETE)
     public void delete(@PathVariable("binaryContentId") UUID binaryContentId) {
         boolean delete = binaryContentService.delete(binaryContentId);
-        if (!delete) {
-            throw new NoSuchElementException("binaryContent with id " + binaryContentId + " not found");
-        }
     }
 
+    @RequestMapping(value = "/{binaryContentId}/download", method = RequestMethod.GET)
+    public ResponseEntity<Resource> download(@PathVariable("binaryContentId") UUID binaryContentId) {
+        BinaryContentResponseDto binaryContentDto = binaryContentService.findById(binaryContentId);
+        return binaryContentStorage.download(binaryContentDto);
+    }
     /*
     @RequestMapping(value = "/find", method = RequestMethod.GET)
     public ResponseEntity<BinaryContentResponseDto> find(
