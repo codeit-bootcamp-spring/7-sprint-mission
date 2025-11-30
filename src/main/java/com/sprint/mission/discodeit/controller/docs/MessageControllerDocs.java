@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.docs;
 
+import com.sprint.mission.discodeit.dto.common.response.PageResponse;
 import com.sprint.mission.discodeit.dto.message.request.MessageInfoReq;
 import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.exception.ErrorInfoRes;
@@ -58,7 +59,9 @@ public interface MessageControllerDocs {
           )
       }
   )
-  ResponseEntity<List<MessageViewRes>> findAllByChannelId(@RequestParam UUID channelId);
+  ResponseEntity<PageResponse<MessageViewRes>> findAllByChannelId(
+      @RequestParam UUID channelId,
+      @RequestParam(defaultValue = "0") int page);
 
   @Operation(summary = "Message 생성")
   @ApiResponses(

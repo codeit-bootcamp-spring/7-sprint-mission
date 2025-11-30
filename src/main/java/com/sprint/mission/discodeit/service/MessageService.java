@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Slice;
 
 public interface MessageService {
 
@@ -20,4 +21,6 @@ public interface MessageService {
   void delete(UUID id);
 
   Message findById(UUID id);
+
+  Slice<Message> getRecentMessages(UUID channelId, int page);
 }

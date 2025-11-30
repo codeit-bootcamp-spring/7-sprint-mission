@@ -10,6 +10,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,14 @@ public class BasicMessageService implements MessageService {
   @Override
   public List<Message> findAllByChannelId(UUID channelId) {
     return messageRepository.findAllByChannelId(channelId);
+  }
+
+  @Override
+  public Slice<Message> getRecentMessages(UUID channelId, int page) {
+    return messageRepository.findByChannelIdOrderByCreatedAtDesc(
+        channelId,
+        PageRequest.of(page, 50) // 50개씩, 최신순 기본 정렬
+    );
   }
 
   //채널에서 가장 마지막 메세지를 조회

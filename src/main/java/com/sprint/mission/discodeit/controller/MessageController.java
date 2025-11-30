@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.docs.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreateReq;
+import com.sprint.mission.discodeit.dto.common.response.PageResponse;
 import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
 import com.sprint.mission.discodeit.dto.message.request.MessageInfoReq;
 import com.sprint.mission.discodeit.dto.message.request.MessageUpdateReq;
@@ -42,8 +43,10 @@ public class MessageController implements MessageControllerDocs {
 
   //특정 채널의 메세지들 조회
   @GetMapping
-  public ResponseEntity<List<MessageViewRes>> findAllByChannelId(@RequestParam UUID channelId) {
-    return ResponseEntity.ok(messageOverviewFacade.findAllByChannelId(channelId));
+  public ResponseEntity<PageResponse<MessageViewRes>> findAllByChannelId(
+      @RequestParam UUID channelId,
+      @RequestParam(defaultValue = "0") int page) {
+    return ResponseEntity.ok(messageOverviewFacade.findAllByChannelId(channelId, page));
   }
 
   //메세지 입력
