@@ -1,16 +1,12 @@
 discodeit:
-  repository:
-    type: file   # jcf | file
-    file-directory: .discodeit
+  storage:
+    type: local       # local일 때만 Bean 등록됨
+    local:
+      root-path: .discodeit/storage/data
 
 file:
   path:
-    userPath: src/main/resources/Users.ser
-    messagePath: src/main/resources/Messages.ser
-    channelPath: src/main/resources/Channels.ser
-    userStatusPath: src/main/resources/UserStatuses.ser
-    binaryContentPath: src/main/resources/BinaryContent.ser
-    readStatusPath: src/main/resources/ReadStatus.ser
+    storage: src/main/resources/Users.ser
 
 spring:
   application:
@@ -29,7 +25,7 @@ spring:
   jpa:
     database: postgresql
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
 
@@ -42,5 +38,8 @@ springdoc:
   servers:
     - url: http://localhost:8080
       description: 로컬 서버
+
+
+
 
 
