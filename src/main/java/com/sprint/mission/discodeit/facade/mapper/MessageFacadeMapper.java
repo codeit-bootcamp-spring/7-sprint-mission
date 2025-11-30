@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.facade.mapper;
 import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfoRes;
 import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.mapper.BinaryContentDtoMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.NonNull;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class MessageMapper {
+public class MessageFacadeMapper {
 
   private final BinaryContentService binaryContentService;
   private final UserService userService;
@@ -21,7 +22,7 @@ public class MessageMapper {
   //변환 메소드
   public MessageViewRes mapToView(@NonNull Message message) {
     List<BinaryContentInfoRes> imgs = message.getAttachments().stream()
-        .map(BinaryContentInfoRes::from).toList();
+        .map(BinaryContentDtoMapper::toResDto).toList();
     return MessageViewRes.from(
         message,
         imgs

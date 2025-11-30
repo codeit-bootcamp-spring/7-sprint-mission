@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.facade.channel;
 
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.facade.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.facade.mapper.ChannelFacadeMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChannelOverViewFacade {
 
   private final ChannelService channelService;
-  private final ChannelMapper channelMapper;
+  private final ChannelFacadeMapper channelFacadeMapper;
 
   //채널 목록 : Public 인 경우 전부, Private 인 경우 자신이 참여한 채널만
   public Map<ChannelType, List<ChannelInfoRes>> findAllMyChannels(@NonNull UUID userId,
@@ -32,7 +32,7 @@ public class ChannelOverViewFacade {
             Map.Entry::getKey,
             entry -> entry.getValue().stream()
                 .filter(channel -> !hasSearch || channel.getName().contains(searchTxt))
-                .map(channelMapper::toInfoRes).toList()
+                .map(channelFacadeMapper::toInfoRes).toList()
         ));
   }
 }

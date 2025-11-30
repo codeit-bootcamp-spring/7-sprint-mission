@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.facade.mapper;
 
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelPrivateInfoRes;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelPublicInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.ChannelDtoMapper;
 import com.sprint.mission.discodeit.service.ChannelMemberService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Component;
 // 채널의 공개 여부에 따라 ResDTO를 맞게 변환해주는 클래스
 @Component
 @RequiredArgsConstructor
-public class ChannelMapper {
+public class ChannelFacadeMapper {
 
   private final MessageService messageService;
   private final ChannelMemberService channelMemberService;
@@ -29,11 +28,12 @@ public class ChannelMapper {
     User manager = channelMemberService.findManagerByChannelId(channel.getId()).getUser();
     List<UUID> memberIds = channelMemberService.findMembersByChannelId(channel.getId()).stream()
         .map(cm -> cm.getUser().getId()).toList();
+
     return switch (channel.getPublicType()) {
-      case PUBLIC -> ChannelPublicInfoRes.from(
+      case PUBLIC -> ChannelDtoMapper.toResDto(
           channel, manager.getId(), lastMessageTime
       );
-      case PRIVATE -> ChannelPrivateInfoRes.from(
+      case PRIVATE -> ChannelDtoMapper.toResDto(
           channel, manager.getId(), memberIds, lastMessageTime);
       default -> throw new CustomException(ErrorCode.INVALID_CHANNEL_TYPE);
     };

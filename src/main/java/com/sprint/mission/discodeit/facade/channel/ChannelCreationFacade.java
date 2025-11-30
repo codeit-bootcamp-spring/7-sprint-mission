@@ -5,11 +5,10 @@ import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateSecReq;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelMemberRole;
-import com.sprint.mission.discodeit.facade.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.facade.mapper.ChannelFacadeMapper;
 import com.sprint.mission.discodeit.factory.ChannelMemberFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ChannelMemberService;
-import com.sprint.mission.discodeit.service.UserService;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ public class ChannelCreationFacade {
 
   private final ChannelService channelService;
   private final ChannelMemberService channelMemberService;
-  private final ChannelMapper channelMapper;
+  private final ChannelFacadeMapper channelFacadeMapper;
   private final ChannelMemberFactory channelMemberFactory;
 
   //공개 채널 추가
@@ -32,7 +31,7 @@ public class ChannelCreationFacade {
     Channel channel = channelService.create(req);
     channelMemberService.create(
         channelMemberFactory.create(managerId, channel.getId(), ChannelMemberRole.MANAGER));
-    return channelMapper.toInfoRes(channel);
+    return channelFacadeMapper.toInfoRes(channel);
   }
 
   //비밀 채널 추가
@@ -51,6 +50,6 @@ public class ChannelCreationFacade {
             ChannelMemberRole.MEMBER
         ))
     );
-    return channelMapper.toInfoRes(channel);
+    return channelFacadeMapper.toInfoRes(channel);
   }
 }

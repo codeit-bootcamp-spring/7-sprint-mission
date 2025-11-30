@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.dto.message.request.MessageUpdateReq;
 import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
+import com.sprint.mission.discodeit.facade.mapper.MessageFacadeMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -23,7 +23,7 @@ public class MessageUpdateFacade {
 
   private final MessageService messageService;
   private final BinaryContentService binaryContentService;
-  private final MessageMapper messageMapper;
+  private final MessageFacadeMapper messageFacadeMapper;
 
   public MessageViewRes updateMessage(@NonNull UUID messageId, @NonNull MessageUpdateReq req) {
     Message message = messageService.findById(messageId);
@@ -43,7 +43,7 @@ public class MessageUpdateFacade {
     );
 
     messageService.update(messageId, req.content(), message.getAttachments());
-    return messageMapper.mapToView(message);
+    return messageFacadeMapper.mapToView(message);
   }
 }
 

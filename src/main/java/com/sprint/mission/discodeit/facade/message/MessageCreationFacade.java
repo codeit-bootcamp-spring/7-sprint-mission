@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
+import com.sprint.mission.discodeit.facade.mapper.MessageFacadeMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -28,7 +28,7 @@ public class MessageCreationFacade {
 
   private final MessageService messageService;
   private final BinaryContentService binaryContentService;
-  private final MessageMapper messageMapper;
+  private final MessageFacadeMapper messageFacadeMapper;
   private final ChannelService channelService;
   private final MessageFactory messageFactory;
   private final EntityManager entityManager; // 추가
@@ -52,7 +52,7 @@ public class MessageCreationFacade {
 
     Message message = messageService.create(
         messageFactory.create(speakerId, channelId, req, attachments));
-    return messageMapper.mapToView(message);
+    return messageFacadeMapper.mapToView(message);
   }
 }
 
