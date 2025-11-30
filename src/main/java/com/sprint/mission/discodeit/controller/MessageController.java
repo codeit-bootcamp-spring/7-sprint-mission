@@ -54,7 +54,7 @@ public class MessageController implements MessageDoc {
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<MessageDto> create(
         @Valid @RequestPart("messageCreateRequest") MessageCreateRequest dtoMessage,
-        @RequestPart(value = "attachmentId", required = false) List<MultipartFile> fileList) {
+        @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList) {
 
         //💎Message 생성
         MessageDto resMessage = messageService.create(dtoMessage, fileList);
