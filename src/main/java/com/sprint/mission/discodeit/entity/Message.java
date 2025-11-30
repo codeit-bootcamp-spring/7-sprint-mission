@@ -2,10 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +11,8 @@ import java.util.List;
 @Entity
 @Table(name = "messages")
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Message extends BaseUpdatableEntity {
 
     @Column(columnDefinition = "TEXT")
@@ -27,22 +26,13 @@ public class Message extends BaseUpdatableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
+    @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(
             name = "message_attachments",
             joinColumns = @JoinColumn(name = "message_id"),
             inverseJoinColumns = @JoinColumn(name = "attachment_id"))
     private List<BinaryContent> attachments = new ArrayList<>();
-
-    @Builder
-    public Message(User author, Channel channel, String content, List<BinaryContent> attachments) {
-        this.content = content;
-        this.channel = channel;
-        this.author = author;
-        if (attachments != null) {
-            this.attachments.addAll(attachments);
-        }
-    }
 
     public void updateContent(String content) {
         this.content = content;
