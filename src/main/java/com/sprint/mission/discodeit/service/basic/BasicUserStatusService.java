@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
 @Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
@@ -28,6 +27,7 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserStatusMapper userStatusMapper;
 
   @Override
+  @Transactional
   public UserStatusResponseDto createUserStatus(CreateUserStatusDto createUserStatusDto) {
     User user = userRepository.findById(createUserStatusDto.userId())
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -43,6 +43,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserStatusResponseDto getUserStatus(UUID userStatusId) {
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
@@ -51,6 +52,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserStatusResponseDto> getAllUserStatuses() {
     return userStatusRepository.findAll().stream()
         .map(userStatusMapper::toResponseDto)
@@ -58,6 +60,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public UserStatusResponseDto updateUserStatus(UUID userStatusId,
       UpdateUserStatusDto updateUserStatusDto) {
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
@@ -70,6 +73,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public UserStatusResponseDto updateStatusByUserId(UUID userId,
       UpdateUserStatusDto updateUserStatusDto) {
     Instant lastActiveAt = updateUserStatusDto.newLastActiveAt();
@@ -82,6 +86,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public void deleteById(UUID userStatusId) {
     if (!userStatusRepository.existsById(userStatusId)) {
       throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);

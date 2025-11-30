@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
+
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -35,6 +35,7 @@ public class BasicChannelService implements ChannelService {
   private final ChannelMapper channelMapper;
 
   @Override
+  @Transactional
   public ChannelResponseDto createChannel(CreatePublicChannelDto createPublicChannelDto) {
     Channel channel = new Channel(
         ChannelType.PUBLIC,
@@ -46,7 +47,9 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toResponseDto(channel);
   }
 
+
   @Override
+  @Transactional
   public ChannelResponseDto createChannel(CreatePrivateChannelDto createPrivateChannelDto) {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     channelRepository.save(channel);
@@ -62,7 +65,9 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toResponseDto(channel);
   }
 
+
   @Override
+  @Transactional(readOnly = true)
   public ChannelResponseDto getChannel(UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
@@ -91,6 +96,7 @@ public class BasicChannelService implements ChannelService {
 
 
   @Override
+  @Transactional
   public ChannelResponseDto updateChannel(UUID channelId, UpdateChannelDto updateChannelDto) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
@@ -105,6 +111,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional
   public void deleteChannel(UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));

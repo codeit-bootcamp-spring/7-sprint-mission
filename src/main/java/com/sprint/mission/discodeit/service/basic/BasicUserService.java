@@ -38,8 +38,8 @@ public class BasicUserService implements UserService {
 
   private final UserMapper userMapper;
 
-  @Transactional
   @Override
+  @Transactional
   public UserResponseDto createUser(CreateUserDto createUserDto,
       Optional<CreateBinaryContentDto> createBinaryContentDto) {
     if (userRepository.findByUsername(createUserDto.username()).isPresent()) {
@@ -68,9 +68,9 @@ public class BasicUserService implements UserService {
 
     return userMapper.toResponseDto(user);
   }
-
-  @Transactional(readOnly = true)
+  
   @Override
+  @Transactional(readOnly = true)
   public UserResponseDto getUser(UUID userId) { // 단건 검색
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -89,6 +89,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional
   public UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
       Optional<CreateBinaryContentDto> createBinaryContentDto) {
     User user = userRepository.findById(userId)
@@ -124,6 +125,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional
   public void deleteUser(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

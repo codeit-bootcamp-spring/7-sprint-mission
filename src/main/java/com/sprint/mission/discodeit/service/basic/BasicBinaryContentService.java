@@ -55,7 +55,6 @@ public class BasicBinaryContentService implements BinaryContentService {
         .stream()
         .map(binaryContentMapper::toResponseDto)
         .toList();
-    System.out.println("list = " + list);
 
     return list;
   }

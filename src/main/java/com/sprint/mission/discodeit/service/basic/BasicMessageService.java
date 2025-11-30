@@ -29,7 +29,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
+
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -45,6 +45,7 @@ public class BasicMessageService implements MessageService {
 
 
   @Override
+  @Transactional
   public MessageResponseDto createMessage(CreateMessageDto createMessageDto,
       List<CreateBinaryContentDto> createBinaryContentDtos) {
 
@@ -78,6 +79,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public MessageResponseDto getMessage(UUID messageId) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
@@ -93,6 +95,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public PageResponse<MessageResponseDto> getAllMessageByChannelId(UUID channelID,
       Instant createdAt,
       Pageable pageable) {
@@ -111,6 +114,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public MessageResponseDto updateMessage(UUID messageId, UpdateMessageDto updateMessageDto) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
@@ -121,6 +125,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public void deleteMessage(UUID messageId) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));

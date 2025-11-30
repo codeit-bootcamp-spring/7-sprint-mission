@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
+
 @Service
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
@@ -28,6 +28,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
 
   @Override
+  @Transactional
   public ReadStatusResponseDto createReadStatus(CreateReadStatusDto createReadStatusDto) {
     User user = userRepository.findById(createReadStatusDto.userId())
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -49,6 +50,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional
   public ReadStatusResponseDto getReadStatus(UUID readStatusId) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> new CustomException(ErrorCode.READ_STATUS_NOT_FOUND));
@@ -57,6 +59,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ReadStatusResponseDto> getAllReadStatusByUserId(UUID userId) {
     return readStatusRepository.findAllByUserId(userId).stream()
         .map(ReadStatusResponseDto::from)
@@ -64,6 +67,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional
   public ReadStatusResponseDto updateReadStatus(UUID readStatusId,
       UpdateReadStatusDto updateReadStatusDto) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
@@ -74,6 +78,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional
   public void deleteReadStatus(UUID readStatusId) {
     if (!userRepository.existsById(readStatusId)) {
       throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
