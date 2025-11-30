@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.update.UpdateUserCommand;
 import com.sprint.mission.discodeit.dto.update.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.response.UserResponseDto;
@@ -37,7 +38,8 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public UserResponseDto createUser(CreateUserCommand request) {
+  public UserResponseDto createUser(CreateUserRequestDto request, MultipartFile profile)
+      throws IOException {
     // username, email 중복 체크
     if (userRepository.findByUsername(request.username()).isPresent()) {
       throw new IllegalArgumentException("이미 유저 이름이 있습니다.");
@@ -47,30 +49,26 @@ public class BasicUserService implements UserService {
     }
 
     // 프로필 이미지 선택적 로직, ID로 체크해서. 컨텐츠 만들어서
-    BinaryContent saved = null;
-    if (request.bytes() != null) {
+    BinaryContent saveProfile = null;
+    if (profile != null) {
       BinaryContent content = new BinaryContent(
-          request.fileName(),
-          (long) request.bytes().length,
-          request.contentType()
+          profile.getOriginalFilename(),
+          profile.getSize(),
+          profile.getContentType()
       );
-      saved = binaryContentRepository.save(content);
-      storage.put(saved.getId(), request.bytes());
+      saveProfile = binaryContentRepository.save(content);
+      storage.put(saveProfile.getId(), profile.getBytes());
     }
 
     // User 생성
     User user = new User(
         request.username(),
         request.email(),
-        request.password()
+        request.password(),
+        saveProfile
     );
 
-    if (saved != null) {
-      user.assignProfile(saved);
-    }
-
     UserStatus status = new UserStatus(user);
-
     user.assignStatus(status);
 
     User saveUser = userRepository.save(user);

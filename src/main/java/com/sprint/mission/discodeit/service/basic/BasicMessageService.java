@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -37,6 +38,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
   private final MessageMapper messageMapper;
   private final PageResponseMapper pageResponseMapper;
+  private final BinaryContentStorage storage;
 
   @Override
   @Transactional
@@ -47,7 +49,7 @@ public class BasicMessageService implements MessageService {
     Channel channel = channelRepository.findById(request.channelId())
         .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
 
-    List<BinaryContent> BinaryContents = new ArrayList<>();
+    List<BinaryContent> binaryContents = new ArrayList<>();
 
     if (fileRequests != null) {
       for (CreateBinaryContentRequestDto fileRequest : fileRequests) {
@@ -56,7 +58,9 @@ public class BasicMessageService implements MessageService {
             (long) fileRequest.bytes().length,
             fileRequest.contentType()
         );
-        BinaryContents.add(binaryContent);
+        BinaryContent saved = binaryContentRepository.save(binaryContent);
+        storage.put(saved.getId(), fileRequest.bytes());
+        binaryContents.add(saved);
       }
     }
 
@@ -64,7 +68,7 @@ public class BasicMessageService implements MessageService {
         request.content(),
         channel,
         author,
-        BinaryContents
+        binaryContents
     );
 
     Message saved = messageRepository.save(message);

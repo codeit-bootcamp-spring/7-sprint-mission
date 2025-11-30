@@ -44,6 +44,5 @@ public class BinaryContentController implements BinaryContentControllerDocs {
       @PathVariable UUID binaryContentId) {
     BinaryContentResponseDto binaryContent = binaryContentService.find(binaryContentId);
     return storage.download(binaryContent);
-
   }
 }

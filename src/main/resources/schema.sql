@@ -71,3 +71,6 @@ CREATE TABLE message_attachments(
 	FOREIGN KEY (attachment_id) REFERENCES binary_contents(id) ON DELETE CASCADE
 );
 
+SELECT * FROM users ORDER BY created_at DESC LIMIT 1;
+
+

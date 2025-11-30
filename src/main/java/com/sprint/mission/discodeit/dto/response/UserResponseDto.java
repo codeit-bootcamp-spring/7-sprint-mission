@@ -13,7 +13,7 @@ public record UserResponseDto(
     UUID id,
     String username, // 유저 이름
     String email, // 이메일
-    BinaryContentResponseDto profileId, // 프로필 ID
+    BinaryContentResponseDto profile,
     Boolean online //온라인 상태
 ) {
 

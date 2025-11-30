@@ -42,17 +42,7 @@ public class UserController implements UserControllerDocs {
       @Valid
       @RequestPart("userCreateRequest") CreateUserRequestDto userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
-
-    CreateBinaryContentRequestDto content = null;
-    if (profile != null) {
-      content = new CreateBinaryContentRequestDto(
-          profile.getOriginalFilename(),
-          profile.getContentType(),
-          profile.getBytes()
-      );
-    }
-    CreateUserCommand from = CreateUserCommand.from(userCreateRequest, content);
-    UserResponseDto user = userService.createUser(from);
+    UserResponseDto user = userService.createUser(userCreateRequest, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 

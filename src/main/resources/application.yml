@@ -32,7 +32,7 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: ./downloads
+      root-path: ./binaryContents
 
 
 springdoc:
