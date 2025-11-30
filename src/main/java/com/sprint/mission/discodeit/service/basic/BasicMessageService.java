@@ -28,7 +28,7 @@ public class BasicMessageService implements MessageService {
 
     // 1. MultipartFile용 create(컨트롤러가 호출)
     @Override
-    public Message createFromMultipart(MessageCreateRequest messageCreateRequest, List<MultipartFile> attachments) {
+    public Message create(MessageCreateRequest messageCreateRequest, List<MultipartFile> attachments) {
         List<BinaryContentCreateRequest> attachmentRequests = attachments == null ? List.of()
                 : attachments.stream()
                 .map(file -> {
@@ -65,11 +65,8 @@ public class BasicMessageService implements MessageService {
                     String contentType = attachmentRequest.contentType();
                     byte[] bytes = attachmentRequest.bytes();
 
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
                     BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
-
-                    // TODO: 실제 파일은 BinaryContentStorage.put(createdBinaryContent.getId(), bytes)로 저장 예정
-
                     return createdBinaryContent.getId();
                 })
                 .toList();

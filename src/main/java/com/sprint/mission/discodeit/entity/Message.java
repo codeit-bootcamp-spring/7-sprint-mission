@@ -1,39 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@Entity
-@Table(name = "messages")
 @Getter
-@NoArgsConstructor
-public class Message extends BaseEntity {
-    @Id
-    @GeneratedValue
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private UUID id;
-
-    @Column(nullable = false, length = 2000)
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
+    private List<UUID> attachmentIds;
 
-    // Message → Channel (N:1)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "channel_id", nullable = false)
-    private Channel channel;
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
+    }
 
-    // Message → User (N:1, 작성자)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false)
-    private User author;
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    // ✅ 여기 추가!
-    public UUID getChannelId() {
-        return channel != null ? channel.getId() : null;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
-

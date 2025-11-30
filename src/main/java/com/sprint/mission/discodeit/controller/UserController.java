@@ -33,13 +33,7 @@ public class UserController {
             @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile).flatMap(file -> {
-            try {
-                return resolveProfileRequest(file);
-            } catch (IOException e) {
-                throw new RuntimeException(e); // GlobalExceptionHandler에서 처리하도록
-            }
-        });
+        Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile).flatMap(this::resolveProfileRequest);
         User createdUser = userService.create(userCreateRequest, profileRequest);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -55,13 +49,7 @@ public class UserController {
             @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile).flatMap(file -> {
-            try {
-                return resolveProfileRequest(file);
-            } catch (IOException e) {
-                throw new RuntimeException(e); // GlobalExceptionHandler에서 처리하도록
-            }
-        });
+        Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile).flatMap(this::resolveProfileRequest);
         User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -95,16 +83,20 @@ public class UserController {
                 .body(updatedUserStatus);
     }
 
-    private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) throws IOException {
+    private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
         if (profileFile.isEmpty()) {
             return Optional.empty();
         } else {
-            BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
-                    profileFile.getOriginalFilename(),
-                    profileFile.getContentType(),
-                    profileFile.getBytes()
-            );
-            return Optional.of(binaryContentCreateRequest);
+            try {
+                BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
+                        profileFile.getOriginalFilename(),
+                        profileFile.getContentType(),
+                        profileFile.getBytes()
+                );
+                return Optional.of(binaryContentCreateRequest);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
