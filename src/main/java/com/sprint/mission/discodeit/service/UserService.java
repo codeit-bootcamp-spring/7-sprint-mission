@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.Binarycontent.request.BinaryContentCreat
 import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserDto;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,8 @@ public interface UserService {
     UserDto create(UserCreateRequest request
             , Optional<BinaryContentCreateRequest> optionalProfileCreateRequest);
 
-    UserDto find(UUID userId);
+
+    UserDto findById(UUID userId);
 
     List<UserDto> findAll();
 

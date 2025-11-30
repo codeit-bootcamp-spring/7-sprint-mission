@@ -61,7 +61,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Transactional(readOnly = true)
     @Override
-    public ReadStatusDto findById(UUID readStatusId) {
+    public ReadStatusDto find(UUID readStatusId) {
 
         return readStatusRepository.findById(readStatusId)
                 .map(readStatusMapper::toDto)

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller.Docs;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -220,5 +221,5 @@ public interface MessageControllerDocs {
                     )
             )
     })
-    ResponseEntity<List<MessageDto>> findAllByChannelId(UUID channelId, int page);
+    ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, int page);
 }

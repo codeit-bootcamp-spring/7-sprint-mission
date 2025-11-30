@@ -83,8 +83,6 @@ public class LocalDiskBinaryContentStorage implements BinaryContentStorage {
                         .filename(dto.fileName(), StandardCharsets.UTF_8)
                         .build()
         );
-    /*    String encode = UriUtils.encode(dto.fileName(), StandardCharsets.UTF_8);
-        headers.add("Content-Disposition", "attachment; filename=" + encode);*/
 
         MediaType mediaType = MediaType.parseMediaType(dto.contentType());
 

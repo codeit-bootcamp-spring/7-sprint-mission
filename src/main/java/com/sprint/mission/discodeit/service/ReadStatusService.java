@@ -12,10 +12,7 @@ public interface ReadStatusService {
 
     ReadStatusDto create(ReadStatusCreateRequest request);
 
-    // ReadStatusDto find(UUID readStatusId);
-
-
-    ReadStatusDto findById(UUID readStatusId);
+    ReadStatusDto find(UUID readStatusId);
 
     List<ReadStatusDto> findAllByUserId(UUID userId);
 

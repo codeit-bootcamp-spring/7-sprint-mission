@@ -5,8 +5,14 @@ import com.sprint.mission.discodeit.dto.Binarycontent.request.BinaryContentCreat
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -80,15 +86,15 @@ public class MessageController implements MessageControllerDocs {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<MessageDto>> findAllByChannelId(@RequestParam("channelId") UUID channelId, @RequestParam(defaultValue = "0") int page) {
-
-
-        List<MessageDto> allByChannelId = messageService.findAllByChannelId(channelId);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(allByChannelId);
+    @GetMapping
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+            @RequestParam("channelId") UUID channelId,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        Slice<MessageDto> slice = messageService.findAllByChannelId(channelId, page);
+        PageResponse<MessageDto> response = PageResponseMapper.fromSlice(slice);
+        return ResponseEntity.ok(response);
     }
+
 
 }

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.Binarycontent.request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.Binarycontent.response.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserDto;
@@ -82,7 +81,7 @@ public class BasicUserService implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public UserDto find(UUID userId) {
+    public UserDto findById(UUID userId) {
         return userRepository.findById(userId)
                 .map(userMapper::toDto)
                 .orElseThrow(() -> new NoSuchElementException("유저아이디로 찾을수없어"));
@@ -144,43 +143,4 @@ public class BasicUserService implements UserService {
         userRepository.deleteById(userId);
     }
 
-/*
-    private BinaryContent makeBinaryContent(Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
-        return binaryContentCreateRequest
-                .map(profileRequest -> {
-
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-
-                    BinaryContent binaryContent = new BinaryContent(
-                            fileName,
-                            (long) bytes.length,
-                            contentType);
-
-                    BinaryContent saved = binaryRepository.save(binaryContent);
-
-                    binaryContentStorage.put(saved.getId(), bytes);
-
-                    return saved;
-                })
-                .orElse(null);
-    }*/
-
-
- /*   private UserDto toDto(User user) {
-        Boolean online = userStatusRepository.findByUserId(user.getId())
-                .map(UserStatus::isOnline)
-                .orElse(null);
-
-        return new UserDto(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getProfile().getId(),
-                online
-        );
-    }*/
 }
