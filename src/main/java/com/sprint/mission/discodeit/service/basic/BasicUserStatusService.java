@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusViewRes;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.UserStateMapper;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.NonNull;
@@ -38,7 +39,7 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(
         () -> new CustomException(ErrorCode.USERSTATUS_NOT_FOUND)
     );
-    return UserStatusViewRes.from(userStatus);
+    return UserStateMapper.toDetailResDto(userStatus);
   }
 
   // ===== 🔧 Controller Direct (단일 도메인 / void) =====

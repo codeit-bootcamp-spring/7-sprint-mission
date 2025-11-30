@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.facade.userstatus;
 
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusViewRes;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStateMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.NonNull;
@@ -23,6 +24,6 @@ public class UserStatusDetailViewFacade {
   public UserStatusViewRes findByUserId(@NonNull UUID userId) {
     userService.findById(userId);               //유저 있는지 확인
     UserStatus userStatus = userStatusService.findByUserId(userId);
-    return UserStatusViewRes.from(userStatus);
+    return UserStateMapper.toDetailResDto(userStatus);
   }
 }
