@@ -10,10 +10,11 @@ import org.springframework.stereotype.Component;
 public class BinaryContentFactory {
 
   public static BinaryContent create(BinaryContentCreateReq req) {
-    return create(req.data(), req.fileName(), req.fileType());
+    long size = req.data() == null ? 0 : req.data().length;
+    return create(req.fileName(), req.fileType(), size);
   }
 
-  public static BinaryContent create(byte[] data, String fileName, String fileType) {
-    return BinaryContent.create(data, fileName, fileType);
+  public static BinaryContent create(String fileName, String fileType, long size) {
+    return BinaryContent.create(fileName, fileType, size);
   }
 }

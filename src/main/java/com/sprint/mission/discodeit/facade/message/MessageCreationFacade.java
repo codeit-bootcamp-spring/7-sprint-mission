@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.factory.MessageFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class MessageCreationFacade {
   private final MessageFacadeMapper messageFacadeMapper;
   private final ChannelService channelService;
   private final MessageFactory messageFactory;
-  private final EntityManager entityManager; // 추가
+  private final BinaryContentStorage binaryContentStorage;
 
   //메세지 추가
   public MessageViewRes createMessage(@NonNull UUID speakerId, @NonNull UUID channelId,
@@ -46,6 +47,7 @@ public class MessageCreationFacade {
         BinaryContent newBinaryContent = binaryContentService.create(
             BinaryContentFactory.create(BinaryContentReq)
         );
+        binaryContentStorage.put(newBinaryContent.getId(), BinaryContentReq.data());
         attachments.add(newBinaryContent);
       });
     }

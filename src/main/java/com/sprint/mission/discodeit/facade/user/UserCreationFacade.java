@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class UserCreationFacade {
 
   private final UserService userService;
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
   private final UserStatusService userStatusService;
   private final UserFactory userFactory;
 
@@ -38,8 +40,8 @@ public class UserCreationFacade {
       BinaryContent profile = binaryContentService.create(
           BinaryContentFactory.create(req.profileImage())
       );
-
       profileId = profile.getId();
+      binaryContentStorage.put(profileId, req.profileImage().data());
     }
     User user = userService.create(userFactory.create(req, profileId));
     userStatusService.create(UserStatus.create(user));

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class UserDeleteFacade {
   private final UserService userService;
   private final BinaryContentService binaryContentService;
   private final UserStatusService userStatusService;
+  private final BinaryContentStorage binaryContentStorage;
 
   //유저 삭제
   public void deleteUser(@NonNull UUID userId) {
@@ -27,6 +29,7 @@ public class UserDeleteFacade {
 
     if (user.getProfile() != null) {
       binaryContentService.delete(user.getProfile().getId());
+      binaryContentStorage.delete(user.getProfile().getId());
     }
     if (userStatus != null) {
       userStatusService.delete(userStatus.getId());

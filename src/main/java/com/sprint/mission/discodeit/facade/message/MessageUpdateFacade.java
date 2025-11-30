@@ -8,9 +8,11 @@ import com.sprint.mission.discodeit.facade.mapper.MessageFacadeMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,24 +26,31 @@ public class MessageUpdateFacade {
   private final MessageService messageService;
   private final BinaryContentService binaryContentService;
   private final MessageFacadeMapper messageFacadeMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   public MessageViewRes updateMessage(@NonNull UUID messageId, @NonNull MessageUpdateReq req) {
     Message message = messageService.findById(messageId);
-    List<BinaryContent> updateAttachments = new ArrayList<>(req.keepAttachmentIds().stream()
-        .map(binaryContentService::findById).toList());
+    // 기존 첨부파일 중 삭제할 파일 처리
+    message.getAttachments().stream()
+        .filter(att -> !req.keepAttachmentIds().contains(att.getId()))
+        .forEach(att -> {
+          binaryContentStorage.delete(att.getId()); //파일 삭제
+          binaryContentService.delete(att.getId()); //DB삭제
+        });
+    message.getAttachments().removeIf(att ->
+        !req.keepAttachmentIds().contains(att.getId())); //컬렉션에서 삭제
 
-    //새로운 첨부파일 파일 생성 : 파일 생성 및 updateIds 에 id 넣기
-    req.newAttachmentReqs().forEach(r ->
-        updateAttachments.add(binaryContentService.create(BinaryContentFactory.create(r))));
+    // 새로운 첨부파일 생성
+    List<BinaryContent> newAttachments = req.newAttachmentReqs().stream()
+        .map(r -> {
+          BinaryContent binaryContent = binaryContentService.create(BinaryContentFactory.create(r));
+          binaryContentStorage.put(binaryContent.getId(), r.data());
+          return binaryContent;
+        }).toList();
 
-    //기존 파일들 중 keep 배열에 없으면 삭제.
-    message.getAttachments().removeIf(att -> !req.keepAttachmentIds().contains(att.getId()));
-    message.getAttachments().addAll(
-        updateAttachments.stream()
-            .filter(att -> !message.getAttachments().contains(att)) // 중복 방지
-            .toList()
-    );
+    message.getAttachments().addAll(newAttachments);
 
+    // 메시지 내용 업데이트
     messageService.update(messageId, req.content(), message.getAttachments());
     return messageFacadeMapper.mapToView(message);
   }

@@ -36,3 +36,9 @@ springdoc:
 
   api-docs:
     path: /my-api
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: A:/myCodes/codit/sprint/storage
