@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.global.exception.custom.CustomException;
+import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import jakarta.annotation.PostConstruct;
+import org.apache.catalina.util.CustomObjectInputStream;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -39,7 +42,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
             Files.createDirectories(path.getParent());
             Files.write(path, bytes);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(ErrorCode.FILE_SAVE_FAILED);
         }
 
         return binaryContentId;
@@ -52,7 +55,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
         try{
             return Files.newInputStream(path);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(ErrorCode.FILE_READ_FAILED);
         }
     }
 
