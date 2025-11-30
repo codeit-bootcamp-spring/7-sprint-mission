@@ -37,7 +37,6 @@ public class UserUpdateFacade {
       binaryContentService.delete(user.getProfile().getId());
       userService.updateProfileImage(userId, null);
     }
-
     //올라온 데이터가 있으면 무조건 만들어서 배정
     if (req.profileImage() != null) {
       BinaryContent profileImg = binaryContentService.create(
@@ -45,6 +44,7 @@ public class UserUpdateFacade {
       );
       profileId = profileImg.getId();
     }
+    System.out.println(profileId);
     userService.updateProfileImage(userId, profileId);
     userStatusService.updateByUserId(userId);
 

@@ -48,6 +48,7 @@ public class BasicMessageService implements MessageService {
 
   //메세지 수정
   @Override
+  @Transactional
   public void update(UUID id, String content, List<BinaryContent> attachments) {
     Message message = findById(id);
     message.update(content, attachments);

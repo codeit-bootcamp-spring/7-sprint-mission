@@ -100,6 +100,7 @@ public class BasicUserService implements UserService {
 
   //업데이트
   @Override
+  @Transactional
   public void update(UUID id, UserUpdateReq req) {
     User user = findById(id);
     //기존 비밀번호를 클라이언트 쪽에서 알 수 없기 때문에, 새로 올라온 비밀번호가 없으면 비밀번호 변경X
@@ -112,6 +113,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional
   public void updateProfileImage(UUID id, UUID profileId) {
     User user = findById(id);
     user.updateProfile(user.getProfile());
