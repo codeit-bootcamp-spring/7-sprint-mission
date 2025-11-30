@@ -16,23 +16,23 @@ import com.sprint.mission.discodeit.page.PageResponseDto;
 import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessageAttachmentsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
-import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.springframework.data.domain.Slice;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
-//@Transactional // 영속성 컨텍스트
+@Transactional(isolation = Isolation.READ_COMMITTED) // 영속성 컨텍스트
 @RequiredArgsConstructor //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 public class MessageService implements InterfaceMessageService {
     private final MessagesRepository messageRepository;
@@ -41,7 +41,6 @@ public class MessageService implements InterfaceMessageService {
     private final MessageAttachmentsRepository messageAttachmentsRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentsRepository binaryContentRepository;
-    private final ReadStatusesRepository readStatusRepository;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
 
@@ -52,7 +51,7 @@ public class MessageService implements InterfaceMessageService {
         }
 
         if (dtoMessage.authorId() == null) {
-          throw new NoSuchElementException("🚨 User를 찾을 수 없음 :: " + dtoMessage.toString());
+            throw new NoSuchElementException("🚨 User를 찾을 수 없음 :: " + dtoMessage.toString());
         }
 
         Channel channel = channelRepository
@@ -63,49 +62,34 @@ public class MessageService implements InterfaceMessageService {
             .findById(dtoMessage.authorId())
             .orElseThrow(() -> new IllegalArgumentException("🚨 noUserId = [" + dtoMessage.authorId().toString() + "]"));
 
-        List<MessageAttachments> attachments = new ArrayList<>();
-        Message newMessage = new Message(dtoMessage.content(),
-                                        channel,
-                                        user,
-                                        attachments);
+        Message message = new Message(dtoMessage.content(),
+            channel,
+            user);
+        Message savedMessage = messageRepository.save(message);
 
+        if (null != fileList && !fileList.isEmpty()) {
+            for (MultipartFile file : fileList) {
+                BinaryContent binaryContent = new BinaryContent(
+                    file.getOriginalFilename(),
+                    file.getSize(),
+                    file.getContentType());
+                //1. 파일 저장
+                binaryContentStorage.put(file, binaryContent);
+                //2. DB 저장
+                BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
-        if (null != fileList) {
-            List<BinaryContent> dtoList = fileList
-                .stream()
-                .map(file -> {
-                    BinaryContent binaryContent = null;
-                    binaryContent = new BinaryContent(
-                        file.getOriginalFilename(),
-                        file.getSize(),
-                        file.getContentType(),
-                        null
-                    );
-
-                    MessageAttachments messageAttachments = new MessageAttachments(
-                        UUID.randomUUID(),
-                        newMessage,
-                        binaryContent
-                    );
-                    attachments.add(messageAttachments);
-                    messageAttachmentsRepository.save(messageAttachments);
-
-                    // 파일 저장
-                    binaryContent.setAttachments(messageAttachments);
-                    binaryContentStorage.put(file, binaryContent);
-
-                    // DB 저장
-                    return binaryContentRepository.save(binaryContent);
-                })
-                .toList();
+                MessageAttachments messageAttachments = new MessageAttachments(
+                    savedMessage,
+                    savedBinaryContent
+                );
+                messageAttachmentsRepository.save(messageAttachments);
+            }
         }
 
-        newMessage.setMessageAttachmentList(attachments);
-        messageRepository.save(newMessage);
-
-        log.info("✅ 💌 MessageService.create.content = [" + newMessage.getContent() + "] 💬");
-        return messageMapper.toDto(newMessage);
+        log.info("✅ 💌 MessageService.create.content = [" + message.getContent() + "] 💬");
+        return messageMapper.toDto(message);
     }
+
 
     @Override
     public void deleteMessage(UUID messageID) {

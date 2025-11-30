@@ -13,7 +13,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Entity
 @Table(name = "binary_contents")
 @Getter @Setter
@@ -32,17 +34,20 @@ public class BinaryContent extends BaseEntity {
     @Column(name = "content_type", nullable = false, length = 100)
     private String contentType;
 
-    @OneToOne(mappedBy = "binaryContent", orphanRemoval = true, cascade = CascadeType.REMOVE)
-    private MessageAttachments attachments;
-
-//    @Column(name = "bytes", nullable = false)
-//    private byte[] bytes;
-
-
-//    public BinaryContent(String fileName, Long size, String contentType, MessageAttachments attachmentId) {
+//    @Setter
+//    @OneToOne(mappedBy = "binaryContent", orphanRemoval = true, cascade = CascadeType.ALL)
+//    private MessageAttachments messageAttachments;
+//
+//    public void initMessageAttachment(Message message) {
+//        if (this.messageAttachments == null) {
+//            this.messageAttachments = new MessageAttachments(null, message, this);
+//            log.info("✅✅✅status = [" + this.messageAttachments.toString() + "]");
+//        }
+//    }
+//
+//    public BinaryContent(String fileName, Long size, String contentType) {
 //        this.fileName = fileName;
 //        this.size = size;
 //        this.contentType = contentType;
-//        this.attachmentId = attachmentId;
 //    }
 }

@@ -23,7 +23,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class MessageAttachments {
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
@@ -35,21 +34,8 @@ public class MessageAttachments {
     @JoinColumn(name = "attachment_id", nullable = false)
     BinaryContent binaryContent;
 
-
-
-//    public MessageAttachments(UUID id, Message message, BinaryContent binaryContent) {
-//        this.id = id;
-//        this.message = message;
-//        this.binaryContent = binaryContent;
-//    }
-
-    public void changeMessage(Message message) {
+    public MessageAttachments(Message message, BinaryContent binaryContent) {
         this.message = message;
-        message.getMessageAttachmentList().add(this);
-    }
-
-    public void changeBinaryContent(BinaryContent binaryContent) {
         this.binaryContent = binaryContent;
-        binaryContent.setAttachments(this);
     }
 }

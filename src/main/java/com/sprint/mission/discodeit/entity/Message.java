@@ -35,8 +35,8 @@ public class Message extends BaseUpdatableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "message", orphanRemoval = true, cascade = CascadeType.REMOVE)
-    private List<MessageAttachments> messageAttachmentList;
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "message", orphanRemoval = true, cascade = CascadeType.REMOVE)
+//    private List<MessageAttachments> messageAttachmentList;
 
 //    public Message(String content, Channel channel, User author, List<MessageAttachments> attachmentId) {
 //        this.content = content;

@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.swaggerDocs;
 
 import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.Res_Message;
 import com.sprint.mission.discodeit.mapper.dto.MessageDto;
 import com.sprint.mission.discodeit.page.PageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;

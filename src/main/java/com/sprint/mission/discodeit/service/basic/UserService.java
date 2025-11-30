@@ -68,13 +68,11 @@ public class UserService implements InterfaceUserService {
                 BinaryContent binaryContent = new BinaryContent(
                     file.getOriginalFilename(),
                     file.getSize(),
-                    file.getContentType(),
-                    null
+                    file.getContentType()
                 );
 
                 // 파일 저장
                 binaryContentStorage.put(file, binaryContent);
-
                 // DB 저장
                 return binaryContentRepository.save(binaryContent);
             })
@@ -167,14 +165,11 @@ public class UserService implements InterfaceUserService {
                         new BinaryContent(
                         file.getOriginalFilename(),
                         file.getSize(),
-                        file.getContentType(),
-                        null
+                        file.getContentType()
                     ));
-
-                // 파일 저장
+                //1. 파일 저장
                 binaryContentStorage.put(file, neoBinaryContent);
-
-                // DB 저장
+                //2. DB 저장
                 return binaryContentRepository.save(neoBinaryContent);
             })
             .orElse(null);

@@ -114,10 +114,11 @@ DROP TABLE messages;
 
 
 CREATE TABLE message_attachments(
+    id UUID  NOT NULL,
     message_id uuid NOT NULL,
-    attachment_id uuid NOT NULL,
-    CONSTRAINT message_attachments_message_id_fk FOREIGN KEY (message_id) REFERENCES public.messages(id) ON DELETE CASCADE,
-    CONSTRAINT message_attachments_attachment_id_fk FOREIGN KEY (attachment_id) REFERENCES public.binary_contents(id) ON DELETE CASCADE
+    attachment_id uuid NOT NULL
+--     CONSTRAINT message_attachments_message_id_fk FOREIGN KEY (message_id) REFERENCES public.messages(id) ON DELETE CASCADE,
+--     CONSTRAINT message_attachments_attachment_id_fk FOREIGN KEY (attachment_id) REFERENCES public.binary_contents(id) ON DELETE CASCADE
 );
 
 DROP TABLE message_attachments;

@@ -89,7 +89,7 @@ public class UserStatusService implements InterfaceUserStatusService {
 
     public UserStatusDto updateUserStatus(UUID userId, Instant newLastActiveAt) {
         UserStatus userStatus = userStatusRepository.findUserStatusByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("🚨해당 User[" + userId.toString() + "]의 UserStatus를 찾을 수 없음"));
+                .orElseThrow(() -> new NoSuchElementException("updateUserStatus.User[" + userId.toString() + "] 찾을 수 없음"));
 
         // 마지막 활동 시간 업데이트
         userStatus.setLastActiveAt(newLastActiveAt);
