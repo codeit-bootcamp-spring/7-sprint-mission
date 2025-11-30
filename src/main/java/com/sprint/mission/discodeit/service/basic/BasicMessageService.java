@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +45,7 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public MessageResponseDto createMessage(CreateMessageRequestDto request,
-      List<CreateBinaryContentRequestDto> fileRequests) {
+      List<MultipartFile> fileRequests) throws IOException {
     User author = userRepository.findById(request.authorId())
         .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
     Channel channel = channelRepository.findById(request.channelId())
@@ -52,14 +54,14 @@ public class BasicMessageService implements MessageService {
     List<BinaryContent> binaryContents = new ArrayList<>();
 
     if (fileRequests != null) {
-      for (CreateBinaryContentRequestDto fileRequest : fileRequests) {
+      for (MultipartFile fileRequest : fileRequests) {
         BinaryContent binaryContent = new BinaryContent(
-            fileRequest.fileName(),
-            (long) fileRequest.bytes().length,
-            fileRequest.contentType()
+            fileRequest.getOriginalFilename(),
+            fileRequest.getSize(),
+            fileRequest.getContentType()
         );
         BinaryContent saved = binaryContentRepository.save(binaryContent);
-        storage.put(saved.getId(), fileRequest.bytes());
+        storage.put(saved.getId(), fileRequest.getBytes());
         binaryContents.add(saved);
       }
     }

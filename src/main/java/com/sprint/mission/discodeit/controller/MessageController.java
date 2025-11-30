@@ -32,24 +32,9 @@ public class MessageController implements MessageControllerDocs {
   @PostMapping(consumes = "multipart/form-data")
   public ResponseEntity<MessageResponseDto> createMessage(
       @RequestPart("messageCreateRequest") CreateMessageRequestDto messageCreateRequest,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
-    List<CreateBinaryContentRequestDto> fileRequests = null;
-    if (attachments != null) {
-      fileRequests = attachments.stream()
-          .map(file ->
-          {
-            try {
-              return new CreateBinaryContentRequestDto(
-                  file.getOriginalFilename(),
-                  file.getContentType(),
-                  file.getBytes()
-              );
-            } catch (IOException e) {
-              throw new RuntimeException(e);
-            }
-          }).toList();
-    }
-    MessageResponseDto message = messageService.createMessage(messageCreateRequest, fileRequests);
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments)
+      throws IOException {
+    MessageResponseDto message = messageService.createMessage(messageCreateRequest, attachments);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 

@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +52,8 @@ public interface MessageControllerDocs {
       @Parameter(description = "Message 생성 정보")
       @RequestPart("messageCreateRequest") CreateMessageRequestDto messageCreateRequest,
       @Parameter(description = "Message 첨부 파일들")
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments);
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments)
+      throws IOException;
 
 
   @Operation(summary = "Message 내용 수정")

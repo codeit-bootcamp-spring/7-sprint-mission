@@ -6,6 +6,8 @@ CREATE TABLE binary_contents (
 	content_type varchar(100) NOT NULL,
 	bytes BYTEA NOT NULL 
 );
+DROP FROM binary_contents;
+
 
 CREATE TABLE users (
 	id UUID PRIMARY KEY,
@@ -71,6 +73,6 @@ CREATE TABLE message_attachments(
 	FOREIGN KEY (attachment_id) REFERENCES binary_contents(id) ON DELETE CASCADE
 );
 
-SELECT * FROM users ORDER BY created_at DESC LIMIT 1;
+
 
 
