@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.facade.message;
 import com.sprint.mission.discodeit.dto.message.request.MessageUpdateReq;
 import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.facade.mapper.MessageMapper;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -25,22 +26,24 @@ public class MessageUpdateFacade {
   private final MessageMapper messageMapper;
 
   public MessageViewRes updateMessage(@NonNull UUID messageId, @NonNull MessageUpdateReq req) {
-    List<BinaryContent> oldAttachments = messageService.findById(messageId).getAttachments();
-    List<BinaryContent> updateAttachments = new ArrayList<>(
-        req.keepAttachmentIds().stream().map(binaryContentService::findById).toList()
-    );
+    Message message = messageService.findById(messageId);
+    List<BinaryContent> updateAttachments = new ArrayList<>(req.keepAttachmentIds().stream()
+        .map(binaryContentService::findById).toList());
 
     //새로운 첨부파일 파일 생성 : 파일 생성 및 updateIds 에 id 넣기
     req.newAttachmentReqs().forEach(r ->
         updateAttachments.add(binaryContentService.create(BinaryContentFactory.create(r))));
 
     //기존 파일들 중 keep 배열에 없으면 삭제.
-    oldAttachments.stream()
-        .filter(binaryContent -> !req.keepAttachmentIds().contains(binaryContent.getId()))
-        .forEach(binaryContent -> binaryContentService.delete(binaryContent.getId()));
+    message.getAttachments().removeIf(att -> !req.keepAttachmentIds().contains(att.getId()));
+    message.getAttachments().addAll(
+        updateAttachments.stream()
+            .filter(att -> !message.getAttachments().contains(att)) // 중복 방지
+            .toList()
+    );
 
-    messageService.update(messageId, req.content(), updateAttachments);
-    return messageMapper.mapToView(messageService.findById(messageId));
+    messageService.update(messageId, req.content(), message.getAttachments());
+    return messageMapper.mapToView(message);
   }
 }
 
