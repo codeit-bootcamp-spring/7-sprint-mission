@@ -35,17 +35,15 @@ public class UserUpdateFacade {
     //기존 프로필 사진 있으면 무조건 삭제
     if (user.getProfile() != null) {
       binaryContentService.delete(user.getProfile().getId());
-      userService.updateProfileImage(userId, null);
+      user.updateProfile(null);
     }
     //올라온 데이터가 있으면 무조건 만들어서 배정
     if (req.profileImage() != null) {
       BinaryContent profileImg = binaryContentService.create(
           BinaryContentFactory.create(req.profileImage())
       );
-      profileId = profileImg.getId();
+      user.updateProfile(profileImg);
     }
-    System.out.println(profileId);
-    userService.updateProfileImage(userId, profileId);
     userStatusService.updateByUserId(userId);
 
     return UserDetailInfoRes.from(

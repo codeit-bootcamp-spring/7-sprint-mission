@@ -23,8 +23,6 @@ public interface UserService {
 
   void update(UUID id, UserUpdateReq req);
 
-  void updateProfileImage(UUID id, UUID profileId);
-
   AvailabilityRes isRegisteredNickname(String nickname);
 
   AvailabilityRes isRegisteredEmail(String email);

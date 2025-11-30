@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.common.email.EmailSender;
 import com.sprint.mission.discodeit.dto.auth.response.AvailabilityRes;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateReq;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -100,7 +101,6 @@ public class BasicUserService implements UserService {
 
   //업데이트
   @Override
-  @Transactional
   public void update(UUID id, UserUpdateReq req) {
     User user = findById(id);
     //기존 비밀번호를 클라이언트 쪽에서 알 수 없기 때문에, 새로 올라온 비밀번호가 없으면 비밀번호 변경X
@@ -110,13 +110,6 @@ public class BasicUserService implements UserService {
     }
     validateDuplicate(id, req.email(), req.nickname());
     user.update(req.email(), req.nickname(), replacaPassword);
-  }
-
-  @Override
-  @Transactional
-  public void updateProfileImage(UUID id, UUID profileId) {
-    User user = findById(id);
-    user.updateProfile(user.getProfile());
   }
 
   //해당 닉네임으로 가입된 사림이 있는지.
