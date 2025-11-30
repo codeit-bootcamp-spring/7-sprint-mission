@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MessageUpdateFacade {
 
   private final MessageService messageService;
   private final BinaryContentService binaryContentService;
   private final MessageMapper messageMapper;
 
-  @Transactional
   public MessageViewRes updateMessage(@NonNull UUID messageId, @NonNull MessageUpdateReq req) {
     List<BinaryContent> oldAttachments = messageService.findById(messageId).getAttachments();
     List<BinaryContent> updateAttachments = new ArrayList<>(

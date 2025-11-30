@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserCreationFacade {
 
   private final UserService userService;
@@ -28,7 +29,6 @@ public class UserCreationFacade {
   private final UserFactory userFactory;
 
   //유저 추가
-  @Transactional
   public UserDetailInfoRes createUser(@NonNull UserCreateReq req) {
     UUID profileId = null;
 

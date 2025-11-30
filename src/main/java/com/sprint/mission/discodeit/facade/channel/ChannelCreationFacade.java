@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ChannelCreationFacade {
 
   private final UserService userService;
@@ -33,7 +34,6 @@ public class ChannelCreationFacade {
   }
 
   //비밀 채널 추가
-  @Transactional
   public ChannelInfoRes createPrivateChannel(@NonNull UUID managerId,
       @NonNull ChannelCreateSecReq req) {
     Channel channel = channelService.create(managerId, req);

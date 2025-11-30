@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserDeleteFacade {
 
   private final UserService userService;
@@ -20,7 +21,6 @@ public class UserDeleteFacade {
   private final UserStatusService userStatusService;
 
   //유저 삭제
-  @Transactional
   public void deleteUser(@NonNull UUID userId) {
     User user = userService.findById(userId);
     UserStatus userStatus = userStatusService.findByUserId(userId);

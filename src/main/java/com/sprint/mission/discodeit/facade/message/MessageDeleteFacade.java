@@ -11,13 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MessageDeleteFacade {
 
   private final MessageService messageService;
   private final BinaryContentService binaryContentService;
 
   //메세지 삭제
-  @Transactional
   public void deleteMessage(@NonNull UUID messageId) {
     Message message = messageService.findById(messageId);
     message.getAttachments().forEach(

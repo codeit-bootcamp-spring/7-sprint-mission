@@ -9,16 +9,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MessageOverviewFacade {
-    private final MessageService messageService;
-    private final MessageMapper messageMapper;
 
-    //메세지 전체 조회
-    public List<MessageViewRes> findAllByChannelId(@NonNull UUID channelId){
-        return messageService.findAllByChannelId(channelId).stream()
-                .map(messageMapper::mapToView).toList();
-    }
+  private final MessageService messageService;
+  private final MessageMapper messageMapper;
+
+  //메세지 전체 조회
+  public List<MessageViewRes> findAllByChannelId(@NonNull UUID channelId) {
+    return messageService.findAllByChannelId(channelId).stream()
+        .map(messageMapper::mapToView).toList();
+  }
 }

@@ -11,13 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ChannelDeleteFacade {
 
   private final ChannelService channelService;
   private final MessageService messageService;
   private final ChannelMemberService channelMemberService;
 
-  @Transactional
   public void deleteChannel(@NonNull UUID channelId) {
     channelMemberService.findAllByChannelId(channelId)
         .forEach(readStatus -> channelMemberService.delete(readStatus.getId()));
