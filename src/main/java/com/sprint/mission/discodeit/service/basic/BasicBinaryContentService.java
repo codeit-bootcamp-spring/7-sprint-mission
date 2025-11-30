@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfo
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   @Transactional(readOnly = true)
   public BinaryContentInfoRes getBinaryContent(UUID id) {
-    return BinaryContentInfoRes.from(findById(id));
+    return BinaryContentMapper.toResDto(findById(id));
   }
 
   @Override
@@ -56,7 +57,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   public List<BinaryContentInfoRes> getBinaryContentList(List<UUID> binaryContentIdList) {
     return findAll().stream()
         .filter(bc -> binaryContentIdList.contains(bc.getId()))
-        .map(BinaryContentInfoRes::from)
+        .map(BinaryContentMapper::toResDto)
         .toList();
   }
 }

@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.facade.message.MessageCreationFacade;
 import com.sprint.mission.discodeit.facade.message.MessageDeleteFacade;
 import com.sprint.mission.discodeit.facade.message.MessageOverviewFacade;
 import com.sprint.mission.discodeit.facade.message.MessageUpdateFacade;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -55,7 +55,7 @@ public class MessageController implements MessageControllerDocs {
       @RequestPart(value = "attachmentFiles", required = false) List<MultipartFile> attachmentFiles) {
 
     List<BinaryContentCreateReq> binaryContentCreateReqs = attachmentFiles == null ?
-        List.of() : attachmentFiles.stream().map(BinaryContentCreateReq::from).toList();
+        List.of() : attachmentFiles.stream().map(BinaryContentMapper::toReqDto).toList();
     MessageCreateReq req = MessageCreateReq.from(messageInfoReq, binaryContentCreateReqs);
     MessageViewRes message = messageCreationFacade.createMessage(speakerId, channelId, req);
 
@@ -71,7 +71,7 @@ public class MessageController implements MessageControllerDocs {
       @RequestPart(value = "attachmentFiles", required = false) List<MultipartFile> newAttachmentReqs) {
 
     List<BinaryContentCreateReq> binaryContentCreateReqs = newAttachmentReqs == null ?
-        List.of() : newAttachmentReqs.stream().map(BinaryContentCreateReq::from).toList();
+        List.of() : newAttachmentReqs.stream().map(BinaryContentMapper::toReqDto).toList();
     MessageUpdateReq req = new MessageUpdateReq(
         messageInfoReq.content(), keepAttachmentIds, binaryContentCreateReqs);
     MessageViewRes res = messageUpdateFacade.updateMessage(messageId, req);

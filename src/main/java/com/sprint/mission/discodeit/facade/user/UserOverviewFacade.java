@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfo
 import com.sprint.mission.discodeit.dto.user.response.UserSimpleInfoRes;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.List;
@@ -28,7 +29,7 @@ public class UserOverviewFacade {
   //변환 메소드
   private UserSimpleInfoRes mapToSimpleInfo(User user) {
     BinaryContentInfoRes profileImg;
-    profileImg = BinaryContentInfoRes.from(user.getProfile());
+    profileImg = BinaryContentMapper.toResDto(user.getProfile());
     UserStatus userStatus = userStatusService.findByUserId(user.getId());
     return UserSimpleInfoRes.from(user, profileImg, userStatus.isOnline());
   }

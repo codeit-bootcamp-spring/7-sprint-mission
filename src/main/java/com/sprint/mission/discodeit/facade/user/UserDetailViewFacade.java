@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfo
 import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -44,7 +45,7 @@ public class UserDetailViewFacade {
   //변환 메소드
   private UserDetailInfoRes toDetailInfo(User user) {
     BinaryContentInfoRes profileImg;
-    profileImg = BinaryContentInfoRes.from(user.getProfile());
+    profileImg = BinaryContentMapper.toResDto(user.getProfile());
     UserStatus userStatus = userStatusService.findByUserId(user.getId());
     return UserDetailInfoRes.from(user, profileImg, userStatus.isOnline());
   }

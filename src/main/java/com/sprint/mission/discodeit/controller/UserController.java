@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.facade.user.UserDetailViewFacade;
 import com.sprint.mission.discodeit.facade.user.UserOverviewFacade;
 import com.sprint.mission.discodeit.facade.user.UserUpdateFacade;
 import com.sprint.mission.discodeit.facade.userstatus.UserStatusUpdateFacade;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -67,7 +68,7 @@ public class UserController implements UserControllerDocs {
   public ResponseEntity<UserDetailInfoRes> createUser(
       @Valid @RequestPart("userInfoReq") UserInfoReq userInfoReq,
       @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
-    BinaryContentCreateReq binaryContentCreateReq = BinaryContentCreateReq.from(profileFile);
+    BinaryContentCreateReq binaryContentCreateReq = BinaryContentMapper.toReqDto(profileFile);
     UserDetailInfoRes user = userCreationFacade.createUser(
         UserCreateReq.from(userInfoReq, binaryContentCreateReq));
     return ResponseEntity.created(URI.create("/api/users/" + user.userId())).body(user);
@@ -79,7 +80,7 @@ public class UserController implements UserControllerDocs {
       @PathVariable UUID userId,
       @Valid @RequestPart("userInfoReq") UserInfoReq userInfoReq,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
-    BinaryContentCreateReq binaryContentCreateReq = BinaryContentCreateReq.from(profile);
+    BinaryContentCreateReq binaryContentCreateReq = BinaryContentMapper.toReqDto(profile);
     UserUpdateReq req = UserUpdateReq.from(userInfoReq, binaryContentCreateReq);
     UserDetailInfoRes res = userUpdateFacade.updateUser(userId, req);
     return ResponseEntity.ok(res);

@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.dto.binarycontent.response;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.util.DateTimeUtil;
-
 import java.util.UUID;
 
 public record BinaryContentInfoRes(
@@ -13,17 +10,4 @@ public record BinaryContentInfoRes(
     String createdAt
 ) {
 
-  public static BinaryContentInfoRes from(BinaryContent binaryContent) {
-    if (binaryContent == null) {
-      return null;
-    } else {
-      return new BinaryContentInfoRes(
-          binaryContent.getId(),
-          binaryContent.getData(),
-          binaryContent.getFileName(),
-          binaryContent.getFileType(),
-          DateTimeUtil.format(binaryContent.getCreatedAt())
-      );
-    }
-  }
 }
