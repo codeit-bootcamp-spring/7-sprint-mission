@@ -28,8 +28,6 @@ import java.time.Instant;
 )
 public class ChannelMember extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
   //Field
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false,

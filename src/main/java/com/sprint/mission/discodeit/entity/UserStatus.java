@@ -21,8 +21,6 @@ import java.util.UUID;
 @Table(name = "user_statuses")
 public class UserStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
   //Field
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", unique = true, nullable = false,

@@ -19,8 +19,6 @@ import java.util.UUID;
 @Table(name = "users")
 public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
   //Field
   @Column(name = "email", length = 100, unique = true, nullable = false)
   private String email;               //이메일

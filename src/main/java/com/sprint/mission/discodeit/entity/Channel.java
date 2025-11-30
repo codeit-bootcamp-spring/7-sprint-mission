@@ -17,8 +17,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
   //Field
   // 채널명
   @Column(name = "name", length = 100)

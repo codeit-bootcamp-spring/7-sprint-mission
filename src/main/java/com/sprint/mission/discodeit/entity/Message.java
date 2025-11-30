@@ -23,8 +23,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "messages")
 public class Message extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
   //Field
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "channel_id", nullable = false,
