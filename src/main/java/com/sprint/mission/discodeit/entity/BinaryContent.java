@@ -2,11 +2,12 @@ package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 
 @Getter
@@ -30,7 +31,7 @@ public class BinaryContent extends BaseEntity {
   private String fileType;
 
   // 파일 데이터
-  @Lob
+  @JdbcTypeCode(SqlTypes.VARBINARY)
   @Column(name = "bytes", nullable = false)
   private byte[] data;
 
