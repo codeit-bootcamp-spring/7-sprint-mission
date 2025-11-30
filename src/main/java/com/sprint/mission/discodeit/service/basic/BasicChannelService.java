@@ -71,18 +71,24 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ChannelResponseDto> getAllChannelByUserId(UUID userId) {
-    List<UUID> participants = readStatusRepository.findAllByUserId(userId).stream()
-        .map(readStatus -> readStatus.getChannel().getId())
+    // user가 참여한 채널 ID 조회
+    List<UUID> channelIds = readStatusRepository.findAllByUserIdWithChannel(userId)
+        .stream()
+        .map(rs -> rs.getChannel().getId())
         .toList();
 
-    // 채널 타입이 퍼블릭이면 전체, private이면 userId로 필터
-    return channelRepository.findAll().stream()
-        .filter(channel -> channel.getType().equals(ChannelType.PUBLIC)
-            || participants.contains(channel.getId()))
+    // channelIds(참여 채널들) + PUBLIC 채널 조회
+    List<Channel> channels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
+        channelIds);
+
+    // DTO로 변환
+    return channels.stream()
         .map(channelMapper::toResponseDto)
         .toList();
   }
+
 
   @Override
   public ChannelResponseDto updateChannel(UUID channelId, UpdateChannelDto updateChannelDto) {

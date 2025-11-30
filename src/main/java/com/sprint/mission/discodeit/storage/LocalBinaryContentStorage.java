@@ -25,7 +25,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   public LocalBinaryContentStorage(
       @Value("${discodeit.storage.local.root-path}") Path root) {
     this.root = root;
-    System.out.println("Storage root path: " + root.toAbsolutePath());
   }
 
   // Bean 생성 직후 자동 호출
@@ -41,7 +40,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   @Override
   public UUID put(UUID binaryContentId, byte[] bytes) {
     Path path = resolvePath(binaryContentId);
-    System.out.println("Saving file to: " + path.toAbsolutePath());
     FileManager.write(path, bytes);
     return binaryContentId;
   }

@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.entity.enums.ChannelType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -34,13 +33,14 @@ public abstract class ChannelMapper {
   @Mapping(target = "lastMessageAt", source = ".", qualifiedByName = "getLastMessageAt")
   public abstract ChannelResponseDto toResponseDto(Channel channel);
 
+  // 해당 채널에서 참여자들 가져오기
   @Named("getParticipants")
   protected List<UserResponseDto> getParticipants(Channel channel) {
     if (channel.getType() != ChannelType.PRIVATE) {
       return List.of();
     }
 
-    return readStatusRepository.findAllByChannel(channel).stream()
+    return readStatusRepository.findAllByChannelWithUserAndProfileAndStatus(channel).stream()
         .map(ReadStatus::getUser)
         .map(userMapper::toResponseDto)
         .toList();
@@ -48,9 +48,9 @@ public abstract class ChannelMapper {
 
   @Named("getLastMessageAt")
   protected Instant getLastMessageAt(Channel channel) {
-    return messageRepository.findAllByChannelId(channel.getId()).stream()
-        .max(Comparator.comparing(Message::getCreatedAt))
+    return messageRepository.findLatestByChannelId(channel.getId()).stream()
         .map(Message::getCreatedAt)
+        .findFirst()
         .orElse(Instant.MIN);
   }
 }

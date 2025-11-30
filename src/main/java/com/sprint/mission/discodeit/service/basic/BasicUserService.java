@@ -81,7 +81,7 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   @Override
   public List<UserResponseDto> getAllUsers() {
-    List<User> users = userRepository.findAll();
+    List<User> users = userRepository.findAllWithProfileAndStatus();
 
     return users.stream()
         .map(userMapper::toResponseDto)

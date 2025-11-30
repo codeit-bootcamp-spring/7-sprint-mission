@@ -14,10 +14,17 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
   void deleteAllByChannelId(UUID channelId);
 
   @Query(value = "SELECT m FROM Message m "
+      + "LEFT JOIN FETCH m.author a "
+      + "JOIN FETCH a.userStatus "
+      + "LEFT JOIN FETCH a.profile "
+      + "LEFT JOIN FETCH m.attachments at "
       + "WHERE m.channel.id =:channelId And m.createdAt < :createdAt")
   Slice<Message> findAllByChannelId(UUID channelId, Instant createdAt, Pageable pageable);
 
-  List<Message> findAllByChannelId(UUID channelId);
+  @Query(value = "SELECT m FROM Message m "
+      + "WHERE m.channel.id = :channelId "
+      + "ORDER BY m.createdAt DESC ")
+  List<Message> findLatestByChannelId(UUID channelId);
 }
 
 // Page<T>
