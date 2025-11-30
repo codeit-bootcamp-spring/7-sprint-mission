@@ -1,16 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
+
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
-import com.sprint.mission.discodeit.entity.dto.Dto_UserUpdate;
-import com.sprint.mission.discodeit.entity.dto.Res_User;
-import com.sprint.mission.discodeit.entity.dto.UserDto;
-import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
-import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
+import com.sprint.mission.discodeit.repository.jpa.UserStatusesRepository;
+import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -19,15 +22,22 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
+@Transactional // 영속성 컨텍스트
 //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 @RequiredArgsConstructor //@Repository 있어야 등록시켜 줌!!
 public class UserService implements InterfaceUserService {
-    private final InterfaceUserRepository userRepository;
-    private final BaseInterfaceRepository<UserStatus> userStatusRepository;
-    private final BaseInterfaceRepository<BinaryContent> binaryContentRepository;
+    private final UsersRepository userRepository;
+    private final UserStatusesRepository userStatusRepository;
+    private final BinaryContentsRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
+    private final UserMapper userMapper;
+
+//    @Autowired
+//    EntityManager em;
 
 //    public UserService(FileUserRepository fileUserRepository) {
 //        this.fileUserRepository = fileUserRepository;
@@ -38,40 +48,48 @@ public class UserService implements InterfaceUserService {
 //    3. 수정자 주입(Setter Injection) : 간단하지만 테스트 어려워서 지양
 
     @Override
-    public Res_User create(Dto_UserCreate dto_userCreate, Optional<Dto_BinaryContent> dto_binaryContent) {
+    public UserDto create(UserCreateRequest userCreateRequest, Optional<MultipartFile> optionalProfileFile) {
 //    public User create(String newUsername, Optional<BufferedImage> profileImageBytes) {
 //        [ ] 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //                유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
 //        [ ] username과 email은 다른 유저와 같으면 안됩니다.
 //        [ ] UserStatus를 같이 생성합니다.
-        if (userRepository.isUsingName(dto_userCreate.username())) {
-            throw new IllegalArgumentException("🚨create : 동일한 newUsername [" + dto_userCreate.username() + "] 사용햐는 User 가 이미 존재함");
+        if (userRepository.findUserByUsername(userCreateRequest.username()).isPresent()) {
+            throw new IllegalArgumentException("🚨create : 동일한 newUsername [" + userCreateRequest.username() + "] 사용햐는 User 가 이미 존재함");
         }
 
-        if(userRepository.isUsingEmail(dto_userCreate.email())) {
-            throw new IllegalArgumentException("🚨create : 동일한 newEmail [" + dto_userCreate.email() + "] 사용햐는 User 가 이미 존재함");
+        if(userRepository.findUserByEmail(userCreateRequest.email()).isPresent()) {
+            throw new IllegalArgumentException("🚨create : 동일한 newEmail [" + userCreateRequest.email() + "] 사용햐는 User 가 이미 존재함");
         }
 
-        UUID binaryContentId = null;
+        BinaryContent profile = optionalProfileFile
+            .map(file -> {
+                BinaryContent binaryContent = new BinaryContent(
+                    file.getOriginalFilename(),
+                    file.getSize(),
+                    file.getContentType(),
+                    null
+                );
 
-        if (dto_binaryContent.isPresent()) {
-            Dto_BinaryContent dtoBinaryContent = dto_binaryContent.get();
-            BinaryContent binaryContent_I = new BinaryContent(dtoBinaryContent);
-            binaryContentId = binaryContent_I.getId();
-            binaryContentRepository.save(binaryContent_I);
-        }
+                // 파일 저장
+                binaryContentStorage.put(file, binaryContent);
 
-        User user = new User(dto_userCreate, binaryContentId);
-        Res_User resUser = Res_User.from(user);
-        userRepository.save(user);
+                // DB 저장
+                return binaryContentRepository.save(binaryContent);
+            })
+            .orElse(null);
 
-        UserStatus userStatus = new UserStatus(user.getId());
-        userStatusRepository.save(userStatus);
+        User newUser = new User(userCreateRequest.username(),
+            userCreateRequest.email(),
+            userCreateRequest.password(),
+            profile);
 
-        log.info("✅ create = [" + dto_userCreate.username() + "]");
+        newUser.initUserStatus();
 
-        return resUser;
+        userRepository.save(newUser);
+
+        return userMapper.toDto(newUser);
     }
 
     @Override
@@ -79,15 +97,17 @@ public class UserService implements InterfaceUserService {
 //        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
 //        [ ] 패스워드 정보는 제외하세요.
         String message = "🚨 find.userID = [" + userID.toString() + "] 오류";
-        User user = userRepository.findById(userID)
+        User user = userRepository
+            .findById(userID)
             .orElseThrow(() -> new IllegalArgumentException(message));
 
-        UserStatus userStatus = userStatusRepository.findByUserId(userID)
+        UserStatus userStatus = userStatusRepository
+            .findUserStatusByUserId(userID)
             .orElseThrow(() -> new IllegalArgumentException(message));
 
-        log.info("✅ UserService.findAllByChannleId = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
+        log.info("✅ UserService.findAllByChannelId = [" + user.getUsername() + "] online = [" + userStatus.isOnline() + "]");
 
-        return UserDto.from(user, userStatus.isOnline());
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -101,15 +121,15 @@ public class UserService implements InterfaceUserService {
 
         for (User user : users) {
             UserStatus userStatus = userStatusList.stream()
-                  .filter(status -> status.getUserId() != null
-                      && status.getUserId().equals(user.getId()))
+                  .filter(status -> status.getUser().getId() != null
+                      && status.getUser().getId().equals(user.getId()))
                   .findFirst()
                   .orElse(null);
 
             if (userStatus != null) {
-                UserDto dto = UserDto.from(user, userStatus.isOnline());
+                UserDto dto = userMapper.toDto(user);
                 dtoList.add(dto);
-                log.info("✅ UserService.findAll = [" + user.getUserName() + "] online = [" + userStatus.isOnline() + "]");
+                log.info("✅ UserService.findAll = [" + user.getUsername() + "] online = [" + userStatus.isOnline() + "]");
             }
         }
 
@@ -117,7 +137,7 @@ public class UserService implements InterfaceUserService {
     }
 
     @Override
-    public Res_User update(UUID userId, Dto_UserUpdate dtoUserUpdate, Optional<Dto_BinaryContent> dtoBinaryContent) {
+    public UserDto update(UUID userId, UserUpdateRequest dtoUserUpdate, Optional<MultipartFile> optionalProfileFile) {
 //        [ ] 선택적으로 프로필 이미지를 대체할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
 //        수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
@@ -127,33 +147,51 @@ public class UserService implements InterfaceUserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new NoSuchElementException("🚨User [" + userId.toString() + "]를 찾을 수 없음"));
 
-        String userName = user.getUserName();
+        String userName = user.getUsername();
 
         if (!userId.equals(user.getId())
-                && userRepository.isUsingName(dtoUserUpdate.newUsername())) {
+                && userRepository.findUserByUsername(dtoUserUpdate.newUsername()).isPresent()) {
             throw new IllegalArgumentException("🚨 같은 newUsername [" + dtoUserUpdate.newUsername() + "]을 사용하는 User가 이미 존재함");
         }
 
         if (!userId.equals(user.getId())
-                && userRepository.isUsingEmail(dtoUserUpdate.newEmail())) {
+                && userRepository.findUserByEmail(dtoUserUpdate.newEmail()).isPresent()) {
             throw new IllegalArgumentException("🚨 같은 newEmail [" + dtoUserUpdate.newEmail() + "]을 사용하는 User가 이미 존재함");
         }
 
-        //!! 선택적으로 프로필 이미지를 대체할 수 있습니다.
-        if (dtoBinaryContent != null && dtoBinaryContent.isPresent()) {
-            BinaryContent neoBinaryContent = binaryContentRepository.findById(userId).orElse(new BinaryContent(dtoBinaryContent.get()));
-            binaryContentRepository.save(neoBinaryContent);
-            //!! 순서 유의_I
-            user.updateUser(dtoUserUpdate.newUsername(), dtoUserUpdate.newPassword(), dtoUserUpdate.newEmail(), neoBinaryContent.getId());
-        }
-        else {
-            user.updateUser(dtoUserUpdate.newUsername(), dtoUserUpdate.newPassword(), dtoUserUpdate.newEmail(), null);
+        BinaryContent profile = optionalProfileFile.map(file -> {
+                BinaryContent neoBinaryContent = null;
+                neoBinaryContent = binaryContentRepository
+                    .findById(userId)
+                    .orElse(
+                        new BinaryContent(
+                        file.getOriginalFilename(),
+                        file.getSize(),
+                        file.getContentType(),
+                        null
+                    ));
+
+                // 파일 저장
+                binaryContentStorage.put(file, neoBinaryContent);
+
+                // DB 저장
+                return binaryContentRepository.save(neoBinaryContent);
+            })
+            .orElse(null);
+
+        user.setProfile(profile);
+        user.setUsername(dtoUserUpdate.newUsername());
+        user.setEmail(dtoUserUpdate.newEmail());
+
+        if (null != dtoUserUpdate.newPassword()) {
+            user.setPassword(dtoUserUpdate.newPassword());
         }
 
         //!! 순서 유의_II
         userRepository.save(user);
         log.info("✅ UserService.update = [" + userName + "]를 [" + dtoUserUpdate.newUsername() + "]로 변경 완료");
-        return Res_User.from(user);
+
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -162,20 +200,20 @@ public class UserService implements InterfaceUserService {
         User user = userRepository.findById(userID)
             .orElseThrow(() -> new NoSuchElementException("🚨User [" + userID.toString() + "] 를 찾을 수 없음"));
 
-        Optional<UserStatus> optionalStatus = userStatusRepository.findByUserId(user.getId());
+        Optional<UserStatus> optionalStatus = userStatusRepository.findUserStatusByUserId(user.getId());
         if (optionalStatus.isPresent()) {
             userStatusRepository.deleteById(optionalStatus.get().getId());
-            log.info("✅ UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
+            log.info("✅ UserService.userStatusRepository.deleteById = [" + user.getUsername() + "]");
         }
 //        else {
 //            log.error("🚨UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
 //        }
 
-        if (user.getProfileId() != null) {
-            Optional<BinaryContent> optionalContents = binaryContentRepository.findById(user.getProfileId());
+        if (user.getProfile().getId() != null) {
+            Optional<BinaryContent> optionalContents = binaryContentRepository.findById(user.getProfile().getId());
             if (optionalContents.isPresent()) {
                 binaryContentRepository.deleteById(optionalContents.get().getId());
-                log.info("✅ UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
+                log.info("✅ UserService.binaryContentRepository.deleteById = [" + user.getUsername() + "]");
             }
 //            else {
 //                log.error("🚨UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
@@ -183,6 +221,6 @@ public class UserService implements InterfaceUserService {
         }
 
         userRepository.deleteById(userID);
-        log.info("✅ ⛔️ UserService.userRepository.deleteById [" + user.getUserName() + "] 완료 ️⛔️");
+        log.info("✅ ⛔️ UserService.userRepository.deleteById [" + user.getUsername() + "] 완료 ️⛔️");
     }
 }

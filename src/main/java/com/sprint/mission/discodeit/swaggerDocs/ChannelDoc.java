@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
-import com.sprint.mission.discodeit.entity.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPrivate;
-import com.sprint.mission.discodeit.entity.dto.Dto_CreateChannelPublic;
-import com.sprint.mission.discodeit.entity.dto.Res_Channel;
-import com.sprint.mission.discodeit.entity.dto.Res_ChannelFind;
+import com.sprint.mission.discodeit.dto.ChannelDto_Update;
+import com.sprint.mission.discodeit.mapper.dto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.mapper.dto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.mapper.dto.ChannelDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,11 +31,11 @@ public interface ChannelDoc {
             responseCode = "200",
             description = "Channel 목록 조회 성공",
             content = @Content(
-                schema = @Schema(implementation = Res_ChannelFind.class, type = "array")
+                schema = @Schema(implementation = ChannelDto.class, type = "array")
             )
         )
     })
-    ResponseEntity<List<Res_ChannelFind>> findAllByUserId(
+    ResponseEntity<List<ChannelDto>> findAllByUserId(
         @Parameter(description = "조회할 User ID") @RequestParam("userId") UUID userId);
 
     /**
@@ -48,12 +47,12 @@ public interface ChannelDoc {
             responseCode = "201",
             description = "Public Channel이 성공적으로 생성됨",
             content = @Content(
-                schema = @Schema(implementation = Res_Channel.class)
+                schema = @Schema(implementation = ChannelDto.class)
             )
         )
     })
-    ResponseEntity<Res_Channel> createPublic(
-        @RequestBody Dto_CreateChannelPublic dtoCreateChannel);
+    ResponseEntity<ChannelDto> createPublic(
+        @RequestBody PublicChannelCreateRequest dtoCreateChannel);
 
     /**
      * POST /api/channels/private - Private Channel 생성
@@ -64,7 +63,7 @@ public interface ChannelDoc {
             responseCode = "201",
             description = "Private Channel이 성공적으로 생성됨",
             content = @Content(
-                schema = @Schema(implementation = Res_Channel.class)
+                schema = @Schema(implementation = ChannelDto.class)
             )
         ),
         @ApiResponse(
@@ -75,8 +74,8 @@ public interface ChannelDoc {
             )
         )
     })
-    ResponseEntity<Res_Channel> createPrivate(
-        @RequestBody Dto_CreateChannelPrivate dtoCreateChannel);
+    ResponseEntity<ChannelDto> createPrivate(
+        @RequestBody PrivateChannelCreateRequest dtoCreateChannel);
 
     /**
      * DELETE /api/channels/{channelId} - Channel 삭제
@@ -107,7 +106,7 @@ public interface ChannelDoc {
             responseCode = "200",
             description = "Channel 정보가 성공적으로 수정됨",
             content = @Content(
-                schema = @Schema(implementation = Res_Channel.class)
+                schema = @Schema(implementation = ChannelDto.class)
             )
         ),
         @ApiResponse(
@@ -125,7 +124,7 @@ public interface ChannelDoc {
             )
         )
     })
-    ResponseEntity<Res_Channel> update(
+    ResponseEntity<ChannelDto> update(
         @Parameter(description = "수정할 Channel ID") @PathVariable("channelId") UUID channelId,
         @RequestBody ChannelDto_Update channelDtoUpdate);
 }

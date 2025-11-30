@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.common;
 
-import static java.util.stream.Collectors.toList;
-
-import com.sprint.mission.discodeit.entity.dto.Dto_BinaryContent;
+import com.sprint.mission.discodeit.dto.Dto_BinaryContent;
 import java.util.List;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,7 +35,7 @@ public class Util {
 
         List<Dto_BinaryContent> dtoFiles = null;
 
-        if (fileList != null) {
+        if (null != fileList) {
             dtoFiles = fileList.stream()
                 .map(Util::parsingMultipartFile)
                 .toList();
