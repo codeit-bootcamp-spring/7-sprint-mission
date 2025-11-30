@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -18,6 +19,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -60,10 +62,12 @@ public class ReadStatusService {
     }
 
     public List<ReadStatusDto> getAllByUserId(UUID id){
+
+
         return readStatusRepository.findAllByUser_Id(id)
                 .stream()
                 .map(mapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
 }

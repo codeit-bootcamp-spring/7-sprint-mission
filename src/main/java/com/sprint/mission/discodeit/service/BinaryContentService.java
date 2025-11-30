@@ -5,10 +5,16 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -30,9 +36,9 @@ public class BinaryContentService {
 
         BinaryContent content =
                 new BinaryContent(
-                        null,
+                        "temp",
+                        "temp",
                         profile.getContentType(),
-                        null,
                         profile.getSize()
                 );
 
@@ -41,6 +47,7 @@ public class BinaryContentService {
         Path filePath = fileManager.put(userId, profile, saved.getId().toString());
         saved.setFileName(saved.getId().toString());
         saved.setFilePath(filePath.toString());
+
 
         return saved;
     }
@@ -70,6 +77,27 @@ public class BinaryContentService {
         return mapper.toDto(binaryContent);
     }
 
+    public ResponseEntity<UrlResource> getUrl(UUID id) {
+        BinaryContent content = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+        Path path = Paths.get(content.getFilePath());
+        UrlResource urlResource;
+        try {
+            urlResource = new UrlResource(path.toUri());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        String contentType = content.getFileType();
+        if(contentType == null || contentType.isBlank()){
+            contentType = "application/octet-stream";
+        }
+        String fileName = content.getFileName();
+
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(urlResource);
+    }
 
 }
 

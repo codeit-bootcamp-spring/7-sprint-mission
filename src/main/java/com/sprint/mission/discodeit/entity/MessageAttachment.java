@@ -12,14 +12,15 @@ import lombok.Setter;
 @Table(name = "message_attachments")
 @Entity
 @NoArgsConstructor
+@AttributeOverride(name = "id", column = @Column(name = "message_attach_id"))
 public class MessageAttachment extends BaseEntity {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "message_id", nullable = false)
     private Message message;
 
-    @OneToOne
-    @Column(name = "attachment_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attachment_id", nullable = false)
     private BinaryContent attachment;
 
     public MessageAttachment(Message message, BinaryContent attachment) {

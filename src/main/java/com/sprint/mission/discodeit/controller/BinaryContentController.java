@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,16 +22,23 @@ public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
     @GetMapping
-    public List<BinaryContentDto> getFile(@RequestParam List<UUID> binaryContentId) {
+    public ResponseEntity<?> getFile(@RequestParam List<UUID> binaryContentId) {
 
-        List<BinaryContent> binaryContents = binaryContentService.getBinaryContents(binaryContentId);
-        return null;
+        List<BinaryContentDto> binaryContents = binaryContentService.getBinaryContents(binaryContentId);
+        return ResponseEntity.status(HttpStatus.OK).body(binaryContents);
     }
 
     @GetMapping("/{binaryContentId}")
-    public BinaryContentDto getFile(@PathVariable UUID binaryContentId) {
-        binaryContentService.getBinaryContent(binaryContentId);
-        return null;
+    public ResponseEntity<BinaryContentDto> getFile(@PathVariable UUID binaryContentId) {
+        BinaryContentDto binaryContent = binaryContentService.getBinaryContent(binaryContentId);
+        return ResponseEntity.status(HttpStatus.OK).body(binaryContent);
+    }
+
+    @GetMapping("/{binaryContentId}/download")
+    public ResponseEntity<UrlResource> download(@PathVariable UUID binaryContentId){
+        return binaryContentService.getUrl(binaryContentId);
+       
+         
     }
 
 

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,22 +10,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "channels")
+@AttributeOverride(name = "id", column = @Column(name = "channel_id"))
 public class Channel extends BaseUpdatableEntity {
 
-    @Column
+    @Column(length = 100)
     private String name;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 100)
     private ChannelType type;
-
-    public Channel(String name, String description, ChannelType type) {
-        this.name = name;
-        this.description = description;
-        this.type = type;
-    }
 }

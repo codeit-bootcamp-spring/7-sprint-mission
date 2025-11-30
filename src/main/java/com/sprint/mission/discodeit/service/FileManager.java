@@ -1,27 +1,53 @@
 package com.sprint.mission.discodeit.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
-@Service
+@Component
 @Slf4j
 @RequiredArgsConstructor
 public class FileManager {
 
     private final Path rootDir = Paths.get("data/uploads"); // 루트 폴더
 
+    @PostConstruct
+    void init() {
+        try {
+            Files.createDirectories(rootDir);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-    public Path put(UUID userId, MultipartFile file, String fileName) {
+//        try {
+//            List<Path> list = Files.walk(rootDir)
+//                    .sorted((a, b) -> b.compareTo(a))
+//                    .toList();// 파일부터 삭제, 폴더 나중에 삭제 (역순 정렬)
+//            for (Path path : list) {
+//                Files.deleteIfExists(path);
+//            }
+//
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+
+    }
+
+    public Path put(UUID userId, MultipartFile file, String binaryContentId) {
         String contentType = file.getContentType();
         validateContentType(contentType);
 
         Path userFolder = getUserFolder(userId);
+        String fileName = makeFileName(file, binaryContentId);
         Path profilePath = userFolder.resolve(fileName);
 
         try {
@@ -61,20 +87,9 @@ public class FileManager {
         }
     }
 
-
-
-
-
-//    public Resource getImageFile(String id) {
-//        BinaryContent content = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
-//        Path path = Paths.get(content.getFilePath());
-//
-//        UrlResource urlResource = null;
-//        try {
-//            urlResource = new UrlResource(path.toUri());
-//        } catch (MalformedURLException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return urlResource;
-//    }
+    private String makeFileName(MultipartFile file, String binaryContentId){
+        int i = file.getOriginalFilename().lastIndexOf(".");
+        String substring = file.getOriginalFilename().substring(i + 1);
+        return binaryContentId+"."+substring;
+    }
 }

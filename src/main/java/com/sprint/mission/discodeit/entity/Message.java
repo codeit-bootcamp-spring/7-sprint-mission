@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,8 +10,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "messages")
+@AttributeOverride(name = "id", column = @Column(name = "message_id"))
 public class Message extends BaseUpdatableEntity {
 
     @ManyToOne
@@ -24,9 +27,5 @@ public class Message extends BaseUpdatableEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    public Message(User user, Channel channel, String content) {
-        this.user = user;
-        this.channel = channel;
-        this.content = content;
-    }
+
 }

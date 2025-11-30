@@ -23,5 +23,7 @@ public abstract class BaseEntity {
     //->디비 서버 기준 시간을 사용하고 싶을 때
     @CreatedDate
     @Column(nullable = false, updatable = false)
+    //updatable은 jpa레벨에서 동작함
+    //디비에는 간단하게 업데이트를 막는 기능은 없음
     private Instant createdAt;
 }

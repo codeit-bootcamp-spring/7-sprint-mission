@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.response.UserDto;
+import com.sprint.mission.discodeit.service.dto.response.UserStatusDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,8 +26,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<?> getAllUsers() {
+        List<UserDto> result = userService.getAllUsers();
+        return ResponseEntity.ok().body(result);
     }
 
     @PostMapping
@@ -37,24 +40,24 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(
+    public ResponseEntity<UserDto> updateUser(
             @PathVariable UUID userId,
             @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile) {
-        User user = userService.updateUserInfo(userId, userUpdateRequest, profile);
-        return null;
+        UserDto userDto = userService.updateUserInfo(userId, userUpdateRequest, profile);
+        return ResponseEntity.status(HttpStatus.OK).body(userDto);
     }
 
 
     @DeleteMapping("/{userId}")
-    public String deleteUser(@PathVariable UUID userId) {
+    public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
         userService.delete(userId);
-        return "삭제완료";
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User가 성공적으로 삭제됨");
     }
 
     @PatchMapping("/{userId}/userStatus")
     public UserStatusDto markOnline(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request) {
-        return userService.markOnline(userId, request.newLastActiveAt());
+        return userService.updateLastActiveAt(userId, request.newLastActiveAt());
     }
 
 }

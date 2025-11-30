@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateReque
 import com.sprint.mission.discodeit.service.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ChannelDto;
 import com.sprint.mission.discodeit.service.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,11 +32,13 @@ import java.util.UUID;
 public class ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
+    private final ReadStatusRepository readStatusRepository;
+
     private final ChannelMapper mapper;
+    private final UserMapper userMapper;
 
-
+    @Transactional
     public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
 
         Channel channel = new Channel(
@@ -44,6 +47,14 @@ public class ChannelService {
                 ChannelType.PUBLIC);
 
         Channel save = channelRepository.save(channel);
+
+        List<ReadStatus> readList = new ArrayList<>();
+        userRepository.findAll()
+                .forEach(user -> {
+                    ReadStatus readStatus = new ReadStatus(user, save, Instant.now());
+                    readList.add(readStatus);
+                });
+        readStatusRepository.saveAll(readList);
         return mapper.toDto(save);
     }
 
@@ -51,6 +62,7 @@ public class ChannelService {
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
 
         Channel channel = new Channel();
+        channel.setName("DM");
         channel.setType(ChannelType.PRIVATE);
         Channel save = channelRepository.save(channel);
 
@@ -84,18 +96,26 @@ public class ChannelService {
 
     @Transactional(readOnly = true)
     public List<ChannelDto> getAllByUser(UUID userId) {
-        List<ChannelDto> list = channelRepository.findAllByType(ChannelType.PUBLIC)
+
+        List<ChannelDto> list = readStatusRepository.findAllByUser_Id(userId)
                 .stream()
-                .map(mapper::toDto)
-                .toList();
-        readStatusRepository.findAllByUser_Id(userId)
-                .stream()
-                .map(readStatus -> mapper.toDto(readStatus.getChannel()))
-                .forEach(list::add);
+                .map(readStatus -> {
+                    if(readStatus.getChannel().getType()==ChannelType.PUBLIC){
+                        return mapper.toDto(readStatus.getChannel());
+                    } else {
+                        List<ReadStatus> allByChannelId = readStatusRepository.findAllByChannel_Id(readStatus.getChannel().getId());
+                        ChannelDto dto = mapper.toDto(readStatus.getChannel());
+                        for (ReadStatus status : allByChannelId) {
+                            dto.getParticipants().add(userMapper.toDto(status.getUser()));
+                        }
+                        return dto;
+                    }
+
+                }).toList();
+
         return list;
+
     }
-
-
 
 
 }
