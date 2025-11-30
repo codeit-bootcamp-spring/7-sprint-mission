@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorInfoRes> handleException(CustomException e,
+  public ResponseEntity<ErrorInfoRes> handleException(Exception e,
       HttpServletRequest request) {
     log.error("[Exception] {} | url={} | method={} | ip={}",
         e.getMessage(),
