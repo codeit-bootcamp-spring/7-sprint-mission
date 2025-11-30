@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.response.UserDetailInfoRes;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -47,6 +48,6 @@ public class UserDetailViewFacade {
     BinaryContentInfoRes profileImg;
     profileImg = BinaryContentMapper.toResDto(user.getProfile());
     UserStatus userStatus = userStatusService.findByUserId(user.getId());
-    return UserDetailInfoRes.from(user, profileImg, userStatus.isOnline());
+    return UserMapper.toDetailResDto(user, profileImg, userStatus.isOnline());
   }
 }

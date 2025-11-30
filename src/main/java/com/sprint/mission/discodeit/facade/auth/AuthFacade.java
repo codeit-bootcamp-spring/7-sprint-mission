@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -36,7 +37,7 @@ public class AuthFacade {
 
     UserStatus userStatus = userStatusService.findByUserId(user.getId());
     userStatusService.updateOfflineAt(userStatus.getId());
-    return UserDetailInfoRes.from(user,
+    return UserMapper.toDetailResDto(user,
         user.getProfile() == null ? null
             : binaryContentService.getBinaryContent(user.getProfile().getId()),
         true);

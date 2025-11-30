@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.BinaryContentFactory;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -46,7 +47,7 @@ public class UserUpdateFacade {
     }
     userStatusService.updateByUserId(userId);
 
-    return UserDetailInfoRes.from(
+    return UserMapper.toDetailResDto(
         user,
         user.getProfile() == null ?
             null : BinaryContentMapper.toResDto(user.getProfile()),
