@@ -34,7 +34,7 @@ public class Channel extends BaseUpdatableEntity {
   private ChannelType publicType;
 
   //Constructor
-  private Channel(UUID managerId, String name, String description, List<UUID> userIds,
+  private Channel(String name, String description, List<UUID> userIds,
       ChannelType publicType) {
     this.name = name;
     this.description = description;
@@ -42,9 +42,8 @@ public class Channel extends BaseUpdatableEntity {
   }
 
   //Factory Method
-  public static Channel createPublic(UUID managerId, String name, String description) {
+  public static Channel createPublic(String name, String description) {
     return new Channel(
-        managerId,
         name,
         description,
         null,
@@ -52,10 +51,9 @@ public class Channel extends BaseUpdatableEntity {
     );
   }
 
-  public static Channel createPrivate(UUID managerId, List<UUID> userIds) {
+  public static Channel createPrivate(List<UUID> userIds) {
     String privateName = "비밀방" + UUID.randomUUID().toString().replace("-", "");
     return new Channel(
-        managerId,
         privateName,
         null,
         userIds,

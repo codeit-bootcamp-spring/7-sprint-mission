@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ChannelCreationFacade {
 
-  private final UserService userService;
   private final ChannelService channelService;
   private final ChannelMemberService channelMemberService;
   private final ChannelMapper channelMapper;
@@ -30,13 +29,16 @@ public class ChannelCreationFacade {
   //공개 채널 추가
   public ChannelInfoRes createPublicChannel(@NonNull UUID managerId,
       @NonNull ChannelCreateReq req) {
-    return channelMapper.toInfoRes(channelService.create(managerId, req));
+    Channel channel = channelService.create(req);
+    channelMemberService.create(
+        channelMemberFactory.create(managerId, channel.getId(), ChannelMemberRole.MANAGER));
+    return channelMapper.toInfoRes(channel);
   }
 
   //비밀 채널 추가
   public ChannelInfoRes createPrivateChannel(@NonNull UUID managerId,
       @NonNull ChannelCreateSecReq req) {
-    Channel channel = channelService.create(managerId, req);
+    Channel channel = channelService.create(req);
     channelMemberService.create(
         channelMemberFactory.create(
             managerId,

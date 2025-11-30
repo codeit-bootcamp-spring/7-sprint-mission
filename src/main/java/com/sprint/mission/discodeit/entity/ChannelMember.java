@@ -54,6 +54,7 @@ public class ChannelMember extends BaseUpdatableEntity {
     this.user = user;
     this.channel = channel;
     this.role = role;
+    this.readAt = Instant.now();
   }
 
   //Factory Method

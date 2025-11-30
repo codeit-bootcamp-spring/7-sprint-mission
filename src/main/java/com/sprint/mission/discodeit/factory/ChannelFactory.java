@@ -12,18 +12,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ChannelFactory {
 
-  public static Channel create(UUID managerId
-      , ChannelCreateReq req) {
+  public Channel create(ChannelCreateReq req) {
     return Channel.createPublic(
-        managerId,
         req.name(),
         req.description()
     );
   }
 
-  public static Channel create(UUID managerId, ChannelCreateSecReq req) {
+  public Channel create(ChannelCreateSecReq req) {
     return Channel.createPrivate(
-        managerId,
         req.userIds()
     );
   }

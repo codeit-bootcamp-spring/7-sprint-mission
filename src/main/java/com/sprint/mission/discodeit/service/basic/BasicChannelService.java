@@ -32,18 +32,19 @@ public class BasicChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   private final ChannelMapper channelMapper;
   private final ChannelMemberRepository channelMemberRepository;
+  private final ChannelFactory channelFactory;
 
   // ===== 🏗️ Domain Logic (Facade 용)  =====
   //채널 생성
   @Override
-  public Channel create(UUID managerId, ChannelCreateReq req) {
-    return channelRepository.save(ChannelFactory.create(managerId, req));
+  public Channel create(ChannelCreateReq req) {
+    return channelRepository.save(channelFactory.create(req));
   }
 
   //채널 생성: 비공개
   @Override
-  public Channel create(UUID managerId, ChannelCreateSecReq req) {
-    return channelRepository.save(ChannelFactory.create(managerId, req));
+  public Channel create(ChannelCreateSecReq req) {
+    return channelRepository.save(channelFactory.create(req));
   }
 
   //채널 삭제

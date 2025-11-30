@@ -13,9 +13,9 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-  Channel create(UUID managerId, ChannelCreateReq req);
+  Channel create(ChannelCreateReq req);
 
-  Channel create(UUID managerId, ChannelCreateSecReq req);
+  Channel create(ChannelCreateSecReq req);
 
   ChannelPublicInfoRes update(UUID id,
       ChannelUpdateReq req);
