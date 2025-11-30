@@ -37,13 +37,13 @@ public class Message extends BaseUpdatableEntity {
       joinColumns = @JoinColumn(name = "message_id"),
       inverseJoinColumns = @JoinColumn(name = "attachment_id")
   )
-  private List<BinaryContent> attachments;
+  private List<BinaryContent> attachments = new ArrayList<>();
 
-  public Message(String content, Channel channel, User author) {
+  public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
     this.content = content;
     this.channel = channel;
     this.author = author;
-    this.attachments = new ArrayList<>();
+    this.attachments = attachments;
   }
 
   public void messageUpdate(String content) {

@@ -15,7 +15,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import java.time.Instant;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +34,7 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
   private final ChannelRepository channelRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   private final UserMapper userMapper;
 
@@ -51,17 +52,18 @@ public class BasicUserService implements UserService {
         .map(profileRequest -> {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
+          Long size = profileRequest.size();
           byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
 
+          BinaryContent binaryContent = new BinaryContent(fileName, size, contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
           return binaryContent;
         })
         .orElse(null);
 
     User user = new User(
         createUserDto.username(), createUserDto.email(), createUserDto.password(), profile);
-    UserStatus userStatus = new UserStatus(user, Instant.now());
     userRepository.save(user);
 
     return userMapper.toResponseDto(user);
@@ -101,11 +103,12 @@ public class BasicUserService implements UserService {
 
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
+          Long size = profileRequest.size();
           byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          binaryContentRepository.save(binaryContent);
 
+          BinaryContent binaryContent = new BinaryContent(fileName, size, contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
           return binaryContent;
         })
         .orElse(null);

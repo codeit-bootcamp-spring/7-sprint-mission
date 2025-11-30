@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
@@ -11,15 +12,20 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.CustomException;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +40,9 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
 
   private final MessageMapper messageMapper;
+  private final BinaryContentStorage binaryContentStorage;
+  private final PageResponseMapper pageResponseMapper;
+
 
   @Override
   public MessageResponseDto createMessage(CreateMessageDto createMessageDto,
@@ -45,24 +54,24 @@ public class BasicMessageService implements MessageService {
     Channel channel = channelRepository.findById(createMessageDto.channelId())
         .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
-    List<UUID> binaryContentIds;
+    List<BinaryContent> attachments;
     if (createBinaryContentDtos == null) {
-      binaryContentIds = new ArrayList<>();
+      attachments = new ArrayList<>();
     } else {
-      binaryContentIds = createBinaryContentDtos.stream().map(
+      attachments = createBinaryContentDtos.stream().map(
           createBinaryContentDto -> {
             BinaryContent binaryContent = new BinaryContent(
                 createBinaryContentDto.fileName(),
                 createBinaryContentDto.size(),
-                createBinaryContentDto.contentType(),
-                createBinaryContentDto.bytes());
+                createBinaryContentDto.contentType());
             binaryContentRepository.save(binaryContent);
-            return binaryContent.getId();
+            binaryContentStorage.put(binaryContent.getId(), createBinaryContentDto.bytes());
+            return binaryContent;
           }
       ).toList();
     }
 
-    Message message = new Message(createMessageDto.content(), channel, user);
+    Message message = new Message(createMessageDto.content(), channel, user, attachments);
     messageRepository.save(message);
 
     return messageMapper.toResponseDto(message);
@@ -84,10 +93,21 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<MessageResponseDto> getAllMessageByChannelId(UUID channelID) {
-    return messageRepository.findAllByChannelId(channelID).stream()
-        .map(messageMapper::toResponseDto)
-        .toList();
+  public PageResponse<MessageResponseDto> getAllMessageByChannelId(UUID channelID,
+      Instant createdAt,
+      Pageable pageable) {
+    Instant cursor = (createdAt == null) ? Instant.now() : createdAt;
+    Slice<MessageResponseDto> slice = messageRepository
+        .findAllByChannelId(channelID, cursor, pageable)
+        .map(messageMapper::toResponseDto);
+
+    Instant nextCursor = null;
+    if (!slice.getContent().isEmpty()) {
+      nextCursor = slice.getContent().get(slice.getContent().size() - 1).createdAt();
+    }
+
+    return pageResponseMapper.toSliceResponseDto(slice, nextCursor);
+
   }
 
   @Override
