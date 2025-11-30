@@ -70,6 +70,7 @@ public class BasicChannelMemberService implements ChannelMemberService {
 
   // ===== 🎯 Controller Direct (DTO 반환) =====
   @Override
+  @Transactional(readOnly = true)
   public ChannelMemberInfoRes findById(UUID id) {
     ChannelMember channelMember = channelMemberRepository.findById(id).orElseThrow(() ->
         new CustomException(ErrorCode.READSTATUS_NOT_FOUND));

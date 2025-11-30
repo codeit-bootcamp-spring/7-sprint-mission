@@ -33,6 +33,7 @@ public class AuthFacade {
     if (!user.getPassword().equals(req.password())) {
       throw new CustomException(ErrorCode.INVALID_PASSWORD);
     }
+
     UserStatus userStatus = userStatusService.findByUserId(user.getId());
     userStatusService.updateOfflineAt(userStatus.getId());
     return UserDetailInfoRes.from(user,

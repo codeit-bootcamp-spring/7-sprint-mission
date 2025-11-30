@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -45,11 +46,13 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   // ===== 🎯 Controller Direct (DTO 반환) ======
   @Override
+  @Transactional(readOnly = true)
   public BinaryContentInfoRes getBinaryContent(UUID id) {
     return BinaryContentInfoRes.from(findById(id));
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<BinaryContentInfoRes> getBinaryContentList(List<UUID> binaryContentIdList) {
     return findAll().stream()
         .filter(bc -> binaryContentIdList.contains(bc.getId()))

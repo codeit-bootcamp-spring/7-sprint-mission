@@ -36,6 +36,7 @@ public class BasicUserService implements UserService {
 
   //메일로 임시 비밀번호 발송 및 임시 비밀번호 발급
   @Override
+  @Transactional
   public void sendEmailTemporaryPassword(String email, String nickname) {
     User user = userRepository.findByEmail(email).orElseThrow(
         () -> new CustomException(ErrorCode.USER_NOT_FOUND)

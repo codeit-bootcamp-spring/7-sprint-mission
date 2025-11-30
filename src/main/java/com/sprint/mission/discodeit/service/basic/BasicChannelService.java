@@ -83,6 +83,7 @@ public class BasicChannelService implements ChannelService {
   // ===== 🔧 Controller Direct (단일 도메인 / void) =====
   //채널 수정
   @Override
+  @Transactional
   public ChannelPublicInfoRes update(@NonNull UUID id, @NonNull ChannelUpdateReq req) {
     Channel channel = channelRepository.findById(id).orElseThrow(
         () -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND)
