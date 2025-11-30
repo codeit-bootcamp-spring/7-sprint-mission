@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.controller.doc.UserDocs;
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
-import com.sprint.mission.discodeit.dto.user.response.CreateUserResponseDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponseDto;
@@ -38,12 +37,12 @@ public class UserController implements UserDocs {
   private final UserStatusService userStatusService;
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<CreateUserResponseDto> createUser(
+  public ResponseEntity<UserResponseDto> createUser(
       @Valid @RequestPart(value = "userCreateRequest") CreateUserDto userDto,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
 
     Optional<CreateBinaryContentDto> createBinaryContentDto = CreateBinaryContentDto.of(profile);
-    CreateUserResponseDto userResponseDto = userService.createUser(userDto, createBinaryContentDto);
+    UserResponseDto userResponseDto = userService.createUser(userDto, createBinaryContentDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
   }
 
@@ -60,12 +59,12 @@ public class UserController implements UserDocs {
   }
 
   @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<CreateUserResponseDto> updateUser(@PathVariable UUID userId,
+  public ResponseEntity<UserResponseDto> updateUser(@PathVariable UUID userId,
       @RequestPart(value = "userUpdateRequest") UpdateUserDto updateUserDto,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
 
     Optional<CreateBinaryContentDto> createBinaryContentDto = CreateBinaryContentDto.of(profile);
-    CreateUserResponseDto createUserResponseDto = userService.updateUser(userId, updateUserDto,
+    UserResponseDto createUserResponseDto = userService.updateUser(userId, updateUserDto,
         createBinaryContentDto);
     return ResponseEntity.status(HttpStatus.OK).body(createUserResponseDto);
   }
