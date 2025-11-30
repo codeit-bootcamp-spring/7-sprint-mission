@@ -44,7 +44,7 @@ public class BasicChannelMemberService implements ChannelMemberService {
 
   @Override
   public void delete(UUID id) {
-    if (channelMemberRepository.existsById(id)) {
+    if (!channelMemberRepository.existsById(id)) {
       throw new CustomException(ErrorCode.READSTATUS_NOT_FOUND);
     }
     channelMemberRepository.deleteById(id);

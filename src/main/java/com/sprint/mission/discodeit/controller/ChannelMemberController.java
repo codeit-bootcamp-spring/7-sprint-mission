@@ -10,6 +10,7 @@ import java.net.URI;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,7 @@ public class ChannelMemberController implements ReadStateControllerDocs {
       @RequestBody ChannelMemberCreateReq req) {
     ChannelMember channelMember = channerMemberCreateFacade.create(req);
 
-    return ResponseEntity.created(URI.create("/api/channel-members" + channelMember.getId()))
+    return ResponseEntity.created(URI.create("/api/channel-members/" + channelMember.getId()))
         .body(ChannelMemberInfoRes.from(channelMember));
   }
 
@@ -47,5 +48,11 @@ public class ChannelMemberController implements ReadStateControllerDocs {
   @GetMapping("/{readStatusId}")
   public ResponseEntity<ChannelMemberInfoRes> getReadStatus(@PathVariable UUID readStatusId) {
     return ResponseEntity.ok(channelMemberService.findById(readStatusId));
+  }
+
+  @DeleteMapping("/{readStatusId}")
+  public ResponseEntity<Void> deleteReadStatus(@PathVariable UUID readStatusId) {
+    channelMemberService.delete(readStatusId);
+    return ResponseEntity.noContent().build();
   }
 }
