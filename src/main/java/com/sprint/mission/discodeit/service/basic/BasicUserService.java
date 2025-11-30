@@ -144,10 +144,10 @@ public class BasicUserService implements UserService {
 
   //기존 유저 회원 정보 수정 시 중복 검사
   private void validateDuplicate(UUID userId, String email, String nickname) {
-    if (!userRepository.existsByIdAndEmail(userId, email)) {
+    if (userRepository.existsByIdNotAndEmail(userId, email)) {
       throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
     }
-    if (!userRepository.existsByIdAndNickname(userId, nickname)) {
+    if (userRepository.existsByIdNotAndNickname(userId, nickname)) {
       throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
     }
   }
