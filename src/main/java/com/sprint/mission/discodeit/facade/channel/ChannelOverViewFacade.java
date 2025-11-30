@@ -26,7 +26,6 @@ public class ChannelOverViewFacade {
   public Map<ChannelType, List<ChannelInfoRes>> findAllMyChannels(@NonNull UUID userId,
       String searchTxt) {
     boolean hasSearch = (searchTxt != null) && (!searchTxt.trim().isEmpty());
-
     return channelService.findAllByUserId(userId).entrySet().stream()
         .collect(Collectors.toMap(
             Map.Entry::getKey,

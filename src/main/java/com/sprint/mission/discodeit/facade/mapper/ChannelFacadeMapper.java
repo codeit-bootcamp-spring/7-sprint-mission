@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.mapper.ChannelDtoMapper;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelMemberService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
@@ -30,10 +30,10 @@ public class ChannelFacadeMapper {
         .map(cm -> cm.getUser().getId()).toList();
 
     return switch (channel.getPublicType()) {
-      case PUBLIC -> ChannelDtoMapper.toResDto(
+      case PUBLIC -> ChannelMapper.toResDto(
           channel, manager.getId(), lastMessageTime
       );
-      case PRIVATE -> ChannelDtoMapper.toResDto(
+      case PRIVATE -> ChannelMapper.toResDto(
           channel, manager.getId(), memberIds, lastMessageTime);
       default -> throw new CustomException(ErrorCode.INVALID_CHANNEL_TYPE);
     };

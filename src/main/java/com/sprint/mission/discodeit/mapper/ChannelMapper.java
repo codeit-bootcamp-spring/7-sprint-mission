@@ -12,9 +12,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ChannelDtoMapper {
+public class ChannelMapper {
 
-  public static ChannelInfoRes toResDto(Channel channel, UUID managerId, Instant lastMessageTime) {
+  public static ChannelInfoRes toResDto(
+      Channel channel,
+      UUID managerId,
+      Instant lastMessageTime) {
     return new ChannelPublicInfoRes(
         channel.getId(),
         channel.getPublicType().getValue(),

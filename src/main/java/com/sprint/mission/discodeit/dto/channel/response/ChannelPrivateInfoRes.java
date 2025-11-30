@@ -15,18 +15,4 @@ public record ChannelPrivateInfoRes(
     Instant lastMessageTime            //가장 최근 메세지의 시간정보
 ) implements ChannelInfoRes {
 
-  public static ChannelPrivateInfoRes from(
-      Channel channel,
-      UUID managerId,
-      List<UUID> userIds,
-      Instant lastMessageTime) {
-    return new ChannelPrivateInfoRes(
-        channel.getId(),
-        channel.getPublicType().getValue(),
-        channel.getName(),
-        managerId,
-        userIds,
-        lastMessageTime
-    );
-  }
 }

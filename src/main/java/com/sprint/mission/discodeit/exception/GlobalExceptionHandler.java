@@ -52,12 +52,13 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorInfoRes> handleCustomException(CustomException e,
       HttpServletRequest request) {
     ErrorCode errorCode = e.getErrorCode();
-    log.error("[CustomException] {} - {} | url={} | method={} | ip={}",
+    log.error("[CustomException] {} - {} | url={} | method={} | ip={} \n",
         errorCode.getCode(),
         errorCode.getMessage(),
         request.getRequestURI(),
         request.getMethod(),
         request.getRemoteAddr()
+        , e  // stack trace 포함
     );
     return ResponseEntity
         .status(errorCode.getStatus())

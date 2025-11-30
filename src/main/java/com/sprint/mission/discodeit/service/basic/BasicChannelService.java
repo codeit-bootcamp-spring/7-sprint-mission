@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.facade.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.facade.mapper.ChannelFacadeMapper;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ChannelMemberRepository;
@@ -30,7 +30,7 @@ public class BasicChannelService implements ChannelService {
 
   //레포지토리
   private final ChannelRepository channelRepository;
-  private final ChannelMapper channelMapper;
+  private final ChannelFacadeMapper channelFacadeMapper;
   private final ChannelMemberRepository channelMemberRepository;
   private final ChannelFactory channelFactory;
 
@@ -93,6 +93,6 @@ public class BasicChannelService implements ChannelService {
       throw new CustomException(ErrorCode.CHANNEL_PRIVATE_CANNOT_MODIFY);
     }
     channel.update(req.name(), req.description());
-    return (ChannelPublicInfoRes) channelMapper.toInfoRes(channel);
+    return (ChannelPublicInfoRes) channelFacadeMapper.toInfoRes(channel);
   }
 }

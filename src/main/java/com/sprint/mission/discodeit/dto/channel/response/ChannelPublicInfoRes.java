@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.dto.channel.response;
 
-import com.sprint.mission.discodeit.entity.Channel;
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -14,15 +12,4 @@ public record ChannelPublicInfoRes(
     Instant lastMessageTime
 ) implements ChannelInfoRes {
 
-  public static ChannelPublicInfoRes from(Channel channel, UUID managerId,
-      Instant lastMessageTime) {
-    return new ChannelPublicInfoRes(
-        channel.getId(),
-        channel.getPublicType().getValue(),
-        managerId,
-        channel.getName(),
-        channel.getDescription(),
-        lastMessageTime
-    );
-  }
 }
