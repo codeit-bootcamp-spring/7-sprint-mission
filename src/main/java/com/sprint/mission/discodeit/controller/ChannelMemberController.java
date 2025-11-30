@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.channelmember.request.ChannelMemberCreat
 import com.sprint.mission.discodeit.dto.channelmember.response.ChannelMemberInfoRes;
 import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.facade.channelmember.ChannerMemberCreateFacade;
+import com.sprint.mission.discodeit.mapper.ChannelMemberMapper;
 import com.sprint.mission.discodeit.service.ChannelMemberService;
 import java.net.URI;
 import java.util.UUID;
@@ -34,14 +35,14 @@ public class ChannelMemberController implements ReadStateControllerDocs {
     ChannelMember channelMember = channerMemberCreateFacade.create(req);
 
     return ResponseEntity.created(URI.create("/api/channel-members/" + channelMember.getId()))
-        .body(ChannelMemberInfoRes.from(channelMember));
+        .body(ChannelMemberMapper.toResDto(channelMember));
   }
 
   //메세지 수신 정보 업데이트
   @PatchMapping("/{readStatusId}")
   public ResponseEntity<ChannelMemberInfoRes> updateReadStatus(@PathVariable UUID readStatusId) {
     ChannelMember channelMember = channelMemberService.update(readStatusId);
-    return ResponseEntity.ok(ChannelMemberInfoRes.from(channelMember));
+    return ResponseEntity.ok(ChannelMemberMapper.toResDto(channelMember));
   }
 
   //메세지 수신 정보 조회

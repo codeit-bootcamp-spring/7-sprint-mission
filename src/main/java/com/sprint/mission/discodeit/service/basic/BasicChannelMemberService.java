@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.entity.ChannelMemberRole;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.ChannelMemberMapper;
 import com.sprint.mission.discodeit.repository.ChannelMemberRepository;
 import com.sprint.mission.discodeit.service.ChannelMemberService;
 import java.util.List;
@@ -75,6 +76,6 @@ public class BasicChannelMemberService implements ChannelMemberService {
   public ChannelMemberInfoRes findById(UUID id) {
     ChannelMember channelMember = channelMemberRepository.findById(id).orElseThrow(() ->
         new CustomException(ErrorCode.READSTATUS_NOT_FOUND));
-    return ChannelMemberInfoRes.from(channelMember);
+    return ChannelMemberMapper.toResDto(channelMember);
   }
 }
