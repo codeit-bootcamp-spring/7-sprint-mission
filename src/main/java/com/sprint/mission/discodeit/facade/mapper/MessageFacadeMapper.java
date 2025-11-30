@@ -4,13 +4,13 @@ import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfo
 import com.sprint.mission.discodeit.dto.message.response.MessageViewRes;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class MessageFacadeMapper {
   public MessageViewRes mapToView(@NonNull Message message) {
     List<BinaryContentInfoRes> imgs = message.getAttachments().stream()
         .map(BinaryContentMapper::toResDto).toList();
-    return MessageViewRes.from(
+    return MessageMapper.toResDto(
         message,
         imgs
     );
