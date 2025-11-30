@@ -21,7 +21,11 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
 
-
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: data/uploads
 
 springdoc:
   swagger-ui:

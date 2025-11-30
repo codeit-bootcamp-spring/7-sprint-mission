@@ -21,6 +21,7 @@ public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
+
     @GetMapping
     public ResponseEntity<?> getFile(@RequestParam List<UUID> binaryContentId) {
 

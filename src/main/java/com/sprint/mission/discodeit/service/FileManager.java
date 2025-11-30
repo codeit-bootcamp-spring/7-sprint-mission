@@ -1,23 +1,40 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class FileManager {
+@ConditionalOnProperty(prefix = "discodeit.storage", name = "type", havingValue = "local", matchIfMissing = true)
+public class FileManager{
 
-    private final Path rootDir = Paths.get("data/uploads"); // 루트 폴더
+    @Value("${discodeit.storage.local.root-path}")
+    private String ROOT_PATH;
+
+    private final Path rootDir = Paths.get(ROOT_PATH); // 루트 폴더
+
+    private final BinaryContentRepository binaryContentRepository;
 
     @PostConstruct
     void init() {
@@ -58,6 +75,29 @@ public class FileManager {
         }
         return profilePath;
     }
+
+    public ResponseEntity<UrlResource> getUrl(UUID id) {
+        BinaryContent content = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+        Path path = Paths.get(content.getFilePath());
+        UrlResource urlResource;
+        try {
+            urlResource = new UrlResource(path.toUri());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        String contentType = content.getFileType();
+        if(contentType == null || contentType.isBlank()){
+            contentType = "application/octet-stream";
+        }
+        String fileName = content.getFileName();
+
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(urlResource);
+    }
+
 
     public void delete(Path filePath) {
         try {

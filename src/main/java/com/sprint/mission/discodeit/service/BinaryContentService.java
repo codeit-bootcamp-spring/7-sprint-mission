@@ -77,26 +77,8 @@ public class BinaryContentService {
         return mapper.toDto(binaryContent);
     }
 
-    public ResponseEntity<UrlResource> getUrl(UUID id) {
-        BinaryContent content = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
-        Path path = Paths.get(content.getFilePath());
-        UrlResource urlResource;
-        try {
-            urlResource = new UrlResource(path.toUri());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-        String contentType = content.getFileType();
-        if(contentType == null || contentType.isBlank()){
-            contentType = "application/octet-stream";
-        }
-        String fileName = content.getFileName();
-
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-                .body(urlResource);
+    public ResponseEntity<UrlResource> getUrl(UUID binaryContentId){
+        return fileManager.getUrl(binaryContentId);
     }
 
 }

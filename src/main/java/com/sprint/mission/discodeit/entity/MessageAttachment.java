@@ -19,7 +19,7 @@ public class MessageAttachment extends BaseEntity {
     @JoinColumn(name = "message_id", nullable = false)
     private Message message;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "attachment_id", nullable = false)
     private BinaryContent attachment;
 
