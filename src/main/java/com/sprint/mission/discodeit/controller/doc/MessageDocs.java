@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.doc;
 
+import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
@@ -17,7 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -64,9 +65,9 @@ public interface MessageDocs {
               mediaType = "*/*",
               array = @ArraySchema(schema = @Schema(implementation = MessageResponseDto.class))))
   })
-  ResponseEntity<List<MessageResponseDto>> getAllMessagesByChannelId(
+  ResponseEntity<PageResponse<MessageResponseDto>> getAllMessagesByChannelId(
       @RequestParam UUID channelId,
       @RequestParam(required = false) Instant cursor,
-      @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+      @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC) Pageable pageable
   );
 }
