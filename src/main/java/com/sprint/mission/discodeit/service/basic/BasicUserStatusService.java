@@ -43,14 +43,12 @@ public class BasicUserStatusService implements UserStatusService {
 
   // ===== 🔧 Controller Direct (단일 도메인 / void) =====
   @Override
-  @Transactional
   public void updateOfflineAt(@NonNull UUID id) {
     UserStatus userStatus = findByUserId(id);
     userStatus.updateOfflineAt();
   }
 
   @Override
-  @Transactional
   public void update(@NonNull UUID id) {
     UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(
         () -> new CustomException(ErrorCode.USERSTATUS_NOT_FOUND)
@@ -59,7 +57,6 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  @Transactional
   public void updateByUserId(@NonNull UUID userId) {
     UserStatus userStatus = findByUserId(userId);
     findByUserId(userId).update();

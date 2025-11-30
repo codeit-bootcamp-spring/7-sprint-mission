@@ -33,7 +33,6 @@ public class BasicChannelMemberService implements ChannelMemberService {
   }
 
   @Override
-  @Transactional
   public ChannelMember update(UUID id) {
     ChannelMember channelMember = channelMemberRepository.findById(id).orElseThrow(
         () -> new CustomException(ErrorCode.READSTATUS_NOT_FOUND)
