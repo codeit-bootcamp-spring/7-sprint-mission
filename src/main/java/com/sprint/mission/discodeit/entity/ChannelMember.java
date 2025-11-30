@@ -20,7 +20,7 @@ import java.time.Instant;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(
-    name = "read_statuses",
+    name = "channel_members",
     uniqueConstraints = @UniqueConstraint(
         name = "ux_read_user_channel",
         columnNames = {"user_id", "channel_id"}
