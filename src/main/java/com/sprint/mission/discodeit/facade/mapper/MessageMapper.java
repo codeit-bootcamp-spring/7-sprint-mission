@@ -22,7 +22,6 @@ public class MessageMapper {
   public MessageViewRes mapToView(@NonNull Message message) {
     List<BinaryContentInfoRes> imgs = message.getAttachments().stream()
         .map(BinaryContentInfoRes::from).toList();
-
     return MessageViewRes.from(
         message,
         imgs

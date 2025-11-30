@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -37,7 +39,7 @@ public class Message extends BaseUpdatableEntity {
   @Column(name = "content", columnDefinition = "TEXT")
   private String content;                   //메세지 내용
 
-  @OneToMany
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id", foreignKey = @ForeignKey(name = "fk_msg_attachment_msg")),
@@ -51,6 +53,7 @@ public class Message extends BaseUpdatableEntity {
     this.channel = channel;
     this.speaker = speaker;
     this.content = content;
+    this.attachments = attachments;
   }
 
   //Factory

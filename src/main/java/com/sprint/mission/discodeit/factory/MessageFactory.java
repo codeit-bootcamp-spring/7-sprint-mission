@@ -25,7 +25,6 @@ public class MessageFactory {
 
     User speaker = userService.findById(speakerId);
     Channel channel = channelService.findById(channelId);
-
     return Message.create(
         channel,
         speaker,
