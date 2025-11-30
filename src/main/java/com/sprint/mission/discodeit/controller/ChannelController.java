@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.facade.channel.ChannelCreationFacade;
 import com.sprint.mission.discodeit.facade.channel.ChannelDeleteFacade;
 import com.sprint.mission.discodeit.facade.channel.ChannelDetailViewFacade;
 import com.sprint.mission.discodeit.facade.channel.ChannelOverViewFacade;
+import com.sprint.mission.discodeit.facade.channel.ChannelUpdateFacade;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
@@ -43,6 +44,7 @@ public class ChannelController implements ChannelControllerDocs {
   private final ChannelCreationFacade channelCreationFacade;
   private final ChannelOverViewFacade channelOverViewFacade;
   private final ChannelDeleteFacade channelDeleteFacade;
+  private final ChannelUpdateFacade channelUpdateFacade;
   private final ChannelService channelService;
 
   //채널 목록 조회 : 공개방은 전부, 비밀방은 내 기준 참여되어있는 것 기준
@@ -80,9 +82,9 @@ public class ChannelController implements ChannelControllerDocs {
 
   //공개 채널 수정
   @PatchMapping("/{channelId}")
-  public ResponseEntity<ChannelPublicInfoRes> updatePublicChannel(@PathVariable UUID channelId,
-      @RequestBody ChannelUpdateReq req) {
-    return ResponseEntity.ok(channelService.update(channelId, req));
+  public ResponseEntity<ChannelInfoRes> updatePublicChannel(@PathVariable UUID channelId,
+      @Valid @RequestBody ChannelUpdateReq req) {
+    return ResponseEntity.ok(channelUpdateFacade.update(channelId, req));
   }
 
   //채널 삭제

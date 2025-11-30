@@ -199,7 +199,7 @@ public interface ChannelControllerDocs {
           )
       }
   )
-  ResponseEntity<ChannelPublicInfoRes> updatePublicChannel(@PathVariable UUID channelId,
+  ResponseEntity<ChannelInfoRes> updatePublicChannel(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateReq req);
 
   @Operation(summary = "Channel 삭제")

@@ -17,7 +17,7 @@ public interface ChannelService {
 
   Channel create(ChannelCreateSecReq req);
 
-  ChannelPublicInfoRes update(UUID id,
+  Channel update(UUID id,
       ChannelUpdateReq req);
 
   void delete(UUID id);
