@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,7 +23,7 @@ import java.util.UUID;
 public class UserStatus extends BaseUpdatableEntity {
 
   //Field
-  @OneToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "user_id", unique = true, nullable = false,
       foreignKey = @ForeignKey(name = "fk_user_status_user"))
   private User user;      //접속자 UUID
