@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -23,21 +25,10 @@ public class Channel extends BaseEntity {
     @Column(nullable = false)
     private ChannelType type;
 
-    // 공개채널: 설명, 비공개채널: null
     @Column(length = 200)
     private String description;
 
-    // 비공개채널의 경우 생성자/메서드에서 참여자 관리 (별도 테이블 존재 가능)
-    // ...필요시 양방향 매핑 구성
-
-    public Channel(String name, ChannelType type, String description) {
-        this.name = name;
-        this.type = type;
-        this.description = description;
-    }
-
-    public void update(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
+    // Channel ↔ Message (1:N)
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages = new ArrayList<>();
 }
