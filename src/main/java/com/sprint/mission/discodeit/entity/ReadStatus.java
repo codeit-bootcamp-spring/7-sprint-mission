@@ -1,40 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
+@Table(name = "read_statuses")
 @Getter
-public class ReadStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+public class ReadStatus extends BaseEntity {
+    @Id
+    @GeneratedValue
     private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
+
+    @Column(nullable = false)
     private UUID userId;
+
+    @Column(nullable = false)
     private UUID channelId;
+
+    @Column(nullable = false)
     private Instant lastReadAt;
 
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
         this.userId = userId;
         this.channelId = channelId;
         this.lastReadAt = lastReadAt;
     }
 
     public void update(Instant newLastReadAt) {
-        boolean anyValueUpdated = false;
-        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
-            this.lastReadAt = newLastReadAt;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+        this.lastReadAt = newLastReadAt;
     }
 }

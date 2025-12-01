@@ -1,30 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
+@Table(name = "messages")
 @Getter
-public class Message implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+@NoArgsConstructor
+public class Message extends BaseEntity {
+    @Id
+    @GeneratedValue
     private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
+
+    @Column(nullable = false, length = 2000)
     private String content;
-    //
+
+    @Column(nullable = false)
     private UUID channelId;
+
+    @Column(nullable = false)
     private UUID authorId;
-    private List<UUID> attachmentIds;
+
+    // 첨부파일 ID 리스트(JSON or 1:N 테이블로 분리 가능)
+    @ElementCollection
+    @CollectionTable(name = "message_attachments", joinColumns = @JoinColumn(name = "message_id"))
+    @Column(name = "attachment_id")
+    private List<UUID> attachmentIds = new ArrayList<>();
 
     public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
@@ -32,14 +41,6 @@ public class Message implements Serializable {
     }
 
     public void update(String newContent) {
-        boolean anyValueUpdated = false;
-        if (newContent != null && !newContent.equals(this.content)) {
-            this.content = newContent;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+        this.content = newContent;
     }
 }

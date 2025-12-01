@@ -28,7 +28,7 @@ public class BasicMessageService implements MessageService {
 
     // 1. MultipartFile용 create(컨트롤러가 호출)
     @Override
-    public Message create(MessageCreateRequest messageCreateRequest, List<MultipartFile> attachments) {
+    public Message createFromMultipart(MessageCreateRequest messageCreateRequest, List<MultipartFile> attachments) {
         List<BinaryContentCreateRequest> attachmentRequests = attachments == null ? List.of()
                 : attachments.stream()
                 .map(file -> {

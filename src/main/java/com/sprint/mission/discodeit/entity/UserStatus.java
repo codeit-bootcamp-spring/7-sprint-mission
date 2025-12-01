@@ -1,45 +1,36 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+public class UserStatus extends BaseEntity {
+    @Id
+    @GeneratedValue
     private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
+
+    @Column(nullable = false)
     private UUID userId;
+
+    @Column(nullable = false)
     private Instant lastActiveAt;
 
+    // online 계산: lastActiveAt ~ now < 임계값으로 서비스단에서 제공
+
     public UserStatus(UUID userId, Instant lastActiveAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
         this.userId = userId;
         this.lastActiveAt = lastActiveAt;
     }
 
-    public void update(Instant lastActiveAt) {
-        boolean anyValueUpdated = false;
-        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
-            this.lastActiveAt = lastActiveAt;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
-    }
-
-    public Boolean isOnline() {
-        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
-
-        return lastActiveAt.isAfter(instantFiveMinutesAgo);
+    public void update(Instant newLastActiveAt) {
+        this.lastActiveAt = newLastActiveAt;
     }
 }

@@ -1,55 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.UUID;
 
+@Entity
+@Table(name = "users")
 @Getter
-public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+@NoArgsConstructor
+public class User extends BaseEntity {
+    @Id
+    @GeneratedValue
     private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
+
+    @Column(nullable = false, unique = true, length = 30)
     private String username;
+
+    @Column(nullable = false, unique = true, length = 50)
     private String email;
+
+    @Column(nullable = false)
     private String password;
-    private UUID profileId;     // BinaryContent
+
+    // profile image가 있다면 BinaryContent로 연결(Nullable)
+    @Column
+    private UUID profileId;
 
     public User(String username, String email, String password, UUID profileId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
         this.username = username;
         this.email = email;
         this.password = password;
         this.profileId = profileId;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
-        boolean anyValueUpdated = false;
-        if (newUsername != null && !newUsername.equals(this.username)) {
-            this.username = newUsername;
-            anyValueUpdated = true;
-        }
-        if (newEmail != null && !newEmail.equals(this.email)) {
-            this.email = newEmail;
-            anyValueUpdated = true;
-        }
-        if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
-            anyValueUpdated = true;
-        }
-        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-            this.profileId = newProfileId;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+    public void update(String username, String email, String password, UUID profileId) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.profileId = profileId;
     }
 }

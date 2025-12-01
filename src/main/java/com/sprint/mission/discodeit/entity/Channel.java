@@ -1,44 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.UUID;
 
+@Entity
+@Table(name = "channels")
 @Getter
-public class Channel implements Serializable {
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+public class Channel extends BaseEntity {
+    @Id
+    @GeneratedValue
     private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
-    private ChannelType type;
+
+    @Column(nullable = false, length = 50)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ChannelType type;
+
+    // 공개채널: 설명, 비공개채널: null
+    @Column(length = 200)
     private String description;
 
-    public Channel(ChannelType type, String name, String description) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
-        this.type = type;
+    // 비공개채널의 경우 생성자/메서드에서 참여자 관리 (별도 테이블 존재 가능)
+    // ...필요시 양방향 매핑 구성
+
+    public Channel(String name, ChannelType type, String description) {
         this.name = name;
+        this.type = type;
         this.description = description;
     }
 
-    public void update(String newName, String newDescription) {
-        boolean anyValueUpdated = false;
-        if (newName != null && !newName.equals(this.name)) {
-            this.name = newName;
-            anyValueUpdated = true;
-        }
-        if (newDescription != null && !newDescription.equals(this.description)) {
-            this.description = newDescription;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+    public void update(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 }
