@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -42,3 +43,5 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
         return data.remove(Objects.requireNonNull(id)) != null;
     }
 }
+
+ */

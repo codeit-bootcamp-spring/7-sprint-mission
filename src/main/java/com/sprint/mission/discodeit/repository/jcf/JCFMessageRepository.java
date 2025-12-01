@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
@@ -83,3 +84,5 @@ public class JCFMessageRepository implements MessageRepository {
                 .toList();
     }
 }
+
+ */

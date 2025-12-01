@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
@@ -114,3 +115,5 @@ public class FileUserRepository implements UserRepository {
                 .findFirst();
     }
 }
+
+ */

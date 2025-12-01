@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -115,3 +116,5 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         return before - cache.size();
     }
 }
+
+ */

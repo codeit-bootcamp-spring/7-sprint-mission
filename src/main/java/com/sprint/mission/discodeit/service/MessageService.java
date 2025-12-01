@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.response.page.PageResponseDto;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -19,4 +21,5 @@ public interface MessageService {
     List<MessageResponseDto> getMessagesByAuthor(UUID authorId);
     List<MessageResponseDto> getMessagesByChannelAndAuthor(UUID channelId, UUID authorId);
     List<MessageResponseDto> searchByKeyword(String keyword);
+    PageResponseDto<MessageResponseDto> getPageByChannelId(UUID channelId, Pageable pageable);
 }

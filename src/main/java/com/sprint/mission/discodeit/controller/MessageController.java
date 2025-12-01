@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.response.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.response.message.MessageResponseDto;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.dto.response.page.PageResponseDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MessageController {
     private final MessageService messageService;
-    private final BinaryContentService binaryContentService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -48,9 +48,25 @@ public class MessageController {
         messageService.delete(messageId);
     }
 
+    /*
     @RequestMapping(method = RequestMethod.GET)
     public List<MessageResponseDto> getByChannelId(
             @RequestParam("channelId") UUID channelId)  {
         return messageService.getAllByChannelId(channelId);
+    }
+
+     */
+
+
+    @RequestMapping(method = RequestMethod.GET)
+    public PageResponseDto<MessageResponseDto> getMessages(
+            @RequestParam("channelId") UUID channelId,
+            @PageableDefault(
+                    size = 50,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ) {
+        return messageService.getPageByChannelId(channelId, pageable);
     }
 }

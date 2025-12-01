@@ -9,5 +9,5 @@ public record UserStatusCreateRequestDto(
         @NotNull
         UUID userId,
 
-        Instant lastReadAt) {
+        Instant lastActiveAt) {
 }

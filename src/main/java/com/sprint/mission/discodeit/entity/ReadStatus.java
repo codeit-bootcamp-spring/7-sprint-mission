@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 /*
     사용자가 채널 별 마지막으로 메세지를 읽은 시간을 표현하는 도메인 모델.
@@ -11,27 +14,36 @@ import java.util.UUID;
  */
 @Getter
 @ToString
-public class ReadStatus extends BaseEntity {
-    private final UUID userId;
-    private final UUID channelId;
+@Entity
+@Table(name = "read_statuses")
+public class ReadStatus extends BaseUpdatableEntity {
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
+
+    @Column(name = "last_read_at", nullable = false)
     private Instant lastReadAt;
 
-    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        this.userId = VerifiedUtils.verifyNull(userId);
-        this.channelId = VerifiedUtils.verifyNull(channelId);
-        this.lastReadAt = lastReadAt;
+    protected ReadStatus() {}
+
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        this.user = Objects.requireNonNull(user);
+        this.channel = Objects.requireNonNull(channel);
+        this.lastReadAt = Objects.requireNonNull(lastReadAt);
     }
 
     public void readNow() {
         this.lastReadAt = Instant.now();
-        reUpdatedAt();
     }
 
     public void readAt(Instant at) {
         Instant time = VerifiedUtils.verifyNull(at);
         if(time.isAfter(this.lastReadAt)) {
             this.lastReadAt = time;
-            reUpdatedAt();
         }
     }
 }

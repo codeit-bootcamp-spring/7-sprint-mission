@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
@@ -53,3 +54,5 @@ public class JCFUserRepository implements UserRepository {
                 .findFirst();
     }
 }
+
+ */
