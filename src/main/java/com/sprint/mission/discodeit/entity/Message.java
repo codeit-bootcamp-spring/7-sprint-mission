@@ -1,33 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-@Getter
-@ToString
-public class Message extends BaseEntity {
+@Getter @ToString
+@Entity
+@Table(name = "messages")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Message extends BaseUpdatableEntity {
+
+    @Column(columnDefinition = "TEXT")
     private String content;
-    private final UUID channelId;
-    private final UUID authorId;
-    private final List<UUID> attachmentIds;
 
-    @Builder
-    public Message(UUID authorId, UUID channelId, String content, List<UUID> attachmentIds) {
-        super();
-        this.content = content;
-        this.channelId = channelId;
-        this.authorId = authorId;
-        this.attachmentIds = attachmentIds != null ? attachmentIds : new ArrayList<>();
-    }
+    @JoinColumn(name = "channel_id",  nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Channel channel;
+
+    @JoinColumn(name = "author_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User author;
+
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
+    private List<BinaryContent> attachments = new ArrayList<>();
 
     public void updateContent(String content) {
         this.content = content;
-        updateTimestamp();
     }
 }
 

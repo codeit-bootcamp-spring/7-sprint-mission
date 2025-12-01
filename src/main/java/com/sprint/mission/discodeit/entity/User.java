@@ -1,23 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.exception.InvalidInputException;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Getter
 @ToString
-public class User extends BaseEntity {
+@NoArgsConstructor
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdatableEntity {
 
-    private String username;        // 닉네임
-    private String email;     // 이메일 -> 아이디로 사용
-    private String password;        // 비밀번호
+    @Column(unique = true, nullable = false, length = 50)
+    private String username;
 
-    // 프로필 이미지 추가
-    private UUID profileId;
+    @Column(unique = true, nullable = false, length = 100)
+    private String email;
+
+    @Column(nullable = false, length = 60)
+    private String password;
+
+    @JoinColumn(name = "profile_id")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", orphanRemoval = true,
+            cascade = CascadeType.ALL, optional = false)
+    private UserStatus status;
 
     // regular expression
     private static final Pattern REGEX_EMAIL_PATTERN
@@ -27,8 +39,6 @@ public class User extends BaseEntity {
 
     @Builder
     public User(String email, String password, String username) {
-        super();
-
         validateEmail(email);
         validatePassword(password);
         validateUserName(username);
@@ -36,31 +46,31 @@ public class User extends BaseEntity {
         this.username = username;       // 특수문자 불가
         this.email = email;             // 받을때 @ 있는지 확인
         this.password = password;       // 8자리 이상
-        this.profileId = null;
+        this.profile = null;
     }
 
     // Update
     public void updateUsername(String username) {
         validateUserName(username);
         this.username = username;
-        updateTimestamp();
     }
 
     public void updateEmail(String email) {
         validateEmail(email);
         this.email = email;
-        updateTimestamp();
     }
 
     public void updatePassword(String password) {
         validatePassword(password);
         this.password = password;
-        updateTimestamp();
     }
 
-    public void updateProfileId(UUID profileId) {
-        this.profileId = profileId;
-        updateTimestamp();
+    public void updateProfile(BinaryContent profile) {
+        this.profile = profile;
+    }
+
+    public void updateStatus(UserStatus status) {
+        this.status = status;
     }
 
     // 논리 삭제
@@ -68,7 +78,6 @@ public class User extends BaseEntity {
         this.username = "Deleted User";
         this.email = this.id.toString() + "@deleted.user";
         this.password = this.id.toString();
-        updateTimestamp();  // 탈퇴일자
     }
 
     // 유효성 검사

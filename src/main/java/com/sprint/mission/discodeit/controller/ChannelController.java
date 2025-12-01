@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.dto.channelDto.ChannelDto;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.entity.dto.channelDto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.ChannelDto;
+import com.sprint.mission.discodeit.dto.channelDto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,21 +22,21 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @RequestMapping(value = "/public", method = RequestMethod.POST)
-    public ResponseEntity<Channel> channelCreate(
+    public ResponseEntity<ChannelDto> channelCreate(
             @Valid @RequestBody PublicChannelCreateRequest channelRequestDto) {
-        Channel channel = channelService.createPublicChannel(channelRequestDto);
+        ChannelDto channel = channelService.createPublicChannel(channelRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @RequestMapping(value = "/private", method = RequestMethod.POST)
-    public ResponseEntity<Channel> channelCreate(
+    public ResponseEntity<ChannelDto> channelCreate(
             @Valid @RequestBody PrivateChannelCreateRequest channelRequestDto) {
-        Channel channel = channelService.createPrivateChannel(channelRequestDto);
+        ChannelDto channel = channelService.createPrivateChannel(channelRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
-    public ResponseEntity<Channel> channelNameUpdate(
+    public ResponseEntity<ChannelDto> channelNameUpdate(
             @PathVariable UUID channelId,
             @Valid @RequestBody PublicChannelUpdateRequest channelUpdateDto) {
         return ResponseEntity.ok(channelService.updateChannel(channelId, channelUpdateDto));

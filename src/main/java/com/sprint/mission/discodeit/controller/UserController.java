@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserCreateRequest;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserDto;
-import com.sprint.mission.discodeit.entity.dto.userDto.UserUpdateRequest;
-import com.sprint.mission.discodeit.entity.dto.userStatusDto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserDto;
+import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -29,7 +28,7 @@ public class UserController {
     // 사용자 등록 (/users)
     // 201 반환
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<User> userCreate(
+    public ResponseEntity<UserDto> userCreate(
             @Valid @RequestPart("userCreateRequest") UserCreateRequest userRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profileImage
     ) {
@@ -44,15 +43,15 @@ public class UserController {
     }
 
     // 사용자 단일 조회 (/user/id)
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.findUserById(id));
+    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+    public ResponseEntity<UserDto> getUserById(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userService.findUserById(userId));
     }
 
-    // 사용자 삭제 (/user/id)
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> userDelete(@PathVariable UUID id) {
-        userService.deleteUser(id);
+    // 사용자 삭제 (/user/userId)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> userDelete(@PathVariable UUID userId) {
+        userService.deleteUser(userId);
         return ResponseEntity.noContent().build();      // 204 no content
         // return ResponseEntity.ok("사용자가 성공적으로 삭제되었습니다.");     // 200 ok
         // return ResponseEntity.status(HttpStatus.OK).body("사용자가 성공적으로 삭제되었습니다."); // 반환타입이 String
@@ -61,7 +60,7 @@ public class UserController {
 
     // 사용자 정보 수정 (/user/..)
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
-    public ResponseEntity<User> userUpdate(
+    public ResponseEntity<UserDto> userUpdate(
             @PathVariable UUID userId,
             @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateDto,
             @RequestPart(value = "profile",  required = false) MultipartFile profileImage
@@ -71,7 +70,7 @@ public class UserController {
 
     // 사용자 온라인 상태 업데이트  (/users/userId/online)
     @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-    public ResponseEntity<UserStatus> onlineUpdate(
+    public ResponseEntity<UserStatusDto> onlineUpdate(
             @PathVariable UUID userId,
             @Valid @RequestBody UserStatusUpdateRequest updateDto) {
         return ResponseEntity.ok(userStatusService.updateStatusByUserId(userId, updateDto));

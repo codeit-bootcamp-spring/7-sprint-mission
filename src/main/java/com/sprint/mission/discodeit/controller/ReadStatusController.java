@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.dto.readStatusDto.*;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +22,14 @@ public class ReadStatusController {
 
     // 수신 정보 생성
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ReadStatus> createReadStatus(
+    public ResponseEntity<ReadStatusDto> createReadStatus(
             @Valid @RequestBody ReadStatusCreateRequest readStatusRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(readStatusService.createReadStatus(readStatusRequestDto));
     }
 
     // 수신 정보 수정
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
-    public ResponseEntity<ReadStatus> readStatusUpdate(
+    public ResponseEntity<ReadStatusDto> readStatusUpdate(
             @PathVariable UUID readStatusId,
             @Valid @RequestBody ReadStatusUpdateRequest readStatusUpdateDto) {
 

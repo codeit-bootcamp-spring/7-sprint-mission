@@ -1,16 +1,21 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.dto.messageDto.MessageCreateRequest;
-import com.sprint.mission.discodeit.entity.dto.messageDto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageDto;
+import com.sprint.mission.discodeit.dto.messageDto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +29,7 @@ public class MessageController {
     // --- 메시지 관리 ---
     // (채널)메시지 생성
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Message> channelMessageCreate(
+    public ResponseEntity<MessageDto> channelMessageCreate(
             @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageRequestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
@@ -34,7 +39,7 @@ public class MessageController {
 
     // 메시지 수정
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
-    public ResponseEntity<Message> channelMessageUpdate(
+    public ResponseEntity<MessageDto> channelMessageUpdate(
             @PathVariable UUID messageId,
             @Valid @RequestBody MessageUpdateRequest updateDto) {
 
@@ -48,10 +53,20 @@ public class MessageController {
         return ResponseEntity.noContent().build();
     }
 
-    // 특정 채널의 메시지 조회
+    // 특정 채널의 메시지 조회(오프셋 기반 페이징)
+//    @RequestMapping(method = RequestMethod.GET)
+//    public ResponseEntity<PageResponse<MessageDto>> getAllByChannelId
+//    (@RequestParam UUID channelId,
+//     @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+//        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, pageable));
+//    }
+
+    // 특정 채널의 메시지 조회(커서 기반 페이징)
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<Message>> getAllByChannelId(@RequestParam UUID channelId) {
-        return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
+    public ResponseEntity<PageResponse<MessageDto>> getAllByChannelId
+    (@RequestParam UUID channelId, @RequestParam(required = false) Instant cursor,
+     @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, cursor, pageable));
     }
 }
 
