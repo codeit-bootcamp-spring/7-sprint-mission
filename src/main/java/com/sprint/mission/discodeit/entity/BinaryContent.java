@@ -25,7 +25,7 @@ public class BinaryContent extends BaseEntity {
     @Column(nullable = false)
     private String contentType;
 
-    // 이제부터는 byte[]가 아니라 실제 바이너리는 storage에 따로 저장
+    // DB에는 실제 파일 데이터(bytes)를 저장하지 않음
 
     public BinaryContent(String fileName, Long size, String contentType) {
         this.fileName = fileName;

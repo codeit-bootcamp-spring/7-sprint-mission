@@ -65,8 +65,11 @@ public class BasicMessageService implements MessageService {
                     String contentType = attachmentRequest.contentType();
                     byte[] bytes = attachmentRequest.bytes();
 
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
                     BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+
+                    // TODO: 실제 파일은 BinaryContentStorage.put(createdBinaryContent.getId(), bytes)로 저장 예정
+
                     return createdBinaryContent.getId();
                 })
                 .toList();
