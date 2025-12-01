@@ -3,27 +3,29 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
-import com.sprint.mission.discodeit.dto.user.response.CreateUserResponseDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.CustomException;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import java.time.Instant;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -32,9 +34,13 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
   private final ChannelRepository channelRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
+
+  private final UserMapper userMapper;
 
   @Override
-  public CreateUserResponseDto createUser(CreateUserDto createUserDto,
+  @Transactional
+  public UserResponseDto createUser(CreateUserDto createUserDto,
       Optional<CreateBinaryContentDto> createBinaryContentDto) {
     if (userRepository.findByUsername(createUserDto.username()).isPresent()) {
       throw new CustomException(ErrorCode.USERNAME_ALREADY_EXIST);
@@ -42,59 +48,49 @@ public class BasicUserService implements UserService {
     if (userRepository.findByEmail(createUserDto.email()).isPresent()) {
       throw new CustomException(ErrorCode.EMAIL_ALREADY_EXIST);
     }
-
-    UUID profileId = createBinaryContentDto
+    BinaryContent profile = createBinaryContentDto
         .map(profileRequest -> {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
+          Long size = profileRequest.size();
           byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          binaryContentRepository.save(binaryContent);
 
-          return binaryContent.getId();
+          BinaryContent binaryContent = new BinaryContent(fileName, size, contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
         })
         .orElse(null);
 
     User user = new User(
-        createUserDto.username(), createUserDto.email(), createUserDto.password(), profileId);
-
-    UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
-
+        createUserDto.username(), createUserDto.email(), createUserDto.password(), profile);
     userRepository.save(user);
-    userStatusRepository.save(userStatus);
 
-    return CreateUserResponseDto.from(user);
+    return userMapper.toResponseDto(user);
   }
-
+  
   @Override
+  @Transactional(readOnly = true)
   public UserResponseDto getUser(UUID userId) { // 단건 검색
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
-
-    return UserResponseDto.from(user, userStatus.isOnline());
+    return userMapper.toResponseDto(user);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public List<UserResponseDto> getAllUsers() {
-    List<User> users = userRepository.findAll();
-
-    Map<UUID, UserStatus> statusMap = userStatusRepository.findAll().stream()
-        .collect(Collectors.toMap(UserStatus::getUserId, s -> s));
+    List<User> users = userRepository.findAllWithProfileAndStatus();
 
     return users.stream()
-        .map(user -> {
-          UserStatus status = statusMap.get(user.getId());
-          return UserResponseDto.from(user, status.isOnline());
-        })
+        .map(userMapper::toResponseDto)
         .toList();
   }
 
   @Override
-  public CreateUserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
+  @Transactional
+  public UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
       Optional<CreateBinaryContentDto> createBinaryContentDto) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -102,45 +98,40 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
         .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
 
-    UUID profileId = createBinaryContentDto
+    BinaryContent profile = createBinaryContentDto
         .map(profileRequest -> {
-          Optional.ofNullable(user.getProfileId()).ifPresent(binaryContentRepository::deleteById);
+          Optional.ofNullable(user.getProfile()).ifPresent(binaryContentRepository::delete);
 
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
+          Long size = profileRequest.size();
           byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          binaryContentRepository.save(binaryContent);
 
-          return binaryContent.getId();
+          BinaryContent binaryContent = new BinaryContent(fileName, size, contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
         })
         .orElse(null);
 
     user.updateUser(updateUserDto.newUsername(),
         updateUserDto.newPassword(),
         updateUserDto.newEmail(),
-        profileId
+        profile
     );
 
     userRepository.save(user);
-    return CreateUserResponseDto.from(user);
+    return userMapper.toResponseDto(user);
   }
 
   @Override
+  @Transactional
   public void deleteUser(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-    if (!userStatusRepository.existsByUserId(userId)) {
-      throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);
-    }
-    userStatusRepository.deleteByUserId(userId);
-
-    // 유저가 삭제되면, 모든 채널에서 해당 유저 삭제
-    channelRepository.findAll()
-        .forEach(channel -> channel.removeParticipant(user));
-
+    // User에서 cascadeType.ALL로 자식에게 전파하므로, User가 삭제되면
+    // UserStatus도 같이 삭제됨.
     userRepository.deleteById(userId);
   }
 }

@@ -19,10 +19,10 @@ public record ReadStatusResponseDto(
   public static ReadStatusResponseDto from(ReadStatus readStatus) {
     return ReadStatusResponseDto.builder()
         .id(readStatus.getId())
-        .createdAt(readStatus.getCreateAt())
-        .updatedAt(readStatus.getUpdateAt())
-        .userId(readStatus.getUserId())
-        .channelId(readStatus.getChannelId())
+        .createdAt(readStatus.getCreatedAt())
+        .updatedAt(readStatus.getUpdatedAt())
+        .userId(readStatus.getUser().getId())
+        .channelId(readStatus.getChannel().getId())
         .lastReadAt(readStatus.getLastReadAt())
         .build();
   }

@@ -1,80 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.enums.ChannelType;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.ToString;
-
-import java.io.Serial;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 
-/**
- * 채널 생성 시 Private, Public을 나눠서 구현합니다. Channel 엔티티에서 만든 participants의 경우, 제가 임의로 만든 멤버 필드입니다.
- * ChannelService에서 createChannel 메소드 로직에는 private인 경우에만 "참여하는 user의 정보를 받아 ReadStatus 정보를 생성한다."라고
- * 정의되어 있습니다. 따라서 participants 멤버 필드는 채널 생성 시, private인 경우 user을 바로 등록하도록 하고 (addParticipant 메소드)
- * public인 경우에는 메세지 생성 시에만 user를 participant List에 저장하도록 구현하였습니다.
- * <p>
- * 즉, public, private 모두 participant 리스트에 참여 유저를 저장하는건 맞으나, private인 경우 채널 생성 시에도 참여 유저들을 등록하도록
- * 설계하였습니다.
- */
 @Getter
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class Channel extends Common {
+@NoArgsConstructor
+@Entity
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-  private Instant updateAt;
+  @Column(name = "type", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private ChannelType type;
 
-  private final ChannelType channelType;
-  private String channelName;
-  private String desc;
+  @Column(name = "name", length = 100)
+  private String name;
 
-  @ToString.Exclude
-  private final List<User> participants;
+  @Column(name = "description", length = 500)
+  private String description;
 
-  public Channel(ChannelType channelType, String channelName, String desc) {
-    this.updateAt = Instant.now();
-    this.channelType = channelType;
-    this.channelName = channelName;
-    this.desc = desc;
-    participants = new ArrayList<>();
+  public Channel(ChannelType type, String name, String description) {
+    this.type = type;
+    this.name = name;
+    this.description = description;
   }
 
-  public void updateChannel(String channelName, String desc) {
-    boolean isUpdate = false;
-
-    if (channelName != null && !channelName.equals(this.channelName)) {
-      this.channelName = channelName;
-      isUpdate = true;
+  public void updateChannel(String channelName, String description) {
+    if (channelName != null && !channelName.equals(this.name)) {
+      this.name = channelName;
     }
-    if (desc != null && !desc.equals(this.desc)) {
-      this.desc = desc;
-      isUpdate = true;
-    }
-
-    if (isUpdate) {
-      updateAt = Instant.now();
+    if (description != null && !description.equals(this.description)) {
+      this.description = description;
     }
   }
-
-  // JPA로 데이터를 제어한다면, 이런 메서드가 필요할까
-  // CASCADE 옵션으로 참조 무결성을 보장할 수 있는데 흠...
-  public void addParticipant(User user) {
-    if (user != null && !participants.contains(user)) {
-      participants.add(user);
-      updateAt = Instant.now();
-    }
-  }
-
-  public void removeParticipant(User user) {
-    if (user != null && participants.contains(user)) {
-      participants.remove(user);
-      updateAt = Instant.now();
-    }
-  }
-
 }

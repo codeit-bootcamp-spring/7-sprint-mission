@@ -1,42 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-
-import java.io.Serial;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class ReadStatus extends Common {
+@Entity
+@NoArgsConstructor
+@Table(
+    name = "read_statuses",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+    }
+)
+public class ReadStatus extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-  private Instant updateAt;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-  private final UUID userId;
-  private final UUID channelId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @Column(name = "last_read_at", nullable = false)
   private Instant lastReadAt;
 
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    this.updateAt = Instant.now();
-    this.userId = userId;
-    this.channelId = channelId;
+  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    this.user = user;
+    this.channel = channel;
     this.lastReadAt = lastReadAt;
   }
 
   public void update(Instant lastReadAt) {
-    boolean isUpdate = false;
     if (lastReadAt != null && !lastReadAt.equals(this.lastReadAt)) {
       this.lastReadAt = lastReadAt;
-      isUpdate = true;
-    }
-
-    if (isUpdate) {
-      this.updateAt = Instant.now();
     }
   }
 }

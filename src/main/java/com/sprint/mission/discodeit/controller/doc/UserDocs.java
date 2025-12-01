@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.controller.doc;
 
 import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
-import com.sprint.mission.discodeit.dto.user.response.CreateUserResponseDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponseDto;
@@ -33,13 +32,13 @@ public interface UserDocs {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201",
           description = "User가 성공적으로 생성됨",
-          content = @Content(mediaType = "*/*", schema = @Schema(implementation = CreateUserResponseDto.class))),
+          content = @Content(mediaType = "*/*", schema = @Schema(implementation = UserResponseDto.class))),
       @ApiResponse(responseCode = "400",
           description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
           content = @Content(mediaType = "*/*", schema = @Schema(implementation = CustomApiResponse.class))
       ),
   })
-  ResponseEntity<CreateUserResponseDto> createUser(
+  ResponseEntity<UserResponseDto> createUser(
       @Parameter(description = "User 생성 정보", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
       @Valid @RequestPart(value = "userCreateRequest") CreateUserDto userDto,
       @Parameter(description = "User 프로필 이미지", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
@@ -73,7 +72,7 @@ public interface UserDocs {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "User 정보가 성공적으로 수정됨",
-          content = @Content(mediaType = "*/*", schema = @Schema(implementation = CreateUserResponseDto.class))
+          content = @Content(mediaType = "*/*", schema = @Schema(implementation = UserResponseDto.class))
       ),
       @ApiResponse(
           responseCode = "404", description = "User를 찾을 수 없음",
@@ -84,7 +83,7 @@ public interface UserDocs {
           content = @Content(mediaType = "*/*", schema = @Schema(implementation = CustomApiResponse.class))
       )
   })
-  ResponseEntity<CreateUserResponseDto> updateUser(
+  ResponseEntity<UserResponseDto> updateUser(
       @Parameter(description = "수정할 User ID") @PathVariable UUID userId,
       @Parameter(description = "수정할 User 정보") @RequestPart UpdateUserDto updateUserDto,
       @Parameter(description = "수정할 User 프로필 이미지") @RequestPart(value = "profile", required = false) MultipartFile profile)

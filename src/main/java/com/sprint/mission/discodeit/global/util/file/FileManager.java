@@ -1,40 +1,42 @@
 package com.sprint.mission.discodeit.global.util.file;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public final class FileManager {
 
+  // TODO: CustomException
+  private FileManager() {
+  }
 
-    private FileManager() {
+  public static void init(Path root) {
+    try {
+      if (Files.notExists(root)) {
+        Files.createDirectories(root);
+      }
+    } catch (IOException e) {
+      throw new IllegalStateException("Failed to initialize storage directory: " + root, e);
     }
+  }
 
-    public static <T extends Serializable> void init(Path filePath) {
-        if (Files.notExists(filePath)) {
-            writeFile(filePath, new HashMap<UUID, T>());
-        }
+  public static void write(Path path, byte[] bytes) {
+    try {
+      Files.createDirectories(path.getParent());
+      Files.write(path, bytes);
+    } catch (IOException e) {
+      throw new UncheckedIOException("Failed to write file: " + path, e);
     }
+  }
 
-    @SuppressWarnings("unchecked")
-    public static <T extends Serializable> Map<UUID, T> readFile(Path filePath) {
-        try (FileInputStream fis = new FileInputStream(filePath.toFile());
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            return (Map<UUID, T>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new UncheckedIOException("파일 읽기 실패: " + filePath, new IOException(e));
-        }
+  public static InputStream read(Path path) {
+    try {
+      return Files.newInputStream(path);
+    } catch (IOException e) {
+      throw new UncheckedIOException("파일 읽기 실패: " + path, new IOException(e));
     }
-
-    public static <T extends Serializable> void writeFile(Path filePath, Map<UUID, T> map) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-            oos.writeObject(map);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
+  }
 }
 

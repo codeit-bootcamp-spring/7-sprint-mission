@@ -1,17 +1,22 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.doc.MessageDocs;
+import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -62,9 +67,14 @@ public class MessageController implements MessageDocs {
   }
 
   @RequestMapping(method = RequestMethod.GET)
-  public ResponseEntity<List<MessageResponseDto>> getMessages(@RequestParam UUID channelId) {
-    List<MessageResponseDto> allMessageByChannelId = messageService.getAllMessageByChannelId(
-        channelId);
+  public ResponseEntity<PageResponse<MessageResponseDto>> getAllMessagesByChannelId(
+      @RequestParam UUID channelId,
+      @RequestParam(required = false) Instant cursor,
+      @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC) Pageable pageable
+  ) {
+
+    PageResponse<MessageResponseDto> allMessageByChannelId = messageService.getAllMessageByChannelId(
+        channelId, cursor, pageable);
     return ResponseEntity.status(HttpStatus.OK).body(allMessageByChannelId);
   }
 

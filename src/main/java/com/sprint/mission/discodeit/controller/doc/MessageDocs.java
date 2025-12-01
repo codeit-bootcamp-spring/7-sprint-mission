@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.doc;
 
+import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
@@ -13,8 +14,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,6 +65,9 @@ public interface MessageDocs {
               mediaType = "*/*",
               array = @ArraySchema(schema = @Schema(implementation = MessageResponseDto.class))))
   })
-  ResponseEntity<List<MessageResponseDto>> getMessages(
-      @Parameter(description = "조회할 Channel ID") @RequestParam UUID channelId);
+  ResponseEntity<PageResponse<MessageResponseDto>> getAllMessagesByChannelId(
+      @RequestParam UUID channelId,
+      @RequestParam(required = false) Instant cursor,
+      @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC) Pageable pageable
+  );
 }

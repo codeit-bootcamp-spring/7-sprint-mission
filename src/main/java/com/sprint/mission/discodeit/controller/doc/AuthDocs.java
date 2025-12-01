@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.doc;
 
 import com.sprint.mission.discodeit.dto.login.request.LoginRequestDto;
-import com.sprint.mission.discodeit.dto.login.response.LoginResponseDto;
+import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.global.dto.CustomApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,7 +24,7 @@ public interface AuthDocs {
           description = "로그인 성공",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = LoginResponseDto.class)
+              schema = @Schema(implementation = UserResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -44,6 +44,6 @@ public interface AuthDocs {
           )
       )
   })
-  ResponseEntity<LoginResponseDto> login(@Parameter(description = "로그인 정보") @Valid @RequestBody
+  ResponseEntity<UserResponseDto> login(@Parameter(description = "로그인 정보") @Valid @RequestBody
   LoginRequestDto loginRequestDto);
 }

@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.channel.request.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePublicChannelDto;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.response.CreateChannelResponseDto;
 import com.sprint.mission.discodeit.global.dto.CustomApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,11 +31,11 @@ public interface ChannelDocs {
           description = "Public Channel이 성공적으로 생성됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = CreateChannelResponseDto.class)
+              schema = @Schema(implementation = ChannelResponseDto.class)
           )
       ),
   })
-  ResponseEntity<CreateChannelResponseDto> createChannel(
+  ResponseEntity<ChannelResponseDto> createChannel(
       @Parameter(description = "Public Channel 생성 정보")
       @Valid @RequestBody CreatePublicChannelDto createPublicChannelDto);
 
@@ -47,11 +46,11 @@ public interface ChannelDocs {
           description = "Private Channel이 성공적으로 생성됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = CreateChannelResponseDto.class)
+              schema = @Schema(implementation = ChannelResponseDto.class)
           )
       ),
   })
-  ResponseEntity<CreateChannelResponseDto> createChannel(
+  ResponseEntity<ChannelResponseDto> createChannel(
       @Parameter(description = "Private Channel 생성 정보")
       @Valid @RequestBody CreatePrivateChannelDto createPrivateChannelDto);
 
@@ -79,7 +78,7 @@ public interface ChannelDocs {
           description = "Channel 정보가 성공적으로 수정됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = CreateChannelResponseDto.class)
+              schema = @Schema(implementation = ChannelResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -99,7 +98,7 @@ public interface ChannelDocs {
           )
       )
   })
-  ResponseEntity<CreateChannelResponseDto> updateChannel(
+  ResponseEntity<ChannelResponseDto> updateChannel(
       @Parameter(description = "수정할 Channel ID") @PathVariable UUID channelId,
       @Parameter(description = "수정할 Channel 정보") @RequestBody UpdateChannelDto updateChannelDto);
 
