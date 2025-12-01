@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Table(name = "binary_contents")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class BinaryContent extends BaseEntity {
     @Id
     @GeneratedValue
@@ -25,11 +27,13 @@ public class BinaryContent extends BaseEntity {
     @Column(nullable = false)
     private String contentType;
 
-    // DB에는 실제 파일 데이터(bytes)를 저장하지 않음
+    @Column(nullable = false)  // 여기 추가하세요!
+    private byte[] bytes;
 
-    public BinaryContent(String fileName, Long size, String contentType) {
+    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
         this.fileName = fileName;
         this.size = size;
         this.contentType = contentType;
+        this.bytes = bytes;
     }
 }

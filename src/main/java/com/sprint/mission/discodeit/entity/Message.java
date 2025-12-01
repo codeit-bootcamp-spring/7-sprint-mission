@@ -30,5 +30,10 @@ public class Message extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
- }
+
+    // ✅ 여기 추가!
+    public UUID getChannelId() {
+        return channel != null ? channel.getId() : null;
+    }
+}
 
