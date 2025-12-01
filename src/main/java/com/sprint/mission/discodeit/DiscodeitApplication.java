@@ -6,7 +6,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
-@EnableJpaAuditing // fix err. createdAt == null
+@EnableJpaAuditing // fix err. createdAt == null //2. @CreatedDate @LastModifiedDate 에 필요
 public class DiscodeitApplication {
 
     public static void main(String[] args) throws Exception {

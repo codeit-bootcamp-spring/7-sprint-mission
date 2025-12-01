@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.mapper.dto.MessageDto;
 import com.sprint.mission.discodeit.page.PageResponseDto;
+import com.sprint.mission.discodeit.service.InterfaceMessageService;
 import com.sprint.mission.discodeit.swaggerDocs.MessageDoc;
 import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
@@ -33,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/messages")
 @Slf4j
 public class MessageController implements MessageDoc {
-    private final MessageService messageService;
+    private final InterfaceMessageService messageService;
 
     @GetMapping
     public ResponseEntity<PageResponseDto<MessageDto>> findAllByChannelId(

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.service.InterfaceAuthService;
 import com.sprint.mission.discodeit.swaggerDocs.AuthDoc;
 import com.sprint.mission.discodeit.mapper.dto.LoginRequest;
 import com.sprint.mission.discodeit.service.basic.AuthService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController implements AuthDoc {
-    private final AuthService authService;
+    private final InterfaceAuthService authService;
 
 //👍- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                  : @RequestBody
 //👍- http://localhost:8000/board?page=1&listSize=10  : @RequestParam

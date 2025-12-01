@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.service.InterfaceReadStatusService;
 import com.sprint.mission.discodeit.swaggerDocs.ReadStatusDoc;
 import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.Dto_ReadStatusUpdate;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/readStatuses")
 public class ReadStatusController implements ReadStatusDoc {
-    private final ReadStatusService readStatusService;
+    private final InterfaceReadStatusService readStatusService;
 
     @GetMapping
     public ResponseEntity<List<ReadStatusDto>> findAllByUserId(

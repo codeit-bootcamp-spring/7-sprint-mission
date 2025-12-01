@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.mapper.dto.ChannelDto;
+import com.sprint.mission.discodeit.service.InterfaceChannelService;
 import com.sprint.mission.discodeit.swaggerDocs.ChannelDoc;
 import com.sprint.mission.discodeit.dto.ChannelDto_Update;
 import com.sprint.mission.discodeit.mapper.dto.PrivateChannelCreateRequest;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
 public class ChannelController implements ChannelDoc {
-    private final ChannelService channelService;
+    private final InterfaceChannelService channelService;
 
     //💎Public Channel 생성
     @PostMapping("/public")

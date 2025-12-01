@@ -44,8 +44,8 @@ dependencies {
 
     //‼️⭐ for Spring Data JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    //‼️⭐ for PostgreSQL 드라이버
-    implementation 'org.postgresql:postgresql'
+    //‼️⭐ for PostgreSQL 드라이버. 컴파일 시점에만 필요
+    runtimeOnly 'org.postgresql:postgresql'
 }
 
 tasks.named('test') {

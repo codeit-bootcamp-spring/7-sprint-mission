@@ -3,6 +3,9 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.dto.UserStatusDto;
+import com.sprint.mission.discodeit.service.InterfaceBinaryContentService;
+import com.sprint.mission.discodeit.service.InterfaceUserService;
+import com.sprint.mission.discodeit.service.InterfaceUserStatusService;
 import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import com.sprint.mission.discodeit.swaggerDocs.UserDoc;
 import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
@@ -35,9 +38,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController implements UserDoc {
-    private final UserService userService;
-    private final BinaryContentService binaryContentService;
-    private final UserStatusService userStatusService;
+    private final InterfaceUserService userService;
+    private final InterfaceBinaryContentService binaryContentService;
+    private final InterfaceUserStatusService userStatusService;
     private final UserMapper userMapper;
 
     //!! @Valid 검증 == dependencies 'spring-boot-starter-validation'
