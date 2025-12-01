@@ -11,8 +11,8 @@ public record UserUpdateResponse(
         String newPassword,
         UUID newProfileImage
 
-){
-    public static UserUpdateResponse from(UUID uuid,User user) {
+) {
+/*    public static UserUpdateResponse from(UUID uuid,User user) {
         return new UserUpdateResponse(
                 user.getId(),
                 user.getUsername(),
@@ -20,5 +20,5 @@ public record UserUpdateResponse(
                 user.getPassword(),
                 user.getProfileId()
         );
-    }
+    }*/
 }

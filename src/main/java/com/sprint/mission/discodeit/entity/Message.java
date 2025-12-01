@@ -1,93 +1,63 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.common.Common;
+import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import com.sprint.mission.discodeit.entity.content.BinaryContent;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.action.internal.OrphanRemovalAction;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
+@NoArgsConstructor
+
 @Getter
-public class Message extends Common implements Serializable {
-    private static final long serialVersionUID = 1L;
+@Table(name = "messages")
+public class Message extends BaseUpdateEntity {
 
-    private UUID authorId;
-    private UUID channelId;
-    private Instant time;
+    @ManyToOne
+    @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "messages_author_id_fk"))
+    private User author;
+
+    @ManyToOne
+    @JoinColumn(name = "channel_id", foreignKey = @ForeignKey(name = "messages_channel_id_fk"), nullable = false)
+    private Channel channel;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
-    private List<UUID> attachmentIds;
-
-    public Message() {
-    }
 
 
-    public  Message(String content,UUID channelId,UUID authorId,List<UUID> attachmentIds ){
-        this.authorId = authorId;
-        this.channelId = channelId;
-        this.time = Instant.now();
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<MessageAttachment> attachments = new ArrayList<>();
+
+
+    public Message(User author, Channel channel, String content) {
+        this.author = author;
         this.content = content;
-        this.attachmentIds = attachmentIds;
-    }
+        this.channel = channel;
 
-/*    public UUID getSender() {
-        return authorId;
-    }
-
-    public void setSender(UUID sender) {
-        this.authorId = sender;
-    }
-
-    public UUID getReceiver() {
-        return channelId;
-    }
-
-    public void setReceiver(UUID receiver) {
-        this.channelId = receiver;
-    }
-
-    public Instant getTime() {
-        return time;
-    }
-
-    public void setTime(Instant time) {
-        this.time = time;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }*/
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "채널 UUID =" + channelId+
-                ",발신자 UUID  =" + authorId+
-                ", 생성시간 =" + time +
-                ",  내용 ='" + content + '\'' +
-                '}';
     }
 
     public void update(String newContent) {
-        boolean anyValueUpdated = false;
+
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
-            anyValueUpdated = true;
+
         }
 
-        if (anyValueUpdated) {
-            this.setUpdatedAt(Instant.ofEpochSecond(Instant.now().getEpochSecond()));
-        }
-        
-        
+
     }
-    //첨부파일추가
-   /* public void addAttachmentId(UUID attachmentId) {
-        this.attachmentIds.add(attachmentId);
-    }*/
+
+    public void addAttachment(BinaryContent content) {
+        MessageAttachment ma = new MessageAttachment(this, content);
+        attachments.add(ma);
+    }
+
+    public void removeAttachment(BinaryContent content) {
+        attachments.removeIf(ma -> ma.getAttachment().equals(content));
+    }
 }

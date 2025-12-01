@@ -9,11 +9,11 @@ public record UserCreateResponse(
         String username,
         UUID profileID
 ) {
-    public static UserCreateResponse from(User user) {
+/*    public static UserCreateResponse from(User user) {
         return new UserCreateResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getProfileId()
         );
-    }
+    }*/
 }

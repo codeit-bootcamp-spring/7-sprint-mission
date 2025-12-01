@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.controller.Docs;
 
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -12,9 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -27,12 +26,12 @@ public interface MessageControllerDocs {
             summary = "메시지 생성",
             description = """
                     새로운 메시지를 생성합니다.
-
+                    
                     **요청 데이터**
                     - content (메시지 본문)
                     - channelId (메시지가 속한 채널)
                     - profiles (첨부 이미지/파일, 선택)
-
+                    
                     **응답**
                     - 생성된 메시지 정보가 반환됩니다.
                     """
@@ -78,19 +77,19 @@ public interface MessageControllerDocs {
                     )
             )
     })
-    ResponseEntity<Message> createMessage(CreateMessageRequest request,
-                                          List<MultipartFile> profiles);
+    ResponseEntity<MessageDto> createMessage(CreateMessageRequest request,
+                                             List<MultipartFile> profiles);
 
 
     @Operation(
             summary = "메시지 수정",
             description = """
                     기존 메시지를 수정합니다.
-
+                    
                     **요청 데이터**
                     - messageId (Path 또는 Query Param)
                     - content (수정할 본문)
-
+                    
                     **응답**
                     - 수정된 메시지 정보가 반환됩니다.
                     """
@@ -133,18 +132,18 @@ public interface MessageControllerDocs {
                     )
             )
     })
-    ResponseEntity<Message> updateMessage(UUID messageId,
-                                          UpdateMessageRequest request);
+    ResponseEntity<MessageDto> updateMessage(UUID messageId,
+                                             UpdateMessageRequest request);
 
 
     @Operation(
             summary = "메시지 삭제",
             description = """
                     메시지를 삭제합니다.
-
+                    
                     **요청 데이터**
                     - messageId (삭제할 메시지 UUID)
-
+                    
                     **응답**
                     - 성공 시 내용 없는 204 응답 반환
                     """
@@ -174,10 +173,10 @@ public interface MessageControllerDocs {
             summary = "채널별 메시지 전체 조회",
             description = """
                     특정 채널(channelId)에 속한 모든 메시지를 조회합니다.
-
+                    
                     **요청 데이터**
                     - channelId (Query Param)
-
+                    
                     **응답**
                     - 메시지 배열(List<Message>)이 반환됩니다.
                     """
@@ -222,5 +221,5 @@ public interface MessageControllerDocs {
                     )
             )
     })
-    ResponseEntity<List<Message>> findAllByChannelId(UUID channelId);
+    ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, int page);
 }

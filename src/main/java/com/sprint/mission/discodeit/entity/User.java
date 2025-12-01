@@ -1,59 +1,65 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.entity.common.Common;
+import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import com.sprint.mission.discodeit.entity.content.BinaryContent;
+import com.sprint.mission.discodeit.entity.status.UserStatus;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
+@NoArgsConstructor
 @Getter
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdateEntity {
 
-public class User implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
+    @Column(name = "name", length = 50, nullable = false, unique = true)
     private String username;
+    @Column(name = "email", length = 100, nullable = false, unique = true)
     private String email;
+    @Column(name = "password", length = 60, nullable = false)
     private String password;
-    private UUID profileId;     // BinaryContent
 
-    public User(String username, String email, String password, UUID profileId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_users_profile"), unique = true, nullable = true)
+    private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserStatus status;
+
+    public User(String username, String email, String password, BinaryContent profile) {
         //
         this.username = username;
         this.email = email;
         this.password = password;
-        this.profileId = profileId;
+        this.profile = profile;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
-        boolean anyValueUpdated = false;
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword, BinaryContent newProfile) {
+
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
-            anyValueUpdated = true;
+
         }
         if (newEmail != null && !newEmail.equals(this.email)) {
             this.email = newEmail;
-            anyValueUpdated = true;
+
         }
         if (newPassword != null && !newPassword.equals(this.password)) {
             this.password = newPassword;
-            anyValueUpdated = true;
+
         }
-        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-            this.profileId = newProfileId;
-            anyValueUpdated = true;
+        if (newProfile != null) {
+            this.profile = newProfile;
+
         }
 
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+
     }
 }

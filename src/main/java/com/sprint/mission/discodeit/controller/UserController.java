@@ -7,8 +7,7 @@ import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserDto;
 import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
+import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,7 +36,7 @@ public class UserController implements UserControllerDocs {
     @RequestMapping(
             method = RequestMethod.POST
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<User> create(
+    public ResponseEntity<UserDto> create(
             @RequestPart("userCreateRequest") UserCreateRequest request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
@@ -46,7 +44,7 @@ public class UserController implements UserControllerDocs {
                 .flatMap(this::resolveProfileRequest);
 
 
-        User createUser = userService.create(request, profileRequest);
+        UserDto createUser = userService.create(request, profileRequest);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -60,7 +58,7 @@ public class UserController implements UserControllerDocs {
             path = "{userId}"
             , method = RequestMethod.PATCH
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<User> update(
+    public ResponseEntity<UserDto> update(
             @PathVariable UUID userId,
             @RequestPart("userUpdateRequest") UserUpdateRequest request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
@@ -70,7 +68,8 @@ public class UserController implements UserControllerDocs {
                 .flatMap(this::resolveProfileRequest);
 
 
-        User update = userService.update(userId, request, optionalProfile);
+        UserDto update = userService.update(userId, request, optionalProfile);
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(update);
@@ -92,10 +91,6 @@ public class UserController implements UserControllerDocs {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> findAll() {
-        System.out.println("다찾을꺼야");
-        for (UserDto userDto : userService.findAll()) {
-            System.out.println("없어?" + userDto.profileId());
-        }
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -103,11 +98,11 @@ public class UserController implements UserControllerDocs {
     }
 
     @RequestMapping(path = "{userId}/userStatus", method = RequestMethod.PATCH)
-    public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
-                                                               @RequestBody UserStatusUpdateRequest request) {
+    public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
+                                                                  @RequestBody UserStatusUpdateRequest request) {
 
 
-        UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
+        UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(updatedUserStatus);

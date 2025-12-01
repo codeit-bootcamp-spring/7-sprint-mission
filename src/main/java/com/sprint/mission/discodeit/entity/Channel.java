@@ -1,49 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.common.Common;
+import com.sprint.mission.discodeit.entity.base.BaseUpdateEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
-public class Channel implements Serializable {
+public class Channel extends BaseUpdateEntity {
 
-    private static final long serialVersionUID = 1L;
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+
     //
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 10)
     private ChannelType type;
+
+    @Column(name = "name", length = 100)
     private String name;
+
+    @Column(name = "description", length = 500)
     private String description;
 
-    public Channel(ChannelType type, String name, String description) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
-        this.type = type;
-        this.name = name;
-        this.description = description;
-    }
 
     public void update(String newName, String newDescription) {
-        boolean anyValueUpdated = false;
+
         if (newName != null && !newName.equals(this.name)) {
             this.name = newName;
-            anyValueUpdated = true;
+
         }
         if (newDescription != null && !newDescription.equals(this.description)) {
             this.description = newDescription;
-            anyValueUpdated = true;
+
         }
 
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
     }
 }
