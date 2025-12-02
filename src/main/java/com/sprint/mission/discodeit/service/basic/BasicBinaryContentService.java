@@ -1,13 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.binaryContent.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.mapStruct.BinaryStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,32 +21,37 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
+
     @Override
-    public BinaryContentResponseDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
-        BinaryContent binaryContent =BinaryContent.builder()
-                .bytes(binaryContentCreateRequestDto.getBytes())
-                .fileName(binaryContentCreateRequestDto.getFileName())
-                .size(binaryContentCreateRequestDto.getSize())
-                .contentType(binaryContentCreateRequestDto.getContentType())
-                .build();
-        binaryContentRepository.createBinaryContent(binaryContent);
-        return BinaryContentResponseDto.from(binaryContent);
+    @Transactional
+    public BinaryContentDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) throws IOException {
+        BinaryContent binaryContent = new BinaryContent(
+                binaryContentCreateRequestDto.getFileName(),
+                binaryContentCreateRequestDto.getContentType(),
+                binaryContentCreateRequestDto.getSize()
+        );
+        binaryContentRepository.save(binaryContent);
+        binaryContentStorage.put(binaryContent.getId(),binaryContentCreateRequestDto.getBytes());
+        return BinaryStruct.INSTANCE.toDto(binaryContent);
 
 
     }
 
     @Override
-    public BinaryContentResponseDto find(UUID binaryContentID) {
+    @Transactional(readOnly = true)
+    public BinaryContentDto find(UUID binaryContentID) {
 
-        return  BinaryContentResponseDto.from(
-                binaryContentRepository.readBinaryContent(binaryContentID)
+        return  BinaryContentDto.from(
+                binaryContentRepository.findById(binaryContentID)
                         .orElseThrow(
                                 ()->new IllegalArgumentException(
                                         "존재하지 않는 binaryContent 입니다."))) ;
     }
 
     @Override
-    public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> binaryContentIdList) {
+    @Transactional(readOnly = true)
+    public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIdList) {
        return binaryContentIdList.stream().map(this::find)
                .toList();
 
@@ -49,17 +59,25 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public void deleteBinaryContent(UUID binaryContentId) {
-    binaryContentRepository.deleteBinaryContent(binaryContentId);
+    binaryContentRepository.deleteById(binaryContentId);
     }
 
 
     @Override
     public List<BinaryContent> findAll() {
-        return binaryContentRepository.readAllBinaryContent();
+        return binaryContentRepository.findAll();
     }
 
     @Override
     public void resetBinaryContentService() {
-        binaryContentRepository.resetBinaryContentRepository();
+        binaryContentRepository.deleteAll();
+    }
+
+    @Override
+    public ResponseEntity<?> downloadFile(UUID binaryContentId) throws IOException {
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow();
+        BinaryContentDto binaryContentDto = BinaryStruct.INSTANCE.toDto(binaryContent);
+        return binaryContentStorage.download(binaryContentDto);
+
     }
 }

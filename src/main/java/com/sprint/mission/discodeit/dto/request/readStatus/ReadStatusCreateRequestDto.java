@@ -8,13 +8,18 @@ import lombok.Getter;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
-@AllArgsConstructor
-public class ReadStatusCreateRequestDto {
-    @NotNull(message = "ReadStatus channel id")
-    private UUID channelId;
-    @NotNull(message = "ReadStatus user id")
-    private UUID userId;
-    private Instant lastReadAt;
+
+public record ReadStatusCreateRequestDto(
+
+        @NotNull(message = "ReadStatus channel id")
+        UUID channelId,
+
+        @NotNull(message = "ReadStatus user id")
+        UUID userId,
+
+        Instant lastReadAt
+
+) {
+
 
 }

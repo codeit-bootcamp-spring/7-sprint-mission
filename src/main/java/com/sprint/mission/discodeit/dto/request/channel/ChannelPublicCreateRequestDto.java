@@ -7,12 +7,15 @@ import lombok.Getter;
 import java.util.HashSet;
 import java.util.UUID;
 
-@Getter
-@AllArgsConstructor
-public class ChannelPublicCreateRequestDto {
-    public HashSet<UUID> participantIds;
-    @NotBlank(message = "Public Channel name")
-    public String name ;
-    public String description;
-    public boolean isTextChannel;
+
+public record ChannelPublicCreateRequestDto(
+
+
+        @NotBlank(message = "Public Channel name")
+        String name,
+
+        String description
+) {
+
+
 }

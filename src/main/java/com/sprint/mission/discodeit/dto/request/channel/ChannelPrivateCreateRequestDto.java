@@ -12,32 +12,18 @@ import java.util.UUID;
 import static com.sprint.mission.discodeit.service.util.StaticString.*;
 
 
-@Getter
-public class ChannelPrivateCreateRequestDto {
-    @NotNull(message = "ChannelPrivate participantIds")
-    private final HashSet<UUID> participantIds;
-    private String name = DEFAULT_CHANNEL_NAME;
-    private String description = DEFAULT_CHANNEL_DESCRIPTION;
-    private final boolean isTextChannel;
+public record ChannelPrivateCreateRequestDto(
 
-    public ChannelPrivateCreateRequestDto(
-            HashSet<UUID> participantIds,
-            String name,
-            String description,
-            boolean isTextChannel
-    ) {
-        this.participantIds = participantIds;
-        this.name = (name != null) ? name : DEFAULT_CHANNEL_NAME;
-        this.description = (description != null) ? description : DEFAULT_CHANNEL_DESCRIPTION;
-        this.isTextChannel = isTextChannel;
+        @NotNull(message = "ChannelPrivate participantIds")
+        HashSet<UUID> participantIds,
+        String name ,
+        String description ,
+        boolean isTextChannel
+
+) {
+    public ChannelPrivateCreateRequestDto(HashSet<UUID> participantIds) {
+        this(new HashSet<>(participantIds),DEFAULT_CHANNEL_NAME,DEFAULT_CHANNEL_DESCRIPTION,true);
     }
 
-    // ✅ name, description 생략용 보조 생성자 (편의 생성자)
-    public ChannelPrivateCreateRequestDto(
-            HashSet<UUID> participantIds,
-            boolean isTextChannel
-    ) {
-        this(participantIds, null, null, isTextChannel);
-    }
 
 }

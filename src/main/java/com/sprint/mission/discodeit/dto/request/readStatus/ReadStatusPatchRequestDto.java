@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 
 public record ReadStatusPatchRequestDto(
+
         @NotNull(message = "ReadStatus newLastReadAt")
         Instant newLastReadAt
 ) {

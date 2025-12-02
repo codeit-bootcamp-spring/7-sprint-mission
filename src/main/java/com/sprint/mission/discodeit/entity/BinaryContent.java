@@ -1,23 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
+import com.sprint.mission.discodeit.subTable.MessageAttachment;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static java.time.Instant.*;
 
-@Builder
 @Getter
-public class BinaryContent implements Serializable {
-    private final UUID id = UUID.randomUUID();
-    private final Instant createdAt = now();
+@Entity
+@Table(name = "binary_contents")
+@NoArgsConstructor
+@AllArgsConstructor
+public class BinaryContent extends BaseEntity implements Serializable {
+
+    @Column(name = "file_name",length = 255,nullable = false)
     private String fileName;
+
+    @Column(name = "content_type",nullable = false)
     private String contentType;
-    private byte [] bytes;
+
+    @Column(name = "size",nullable = false,columnDefinition = "bigint")
     private Long size;
-//    private BinaryContentUsage binaryContentUsage;
+
+    @OneToMany( mappedBy = "binaryContent",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<MessageAttachment> messageAttachment;
+
+    public BinaryContent(String fileName, String contentType, Long size){
+        this.fileName = fileName;
+        this.contentType = contentType;
+        this.size = size;
+    }
+
 }

@@ -4,11 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public class LoginRequestDto {
-    @NotBlank(message = "Login UserName")
-    String username;
-    @NotBlank(message = "Login Password")
-    String password;
+
+public record LoginRequestDto(
+        @NotBlank(message = "Login UserName")
+        String username,
+
+        @NotBlank(message = "Login Password")
+        String password
+) {
 }

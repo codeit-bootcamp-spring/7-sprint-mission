@@ -1,81 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.service.util.StaticString;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-@Builder
+
 @Getter
 @Setter
-public class User extends Entity implements Serializable {
+@Entity
+@Table(name = "users")
+@NoArgsConstructor
+@AllArgsConstructor
+public class User extends BaseUpdatableEntity implements Serializable {
 
-
-    private String name;
+    @Column(name = "username",nullable = false, unique = true,length = 50)
     private String userName;
+
+    @Column(name = "email",nullable = false, unique = true,length = 100)
     private String email;
-    private boolean isOnline = true;
+
+    @Column(name = "password",length = 60,nullable = false)
     private String password;
-    private UUID profileId;
 
-    private final HashSet<UUID> joinChannelList = new HashSet<>();
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private BinaryContent profile;
 
-    public void addChannel(UUID channelId){
-        if(joinChannelList.contains(channelId)) {
-            throw new IllegalArgumentException(StaticString.CHANNEL_EXIST);
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    private UserStatus userStatus;
 
-        }
-        joinChannelList.add(channelId);
+    public static User createUserWithProfileFactory(String userName, String email, String password, BinaryContent profile){
 
-    }
-    public void removeChannel(UUID channelId){
-        if(!joinChannelList.contains(channelId)) throw new IllegalArgumentException(StaticString.CHANNEL_NOT_EXIST);
-        joinChannelList.remove(channelId);
+        return new User(userName,email,password,profile,null);
     }
 
+    public static User createUserFactory(String userName, String email, String password){
 
-//    public User(String name, String userName, String email,String password) {
-//        super();
-//        init(name, userName,email,password);
-//    }
-//
-//    public User(UUID id, String name, String userName, String email,String password) {
-//        super(id);
-//        init(name, userName,email,password);
-//    }
-//    public void init(String name,String nickname,String email,String password){
-//        this.name = name;
-//        this.userName = nickname;
-//        this.email = email;
-//        this.password = password;
-//
-//    }
-
-
-
-
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "name='" + name + '\'' +
-                ", nickname='" + userName + '\'' +
-                ", email='" + email + '\'' +
-                ", isOnline=" + isOnline +
-                ", channelDb=" + showChannel(this) +
-                '}';
+        return new User(userName,email,password,null,null);
     }
 
-    public String showChannel(User user){
-        StringBuilder out = new StringBuilder();
-        for(UUID channelId : user.getJoinChannelList()){
-            out.append(channelId).append("\n");
-        }
-        return out.toString();
-    }
+
+
 }

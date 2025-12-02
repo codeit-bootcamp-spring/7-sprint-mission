@@ -2,30 +2,39 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
-import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.response.MessageReadResponseDto;
+import com.sprint.mission.discodeit.dto.response.PageResponseDto;
+import com.sprint.mission.discodeit.dto.response.PageResponseDtoBasic;
+import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entityElement.MessageElement;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseBasicMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.subTable.MessageAttachment;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.service.util.StaticString.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -34,113 +43,112 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final UserRepository userRepository;
+    private final MessageAttachmentRepository messageAttachmentRepository;
+    private final MessageMapper messageMapper;
+    private final BinaryContentStorage binaryContentStorage;
+    private final PageResponseMapper<MessageDto> pageResponseMapper;
+    private final PageResponseBasicMapper<MessageDto> pageResponseBasicMapper;
+    private final ReadStatusRepository readStatusRepository;
 
 
-    public MessageReadResponseDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments   ){
-        //todo channel id 랑 sender id 관련 안전성 확인, 일단 지금은 안함
-        List<Channel> channelList = channelRepository.getAllChannel();
-        Channel channel2 = channelRepository.getChannelById(messageCreateRequestDto.getChannelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
-//        if(channel2.getJoinUserList().stream().noneMatch(x->x.equals(messageCreateRequestDto.getAuthorId()))) throw new IllegalArgumentException(USER_NOT_EXIST);
+
+    @Transactional
+    public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments   ) throws IOException {
+
+        Channel channel2 = channelRepository.findById(messageCreateRequestDto.channelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
+        User targetUser = userRepository.findById(messageCreateRequestDto.authorId()).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
+        if(readStatusRepository.findReadStatusByChannelAndUser(channel2,targetUser)== null) throw(new IllegalArgumentException(USER_NOT_JOINED));
+
         Message message;
+        message = messageRepository.save(Message.createMessageFactory(
+                messageCreateRequestDto.content(),
+                targetUser,
+                channel2
+        ));
+
         if(attachments!=null) {
-            System.out.println("attachment list");
-            message = messageRepository.saveMessage(Message.builder()
-                    .content(messageCreateRequestDto.getContent())
-                    .channelId(messageCreateRequestDto.getChannelId())
-                    .senderId(messageCreateRequestDto.getAuthorId())
-                    .attachmentIdList(
-                            attachments.stream().map(x ->
-                                    {
-                                        BinaryContent binaryContent = null;
-                                        try {
-                                            binaryContent = BinaryContent.builder()
-                                                    .fileName(x.getName())
-                                                    .bytes(x.getBytes())
-                                                    .contentType(x.getContentType())
-                                                    .size(x.getSize())
-                                                    .build();
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                        return binaryContentRepository.createBinaryContent(binaryContent).getId();
-                                    }
-                            ).collect(Collectors.toCollection(HashSet::new))
-                    )
-                    .build());
-        }
-        else {
-            message = messageRepository.saveMessage(
-                    Message.builder()
-                            .content(messageCreateRequestDto.getContent())
-                    .channelId(messageCreateRequestDto.getChannelId())
-                            .attachmentIdList(new HashSet<>())
-                            .senderId(messageCreateRequestDto.getAuthorId())
-                    .build()
+            List<MessageAttachment> messageAttachmentList = new ArrayList<>();
+            List<BinaryContent> attachmentList = new ArrayList<>();
+            attachments.forEach(
+                    x-> {
+                        try {
+                           BinaryContent binaryContent = binaryContentRepository.save(
+                                   new BinaryContent(x.getOriginalFilename(),x.getContentType(),x.getSize())
+                            );
+                           attachmentList.add(binaryContent);
+                           binaryContentStorage.put(binaryContent.getId(),x.getBytes());
+                            MessageAttachment save = messageAttachmentRepository.save(new MessageAttachment(message, binaryContent));
+                            messageAttachmentList.add(save);
+                        }
+
+                        catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
             );
+            message.setAttachments(attachmentList);
+            message.setMessageAttachment(messageAttachmentList);
         }
 
-        channel2.getMessageIdList().add(message.getId());
-        channelRepository.updateChannel(channel2);
-        return MessageReadResponseDto.from(message);
+        return messageMapper.toDto(message);
     }
-    public MessageReadResponseDto readMessage(Message message){
-        Message message1 = messageRepository.getMessage(message).orElseThrow(()->new IllegalArgumentException("Message not found"));
-        return MessageReadResponseDto.from(message1);
-    }
-    public List<MessageReadResponseDto> readAllMessage(){
-        messageRepository.getAllMessage().forEach(x-> System.out.println(x.getContent()+": "+x.getId()));
-        return messageRepository.getAllMessage().stream().map(MessageReadResponseDto::from).toList();
+
+    @Transactional(readOnly = true)
+    public List<MessageDto> readAllMessage(){
+        return messageRepository.findAll().stream().map(messageMapper::toDto).toList();
     }
     public void deleteMessage(UUID messageId){
-        List<BinaryContent> binaryContentList = binaryContentRepository.readAllBinaryContent();
-        Message message = messageRepository.getMessageById(messageId).orElseThrow(()->new IllegalArgumentException("Message not found"));
-        if(message.getAttachmentIdList()!=null) {
-            HashSet<UUID> attatchmentIdList = message.getAttachmentIdList();
-            attatchmentIdList.forEach(binaryContentRepository::deleteBinaryContent);
+        messageRepository.deleteById(messageId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDtoBasic<MessageDto> findallByChannelId(UUID channelId, Pageable pageable) {
+
+        Page<Message> targetPage = messageRepository.findByChannelId(channelId,pageable);
+        if(targetPage.isEmpty()) return pageResponseBasicMapper.fromPage(Page.empty());
+        Message message = targetPage.getContent().get(0);
+        MessageDto messageDto = messageMapper.toDto(message);
+        Page<MessageDto> targetPageDto = targetPage.map(messageMapper::toDto);
+        return pageResponseBasicMapper.fromPage(targetPageDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDto<MessageDto> findallByChannelIdWithCursor(UUID channelId, String cursor,Pageable pageable) {
+        Slice<Message> targetSlice ;
+
+        if(cursor == null) {
+          Instant tempTime = Instant.now().minus(Duration.ofDays(2));
+          targetSlice = messageRepository.findByChannelIdAndCreatedAtAfter(channelId,tempTime,pageable);
         }
-        Channel channel = channelRepository.getChannelById(message.getChannelId()).orElseThrow(() -> new IllegalArgumentException("Channel not found"));
-        channel.getMessageIdList().remove(messageId);
-        channelRepository.updateChannel(channel);
-        messageRepository.deleteMessage(message);
-
-    }
-    public <T>void updateMessage(MessageUpdateRequestDto<T> messageUpdateRequestDto){
-        MessageElement messageElement = messageUpdateRequestDto.getType();
-        Message message = messageRepository.getMessageById(messageUpdateRequestDto.getMessageId()).orElseThrow(()->new IllegalArgumentException("Message not found"));
-        BiConsumer<Message ,T> biConsumer = (BiConsumer<Message, T>) messageElement.setter;
-        biConsumer.accept(message, messageUpdateRequestDto.getUpdateValue());
-        message.updateEntity();
-        messageRepository.updateMessage(message);
-
-    }
-    public List<MessageReadResponseDto> readUpdatedMessage(){
-
-        return messageRepository.getUpdatedMessage().stream().map(MessageReadResponseDto::from).toList();
-    }
-    @Override
-    public List<MessageReadResponseDto> findallByChannelId(UUID channelId) {
-        Channel targetChannel = channelRepository.getChannelById(channelId).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
-        List<Message> messageList = messageRepository.getAllMessage();
-        return messageList.stream().filter(x -> x.getChannelId().equals(channelId)).map(MessageReadResponseDto::from).toList();
+        else{
+            targetSlice = messageRepository.findByChannelIdAndCreatedAtAfter(channelId,Instant.parse(cursor),pageable);
+        }
+            Object next = targetSlice.isEmpty()?Instant.now().minus(Duration.ofDays(2)):
+                    targetSlice.getContent().get(targetSlice.getContent().size()-1)
+                            .getCreatedAt();
+        Slice<MessageDto> targetSliceDto = targetSlice.map(messageMapper::toDto);
+        return pageResponseMapper.fromSlice(targetSliceDto,next);
     }
 
     @Override
-    public List<MessageReadResponseDto> readAllMessageByUserId(UUID userId) {
-        messageRepository.getAllMessage().forEach(x-> System.out.println(x.getContent()+": "+x.getId()));
-        return messageRepository.getAllMessage().stream().filter(x->x.getSenderId().equals(userId)).map(MessageReadResponseDto::from).toList();
+    public List<MessageDto> readAllMessageByUserId(UUID userId) {
+        return messageRepository.findAll().stream().filter(x->x.getAuthor().getId().equals(userId)).map(messageMapper::toDto).toList();
     }
 
     @Override
     public void resetMessage() {
-        messageRepository.getAllMessage().forEach(x-> deleteMessage(x.getId()));
+        messageRepository.deleteAll();
     }
 
     @Override
-    public MessageReadResponseDto patchMessage(MessagePatchRequestDto dto, UUID messageId) {
-        Message message = messageRepository.getMessageById(messageId).orElseThrow(()->new IllegalArgumentException("Message not found"));
+    @Transactional
+    public MessageDto patchMessage(MessagePatchRequestDto dto, UUID messageId) {
+        Message message = messageRepository.findById(messageId).orElseThrow(()->new IllegalArgumentException("Message not found"));
         message.setContent(dto.newContent()==null?message.getContent():dto.newContent());
-        message.updateEntity();
-        messageRepository.updateMessage(message);
-        return MessageReadResponseDto.from(message);
+        messageRepository.save(message);
+        return messageMapper.toDto(message);
     }
 }

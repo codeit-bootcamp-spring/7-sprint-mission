@@ -12,14 +12,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-@Getter
-public class MessageCreateRequestDto {
 
-    private String content;
-    @NotNull (message = "message author id")
-    private UUID authorId;
-    //private boolean isMarkDown;
-    @NotNull(message = "message channel id")
-    private UUID channelId;
-//    private Set<ProfileCreateRequestDto> attachments  = new HashSet<>();
+public record MessageCreateRequestDto(
+
+        String content,
+
+        @NotNull(message = "message author id")
+        UUID authorId,
+
+        @NotNull(message = "message channel id")
+        UUID channelId
+) {
+
+
 }
