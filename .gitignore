@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### myCustom ###
-!**/logs/**
+**/logs/**
 
 # secrets
-!**/application-secret.yml
+**/application-secret.yml

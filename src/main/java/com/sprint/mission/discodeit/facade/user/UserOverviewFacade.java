@@ -4,40 +4,34 @@ import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfo
 import com.sprint.mission.discodeit.dto.user.response.UserSimpleInfoRes;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserOverviewFacade {
-    private final UserService userService;
-    private final BinaryContentService binaryContentService;
-    private final UserStatusService userStatusService;
 
-    //유저 전체 조회
-    public List<UserSimpleInfoRes> findAll(){
-        return userService.findAll().stream()
-                .map(this::mapToSimpleInfo).toList();
-    }
+  private final UserService userService;
+  private final UserStatusService userStatusService;
 
-    //변환 메소드
-    private UserSimpleInfoRes mapToSimpleInfo(User user) {
-        BinaryContentInfoRes profileImg;
+  //유저 전체 조회
+  public List<UserSimpleInfoRes> findAll() {
+    return userService.findAll().stream()
+        .map(this::mapToSimpleInfo).toList();
+  }
 
-        if(user.getProfileId() != null){
-            profileImg = BinaryContentInfoRes.from(
-                    binaryContentService.findById(user.getProfileId())
-            );
-        }else{
-            profileImg = null;
-        }
-        UserStatus userStatus = userStatusService.findByUserId(user.getId());
-        userStatus.updateOnline();
-        return UserSimpleInfoRes.from(user, profileImg, userStatus.isOnline());
-    }
+  //변환 메소드
+  private UserSimpleInfoRes mapToSimpleInfo(User user) {
+    BinaryContentInfoRes profileImg;
+    profileImg = BinaryContentMapper.toResDto(user.getProfile());
+    UserStatus userStatus = userStatusService.findByUserId(user.getId());
+    return UserMapper.toSimpleResDto(user, profileImg, userStatus.isOnline());
+  }
 }

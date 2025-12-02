@@ -1,49 +1,70 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.UUID;
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Message extends BaseEntity {
-    private static final long serialVersionUID = 1L;
+@Entity
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity {
 
-    //Field
-    private UUID channelId;             //채널 UUID
-    private UUID speakerId;             //화자 UUID
-    private String content;                   //메세지 내용
-    private List<UUID> attachmentIds;         //첨부 파일들 UUID
+  //Field
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false,
+      foreignKey = @ForeignKey(name = "fk_msg_channel"))
+  private Channel channel;             //채널
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id", nullable = false,
+      foreignKey = @ForeignKey(name = "fk_msg_author"))
+  private User speaker;             //화자 UUID
 
-    //Constructor
-    private Message(UUID channelId, UUID speakerId,
-                   String content, List<UUID> attachmentIds) {
-        this.channelId = channelId;
-        this.speakerId = speakerId;
-        this.content = content;
-        this.attachmentIds = attachmentIds;
-    }
+  @Column(name = "content", columnDefinition = "TEXT")
+  private String content;                   //메세지 내용
 
-    //Factory
-    public static Message createText(UUID channelId, UUID speakerId, String content){
-        return new Message(channelId, speakerId, content, List.of());
-    }
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id", foreignKey = @ForeignKey(name = "fk_msg_attachment_msg")),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id", foreignKey = @ForeignKey(name = "fk_msg_attachment_file"))
+  )
+  private List<BinaryContent> attachments = new ArrayList<>();
 
-    public static Message createWithAttachment(UUID channelId, UUID speakerId,
-                                               String content, List<UUID> attachmentIds){
-        return new Message(channelId, speakerId, content, attachmentIds);
-    }
+  //Constructor
+  private Message(Channel channel, User speaker,
+      String content, List<BinaryContent> attachments) {
+    this.channel = channel;
+    this.speaker = speaker;
+    this.content = content;
+    this.attachments = attachments;
+  }
 
-    //메세지 수정
-    public Message update(String content,
-                          List<UUID> attachmentIds){
-        super.update();
-        this.content = content;
-        this.attachmentIds = attachmentIds;
-        return this;
-    }
+  //Factory
+  public static Message create(Channel channel, User speaker, String content,
+      List<BinaryContent> attachments) {
+    return new Message(channel, speaker, content, attachments);
+  }
+
+  //메세지 수정
+  public Message update(String content, List<BinaryContent> attachments) {
+    super.update();
+    this.content = content;
+    this.attachments = attachments;
+    return this;
+  }
 }

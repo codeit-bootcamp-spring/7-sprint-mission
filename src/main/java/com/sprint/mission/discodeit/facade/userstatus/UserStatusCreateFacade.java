@@ -8,16 +8,19 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserStatusCreateFacade {
-    private final UserStatusService userStatusService;
-    private final UserService userService;
 
-    //UserState
-    public UserStatus create(@NonNull UserStatusCreateReq req){
-        User user = userService.findById(req.userId());
-        return userStatusService.create(UserStatus.create(user.getId()));
-    }
+  private final UserStatusService userStatusService;
+  private final UserService userService;
+
+  //UserState
+  public UserStatus create(@NonNull UserStatusCreateReq req) {
+    User user = userService.findById(req.userId());
+    return userStatusService.create(UserStatus.create(user));
+  }
 }

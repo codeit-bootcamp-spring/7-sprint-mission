@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binarycontent.response.BinaryContentInfo
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -40,20 +42,22 @@ public class BasicBinaryContentService implements BinaryContentService {
     if (!binaryContentRepository.existsById(id)) {
       throw new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUNT);
     }
-    binaryContentRepository.delete(id);
+    binaryContentRepository.deleteById(id);
   }
 
   // ===== 🎯 Controller Direct (DTO 반환) ======
   @Override
+  @Transactional(readOnly = true)
   public BinaryContentInfoRes getBinaryContent(UUID id) {
-    return BinaryContentInfoRes.from(findById(id));
+    return BinaryContentMapper.toResDto(findById(id));
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<BinaryContentInfoRes> getBinaryContentList(List<UUID> binaryContentIdList) {
     return findAll().stream()
         .filter(bc -> binaryContentIdList.contains(bc.getId()))
-        .map(BinaryContentInfoRes::from)
+        .map(BinaryContentMapper::toResDto)
         .toList();
   }
 }

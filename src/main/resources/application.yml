@@ -13,11 +13,18 @@ spring:
       mail.smtp.starttls.enable: true
   config:
     import: "classpath:application-secret.yml"
-
-discodeit:
-  repository:
-    type: file   # jcf | file
-    file-directory: .discodeit
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true  # SQL을 이쁘게 포맷팅
+        default_batch_fetch_size: 50 # 연관관계(LAZY)에서 N+1 문제를 줄이기 위해 한 번에 50개씩 IN 쿼리로 묶어서 가져오게 하는 옵션
+    open-in-view: false
+  logging:
+    level:
+      org.hibernate.SQL: debug # 실행되는 SQL 문장 자체를 로깅
+      org.hibernate.orm.jdbc.bind: trace # SQL 안의 바인딩 값(?, ?, ?)에 들어가는 실제 파라미터를 출력
 
 springdoc:
   swagger-ui:
@@ -29,3 +36,9 @@ springdoc:
 
   api-docs:
     path: /my-api
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: A:/myCodes/codit/sprint/storage

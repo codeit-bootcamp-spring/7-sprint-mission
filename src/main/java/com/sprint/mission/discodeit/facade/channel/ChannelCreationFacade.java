@@ -4,39 +4,53 @@ import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateReq;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateSecReq;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.facade.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.entity.ChannelMemberRole;
+import com.sprint.mission.discodeit.factory.ChannelMemberFactory;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.service.ChannelMemberService;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.transactional.CustomTransactional;
+import com.sprint.mission.discodeit.service.query.QueryChannelService;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ChannelCreationFacade {
 
   private final ChannelService channelService;
-  private final ReadStatusService readStatusService;
-  private final ChannelMapper channelMapper;
+  private final ChannelMemberService channelMemberService;
+  private final ChannelMemberFactory channelMemberFactory;
+  private final QueryChannelService queryChannelService;
 
   //공개 채널 추가
   public ChannelInfoRes createPublicChannel(@NonNull UUID managerId,
       @NonNull ChannelCreateReq req) {
-    return channelMapper.toInfoRes(channelService.create(managerId, req));
+    Channel channel = channelService.create(req);
+    channelMemberService.create(
+        channelMemberFactory.create(managerId, channel.getId(), ChannelMemberRole.MANAGER));
+    return ChannelMapper.toResDto(queryChannelService.get(channel.getId()));
   }
 
   //비밀 채널 추가
-  @CustomTransactional
   public ChannelInfoRes createPrivateChannel(@NonNull UUID managerId,
       @NonNull ChannelCreateSecReq req) {
-    Channel channel = channelService.create(managerId, req);
-    readStatusService.create(ReadStatus.create(managerId, channel.getId()));
-    req.userIds().forEach(userId -> readStatusService.create(
-        ReadStatus.create(userId, channel.getId())
-    ));
-    return channelMapper.toInfoRes(channel);
+    Channel channel = channelService.create(req);
+    channelMemberService.create(
+        channelMemberFactory.create(
+            managerId,
+            channel.getId(),
+            ChannelMemberRole.MANAGER));
+    req.userIds().forEach(userId -> channelMemberService.create(
+        channelMemberFactory.create(
+            userId,
+            channel.getId(),
+            ChannelMemberRole.MEMBER
+        ))
+    );
+    return ChannelMapper.toResDto(queryChannelService.get(channel.getId()));
   }
 }

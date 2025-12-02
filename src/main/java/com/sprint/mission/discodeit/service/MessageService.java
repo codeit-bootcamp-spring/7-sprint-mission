@@ -1,17 +1,26 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Slice;
 
 public interface MessageService {
-    List<Message> findAllByUser(UUID userId);
-    List<Message> findAllByChannelId(UUID channelId);
-    List<Message> searchMessagesByContent(String searchText);
-    Message findLastMessageByChannelId(UUID channelId);
-    Message create(Message message);
-    void update(UUID id, String content, List<UUID> attachmentIds);
-    void delete(UUID id);
-    Message findById(UUID id);
+
+  List<Message> findAllByChannelId(UUID channelId);
+
+  Instant getListMessageTime(UUID channelId);
+
+  Message create(Message message);
+
+  void update(UUID id, String content, List<BinaryContent> attachments);
+
+  void delete(UUID id);
+
+  Message findById(UUID id);
+
+  Slice<Message> getRecentMessages(UUID channelId, int page);
 }

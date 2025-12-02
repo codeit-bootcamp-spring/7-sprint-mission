@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.docs.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.BinaryContentCreateReq;
+import com.sprint.mission.discodeit.dto.common.response.PageResponse;
 import com.sprint.mission.discodeit.dto.message.request.MessageCreateReq;
 import com.sprint.mission.discodeit.dto.message.request.MessageInfoReq;
 import com.sprint.mission.discodeit.dto.message.request.MessageUpdateReq;
@@ -10,6 +11,7 @@ import com.sprint.mission.discodeit.facade.message.MessageCreationFacade;
 import com.sprint.mission.discodeit.facade.message.MessageDeleteFacade;
 import com.sprint.mission.discodeit.facade.message.MessageOverviewFacade;
 import com.sprint.mission.discodeit.facade.message.MessageUpdateFacade;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -28,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -42,8 +43,10 @@ public class MessageController implements MessageControllerDocs {
 
   //특정 채널의 메세지들 조회
   @GetMapping
-  public ResponseEntity<List<MessageViewRes>> findAllByChannelId(@RequestParam UUID channelId) {
-    return ResponseEntity.ok(messageOverviewFacade.findAllByChannelId(channelId));
+  public ResponseEntity<PageResponse<MessageViewRes>> findAllByChannelId(
+      @RequestParam UUID channelId,
+      @RequestParam(defaultValue = "0") int page) {
+    return ResponseEntity.ok(messageOverviewFacade.findAllByChannelId(channelId, page));
   }
 
   //메세지 입력
@@ -55,16 +58,11 @@ public class MessageController implements MessageControllerDocs {
       @RequestPart(value = "attachmentFiles", required = false) List<MultipartFile> attachmentFiles) {
 
     List<BinaryContentCreateReq> binaryContentCreateReqs = attachmentFiles == null ?
-        List.of() : attachmentFiles.stream().map(BinaryContentCreateReq::from).toList();
+        List.of() : attachmentFiles.stream().map(BinaryContentMapper::toReqDto).toList();
     MessageCreateReq req = MessageCreateReq.from(messageInfoReq, binaryContentCreateReqs);
     MessageViewRes message = messageCreationFacade.createMessage(speakerId, channelId, req);
 
-    URI location = ServletUriComponentsBuilder
-        .fromCurrentRequestUri()
-        .path("/{id}")
-        .buildAndExpand(message.messageId())
-        .toUri();
-    return ResponseEntity.created(location).body(message);
+    return ResponseEntity.created(URI.create("/api/messages/" + message.messageId())).body(message);
   }
 
   //메세지 수정
@@ -76,7 +74,7 @@ public class MessageController implements MessageControllerDocs {
       @RequestPart(value = "attachmentFiles", required = false) List<MultipartFile> newAttachmentReqs) {
 
     List<BinaryContentCreateReq> binaryContentCreateReqs = newAttachmentReqs == null ?
-        List.of() : newAttachmentReqs.stream().map(BinaryContentCreateReq::from).toList();
+        List.of() : newAttachmentReqs.stream().map(BinaryContentMapper::toReqDto).toList();
     MessageUpdateReq req = new MessageUpdateReq(
         messageInfoReq.content(), keepAttachmentIds, binaryContentCreateReqs);
     MessageViewRes res = messageUpdateFacade.updateMessage(messageId, req);

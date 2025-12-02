@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -13,9 +14,11 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class AuthFacade {
 
   private final UserService userService;
@@ -31,13 +34,12 @@ public class AuthFacade {
     if (!user.getPassword().equals(req.password())) {
       throw new CustomException(ErrorCode.INVALID_PASSWORD);
     }
-    UserStatus userStatus = userStatusService.findByUserId(user.getId());
-    userStatusService.updateOnlineAt(userStatus.getId());
-    userStatusService.updateOfflineAt(userStatus.getId());
 
-    return UserDetailInfoRes.from(user,
-        user.getProfileId() == null ? null
-            : binaryContentService.getBinaryContent(user.getProfileId()),
+    UserStatus userStatus = userStatusService.findByUserId(user.getId());
+    userStatusService.updateOfflineAt(userStatus.getId());
+    return UserMapper.toDetailResDto(user,
+        user.getProfile() == null ? null
+            : binaryContentService.getBinaryContent(user.getProfile().getId()),
         true);
   }
 

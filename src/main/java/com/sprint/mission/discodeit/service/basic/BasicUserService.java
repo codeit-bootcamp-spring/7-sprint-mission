@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.email.EmailSender;
 import com.sprint.mission.discodeit.dto.auth.response.AvailabilityRes;
 import com.sprint.mission.discodeit.dto.user.request.UserUpdateReq;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -19,6 +22,39 @@ public class BasicUserService implements UserService {
 
   //리포지토리
   private final UserRepository userRepository;
+  private final EmailSender emailSender;
+
+  // ===== 🎯 Controller Direct (DTO 반환) =====
+  //메일로 가입했던 아이디를 발송
+  public void sendEmailId(String email) {
+    User user = findByEmail(email);
+    emailSender.sendEmailAsync(
+        email,
+        "[ch-ah] 가입하신 아이디를 보내드립니다",
+        "nickname: " + user.getNickname()
+    );
+  }
+
+  //메일로 임시 비밀번호 발송 및 임시 비밀번호 발급
+  @Override
+  @Transactional
+  public void sendEmailTemporaryPassword(String email, String nickname) {
+    User user = userRepository.findByEmail(email).orElseThrow(
+        () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+    );
+    if (!user.getNickname().equals(nickname)) {
+      throw new CustomException(ErrorCode.INVALID_USER_NICKNAME);
+    }
+    String passwordTemp = UUID.randomUUID().toString().replaceAll("-", "");
+    user.updateTemporaryPassword(passwordTemp);
+    emailSender.sendEmailAsync(
+        email,
+        "[ch-at] 임시 비밀번호를 보내드립니다",
+        String.format("""
+            임시 비밀번호: %s
+            반드시 이후에 비밀번호 변경을 해주세요.""", passwordTemp)
+    );
+  }
 
   // ===== 🏗️ Domain Logic (Facade 용)  =====
   //유저 추가
@@ -60,33 +96,30 @@ public class BasicUserService implements UserService {
     if (!userRepository.existsById(id)) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    userRepository.delete(id);
+    userRepository.deleteById(id);
   }
 
   //업데이트
   @Override
   public void update(UUID id, UserUpdateReq req) {
-    if (!userRepository.existsById(id)) {
-      throw new CustomException(ErrorCode.USER_NOT_FOUND);
+    User user = findById(id);
+    //기존 비밀번호를 클라이언트 쪽에서 알 수 없기 때문에, 새로 올라온 비밀번호가 없으면 비밀번호 변경X
+    String replacaPassword = req.password() == null ? user.getPassword() : req.password();
+    if (req.password() == null) {
+      replacaPassword = user.getPassword();
     }
     validateDuplicate(id, req.email(), req.nickname());
-    userRepository.update(id, req.email(), req.nickname(), req.password());
+    user.update(req.email(), req.nickname(), replacaPassword);
   }
 
-  @Override
-  public void updateProfileImage(UUID id, UUID profileId) {
-    if (!userRepository.existsById(id)) {
-      throw new CustomException(ErrorCode.USER_NOT_FOUND);
-    }
-    userRepository.updateProfileImage(id, profileId);
-  }
-
+  //해당 닉네임으로 가입된 사림이 있는지.
   @Override
   public AvailabilityRes isRegisteredNickname(String nickname) {
     return new AvailabilityRes(
         userRepository.existsByNickname(nickname));
   }
 
+  //해당 이메일로 가입된 사림이 있는지.
   @Override
   public AvailabilityRes isRegisteredEmail(String email) {
     return new AvailabilityRes(
@@ -107,10 +140,10 @@ public class BasicUserService implements UserService {
 
   //기존 유저 회원 정보 수정 시 중복 검사
   private void validateDuplicate(UUID userId, String email, String nickname) {
-    if (userRepository.existsByEmailAndIdNot(email, userId)) {
+    if (userRepository.existsByIdNotAndEmail(userId, email)) {
       throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
     }
-    if (userRepository.existsByNicknameAndIdNot(nickname, userId)) {
+    if (userRepository.existsByIdNotAndNickname(userId, nickname)) {
       throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
     }
   }
