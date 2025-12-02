@@ -5,15 +5,15 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.40/398c6d2d7c42c96b65e78d2ddc9be0058c163453/lombok-1.18.40.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.36/5a30490a6e14977d97d9c73c924c1f1b5311ea95/lombok-1.18.36.jar" />
         </processorPath>
-        <module name="7-sprint-mission.main" />
+        <module name="discodeit.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="discodeit" target="17" />
-      <module name="discodeit.main" target="17" />
-      <module name="discodeit.test" target="17" />
+      <module name="7-sprint-mission" target="17" />
+      <module name="7-sprint-mission.main" target="17" />
+      <module name="7-sprint-mission.test" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

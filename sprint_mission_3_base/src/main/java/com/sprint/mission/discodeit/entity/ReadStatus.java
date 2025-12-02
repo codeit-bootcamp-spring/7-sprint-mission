@@ -1,41 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-import java.io.Serializable;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
+
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
-public class ReadStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+@Entity
+@Table(name = "read_status")
+public class ReadStatus extends BaseEntity {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    private UUID userId;        // 어떤 유저가
-    private UUID channelId;     // 어떤 채널에서
-    private Instant lastReadAt; // 마지막 읽음 시각
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
 
-    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-        this.userId = userId;
-        this.channelId = channelId;
-        this.lastReadAt = lastReadAt;
+    @Column(nullable = false)
+    private Instant lastReadAt;
+
+    @Builder
+    public ReadStatus(User user, Channel channel) {
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = Instant.now();
     }
 
-    public void updateLastReadAt(Instant at) {
-        if (at != null && !at.equals(this.lastReadAt)) {
-            this.lastReadAt = at;
-            this.updatedAt = Instant.now();
-        }
+    /** 마지막 읽은 시각 업데이트 */
+    public void updateReadTime() {
+        this.lastReadAt = Instant.now();
     }
-    public void update(java.time.Instant newLastReadAt) {
-        if (newLastReadAt == null) return;
-        this.lastReadAt = newLastReadAt;
-        this.updatedAt = java.time.Instant.now();
-    }
-
 }

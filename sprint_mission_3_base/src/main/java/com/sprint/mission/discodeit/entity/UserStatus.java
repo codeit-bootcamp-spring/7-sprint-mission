@@ -1,52 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
-import java.io.Serializable;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
-public class UserStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+@Entity
+@Table(name = "user_status")
+public class UserStatus extends BaseEntity {
 
-    // 공통 필드
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    // 도메인 필드
-    private UUID userId;
-    private Instant lastSeenAt;
+    @Column(nullable = false)
+    private Instant lastActiveAt;
 
-    // 생성자: userId만 주는 경우
-    public UserStatus(UUID userId) {
-        this(userId, Instant.now());
+    @Builder
+    public UserStatus(User user) {
+        this.user = user;
+        this.lastActiveAt = Instant.now();
     }
 
-    // 생성자: userId, lastSeenAt 지정
-    public UserStatus(UUID userId, Instant lastSeenAt) {
-        this.id = UUID.randomUUID();
-        Instant now = Instant.now();
-        this.createdAt = now;
-        this.updatedAt = now;
-        this.userId = userId;
-        this.lastSeenAt = (lastSeenAt != null) ? lastSeenAt : now;
+    public boolean isOnline() {
+        return lastActiveAt.isAfter(Instant.now().minusSeconds(300));
     }
 
-    /**
-     * 서비스에서 기대하는 갱신 메서드
-     * (BasicUserStatusService에서 us.update(Instant) 호출)
-     */
-    public void update(Instant lastSeenAt) {
-        this.lastSeenAt = (lastSeenAt != null) ? lastSeenAt : Instant.now();
-        this.updatedAt = Instant.now();
+    /** 최근 활성 시간 업데이트 */
+    public void updateLastSeen() {
+        this.lastActiveAt = Instant.now();
     }
 
-    /** 편의 메서드: 특정 기간 내 접속 여부 */
-    public boolean isOnlineWithin(Duration within, Instant now) {
-        Instant pivot = now.minus(within);
-        return !this.lastSeenAt.isBefore(pivot);
+    // 기존 서비스에서 호출할 이름을 위해 alias 제공
+    public void updateActivity() {
+        updateLastSeen();
     }
 }

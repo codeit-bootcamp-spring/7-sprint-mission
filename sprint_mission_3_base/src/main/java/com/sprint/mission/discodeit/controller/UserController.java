@@ -1,70 +1,103 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
-
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    // ✅ 사용자 생성
-    @PostMapping
-    public ResponseEntity<UserDto> create(@RequestBody UserCreateRequest request) {
-        UserDto createdUser = userService.create(request);
-        return ResponseEntity.status(201).body(createdUser); // 생성 시 201 Created
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequestBody(
+            content = @Content(
+                    mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    schema = @Schema(
+                            description = "User 생성 요청(JSON + 프로필 파일)"
+                    )
+            )
+    )
+    public ResponseEntity<UserDto> create(
+            @RequestPart("userCreateRequest")
+            @Schema(
+                    description = "JSON 입력: {\"username\":\"...\", \"email\":\"...\", \"password\":\"...\"}"
+            )
+            UserCreateRequest userCreateRequest,
+
+            @RequestPart(name = "profile", required = false)
+            @Schema(type = "string", format = "binary")
+            MultipartFile profile
+    ) {
+        Optional<BinaryContentCreateRequest> profileReq =
+                Optional.ofNullable(profile).flatMap(this::convert);
+
+        UserDto dto = userService.create(userCreateRequest, profileReq);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
-    // ✅ 사용자 전체 조회
+    @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserDto> update(
+            @PathVariable UUID userId,
+
+            @RequestPart("userUpdateRequest")
+            @Schema(description = "JSON 입력: {\"name\":\"새 이름\"}")
+            UserUpdateRequest userUpdateRequest,
+
+            @RequestPart(name = "profile", required = false)
+            @Schema(type = "string", format = "binary")
+            MultipartFile profile
+    ) {
+        Optional<BinaryContentCreateRequest> profileReq =
+                Optional.ofNullable(profile).flatMap(this::convert);
+
+        UserDto dto = userService.update(userId, userUpdateRequest, profileReq);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDto> find(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userService.find(userId));
+    }
+
     @GetMapping
-    public ResponseEntity<List<UserDto>> findAll() {
+    public ResponseEntity<?> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    // ✅ 사용자 단건 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDto> find(@PathVariable UUID id) {
-        return userService.find(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+        userService.delete(userId);
+        return ResponseEntity.noContent().build();
     }
 
-    // ✅ 사용자 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        userService.delete(id);
-        return ResponseEntity.noContent().build(); // 204 No Content
-    }
-
-    @PatchMapping("/{userId}")
-    public ResponseEntity<?> updateUser(@PathVariable UUID userId, @RequestBody Map<String, Object> updates) {
+    private Optional<BinaryContentCreateRequest> convert(MultipartFile file) {
         try {
-            // username이나 email 중 들어온 것만 업데이트
-            if (updates.containsKey("username")) {
-                String newUsername = (String) updates.get("username");
-                userService.updateUsername(userId, newUsername);
-            }
-            if (updates.containsKey("email")) {
-                String newEmail = (String) updates.get("email");
-                userService.updateEmail(userId, newEmail);
-            }
-
-            return ResponseEntity.ok().body("User updated successfully");
+            return Optional.of(
+                    new BinaryContentCreateRequest(
+                            file.getOriginalFilename(),
+                            file.getContentType(),
+                            file.getBytes()
+                    )
+            );
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Update failed: " + e.getMessage());
+            throw new RuntimeException("파일 변환 중 오류", e);
         }
     }
 }

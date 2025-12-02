@@ -1,43 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 @Getter
-public class BinaryContent implements Serializable {
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+@Entity
+@Table(name = "binary_contents")
+public class BinaryContent extends BaseEntity {
 
-    private UUID id;
-    private Instant createdAt;   // 수정 불가 모델 → updatedAt 없음
-    private BinaryOwnerType ownerType; // USER_PROFILE or MESSAGE_ATTACHMENT
-    private UUID ownerId;              // User.id 또는 Message.id
-    private String filename;
+    @Column(nullable = false)
+    private String fileName;
+
+    @Column(nullable = false)
+    private long size;
+
+    @Column(nullable = false)
     private String contentType;
-    private byte[] data;
 
-    public BinaryContent(BinaryOwnerType ownerType, UUID ownerId,
-                         String filename, String contentType, byte[] data) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.ownerType = ownerType;
-        this.ownerId = ownerId;
-        this.filename = filename;
+    // Message와 1:1(선택적)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "message_id")
+    private Message message;
+
+    // User 프로필 이미지(N:1)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Builder
+    public BinaryContent(String fileName, long size, String contentType,
+                         Message message, User user) {
+
+        this.fileName = fileName;
+        this.size = size;
         this.contentType = contentType;
-        this.data = data;
-    }
-
-    // --- 정적 팩토리 메서드 추가 ---
-    public static BinaryContent forUserProfile(
-            UUID userId, String filename, String contentType, byte[] data
-    ) {
-        return new BinaryContent(BinaryOwnerType.USER_PROFILE, userId, filename, contentType, data);
-    }
-
-    public static BinaryContent forMessageAttachment(
-            UUID messageId, String filename, String contentType, byte[] data
-    ) {
-        return new BinaryContent(BinaryOwnerType.MESSAGE_ATTACHMENT, messageId, filename, contentType, data);
+        this.message = message;
+        this.user = user;
     }
 }

@@ -1,50 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
 @Getter
-@Setter
-public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+@Table(name = "users")
+public class User extends BaseEntity {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private String username;
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
 
-    public User(String username, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt; // ✅ 추가: 생성 시점과 동일하게 초기화
-        this.username = username;
+    /* 🔥 추가: User ↔ BinaryContent (프로필 1:1 관계) */
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
+    private BinaryContent profile;
+
+    @Builder
+    public User(String name, String email, String password) {
+        this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword) {
-        boolean anyValueUpdated = false;
-        if (newUsername != null && !newUsername.equals(this.username)) {
-            this.username = newUsername;
-            anyValueUpdated = true;
-        }
-        if (newEmail != null && !newEmail.equals(this.email)) {
-            this.email = newEmail;
-            anyValueUpdated = true;
-        }
-        if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
-            anyValueUpdated = true;
-        }
+    public void update(String name) {
+        this.name = name;
+    }
 
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+    /* 🔥 프로필 업데이트 */
+    public void updateProfile(BinaryContent profile) {
+        this.profile = profile;
     }
 }

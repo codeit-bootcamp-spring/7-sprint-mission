@@ -1,26 +1,9 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import java.util.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.UUID;
 
-public interface BinaryContentRepository {
-    BinaryContent save(BinaryContent binary);
-
-    Optional<BinaryContent> findById(UUID id);
-
-    Optional<BinaryContent> findByUserId(UUID userId);
-
-    List<BinaryContent> findAllByMessageId(UUID messageId);
-
-    List<BinaryContent> findAllByIdIn(List<UUID> ids);
-
-    void deleteById(UUID id);
-
-    void deleteByUserId(UUID userId);
-
-    void deleteAllByMessageId(UUID messageId);
-
-    default boolean existsById(UUID id) {
-        return findById(id).isPresent();
-    }
+public interface BinaryContentRepository extends JpaRepository<BinaryContent, UUID> {
 }
+

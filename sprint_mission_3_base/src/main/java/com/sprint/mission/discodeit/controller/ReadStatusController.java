@@ -2,8 +2,6 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,52 +9,36 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/readStatuses")
 @RequiredArgsConstructor
+@RequestMapping("/api/read-status")
 public class ReadStatusController {
 
     private final ReadStatusService readStatusService;
 
-    // ✅ 읽음 상태 생성
+    // 생성
     @PostMapping
-    public ResponseEntity<UUID> create(@RequestBody ReadStatusCreateRequest request) {
-        UUID createdId = readStatusService.create(request);
-        return ResponseEntity.status(201).body(createdId);
+    public ResponseEntity<ReadStatusDto> create(@RequestBody ReadStatusCreateRequest request) {
+        return ResponseEntity.ok(readStatusService.create(request));
     }
 
-    // ✅ 사용자별 읽음 상태 목록 조회
-    @GetMapping
-    public ResponseEntity<List<ReadStatusDto>> findAllByUser(@RequestParam UUID userId) {
-        List<ReadStatusDto> statuses = readStatusService.findAllByUserId(userId).stream()
-                .map(rs -> new ReadStatusDto(
-                        rs.getId(),
-                        rs.getUserId(),
-                        rs.getChannelId(),
-                        rs.getLastReadAt(),
-                        rs.getCreatedAt(),
-                        rs.getUpdatedAt()
-                ))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(statuses);
+    // 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<ReadStatusDto> find(@PathVariable("id") UUID id) {
+        return ResponseEntity.ok(readStatusService.find(id));
     }
 
-    // ✅ 읽음 상태 수정 (반환 타입 수정 완료)
-    @PatchMapping
-    public ResponseEntity<ReadStatusDto> update(@RequestBody ReadStatusUpdateRequest request) {
-        ReadStatus updated = readStatusService.update(request);
+    // 특정 user의 모든 읽음 상태 조회
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@PathVariable("userId") UUID userId) {
+        return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
+    }
 
-        ReadStatusDto dto = new ReadStatusDto(
-                updated.getId(),
-                updated.getUserId(),
-                updated.getChannelId(),
-                updated.getLastReadAt(),
-                updated.getCreatedAt(),
-                updated.getUpdatedAt()
-        );
-
-        return ResponseEntity.ok(dto);
+    // 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
+        readStatusService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

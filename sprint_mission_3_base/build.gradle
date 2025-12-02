@@ -1,12 +1,11 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.10'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.6'
 }
 
 group = 'com.sprint.mission'
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
 
 java {
     toolchain {
@@ -25,19 +24,26 @@ repositories {
 }
 
 dependencies {
-    // ✅ Spring Boot Web
+    // Spring Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // ✅ Swagger & OpenAPI (springdoc)
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+    // Spring Data JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // ✅ Lombok
+    // PostgreSQL Driver
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // ✅ Test
+    // validation (DTO 검증)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // swagger springdoc
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {

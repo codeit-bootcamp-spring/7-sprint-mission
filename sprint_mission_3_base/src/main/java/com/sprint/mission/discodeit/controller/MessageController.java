@@ -3,47 +3,61 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/messages")
 @RequiredArgsConstructor
+@RequestMapping("/api/messages")
 public class MessageController {
 
     private final MessageService messageService;
 
-    // ✅ 메시지 생성
-    @PostMapping
-    public ResponseEntity<MessageDto> create(@RequestBody MessageCreateRequest request) {
-        MessageDto created = messageService.create(request);
-        return ResponseEntity.status(201).body(created);
+    // 이미지 첨부 메시지 생성
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MessageDto create(
+            @RequestPart("json") MessageCreateRequest request,
+            @RequestPart(name = "file", required = false) MultipartFile file
+    ) {
+        return messageService.createWithFile(request, file);
     }
 
-    // ✅ 채널별 메시지 조회
-    // 기존: /channel/{channelId} → 개선: /api/messages?channelId={id}
-    @GetMapping
-    public ResponseEntity<List<MessageDto>> findAllByChannel(@RequestParam UUID channelId) {
-        List<MessageDto> messages = messageService.findAllByChannelId(channelId);
-        return ResponseEntity.ok(messages);
+
+    // 메시지 수정
+    @PutMapping("/{id}")
+    public MessageDto update(
+            @PathVariable UUID id,
+            @RequestBody MessageUpdateRequest request
+    ) {
+        MessageUpdateRequest fixed = new MessageUpdateRequest(id, request.content());
+        return messageService.update(fixed);
     }
 
-    // ✅ 메시지 내용 수정
-    @PatchMapping
-    public ResponseEntity<MessageDto> update(@RequestBody MessageUpdateRequest request) {
-        MessageDto updated = messageService.update(request);
-        return ResponseEntity.ok(updated);
-    }
-
-    // ✅ 메시지 삭제
+    // 메시지 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public void delete(@PathVariable UUID id) {
         messageService.delete(id);
-        return ResponseEntity.noContent().build();
+    }
+
+    // 메시지 조회 (페이징)
+    @GetMapping("/channel/{channelId}")
+    public PageResponse<MessageDto> findAllByChannelId(
+            @PathVariable UUID channelId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return messageService.findAllByChannelId(channelId, page, size);
+    }
+
+    // 메시지 단건 조회
+    @GetMapping("/{id}")
+    public MessageDto find(@PathVariable UUID id) {
+        return messageService.find(id);
     }
 }
