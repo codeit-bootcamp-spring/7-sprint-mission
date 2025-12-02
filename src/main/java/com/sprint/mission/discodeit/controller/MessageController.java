@@ -1,47 +1,62 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.docs.MessageControllerDocs;
-import com.sprint.mission.discodeit.service.BasicMessageService;
-import com.sprint.mission.discodeit.service.dto.request.MessageForm;
-import com.sprint.mission.discodeit.service.dto.request.MessageUpdate;
-import com.sprint.mission.discodeit.service.dto.response.MessageResponse;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.service.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.response.MessageDto;
+import com.sprint.mission.discodeit.service.dto.response.PageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
 
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
-public class MessageController implements MessageControllerDocs {
+public class MessageController {
 
-    private final BasicMessageService messageService;
+    private final MessageService messageService;
 
 
     @PostMapping
-    public MessageResponse sendMessage(@RequestPart("messageCreateRequest") MessageForm messageCreateRequest,
-                                       @RequestPart(required = false) List<MultipartFile> attachments) {
-        return messageService.sendMessage(messageCreateRequest, attachments);
+    public ResponseEntity<MessageDto> sendMessage(@RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+                                                  @RequestPart(required = false) List<MultipartFile> attachments) {
+
+        MessageDto messageDto = messageService.sendMessage(messageCreateRequest, attachments);
+        return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
     }
 
     @PatchMapping("/{messageId}")
-    public MessageResponse updateMessage(@PathVariable UUID messageId, @ModelAttribute MessageUpdate messageUpdate) {
-        return messageService.updateMessage(messageId, messageUpdate);
+    public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId, @ModelAttribute MessageUpdateRequest messageUpdateRequest) {
+        MessageDto messageDto = messageService.updateMessage(messageId, messageUpdateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
     }
 
     @DeleteMapping("/{messageId}")
-    public String deleteMessage(@PathVariable UUID messageId) {
+    public ResponseEntity<?> deleteMessage(@PathVariable UUID messageId) {
         messageService.deleteMessage(messageId);
-        return "삭제 성공";
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("삭제 완료");
     }
 
     @GetMapping
-    public List<MessageResponse> getAllMessageByChannelId(@RequestParam UUID channelId) {
-        return messageService.getAllMessage(channelId);
+    public ResponseEntity<PageResponse<MessageDto>> getAllMessageByChannelId(
+            @RequestParam UUID channelId,
+            @PageableDefault(size = 50, page = 0, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        PageResponse<MessageDto> allByChannelId = messageService.getAllByChannelId(channelId, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(allByChannelId);
     }
 
 
