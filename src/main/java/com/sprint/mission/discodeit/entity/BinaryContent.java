@@ -1,47 +1,27 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.Objects;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
-public class BinaryContent implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final String name;
-    private final Instant createdAt;
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@AllArgsConstructor
+@ToString
+@Entity
+@Table(name = "binary_contents")
+public class BinaryContent extends BaseEntity {
+
+    @Column(name = "file_name", nullable = false)
+    private String fileName;
+
+    @Column(nullable = false)
+    private Long size;
+
+    @Column(name = "content_type", nullable = false)
     private String contentType;
-    private final byte[] bytes; // 파일 데이터
-
-    public BinaryContent(String name, String contentType, byte[] bytes) {
-        Instant now = Instant.now();
-        this.id = UUID.randomUUID(); // 랜덤 UUID로 초기화
-        this.createdAt = now;
-        this.name = name;
-        this.contentType = contentType;
-        this.bytes = bytes;
-    }
-
-    @Override
-    public String toString() {
-        return "BinaryContent{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", (" + bytes.length + " bytes)" +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof BinaryContent that)) return false;
-        return Objects.equals(id, that.id) && Objects.equals(createdAt, that.createdAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, createdAt);
-    }
 }

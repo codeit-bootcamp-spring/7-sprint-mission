@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -8,18 +10,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserStatusRepository {
-
-    void save(UserStatus userStatus);
-
-    Optional<UserStatus> findById(UUID id);
-
+public interface UserStatusRepository extends JpaRepository<UserStatus, UUID> {
     Optional<UserStatus> findByUserId(UUID userId);
 
-    List<UserStatus> findAll();
-
-    // 유저가 로그인한 경우 시간 갱신
-    void update(UserStatus status);
-
-    void deleteById(UUID id);
+    @Query("select us from UserStatus us join fetch us.user")
+    List<UserStatus> findAllWithUser();
 }

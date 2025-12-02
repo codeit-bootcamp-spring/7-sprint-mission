@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -17,20 +17,21 @@ import java.util.UUID;
 @Hidden
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class UserViewController {
     private final UserService userService;
     private final BinaryContentService binaryContentService;
 
     // 유저 목록 조회
-    @RequestMapping(value = "/api/user/findAll", method = RequestMethod.GET)
+    @GetMapping("/user/findAll")
     public ResponseEntity<List<UserResponseDto>> searchUsers() {
         return ResponseEntity.ok().body(userService.findAll());
     }
 
     // binaryContentId로 파일 찾기
-    @RequestMapping(value = "/api/binaryContent/find", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContent> searchProfileById(@RequestParam UUID binaryContentId) {
-        BinaryContent content = binaryContentService.find(binaryContentId);
+    @GetMapping("/binaryContent/find")
+    public ResponseEntity<BinaryContentResponseDto> searchProfileById(@RequestParam UUID binaryContentId) {
+        BinaryContentResponseDto content = binaryContentService.find(binaryContentId);
         return ResponseEntity.ok(content);
     }
 }

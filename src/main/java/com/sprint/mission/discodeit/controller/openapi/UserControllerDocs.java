@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userstatus.request.UpdateUserStatusRequestDto;
+import com.sprint.mission.discodeit.dto.userstatus.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -88,7 +89,7 @@ public interface UserControllerDocs {
                     )
             )
     })
-    ResponseEntity<User> createUser(CreateUserRequestDto requestDto, MultipartFile profile);
+    ResponseEntity<UserResponseDto> createUser(CreateUserRequestDto requestDto, MultipartFile profile);
 
     @Operation(
             summary = "사용자 정보 수정",
@@ -157,7 +158,7 @@ public interface UserControllerDocs {
                     )
             )
     })
-    ResponseEntity<User> updateUser(UUID userId, UpdateUserRequestDto requestDto, MultipartFile profile);
+    ResponseEntity<UserResponseDto> updateUser(UUID userId, UpdateUserRequestDto requestDto, MultipartFile profile);
 
     @Operation(
             summary = "사용자 정보 삭제",
@@ -297,5 +298,5 @@ public interface UserControllerDocs {
                     )
             )
     })
-    ResponseEntity<UserStatus> onlineUser(UUID userId, UpdateUserStatusRequestDto request);
+    ResponseEntity<UserStatusResponseDto> onlineUser(UUID userId, UpdateUserStatusRequestDto request);
 }

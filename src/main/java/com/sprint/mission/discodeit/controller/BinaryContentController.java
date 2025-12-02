@@ -1,14 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.openapi.BinaryContentControllerDocs;
-import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.global.dto.ApiResponse;
+import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import jakarta.websocket.Decoder;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,21 +15,26 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController implements BinaryContentControllerDocs {
-    private final UserService userService;
-    private final MessageService messageService;
     private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
 
-    @RequestMapping(value = "/binaryContents/{binaryContentId}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContent> find(@PathVariable UUID binaryContentId) {
-        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+    @GetMapping("/{binaryContentId}")
+    public ResponseEntity<BinaryContentResponseDto> find(@PathVariable UUID binaryContentId) {
+        BinaryContentResponseDto binaryContent = binaryContentService.find(binaryContentId);
         return ResponseEntity.status(HttpStatus.OK).body(binaryContent);
     }
 
-    @RequestMapping(value = "/binaryContents", method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContent>> findAllByIdIn(@RequestParam List<UUID> binaryContentIds) {
-        List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    @GetMapping
+    public ResponseEntity<List<BinaryContentResponseDto>> findAllByIdIn(@RequestParam List<UUID> binaryContentIds) {
+        List<BinaryContentResponseDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
         return ResponseEntity.status(HttpStatus.OK).body(binaryContents);
+    }
+
+    @GetMapping("/{binaryContentId}/download")
+    public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
+        BinaryContentResponseDto binaryContent = binaryContentService.find(binaryContentId);
+        return binaryContentStorage.download(binaryContent);
     }
 }

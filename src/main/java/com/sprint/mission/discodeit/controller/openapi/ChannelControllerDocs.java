@@ -78,7 +78,7 @@ public interface ChannelControllerDocs {
                     )
             )
     })
-    ResponseEntity<Channel> createPublic(CreatePublicChannelRequestDto requestDto);
+    ResponseEntity<ChannelDto> createPublic(CreatePublicChannelRequestDto requestDto);
 
     @Operation(
             summary = "비공개 채널 생성",
@@ -137,7 +137,7 @@ public interface ChannelControllerDocs {
                     )
             )
     })
-    ResponseEntity<Channel> createPrivate(@RequestBody CreatePrivateChannelRequestDto requestDto);
+    ResponseEntity<ChannelDto> createPrivate(@RequestBody CreatePrivateChannelRequestDto requestDto);
 
     @Operation(
             summary = "채널 정보 수정",
@@ -215,7 +215,7 @@ public interface ChannelControllerDocs {
                     )
             )
     })
-    ResponseEntity<Channel> update(UUID channelId, UpdatePublicChannelRequestDto request);
+    ResponseEntity<ChannelDto> update(UUID channelId, UpdatePublicChannelRequestDto request);
 
 
     @Operation(

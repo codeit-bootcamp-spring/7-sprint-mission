@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.dto.archive.response;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.ChannelVisibility;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.ToString;
@@ -20,8 +19,6 @@ public class ChannelResponseDto {
     UUID id;
     String channelName;
     ChannelType channelType;
-    ChannelVisibility visibility;
-    UUID adminId;
     Instant lastedMessageAt;
 
     public static ChannelResponseDto from(Channel channel, Instant lastedMessageAt) {
@@ -29,8 +26,6 @@ public class ChannelResponseDto {
                 .id(channel.getId())
                 .channelName(channel.getChannelName())
                 .channelType(channel.getChannelType())
-                .visibility(channel.getVisibility())
-                .adminId(channel.getAdminId())
                 .lastedMessageAt(lastedMessageAt)
                 .build();
     }

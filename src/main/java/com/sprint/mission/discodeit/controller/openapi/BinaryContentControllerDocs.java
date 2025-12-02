@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.openapi;
 
+import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -50,7 +51,7 @@ public interface BinaryContentControllerDocs {
                     )
             )
     })
-    ResponseEntity<BinaryContent> find(UUID binaryContentId);
+    ResponseEntity<BinaryContentResponseDto> find(UUID binaryContentId);
 
     @Operation(
             summary = "파일 다중 조회",
@@ -96,5 +97,5 @@ public interface BinaryContentControllerDocs {
                     )
             )
     })
-    ResponseEntity<List<BinaryContent>> findAllByIdIn(List<UUID> binaryContentIds);
+    ResponseEntity<List<BinaryContentResponseDto>> findAllByIdIn(List<UUID> binaryContentIds);
 }

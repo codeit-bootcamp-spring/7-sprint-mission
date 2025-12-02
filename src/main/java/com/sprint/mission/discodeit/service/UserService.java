@@ -19,24 +19,9 @@ public interface UserService {
     /**
      * 새로운 사용자 생성
      */
-    User create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest);
+    UserResponseDto create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest);
 
     UserResponseDto find(UUID userId);
-
-    /**
-     * 이메일로 사용자 조회
-     */
-    UserResponseDto findByEmail(String email);
-
-    /**
-     * 전화번호로 사용자 조회
-     */
-    UserResponseDto findByPhoneNum(String phoneNum);
-
-    /**
-     * 사용자ID로 사용자 조회
-     */
-    UserResponseDto findByUsername(String username);
 
     /**
      * 전체 사용자 목록 조회
@@ -44,20 +29,13 @@ public interface UserService {
     List<UserResponseDto> findAll();
 
     /**
-     * UUID로 사용자 닉네임 조회
-     */
-    String findNickNameById(UUID userId);
-
-    /**
      * 사용자 정보 업데이트
      */
-    User update(UUID userId, UpdateUserRequestDto request, CreateBinaryContentRequestDto profileRequest);
+    UserResponseDto update(UUID userId, UpdateUserRequestDto request, CreateBinaryContentRequestDto profileRequest);
 
     /**
      * 사용자 삭제
      * @param userId 삭제할 User UUID
      */
     void delete(UUID userId);
-
-    boolean isPasswordMatch(UUID userId, String password);
 }
