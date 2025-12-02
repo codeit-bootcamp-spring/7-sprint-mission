@@ -5,10 +5,11 @@ import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateSecReq;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelMemberRole;
-import com.sprint.mission.discodeit.facade.mapper.ChannelFacadeMapper;
 import com.sprint.mission.discodeit.factory.ChannelMemberFactory;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelMemberService;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.query.QueryChannelService;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +23,8 @@ public class ChannelCreationFacade {
 
   private final ChannelService channelService;
   private final ChannelMemberService channelMemberService;
-  private final ChannelFacadeMapper channelFacadeMapper;
   private final ChannelMemberFactory channelMemberFactory;
+  private final QueryChannelService queryChannelService;
 
   //공개 채널 추가
   public ChannelInfoRes createPublicChannel(@NonNull UUID managerId,
@@ -31,7 +32,7 @@ public class ChannelCreationFacade {
     Channel channel = channelService.create(req);
     channelMemberService.create(
         channelMemberFactory.create(managerId, channel.getId(), ChannelMemberRole.MANAGER));
-    return channelFacadeMapper.toInfoRes(channel);
+    return ChannelMapper.toResDto(queryChannelService.get(channel.getId()));
   }
 
   //비밀 채널 추가
@@ -50,6 +51,6 @@ public class ChannelCreationFacade {
             ChannelMemberRole.MEMBER
         ))
     );
-    return channelFacadeMapper.toInfoRes(channel);
+    return ChannelMapper.toResDto(queryChannelService.get(channel.getId()));
   }
 }

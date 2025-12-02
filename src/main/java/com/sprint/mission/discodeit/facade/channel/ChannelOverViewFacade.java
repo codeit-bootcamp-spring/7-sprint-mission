@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.facade.channel;
 
+import com.sprint.mission.discodeit.dto.channel.query.ChannelInfoQuery;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.facade.mapper.ChannelFacadeMapper;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.query.QueryChannelService;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,19 +20,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ChannelOverViewFacade {
 
-  private final ChannelService channelService;
-  private final ChannelFacadeMapper channelFacadeMapper;
+  private final QueryChannelService queryChannelService;
 
   //채널 목록 : Public 인 경우 전부, Private 인 경우 자신이 참여한 채널만
-  public Map<ChannelType, List<ChannelInfoRes>> findAllMyChannels(@NonNull UUID userId,
+  public Map<ChannelType, List<ChannelInfoRes>> findAllMyChannels(UUID userId,
       String searchTxt) {
-    boolean hasSearch = (searchTxt != null) && (!searchTxt.trim().isEmpty());
-    return channelService.findAllByUserId(userId).entrySet().stream()
-        .collect(Collectors.toMap(
-            Map.Entry::getKey,
-            entry -> entry.getValue().stream()
-                .filter(channel -> !hasSearch || channel.getName().contains(searchTxt))
-                .map(channelFacadeMapper::toInfoRes).toList()
+    String normalizedSearch = (searchTxt == null || searchTxt.trim().isEmpty()) ? "" : searchTxt;
+
+    return queryChannelService.getAllByUser(userId, normalizedSearch).stream()
+        .collect(Collectors.groupingBy(
+            ChannelInfoQuery::getPublicType,
+            Collectors.mapping(
+                ChannelMapper::toResDto,
+                Collectors.toList()
+            )
         ));
   }
 }

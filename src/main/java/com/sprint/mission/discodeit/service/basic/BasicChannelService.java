@@ -3,25 +3,22 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateReq;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateSecReq;
 import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateReq;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelPublicInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.facade.mapper.ChannelFacadeMapper;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ChannelMemberRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -30,7 +27,6 @@ public class BasicChannelService implements ChannelService {
 
   //레포지토리
   private final ChannelRepository channelRepository;
-  private final ChannelFacadeMapper channelFacadeMapper;
   private final ChannelMemberRepository channelMemberRepository;
   private final ChannelFactory channelFactory;
 
@@ -81,11 +77,10 @@ public class BasicChannelService implements ChannelService {
     );
   }
 
-  // ===== 🔧 Controller Direct (단일 도메인 / void) =====
   //채널 수정
   @Override
   @Transactional
-  public ChannelPublicInfoRes update(@NonNull UUID id, @NonNull ChannelUpdateReq req) {
+  public Channel update(@NonNull UUID id, @NonNull ChannelUpdateReq req) {
     Channel channel = channelRepository.findById(id).orElseThrow(
         () -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND)
     );
@@ -93,6 +88,6 @@ public class BasicChannelService implements ChannelService {
       throw new CustomException(ErrorCode.CHANNEL_PRIVATE_CANNOT_MODIFY);
     }
     channel.update(req.name(), req.description());
-    return (ChannelPublicInfoRes) channelFacadeMapper.toInfoRes(channel);
+    return channel;
   }
 }

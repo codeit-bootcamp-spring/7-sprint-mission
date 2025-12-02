@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.mapper;
 
+import com.sprint.mission.discodeit.dto.channel.query.ChannelInfoQuery;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelInfoRes;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelPrivateInfoRes;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelPublicInfoRes;
 import com.sprint.mission.discodeit.entity.Channel;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,20 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ChannelMapper {
 
-  public static ChannelInfoRes toResDto(
+  public static ChannelInfoRes toPrivateResDto(
+      Channel channel,
+      UUID managerId,
+      Instant lastMessageTime) {
+    return new ChannelPrivateInfoRes(
+        channel.getId(),
+        channel.getPublicType().getValue(),
+        managerId,
+        channel.getName(),
+        lastMessageTime
+    );
+  }
+
+  public static ChannelInfoRes toPublicResDto(
       Channel channel,
       UUID managerId,
       Instant lastMessageTime) {
@@ -29,17 +42,14 @@ public class ChannelMapper {
   }
 
   public static ChannelInfoRes toResDto(
-      Channel channel,
-      UUID managerId,
-      List<UUID> userIds,
-      Instant lastMessageTime) {
-    return new ChannelPrivateInfoRes(
-        channel.getId(),
+      ChannelInfoQuery channel) {
+    return new ChannelPublicInfoRes(
+        channel.getChannelId(),
         channel.getPublicType().getValue(),
+        channel.getManagerId(),
         channel.getName(),
-        managerId,
-        userIds,
-        lastMessageTime
+        channel.getDescription(),
+        channel.getLastMessageTime()
     );
   }
 }
