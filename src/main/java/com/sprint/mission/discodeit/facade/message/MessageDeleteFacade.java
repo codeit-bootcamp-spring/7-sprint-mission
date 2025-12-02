@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.facade.message;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.UUID;
@@ -16,18 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class MessageDeleteFacade {
 
   private final MessageService messageService;
-  private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
 
   //메세지 삭제
   public void deleteMessage(@NonNull UUID messageId) {
     Message message = messageService.findById(messageId);
     message.getAttachments().forEach(
-        attachment -> {
-          binaryContentService.delete(attachment.getId());
-          binaryContentStorage.delete(attachment.getId());
-        }
-    );
+        attachment -> binaryContentStorage.delete(attachment.getId()));
     messageService.delete(messageId);
   }
 }
