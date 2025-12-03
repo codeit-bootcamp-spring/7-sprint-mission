@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "message_attachments")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AttributeOverride(name = "id", column = @Column(name = "message_attach_id"))
+@AttributeOverride(name = "id", column = @Column(name = "message_attachment_id"))
 public class MessageAttachment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -20,7 +20,7 @@ public class MessageAttachment extends BaseEntity {
     private Message message;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "attachment_id", nullable = false)
+    @JoinColumn(name = "binary_content_id", nullable = false)
     private BinaryContent attachment;
 
     public MessageAttachment(Message message, BinaryContent attachment) {
