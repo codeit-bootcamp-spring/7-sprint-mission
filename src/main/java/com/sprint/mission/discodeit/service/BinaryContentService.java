@@ -45,8 +45,8 @@ public class BinaryContentService {
         BinaryContent saved = binaryContentRepository.save(content);
 
         Path filePath = fileManager.put(userId, profile, saved.getId().toString());
-        saved.setFileName(saved.getId().toString());
-        saved.setFilePath(filePath.toString());
+        saved.updateFileName(saved.getId().toString());
+        saved.updateFilePath(filePath.toString());
 
 
         return saved;
