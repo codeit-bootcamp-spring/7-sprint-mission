@@ -16,6 +16,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+springBoot {
+    mainClass = 'com.sprint.mission.discodeit.DiscodeitApplication'
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
