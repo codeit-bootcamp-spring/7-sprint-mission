@@ -31,6 +31,8 @@ public class UserController {
         return ResponseEntity.ok().body(result);
     }
 
+
+//    ResponseEntity<Void> 적용해야 함 모든 컨트롤어에 다
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
                                               @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {

@@ -2,18 +2,14 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 
 
 @Getter
 @Entity
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "read_statuses")
 @AttributeOverride(name = "id", column = @Column(name = "read_status_id"))
@@ -31,5 +27,8 @@ public class ReadStatus extends BaseUpdatableEntity {
     @Column(name = "last_read_at")
     private Instant lastReadAt;
 
+    public void updateLastReadAt(Instant lastReadAt){
+        this.lastReadAt=lastReadAt;
+    }
 }
 

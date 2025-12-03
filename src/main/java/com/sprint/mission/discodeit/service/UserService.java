@@ -59,7 +59,7 @@ public class UserService {
 
         if (file != null && !file.isEmpty()) {
             BinaryContent content = binaryContentService.put(save.getId(), file);
-            save.setProfile(content);
+            save.updateProfile(content);
         }
 
         List<ReadStatus> readList = new ArrayList<>();
@@ -79,18 +79,19 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
 
         if (updateDto.newUsername() != null) {
-            user.setUsername(updateDto.newUsername());
+            user.updateUsername(updateDto.newUsername());
         }
         if (updateDto.newPassword() != null) {
-            user.setPassword(updateDto.newPassword());
+            user.updatePassword(updateDto.newPassword());
         }
         if (updateDto.newEmail() != null) {
-            user.setPassword(updateDto.newEmail());
+            user.updateEmail(updateDto.newEmail());
         }
 
         if (file != null) {
             BinaryContent content = binaryContentService.put(user.getId(), file);
-            user.setProfile(content);
+            user.updateProfile(content);
+            //여기서 업데이트하면 알아서 전 profile은 삭제 쿼리 날라감
         }
         return mapper.toDto(user);
     }

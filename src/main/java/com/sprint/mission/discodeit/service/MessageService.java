@@ -75,7 +75,7 @@ public class MessageService {
 
     public MessageDto updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("수정하고자 하는 메세지를 찾을 수 없습니다."));
-        message.setContent(messageUpdateRequest.newContent());
+        message.updateContent(messageUpdateRequest.newContent());
         return mapper.toDto(message);
 
 
@@ -83,7 +83,7 @@ public class MessageService {
 
     @Transactional
     public void deleteMessage(UUID messageId) {
-        List<MessageAttachment> list = attachmentRepository.findAllByMessage_Id(messageId);
+        List<MessageAttachment> list = attachmentRepository.findAllByMessageId(messageId);
         attachmentRepository.deleteById(messageId);
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("메세지가 없습니다."));
         messageRepository.delete(message);
@@ -96,10 +96,10 @@ public class MessageService {
 
 
     public PageResponse<MessageDto> getAllByChannelId(UUID channelId, Pageable pageable) {
-        Page<MessageDto> map = messageRepository.findAllByChannel_Id(channelId, pageable)
+        Page<MessageDto> map = messageRepository.findAllByChannelId(channelId, pageable)
                 .map(message -> {
                     MessageDto dto = mapper.toDto(message);
-                    List<MessageAttachment> allByMessageId = attachmentRepository.findAllByMessage_Id(message.getId());
+                    List<MessageAttachment> allByMessageId = attachmentRepository.findAllByMessageId(message.getId());
                     for (MessageAttachment messageAttachment : allByMessageId) {
                         BinaryContentDto content = binaryContentMapper.toDto(messageAttachment.getAttachment());
                         dto.addAttachment(content);

@@ -8,6 +8,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageAttachmentRepository extends JpaRepository<MessageAttachment, UUID> {
-    List<MessageAttachment> findAllByMessage_Id(UUID messageId);
-    void deleteAllByMessage_Id(UUID messageId);
+    List<MessageAttachment> findAllByMessageId(UUID messageId);
 }

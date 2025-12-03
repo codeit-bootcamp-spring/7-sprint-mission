@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service;
 
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -32,7 +31,7 @@ public class ReadStatusService {
     private final ReadStatusMapper mapper;
 
 
-    public ReadStatusDto createReadStatus(ReadStatusCreateRequest request){
+    public ReadStatusDto createReadStatus(ReadStatusCreateRequest request) {
         User user =
                 userRepository.findById(request.userId()).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
 
@@ -52,16 +51,16 @@ public class ReadStatusService {
         return mapper.toDto(saved);
     }
 
-    public ReadStatusDto updateReadStatus(UUID readStatusId){
+    public ReadStatusDto updateReadStatus(UUID readStatusId) {
         ReadStatus readStatus =
                 readStatusRepository.findById(readStatusId).orElseThrow(() -> new NoSuchElementException("해당 채널에 대한 수신 정보가 존재하지 않습니다."));
-        readStatus.setLastReadAt(Instant.now());
+        readStatus.updateLastReadAt(Instant.now());
 
 
         return mapper.toDto(readStatus);
     }
 
-    public List<ReadStatusDto> getAllByUserId(UUID id){
+    public List<ReadStatusDto> getAllByUserId(UUID id) {
 
 
         return readStatusRepository.findAllByUser_Id(id)

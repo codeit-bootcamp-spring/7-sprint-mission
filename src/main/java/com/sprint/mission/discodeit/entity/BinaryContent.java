@@ -5,16 +5,12 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Setter
 @Table(name = "binary_contents")
 @AttributeOverride(name = "id", column = @Column(name = "binary_content_id"))
 public class BinaryContent extends BaseEntity {
@@ -32,4 +28,11 @@ public class BinaryContent extends BaseEntity {
     private long fileSize;
 
 
+    public void updateFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void updateFilePath(String filePath) {
+        this.filePath = filePath;
+    }
 }
