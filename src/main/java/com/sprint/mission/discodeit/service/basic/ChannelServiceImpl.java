@@ -8,7 +8,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.entityType.ChannelType;
-import com.sprint.mission.discodeit.exception.NotFoundChannelException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -70,7 +72,7 @@ public class ChannelServiceImpl implements ChannelService {
     @Transactional(readOnly = true)
     public ChannelDto findChannelById(UUID id) {
         Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(id));
 
         return channelMapper.toDto(channel);
     }
@@ -78,6 +80,10 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     @Transactional(readOnly = true)
     public List<ChannelDto> findAllByUserId(UUID userId) {
+
+        if(!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
 
         List<Channel> allChannels = channelRepository.findAll();    // 모든 채널
 
@@ -102,10 +108,10 @@ public class ChannelServiceImpl implements ChannelService {
     public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest updateDto) {
 
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         if (channel.getType() == ChannelType.PRIVATE) {
-            throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
+            throw new PrivateChannelUpdateException(channelId);
         }
 
         channel.updateChannelInfo(updateDto.newName(), updateDto.newDescription());
@@ -120,7 +126,7 @@ public class ChannelServiceImpl implements ChannelService {
     public void deleteChannel(UUID id) {
 
         channelRepository.findById(id)
-                        .orElseThrow(() -> new NotFoundChannelException("채널을 찾을 수 없습니다."));
+                        .orElseThrow(() -> new ChannelNotFoundException(id));
 
         channelRepository.deleteById(id);
 

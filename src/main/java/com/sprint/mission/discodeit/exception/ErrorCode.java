@@ -14,16 +14,19 @@ public enum ErrorCode {
 
     // Channel
     CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "C001", "채널을 찾을 수 없습니다."),
+    PRIVATE_CHANNEL_UPDATE(HttpStatus.NOT_FOUND, "C002", "개인 채널은 수정할 수 없습니다."),
 
     // Message
     MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "M001", "메시지를 찾을 수 없습니다."),
+    MESSAGE_NOT_EMPTY(HttpStatus.UNPROCESSABLE_ENTITY, "M002", "메시지는 비어있을 수 없습니다."),
 
 
     // BinaryContent
     DIRECTORY_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "B001", "디렉토리 생성에 실패했습니다."),
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "B002", "파일을 찾을 수 없습니다."),
     FILE_OPERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "B003", "파일 처리 중 오류가 발생했습니다."),
-    FILE_SIZE_LIMIT_EXCEED(HttpStatus.INTERNAL_SERVER_ERROR, "B003", "파일 처리 중 오류가 발생했습니다."),
+    FILE_SIZE_LIMIT_EXCEED(HttpStatus.PAYLOAD_TOO_LARGE, "B004", "파일 업로드 최대 크기를 초과했습니다."),
+    FILE_UPLOAD_LIMIT_EXCEED(HttpStatus.UNPROCESSABLE_ENTITY, "B005", "업로드는 한 번에 10건만 가능합니다."),
 
     // ReadStatus
 

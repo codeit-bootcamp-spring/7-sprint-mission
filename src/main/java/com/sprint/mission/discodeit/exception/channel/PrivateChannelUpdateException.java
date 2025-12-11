@@ -5,11 +5,10 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.Map;
 import java.util.UUID;
 
-public class ChannelNotFoundException extends ChannelException {
-    public ChannelNotFoundException(UUID id) {
-        super(ErrorCode.CHANNEL_NOT_FOUND,
+public class PrivateChannelUpdateException extends ChannelException {
+    public PrivateChannelUpdateException(UUID id) {
+        super(ErrorCode.PRIVATE_CHANNEL_UPDATE,
                 Map.of("id", id)
         );
     }
-
 }

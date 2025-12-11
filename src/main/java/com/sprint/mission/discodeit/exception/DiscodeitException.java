@@ -21,6 +21,7 @@ public class DiscodeitException extends RuntimeException {
     }
 
     public DiscodeitException(ErrorCode errorCode, Map<String, Object> details) {
+        super(errorCode.getMessage());
         this.timestamp = Instant.now();
         this.errorCode = errorCode;
         this.details = details;

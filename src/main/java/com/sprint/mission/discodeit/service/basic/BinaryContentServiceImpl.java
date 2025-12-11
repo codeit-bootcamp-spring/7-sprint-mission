@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.binaryContent.FileNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -45,7 +45,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     @Transactional(readOnly = true)
     public BinaryContentDto findBinaryContentById(UUID id) {
         BinaryContent content=  binaryContentRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
+                .orElseThrow(() -> new FileNotFoundException(id));
         return binaryContentMapper.toDto(content);
     }
 

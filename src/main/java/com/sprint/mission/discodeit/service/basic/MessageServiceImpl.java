@@ -8,9 +8,12 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.InvalidInputException;
-import com.sprint.mission.discodeit.exception.NotFoundChannelException;
-import com.sprint.mission.discodeit.exception.NotFoundUserException;
+import com.sprint.mission.discodeit.exception.binaryContent.FileOperationFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.FileUploadLimitExceedException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotEmptyException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -30,7 +33,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -51,7 +53,7 @@ public class MessageServiceImpl implements MessageService {
             return new ArrayList<>();
         }
         if (files.size() > 10) {
-            throw new InvalidInputException("파일은 한번에 10개까지만 보낼 수 있습니다."); // 예외 임시
+            throw new FileUploadLimitExceedException();
         }
 
         List<BinaryContent> attachments = new ArrayList<>();
@@ -67,7 +69,7 @@ public class MessageServiceImpl implements MessageService {
             try {
                 binaryContentStorage.put(binaryContent.getId(), file.getBytes());
             } catch (IOException e) {
-                throw new RuntimeException("오류가 발생");
+                throw new FileOperationFailedException(binaryContent.getId());
             }
         }
         return attachments;
@@ -78,13 +80,13 @@ public class MessageServiceImpl implements MessageService {
     public MessageDto createMessage(MessageCreateRequest requestDto, List<MultipartFile> files) {
         if ((requestDto.getContent() == null || requestDto.getContent().isBlank()) &&
                 (files == null || files.isEmpty())) {
-            throw new InvalidInputException("공백을 보낼 수 없음");
+            throw new MessageNotEmptyException();
         }
 
         User author = userRepository.findById(requestDto.getAuthorId())
-                .orElseThrow(() -> new NotFoundUserException("메시지를 보내는 사용자를 찾을 수 없음"));
+                .orElseThrow(() -> new UserNotFoundException(requestDto.getAuthorId()));
         Channel channel = channelRepository.findById(requestDto.getChannelId())
-                .orElseThrow(() -> new NotFoundChannelException("메시지를 받을 채널을 찾을 수 없음"));
+                .orElseThrow(() -> new ChannelNotFoundException(requestDto.getChannelId()));
 
         List<BinaryContent> attachments = saveAttachment(files);
 
@@ -142,10 +144,10 @@ public class MessageServiceImpl implements MessageService {
     public MessageDto updateMessage(UUID messageId, MessageUpdateRequest updateDto) {
 
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MessageNotFoundException(messageId));
 
         if (updateDto.newContent() == null || updateDto.newContent().isBlank()) {
-            throw new InvalidInputException("비어 있을 수 없습니다.");
+            throw new MessageNotEmptyException(messageId);
         }
 
         message.updateContent(updateDto.newContent());
@@ -158,7 +160,7 @@ public class MessageServiceImpl implements MessageService {
     @Transactional
     public void deleteMessage(UUID id) {
         messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MessageNotFoundException(id));
 
         messageRepository.deleteById(id);
     }
