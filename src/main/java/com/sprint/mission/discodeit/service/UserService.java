@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.service;
 
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.exception.DuplicateException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.UserException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -22,17 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
 
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
@@ -45,13 +42,13 @@ public class UserService {
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
         log.info("UserService.createUser");
         if (userRepository.existsByEmail(request.email())) {
-            throw new DuplicateException("이미 등록된 이메일입니다");
+            throw new UserException(Instant.now(), ErrorCode.USER_NOT_FOUND, new HashMap<>());
         }
         if (userRepository.existsByUsername(request.username())) {
-            throw new DuplicateException("이미 등록된 아이디입니다");
+            throw new UserException(Instant.now(), ErrorCode.USER_NOT_FOUND, new HashMap<>());
         }
 
-        User user = new User(request.email(),request.password(),request.username());
+        User user = new User(request.email(), request.password(), request.username());
 
 
         User save = userRepository.save(user);
@@ -65,7 +62,7 @@ public class UserService {
         List<ReadStatus> readList = new ArrayList<>();
         channelRepository.findAllByType(ChannelType.PUBLIC)
                 .forEach(channel -> {
-                    ReadStatus readStatus = new ReadStatus(save,channel,Instant.now());
+                    ReadStatus readStatus = new ReadStatus(save, channel, Instant.now());
                     readList.add(readStatus);
                 });
         readStatusRepository.saveAll(readList);

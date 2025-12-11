@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.entity.exception.ErrorType;
-import com.sprint.mission.discodeit.entity.exception.ValidationException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,7 +34,7 @@ public class User extends BaseUpdatableEntity {
     @JoinColumn(name = "profile_id")
     private BinaryContent profile;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private UserStatus userStatus;
 
 
