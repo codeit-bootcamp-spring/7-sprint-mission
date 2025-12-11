@@ -40,7 +40,7 @@ public class ChannelService {
 
     @Transactional
     public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
-
+        log.info("ChannelService.createPublicChannel");
         Channel channel = new Channel(
                 request.name(),
                 request.description(),
@@ -60,7 +60,7 @@ public class ChannelService {
 
     @Transactional
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
-
+        log.info("ChannelService.createPrivateChannel");
         Channel channel = new Channel("dm","description",ChannelType.PRIVATE);
         Channel save = channelRepository.save(channel);
 
@@ -78,6 +78,7 @@ public class ChannelService {
 
     @Transactional
     public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest requestDto) {
+        log.info("ChannelService.updateChannel");
         Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다"));
         if (requestDto.newName() != null) {
             channel.updateName(requestDto.newName());
@@ -90,6 +91,7 @@ public class ChannelService {
 
     @Transactional
     public void deleteChannel(UUID id) {
+        log.info("ChannelService.deleteChannel");
         Channel channel = channelRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다"));
         channelRepository.delete(channel);
     }

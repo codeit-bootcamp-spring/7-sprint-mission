@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   application:
     name: discodeit
   datasource:
@@ -12,14 +14,21 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-        show_sql: true
+#        show_sql: true
         format_sql: true
+#        default_batch_fetch_size: 100
 
 
 logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+    root: info
+
+#  file:
+#    name: app.log
+#logback 설정 파일이 존재하면 무용지물
+
 
 discodeit:
   storage:
@@ -34,6 +43,5 @@ springdoc:
     operations-sorter: method # 메서드 정렬 방식
     display-request-duration: true # 요청에 소요된 시간 표시
     doc-expansion: list # 문서 펼침 상태 (none, list, full)
-
   api-docs:
     path: /my-api # Swagger가 우리 API의 정보를 얻어오기 위해서 요청하는 url

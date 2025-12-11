@@ -43,7 +43,7 @@ public class UserService {
 
     @Transactional
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
-
+        log.info("UserService.createUser");
         if (userRepository.existsByEmail(request.email())) {
             throw new DuplicateException("이미 등록된 이메일입니다");
         }
@@ -75,7 +75,7 @@ public class UserService {
 
     @Transactional
     public UserDto updateUserInfo(UUID id, UserUpdateRequest updateDto, MultipartFile file) {
-
+        log.info("UserService.updateUserInfo");
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
 
         if (updateDto.newUsername() != null) {
@@ -98,7 +98,8 @@ public class UserService {
 
 
     @Transactional
-    public void delete(UUID id) {
+    public void deleteUser(UUID id) {
+        log.info("UserService.deleteUser");
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
         userRepository.delete(user);
         binaryContentService.deleteFile(user.getId());
