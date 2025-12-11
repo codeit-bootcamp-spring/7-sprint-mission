@@ -1,10 +1,14 @@
 package com.sprint.mission.discodeit.dto.loginDto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
-import lombok.NonNull;
 
 
 @Builder
-public record LoginRequest(@NonNull String username, @NonNull String password) {
+public record LoginRequest(
+        @NotBlank(message = "아이디를 입력해 주세요.")
+        String username,
+        @NotBlank(message = "비밀번호를 입력해 주세요.")
+        String password) {
 
 }
