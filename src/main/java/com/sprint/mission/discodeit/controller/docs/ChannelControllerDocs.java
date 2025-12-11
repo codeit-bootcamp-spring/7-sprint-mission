@@ -35,7 +35,7 @@ public interface ChannelControllerDocs {
           )
       )
   })
-  ResponseEntity<Channel> createPublicChannel(
+  ResponseEntity<ChannelResponseDto> createPublicChannel(
       @Parameter(description = "Public Channel 생성 정보")
       @Valid @RequestBody CreatePublicChannelDto request);
 
@@ -45,11 +45,11 @@ public interface ChannelControllerDocs {
           responseCode = "201",
           description = "Private Channel이 성공적으로 생성됨",
           content = @Content(
-              schema = @Schema(implementation = Channel.class)
+              schema = @Schema(implementation = ChannelResponseDto.class)
           )
       )
   })
-  ResponseEntity<Channel> createPrivateChannel(
+  ResponseEntity<ChannelResponseDto> createPrivateChannel(
       @Parameter(description = "Private Channel 생성 정보")
       @Valid @RequestBody CreatePrivateChannelDto request);
 
@@ -60,7 +60,7 @@ public interface ChannelControllerDocs {
           responseCode = "200",
           description = "Channel 정보가 성공적으로 수정됨",
           content = @Content(
-              schema = @Schema(implementation = Channel.class)
+              schema = @Schema(implementation = ChannelResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -82,7 +82,7 @@ public interface ChannelControllerDocs {
           )
       )
   })
-  ResponseEntity<Channel> updatePublicChannel(
+  ResponseEntity<ChannelResponseDto> updatePublicChannel(
       @Parameter(description = "수정할 Channel ID")
       @PathVariable UUID channelId,
       @Parameter(description = "수정할 Channel 정보")

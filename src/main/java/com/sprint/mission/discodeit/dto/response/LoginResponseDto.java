@@ -17,7 +17,7 @@ public record LoginResponseDto(
         user.getId(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfileId()
+        user.getProfile().getId()
     );
   }
 }

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller.docs;
 
 import com.sprint.mission.discodeit.dto.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.dto.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.update.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -44,7 +45,7 @@ public interface UserControllerDocs {
           )
       )
   })
-  ResponseEntity<User> createUser(
+  ResponseEntity<UserResponseDto> createUser(
       @Parameter(description = "User 정보 생성")
       @Valid @RequestPart("user") CreateUserRequestDto UserCreateRequestDto,
       @Parameter(description = "User 프로필 이미지")
@@ -67,7 +68,7 @@ public interface UserControllerDocs {
           responseCode = "200",
           description = "User 정보가 성공적으로 수정됨",
           content = @Content(
-              schema = @Schema(implementation = User.class)
+              schema = @Schema(implementation = UserResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -89,7 +90,7 @@ public interface UserControllerDocs {
           )
       )
   })
-  ResponseEntity<User> updateUser(
+  ResponseEntity<UserResponseDto> updateUser(
       @Parameter(description = "수정 할 User ID")
       @Valid @PathVariable UUID userId,
       @Parameter(description = "수정 할 User 정보")
@@ -125,7 +126,7 @@ public interface UserControllerDocs {
           responseCode = "200",
           description = "User 온라인 상태가 성공적으로 업데이트됨",
           content = @Content(
-              schema = @Schema(implementation = UserStatus.class)
+              schema = @Schema(implementation = UserStatusResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -138,7 +139,7 @@ public interface UserControllerDocs {
           )
       )
   })
-  ResponseEntity<UserStatus> updateUserStatusByUserId(
+  ResponseEntity<UserStatusResponseDto> updateUserStatusByUserId(
       @Parameter(description = "상태를 변경할 User ID")
       @PathVariable UUID userId);
 

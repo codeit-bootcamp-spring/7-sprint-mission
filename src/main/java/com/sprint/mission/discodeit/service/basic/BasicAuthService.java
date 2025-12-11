@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +18,8 @@ public class BasicAuthService implements AuthService {
 
 
   @Override
-  public User login(LoginRequestDto request) {
+  @Transactional(readOnly = true)
+  public LoginResponseDto login(LoginRequestDto request) {
     String username = request.username();
     String password = request.password();
 
@@ -27,6 +29,6 @@ public class BasicAuthService implements AuthService {
     if (!user.getPassword().equals(password)) {
       throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
     }
-    return user;
+    return LoginResponseDto.from(user);
   }
 }

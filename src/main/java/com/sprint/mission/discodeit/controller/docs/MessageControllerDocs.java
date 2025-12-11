@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller.docs;
 
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.response.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,8 +13,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,7 +35,7 @@ public interface MessageControllerDocs {
           responseCode = "201",
           description = "Message가 성공적으로 생성됨",
           content = @Content(
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -43,11 +48,12 @@ public interface MessageControllerDocs {
           )
       )
   })
-  ResponseEntity<Message> createMessage(
+  ResponseEntity<MessageResponseDto> createMessage(
       @Parameter(description = "Message 생성 정보")
       @RequestPart("messageCreateRequest") CreateMessageRequestDto messageCreateRequest,
       @Parameter(description = "Message 첨부 파일들")
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments);
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments)
+      throws IOException;
 
 
   @Operation(summary = "Message 내용 수정")
@@ -56,7 +62,7 @@ public interface MessageControllerDocs {
           responseCode = "200",
           description = "Message가 성공적으로 수정됨",
           content = @Content(
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageResponseDto.class)
           )
       ),
       @ApiResponse(
@@ -69,7 +75,7 @@ public interface MessageControllerDocs {
           )
       )
   })
-  ResponseEntity<Message> updateMessage(
+  ResponseEntity<MessageResponseDto> updateMessage(
       @Parameter(description = "수정할 Message ID")
       @PathVariable UUID messageId,
       @Parameter(description = "수정할 Message 내용")
@@ -102,13 +108,17 @@ public interface MessageControllerDocs {
           responseCode = "200",
           description = "Message 목록 조회 성공",
           content = @Content(
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageResponseDto.class)
           )
       )
   })
-  ResponseEntity<List<Message>> findAllByChannelId(
+  ResponseEntity<PageResponse<MessageResponseDto>> findAllByChannelId(
       @Parameter(description = "조회할 Channel Id")
-      @RequestParam UUID channelId);
+      @RequestParam UUID channelId,
+      @PageableDefault(
+          size = 50,
+          sort = "createdAt",
+          direction = Sort.Direction.DESC) Pageable pageable);
 
 
 }

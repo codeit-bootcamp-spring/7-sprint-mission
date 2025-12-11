@@ -1,32 +1,53 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
-public class Message extends BasicEntity implements Serializable {
+@NoArgsConstructor
+@Entity
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
+  @Column(nullable = false)
+  private String content;
 
-  private String content; // 메시지
-  private final UUID channelId; // 채널ID
-  private final UUID authorId; // 유저ID
-  private List<UUID> attachmentIds; // 첨부파일
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id")
+  private User author;
 
-  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-    super();
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id"))
+  private List<BinaryContent> attachments;
+
+  public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
     this.content = content;
-    this.channelId = channelId;
-    this.authorId = authorId;
-    this.attachmentIds = attachmentIds;
+    this.channel = channel;
+    this.author = author;
+    this.attachments = attachments;
   }
 
   public void updateContent(String newContent) {
     this.content = newContent;
-    update();
   }
 }

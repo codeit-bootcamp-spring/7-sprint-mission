@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.request.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.dto.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.update.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -36,22 +37,12 @@ public class UserController implements UserControllerDocs {
 
   //사용자를 등록할 수 있다. * 해결.
   @PostMapping(consumes = "multipart/form-data")
-  public ResponseEntity<User> createUser(
+  public ResponseEntity<UserResponseDto> createUser(
       //RequestPart 파트별로 분할해서 전달
       @Valid
       @RequestPart("userCreateRequest") CreateUserRequestDto userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
-
-    CreateBinaryContentRequestDto content = null;
-    if (profile != null) {
-      content = new CreateBinaryContentRequestDto(
-          profile.getOriginalFilename(),
-          profile.getContentType(),
-          profile.getBytes()
-      );
-    }
-    CreateUserCommand from = CreateUserCommand.from(userCreateRequest, content);
-    User user = userService.createUser(from);
+    UserResponseDto user = userService.createUser(userCreateRequest, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 
@@ -64,11 +55,11 @@ public class UserController implements UserControllerDocs {
 
   //사용자 정보를 수정할 수 있다. * 해결
   @PatchMapping(value = "/{userId}", consumes = "multipart/form-data", produces = "application/json")
-  public ResponseEntity<User> updateUser(
+  public ResponseEntity<UserResponseDto> updateUser(
       @Valid @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UpdateUserDto userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
-    User user = userService.updateUser(userId, userUpdateRequest, profile);
+    UserResponseDto user = userService.updateUser(userId, userUpdateRequest, profile);
     return ResponseEntity.status(HttpStatus.OK).body(user);
   }
 
@@ -81,9 +72,9 @@ public class UserController implements UserControllerDocs {
 
   //사용자의 온라인 상태를 업데이트할 수 있다. * 해결
   @PatchMapping(value = "/{userId}/userStatus")
-  public ResponseEntity<UserStatus> updateUserStatusByUserId(
+  public ResponseEntity<UserStatusResponseDto> updateUserStatusByUserId(
       @PathVariable UUID userId) {
-    UserStatus userStatus = userStatusService.updateByUserId(userId);
+    UserStatusResponseDto userStatus = userStatusService.updateByUserId(userId);
     return ResponseEntity.status(HttpStatus.OK).body(userStatus);
   }
 }

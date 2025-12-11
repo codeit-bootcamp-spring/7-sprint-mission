@@ -1,38 +1,67 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class User extends BasicEntity implements Serializable {
+@NoArgsConstructor
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
+  @Column(length = 50, nullable = false, unique = true)
+  private String username;
 
-  private String username; // 유저 이름
-  private String email; // 이메일
-  private String password; // 유저 비밀번호
-  private UUID profileId;
+  @Column(length = 100, nullable = false, unique = true)
+  private String email;
+
+  @Column(length = 60, nullable = false)
+  private String password;
+
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id", unique = true)
+  private BinaryContent profile;
+
+  @OneToOne(mappedBy = "user",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private UserStatus status;
 
 
-  public User(String username, String email, String password, UUID profileId) {
-    super();
+  public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profileId = profileId;
+    this.profile = profile;
   }
 
-  public void updateProfile(UUID NewProfileId) {
-    this.profileId = NewProfileId;
-    update();
+  public void assignStatus(UserStatus status) {
+    this.status = status;
+  }
+
+  public void updateProfile(BinaryContent newProfile) {
+    this.profile = newProfile;
   }
 
   public void updateInfo(String newUsername, String newEmail, String newPassword) {
-    this.username = newUsername;
-    this.email = newEmail;
-    this.password = newPassword;
-    update();
+    if (newUsername != null) {
+      this.username = newUsername;
+    }
+    if (newEmail != null) {
+      this.email = newEmail;
+    }
+    if (newPassword != null) {
+      this.password = newPassword;
+    }
   }
 }
