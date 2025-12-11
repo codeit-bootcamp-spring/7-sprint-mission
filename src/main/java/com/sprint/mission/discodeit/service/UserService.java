@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.exception.DuplicateException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.UserException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -42,17 +43,14 @@ public class UserService {
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
         log.info("UserService.createUser");
         if (userRepository.existsByEmail(request.email())) {
-            throw new UserException(Instant.now(), ErrorCode.USER_NOT_FOUND, new HashMap<>());
+            throw new DuplicateException("이미 등록된 이메일입니다");
         }
         if (userRepository.existsByUsername(request.username())) {
-            throw new UserException(Instant.now(), ErrorCode.USER_NOT_FOUND, new HashMap<>());
+            throw new DuplicateException("이미 등록된 아이디입니다");
         }
 
         User user = new User(request.email(), request.password(), request.username());
-
-
         User save = userRepository.save(user);
-
 
         if (file != null && !file.isEmpty()) {
             BinaryContent content = binaryContentService.put(save.getId(), file);
@@ -135,6 +133,4 @@ public class UserService {
         user.updateActiveAt(lastActiveAt);
         return userStatusMapper.toDto(user.getUserStatus());
     }
-
-
 }

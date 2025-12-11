@@ -1,5 +1,6 @@
-package com.sprint.mission.discodeit.exception;
+package com.sprint.mission.discodeit.exception.advice;
 
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.LazyInitializationException;
 import org.springframework.http.HttpStatus;
@@ -13,18 +14,17 @@ public class ExceptionControllerAdvice {
 
 
 
-    @ExceptionHandler
+    @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> illegalException(IllegalArgumentException e){
         log.info("[ExceptionHandler] {}",e.getMessage());
         return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
-//    @ExceptionHandler
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public String allException(Exception e){
-//        log.info("[ExceptionHandler] {}",e.getMessage());
-//        return e.getMessage();
-//    }
+    @ExceptionHandler(DiscodeitException.class)
+    public String discodeException(DiscodeitException e){
+        log.info("[ExceptionHandler] {}",e.getMessage());
+        return e.getMessage();
+    }
 
     @ExceptionHandler
     public String lazyInitializationException(LazyInitializationException e){

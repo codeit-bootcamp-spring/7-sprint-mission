@@ -1,9 +1,18 @@
 package com.sprint.mission.discodeit.service.dto.request;
 
-public record UserCreateRequest(
-        String email,
-        String password,
-        String username
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
-)
- {}
+public record UserCreateRequest(
+        @Email
+        @NotNull
+        String email,
+
+        @NotNull
+        @Size(min=4)
+        String password,
+
+        @NotNull
+        String username
+) {}
