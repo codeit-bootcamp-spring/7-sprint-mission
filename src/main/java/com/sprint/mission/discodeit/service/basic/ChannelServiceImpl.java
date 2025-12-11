@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.entity.entityType.ChannelType;
 import com.sprint.mission.discodeit.exception.NotFoundChannelException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -27,12 +26,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class BasicChannelService implements ChannelService {
+public class ChannelServiceImpl implements ChannelService {
 
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
-    private final MessageRepository messageRepository;
     private final ChannelMapper channelMapper;
 
     @Override
@@ -59,11 +57,6 @@ public class BasicChannelService implements ChannelService {
         if (requestDto.getParticipantIds() != null && !requestDto.getParticipantIds().isEmpty()) {
 
             List<User> users = userRepository.findAllById(requestDto.getParticipantIds());
-            /*  모든 유저가 존재하는 지
-            if (users.size() != requestDto.getParticipantIds().size()) {
-                throw new NotFoundUserException("일부 사용자를 찾을 수 없습니다.");
-            }
-            */
             List<ReadStatus> readStatuses = users.stream()
                     .map(user -> new ReadStatus(user, newChannel))
                     .collect(Collectors.toList());

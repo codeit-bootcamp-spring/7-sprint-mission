@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class BasicReadStatusService implements ReadStatusService {
+public class ReadStatusServiceImpl implements ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;

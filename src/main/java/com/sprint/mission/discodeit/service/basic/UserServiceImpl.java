@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.exception.NotFoundUserException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +26,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class BasicUserService implements UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-
-    // 고도화 의존성 추가
     private final BinaryContentRepository binaryContentRepository;
-    private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
     private final BinaryContentStorage binaryContentStorage;
 
@@ -149,7 +145,7 @@ public class BasicUserService implements UserService {
     }
 
 
-    // 물리 삭제
+    // 삭제
     @Override
     @Transactional
     public void deleteUser(UUID userId) {

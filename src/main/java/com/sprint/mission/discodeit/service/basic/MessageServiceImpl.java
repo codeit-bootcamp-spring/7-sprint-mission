@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class BasicMessageService implements MessageService {
+public class MessageServiceImpl implements MessageService {
 
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
