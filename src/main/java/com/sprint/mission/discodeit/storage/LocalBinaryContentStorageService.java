@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -18,6 +19,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 public class LocalBinaryContentStorageService implements BinaryContentStorage {
     @Value( "${discodeit.storage.local.root-path}")
@@ -27,7 +29,7 @@ public class LocalBinaryContentStorageService implements BinaryContentStorage {
     public UUID put(UUID id, byte[] bytes) throws IOException {
             Path storagePath = resolvePath(id);
             Files.write(storagePath,bytes);
-
+        log.debug("file Path : {}",storagePath);
         return id;
     }
 
@@ -45,6 +47,7 @@ public class LocalBinaryContentStorageService implements BinaryContentStorage {
         String fileName = binaryContentDto.fileName();
         Resource resource = new InputStreamResource(targetInput);
         String encodeFile = UriUtils.encode(fileName, StandardCharsets.UTF_8);
+        log.info("download : {}", encodeFile);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=" + encodeFile)
                 .header("Content-Type",contentType)

@@ -36,6 +36,7 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserCreateRequestDto userCreateRequestDto, MultipartFile profile) throws IOException {
+        log.debug("createUser : {} Siuuuuu!!!",userCreateRequestDto);
     if(profile!=null) {
         BinaryContent binaryContent = binaryContentRepository.save(
                 new BinaryContent(profile.getName(), profile.getContentType(), profile.getSize())
@@ -84,7 +85,9 @@ public class BasicUserService implements UserService {
 
     @Override
     public void deleteUser(UUID userId) {
-       userRepository.deleteById(userId);
+
+        log.info("deleteUser : {} info layer",userId);
+        userRepository.deleteById(userId);
     }
 
     @Override
@@ -101,6 +104,7 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public UserDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile) throws IOException {
+
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
         user.setUserName(dto.newUsername()==null?user.getUserName():dto.newUsername());
         user.setPassword(dto.newPassword()==null?user.getPassword():dto.newPassword());
@@ -114,7 +118,7 @@ public class BasicUserService implements UserService {
             user.setProfile(tmpBinaryContent);
         }
         userRepository.save(user);
-
+        log.debug("patchUser : {} siuuuuuuuu!!!",user);
         return userMapper.toDto(user);
     }
 

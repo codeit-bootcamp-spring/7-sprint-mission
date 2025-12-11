@@ -70,6 +70,7 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.save(ReadStatus.createReadStatusFactory(x,channel)
         )
         );
+        log.info("channel : {} ",channel);
     return channelMapper.toDto(channel);
     }
 
@@ -108,6 +109,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID channelID) {
+
+        log.warn("delete channel : {}",channelID);
         channelRepository.deleteById(channelID);
     }
 
@@ -118,6 +121,7 @@ public class BasicChannelService implements ChannelService {
         channel.setDescription(dto.newDescription()==null?channel.getDescription():dto.newDescription());
         channel.setName(dto.newName()==null?channel.getName():dto.newName());
         channelRepository.save(channel);
+        log.info("updated channel : {}",channel);
         return channelMapper.toDto(channel);
     }
 

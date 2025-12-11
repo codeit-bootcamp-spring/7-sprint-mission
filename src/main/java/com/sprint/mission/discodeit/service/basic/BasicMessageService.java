@@ -90,6 +90,7 @@ public class BasicMessageService implements MessageService {
             message.setAttachments(attachmentList);
             message.setMessageAttachment(messageAttachmentList);
         }
+        log.error("message : {} 일단 에러를 뱉어",message);
 
         return messageMapper.toDto(message);
     }
@@ -99,6 +100,8 @@ public class BasicMessageService implements MessageService {
         return messageRepository.findAll().stream().map(messageMapper::toDto).toList();
     }
     public void deleteMessage(UUID messageId){
+
+        log.warn("delete message : {}",messageId);
         messageRepository.deleteById(messageId);
     }
 
@@ -149,6 +152,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId).orElseThrow(()->new IllegalArgumentException("Message not found"));
         message.setContent(dto.newContent()==null?message.getContent():dto.newContent());
         messageRepository.save(message);
+        log.debug("updated message : {} ",message);
         return messageMapper.toDto(message);
     }
 }
