@@ -7,7 +7,7 @@ public class UserControllerTest {
 //  private UserService userService;
 //
 //  @MockBean
-//  private Dto_UserCreate dtoUserCreate;
+//  private UserCreateRequest dtoUserCreate;
 //
 //  @Autowired
 //  private MockMvc mockMvc;
@@ -30,10 +30,10 @@ public class UserControllerTest {
 //        .build();
 //
 //    BDDMockito.given(
-//        userService.create(ArgumentMatchers.any(Dto_UserCreate.class), ArgumentMatchers.isNull()))
+//        userService.create(ArgumentMatchers.any(UserCreateRequest.class), ArgumentMatchers.isNull()))
 //    .willReturn(resUser);
 //
-//    var dto_UserCreate = Dto_UserCreate.builder()
+//    var dto_UserCreate = UserCreateRequest.builder()
 //        .username("🦁lion")
 //        .email("lion@E.m")
 //        .password("1234")

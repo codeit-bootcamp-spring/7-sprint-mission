@@ -33,10 +33,19 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    //‼️⭐️ Swagger/OpenAPI 추가
+    //‼️⭐for MapStruct
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+
+    //‼️⭐️ for Swagger/OpenAPI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
     //‼️⭐    http://localhost:4444/swagger-ui/index.html
     //‼️⭐    https://editor.swagger.io/
+
+    //‼️⭐ for Spring Data JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    //‼️⭐ for PostgreSQL 드라이버. 컴파일 시점에만 필요
+    runtimeOnly 'org.postgresql:postgresql'
 }
 
 tasks.named('test') {

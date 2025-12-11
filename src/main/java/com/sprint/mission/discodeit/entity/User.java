@@ -1,43 +1,59 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_UserCreate;
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
+@Entity @Table(name = "users")
+@Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 🔥 추가 필수
 @AllArgsConstructor
-@Getter
-public class User extends BaseModel {
-    private String userName;
+public class User extends BaseUpdatableEntity {
+    @Column(nullable = false, length = 50, unique = true)
+    private String username;
+
+    @Column(nullable = false, length = 100, unique = true)
+    private String email;
+
+    @Column(nullable = false, length = 60)
     private String password;
-    private String eMail;
-    private UUID profileId;
 
-    public User(Dto_UserCreate dtoUser, UUID profileId) {
-        super();
-        this.userName = dtoUser.username();
-        this.password = dtoUser.password();
-        this.eMail = dtoUser.email();
-        this.profileId = profileId;
+    @OneToOne(fetch = FetchType.LAZY) // (orphanRemoval = false) // ON DELETE SET NULL
+    @JoinColumn(name = "profile_id", nullable = true)
+    private BinaryContent profile;
+
+//    @Setter
+//    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.REMOVE) // ON DELETE CASCADE
+//    private UserStatus status;
+
+    @Setter
+    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL) // ON DELETE CASCADE
+    private UserStatus userStatus;
+
+    public void initUserStatus() {
+        if (this.userStatus == null) {
+            this.userStatus = new UserStatus(this, java.time.Instant.now());
+            log.info("✅✅✅status = [" + this.userStatus.toString() + "]");
+        }
     }
 
-    @Override
-    public String toString() {
-        String strProfileId = (profileId == null) ? "null" : profileId.toString();
-        return "user {" +
-                super.toString() +
-                "\n name = [" + userName + "] " +
-                "\n newPassword = [" + password + "]"   +
-                "\n newEmail = [" + eMail + "]"   +
-                "\n profileId = [" + strProfileId + "]" + //❌ 생성자에서 제외
-                "}";
+    public User(String username, String email, String password, BinaryContent profile) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.profile = profile;
     }
 
-    public void updateUser(String reName, String password, String reEmail, UUID profiledId) {
-        if (reName != null) this.userName = reName;
-        if (password != null) this.password = password;
-        if (reEmail != null) this.eMail = reEmail;
-        if (profiledId != null) this.profileId = profiledId;
-        super.setUpdatedAtNow();
-    }
 }

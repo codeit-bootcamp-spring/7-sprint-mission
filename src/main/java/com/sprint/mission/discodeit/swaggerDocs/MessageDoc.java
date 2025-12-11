@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
-import com.sprint.mission.discodeit.entity.dto.Dto_MessageUpdate;
-import com.sprint.mission.discodeit.entity.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.entity.dto.Res_Message;
+import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.mapper.dto.MessageDto;
+import com.sprint.mission.discodeit.page.PageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,27 +36,32 @@ public interface MessageDoc {
             responseCode = "200",
             description = "Message 목록 조회 성공",
             content = @Content(
-                schema = @Schema(implementation = Res_Message.class, type = "array")
+                schema = @Schema(implementation = MessageDto.class, type = "array")
             )
         )
     })
 
-    ResponseEntity<List<Res_Message>> findAllByChannleId(
-        @Parameter(description = "메시지를 조회할 Channel ID") @RequestParam("channelId") UUID channelID);
+    ResponseEntity<PageResponseDto<MessageDto>> findAllByChannelId(
+        @Parameter(description = "조회할 Channel ID")
+        @RequestParam("channelId") UUID channelID,
+
+        @Parameter(description = "조회할 PageableDefault")
+        @PageableDefault(size = 50,
+                        sort = "createdAt, desc",
+                        direction = Direction.DESC) Pageable pageable);
     /**
      * POST /api/messages - Message 생성 (첨부 파일 포함)
      * Multipart 요청을 위한 문서화입니다.
      */
     @Operation(
-        summary = "Message 생성 (첨부 파일 포함)",
-        description = "**Content-Type: multipart/form-data** 요청입니다. 여러 개의 파일을 첨부할 수 있습니다."
+        summary = "Message 생성 (첨부 파일 포함)"
     )
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "201",
             description = "Message가 성공적으로 생성됨",
             content = @Content(
-                schema = @Schema(implementation = Res_Message.class)
+                schema = @Schema(implementation = MessageDto.class)
             )
         ),
         @ApiResponse(
@@ -63,9 +72,9 @@ public interface MessageDoc {
             )
         )
     })
-    ResponseEntity<Res_Message> create(
+    ResponseEntity<MessageDto> create(
         @Parameter(description = "Message 생성 정보 (JSON)") @RequestPart(value = "messageCreateRequest") MessageCreateRequest dtoMessage,
-        @Parameter(description = "첨부 파일 목록 (선택 사항)") @RequestPart(value = "attachments", required = false) List<MultipartFile> fileList);
+        @Parameter(description = "첨부 파일 목록 (선택 사항)") @RequestPart(value = "attachmentId", required = false) List<MultipartFile> fileList);
 
 
     /**
@@ -98,7 +107,7 @@ public interface MessageDoc {
             responseCode = "200",
             description = "Message가 성공적으로 수정됨",
             content = @Content(
-                schema = @Schema(implementation = Res_Message.class)
+                schema = @Schema(implementation = MessageDto.class)
             )
         ),
         @ApiResponse(
@@ -109,7 +118,7 @@ public interface MessageDoc {
             )
         )
     })
-    ResponseEntity<Res_Message> updateMessage(
+    ResponseEntity<MessageDto> updateMessage(
         @Parameter(description = "수정할 Message ID") @PathVariable("messageId") UUID messageId,
         @RequestBody Dto_MessageUpdate requestDto);
 }

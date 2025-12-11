@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
-import com.sprint.mission.discodeit.entity.dto.AuthServiceDto;
-import com.sprint.mission.discodeit.entity.dto.Res_UserLogin;
+import com.sprint.mission.discodeit.mapper.dto.LoginRequest;
+import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -22,7 +22,7 @@ public interface AuthDoc {
             responseCode = "200",
             description = "로그인 성공",
             content = @Content(
-                schema = @Schema(implementation = Res_UserLogin.class)
+                schema = @Schema(implementation = UserDto.class)
             )
         ),
 
@@ -42,5 +42,5 @@ public interface AuthDoc {
             )
         )
     })
-    ResponseEntity<Res_UserLogin> login(@RequestBody AuthServiceDto authServiceDto);
+    ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest);
 }

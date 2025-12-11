@@ -3,12 +3,16 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatus;
-import com.sprint.mission.discodeit.entity.dto.Dto_ReadStatusUpdate;
-import com.sprint.mission.discodeit.entity.dto.Res_ReadStatus;
-import com.sprint.mission.discodeit.repository.BaseInterfaceRepository;
-import com.sprint.mission.discodeit.repository.InterfaceUserRepository;
+import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.Dto_ReadStatusUpdate;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
+import com.sprint.mission.discodeit.mapper.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
+import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
+import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceReadStatusService;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -19,13 +23,15 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@Transactional // 영속성 컨텍스트
 @RequiredArgsConstructor
 public class ReadStatusService implements InterfaceReadStatusService {
-    private final InterfaceUserRepository userRepository;
-    private final BaseInterfaceRepository<Channel> channelRepository;
-    private final BaseInterfaceRepository<ReadStatus> readStatusRepository;
+    private final UsersRepository userRepository;
+    private final ChannelsRepository channelRepository;
+    private final ReadStatusesRepository readStatusRepository;
+    private final ReadStatusMapper readStatusMapper;
 
-    public Res_ReadStatus create(Dto_ReadStatus dtoReadStatus) {
+    public ReadStatusDto create(ReadStatusCreateRequest dtoReadStatus) {
         User user = userRepository.findById(dtoReadStatus.userId()).stream()
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("🚨User[" + dtoReadStatus.userId().toString() + "] 를 찾을 수 없음 "));
@@ -36,64 +42,62 @@ public class ReadStatusService implements InterfaceReadStatusService {
 
         // 이미 있으면 오류가 맞는걸까? => 그냥 이게 의도한 오류 한줄 던지니 깔끔! 요걸로 채택!
         // 있는걸 되돌려줘도 되는걸까?  => 해봤더니 줄줄이 사탕 에러!
-        Optional<ReadStatus> byUserAndChannelId
-            = readStatusRepository.findByUserAndChannelId(user.getId(), channel.getId()).stream()
+        Optional<ReadStatus> byUserAndChannelId = readStatusRepository.findReadStatusByUserIdAndChannelId(user.getId(), channel.getId())
+            .stream()
             .findFirst();
 
         if (byUserAndChannelId.isPresent()) {
             throw new IllegalArgumentException("⚠️이미 있는 User + Channel 임!");
         }
 
-        ReadStatus newReadStatus = new ReadStatus(user.getId(), channel.getId());
-        readStatusRepository.save(newReadStatus);
-        log.info("✅ 🍎🍎ReadStatusService.create = [" + newReadStatus + "]");
+        ReadStatus newReadStatus = new ReadStatus(user
+                                                , channel
+                                                , Instant.now());
 
-        return Res_ReadStatus.from(newReadStatus);
+        readStatusRepository.save(newReadStatus);
+        log.info("✅ ReadStatusService.create = [" + newReadStatus + "]");
+
+        return readStatusMapper.toDto(newReadStatus);
     }
 
-    public Res_ReadStatus find(UUID statusID) {
+    public ReadStatusDto find(UUID statusID) {
         //find
         //[ ] id로 조회합니다.
         ReadStatus readStatus = readStatusRepository.findById(statusID).stream()
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("🚨statusID = [" + statusID.toString() + "] 오류"));
 
-        Res_ReadStatus dto = Res_ReadStatus.from(readStatus);
+        ReadStatusDto dto = readStatusMapper.toDto(readStatus);
         log.info("✅ ReadStatusService.find = [" + dto + "]");
 
         return dto;
     }
 
-    public List<Res_ReadStatus> findAllByUserId(UUID userID) {
-        //findAllByUserId
+    public List<ReadStatusDto> findAllByUserId(UUID userID) {
         //[ ] userId를 조건으로 조회합니다.
         List<ReadStatus> readStatuses = readStatusRepository.findAll();
-        readStatuses.forEach(resReadStatus -> log.info("❌ ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"));
-
-        List<Res_ReadStatus> dtoList = readStatuses.stream()
-            .peek(resReadStatus -> log.info("🍏 ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"))
-            .filter(readStatus -> readStatus.getUserId().equals(userID))
-            .peek(resReadStatus -> log.info("🍏🍏 ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"))
-            .map(Res_ReadStatus::from)
-            .peek(resReadStatus -> log.info("🍏🍏🍏 ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"))
+        List<ReadStatusDto> dtoList = readStatuses.stream()
+            .filter(readStatus -> readStatus.getUser().getId().equals(userID))
+            .map(readStatusMapper::toDto)
+            .peek(resReadStatus -> log.info("✅ ReadStatusService.findAllByUserId = [" + resReadStatus.toString() + "]"))
             .toList();
 
         return dtoList;
     }
 
-    public Res_ReadStatus update(UUID readStatusId, Dto_ReadStatusUpdate requestDto) {
+    public ReadStatusDto update(UUID readStatusId, Dto_ReadStatusUpdate requestDto) {
         //update
         //[ ] DTO를 활용해 파라미터를 그룹화합니다.
         //수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(() -> new NoSuchElementException("🚨Message[" + readStatusId.toString() + "] 읽음 상태를 찾을 수 없음"));
 
-        readStatus.updateLastReadAt(requestDto);
+        readStatus.setLastReadAt(requestDto.newLastReadAt());
         readStatusRepository.save(readStatus);
 
         log.info("✅ readStatusRepository.update = [" + readStatus + "]");
 
-        return Res_ReadStatus.from(readStatus);
+        return readStatusMapper.toDto(readStatus);
     }
 
     public void delete(UUID statusID) {
