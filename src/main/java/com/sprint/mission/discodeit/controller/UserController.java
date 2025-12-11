@@ -36,7 +36,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
                                               @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
-
+        log.info("createUser");
         UserDto response = userService.createUser(userCreateRequest, profileImage);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -53,7 +53,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
-        userService.delete(userId);
+        userService.deleteUser(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User가 성공적으로 삭제됨");
     }
 

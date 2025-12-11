@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BinaryContentService {
 
 
@@ -34,6 +36,7 @@ public class BinaryContentService {
     @Transactional
     public BinaryContent put(UUID userId, MultipartFile profile) {
 
+        log.info("BinaryService.put");
         BinaryContent content =
                 new BinaryContent(
                         "temp",
@@ -63,6 +66,7 @@ public class BinaryContentService {
     @Transactional
     public List<BinaryContentDto> getBinaryContents(List<UUID> ids) {
 
+        log.info("BinaryService.getBinaryContents");
         return binaryContentRepository.findAllById(ids)
                 .stream()
                 .map(mapper::toDto)

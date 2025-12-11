@@ -43,7 +43,7 @@ public class MessageService {
 
     @Transactional
     public MessageDto sendMessage(MessageCreateRequest request, List<MultipartFile> attachments) {
-
+        log.info("MessageService.sendMessage");
         User user =
                 userRepository.findById(request.authorId()).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
 
@@ -74,6 +74,7 @@ public class MessageService {
     }
 
     public MessageDto updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
+        log.info("MessageService.updateMessage");
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("수정하고자 하는 메세지를 찾을 수 없습니다."));
         message.updateContent(messageUpdateRequest.newContent());
         return mapper.toDto(message);
@@ -83,6 +84,7 @@ public class MessageService {
 
     @Transactional
     public void deleteMessage(UUID messageId) {
+        log.info("MessageService.deleteMessage");
         List<MessageAttachment> list = attachmentRepository.findAllByMessageId(messageId);
         attachmentRepository.deleteById(messageId);
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("메세지가 없습니다."));
