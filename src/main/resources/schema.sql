@@ -1,7 +1,7 @@
 CREATE TABLE binary_contents
 (
     id           UUID PRIMARY KEY,
-    created_at   TIMESTAMPTZ  NOT NULL,
+    created_at timestamp with time zone NOT NULL,
     file_name    VARCHAR(255) NOT NULL,
     size         BIGINT       NOT NULL,
     content_type VARCHAR(100) NOT NULL,
@@ -11,8 +11,8 @@ CREATE TABLE binary_contents
 CREATE TABLE users
 (
     id         uuid PRIMARY KEY,
-    created_at timestamptz  NOT NULL,
-    updated_at timestamptz,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone,
     username   varchar(50)  NOT NULL UNIQUE,
     email      varchar(100) NOT NULL UNIQUE,
     password   varchar(60)  NOT NULL,
@@ -22,8 +22,8 @@ CREATE TABLE users
 CREATE TABLE user_statuses
 (
     id             uuid PRIMARY KEY,
-    created_at     timestamptz                                  NOT NULL,
-    updated_at     timestamptz,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone,
     user_id        uuid REFERENCES users (id) ON DELETE CASCADE NOT NULL,
     last_active_at timestamptz                                  NOT NULL
 )
@@ -31,8 +31,8 @@ CREATE TABLE user_statuses
 CREATE TABLE read_statuses
 (
     id           uuid PRIMARY KEY,
-    created_at   timestamptz                                     NOT NULL,
-    updated_at   timestamptz,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone,
     user_id      uuid REFERENCES users (id) ON DELETE CASCADE    NOT NULL,
     channel_id   uuid REFERENCES channels (id) ON DELETE CASCADE NOT NULL,
     last_read_at timestamptz                                     NOT NULL,
@@ -43,8 +43,8 @@ CREATE TABLE read_statuses
 CREATE TABLE channels
 (
     id          uuid PRIMARY KEY,
-    created_at  timestamptz NOT NULL,
-    updated_at  timestamptz,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone,
     name        varchar(100),
     description varchar(500),
     TYPE        varchar(10) NOT NULL CHECK (type IN ('PUBLIC', 'PRIVATE'))
@@ -53,8 +53,8 @@ CREATE TABLE channels
 CREATE TABLE messages
 (
     id         uuid PRIMARY KEY,
-    created_at timestamptz                                     NOT NULL,
-    updated_at timestamptz,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone,
     CONTENT    text,
     channel_id uuid REFERENCES channels (id) ON DELETE CASCADE NOT NULL,
     author_id  uuid                                            REFERENCES users (id) ON DELETE SET NULL
