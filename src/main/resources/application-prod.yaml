@@ -17,18 +17,6 @@ spring:
         show_sql: true
         format_sql: true
 
-logging:
-  level:
-    com:
-      sprint:
-        mission:
-          discodeit: INFO
-    org:
-      hibernate:
-        orm:
-          jdbc:
-            bind: INFO
-
 discodeit:
   storage:
     type: local

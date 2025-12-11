@@ -12,9 +12,8 @@
         <file>./.logs/app.log</file>
 
         <!-- 날짜가 바뀔 때 (자정 기준) 로그 파일 분리 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>./.logs/app-%d{yy-MM-dd}.%i.log</fileNamePattern>
-            <maxFileSize>10MB</maxFileSize>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./.logs/app-%d{yy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
 
@@ -30,6 +29,7 @@
             <appender-ref ref="FILE"/>
         </root>
         <logger name="com.sprint.mission.discodeit" level="DEBUG" />
+        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" />
     </springProfile>
 
     <springProfile name="prod">
@@ -37,13 +37,11 @@
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </root>
-        <logger name="com.sprint.mission.discodeit" level="INFO" />
     </springProfile>
 
     <springProfile name="default">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="FILE"/>
         </root>
     </springProfile>
 

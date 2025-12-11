@@ -26,7 +26,3 @@ springdoc:
 
   api-docs:
     path: /my-api # Swagger가 우리 api의 정보를 얻어오기 위해 요청하는 url
-
-logging:
-  level:
-    root: INFO

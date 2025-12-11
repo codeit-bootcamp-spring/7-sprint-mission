@@ -21,21 +21,6 @@ spring:
         show_sql: true
         format_sql: true
 
-logging:
-  level:
-    com:
-      sprint:
-        mission:
-          discodeit: DEBUG
-    org:
-      hibernate:
-        orm:
-          jdbc:
-            bind: TRACE
-
-
-
-# application.yaml
 discodeit:
   storage:
     type: local
