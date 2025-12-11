@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Slf4j
 public class ReadStatusServiceImpl implements ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
@@ -54,6 +55,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReadStatusDto findReadStatusById(UUID id) {
         ReadStatus status = readStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
@@ -61,6 +63,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReadStatusDto> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId)
                 .stream().map(readStatusMapper::toDto).collect(Collectors.toList());

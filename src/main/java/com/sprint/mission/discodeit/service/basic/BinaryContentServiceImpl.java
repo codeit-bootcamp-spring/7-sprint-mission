@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Slf4j
 public class BinaryContentServiceImpl implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
@@ -41,6 +42,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BinaryContentDto findBinaryContentById(UUID id) {
         BinaryContent content=  binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
@@ -48,6 +50,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BinaryContentDto> findAllBinaryContentByIdIn(List<UUID> ids) {
         return binaryContentRepository.findAllByIdIn(ids).stream()
                 .map(binaryContentMapper::toDto)

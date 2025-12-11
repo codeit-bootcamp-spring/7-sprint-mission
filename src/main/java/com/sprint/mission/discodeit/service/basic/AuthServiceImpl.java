@@ -13,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto login(LoginRequest loginRequestDto) {
         User user = userRepository.findByUsername(loginRequestDto.username())
                 .orElseThrow(() -> new AuthenticationException("아이디 또는 비밀번호가 틀립니다."));

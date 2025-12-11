@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Slf4j
 public class MessageServiceImpl implements MessageService {
 
     private final UserRepository userRepository;
@@ -110,6 +111,7 @@ public class MessageServiceImpl implements MessageService {
 //    }
 
     // 커서 기반 페이징
+    @Transactional(readOnly = true)
     public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
 
         Instant cursorAt = (cursor == null) ? Instant.now() : cursor;

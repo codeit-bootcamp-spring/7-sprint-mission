@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Slf4j
 public class UserStatusServiceImpl implements UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
@@ -46,6 +47,7 @@ public class UserStatusServiceImpl implements UserStatusService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserStatusDto findStatusById(UUID id) {
         UserStatus status = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없음"));
@@ -65,6 +67,7 @@ public class UserStatusServiceImpl implements UserStatusService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserStatusDto> findAllStatus() {
         return userStatusRepository.findAll().stream().map(userStatusMapper::toDto)
                 .collect(Collectors.toList());

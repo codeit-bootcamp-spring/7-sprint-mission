@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -83,6 +84,7 @@ public class UserServiceImpl implements UserService {
 
     // ID로 출력
     @Override
+    @Transactional(readOnly = true)
     public UserDto findUserById(UUID userId) {
 
         User user = userRepository.findById(userId)
@@ -92,6 +94,7 @@ public class UserServiceImpl implements UserService {
 
     // 전체출력
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> findAllUsers() {
         return userRepository.findAllWithProfile().stream()
                 .map(userMapper::toDto).collect(Collectors.toList());
