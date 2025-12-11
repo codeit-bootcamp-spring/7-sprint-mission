@@ -23,6 +23,10 @@ spring:
 
 logging:
   level:
+    com:
+      sprint:
+        mission:
+          discodeit: DEBUG
     org:
       hibernate:
         orm:
