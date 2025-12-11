@@ -1,7 +1,8 @@
 spring:
   profiles:
     active: dev
-
+  config:
+    import: optional:classpath:actuator.yml
 logging:
   level:
     root: INFO
