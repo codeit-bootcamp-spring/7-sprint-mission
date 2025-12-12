@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -21,8 +22,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test")
 @SpringBootTest
-@Transactional
+
 class UserServiceIntegrationTest {
 
     @Autowired
@@ -43,6 +45,7 @@ class UserServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] 유저 생성")
+    @Transactional
     void createUser() throws IOException {
         //given
         UserCreateRequestDto userCreateRequestDto = TestFixture.userCreateFactory();
@@ -57,6 +60,7 @@ class UserServiceIntegrationTest {
 
     @Test
     @DisplayName("[예외 케이스] null 유저 생성")
+    @Transactional
     void createNullUser() {
         UserCreateRequestDto userCreateRequestDto = new UserCreateRequestDto(
                 null,
@@ -75,6 +79,7 @@ class UserServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] 유저 삭제")
+    @Transactional
     void deleteUser() throws IOException {
         //given
         UserCreateRequestDto userCreateRequestDto = TestFixture.userCreateFactory();
@@ -89,6 +94,7 @@ class UserServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] 유저 전체 조회")
+    @Transactional
     void findAllUsers() throws IOException {
         //given
         UserCreateRequestDto userCreateRequestDto = TestFixture.userCreateFactory();
@@ -106,6 +112,7 @@ class UserServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] 유저 수정")
+    @Transactional
     void patchUser() throws IOException {
         //given
         UserDto userDto = userService.createUser(TestFixture.userCreateFactory(),null);

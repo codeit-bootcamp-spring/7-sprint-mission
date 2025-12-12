@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
+import com.sprint.mission.discodeit.exception.domain.message.MessageNotExistException;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotJoinException;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -15,6 +17,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.subTable.MessageAttachment;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,10 +34,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test")
 @SpringBootTest
-@Transactional
 class MessageServiceIntegrationTest {
 
     @Autowired
@@ -62,6 +67,7 @@ class MessageServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] 메세지 생성")
+    @Transactional
     void createMessage() throws IOException {
         //given
         UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
@@ -80,6 +86,7 @@ class MessageServiceIntegrationTest {
 
     @Test
     @DisplayName("[예외 케이스] null 값 넣기")
+    @Transactional
     void createInvalidChannel() throws IOException {
 
         MessageCreateRequestDto messageCreateRequestDto1 = TestFixture.messageCreateFactory(null, null);
@@ -91,7 +98,8 @@ class MessageServiceIntegrationTest {
 
     @Test
     @DisplayName("[예외 케이스] 채널에 없는 유저 메세지 생성")
-    void createMessageWithNotJoinUser() throws IOException {
+    @Transactional
+    void createMessageWithNotJoinUser()   {
 
         UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
         UserDto user2 = userService.createUser(TestFixture.userCreateFactory(), null);
@@ -102,16 +110,14 @@ class MessageServiceIntegrationTest {
 
         MessageCreateRequestDto messageCreateRequestDto2 = TestFixture.messageCreateFactory(user.id(), privateChannel.id());
 
-        assertThrows(IllegalArgumentException.class,()->messageService.createMessage(
-                        messageCreateRequestDto2,
-                        null
-                )
-        );
+        assertThatThrownBy(() -> messageService.createMessage(messageCreateRequestDto2, null))
+                .isInstanceOf(UserNotJoinException.class);
     }
 
 
     @Test
     @DisplayName("[정상 케이스] 메세지 전체 조회")
+    @Transactional
     void readAllMessage() {
         //given
 
@@ -126,6 +132,7 @@ class MessageServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] 메세지 삭제")
+    @Transactional
     void deleteMessage() throws IOException {
         //given
 
@@ -146,6 +153,7 @@ class MessageServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] 메세지 변경")
+    @Transactional
     void patchMessage() throws IOException {
         //given
         UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
@@ -164,6 +172,7 @@ class MessageServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] 메세지 파일 생성")
+    @Transactional
     void createMessageAttachment() throws IOException {
 
     //given
@@ -193,9 +202,10 @@ class MessageServiceIntegrationTest {
 
     @Test
     @DisplayName("[예외 케이스] 존재하지 않는 메세지 삭제")
+    @Transactional
     void deleteNotMessage() throws IOException {
 
-        //delete 는 기본적으로 에러를 뱉지 않는다.
-        assertDoesNotThrow( () ->messageService.deleteMessage(UUID.randomUUID()));
+        assertThatThrownBy(()->messageService.deleteMessage(UUID.randomUUID()))
+                .isInstanceOf(MessageNotExistException.class);
     }
 }
