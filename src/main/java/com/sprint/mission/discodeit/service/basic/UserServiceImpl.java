@@ -6,8 +6,10 @@ import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.DuplicateEmailException;
-import com.sprint.mission.discodeit.exception.NotFoundUserException;
+import com.sprint.mission.discodeit.exception.binaryContent.FileOperationFailedException;
+import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
+import com.sprint.mission.discodeit.exception.user.DuplicateNameException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -39,10 +41,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto createUser(UserCreateRequest requestDto, MultipartFile profileImage) {
         userRepository.findByEmail(requestDto.email()).ifPresent(user
-                -> { throw new DuplicateEmailException("이미 존재하는 이메일"); });
+                -> { throw new DuplicateEmailException(requestDto.email()); });
 
         userRepository.findByUsername(requestDto.username()).ifPresent(user
-                -> { throw new DuplicateEmailException("이미 존재하는 닉네임"); });
+                -> { throw new DuplicateNameException(requestDto.username()); });
 
         BinaryContent profile = saveProfileImage(profileImage);
 
@@ -75,7 +77,7 @@ public class UserServiceImpl implements UserService {
         try {
             binaryContentStorage.put(binaryContent.getId(), profileImage.getBytes());
         } catch (IOException e) {
-            throw new RuntimeException("파일 저장 실패");
+            throw new FileOperationFailedException(binaryContent.getId());
         }
         return binaryContent;
     }
@@ -88,7 +90,7 @@ public class UserServiceImpl implements UserService {
     public UserDto findUserById(UUID userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         return userMapper.toDto(user);
     }
 
@@ -107,7 +109,7 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUserInfo(UUID userId, UserUpdateRequest updateDto, MultipartFile profileImage) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         if (profileImage != null && !profileImage.isEmpty()) {
             // 기존 프로필사진 확인
@@ -124,7 +126,7 @@ public class UserServiceImpl implements UserService {
         if (updateDto.newUsername() != null && !updateDto.newUsername().isBlank()) {
             userRepository.findByUsername(updateDto.newUsername()).ifPresent(existingUser -> {
                 if (!existingUser.getId().equals(user.getId())) {
-                    throw new DuplicateEmailException("이미 존재하는 닉네임");
+                    throw new DuplicateNameException(updateDto.newUsername());
                 }
             });
             user.updateUsername(updateDto.newUsername());
@@ -133,7 +135,7 @@ public class UserServiceImpl implements UserService {
         if (updateDto.newEmail() != null && !updateDto.newEmail().isBlank()) {
             userRepository.findByEmail(updateDto.newEmail()).ifPresent(existingUser -> {
                 if (!existingUser.getId().equals(user.getId())) {
-                    throw new DuplicateEmailException("이미 존재하는 이메일");
+                    throw new DuplicateEmailException(updateDto.newEmail());
                 }
             });
             user.updateEmail(updateDto.newEmail());
@@ -154,7 +156,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(UUID userId) {
 
         userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         userRepository.deleteById(userId);
     }
