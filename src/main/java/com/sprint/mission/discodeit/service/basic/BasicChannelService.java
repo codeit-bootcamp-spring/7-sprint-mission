@@ -48,30 +48,34 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelDto createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
 
-        Channel channel = channelRepository.save(Channel.privateChannelFactory(channelPrivateCreateRequestDto.name(),channelPrivateCreateRequestDto.description()));
-       channelPrivateCreateRequestDto.participantIds().forEach(
+        List<User> userList = channelPrivateCreateRequestDto.participantIds().stream().map(
                 x ->
                 {
-                    User tempUser = userRepository.findById(x).orElseThrow(()->new UserNotExistException(x));
-                   readStatusRepository.save(ReadStatus.createReadStatusFactory(tempUser,channel));
+                    User tempUser = userRepository.findById(x).orElseThrow(() -> new UserNotExistException(x));
+                    return tempUser;
                 }
-        );
+        ).toList();
+
+        Channel channel = channelRepository.save(Channel.privateChannelFactory(channelPrivateCreateRequestDto.name(),channelPrivateCreateRequestDto.description()));
+       userList.forEach(x->readStatusRepository.save(ReadStatus.createReadStatusFactory(x,channel)));
         return channelMapper.toDto(channel);
     }
 
     @Override
     @Transactional
     public ChannelDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
-
+        List<User> users = userRepository.findAll();
     Channel channel = channelRepository.save(Channel.publicChannelFactory(
             channelPublicCreateRequestDto.name(),
             channelPublicCreateRequestDto.description()
     ));
-        List<User> users = userRepository.findAll();
+
         users.forEach(x->
             readStatusRepository.save(ReadStatus.createReadStatusFactory(x,channel)
         )
         );
+
+
         log.info("channel : {} ",channel);
     return channelMapper.toDto(channel);
     }
@@ -111,7 +115,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID channelID) {
-
+        if(!channelRepository.existsById(channelID)) throw new ChannelNotExistException(channelID);
         log.warn("delete channel : {}",channelID);
         channelRepository.deleteById(channelID);
     }

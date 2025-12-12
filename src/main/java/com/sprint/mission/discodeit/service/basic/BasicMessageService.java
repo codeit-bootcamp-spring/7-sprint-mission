@@ -106,7 +106,7 @@ public class BasicMessageService implements MessageService {
         return messageRepository.findAll().stream().map(messageMapper::toDto).toList();
     }
     public void deleteMessage(UUID messageId){
-
+        if(!messageRepository.existsById(messageId)) throw new MessageNotExistException(messageId);
         log.warn("delete message : {}",messageId);
         messageRepository.deleteById(messageId);
     }
@@ -114,7 +114,7 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDtoBasic<MessageDto> findallByChannelId(UUID channelId, Pageable pageable) {
-
+        if(!channelRepository.existsById(channelId)) throw new ChannelNotExistException(channelId);
         Page<Message> targetPage = messageRepository.findByChannelId(channelId,pageable);
         if(targetPage.isEmpty()) return pageResponseBasicMapper.fromPage(Page.empty());
         Message message = targetPage.getContent().get(0);

@@ -192,8 +192,11 @@ public class UserServiceUnitTest {
     @DisplayName("[정상 케이스] 유저 삭제 ")
     void deleteUser_Success() {
 
+        when(userRepository.existsById(any(UUID.class))).thenReturn(true);
         doNothing().when(userRepository).deleteById(any(UUID.class));
+
         userService.deleteUser(UUID.randomUUID());
+
         verify(userRepository,times(1)).deleteById(any(UUID.class));
     }
 
