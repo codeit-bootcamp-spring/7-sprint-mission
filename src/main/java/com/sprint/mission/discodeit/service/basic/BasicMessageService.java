@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -46,14 +48,23 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageResponseDto createMessage(CreateMessageRequestDto request,
       List<MultipartFile> fileRequests) throws IOException {
+
+    log.debug("메시지 생성 시작 - 채널 id : {}", request.channelId());
     User author = userRepository.findById(request.authorId())
-        .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        .orElseThrow(() -> {
+          log.warn("메시지 생성 실패 - 존재하지 않는 유저: {}", request.authorId());
+          return new IllegalArgumentException("유저를 찾을 수 없습니다.");
+        });
     Channel channel = channelRepository.findById(request.channelId())
-        .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
+        .orElseThrow(() -> {
+          log.warn("메시지 생성 실패 - 존재하지 않는 채널: {}", request.channelId());
+          return new IllegalArgumentException("채널을 찾을 수 없습니다.");
+        });
 
     List<BinaryContent> binaryContents = new ArrayList<>();
 
     if (fileRequests != null) {
+      log.debug("첨부파일 {}개 업로드 시작", fileRequests.size());
       for (MultipartFile fileRequest : fileRequests) {
         BinaryContent binaryContent = new BinaryContent(
             fileRequest.getOriginalFilename(),
@@ -64,6 +75,7 @@ public class BasicMessageService implements MessageService {
         storage.put(saved.getId(), fileRequest.getBytes());
         binaryContents.add(saved);
       }
+      log.debug("첨부파일 업로드 완료 - 첨부파일 {}개", binaryContents.size());
     }
 
     Message message = new Message(
@@ -74,6 +86,8 @@ public class BasicMessageService implements MessageService {
     );
 
     Message saved = messageRepository.save(message);
+    log.info("메시지 생성 완료 - 메시지 ID: {}, 채널명: {} 첨부파일: {}개",
+        saved.getId(), saved.getChannel().getName(), binaryContents.size());
     return messageMapper.toDto(saved);
   }
 
@@ -92,21 +106,30 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public MessageResponseDto updateMessage(UUID messageId, UpdateMessageDto MessageUpdateRequest) {
+    log.debug("메시지 수정 시작 - 메시지 id: {}", messageId);
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
+        .orElseThrow(() -> {
+          log.warn("메시지 수정 실패 - 존재하지 않는 메시지 id: {}", messageId);
+          return new IllegalArgumentException("메시지를 찾을 수 없습니다.");
+        });
 
     String newContent = MessageUpdateRequest.newContent();
 
     message.updateContent(newContent);
-
+    log.info("메시지 수정 완료 - 메시지 id: {}", messageId);
     return messageMapper.toDto(message);
   }
 
   @Override
   @Transactional
   public void deleteMessage(UUID messageId) {
+    log.debug("메시지 삭제 시작 - 메시지 id: {}", messageId);
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
+        .orElseThrow(() -> {
+          log.warn("메시지 삭제 실패 - 존재하지 않는 메시지 id: {}", messageId);
+          return new IllegalArgumentException("메시지를 찾을 수 없습니다.");
+        });
+    log.info("메시지 삭제 성공 - 메시지 id: {}", messageId);
     messageRepository.delete(message);
   }
 }

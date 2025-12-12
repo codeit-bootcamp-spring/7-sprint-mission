@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
+@Slf4j
 public class MessageController implements MessageControllerDocs {
 
   private final MessageService messageService;
@@ -34,6 +36,7 @@ public class MessageController implements MessageControllerDocs {
       @RequestPart("messageCreateRequest") CreateMessageRequestDto messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments)
       throws IOException {
+    log.info("POST /api/messages - 메시지 생성 요청");
     MessageResponseDto message = messageService.createMessage(messageCreateRequest, attachments);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
@@ -45,6 +48,7 @@ public class MessageController implements MessageControllerDocs {
       @RequestBody UpdateMessageDto MessageUpdateRequest) {
     MessageResponseDto response = messageService.updateMessage(messageId,
         MessageUpdateRequest);
+    log.info("PATCH api/messages/{} - 메시지 수정 요청", messageId);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
@@ -52,6 +56,7 @@ public class MessageController implements MessageControllerDocs {
   @DeleteMapping(value = "/{messageId}")
   public ResponseEntity<Void> deleteMessage(
       @PathVariable UUID messageId) {
+    log.info("DELETE api/messages/{}", messageId);
     messageService.deleteMessage(messageId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
