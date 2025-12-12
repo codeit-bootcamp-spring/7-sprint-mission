@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.binarycontent.FileSaveFailException;
+import com.sprint.mission.discodeit.exception.binarycontent.GetFileFailException;
+import com.sprint.mission.discodeit.exception.binarycontent.RepoFailException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import io.swagger.v3.oas.annotations.servers.Server;
 import jakarta.annotation.PostConstruct;
@@ -47,7 +50,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         log.info("저장 디렉토리 생성 완료 - 경로: {}", root);
       } catch (IOException e) {
         log.error("저장소 초기화 실패 - 경로: {}", root, e);
-        throw new RuntimeException("초기화 실패: " + root, e);
+        throw new RepoFailException();
       }
     }
   }
@@ -65,7 +68,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     } catch (IOException e) {
       log.error("파일 저장 실패 - binaryContentId: {}", binaryContentId, e);
-      throw new RuntimeException("파일 쓰기 실패: " + e);
+      throw new FileSaveFailException();
     }
     return binaryContentId;
   }
@@ -82,7 +85,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       log.debug("파일 읽기 완료 - binaryContentId: {}", binaryContentId);
     } catch (IOException e) {
       log.error("파일 읽기 실패 - binaryContentId: {}", binaryContentId, e);
-      throw new RuntimeException("파일 가져오기 실패: " + e);
+      throw new GetFileFailException();
     }
     return input;
   }

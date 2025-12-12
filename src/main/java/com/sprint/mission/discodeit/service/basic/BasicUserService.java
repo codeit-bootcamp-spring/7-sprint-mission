@@ -9,6 +9,10 @@ import com.sprint.mission.discodeit.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.binarycontent.FileSaveFailException;
+import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -46,11 +50,11 @@ public class BasicUserService implements UserService {
     // username, email 중복 체크
     if (userRepository.findByUsername(request.username()).isPresent()) {
       log.warn("유저 생성 실패 - 중복된 유저 이름: {}", request.username());
-      throw new IllegalArgumentException("이미 유저 이름이 있습니다.");
+      throw new DuplicateUsernameException(request.username());
     }
     if (userRepository.findByEmail(request.email()).isPresent()) {
       log.warn("유저 생성 실패 - 중복된 이메일: {}", request.email());
-      throw new IllegalArgumentException("이미 이메일이 있습니다.");
+      throw new DuplicateEmailException(request.email());
     }
 
     // 프로필 이미지 선택적 로직, ID로 체크해서. 컨텐츠 만들어서
@@ -88,7 +92,7 @@ public class BasicUserService implements UserService {
   @Override
   public UserResponseDto find(UUID id) {
     User user = userRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        .orElseThrow(() -> new UserNotFoundException(id));
     return userMapper.toDto(user);
   }
 
@@ -107,7 +111,7 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> {
           log.warn("수정 실패 - 존재하지 않은 유저 ID: {}", userId);
-          return new IllegalArgumentException("유저를 찾을 수 없습니다.");
+          return new UserNotFoundException(userId);
         });
 
     // 프로필 이미지 선택적 로직
@@ -127,7 +131,7 @@ public class BasicUserService implements UserService {
       } catch (IOException e) {
         log.error("이미지 등록 실패 - 파일명: {}, 크기: {}",
             profile.getOriginalFilename(), profile.getSize());
-        throw new IllegalArgumentException("이미지 등록 실패", e);
+        throw new FileSaveFailException();
       }
     }
 
@@ -147,7 +151,7 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> {
           log.warn("삭제 실패 - 존재하지 않는 유저 ID: {}", userId);
-          return new IllegalArgumentException("유저를 찾을 수 없습니다.");
+          return new UserNotFoundException(userId);
         });
     if (user.getProfile() != null) {
       log.debug("프로필 이미지 삭제 - binaryContent ID: {}", user.getProfile().getId());

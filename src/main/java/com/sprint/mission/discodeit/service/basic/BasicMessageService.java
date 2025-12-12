@@ -9,6 +9,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -53,12 +56,12 @@ public class BasicMessageService implements MessageService {
     User author = userRepository.findById(request.authorId())
         .orElseThrow(() -> {
           log.warn("메시지 생성 실패 - 존재하지 않는 유저: {}", request.authorId());
-          return new IllegalArgumentException("유저를 찾을 수 없습니다.");
+          return new UserNotFoundException(request.authorId());
         });
     Channel channel = channelRepository.findById(request.channelId())
         .orElseThrow(() -> {
           log.warn("메시지 생성 실패 - 존재하지 않는 채널: {}", request.channelId());
-          return new IllegalArgumentException("채널을 찾을 수 없습니다.");
+          return new ChannelNotFoundException(request.channelId());
         });
 
     List<BinaryContent> binaryContents = new ArrayList<>();
@@ -94,7 +97,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public PageResponse<MessageResponseDto> findAllByChannelId(UUID channelId, Pageable pageable) {
     if (!channelRepository.existsById(channelId)) {
-      throw new IllegalArgumentException("채널이 존재하지 않습니다.");
+      throw new ChannelNotFoundException(channelId);
     }
 
     Slice<MessageResponseDto> slice = messageRepository.findByChannelId(channelId, pageable)
@@ -110,7 +113,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> {
           log.warn("메시지 수정 실패 - 존재하지 않는 메시지 id: {}", messageId);
-          return new IllegalArgumentException("메시지를 찾을 수 없습니다.");
+          return new MessageNotFoundException(messageId);
         });
 
     String newContent = MessageUpdateRequest.newContent();
@@ -127,7 +130,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> {
           log.warn("메시지 삭제 실패 - 존재하지 않는 메시지 id: {}", messageId);
-          return new IllegalArgumentException("메시지를 찾을 수 없습니다.");
+          return new MessageNotFoundException(messageId);
         });
     log.info("메시지 삭제 성공 - 메시지 id: {}", messageId);
     messageRepository.delete(message);
