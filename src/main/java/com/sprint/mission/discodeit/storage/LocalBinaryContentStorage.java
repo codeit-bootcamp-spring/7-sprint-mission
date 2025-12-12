@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResp
 import com.sprint.mission.discodeit.global.exception.custom.CustomException;
 import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
 import jakarta.annotation.PostConstruct;
-import org.apache.catalina.util.CustomObjectInputStream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
+@Slf4j
 public class LocalBinaryContentStorage implements BinaryContentStorage{
 
     private final Path root;
@@ -61,6 +62,9 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
 
     @Override
     public ResponseEntity<Resource> download(BinaryContentResponseDto dto) {
+
+        log.debug("파일 다운로드: binaryContentId = {}", dto.id());
+
         ByteArrayResource resource = new ByteArrayResource(dto.bytes());
 
         return ResponseEntity.ok()
