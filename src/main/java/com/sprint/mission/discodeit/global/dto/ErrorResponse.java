@@ -31,6 +31,20 @@ public record ErrorResponse (
     }
 
     // 실패 응답(스프링 기본 예외 결과 전달)
+    public static ResponseEntity<ErrorResponse> error(ErrorCode errorCode, Map<String, Object> details, Exception e) {
+        return ResponseEntity
+                .status(errorCode.getStatus())
+                .body(new ErrorResponse(
+                        Instant.now(),
+                        errorCode.name(),
+                        errorCode.getMessage(),
+                        details,
+                        e.getClass().getSimpleName(),
+                        errorCode.getStatus().value()
+                ));
+    }
+
+    // 실패 응답(스프링 기본 예외 결과 전달)
     public static ResponseEntity<ErrorResponse> error(ErrorCode errorCode, Exception e) {
         return ResponseEntity
                 .status(errorCode.getStatus())

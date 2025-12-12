@@ -16,10 +16,6 @@ public enum ErrorCode {
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
     USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
 
-    //===== USER VALIDATOR =====//
-    INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "이메일 형식이 올바르지 않습니다."),
-    INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST, "비밀번호 형식이 올바르지 않습니다."),
-
     //===== CHANNEL =====//
     // 400 BAD REQUEST
     NOT_CHANNEL_MEMBER(HttpStatus.BAD_REQUEST, "사용자가 채널에 속해 있지 않습니다."),
@@ -62,8 +58,8 @@ public enum ErrorCode {
     //===== BINARY_CONTENT =====//
     BINARYCONTENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "파일을 찾을 수 없습니다."),
 
-    //==== NULL INPUT =====//
-    NULL_INPUT_VALUE(HttpStatus.BAD_REQUEST, "null 값은 입력할 수 없습니다."),
+    // 400 Bad Request
+    VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "요청 데이터가 유효하지 않습니다."),
 
     // 500 INTERNAL SERVER ERROR
     FILE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 중 오류가 발생했습니다."),

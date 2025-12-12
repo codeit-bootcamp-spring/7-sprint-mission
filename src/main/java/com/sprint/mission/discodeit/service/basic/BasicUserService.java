@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.validator.UserValidator;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -52,10 +51,6 @@ public class BasicUserService implements UserService{
         // username, email 중복 검사
         validateUsernameDuplicate(userRequest.username());
         validateEmailDuplicate(userRequest.email());
-
-        // 이메일, 비밀번호 포맷 검사
-        validateEmailFormat(userRequest.email());
-        validatePasswordFormat(userRequest.password());
 
         // 선택적 프로필 이미지 처리
         BinaryContent profileImage = saveProfileImage(null, profileRequest);
@@ -125,10 +120,6 @@ public class BasicUserService implements UserService{
             // username, email 중복 검사
             validateUsernameDuplicate(username);
             validateEmailDuplicate(email);
-
-            // 이메일, 비밀번호 포맷 검사
-            validateEmailFormat(email);
-            validatePasswordFormat(password);
         }
 
         // 선택적 프로필 이미지 처리
@@ -193,20 +184,6 @@ public class BasicUserService implements UserService{
                     Map.of("email", email)
             );
         }
-    }
-
-    private void validateEmailFormat(String email) {
-        Optional.ofNullable(email).ifPresent(e ->{
-            log.debug("이메일 형식 검증 시작: {}", e);
-            UserValidator.validateEmail(e);
-        });
-    }
-
-    private void validatePasswordFormat(String password) {
-        Optional.ofNullable(password).ifPresent(pw -> {
-            log.debug("패스워드 형식 검증 시작");
-            UserValidator.validatePassword(pw);
-        });
     }
 
     private BinaryContent saveProfileImage(BinaryContent oldProfile, CreateBinaryContentRequestDto request) {

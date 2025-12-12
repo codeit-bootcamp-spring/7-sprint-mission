@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +53,7 @@ public class MessageController implements MessageControllerDocs {
     @PatchMapping("/{messageId}")
     public ResponseEntity<MessageResponseDto> updateMessage(
             @PathVariable UUID messageId,
-            @RequestBody UpdateMessageRequestDto requestDto
+            @Valid @RequestBody UpdateMessageRequestDto requestDto
     ) {
         log.info("PATCH /api/messages/{} - 메시지 수정 요청", messageId);
 
