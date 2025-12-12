@@ -33,7 +33,6 @@ public class ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
-
     private final ChannelMapper mapper;
     private final UserMapper userMapper;
 

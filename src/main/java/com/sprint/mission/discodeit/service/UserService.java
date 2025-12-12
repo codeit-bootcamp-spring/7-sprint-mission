@@ -45,10 +45,7 @@ public class UserService {
     @Transactional
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
         log.info("UserService.createUser");
-        if (userRepository.existsByEmail(request.email())) {
-            throw new UserAlreadyExistsException( ErrorCode.DUPLICATE_USER,new HashMap<>());
-        }
-        if (userRepository.existsByUsername(request.username())) {
+        if (userRepository.existsByEmailOrUsername(request.email(), request.username())) {
             throw new UserAlreadyExistsException( ErrorCode.DUPLICATE_USER,new HashMap<>());
         }
 
@@ -61,9 +58,10 @@ public class UserService {
         }
 
         List<ReadStatus> readList = new ArrayList<>();
+        //나중에 1차 캐시 해보기
         channelRepository.findAllByType(ChannelType.PUBLIC)
                 .forEach(channel -> {
-                    ReadStatus readStatus = new ReadStatus(save, channel, Instant.now());
+                    ReadStatus readStatus = new ReadStatus(save, channel);
                     readList.add(readStatus);
                 });
         readStatusRepository.saveAll(readList);

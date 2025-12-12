@@ -10,7 +10,6 @@ import java.time.Instant;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Table(name = "read_statuses")
 @AttributeOverride(name = "id", column = @Column(name = "read_status_id"))
 public class ReadStatus extends BaseUpdatableEntity {
@@ -26,6 +25,18 @@ public class ReadStatus extends BaseUpdatableEntity {
 
     @Column(name = "last_read_at")
     private Instant lastReadAt;
+
+    public ReadStatus(User user, Channel channel) {
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = Instant.now();
+    }
+
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = lastReadAt;
+    }
 
     public void updateLastReadAt(Instant lastReadAt){
         this.lastReadAt=lastReadAt;
