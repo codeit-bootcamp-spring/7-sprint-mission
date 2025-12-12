@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 로그를 어디에 기록할까? -->
+    <!-- 이름과 클래스로 로그 출력 결정 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!--%logger{숫자} : 숫자를 늘리면 패키지 경로를 더 자세하게 출력 가능(30~50자 추천)-->
+            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <!-- 콘솔 로그 출력의 문턱은 INFO다. (INFO 레벨보다 낮은 로그는 모두 무시하겠다.) -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--log 저장할 경로 넣어주기-->
+        <file>./logs/app.log</file>
+
+        <!-- 날짜가 바뀔 때 (자정 기준) 로그 파일 분리 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- %i : 파일 번호 (0번부터 시작), 날짜 별로 maxFileSize가 넘어가면 다음 파일로 넘어갈 때 사용 -->
+            <!-- maxHistory : 날짜가 지나면 자동 삭제 (예시는 30일) -->
+            <fileNamePattern>./logs/app-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
+
+    <!-- 기본 로그 레벨 설정 -->
+    <!-- 각 appender의 filter에서 걸러서 처리한다. -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>

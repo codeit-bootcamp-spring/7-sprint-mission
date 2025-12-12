@@ -7,3 +7,11 @@ spring:
 
 server:
   port: 8081
+
+logging:
+  level:
+    root: warn
+    com.sprint.mission.discodeit: info
+    org.hibernate.sql: warn
+  file:
+    path: ./logs
