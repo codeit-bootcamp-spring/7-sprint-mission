@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: prod
+    active: dev
   application:
     name: discodeit
   datasource:
@@ -17,6 +17,11 @@ spring:
 #        show_sql: true
         format_sql: true
 #        default_batch_fetch_size: 100
+  servlet:
+    multipart:
+      enabled: true            # 멀티파트 기능 활성화
+      max-file-size: 10MB      # 파일 하나의 최대 크기
+      max-request-size: 20MB   # 전체 요청 크기
 
 
 logging:
@@ -45,3 +50,37 @@ springdoc:
     doc-expansion: list # 문서 펼침 상태 (none, list, full)
   api-docs:
     path: /my-api # Swagger가 우리 API의 정보를 얻어오기 위해서 요청하는 url
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers # *
+      base-path: /management  #actuator->management 로 경로 변경
+  endpoint:
+    health:
+      show-details: always #개발 환경에서는 always, 운영에서는 when-authorized
+  info:
+    env:
+      enabled: true
+  server:
+    port: 9090 # Actuator 전용 포트 (방화벽으로 막음)
+
+info:
+  app:
+    name: Discodeit
+    description: codeit_practice
+    version: 1.7.0
+    encoding: UTF-8
+    java-version: 17
+    spring-boot-version: 3.4.0
+
+  properties:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}

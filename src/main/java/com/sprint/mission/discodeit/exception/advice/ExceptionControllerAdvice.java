@@ -38,15 +38,5 @@ public class ExceptionControllerAdvice {
                 400);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ErrorResponse exception(Exception e) {
-        log.info("[ExceptionHandler] {}", e.getMessage());
-        return new ErrorResponse(
-                Instant.now(),
-                null,
-                e.getMessage(),
-                null,
-                "Exception",
-                400);
-    }
+
 }
