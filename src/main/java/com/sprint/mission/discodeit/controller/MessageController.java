@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
@@ -37,8 +39,12 @@ public class MessageController implements MessageControllerDocs {
             @RequestPart("messageCreateRequest") CreateMessageRequestDto requestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
+        log.info("POST /api/messages - 메시지 생성 요청");
+
         List<CreateBinaryContentRequestDto> attachmentRequests = binaryContentMapper.toRequestDto(attachments);
         MessageResponseDto createdMessage = messageService.create(requestDto, attachmentRequests);
+
+        log.info("POST /api/messages - 메시지 생성 완료: messageId = {}", createdMessage.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
     }
 
@@ -48,14 +54,22 @@ public class MessageController implements MessageControllerDocs {
             @PathVariable UUID messageId,
             @RequestBody UpdateMessageRequestDto requestDto
     ) {
+        log.info("PATCH /api/messages/{} - 메시지 수정 요청", messageId);
+
         MessageResponseDto updatedMessage = messageService.update(messageId, requestDto);
+
+        log.info("PATCH /api/messages/{} - 메시지 수정 완료", messageId);
         return ResponseEntity.status(HttpStatus.OK).body(updatedMessage);
     }
 
     // 메시지 삭제
     @DeleteMapping("/{messageId}")
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+        log.info("DELETE /api/messages/{} - 메시지 삭제 요청", messageId);
+
         messageService.delete(messageId);
+
+        log.info("DELETE /api/messages/{} - 메시지 삭제 완료", messageId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
