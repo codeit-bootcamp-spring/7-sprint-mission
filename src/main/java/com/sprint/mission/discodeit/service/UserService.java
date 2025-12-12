@@ -12,6 +12,8 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.binarycontent.BinaryContentManager;
+import com.sprint.mission.discodeit.service.binarycontent.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.UserDto;
@@ -35,7 +37,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
-    private final BinaryContentService binaryContentService;
+    private final BinaryContentManager binaryContentManager;
     private final ReadStatusRepository readStatusRepository;
     private final UserMapper mapper;
     private final UserStatusMapper userStatusMapper;
@@ -54,7 +56,7 @@ public class UserService {
         User save = userRepository.save(user);
 
         if (file != null && !file.isEmpty()) {
-            BinaryContent content = binaryContentService.put(save.getId(), file);
+            BinaryContent content = binaryContentManager.saveFileAndMeta(file);
             save.updateProfile(content);
         }
 
@@ -85,9 +87,9 @@ public class UserService {
         }
 
         if (file != null) {
-            BinaryContent content = binaryContentService.put(user.getId(), file);
+            binaryContentManager.deleteFile(user.getProfile());
+            BinaryContent content = binaryContentManager.saveFileAndMeta(file);
             user.updateProfile(content);
-            //여기서 업데이트하면 알아서 전 profile은 삭제 쿼리 날라감
         }
         return mapper.toDto(user);
     }
@@ -97,8 +99,8 @@ public class UserService {
     public void deleteUser(UUID id) {
         log.info("UserService.deleteUser");
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
+        binaryContentManager.deleteFile(user.getProfile());
         userRepository.delete(user);
-        binaryContentService.deleteFile(user.getId());
     }
 
 

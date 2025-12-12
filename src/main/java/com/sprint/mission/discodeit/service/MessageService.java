@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.binarycontent.BinaryContentManager;
+import com.sprint.mission.discodeit.service.binarycontent.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
@@ -38,7 +40,7 @@ public class MessageService {
     private final MessageMapper mapper;
     private final MessagePageResponseMapper pageMapper;
     private final BinaryContentMapper binaryContentMapper;
-    private final BinaryContentService binaryContentService;
+    private final BinaryContentManager binaryContentManager;
 
 
     @Transactional
@@ -46,24 +48,20 @@ public class MessageService {
         log.info("MessageService.sendMessage");
         User user =
                 userRepository.findById(request.authorId()).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
-
         Channel channel =
                 channelRepository.findById(request.channelId()).orElseThrow(() -> new NoSuchElementException("해당 채널이 존재하지 않습니다."));
-
-
         Message message = new Message(
                 user,
                 channel,
                 request.content()
         );
 
-
         Message save = messageRepository.save(message);
         MessageDto dto = mapper.toDto(save);
 
         if (attachments != null) {
             for (MultipartFile file : attachments) {
-                BinaryContent content = binaryContentService.put(request.authorId(), file);
+                BinaryContent content = binaryContentManager.saveFileAndMeta(file);
                 MessageAttachment messageAttachment = new MessageAttachment(message, content);
                 MessageAttachment save1 = attachmentRepository.save(messageAttachment);
                 dto.addAttachment(binaryContentMapper.toDto(content));
@@ -91,7 +89,7 @@ public class MessageService {
         messageRepository.delete(message);
 
         for (MessageAttachment attachment : list) {
-            binaryContentService.deleteFile(attachment.getAttachment().getId());
+            binaryContentManager.deleteFile(attachment.getAttachment());
         }
 
     }

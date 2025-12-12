@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.binarycontent;
 
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +9,10 @@ import java.util.UUID;
 
 public interface BinaryContentStorage {
 
-    UUID put(UUID id, MultipartFile file);
+    UUID put(MultipartFile file);
     InputStream get(UUID id);
-    ResponseEntity<UrlResource> getUrl(UUID id);
+    UrlResource getUrlResource(String fileName);
+
+    void deleteFile(String fileName);
     
 }

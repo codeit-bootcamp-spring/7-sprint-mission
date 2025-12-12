@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,21 +20,10 @@ public class BinaryContent extends BaseEntity {
     @Column(name = "file_name", length = 100, nullable = false)
     private String fileName;
 
-    @Column(name = "file_path",nullable = false)
-    private String filePath;
 
     @Column(name = "file_type", length = 50,nullable = false)
     private String fileType;
 
     @Column(name = "file_size",nullable = false)
     private long fileSize;
-
-
-    public void updateFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public void updateFilePath(String filePath) {
-        this.filePath = filePath;
-    }
 }
