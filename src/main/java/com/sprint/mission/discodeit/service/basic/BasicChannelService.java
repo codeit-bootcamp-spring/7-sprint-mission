@@ -2,10 +2,13 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.request.*;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
+import com.sprint.mission.discodeit.global.exception.channel.ChannelNameAlreadyExistsException;
+import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.global.exception.channel.PrivateChannelUpdateForbiddenException;
+import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.global.exception.custom.CustomException;
-import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -57,10 +60,10 @@ public class BasicChannelService implements ChannelService {
         // 비공개 채널 참가 유저 존재 여부 판단
         List<User> users = request.participantIds().stream()
                 .map(userId -> userRepository.findById(userId)
-                        .orElseThrow(() -> {
-                            log.warn("userId = {}인 사용자가 없습니다.", userId);
-                            return new CustomException(ErrorCode.USER_NOT_FOUND);
-                        })
+                        .orElseThrow(() -> new UserNotFoundException(
+                                ErrorCode.USER_NOT_FOUND,
+                                Map.of("userId", userId)
+                        ))
                 )
                 .toList();
 
@@ -83,12 +86,17 @@ public class BasicChannelService implements ChannelService {
         log.debug("채널 수정 요청: channelId = {}", channelId);
 
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() ->  new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() ->  new ChannelNotFoundException(
+                        ErrorCode.CHANNEL_NOT_FOUND,
+                        Map.of("channelId", channelId)
+                ));
 
         // 비공개 채널의 경우 수정 불가
         if (channel.getChannelType() ==  ChannelType.PRIVATE) {
-            log.warn("비공개 채널 수정 요청 감지: channelId = {}", channelId);
-            throw new CustomException(ErrorCode.PRIVATE_CHANNEL_UPDATE_FORBIDDEN);
+            throw new PrivateChannelUpdateForbiddenException(
+                    ErrorCode.PRIVATE_CHANNEL_UPDATE_FORBIDDEN,
+                    Map.of("channelId", channelId)
+            );
         }
 
         // 이름 중복 저장 불가
@@ -105,7 +113,10 @@ public class BasicChannelService implements ChannelService {
     @Transactional(readOnly = true)
     public ChannelDto find(UUID channelId){
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> new ChannelNotFoundException(
+                        ErrorCode.CHANNEL_NOT_FOUND,
+                        Map.of("channelId", channelId)
+                ));
         return channelMapper.toResponseDto(channel);
     }
 
@@ -139,7 +150,10 @@ public class BasicChannelService implements ChannelService {
         log.debug("채널 삭제 요청: channelId = {}", channelId);
 
         channelRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> new ChannelNotFoundException(
+                        ErrorCode.CHANNEL_NOT_FOUND,
+                        Map.of("channelId", channelId)
+                ));
 
         // 채널 메시지 연관 파일 UUID 저장
         List<UUID> binaryContentIds = messageRepository.findAllByChannelId(channelId).stream()
@@ -161,8 +175,10 @@ public class BasicChannelService implements ChannelService {
                 .anyMatch(c -> c.getChannelName().equals(name));
 
         if(exists) {
-            log.warn("중복된 채널 이름: {}", name);
-            throw new CustomException(ErrorCode.CHANNEL_NAME_ALREADY_EXISTS);
+            throw new ChannelNameAlreadyExistsException(
+                    ErrorCode.CHANNEL_NAME_ALREADY_EXISTS,
+                    Map.of("channelName", name)
+            );
         }
     }
 }

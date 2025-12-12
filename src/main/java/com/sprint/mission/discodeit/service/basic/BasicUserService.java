@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.global.exception.user.EmailAlreadyExistsException;
+import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.global.exception.user.UsernameAlreadyExistsException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
@@ -9,8 +12,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.validator.UserValidator;
-import com.sprint.mission.discodeit.global.exception.custom.CustomException;
-import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -81,7 +84,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto find(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(
+                        ErrorCode.USER_NOT_FOUND,
+                        Map.of("userId", userId)
+                ));
 
         return userMapper.toResponseDto(user);
     }
@@ -99,7 +105,10 @@ public class BasicUserService implements UserService{
     public UserResponseDto update(UUID userId, UpdateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
         
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(
+                        ErrorCode.USER_NOT_FOUND,
+                        Map.of("userId", userId)
+                ));
 
         log.debug("사용자 정보 수정 요청: userId = {}, username = {}", user.getId(), user.getUsername());
 
@@ -135,9 +144,12 @@ public class BasicUserService implements UserService{
 
     @Override
     @Transactional
-    public void delete(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public void delete(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        ErrorCode.USER_NOT_FOUND,
+                        Map.of("userId", userId)
+                ));
 
         log.debug("사용자 삭제 요청: userId = {}, username = {}", user.getId(), user.getUsername());
 
@@ -150,9 +162,9 @@ public class BasicUserService implements UserService{
         }
 
         userStatusRepository.deleteById(userStatus.getId());
-        userRepository.deleteById(id);
+        userRepository.deleteById(userId);
 
-        log.info("사용자 삭제 완료");
+        log.info("사용자 삭제 완료: userId = {}", userId);
     }
 
     private void validateUsernameDuplicate(String username) {
@@ -162,8 +174,10 @@ public class BasicUserService implements UserService{
                 .anyMatch(u -> u.getUsername().equals(username));
 
         if (exists) {
-            log.warn("username {}은 이미 존재합니다.", username);
-            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
+            throw new UsernameAlreadyExistsException(
+                    ErrorCode.USERNAME_ALREADY_EXISTS,
+                    Map.of("username", username)
+            );
         }
     }
 
@@ -174,8 +188,10 @@ public class BasicUserService implements UserService{
                 anyMatch(u -> u.getEmail().equals(email));
 
         if (exists) {
-            log.warn("email {}은 이미 존재합니다.", email);
-            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
+            throw new EmailAlreadyExistsException(
+                    ErrorCode.EMAIL_ALREADY_EXISTS,
+                    Map.of("email", email)
+            );
         }
     }
 

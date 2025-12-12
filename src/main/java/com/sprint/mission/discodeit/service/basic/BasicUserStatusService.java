@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.global.exception.userstatus.UserNotFoundForUserStatusException;
+import com.sprint.mission.discodeit.global.exception.userstatus.UserStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.global.exception.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.dto.userstatus.request.CreateUserStatusRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.request.UpdateUserStatusRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.global.exception.custom.CustomException;
-import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -32,10 +35,16 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     public void create(CreateUserStatusRequestDto request) {
         User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND_FOR_STATUS));
+                .orElseThrow(() -> new UserNotFoundForUserStatusException(
+                        ErrorCode.USER_NOT_FOUND_FOR_USER_STATUS,
+                        Map.of("userId", request.userId())
+                ));
 
         userStatusRepository.findById(request.userId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_ALREADY_EXISTS));
+                .orElseThrow(() -> new UserStatusAlreadyExistsException(
+                        ErrorCode.USER_STATUS_ALREADY_EXISTS,
+                        Map.of("userId", request.userId())
+                ));
 
         UserStatus newUserStatus = new UserStatus(user);
         userStatusRepository.save(newUserStatus);
@@ -44,7 +53,10 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusResponseDto find(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+                .orElseThrow(() -> new UserStatusNotFoundException(
+                        ErrorCode.USER_STATUS_NOT_FOUND,
+                        Map.of("userStatusId", userStatusId)
+                ));
 
         return userStatusMapper.toResponseDto(userStatus);
     }
@@ -63,7 +75,10 @@ public class BasicUserStatusService implements UserStatusService {
         Instant newLastActiveAt = request.newLastActiveAt();
 
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+                .orElseThrow(() -> new UserStatusNotFoundException(
+                        ErrorCode.USER_STATUS_NOT_FOUND,
+                        Map.of("userStatusId", userStatusId)
+                ));
         userStatus.update(newLastActiveAt);
         userStatusRepository.save(userStatus);
         return userStatusMapper.toResponseDto(userStatus);
@@ -75,7 +90,10 @@ public class BasicUserStatusService implements UserStatusService {
         Instant newLastActiveAt = request.newLastActiveAt();
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+                .orElseThrow(() -> new UserStatusNotFoundException(
+                        ErrorCode.USER_STATUS_NOT_FOUND,
+                        Map.of("userId", userId)
+                ));
         userStatus.update(newLastActiveAt);
         userStatusRepository.save(userStatus);
         return userStatusMapper.toResponseDto(userStatus);
@@ -85,7 +103,10 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     public void delete(UUID userStatusId) {
         userStatusRepository.findById(userStatusId)
-                .orElseThrow(() ->  new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+                .orElseThrow(() ->  new UserStatusNotFoundException(
+                        ErrorCode.USER_STATUS_NOT_FOUND,
+                        Map.of("userStatusId", userStatusId)
+                ));
 
         userStatusRepository.deleteById(userStatusId);
     }

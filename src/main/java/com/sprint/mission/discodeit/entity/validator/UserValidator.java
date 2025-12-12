@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.entity.validator;
 
-import com.sprint.mission.discodeit.global.exception.custom.CustomException;
-import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.user.InvalidEmailFormatException;
+import com.sprint.mission.discodeit.global.exception.user.InvalidPasswordFormatException;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
 
 @Slf4j
 public class UserValidator {
@@ -12,8 +15,10 @@ public class UserValidator {
         ValidationUtils.validateNotNull(email, "이메일");
 
         if(!email.matches(EMAIL_PATTERN)){
-            log.warn("유효하지 않은 이메일 형식: {}", email);
-            throw new CustomException(ErrorCode.INVALID_EMAIL_FORMAT);
+            throw new InvalidEmailFormatException(
+                    ErrorCode.INVALID_EMAIL_FORMAT,
+                    Map.of("email", email)
+            );
         }
     }
 
@@ -21,7 +26,10 @@ public class UserValidator {
         ValidationUtils.validateNotNull(password, "비밀번호");
 
         if(password.length() < 8 || password.isBlank()){
-            log.warn("유효하지 않은 비밀번호 형식: (길이={}, 공백여부={})", password.length(), password.isBlank());
-            throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);        }
+            throw new InvalidPasswordFormatException(
+                    ErrorCode.INVALID_PASSWORD_FORMAT,
+                    Map.of("length", password.length(), "isBlank", password.isBlank())
+            );
+        }
     }
 }

@@ -2,10 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.global.exception.custom.CustomException;
-import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,7 +44,10 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContentResponseDto find(UUID binaryContentId) {
         BinaryContent content = binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND));
+                .orElseThrow(() -> new BinaryContentNotFoundException(
+                        ErrorCode.BINARYCONTENT_NOT_FOUND,
+                        Map.of("binaryContentId", binaryContentId)
+                ));
 
         return binaryContentMapper.toResponseDto(content);
     }
@@ -61,7 +65,10 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional
     public void delete(UUID binaryContentId) {
         binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new CustomException(ErrorCode.BINARYCONTENT_NOT_FOUND));
+                .orElseThrow(() -> new BinaryContentNotFoundException(
+                        ErrorCode.BINARYCONTENT_NOT_FOUND,
+                        Map.of("binaryContentId", binaryContentId)
+                ));
         binaryContentRepository.deleteById(binaryContentId);
     }
 
