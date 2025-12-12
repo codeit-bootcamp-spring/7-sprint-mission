@@ -1,5 +1,6 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.readstatus;
 
+import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.readStatus.ReadStatusPatchRequestDto;
 import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
@@ -8,7 +9,9 @@ import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.service.util.TestFixture;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +25,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
-class ReadStatusServiceTest {
+class ReadStatusServiceIntegrationTest {
 
     @Autowired
     ReadStatusService readStatusService;
-
-    @Autowired
-    TestFixture fixture;
 
     @Autowired
     ChannelService channelService;
@@ -44,13 +44,13 @@ class ReadStatusServiceTest {
     @DisplayName("[정상 케이스] readStatus 생성")
     void createReadStatus() throws IOException {
         //given
-        UserDto user = userService.createUser(fixture.userCreateFactory(), null);
+        UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
         ChannelDto privateChannel = channelService.createPrivateChannel(new ChannelPrivateCreateRequestDto(
                         new HashSet<>(List.of(user.id()))
                 )
         );
         //when
-        ReadStatusDto readStatus = readStatusService.createReadStatus(fixture.readStatusCreateFactory(privateChannel.id(),user.id()));
+        ReadStatusDto readStatus = readStatusService.createReadStatus(TestFixture.readStatusCreateFactory(privateChannel.id(),user.id()));
 
 
         //then
@@ -64,8 +64,8 @@ class ReadStatusServiceTest {
     @DisplayName("[정상 케이스] 유저 id로 조회")
     void findAllyByUserId() throws IOException {
         //given
-        UserDto userDto =userService.createUser(fixture.userCreateFactory(),null);
-        ChannelDto publicChannel = channelService.createPublicChannel(fixture.channelPublicCreateFactory());
+        UserDto userDto =userService.createUser(TestFixture.userCreateFactory(),null);
+        ChannelDto publicChannel = channelService.createPublicChannel(TestFixture.channelPublicCreateFactory());
         ChannelDto privateChannel = channelService.createPrivateChannel(new ChannelPrivateCreateRequestDto
                 (new HashSet<>
                         (List.of(userDto.id())
@@ -101,12 +101,12 @@ class ReadStatusServiceTest {
     @DisplayName("[정상 케이스] readStatus 변경")
     void patchReadStatus() throws IOException {
         //given
-        UserDto user = userService.createUser(fixture.userCreateFactory(), null);
+        UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
         ChannelDto privateChannel = channelService.createPrivateChannel(new ChannelPrivateCreateRequestDto(
                         new HashSet<>(List.of(user.id()))
                 )
         );
-        ReadStatusPatchRequestDto readStatusPatchRequestDto = fixture.readStatusPatchFactory();
+        ReadStatusPatchRequestDto readStatusPatchRequestDto = TestFixture.readStatusPatchFactory();
         ReadStatus readStatus = readStatusRepository.findAll().stream().filter(x -> x.getUser().getId() == user.id()
                 && x.getChannel().getId() == privateChannel.id()
         ).findFirst().orElseThrow();

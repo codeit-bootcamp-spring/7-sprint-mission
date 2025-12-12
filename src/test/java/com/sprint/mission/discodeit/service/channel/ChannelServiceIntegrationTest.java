@@ -1,18 +1,19 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.channel;
 
+import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.service.util.TestFixture;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -24,14 +25,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class ChannelServiceTest {
+class ChannelServiceIntegrationTest {
 
-    private static final Logger log = LoggerFactory.getLogger(ChannelServiceTest.class);
+    private static final Logger log = LoggerFactory.getLogger(ChannelServiceIntegrationTest.class);
     @Autowired
     ChannelService channelService;
 
-    @Autowired
-    TestFixture fixture;
 
     @Autowired
     UserService userService;
@@ -44,8 +43,8 @@ class ChannelServiceTest {
     @DisplayName("[정상 케이스] private 채널 생성")
     void createPrivateChannel() throws IOException {
         //given
-        UserDto userDto =userService.createUser(fixture.userCreateFactory(),null);
-        UserDto userDto2 =userService.createUser(fixture.userCreateFactory(),null);
+        UserDto userDto =userService.createUser(TestFixture.userCreateFactory(),null);
+        UserDto userDto2 =userService.createUser(TestFixture.userCreateFactory(),null);
 
 
 
@@ -73,7 +72,7 @@ class ChannelServiceTest {
         //given
 
         //when
-        ChannelDto publicChannel = channelService.createPublicChannel(fixture.channelPublicCreateFactory());
+        ChannelDto publicChannel = channelService.createPublicChannel(TestFixture.channelPublicCreateFactory());
         //then
         var actualResult = channelRepository.findById(publicChannel.id()).isPresent();
         var expectedResult = true;
@@ -85,8 +84,8 @@ class ChannelServiceTest {
     @DisplayName("[정상 케이스] 채널 내용 변경")
     void patchChannel() throws IOException {
         //given
-        UserDto userDto =userService.createUser(fixture.userCreateFactory(),null);
-        UserDto userDto2 =userService.createUser(fixture.userCreateFactory(),null);
+        UserDto userDto =userService.createUser(TestFixture.userCreateFactory(),null);
+        UserDto userDto2 =userService.createUser(TestFixture.userCreateFactory(),null);
         ChannelDto privateChannel = channelService.createPrivateChannel(new ChannelPrivateCreateRequestDto
                 (new HashSet<>
                         (List.of(userDto.id(), userDto2.id())
@@ -94,7 +93,7 @@ class ChannelServiceTest {
                 )
         );
         //when
-        ChannelPatchRequestDto channelPatchRequestDto = fixture.channelPatchFactory();
+        ChannelPatchRequestDto channelPatchRequestDto = TestFixture.channelPatchFactory();
         channelService.patchChannel(channelPatchRequestDto,privateChannel.id());
 
         //then
@@ -109,15 +108,15 @@ class ChannelServiceTest {
     void findAllByUserId() throws IOException {
         //given
 
-        UserDto userDto =userService.createUser(fixture.userCreateFactory(),null);
-        UserDto userDto2 =userService.createUser(fixture.userCreateFactory(),null);
+        UserDto userDto =userService.createUser(TestFixture.userCreateFactory(),null);
+        UserDto userDto2 =userService.createUser(TestFixture.userCreateFactory(),null);
         ChannelDto privateChannel = channelService.createPrivateChannel(new ChannelPrivateCreateRequestDto
                 (new HashSet<>
                         (List.of(userDto.id(), userDto2.id())
                         )
                 )
         );
-        ChannelDto publicChannel = channelService.createPublicChannel(fixture.channelPublicCreateFactory());
+        ChannelDto publicChannel = channelService.createPublicChannel(TestFixture.channelPublicCreateFactory());
         ChannelDto privateChannel2 = channelService.createPrivateChannel(new ChannelPrivateCreateRequestDto
                 (new HashSet<>
                         (List.of(userDto.id(), userDto2.id())
@@ -151,7 +150,7 @@ class ChannelServiceTest {
     @DisplayName("[정상 케이스] 채널 삭제")
     void deleteChannel() {
         //given
-        ChannelDto publicChannel = channelService.createPublicChannel(fixture.channelPublicCreateFactory());
+        ChannelDto publicChannel = channelService.createPublicChannel(TestFixture.channelPublicCreateFactory());
 
         //when
         channelService.deleteChannel(publicChannel.id());

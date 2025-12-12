@@ -41,14 +41,14 @@ public class UserController{
     public ResponseEntity<UserDto> createUser(
             @Valid @RequestPart("userCreateRequest") UserCreateRequestDto dto
             , @RequestPart(value = "profile", required = false) MultipartFile profile
-    ) throws IOException {
+    ) {
         return new ResponseEntity<UserDto>(userService.createUser(dto,profile),HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> patchUser(@PathVariable UUID userId,
                                              @Valid @RequestPart("userUpdateRequest") UserUpdateRequest dto,
-                                             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+                                             @RequestPart(value = "profile", required = false) MultipartFile profile)   {
        ;
         return new ResponseEntity<UserDto>(userService.patchUser(userId, dto,profile), HttpStatus.OK);
     }

@@ -1,9 +1,11 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.service.util.TestFixture;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,24 +16,19 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
-class BinaryContentServiceTest {
+class BinaryContentServiceIntegrationTest {
 
     @Autowired
     UserService userService;
 
     @Autowired
     BinaryContentService binaryContentService;
-
-    @Autowired
-    TestFixture fixture;
 
     @Autowired
     BinaryContentRepository binaryContentRepository;
@@ -50,7 +47,7 @@ class BinaryContentServiceTest {
                 "application/octet-stream",  // 일반적으로 그냥 placeholder로 사용 가능
                 new byte[0]
         );
-        var userDto = userService.createUser(fixture.userCreateFactory(),multipartFile);
+        var userDto = userService.createUser(TestFixture.userCreateFactory(),multipartFile);
 
         //when
         BinaryContentDto binaryContentDto = binaryContentService.find(userDto.profile().id());
@@ -83,9 +80,9 @@ class BinaryContentServiceTest {
                 "application/octet-stream",  // 일반적으로 그냥 placeholder로 사용 가능
                 new byte[0]
         );
-        UserDto user1 = userService.createUser(fixture.userCreateFactory(), multipartFile1);
-        UserDto user2 = userService.createUser(fixture.userCreateFactory(), multipartFile2);
-        UserDto user3 = userService.createUser(fixture.userCreateFactory(), multipartFile3);
+        UserDto user1 = userService.createUser(TestFixture.userCreateFactory(), multipartFile1);
+        UserDto user2 = userService.createUser(TestFixture.userCreateFactory(), multipartFile2);
+        UserDto user3 = userService.createUser(TestFixture.userCreateFactory(), multipartFile3);
 
         //when
         List<BinaryContentDto> allByIdIn = binaryContentService.findAllByIdIn(List.of(user1.profile().id(),
@@ -118,7 +115,7 @@ class BinaryContentServiceTest {
                 "application/octet-stream",  // 일반적으로 그냥 placeholder로 사용 가능
                 new byte[0]
         );
-        var userDto = userService.createUser(fixture.userCreateFactory(),multipartFile);
+        var userDto = userService.createUser(TestFixture.userCreateFactory(),multipartFile);
 
         //when
         ResponseEntity<?> responseEntity = binaryContentService.downloadFile(userDto.profile().id());
@@ -132,7 +129,7 @@ class BinaryContentServiceTest {
     @Test
     @DisplayName("[예외 케이스] 파일 값에 null 입력")
     void downloadNullFile() throws IOException {
-        var userDto = userService.createUser(fixture.userCreateFactory(),null);
+        var userDto = userService.createUser(TestFixture.userCreateFactory(),null);
 
         assertThrows(NullPointerException.class,()->binaryContentService.downloadFile(userDto.profile().id()));
 

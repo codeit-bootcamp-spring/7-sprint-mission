@@ -1,11 +1,12 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.user;
 
+import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.util.TestFixture;
+import com.sprint.mission.discodeit.service.UserService;
 import jakarta.persistence.EntityManager;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,8 +14,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.Constants;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -24,13 +23,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class UserServiceTest {
+class UserServiceIntegrationTest {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private TestFixture fixture;
 
     @Autowired
     private UserRepository userRepository;
@@ -49,7 +45,7 @@ class UserServiceTest {
     @DisplayName("[정상 케이스] 유저 생성")
     void createUser() throws IOException {
         //given
-        UserCreateRequestDto userCreateRequestDto = fixture.userCreateFactory();
+        UserCreateRequestDto userCreateRequestDto = TestFixture.userCreateFactory();
 
         //when
         UserDto userDto=userService.createUser(userCreateRequestDto,null);
@@ -81,7 +77,7 @@ class UserServiceTest {
     @DisplayName("[정상 케이스] 유저 삭제")
     void deleteUser() throws IOException {
         //given
-        UserCreateRequestDto userCreateRequestDto = fixture.userCreateFactory();
+        UserCreateRequestDto userCreateRequestDto = TestFixture.userCreateFactory();
         UserDto userDto = userService.createUser(userCreateRequestDto,null);
 
         //then
@@ -95,8 +91,8 @@ class UserServiceTest {
     @DisplayName("[정상 케이스] 유저 전체 조회")
     void findAllUsers() throws IOException {
         //given
-        UserCreateRequestDto userCreateRequestDto = fixture.userCreateFactory();
-        UserCreateRequestDto userCreateRequestDto2 = fixture.userCreateFactory();
+        UserCreateRequestDto userCreateRequestDto = TestFixture.userCreateFactory();
+        UserCreateRequestDto userCreateRequestDto2 = TestFixture.userCreateFactory();
         userService.createUser(userCreateRequestDto,null);
         userService.createUser(userCreateRequestDto2,null);
 
@@ -112,8 +108,8 @@ class UserServiceTest {
     @DisplayName("[정상 케이스] 유저 수정")
     void patchUser() throws IOException {
         //given
-        UserDto userDto = userService.createUser(fixture.userCreateFactory(),null);
-        UserUpdateRequest userPatchRequestDto = fixture.userUpdateFactory();
+        UserDto userDto = userService.createUser(TestFixture.userCreateFactory(),null);
+        UserUpdateRequest userPatchRequestDto = TestFixture.userUpdateFactory();
 
         //when
         UserDto newUser= userService.patchUser(userDto.id(),userPatchRequestDto,null);

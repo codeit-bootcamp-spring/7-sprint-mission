@@ -17,7 +17,7 @@ import java.util.UUID;
 public interface MessageService {
 
     MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto
-            , List<MultipartFile> attachments) throws IOException;
+            , List<MultipartFile> attachments);
      List<MessageDto> readAllMessage();
      PageResponseDtoBasic<MessageDto> findallByChannelId(UUID channelId, Pageable pageable);
     PageResponseDto<MessageDto> findallByChannelIdWithCursor(UUID channelId, String cursor, Pageable pageable);

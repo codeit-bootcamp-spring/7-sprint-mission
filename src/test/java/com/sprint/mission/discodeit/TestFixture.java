@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.util;
+package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPatchRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateRequestDto;
@@ -9,17 +9,15 @@ import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.userStatus.UserStatusPatchRequestDto;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.UUID;
 
-@Service
+
 public class TestFixture {
 
-    public UserCreateRequestDto userCreateFactory(){
+    public static  UserCreateRequestDto userCreateFactory(){
         return new UserCreateRequestDto(
                 randomString(),
                 randomString(),
@@ -27,7 +25,7 @@ public class TestFixture {
         );
     }
 
-    public UserUpdateRequest userUpdateFactory(){
+    public static UserUpdateRequest userUpdateFactory(){
         return new UserUpdateRequest(
 
                 randomString(),
@@ -37,23 +35,23 @@ public class TestFixture {
     }
 
 
-    public UserStatusPatchRequestDto userStatusPatchFactory(){
+    public static UserStatusPatchRequestDto userStatusPatchFactory(){
         return new UserStatusPatchRequestDto(randomInstant());
     }
 
-    public MessageCreateRequestDto messageCreateFactory(UUID userId,UUID channelId){
+    public static MessageCreateRequestDto messageCreateFactory(UUID userId,UUID channelId){
         return new MessageCreateRequestDto(randomString(),userId,channelId);
     }
 
-    public ChannelPublicCreateRequestDto channelPublicCreateFactory(){
+    public static ChannelPublicCreateRequestDto channelPublicCreateFactory(){
         return new ChannelPublicCreateRequestDto(randomString(),randomString());
     }
 
-    public ChannelPatchRequestDto channelPatchFactory(){
+    public static ChannelPatchRequestDto channelPatchFactory(){
         return new ChannelPatchRequestDto(randomString(),randomString());
     }
 
-    public ReadStatusCreateRequestDto readStatusCreateFactory(UUID channelId,UUID userId){
+    public static ReadStatusCreateRequestDto readStatusCreateFactory(UUID channelId,UUID userId){
         return new ReadStatusCreateRequestDto(channelId,userId,randomInstant());
     }
 
@@ -61,16 +59,16 @@ public class TestFixture {
 
 
 
-    private String randomString(){
+    static String randomString(){
         return UUID.randomUUID().toString();
     }
 
-    private Instant randomInstant(){
+    static Instant randomInstant(){
         int randomDay = (int)(Math.random()*365);
         return Instant.now().minus(Duration.ofDays(randomDay));
     }
 
-    public ReadStatusPatchRequestDto readStatusPatchFactory() {
+    public static ReadStatusPatchRequestDto readStatusPatchFactory() {
         return new ReadStatusPatchRequestDto(randomInstant());
     }
 }

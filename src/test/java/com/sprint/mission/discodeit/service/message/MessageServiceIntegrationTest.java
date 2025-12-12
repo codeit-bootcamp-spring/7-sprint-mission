@@ -1,5 +1,6 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.message;
 
+import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
@@ -9,7 +10,10 @@ import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.util.TestFixture;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.subTable.MessageAttachment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,13 +34,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MessageServiceTest {
+class MessageServiceIntegrationTest {
 
     @Autowired
     MessageService messageService;
-
-    @Autowired
-    TestFixture fixture;
 
     @Autowired
     ChannelService channelService;
@@ -63,9 +64,9 @@ class MessageServiceTest {
     @DisplayName("[정상 케이스] 메세지 생성")
     void createMessage() throws IOException {
         //given
-        UserDto user = userService.createUser(fixture.userCreateFactory(), null);
-        ChannelDto publicChannel = channelService.createPublicChannel(fixture.channelPublicCreateFactory());
-        MessageCreateRequestDto message = fixture.messageCreateFactory(user.id(), publicChannel.id());
+        UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
+        ChannelDto publicChannel = channelService.createPublicChannel(TestFixture.channelPublicCreateFactory());
+        MessageCreateRequestDto message = TestFixture.messageCreateFactory(user.id(), publicChannel.id());
 
         //when
 
@@ -81,7 +82,7 @@ class MessageServiceTest {
     @DisplayName("[예외 케이스] null 값 넣기")
     void createInvalidChannel() throws IOException {
 
-        MessageCreateRequestDto messageCreateRequestDto1 = fixture.messageCreateFactory(null, null);
+        MessageCreateRequestDto messageCreateRequestDto1 = TestFixture.messageCreateFactory(null, null);
 
         assertThrows(InvalidDataAccessApiUsageException.class,()->messageService.createMessage(messageCreateRequestDto1,
                 null));
@@ -92,14 +93,14 @@ class MessageServiceTest {
     @DisplayName("[예외 케이스] 채널에 없는 유저 메세지 생성")
     void createMessageWithNotJoinUser() throws IOException {
 
-        UserDto user = userService.createUser(fixture.userCreateFactory(), null);
-        UserDto user2 = userService.createUser(fixture.userCreateFactory(), null);
+        UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
+        UserDto user2 = userService.createUser(TestFixture.userCreateFactory(), null);
         ChannelDto privateChannel = channelService.createPrivateChannel(
                 new ChannelPrivateCreateRequestDto(new HashSet<>(List.of(user2.id())))
 
         );
 
-        MessageCreateRequestDto messageCreateRequestDto2 = fixture.messageCreateFactory(user.id(), privateChannel.id());
+        MessageCreateRequestDto messageCreateRequestDto2 = TestFixture.messageCreateFactory(user.id(), privateChannel.id());
 
         assertThrows(IllegalArgumentException.class,()->messageService.createMessage(
                         messageCreateRequestDto2,
@@ -128,9 +129,9 @@ class MessageServiceTest {
     void deleteMessage() throws IOException {
         //given
 
-        UserDto user = userService.createUser(fixture.userCreateFactory(), null);
-        ChannelDto publicChannel = channelService.createPublicChannel(fixture.channelPublicCreateFactory());
-        MessageCreateRequestDto message = fixture.messageCreateFactory(user.id(), publicChannel.id());
+        UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
+        ChannelDto publicChannel = channelService.createPublicChannel(TestFixture.channelPublicCreateFactory());
+        MessageCreateRequestDto message = TestFixture.messageCreateFactory(user.id(), publicChannel.id());
         MessageDto message1 = messageService.createMessage(message, null);
         //when
         messageService.deleteMessage(message1.id());
@@ -147,9 +148,9 @@ class MessageServiceTest {
     @DisplayName("[정상 케이스] 메세지 변경")
     void patchMessage() throws IOException {
         //given
-        UserDto user = userService.createUser(fixture.userCreateFactory(), null);
-        ChannelDto publicChannel = channelService.createPublicChannel(fixture.channelPublicCreateFactory());
-        MessageCreateRequestDto message = fixture.messageCreateFactory(user.id(), publicChannel.id());
+        UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
+        ChannelDto publicChannel = channelService.createPublicChannel(TestFixture.channelPublicCreateFactory());
+        MessageCreateRequestDto message = TestFixture.messageCreateFactory(user.id(), publicChannel.id());
         MessageDto message1 = messageService.createMessage(message, null);
         String newContent = "newContent";
         //when
@@ -166,9 +167,9 @@ class MessageServiceTest {
     void createMessageAttachment() throws IOException {
 
     //given
-        UserDto user = userService.createUser(fixture.userCreateFactory(), null);
-        ChannelDto publicChannel = channelService.createPublicChannel(fixture.channelPublicCreateFactory());
-        MessageCreateRequestDto message = fixture.messageCreateFactory(user.id(), publicChannel.id());
+        UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
+        ChannelDto publicChannel = channelService.createPublicChannel(TestFixture.channelPublicCreateFactory());
+        MessageCreateRequestDto message = TestFixture.messageCreateFactory(user.id(), publicChannel.id());
 
         MultipartFile multipartFile = new MockMultipartFile(
                 "file",

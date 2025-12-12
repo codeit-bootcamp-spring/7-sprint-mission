@@ -1,10 +1,12 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.auth;
 
+import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.authService.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.login.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
-import com.sprint.mission.discodeit.service.util.TestFixture;
+import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
-class AuthServiceTest {
+class AuthServiceIntegrationTest {
 
     @Autowired
     AuthService authService;
@@ -24,14 +26,13 @@ class AuthServiceTest {
     @Autowired
     UserService userService;
 
-    @Autowired
-    TestFixture fixture;
+
 
     @Test
     @DisplayName("[정상 케이스] 유저 로그인")
     void checkLoginUser() throws IOException {
         //given
-        UserCreateRequestDto userCreateRequestDto = fixture.userCreateFactory();
+        UserCreateRequestDto userCreateRequestDto = TestFixture.userCreateFactory();
         UserDto user = userService.createUser(userCreateRequestDto, null);
 
         //when

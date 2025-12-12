@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +25,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     @Transactional
-    public BinaryContentDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) throws IOException {
+    public BinaryContentDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto)  {
         BinaryContent binaryContent = new BinaryContent(
                 binaryContentCreateRequestDto.getFileName(),
                 binaryContentCreateRequestDto.getContentType(),

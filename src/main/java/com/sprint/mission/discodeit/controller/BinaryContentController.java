@@ -40,7 +40,7 @@ public class BinaryContentController {
     }
 
     @GetMapping("/{binaryContentId}/download")
-    public ResponseEntity<?> downloadBinaryContent(@PathVariable UUID binaryContentId) throws IOException {
+    public ResponseEntity<?> downloadBinaryContent(@PathVariable UUID binaryContentId)   {
 
         return binaryContentService.downloadFile(binaryContentId);
     }

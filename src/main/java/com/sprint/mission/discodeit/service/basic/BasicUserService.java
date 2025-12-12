@@ -47,7 +47,7 @@ public class BasicUserService implements UserService {
 
         try {
             binaryContentStorage.put(binaryContent.getId(),profile.getBytes());
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new FileByteReadFailException(profile.getName());
         }
 
@@ -92,7 +92,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void deleteUser(UUID userId) {
-
+        if (!userRepository.existsById(userId)) throw new UserNotExistException(userId);
         log.info("deleteUser : {} info layer",userId);
         userRepository.deleteById(userId);
     }
@@ -123,7 +123,7 @@ public class BasicUserService implements UserService {
             );
             try {
                 binaryContentStorage.put(tmpBinaryContent.getId(),profile.getBytes());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new FileByteReadFailException(profile.getName());
             }
             user.setProfile(tmpBinaryContent);
