@@ -9,63 +9,62 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
 
 
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-  private final BinaryContentRepository binaryContentRepository;
-  private final BinaryContentMapper binaryContentMapper;
-  private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
-  @Transactional
-  @Override
-  public BinaryContentResponseDto createBinaryContent(
-      CreateBinaryContentDto createBinaryContentDto) {
-    BinaryContent binaryContent = new BinaryContent(
-        createBinaryContentDto.fileName(),
-        createBinaryContentDto.size(),
-        createBinaryContentDto.contentType()
-    );
-    binaryContentRepository.save(binaryContent);
-    binaryContentStorage.put(binaryContent.getId(), createBinaryContentDto.bytes());
+    @Transactional
+    @Override
+    public BinaryContentResponseDto createBinaryContent(CreateBinaryContentDto createBinaryContentDto) {
+        BinaryContent binaryContent = BinaryContent.builder()
+                .fileName(createBinaryContentDto.fileName())
+                .size(createBinaryContentDto.size())
+                .contentType(createBinaryContentDto.contentType())
+                .build();
 
-    return binaryContentMapper.toResponseDto(binaryContent);
-  }
+        binaryContentRepository.save(binaryContent);
+        binaryContentStorage.put(binaryContent.getId(), createBinaryContentDto.bytes());
 
-  @Transactional(readOnly = true)
-  @Override
-  public BinaryContentResponseDto getBinaryContent(UUID binaryContentId) {
-    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-        .orElseThrow(() -> new CustomException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
-
-    return binaryContentMapper.toResponseDto(binaryContent);
-  }
-
-  @Transactional(readOnly = true)
-  @Override
-  public List<BinaryContentResponseDto> getAllBinaryContentByIdIn(List<UUID> binaryContentIds) {
-    List<BinaryContentResponseDto> list = binaryContentRepository.findAllById(binaryContentIds)
-        .stream()
-        .map(binaryContentMapper::toResponseDto)
-        .toList();
-
-    return list;
-  }
-
-  @Transactional
-  @Override
-  public void deleteBinaryContent(UUID binaryContentId) {
-    if (!binaryContentRepository.existsById(binaryContentId)) {
-      throw new CustomException(ErrorCode.BINARY_CONTENT_NOT_FOUND);
+        return binaryContentMapper.toResponseDto(binaryContent);
     }
 
-    binaryContentRepository.deleteById(binaryContentId);
-  }
+    @Transactional(readOnly = true)
+    @Override
+    public BinaryContentResponseDto getBinaryContent(UUID binaryContentId) {
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
+
+        return binaryContentMapper.toResponseDto(binaryContent);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<BinaryContentResponseDto> getAllBinaryContentByIdIn(List<UUID> binaryContentIds) {
+        return binaryContentRepository.findAllById(binaryContentIds)
+                .stream()
+                .map(binaryContentMapper::toResponseDto)
+                .toList();
+    }
+
+    @Transactional
+    @Override
+    public void deleteBinaryContent(UUID binaryContentId) {
+        if (!binaryContentRepository.existsById(binaryContentId)) {
+            throw new CustomException(ErrorCode.BINARY_CONTENT_NOT_FOUND);
+        }
+
+        binaryContentRepository.deleteById(binaryContentId);
+    }
 }
