@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.message;
+package com.sprint.mission.discodeit.message.service;
 
 import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;

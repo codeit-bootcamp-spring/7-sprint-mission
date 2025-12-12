@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.channel;
+package com.sprint.mission.discodeit.channel.service;
 
 import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
@@ -13,9 +13,7 @@ import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

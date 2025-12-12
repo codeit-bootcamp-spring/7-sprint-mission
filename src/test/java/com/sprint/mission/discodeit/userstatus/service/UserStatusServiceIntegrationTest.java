@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.userstatus;
+package com.sprint.mission.discodeit.userstatus.service;
 
 import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;

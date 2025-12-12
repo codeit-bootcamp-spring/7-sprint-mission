@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.channel;
+package com.sprint.mission.discodeit.channel.service;
 
 import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPatchRequestDto;

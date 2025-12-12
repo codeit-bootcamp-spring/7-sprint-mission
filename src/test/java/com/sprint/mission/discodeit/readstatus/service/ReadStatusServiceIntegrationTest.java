@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.readstatus;
+package com.sprint.mission.discodeit.readstatus.service;
 
 import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelPrivateCreateRequestDto;
