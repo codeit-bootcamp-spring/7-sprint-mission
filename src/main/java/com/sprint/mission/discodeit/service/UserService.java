@@ -72,7 +72,7 @@ public class UserService {
     @Transactional
     public UserDto updateUserInfo(UUID id, UserUpdateRequest updateDto, MultipartFile file) {
         log.info("UserService.updateUserInfo");
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, new HashMap<>()));
 
         if (updateDto.newUsername() != null) {
             user.updateUsername(updateDto.newUsername());
@@ -97,7 +97,9 @@ public class UserService {
     public void deleteUser(UUID id) {
         log.info("UserService.deleteUser");
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
-        binaryContentManager.deleteFile(user.getProfile());
+        if (user.getProfile()!=null){
+            binaryContentManager.deleteFile(user.getProfile());
+        }
         userRepository.delete(user);
     }
 
