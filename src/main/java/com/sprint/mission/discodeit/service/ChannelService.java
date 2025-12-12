@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -20,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -79,7 +78,9 @@ public class ChannelService {
     @Transactional
     public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest requestDto) {
         log.info("ChannelService.updateChannel");
-        Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다"));
+        Channel channel =
+                channelRepository.findById(channelId)
+                        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, new HashMap<>()));
         if (requestDto.newName() != null) {
             channel.updateName(requestDto.newName());
         }
@@ -92,20 +93,20 @@ public class ChannelService {
     @Transactional
     public void deleteChannel(UUID id) {
         log.info("ChannelService.deleteChannel");
-        Channel channel = channelRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다"));
+        Channel channel = channelRepository.findById(id).orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, new HashMap<>()));
         channelRepository.delete(channel);
     }
 
     @Transactional(readOnly = true)
     public List<ChannelDto> getAllByUser(UUID userId) {
 
-        List<ChannelDto> list = readStatusRepository.findAllByUser_Id(userId)
+        List<ChannelDto> list = readStatusRepository.findAllByUserId(userId)
                 .stream()
                 .map(readStatus -> {
                     if(readStatus.getChannel().getType()==ChannelType.PUBLIC){
                         return mapper.toDto(readStatus.getChannel());
                     } else {
-                        List<ReadStatus> allByChannelId = readStatusRepository.findAllByChannel_Id(readStatus.getChannel().getId());
+                        List<ReadStatus> allByChannelId = readStatusRepository.findAllByChannelId(readStatus.getChannel().getId());
                         ChannelDto dto = mapper.toDto(readStatus.getChannel());
                         for (ReadStatus status : allByChannelId) {
                             dto.getParticipants().add(userMapper.toDto(status.getUser()));

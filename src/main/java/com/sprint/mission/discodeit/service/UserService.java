@@ -5,9 +5,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.exception.DuplicateException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.UserException;
+import com.sprint.mission.discodeit.exception.user.LoginPasswordNotMatchException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -43,10 +44,10 @@ public class UserService {
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
         log.info("UserService.createUser");
         if (userRepository.existsByEmail(request.email())) {
-            throw new DuplicateException("이미 등록된 이메일입니다");
+            throw new UserAlreadyExistsException( ErrorCode.DUPLICATE_USER,new HashMap<>());
         }
         if (userRepository.existsByUsername(request.username())) {
-            throw new DuplicateException("이미 등록된 아이디입니다");
+            throw new UserAlreadyExistsException( ErrorCode.DUPLICATE_USER,new HashMap<>());
         }
 
         User user = new User(request.email(), request.password(), request.username());
@@ -95,7 +96,7 @@ public class UserService {
     @Transactional
     public void deleteUser(UUID id) {
         log.info("UserService.deleteUser");
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
         userRepository.delete(user);
         binaryContentService.deleteFile(user.getId());
     }
@@ -115,9 +116,9 @@ public class UserService {
 
         User user = userRepository
                 .findByUsername(loginId)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+                .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
         if (!user.getPassword().equals(password)) {
-            throw new IllegalArgumentException("비밀번호가 틀립니다");
+            throw new LoginPasswordNotMatchException(ErrorCode.LOGIN_PASSWORD, new HashMap<>());
         }
 
         return mapper.toDto(user);
@@ -128,7 +129,7 @@ public class UserService {
     public UserStatusDto updateLastActiveAt(UUID id, Instant lastActiveAt) {
         User user = userRepository
                 .findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+                .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
 
         user.updateActiveAt(lastActiveAt);
         return userStatusMapper.toDto(user.getUserStatus());

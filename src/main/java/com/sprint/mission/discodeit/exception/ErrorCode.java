@@ -4,10 +4,17 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
-    USER_NOT_FOUND("생성 실패"),
-    DUPLICATE_USER("실패"),
-    CHANNEL_NOT_FOUND("실패"),
-    PRIVATE_CHANNEL_UPDATE("실패");
+    USER_NOT_FOUND("해당 유저를 찾을 수 없습니다."),
+    DUPLICATE_USER("이미 존재하는 유저입니다."),
+    CHANNEL_NOT_FOUND("해당 채널을 찾을 수 없습니다."),
+    PRIVATE_CHANNEL_UPDATE("DM은 수정할 수 없습니다."),
+    MESSAGE_NOT_FOUND("해당 메세지를 찾을 수 없습니다."),
+    DUPLICATE_READ_STATUS("이미 참가중인 채널입니다."),
+    READ_STATUS_NOT_FOUND("해당 채널 수신 정보를 찾을 수 없습니다."),
+    LOGIN_PASSWORD("비밀번호가 일치하지 않습니다."),
+    BINARY_CONTENT_NOT_FOUND("해당 파일을 찾을 수 없습니다.");
+
+
 
     private final String message;
 

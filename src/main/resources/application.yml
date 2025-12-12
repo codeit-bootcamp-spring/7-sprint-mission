@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: prod
   application:
     name: discodeit
   datasource:
@@ -11,7 +11,7 @@ spring:
   jpa:
     database: postgresql
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
 #        show_sql: true

@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
-    List<ReadStatus> findAllByUser_Id(UUID userId);
+    List<ReadStatus> findAllByUserId(UUID userId);
 
-    List<ReadStatus> findAllByChannel_Id(UUID channelId);
+    List<ReadStatus> findAllByChannelId(UUID channelId);
 
     @Query(" SELECT r FROM ReadStatus r JOIN FETCH r.channel WHERE r.user.id =:userId")
     List<ReadStatus> findAllWithChannelByUserId(UUID userId);

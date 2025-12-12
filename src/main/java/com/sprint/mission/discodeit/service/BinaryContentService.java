@@ -1,25 +1,23 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -57,7 +55,7 @@ public class BinaryContentService {
 
 
     public void deleteFile(UUID binaryContentId) {
-        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new NoSuchElementException("해당 파일이 존재하지 않습니다."));
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new BinaryContentNotFoundException(ErrorCode.BINARY_CONTENT_NOT_FOUND, new HashMap<>()));
         binaryContentRepository.delete(binaryContent);
         fileManager.delete(Paths.get(binaryContent.getFilePath()));
     }
@@ -75,13 +73,13 @@ public class BinaryContentService {
     }
 
     public BinaryContentDto getBinaryContent(UUID binaryContentId) {
-        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new BinaryContentNotFoundException(ErrorCode.BINARY_CONTENT_NOT_FOUND, new HashMap<>()));
 
 
         return mapper.toDto(binaryContent);
     }
 
-    public ResponseEntity<UrlResource> getUrl(UUID binaryContentId){
+    public ResponseEntity<UrlResource> getUrl(UUID binaryContentId) {
         return fileManager.getUrl(binaryContentId);
     }
 

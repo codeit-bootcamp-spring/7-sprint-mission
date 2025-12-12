@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import jakarta.annotation.PostConstruct;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,16 +24,16 @@ import java.util.UUID;
 @Component
 @Slf4j
 @ConditionalOnProperty(prefix = "discodeit.storage", name = "type", havingValue = "local", matchIfMissing = true)
-public class FileManager{
+public class FileManager {
 
 
     private final Path rootDir; // 루트 폴더
 
     private final BinaryContentRepository binaryContentRepository;
 
-    public FileManager(@Value("${discodeit.storage.local.root-path}") String ROOT_PATH,BinaryContentRepository binaryContentRepository) {
+    public FileManager(@Value("${discodeit.storage.local.root-path}") String ROOT_PATH, BinaryContentRepository binaryContentRepository) {
         this.rootDir = Paths.get(ROOT_PATH);
-        this.binaryContentRepository=binaryContentRepository;
+        this.binaryContentRepository = binaryContentRepository;
     }
 
     @PostConstruct
@@ -90,7 +87,7 @@ public class FileManager{
             throw new RuntimeException(e);
         }
         String contentType = content.getFileType();
-        if(contentType == null || contentType.isBlank()){
+        if (contentType == null || contentType.isBlank()) {
             contentType = "application/octet-stream";
         }
         String fileName = content.getFileName();
@@ -131,9 +128,9 @@ public class FileManager{
         }
     }
 
-    private String makeFileName(MultipartFile file, String binaryContentId){
+    private String makeFileName(MultipartFile file, String binaryContentId) {
         int i = file.getOriginalFilename().lastIndexOf(".");
         String substring = file.getOriginalFilename().substring(i + 1);
-        return binaryContentId+"."+substring;
+        return binaryContentId + "." + substring;
     }
 }

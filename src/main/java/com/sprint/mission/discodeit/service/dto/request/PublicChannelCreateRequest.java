@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+
 public record PublicChannelCreateRequest(
-        String name,
-        String description
+        @NotNull String name,
+        @NotNull String description
 ) {
 }
