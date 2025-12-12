@@ -16,11 +16,16 @@ spring:
         format_sql: true
     open-in-view: false
 
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 10MB
+
 discodeit:
   storage:
     type: local
     local:
-      root-path: C:/Users/user/Workspace/codeit-sprint-bootcamp/7-sprint-mission/image
+      root-path: ./image
 
 springdoc:
   api-docs:
@@ -29,3 +34,39 @@ springdoc:
     path: /swagger-ui.html
     enabled: true
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+
+  endpoint:
+    health:
+      show-details: always # 개발 환경에서는 always, 운영에서는 when-authorized
+
+  info:
+    env:
+      enabled: true
+
+  server:
+    port: 9090 # Actuator 전용 포트 (방화벽으로 막음)
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    java:
+      version: 17
+    spring-boot:
+      version: 3.4.0
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}
