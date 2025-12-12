@@ -53,6 +53,7 @@ public class MessageServiceImpl implements MessageService {
             return new ArrayList<>();
         }
         if (files.size() > 10) {
+            log.warn("파일 업로드 실패 - 업로드 최대 갯수 초과");
             throw new FileUploadLimitExceedException();
         }
 
@@ -69,6 +70,7 @@ public class MessageServiceImpl implements MessageService {
             try {
                 binaryContentStorage.put(binaryContent.getId(), file.getBytes());
             } catch (IOException e) {
+                log.warn("파일 업로드 실패: {}", binaryContent.getId());
                 throw new FileOperationFailedException(binaryContent.getId());
             }
         }
@@ -78,15 +80,25 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public MessageDto createMessage(MessageCreateRequest requestDto, List<MultipartFile> files) {
+
+        log.debug("메시지 생성 요청 - userId: {}, channelId: {}",
+                requestDto.getAuthorId(), requestDto.getChannelId());
         if ((requestDto.getContent() == null || requestDto.getContent().isBlank()) &&
                 (files == null || files.isEmpty())) {
+            log.warn("메시지 생성 실패 - 공백 전송 불가");
             throw new MessageNotEmptyException();
         }
 
         User author = userRepository.findById(requestDto.getAuthorId())
-                .orElseThrow(() -> new UserNotFoundException(requestDto.getAuthorId()));
+                .orElseThrow(() -> {
+                    log.warn("메시지 생성 실패 - 유저를 찾을 수 없음: {}",  requestDto.getAuthorId());
+                    return new UserNotFoundException(requestDto.getAuthorId());
+                });
         Channel channel = channelRepository.findById(requestDto.getChannelId())
-                .orElseThrow(() -> new ChannelNotFoundException(requestDto.getChannelId()));
+                .orElseThrow(() -> {
+                    log.warn("메시지 생성 실패 - 채널을 찾을 수 없음: {}", requestDto.getChannelId());
+                    return new ChannelNotFoundException(requestDto.getChannelId());
+                });
 
         List<BinaryContent> attachments = saveAttachment(files);
 
@@ -98,6 +110,7 @@ public class MessageServiceImpl implements MessageService {
                 .build();
         messageRepository.save(message);
 
+        log.info("메시지 생성 완료: {}", message.getId());
         return messageMapper.toDto(message);
     }
 
@@ -143,15 +156,21 @@ public class MessageServiceImpl implements MessageService {
     @Transactional
     public MessageDto updateMessage(UUID messageId, MessageUpdateRequest updateDto) {
 
+        log.debug("메시지 수정 요청: {}", messageId);
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new MessageNotFoundException(messageId));
+                .orElseThrow(() -> {
+                    log.warn("메시지 수정 실패 - 메시지를 찾을 수 없음: {}",  messageId);
+                    return new MessageNotFoundException(messageId);
+                });
 
         if (updateDto.newContent() == null || updateDto.newContent().isBlank()) {
+            log.warn("메시지 수정 실패 - 메시지 공백 불가");
             throw new MessageNotEmptyException(messageId);
         }
 
         message.updateContent(updateDto.newContent());
         messageRepository.save(message);
+        log.info("메시지 수정 성공: {}", messageId);
         return messageMapper.toDto(message);
     }
 
@@ -159,9 +178,14 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public void deleteMessage(UUID id) {
+        log.info("메시지 삭제 요청: {}", id);
         messageRepository.findById(id)
-                .orElseThrow(() -> new MessageNotFoundException(id));
+                .orElseThrow(() -> {
+                    log.warn("메시지 삭제 실패 - 메시지를 찾을 수 없음: {}", id);
+                    return new MessageNotFoundException(id);
+                });
 
+        log.info("메시지 삭제 성공: {}", id);
         messageRepository.deleteById(id);
     }
 }

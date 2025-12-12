@@ -40,6 +40,9 @@ public class ChannelServiceImpl implements ChannelService {
     @Transactional
     public ChannelDto createPublicChannel(PublicChannelCreateRequest requestDto) {
 
+        log.debug("공개 채널 생성 요청 - name: {}, description: {}",
+                requestDto.getName(), requestDto.getDescription());
+
         Channel newChannel = new Channel(
                 requestDto.getName(),
                 requestDto.getDescription(),
@@ -47,6 +50,7 @@ public class ChannelServiceImpl implements ChannelService {
                 );
 
         channelRepository.save(newChannel);
+        log.info("공개 채널 생성 완료");
         return channelMapper.toDto(newChannel);
     }
 
@@ -54,6 +58,7 @@ public class ChannelServiceImpl implements ChannelService {
     @Transactional
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest requestDto) {
 
+        log.info("프라이빗 채널 생성 요청");
         Channel newChannel = new Channel(ChannelType.PRIVATE);
         channelRepository.save(newChannel);
 
@@ -65,6 +70,7 @@ public class ChannelServiceImpl implements ChannelService {
                     .collect(Collectors.toList());
             readStatusRepository.saveAll(readStatuses);
         }
+        log.info("프라이빗 채널 생성 완료");
         return channelMapper.toDto(newChannel);
     }
 
@@ -107,16 +113,22 @@ public class ChannelServiceImpl implements ChannelService {
     @Transactional
     public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest updateDto) {
 
+        log.debug("채널 수정 요청 - channelId: {}", channelId);
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new ChannelNotFoundException(channelId));
+                .orElseThrow(() -> {
+                    log.warn("채널 수정 실패 - 채널을 찾을 수 없음: {}",  channelId);
+                    return new ChannelNotFoundException(channelId);
+                });
 
         if (channel.getType() == ChannelType.PRIVATE) {
+            log.warn("채널 수정 실패 - 프라이빗 채널 수정 불가: {}", channelId);
             throw new PrivateChannelUpdateException(channelId);
         }
 
         channel.updateChannelInfo(updateDto.newName(), updateDto.newDescription());
 
         channelRepository.save(channel);
+        log.info("채널 수정 성공: {}", channelId);
         return channelMapper.toDto(channel);
 
     }
@@ -124,10 +136,13 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     @Transactional
     public void deleteChannel(UUID id) {
-
+        log.info("채널 삭제 요청: {}", id);
         channelRepository.findById(id)
-                        .orElseThrow(() -> new ChannelNotFoundException(id));
-
+                        .orElseThrow(() -> {
+                            log.warn("채널 삭제 실패 - 채널을 찾을 수 없음: {}", id);
+                            return new ChannelNotFoundException(id);
+                        });
+        log.info("채널 삭제 성공: {}", id);
         channelRepository.deleteById(id);
 
     }

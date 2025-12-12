@@ -40,11 +40,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserCreateRequest requestDto, MultipartFile profileImage) {
+        log.debug("회원가입 요청 - email: {}, username: {}", requestDto.email(), requestDto.username());
         userRepository.findByEmail(requestDto.email()).ifPresent(user
-                -> { throw new DuplicateEmailException(requestDto.email()); });
+                -> {
+            log.warn("회원가입 실패 - 중복된 이메일: {}", requestDto.email());
+            throw new DuplicateEmailException(requestDto.email()); });
 
         userRepository.findByUsername(requestDto.username()).ifPresent(user
-                -> { throw new DuplicateNameException(requestDto.username()); });
+                -> {
+            log.warn("회원가입 실패 - 중복된 유저이름: {}", requestDto.username());
+            throw new DuplicateNameException(requestDto.username()); });
 
         BinaryContent profile = saveProfileImage(profileImage);
 
@@ -60,6 +65,7 @@ public class UserServiceImpl implements UserService {
         newUser.updateStatus(status);
 
         userRepository.save(newUser);
+        log.info("회원가입 완료 - userId: {}", newUser.getId());
         return userMapper.toDto(newUser);
     }
 
@@ -77,6 +83,7 @@ public class UserServiceImpl implements UserService {
         try {
             binaryContentStorage.put(binaryContent.getId(), profileImage.getBytes());
         } catch (IOException e) {
+            log.debug("이미지 업로드 실패: {}", binaryContent.getId());
             throw new FileOperationFailedException(binaryContent.getId());
         }
         return binaryContent;
@@ -108,8 +115,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto updateUserInfo(UUID userId, UserUpdateRequest updateDto, MultipartFile profileImage) {
 
+        log.debug("회원 정보 수정 요청 - userId: {}", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> {
+                    log.warn("유저 수정 실패 - 존재하지 않는 유저: {}", userId);
+                    return new UserNotFoundException(userId);
+                });
 
         if (profileImage != null && !profileImage.isEmpty()) {
             // 기존 프로필사진 확인
@@ -126,6 +137,7 @@ public class UserServiceImpl implements UserService {
         if (updateDto.newUsername() != null && !updateDto.newUsername().isBlank()) {
             userRepository.findByUsername(updateDto.newUsername()).ifPresent(existingUser -> {
                 if (!existingUser.getId().equals(user.getId())) {
+                    log.warn("유저 수정 실패 - 중복된 유저이름: {}", updateDto.newUsername());
                     throw new DuplicateNameException(updateDto.newUsername());
                 }
             });
@@ -135,6 +147,7 @@ public class UserServiceImpl implements UserService {
         if (updateDto.newEmail() != null && !updateDto.newEmail().isBlank()) {
             userRepository.findByEmail(updateDto.newEmail()).ifPresent(existingUser -> {
                 if (!existingUser.getId().equals(user.getId())) {
+                    log.warn("유저 수정 실패 - 중복된 이메일: {}", updateDto.newEmail());
                     throw new DuplicateEmailException(updateDto.newEmail());
                 }
             });
@@ -146,6 +159,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
+        log.info("유저 정보 수정 완료: {}", user.getId());
         return userMapper.toDto(user);
     }
 
@@ -155,9 +169,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(UUID userId) {
 
+        log.info("유저 삭제 요청: {}", userId);
         userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> {
+                    log.warn("유저 삭제 실패 - 존재하지 않는 유저: {}", userId);
+                    return new UserNotFoundException(userId);
+                });
 
+        log.info("유저 삭제 성공: {}", userId);
         userRepository.deleteById(userId);
     }
 }
