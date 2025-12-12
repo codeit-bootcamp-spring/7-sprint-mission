@@ -21,7 +21,6 @@ import java.util.UUID;
 public class ChannelController {
 
     private final ChannelService channelService;
-    private final ReadStatusService readStatusService;
 
     @PostMapping( "/private")
     public ResponseEntity<ChannelDto> createPrivateChannel(@Valid @RequestBody ChannelPrivateCreateRequestDto dto){

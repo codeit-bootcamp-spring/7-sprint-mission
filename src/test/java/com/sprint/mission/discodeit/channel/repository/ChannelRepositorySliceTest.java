@@ -25,6 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DataJpaTest
 @DisplayName("Channel Repository slice test")
 @ActiveProfiles("test")
+@EnableJpaAuditing
 public class ChannelRepositorySliceTest {
 
     @Autowired
