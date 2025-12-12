@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface BinaryContentStorage {
 
-    public UUID put(UUID id, byte[] bytes) throws IOException;
-    public InputStream get(UUID fileId) throws IOException;
-    public ResponseEntity<?> download(BinaryContentDto binaryContentDto) throws IOException;
+    public UUID put(UUID id, byte[] bytes);
+    public InputStream get(UUID fileId) ;
+    public ResponseEntity<?> download(BinaryContentDto binaryContentDto) ;
 }

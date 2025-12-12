@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.domain.file.FileDirectoryCreateFailException;
+import com.sprint.mission.discodeit.exception.domain.file.FileReadFailException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -26,22 +27,31 @@ public class LocalBinaryContentStorageService implements BinaryContentStorage {
     private String root;
 
         @Override
-    public UUID put(UUID id, byte[] bytes) throws IOException {
+    public UUID put(UUID id, byte[] bytes)  {
             Path storagePath = resolvePath(id);
-            Files.write(storagePath,bytes);
-        log.debug("file Path : {}",storagePath);
+            try {
+                Files.write(storagePath,bytes);
+            } catch (IOException e) {
+                throw new FileReadFailException(storagePath);
+            }
+            log.debug("file Path : {}",storagePath);
         return id;
     }
 
     @Override
-    public InputStream get(UUID fileId) throws IOException {
+    public InputStream get(UUID fileId)  {
             Path storagePath = resolvePath(fileId);
             if(!Files.exists(storagePath))return null;
-        return new ByteArrayInputStream(Files.readAllBytes(storagePath));
+
+        try {
+            return new ByteArrayInputStream(Files.readAllBytes(storagePath));
+        } catch (IOException e) {
+            throw new FileReadFailException(storagePath);
+        }
     }
 
     @Override
-    public ResponseEntity<?> download(BinaryContentDto binaryContentDto) throws IOException {
+    public ResponseEntity<?> download(BinaryContentDto binaryContentDto)  {
         InputStream targetInput = get(binaryContentDto.id());
         String contentType = binaryContentDto.contentType();
         String fileName = binaryContentDto.fileName();
@@ -55,9 +65,15 @@ public class LocalBinaryContentStorageService implements BinaryContentStorage {
     }
 
     @PostConstruct
-    void init() throws IOException {
+    void init()  {
         Path tempPath = Path.of(root);
-            if(!Files.exists(tempPath))Files.createDirectories(tempPath);
+            if(!Files.exists(tempPath)) {
+                try {
+                    Files.createDirectories(tempPath);
+                } catch (IOException e) {
+                    throw new FileDirectoryCreateFailException(tempPath);
+                }
+            }
     }
 
     Path resolvePath(UUID fileId){

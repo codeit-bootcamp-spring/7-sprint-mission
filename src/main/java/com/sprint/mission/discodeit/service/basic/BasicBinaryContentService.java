@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.binaryContent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.domain.file.FileNotExistException;
 import com.sprint.mission.discodeit.mapper.mapStruct.BinaryStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -45,8 +46,8 @@ public class BasicBinaryContentService implements BinaryContentService {
         return  BinaryContentDto.from(
                 binaryContentRepository.findById(binaryContentID)
                         .orElseThrow(
-                                ()->new IllegalArgumentException(
-                                        "존재하지 않는 binaryContent 입니다."))) ;
+                                ()->new FileNotExistException(
+                                        binaryContentID))) ;
     }
 
     @Override
@@ -74,7 +75,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public ResponseEntity<?> downloadFile(UUID binaryContentId) throws IOException {
+    public ResponseEntity<?> downloadFile(UUID binaryContentId)  {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow();
         BinaryContentDto binaryContentDto = BinaryStruct.INSTANCE.toDto(binaryContent);
         return binaryContentStorage.download(binaryContentDto);

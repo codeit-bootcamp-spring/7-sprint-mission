@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateReque
 import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entityElement.ChannelType;
+import com.sprint.mission.discodeit.exception.domain.channel.ChannelNotExistException;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -50,7 +52,7 @@ public class BasicChannelService implements ChannelService {
        channelPrivateCreateRequestDto.participantIds().forEach(
                 x ->
                 {
-                    User tempUser = userRepository.findById(x).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
+                    User tempUser = userRepository.findById(x).orElseThrow(()->new UserNotExistException(x));
                    readStatusRepository.save(ReadStatus.createReadStatusFactory(tempUser,channel));
                 }
         );
@@ -84,7 +86,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelDto readChannel(UUID channelId) {
-        Channel expectedChannel = channelRepository.findById(channelId).orElseThrow(()->new IllegalArgumentException("Channel not found"));
+        Channel expectedChannel = channelRepository.findById(channelId).orElseThrow(()->new UserNotExistException(channelId));
         return channelMapper.toDto(expectedChannel);
     }
 
@@ -117,7 +119,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelDto patchChannel(ChannelPatchRequestDto dto, UUID channelId) {
-        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
+        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new ChannelNotExistException(channelId));
         channel.setDescription(dto.newDescription()==null?channel.getDescription():dto.newDescription());
         channel.setName(dto.newName()==null?channel.getName():dto.newName());
         channelRepository.save(channel);

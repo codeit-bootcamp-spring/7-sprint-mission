@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.exception.domain.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.domain.DiscodeitException;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,19 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class CommonExceptionHandler {
+
+    @ExceptionHandler(DiscodeitException.class)
+    public ResponseEntity<ErrorResponse> discodeitExceptionHandler(DiscodeitException e){
+        ErrorResponse errorResponse = new ErrorResponse(
+                e.getTimestamp(),
+                e.getErrorCode().toString(),
+                e.getMessage(),
+                e.getDetails(),
+                e.getClass().getName(),
+                400
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e){
@@ -33,18 +47,18 @@ public class CommonExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> userNotFoundExceptionHandler(UserNotFoundException e){
-        ErrorResponse errorResponse = new ErrorResponse(
-                e.getTimestamp(),
-                e.getErrorCode().toString(),
-                e.getMessage(),
-                e.getDetails(),
-                e.getClass().getName(),
-                400
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler(UserNotExistException.class)
+//    public ResponseEntity<ErrorResponse> userNotFoundExceptionHandler(UserNotExistException e){
+//        ErrorResponse errorResponse = new ErrorResponse(
+//                e.getTimestamp(),
+//                e.getErrorCode().toString(),
+//                e.getMessage(),
+//                e.getDetails(),
+//                e.getClass().getName(),
+//                400
+//        );
+//        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+//    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> reallyRestExceptionHandler(Exception e){
