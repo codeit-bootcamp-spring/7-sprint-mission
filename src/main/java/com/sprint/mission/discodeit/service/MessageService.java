@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentManager;
-import com.sprint.mission.discodeit.service.binarycontent.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -47,9 +51,9 @@ public class MessageService {
     public MessageDto sendMessage(MessageCreateRequest request, List<MultipartFile> attachments) {
         log.info("MessageService.sendMessage");
         User user =
-                userRepository.findById(request.authorId()).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다."));
+                userRepository.findById(request.authorId()).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, new HashMap<>()));
         Channel channel =
-                channelRepository.findById(request.channelId()).orElseThrow(() -> new NoSuchElementException("해당 채널이 존재하지 않습니다."));
+                channelRepository.findById(request.channelId()).orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, new HashMap<>()));
         Message message = new Message(
                 user,
                 channel,
@@ -73,7 +77,7 @@ public class MessageService {
 
     public MessageDto updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
         log.info("MessageService.updateMessage");
-        Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("수정하고자 하는 메세지를 찾을 수 없습니다."));
+        Message message = messageRepository.findById(messageId).orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, new HashMap<>()));
         message.updateContent(messageUpdateRequest.newContent());
         return mapper.toDto(message);
 
@@ -83,15 +87,14 @@ public class MessageService {
     @Transactional
     public void deleteMessage(UUID messageId) {
         log.info("MessageService.deleteMessage");
-        List<MessageAttachment> list = attachmentRepository.findAllByMessageId(messageId);
-        attachmentRepository.deleteById(messageId);
-        Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException("메세지가 없습니다."));
-        messageRepository.delete(message);
-
+        List<MessageAttachment> list = attachmentRepository.findAllWithBinaryContentByMessageId(messageId);
+        //여기서 삭제 쿼리는 여러번 나감.
+        // 나중에 여러개를 한 번에 삭제해주는 쿼리 + 여러 파일 동시 삭제 메서드를 manager에 만들어주면 될 듯
         for (MessageAttachment attachment : list) {
             binaryContentManager.deleteFile(attachment.getAttachment());
         }
-
+        attachmentRepository.deleteByMessageId(messageId);
+        messageRepository.deleteById(messageId);
     }
 
 
@@ -99,7 +102,7 @@ public class MessageService {
         Page<MessageDto> map = messageRepository.findAllByChannelId(channelId, pageable)
                 .map(message -> {
                     MessageDto dto = mapper.toDto(message);
-                    List<MessageAttachment> allByMessageId = attachmentRepository.findAllByMessageId(message.getId());
+                    List<MessageAttachment> allByMessageId = attachmentRepository.findAllWithBinaryContentByMessageId(message.getId());
                     for (MessageAttachment messageAttachment : allByMessageId) {
                         BinaryContentDto content = binaryContentMapper.toDto(messageAttachment.getAttachment());
                         dto.addAttachment(content);
