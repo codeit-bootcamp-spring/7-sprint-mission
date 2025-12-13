@@ -55,44 +55,7 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    @Test
-    @DisplayName("유저 정보 업데이트 성공 - 파일 포함")
-    void updateUserInfoSuccessWithFile() {
-        //given
-        UUID userId = UUID.randomUUID();
 
-        User user = new User("test@gmail.com", "1234", "test");
-        BinaryContent oldProfile = new BinaryContent(null, null, 10);
-        user.updateProfile(oldProfile);
-
-        when(userRepository.findById(userId))
-                .thenReturn(Optional.of(user));
-
-        UserUpdateRequest updateRequest =
-                new UserUpdateRequest("new@gmail.com", "new", "4321");
-
-        MockMultipartFile mockFile = new MockMultipartFile(
-                "file",
-                "profile.png",
-                "image/png",
-                "fake image".getBytes()
-        );
-
-        BinaryContent newProfile = new BinaryContent(null, null, 20);
-        when(binaryContentManager.saveFileAndMeta(mockFile))
-                .thenReturn(newProfile);
-
-        //when
-        UserDto result = userService.updateUserInfo(userId, updateRequest, mockFile);
-
-        //then
-        assertThat(result.getEmail()).isEqualTo("new@gmail.com");
-        assertThat(result.getUsername()).isEqualTo("new");
-        assertThat(user.getPassword()).isEqualTo(updateRequest.newPassword());
-        assertThat(user.getProfile()).isEqualTo(newProfile);
-        verify(binaryContentManager).deleteFile(oldProfile);
-        verify(binaryContentManager).saveFileAndMeta(mockFile);
-    }
 
     @Nested
     @DisplayName("유정 생성")

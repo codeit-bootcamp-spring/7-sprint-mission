@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 
-public record PublicChannelUpdateRequest(
+public record ChannelUpdateRequest(
         @NotNull
         String newName,
         @NotNull

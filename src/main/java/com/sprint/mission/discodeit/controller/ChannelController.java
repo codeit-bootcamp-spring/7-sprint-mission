@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.dto.request.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ChannelDto;
@@ -53,7 +53,7 @@ public class ChannelController {
     }
 
     @PatchMapping("/{channelId}")
-    public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId, @RequestBody PublicChannelUpdateRequest request) {
+    public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId, @RequestBody ChannelUpdateRequest request) {
         ChannelDto channelDto = channelService.updateChannel(channelId, request);
         return ResponseEntity.status(HttpStatus.OK).body(channelDto);
     }
