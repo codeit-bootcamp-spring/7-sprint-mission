@@ -15,11 +15,11 @@ import lombok.NoArgsConstructor;
 @AttributeOverride(name = "id", column = @Column(name = "message_id"))
 public class Message extends BaseUpdatableEntity {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
 

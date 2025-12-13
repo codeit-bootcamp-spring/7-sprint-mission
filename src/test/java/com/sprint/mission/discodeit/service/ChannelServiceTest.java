@@ -23,7 +23,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,7 +47,7 @@ class ChannelServiceTest {
     @Spy
     private ChannelMapper mapper = Mappers.getMapper(ChannelMapper.class);
     @Spy
-    private UserMapper userMapper;
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     @InjectMocks
     private ChannelService channelService;
 
@@ -85,7 +87,7 @@ class ChannelServiceTest {
                     .thenThrow(new RuntimeException("DB error"));
 
             //when, then
-            assertThatThrownBy(()->channelService.createPublicChannel(request))
+            assertThatThrownBy(() -> channelService.createPublicChannel(request))
                     .isInstanceOf(RuntimeException.class);
             verify(channelRepository).save(any(Channel.class));
             verify(userRepository, never()).findAll();
@@ -104,7 +106,7 @@ class ChannelServiceTest {
             when(channelRepository.save(any(Channel.class)))
                     .thenReturn(channel);
             when(userRepository.findAllById(request.participantIds()))
-                    .thenReturn(List.of(new User("test","1234","1234"), new User("test1","1234","12344")));
+                    .thenReturn(List.of(new User("test", "1234", "1234"), new User("test1", "1234", "12344")));
             //when
             ChannelDto channelDto = channelService.createPrivateChannel(request);
 
@@ -126,7 +128,7 @@ class ChannelServiceTest {
                     .thenThrow(new RuntimeException("DB error"));
 
             //when, then
-            assertThatThrownBy(()->channelService.createPrivateChannel(request))
+            assertThatThrownBy(() -> channelService.createPrivateChannel(request))
                     .isInstanceOf(RuntimeException.class);
             verify(channelRepository).save(any(Channel.class));
             verify(userRepository, never()).findAllById(any(List.class));
@@ -139,7 +141,7 @@ class ChannelServiceTest {
     class UpdateChannel {
         @Test
         @DisplayName("채널 수정 성공")
-        void channelUpdateSuccess (){
+        void channelUpdateSuccess() {
             //given
             UUID channelId = UUID.randomUUID();
             Channel channel = new Channel("test", "test", ChannelType.PUBLIC);
@@ -154,11 +156,11 @@ class ChannelServiceTest {
             assertThat(channelDto.getName()).isEqualTo(request.newName());
             assertThat(channelDto.getDescription()).isEqualTo(request.newDescription());
             verify(channelRepository).findById(channelId);
-         }
+        }
 
         @Test
         @DisplayName("채널 수정 실패")
-        void channelUpdateFail (){
+        void channelUpdateFail() {
             //given
             UUID channelId = UUID.randomUUID();
             Channel channel = new Channel("test", "test", ChannelType.PUBLIC);
@@ -167,7 +169,7 @@ class ChannelServiceTest {
             ChannelUpdateRequest request = new ChannelUpdateRequest("newName", "newDescription");
 
             //when, then
-            assertThatThrownBy(()->channelService.updateChannel(channelId, request))
+            assertThatThrownBy(() -> channelService.updateChannel(channelId, request))
                     .isInstanceOf(ChannelNotFoundException.class);
             verify(channelRepository).findById(channelId);
         }
@@ -178,7 +180,7 @@ class ChannelServiceTest {
     class DeleteChannel {
         @Test
         @DisplayName("채널 삭제 성공")
-        void deleteChannelSuccess (){
+        void deleteChannelSuccess() {
             //given
             UUID channelId = UUID.randomUUID();
             Channel channel = new Channel("test", "tests", ChannelType.PRIVATE);
@@ -190,18 +192,18 @@ class ChannelServiceTest {
             //then
             verify(channelRepository).findById(channelId);
             verify(channelRepository).delete(channel);
-         }
+        }
 
         @Test
         @DisplayName("채널 삭제 실패")
-        void deleteChannelFail (){
+        void deleteChannelFail() {
             //given
             UUID channelId = UUID.randomUUID();
 
             when(channelRepository.findById(channelId))
                     .thenReturn(Optional.empty());
             //when, then
-            assertThatThrownBy(()-> channelService.deleteChannel(channelId))
+            assertThatThrownBy(() -> channelService.deleteChannel(channelId))
                     .isInstanceOf(ChannelNotFoundException.class);
 
             verify(channelRepository).findById(channelId);
@@ -214,15 +216,48 @@ class ChannelServiceTest {
     class FindChannel {
         @Test
         @DisplayName("채널 조회 성공")
-        void findChannelSuccess (){
+        void findChannelSuccess() {
             //given
+            UUID userId = UUID.randomUUID();
+            User userA = new User("test1@gmail.com", "1234", "test");
+            User userB = new User("test2@gmail.com", "1234", "test2");
+            Channel publicChannel = new Channel("test", "test", ChannelType.PUBLIC);
+            Channel privateChannel = new Channel("test", "test", ChannelType.PRIVATE);
+            ReflectionTestUtils.setField(publicChannel, "id", UUID.randomUUID());
+            ReflectionTestUtils.setField(privateChannel, "id", UUID.randomUUID());
+            List<ReadStatus> readStatuses = new ArrayList<>();
+            ReadStatus readStatusAToPublic = new ReadStatus(userA, publicChannel);
+            ReadStatus readStatusAToPrivate = new ReadStatus(userA, privateChannel);
+            ReadStatus readStatusBToPrivate = new ReadStatus(userB, privateChannel);
 
+            readStatuses.add(readStatusAToPublic);
+            readStatuses.add(readStatusAToPrivate);
+
+            when(readStatusRepository.findAllWithChannelByUserId(userId))
+                    .thenReturn(readStatuses);
+
+            List<ReadStatus> readStatusesByPrivate = new ArrayList<>();
+            readStatusesByPrivate.add(readStatusAToPrivate);
+            readStatusesByPrivate.add(readStatusBToPrivate);
+
+            when(readStatusRepository.findAllByChannelIds(any(List.class)))
+                    .thenReturn(readStatusesByPrivate);
 
             //when
-//            channelService.
+            List<ChannelDto> channelDtos = channelService.getAllByUser(userId);
 
             //then
+            assertThat(channelDtos.size()).isEqualTo(2);
+            assertThat(channelDtos)
+                    .filteredOn(dto -> dto.getType() == ChannelType.PRIVATE)
+                    .singleElement()
+                    .satisfies(dto ->
+                            assertThat(dto.getParticipants()).hasSize(2)
+                    );
+            verify(readStatusRepository).findAllWithChannelByUserId(userId);
+            verify(readStatusRepository).findAllByChannelIds(any(List.class));
+        }
 
-         }
     }
 }
+

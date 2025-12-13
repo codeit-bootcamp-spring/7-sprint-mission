@@ -11,4 +11,6 @@ import java.util.UUID;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
     Page<Message> findAllByChannelId(UUID channelId, Pageable pageable);
+
+    void deleteById(UUID id);
 }

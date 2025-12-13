@@ -49,6 +49,8 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("삭제 완료");
     }
 
+    //지금 프론트에서 계속 page가 0으로 넘어오는 문제가 있음.
+    //아예 커서로 넘어가자!
     @GetMapping
     public ResponseEntity<PageResponse<MessageDto>> getAllMessageByChannelId(
             @RequestParam UUID channelId,

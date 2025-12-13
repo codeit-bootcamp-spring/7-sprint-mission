@@ -102,13 +102,16 @@ public class MessageService {
         Page<MessageDto> map = messageRepository.findAllByChannelId(channelId, pageable)
                 .map(message -> {
                     MessageDto dto = mapper.toDto(message);
-                    List<MessageAttachment> allByMessageId = attachmentRepository.findAllWithBinaryContentByMessageId(message.getId());
-                    for (MessageAttachment messageAttachment : allByMessageId) {
-                        BinaryContentDto content = binaryContentMapper.toDto(messageAttachment.getAttachment());
-                        dto.addAttachment(content);
-                    }
+//                    List<MessageAttachment> allByMessageId = attachmentRepository.findAllWithBinaryContentByMessageId(message.getId());
+//                    for (MessageAttachment messageAttachment : allByMessageId) {
+//                        BinaryContentDto content = binaryContentMapper.toDto(messageAttachment.getAttachment());
+//                        dto.addAttachment(content);
+//                    }
                     return dto;
                 });
+// 지그 N+1문제 터지고 있음. message를 가져오는 거 까지는 문제가 없지만, 각 메세지 마다 attachmentRepository.findAllWith~ 호출중.
+        //
+
         return pageMapper.fromPage(map);
     }
 
