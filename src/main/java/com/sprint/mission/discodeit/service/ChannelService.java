@@ -10,10 +10,11 @@ import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.service.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ChannelDto;
+import com.sprint.mission.discodeit.service.dto.response.UserDto;
 import com.sprint.mission.discodeit.service.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
+
+import static java.util.stream.Collectors.*;
 
 
 @Service
@@ -59,7 +62,7 @@ public class ChannelService {
     @Transactional
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
         log.info("ChannelService.createPrivateChannel");
-        Channel channel = new Channel("dm","description",ChannelType.PRIVATE);
+        Channel channel = new Channel("dm", "description", ChannelType.PRIVATE);
         Channel save = channelRepository.save(channel);
 
         List<User> users = userRepository.findAllById(request.participantIds());
@@ -75,7 +78,7 @@ public class ChannelService {
     }
 
     @Transactional
-    public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest requestDto) {
+    public ChannelDto updateChannel(UUID channelId, ChannelUpdateRequest requestDto) {
         log.info("ChannelService.updateChannel");
         Channel channel =
                 channelRepository.findById(channelId)
@@ -83,7 +86,7 @@ public class ChannelService {
         if (requestDto.newName() != null) {
             channel.updateName(requestDto.newName());
         }
-        if(requestDto.newDescription()!=null){
+        if (requestDto.newDescription() != null) {
             channel.updateDescription(requestDto.newDescription());
         }
         return mapper.toDto(channel);
@@ -98,26 +101,33 @@ public class ChannelService {
 
     @Transactional(readOnly = true)
     public List<ChannelDto> getAllByUser(UUID userId) {
+        List<ReadStatus> readStatuses = readStatusRepository.findAllWithChannelByUserId(userId);
 
-        List<ChannelDto> list = readStatusRepository.findAllByUserId(userId)
-                .stream()
-                .map(readStatus -> {
-                    if(readStatus.getChannel().getType()==ChannelType.PUBLIC){
-                        return mapper.toDto(readStatus.getChannel());
-                    } else {
-                        List<ReadStatus> allByChannelId = readStatusRepository.findAllByChannelId(readStatus.getChannel().getId());
-                        ChannelDto dto = mapper.toDto(readStatus.getChannel());
-                        for (ReadStatus status : allByChannelId) {
-                            dto.getParticipants().add(userMapper.toDto(status.getUser()));
-                        }
-                        return dto;
+        List<Channel> list = readStatuses.stream()
+                .map(rs -> rs.getChannel())
+                .toList();
+
+        List<UUID> privateChannelIds = list.stream()
+                .filter(channel -> channel.getType() == ChannelType.PRIVATE)
+                .map(channel -> channel.getId())
+                .toList();
+
+        List<ReadStatus> privateParticipants = readStatusRepository.findAllByChannelIds(privateChannelIds);
+
+        Map<UUID, List<User>> usersByChannelId = privateParticipants.stream()
+                .collect(groupingBy(rs -> rs.getChannel().getId(),
+                        mapping(ReadStatus::getUser, toList())));
+
+        return list.stream()
+                .map(channel -> {
+                    ChannelDto dto = mapper.toDto(channel);
+                    if (channel.getType() == ChannelType.PRIVATE) {
+                        List<User> users = usersByChannelId.get(channel.getId());
+                        List<UserDto> userDtos = users.stream().map(userMapper::toDto).toList();
+                        dto.setParticipants(userDtos);
                     }
-
+                    return dto;
                 }).toList();
 
-        return list;
-
     }
-
-
 }
