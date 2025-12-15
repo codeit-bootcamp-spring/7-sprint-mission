@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.dto.response.MessageDto;
+import com.sprint.mission.discodeit.service.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.mapper.MessageMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -24,8 +25,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -289,12 +292,46 @@ public class MessageServiceTest {
         @DisplayName("채널 별 메세지 조회 성공")
         void findByChannelSuccess() {
             //given
+            UUID channelId = UUID.randomUUID();
+            User user = new User("test@gmail.com", "1234", "test");
+            Channel channel = new Channel("test", "test", ChannelType.PUBLIC);
+            Message message = new Message(user, channel, "message");
+            ReflectionTestUtils.setField(message, "id", UUID.randomUUID());
+            BinaryContent binaryContent = new BinaryContent("name", "png", 1234);
 
+            MessageAttachment messageAttachment = new MessageAttachment(message, binaryContent);
+
+            given(messageRepository.findAllByChannelId(channelId, 51, "createdAt,desc",null))
+                    .willReturn(List.of(message));
+
+            given(attachmentRepository.findAllWithBinaryContentByMessageIds(any(List.class)))
+                    .willReturn(List.of(messageAttachment));
+
+            MessageDto messageDto = new MessageDto();
+            messageDto.setContent(message.getContent());
+
+
+            given(mapper.toDto(message))
+                    .willReturn(messageDto);
+
+            given(messageRepository.getTotalElementsByChannelId(channelId))
+                    .willReturn(1L);
 
             //when
-//            messageService.getAllByChannelId()
+            PageResponse<MessageDto> result
+                    = messageService.getAllByChannelId(channelId, null, 50, "createdAt,desc");
 
             //then
+            assertThat(result.getContent().size()).isEqualTo(1);
+            assertThat(result.getNextCursor()).isEqualTo(messageDto);
+            assertThat(result.getSize()).isEqualTo(1);
+            assertThat(result.getTotalElements()).isEqualTo(1L);
+            assertThat(result.isHasNext()).isEqualTo(false);
+            assertThat(result.getContent().get(0)).isEqualTo(messageDto);
+            then(messageRepository).should().findAllByChannelId(channelId, 51, "createdAt,desc", null);
+            then(attachmentRepository).should().findAllWithBinaryContentByMessageIds(any(List.class));
+            then(mapper).should().toDto(message);
+            then(messageRepository).should().getTotalElementsByChannelId(channelId);
 
         }
     }
