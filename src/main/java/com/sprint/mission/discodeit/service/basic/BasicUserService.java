@@ -6,12 +6,10 @@ import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.global.exception.CustomException;
-import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.discodietException.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -33,7 +31,6 @@ public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
-    private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
 
@@ -43,25 +40,14 @@ public class BasicUserService implements UserService {
     @Transactional
     public UserResponseDto createUser(CreateUserDto createUserDto, Optional<CreateBinaryContentDto> createBinaryContentDto) {
         if (userRepository.findByUsername(createUserDto.username()).isPresent()) {
-            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXIST);
+            throw UserAlreadyExistsException.byUsername(createUserDto.username());
         }
         if (userRepository.findByEmail(createUserDto.email()).isPresent()) {
-            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXIST);
+            throw UserAlreadyExistsException.byEmail(createUserDto.email());
         }
+
         BinaryContent profile = createBinaryContentDto
-                .map(profileRequest -> {
-                    BinaryContent binaryContent = BinaryContent.builder()
-                            .fileName(profileRequest.fileName())
-                            .contentType(profileRequest.contentType())
-                            .size(profileRequest.size())
-                            .build();
-
-                    byte[] bytes = profileRequest.bytes();
-
-                    binaryContentRepository.save(binaryContent);
-                    binaryContentStorage.put(binaryContent.getId(), bytes);
-                    return binaryContent;
-                })
+                .map(this::saveBinaryContent)
                 .orElse(null);
 
         User user = User.builder()
@@ -78,9 +64,9 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDto getUser(UUID userId) { // 단건 검색
+    public UserResponseDto getUser(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> UserNotFoundException.byId(userId));
 
         return userMapper.toResponseDto(user);
     }
@@ -101,28 +87,10 @@ public class BasicUserService implements UserService {
                                       Optional<CreateBinaryContentDto> createBinaryContentDto) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_STATUS_NOT_FOUND));
+                .orElseThrow(() -> UserNotFoundException.byId(userId));
 
         BinaryContent profile = createBinaryContentDto
-                .map(profileRequest -> {
-                    Optional.ofNullable(user.getProfile()).ifPresent(binaryContentRepository::delete);
-
-                    BinaryContent binaryContent = BinaryContent.builder()
-                            .fileName(profileRequest.fileName())
-                            .contentType(profileRequest.contentType())
-                            .size(profileRequest.size())
-                            .build();
-
-                    byte[] bytes = profileRequest.bytes();
-
-                    binaryContentRepository.save(binaryContent);
-                    binaryContentStorage.put(binaryContent.getId(), bytes);
-
-                    return binaryContent;
-                })
+                .map(this::saveBinaryContent)
                 .orElse(null);
 
         user.updateUser(updateUserDto.newUsername(),
@@ -131,7 +99,6 @@ public class BasicUserService implements UserService {
                 profile
         );
 
-        userRepository.save(user);
         return userMapper.toResponseDto(user);
     }
 
@@ -139,10 +106,21 @@ public class BasicUserService implements UserService {
     @Transactional
     public void deleteUser(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> UserNotFoundException.byId(userId));
 
-        // User에서 cascadeType.ALL로 자식에게 전파하므로, User가 삭제되면
-        // UserStatus도 같이 삭제됨.
-        userRepository.deleteById(userId);
+        userRepository.delete(user);
+    }
+
+    private BinaryContent saveBinaryContent(CreateBinaryContentDto createBinaryContentDto) {
+        BinaryContent binaryContent = BinaryContent.builder()
+                .fileName(createBinaryContentDto.fileName())
+                .contentType(createBinaryContentDto.contentType())
+                .size(createBinaryContentDto.size())
+                .build();
+
+        binaryContentRepository.save(binaryContent);
+        binaryContentStorage.put(binaryContent.getId(), createBinaryContentDto.bytes());
+
+        return binaryContent;
     }
 }
