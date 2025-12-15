@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         Map<String, Object> details = new HashMap<>();
-        ErrorResponse errorResponse = errorResponseMapper.toErrorResponse(e, ErrorCode.VALIDATION_ERROR, details);
+        ErrorResponse errorResponse = errorResponseMapper.toErrorResponse(e, ErrorCode.INTERNAL_SERVER_ERROR, details);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 }
