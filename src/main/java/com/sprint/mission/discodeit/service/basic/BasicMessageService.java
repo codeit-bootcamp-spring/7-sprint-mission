@@ -107,7 +107,7 @@ public class BasicMessageService implements MessageService {
         Message saved = messageRepository.save(newMessage);
 
         log.info("메시지 생성 완료: messageId = {}", saved.getId());
-        return messageMapper.toResponseDto(newMessage);
+        return messageMapper.toResponseDto(saved);
     }
 
     @Override
@@ -147,10 +147,10 @@ public class BasicMessageService implements MessageService {
                 ));
 
         message.update(request.newContent());
-        messageRepository.save(message);
+        Message saved = messageRepository.save(message);
 
         log.info("메시지 수정 완료: messageId = {}", messageId);
-        return messageMapper.toResponseDto(message);
+        return messageMapper.toResponseDto(saved);
     }
 
     /**
