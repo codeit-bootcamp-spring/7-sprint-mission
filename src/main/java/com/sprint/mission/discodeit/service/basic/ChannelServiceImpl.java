@@ -41,11 +41,11 @@ public class ChannelServiceImpl implements ChannelService {
     public ChannelDto createPublicChannel(PublicChannelCreateRequest requestDto) {
 
         log.debug("공개 채널 생성 요청 - name: {}, description: {}",
-                requestDto.getName(), requestDto.getDescription());
+                requestDto.name(), requestDto.description());
 
         Channel newChannel = new Channel(
-                requestDto.getName(),
-                requestDto.getDescription(),
+                requestDto.name(),
+                requestDto.description(),
                 ChannelType.PUBLIC
                 );
 
@@ -62,9 +62,9 @@ public class ChannelServiceImpl implements ChannelService {
         Channel newChannel = new Channel(ChannelType.PRIVATE);
         channelRepository.save(newChannel);
 
-        if (requestDto.getParticipantIds() != null && !requestDto.getParticipantIds().isEmpty()) {
+        if (requestDto.participantIds() != null && !requestDto.participantIds().isEmpty()) {
 
-            List<User> users = userRepository.findAllById(requestDto.getParticipantIds());
+            List<User> users = userRepository.findAllById(requestDto.participantIds());
             List<ReadStatus> readStatuses = users.stream()
                     .map(user -> new ReadStatus(user, newChannel))
                     .collect(Collectors.toList());
