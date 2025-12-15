@@ -21,7 +21,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DiscodeitException.class)
     public ResponseEntity<ErrorResponse> DiscodeitException(DiscodeitException e) {
         ErrorResponse errorResponse = errorResponseMapper.toErrorResponseDto(e);
+        logResponse(errorResponse);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+
     }
 
     // Validation에 대한 에러 핸들러
@@ -35,6 +37,7 @@ public class GlobalExceptionHandler {
                 );
 
         ErrorResponse errorResponse = errorResponseMapper.toErrorResponseDto(e, ErrorCode.VALIDATION_ERROR, details);
+        logResponse(errorResponse);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
@@ -42,6 +45,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         Map<String, Object> details = new HashMap<>();
         ErrorResponse errorResponse = errorResponseMapper.toErrorResponseDto(e, ErrorCode.INTERNAL_SERVER_ERROR, details);
+        logResponse(errorResponse);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+    }
+
+    private void logResponse(ErrorResponse errorResponse) {
+        log.warn("Response Error [{}]: Status={}, Code={}, Message={}, details={}",
+                errorResponse.exceptionType(),
+                errorResponse.status(),
+                errorResponse.code(),
+                errorResponse.message(),
+                errorResponse.details());
     }
 }
