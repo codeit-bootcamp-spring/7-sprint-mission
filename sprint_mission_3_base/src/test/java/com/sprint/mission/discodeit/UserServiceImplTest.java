@@ -40,21 +40,17 @@ class UserServiceImplTest {
     @Test
     @DisplayName("create 성공: 프로필 없음 -> User 저장 + UserStatus 저장, Binary 저장/스토리지 저장 없음")
     void create_success_withoutProfile() {
-        // given
         UserCreateRequest req = new UserCreateRequest("taehun", "taehun@test.com", "password1234");
 
         given(userRepository.existsByEmail(req.email())).willReturn(false);
         given(userRepository.save(any(User.class))).willAnswer(invocation -> {
             User u = invocation.getArgument(0);
-            // UserDto.from(user)에서 id가 필요할 수 있어서 테스트에서 강제로 세팅
             ReflectionTestUtils.setField(u, "id", UUID.randomUUID());
             return u;
         });
 
-        // when
         UserDto result = userService.create(req, Optional.empty());
 
-        // then
         assertThat(result).isNotNull();
         then(userRepository).should().existsByEmail(req.email());
         then(userRepository).should().save(any(User.class));
@@ -67,11 +63,9 @@ class UserServiceImplTest {
     @Test
     @DisplayName("create 실패: 이메일 중복 -> UserAlreadyExistsException")
     void create_fail_emailAlreadyExists() {
-        // given
         UserCreateRequest req = new UserCreateRequest("taehun", "dup@test.com", "password1234");
         given(userRepository.existsByEmail(req.email())).willReturn(true);
 
-        // when & then
         assertThatThrownBy(() -> userService.create(req, Optional.empty()))
                 .isInstanceOf(UserAlreadyExistsException.class);
 
@@ -85,7 +79,6 @@ class UserServiceImplTest {
     @Test
     @DisplayName("create 성공: 프로필 있음 -> Binary 저장 + storage.put 호출")
     void create_success_withProfile() {
-        // given
         UserCreateRequest req = new UserCreateRequest("taehun", "taehun2@test.com", "password1234");
         byte[] bytes = "hello".getBytes();
         BinaryContentCreateRequest profileReq = new BinaryContentCreateRequest("p.png", "image/png", bytes);
@@ -104,13 +97,11 @@ class UserServiceImplTest {
             return b;
         });
 
-        // when
         UserDto result = userService.create(req, Optional.of(profileReq));
 
-        // then
         assertThat(result).isNotNull();
         then(binaryRepo).should().save(any(BinaryContent.class));
-        // id가 null일 가능성 대비해서 nullable 사용
+
         then(storage).should().put(nullable(UUID.class), eq(bytes));
         then(userStatusRepository).should().save(any());
     }
@@ -118,7 +109,7 @@ class UserServiceImplTest {
     @Test
     @DisplayName("update 성공: 유저 존재 + 프로필 없음 -> UserRepository.save 호출 없이 값 변경(더티체킹 가정)")
     void update_success_withoutProfile() {
-        // given
+
         UUID userId = UUID.randomUUID();
         User user = new User("old", "old@test.com", "oldpass1234", null);
         ReflectionTestUtils.setField(user, "id", userId);
@@ -130,10 +121,10 @@ class UserServiceImplTest {
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
-        // when
+
         UserDto result = userService.update(userId, req, Optional.empty());
 
-        // then
+
         assertThat(result).isNotNull();
         then(userRepository).should().findById(userId);
         then(userRepository).should(never()).save(any());
@@ -145,13 +136,13 @@ class UserServiceImplTest {
     @Test
     @DisplayName("update 실패: 유저 없음 -> UserNotFoundException")
     void update_fail_userNotFound() {
-        // given
+
         UUID userId = UUID.randomUUID();
 
         UserUpdateRequest req = mock(UserUpdateRequest.class);
         given(userRepository.findById(userId)).willReturn(Optional.empty());
 
-        // when & then
+
         assertThatThrownBy(() -> userService.update(userId, req, Optional.empty()))
                 .isInstanceOf(UserNotFoundException.class);
 
@@ -164,17 +155,16 @@ class UserServiceImplTest {
     @Test
     @DisplayName("delete 성공: 유저 존재 -> delete 호출")
     void delete_success() {
-        // given
+
         UUID userId = UUID.randomUUID();
         User user = new User("u", "u@test.com", "password1234", null);
         ReflectionTestUtils.setField(user, "id", userId);
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
-        // when
         userService.delete(userId);
 
-        // then
+
         then(userRepository).should().findById(userId);
         then(userRepository).should().delete(user);
     }
@@ -182,11 +172,10 @@ class UserServiceImplTest {
     @Test
     @DisplayName("delete 실패: 유저 없음 -> UserNotFoundException")
     void delete_fail_userNotFound() {
-        // given
+
         UUID userId = UUID.randomUUID();
         given(userRepository.findById(userId)).willReturn(Optional.empty());
 
-        // when & then
         assertThatThrownBy(() -> userService.delete(userId))
                 .isInstanceOf(UserNotFoundException.class);
 
