@@ -11,7 +11,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: public
 
 logging:
   level:
+
     root: INFO

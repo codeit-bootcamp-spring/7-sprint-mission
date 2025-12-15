@@ -1,69 +1,79 @@
 package com.sprint.mission.discodeit.exception;
 
-import lombok.extern.slf4j.Slf4j;
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
-import java.util.Map;
-
-@Slf4j
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 커스텀 예외
+    private final ErrorCodeStatusMapper statusMapper;
+
     @ExceptionHandler(DiscodeitException.class)
-    public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {
-        log.warn("DiscodeitException 발생", e);
-
-        ErrorCode errorCode = e.getErrorCode();
-        ErrorResponse response = ErrorResponse.of(
-                errorCode,
+    public ResponseEntity<ErrorResponse> handleDiscodeit(DiscodeitException e) {
+        HttpStatus status = statusMapper.map(e.getErrorCode());
+        return ResponseEntity.status(status).body(new ErrorResponse(
+                e.getTimestamp(),
+                e.getErrorCode().name(),
+                e.getErrorCode().getMessage(),
+                e.getDetails(),
                 e.getClass().getSimpleName(),
-                e.getDetails()
-        );
-
-        return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(response);
+                status.value()
+        ));
     }
 
-    // Validation 예외
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
-        log.warn("Validation 실패", e);
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
+        Map<String, Object> details = new LinkedHashMap<>();
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+        for (FieldError fe : e.getBindingResult().getFieldErrors()) {
+            fieldErrors.put(fe.getField(), fe.getDefaultMessage());
+        }
+        details.put("fieldErrors", fieldErrors);
 
-        Map<String, Object> fieldErrors = new HashMap<>();
-        e.getBindingResult().getFieldErrors()
-                .forEach(err -> fieldErrors.put(err.getField(), err.getDefaultMessage()));
-
-        ErrorResponse response = new ErrorResponse(
-                java.time.Instant.now(),
-                400,
-                "Bad Request",
-                "요청 값 검증에 실패했습니다.",
+        HttpStatus status = statusMapper.map(ErrorCode.VALIDATION_FAILED);
+        return ResponseEntity.status(status).body(new ErrorResponse(
+                Instant.now(),
+                ErrorCode.VALIDATION_FAILED.name(),
+                ErrorCode.VALIDATION_FAILED.getMessage(),
+                details,
                 e.getClass().getSimpleName(),
-                fieldErrors
-        );
-
-        return ResponseEntity.badRequest().body(response);
+                status.value()
+        ));
     }
 
-    // 그 외 모든 예외
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        log.error("처리되지 않은 예외", e);
-
-        ErrorResponse response = ErrorResponse.of(
-                ErrorCode.INTERNAL_ERROR,
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleBadJson(HttpMessageNotReadableException e) {
+        HttpStatus status = statusMapper.map(ErrorCode.BAD_REQUEST);
+        return ResponseEntity.status(status).body(new ErrorResponse(
+                Instant.now(),
+                ErrorCode.BAD_REQUEST.name(),
+                "Request body is invalid or unreadable.",
+                Map.of(),
                 e.getClass().getSimpleName(),
-                null
-        );
+                status.value()
+        ));
+    }
 
-        return ResponseEntity
-                .status(ErrorCode.INTERNAL_ERROR.getStatus())
-                .body(response);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnknown(Exception e) {
+        HttpStatus status = statusMapper.map(ErrorCode.INTERNAL_ERROR);
+        return ResponseEntity.status(status).body(new ErrorResponse(
+                Instant.now(),
+                ErrorCode.INTERNAL_ERROR.name(),
+                ErrorCode.INTERNAL_ERROR.getMessage(),
+                Map.of(),
+                e.getClass().getSimpleName(),
+                status.value()
+        ));
     }
 }

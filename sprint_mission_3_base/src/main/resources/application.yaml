@@ -22,8 +22,6 @@ discodeit:
     type: local
     local:
       root-path: .discodeit/storage
-  logging:
-    path: .discodeit/logs
 
 management:
   endpoints:

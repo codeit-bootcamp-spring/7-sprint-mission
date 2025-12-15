@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-
     <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="discodeit"/>
 
-    <springProperty scope="context" name="LOG_PATH" source="discodeit.logging.path" defaultValue=".discodeit/logs"/>
-
+    <springProperty scope="context" name="LOG_PATH" source="discodeit.logging.path" defaultValue=".logs"/>
 
     <property name="CONSOLE_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
-
+              value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
 
     <property name="FILE_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+              value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${CONSOLE_PATTERN}</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
@@ -30,7 +28,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/archive/${APP_NAME}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
-            <maxHistory>14</maxHistory>
+            <maxHistory>30</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
     </appender>

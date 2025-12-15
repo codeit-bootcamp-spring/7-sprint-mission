@@ -9,6 +9,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import com.sprint.mission.discodeit.exception.auth.InvalidCredentialsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+
 
 @Primary
 @Service
@@ -24,10 +27,10 @@ public class AuthServiceImpl implements AuthService {
         String password = loginRequest.password();
 
         User user = userRepository.findByUsername(emailOrUsername)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(emailOrUsername));
 
         if (!user.getPassword().equals(password)) {
-            throw new IllegalArgumentException("Invalid password");
+            throw new InvalidCredentialsException(emailOrUsername);
         }
 
         return UserDto.from(user);
