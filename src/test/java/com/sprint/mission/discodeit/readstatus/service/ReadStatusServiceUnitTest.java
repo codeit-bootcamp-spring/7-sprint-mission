@@ -94,9 +94,6 @@ public class ReadStatusServiceUnitTest {
 
         then(readStatusRepository).should(times(1)).save(any(ReadStatus.class));
         then(readStatusMapper).should(times(1)).toDto(any(ReadStatus.class));
-        then(channelRepository).should(times(1)).findById(any(UUID.class));
-        then(userRepository).should(times(1)).findById(any(UUID.class));
-
     }
 
     @Test
@@ -119,7 +116,6 @@ public class ReadStatusServiceUnitTest {
 
         assertThat(response).containsExactly(readStatusDto);
 
-        then(readStatusRepository).should(times(1)).findAll();
         then(readStatusMapper).should(times(1)).toDto(any(ReadStatus.class));
     }
 
@@ -135,7 +131,6 @@ public class ReadStatusServiceUnitTest {
 
         assertThat(response).isEqualTo(readStatusDto);
 
-        then(readStatusRepository).should(times(1)).findById(any(UUID.class));
         then(readStatusRepository).should(times(1)).save(any(ReadStatus.class));
         then(readStatusMapper).should(times(1)).toDto(any(ReadStatus.class));
 

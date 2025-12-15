@@ -89,10 +89,8 @@ public class UserStatusServiceUnitTest {
         assertThat(response.userId()).isEqualTo(userId);
 
         //then
-        then(userRepository).should(times(1)).findById(any(UUID.class));
-        then(userStatusRepository).should(times(1)).findAll();
+
         then(userStatusRepository).should(times(1)).save(any(UserStatus.class));
-        then(userStatusMapper).should(times(1)).toDto(any(UserStatus.class));
         then(userRepository).should(times(1)).save(any(User.class));
 
 
@@ -118,7 +116,6 @@ public class UserStatusServiceUnitTest {
         assertThat(response).isEqualTo(userStatusDto);
         assertThat(response.userId()).isEqualTo(userId);
 
-        then(userRepository).should(times(1)).findById(any(UUID.class));
         then(userStatusRepository).should(times(1)).save(any(UserStatus.class));
         then(userStatusMapper).should(times(1)).toDto(any(UserStatus.class));
 

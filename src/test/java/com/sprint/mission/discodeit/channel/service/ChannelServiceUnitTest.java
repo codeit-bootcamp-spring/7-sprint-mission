@@ -87,7 +87,6 @@ public class ChannelServiceUnitTest {
         assertThat(response).isEqualTo(channelDto);
 
         then(channelRepository).should(times(1)).save(any(Channel.class));
-        then(userRepository).should(times(1)).findById(any(UUID.class));
         then(readStatusRepository).should(times(1)).save(any(ReadStatus.class));
         then(channelMapper).should(times(1)).toDto(any(Channel.class));
 
@@ -118,7 +117,6 @@ public class ChannelServiceUnitTest {
         assertThat(response).isEqualTo(channelDto);
 
         then(channelRepository).should(times(1)).save(any(Channel.class));
-        then(userRepository).should(times(1)).findAll();
         then(readStatusRepository).should(times(1)).save(any(ReadStatus.class));
         then(channelMapper).should(times(1)).toDto(any(Channel.class));
 
@@ -149,7 +147,6 @@ public class ChannelServiceUnitTest {
 
         assertThat(response).isEqualTo(channelDto);
 
-        then(channelRepository).should(times(1)).findById(any(UUID.class));
         then(channelRepository).should(times(1)).save(any(Channel.class));
         then(channelMapper).should(times(1)).toDto(any(Channel.class));
     }

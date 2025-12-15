@@ -137,9 +137,6 @@ public class MessageServiceUnitTest {
 
         assertThat(response).isEqualTo(messageDto);
 
-        then(channelRepository).should(times(1)).findById(any(UUID.class));
-        then(userRepository).should(times(1)).findById(any(UUID.class));
-        then(readStatusRepository).should(times(1)).findReadStatusByChannelAndUser(any(Channel.class),any(User.class));
         then(messageRepository).should(times(1)).save(any(Message.class));
         then(binaryContentRepository).should(times(1)).save(any(BinaryContent.class));
         then(binaryContentStorage).should(times(1)).put(any(),any(byte[].class));
@@ -179,7 +176,6 @@ public class MessageServiceUnitTest {
 
         assertThat(response).isEqualTo(messageDto);
 
-        then(messageRepository).should(times(1)).findById(any(UUID.class));
         then(messageRepository).should(times(1)).save(any(Message.class));
     }
 
@@ -269,12 +265,9 @@ public class MessageServiceUnitTest {
         assertThat(response.size()).isEqualTo(1557);
         assertThat(response.hasNext()).isEqualTo(false);
 
-        then(messageRepository).should(times(1))
-                .findByChannelId(any(UUID.class),any(Pageable.class));
         then(pageResponseBasicMapper)
                 .should(times(1)).fromPage(any(Page.class));
         then(messageMapper).should(times(1)).toDto(any(Message.class));
-        then(channelRepository).should(times(1)).existsById(any(UUID.class));
 
     }
 

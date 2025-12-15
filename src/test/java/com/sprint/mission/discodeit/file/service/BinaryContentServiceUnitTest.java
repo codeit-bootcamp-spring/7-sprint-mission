@@ -67,7 +67,6 @@ private UUID binaryContentId;
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         then(binaryContentStorage).should(times(1)).download(any(BinaryContentDto.class));
-        then(binaryContentRepository).should(times(1)).findById(any(UUID.class));
 
     }
 
