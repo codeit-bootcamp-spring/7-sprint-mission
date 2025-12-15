@@ -1,59 +1,59 @@
 package com.sprint.mission.discodeit.service.jpa;
 
-import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentUploadRequest;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
+@Primary
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class BinaryContentServiceImpl implements BinaryContentService {
 
-    private final BinaryContentRepository binaryRepo;
-    private final MessageRepository messageRepo;
+    private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage storage;
 
     @Override
-    public BinaryContentDto upload(BinaryContentUploadRequest req) {
-
-        Message message = messageRepo.findById(req.messageId())
-                .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
+    public BinaryContentDto create(BinaryContentCreateRequest request) {
 
         BinaryContent binary = BinaryContent.builder()
-                .fileName(req.fileName())
-                .size(req.bytes().length)
-                .contentType(req.contentType())
-                .message(message)
+                .fileName(request.fileName())
+                .size((long) request.bytes().length)
+                .contentType(request.contentType())
                 .build();
 
-        binaryRepo.save(binary);
-
-        storage.put(binary.getId(), req.bytes());
+        binaryContentRepository.save(binary);
+        storage.put(binary.getId(), request.bytes());
 
         return BinaryContentDto.from(binary);
     }
 
-
     @Override
-    public BinaryContentDto find(UUID id) {
-        return binaryRepo.findById(id)
+    public BinaryContentDto find(UUID binaryContentId) {
+        return binaryContentRepository.findById(binaryContentId)
                 .map(BinaryContentDto::from)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("BinaryContent not found"));
+                .orElseThrow(() -> new IllegalArgumentException("BinaryContent not found"));
     }
 
     @Override
-    public void delete(UUID id) {
-        binaryRepo.deleteById(id);
+    public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
+        return binaryContentRepository.findAllById(binaryContentIds).stream()
+                .map(BinaryContentDto::from)
+                .toList();
+    }
+
+    @Override
+    public void delete(UUID binaryContentId) {
+        binaryContentRepository.deleteById(binaryContentId);
     }
 }

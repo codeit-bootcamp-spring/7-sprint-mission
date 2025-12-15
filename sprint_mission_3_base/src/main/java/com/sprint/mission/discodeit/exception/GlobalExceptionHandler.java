@@ -1,73 +1,69 @@
 package com.sprint.mission.discodeit.exception;
 
-import java.time.Instant;
-import java.util.Map;
-
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 커스텀 예외
     @ExceptionHandler(DiscodeitException.class)
     public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {
+        log.warn("DiscodeitException 발생", e);
 
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorCode errorCode = e.getErrorCode();
+        ErrorResponse response = ErrorResponse.of(
+                errorCode,
+                e.getClass().getSimpleName(),
+                e.getDetails()
+        );
 
         return ResponseEntity
-                .status(status)
-                .body(new ErrorResponse(
-                        e.getTimestamp(),
-                        e.getErrorCode().name(),
-                        e.getMessage(),
-                        e.getDetails(),
-                        e.getClass().getSimpleName(),
-                        status.value()
-                ));
+                .status(errorCode.getStatus())
+                .body(response);
     }
 
+    // Validation 예외
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(
-            MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
+        log.warn("Validation 실패", e);
 
-        Map<String, Object> fieldErrors = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .collect(java.util.stream.Collectors.toMap(
-                        err -> err.getField(),
-                        err -> err.getDefaultMessage(),
-                        (a, b) -> a
-                ));
+        Map<String, Object> fieldErrors = new HashMap<>();
+        e.getBindingResult().getFieldErrors()
+                .forEach(err -> fieldErrors.put(err.getField(), err.getDefaultMessage()));
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(
-                        Instant.now(),
-                        "VALIDATION_ERROR",
-                        "요청 값 검증에 실패했습니다.",
-                        fieldErrors,
-                        e.getClass().getSimpleName(),
-                        HttpStatus.BAD_REQUEST.value()
-                ));
+        ErrorResponse response = new ErrorResponse(
+                java.time.Instant.now(),
+                400,
+                "Bad Request",
+                "요청 값 검증에 실패했습니다.",
+                e.getClass().getSimpleName(),
+                fieldErrors
+        );
+
+        return ResponseEntity.badRequest().body(response);
     }
 
-
+    // 그 외 모든 예외
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        e.printStackTrace();
+        log.error("처리되지 않은 예외", e);
+
+        ErrorResponse response = ErrorResponse.of(
+                ErrorCode.INTERNAL_ERROR,
+                e.getClass().getSimpleName(),
+                null
+        );
 
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse(
-                        Instant.now(),
-                        "INTERNAL_SERVER_ERROR",
-                        "서버 내부 오류가 발생했습니다.",
-                        null,
-                        e.getClass().getSimpleName(),
-                        HttpStatus.INTERNAL_SERVER_ERROR.value()
-                ));
+                .status(ErrorCode.INTERNAL_ERROR.getStatus())
+                .body(response);
     }
 }

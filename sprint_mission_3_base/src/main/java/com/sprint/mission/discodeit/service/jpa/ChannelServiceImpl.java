@@ -2,17 +2,19 @@ package com.sprint.mission.discodeit.service.jpa;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-
+@Primary
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -22,21 +24,24 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public ChannelDto create(ChannelCreateRequest request) {
-        Channel channel = Channel.builder()
-                .name(request.name())
-                .build();
+        Channel channel = new Channel(
+                ChannelType.PUBLIC,
+                request.name(),
+                null
+        );
 
         channelRepository.save(channel);
         return ChannelDto.from(channel);
     }
 
     @Override
-    public ChannelDto update(ChannelUpdateRequest request) {
+    public ChannelDto update(UUID channelId, ChannelUpdateRequest request) {
 
-        Channel channel = channelRepository.findById(request.id())
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
-        channel.update(request.name());
+        channel.update(request.name(), null);
+
         return ChannelDto.from(channel);
     }
 
@@ -59,5 +64,6 @@ public class ChannelServiceImpl implements ChannelService {
                 .map(ChannelDto::from)
                 .toList();
     }
+
 
 }

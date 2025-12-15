@@ -5,10 +5,24 @@ import java.util.Map;
 
 public record ErrorResponse(
         Instant timestamp,
-        String code,
+        int status,
+        String error,
         String message,
-        Map<String, Object> details,
         String exceptionType,
-        int status
+        Map<String, Object> details
 ) {
+    public static ErrorResponse of(
+            ErrorCode errorCode,
+            String exceptionType,
+            Map<String, Object> details
+    ) {
+        return new ErrorResponse(
+                Instant.now(),
+                errorCode.getStatus().value(),
+                errorCode.getStatus().getReasonPhrase(),
+                errorCode.getMessage(),
+                exceptionType,
+                details
+        );
+    }
 }

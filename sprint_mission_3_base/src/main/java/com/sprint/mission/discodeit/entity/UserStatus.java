@@ -8,6 +8,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+
+import java.sql.ConnectionBuilder;
 import java.time.Duration;
 import java.time.Instant;
 import lombok.AccessLevel;
@@ -26,12 +28,16 @@ public class UserStatus extends BaseUpdatableEntity {
   private User user;
   @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant lastActiveAt;
+  private Instant lastSeenAt;
 
   public UserStatus(User user, Instant lastActiveAt) {
     setUser(user);
     this.lastActiveAt = lastActiveAt;
   }
 
+  public void updateLastSeen() {
+        this.lastSeenAt = Instant.now();
+    }
   public void update(Instant lastActiveAt) {
     if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
       this.lastActiveAt = lastActiveAt;

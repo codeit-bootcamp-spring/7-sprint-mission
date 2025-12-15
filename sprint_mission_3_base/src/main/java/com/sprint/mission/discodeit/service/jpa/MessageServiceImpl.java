@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.jpa;
 
-import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -16,93 +16,106 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import jakarta.transaction.Transactional;
-import java.io.IOException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+@Primary
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class MessageServiceImpl implements MessageService {
 
-    private final MessageRepository messageRepo;
-    private final UserRepository userRepo;
-    private final ChannelRepository channelRepo;
-    private final BinaryContentRepository binaryRepo;
-    private final BinaryContentStorage storage;  // 파일 저장
+    private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage storage;
+    private final PageResponseMapper pageResponseMapper;
 
     @Override
-    public MessageDto createWithFile(MessageCreateRequest request, MultipartFile file) {
-
-        User user = userRepo.findById(request.authorId())
+    public MessageDto create(
+            MessageCreateRequest request,
+            List<BinaryContentCreateRequest> binaryRequests
+    ) {
+        User user = userRepository.findById(request.authorId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        Channel channel = channelRepo.findById(request.channelId())
+        Channel channel = channelRepository.findById(request.channelId())
                 .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
-        // 1) 메시지 저장
-        Message message = Message.builder()
-                .content(request.content())
-                .user(user)
-                .channel(channel)
-                .build();
-        messageRepo.save(message);
+        Message message = new Message(
+                request.content(),
+                channel,
+                user,
+                List.of()
+        );
 
-        // 2) 이미지 있으면 저장
-        if (file != null && !file.isEmpty()) {
-            try {
-                BinaryContent binary = BinaryContent.builder()
-                        .fileName(file.getOriginalFilename())
-                        .contentType(file.getContentType())
-                        .size(file.getBytes().length)
-                        .message(message)  // 메시지와 연결
-                        .build();
+        messageRepository.save(message);
 
-                binaryRepo.save(binary);
-                storage.put(binary.getId(), file.getBytes());
-
-                // 메시지가 binaryContent를 인식하게 설정
-                message.updateBinary(binary);
-
-            } catch (IOException e) {
-                throw new RuntimeException("파일 저장 실패", e);
-            }
+        for (BinaryContentCreateRequest br : binaryRequests) {
+            BinaryContent binary = new BinaryContent(
+                    br.fileName(),
+                    (long) br.bytes().length,
+                    br.contentType()
+            );
+            binaryContentRepository.save(binary);
+            storage.put(binary.getId(), br.bytes());
         }
 
         return MessageDto.from(message);
     }
 
     @Override
-    public MessageDto update(MessageUpdateRequest request) {
-        Message msg = messageRepo.findById(request.id())
-                .orElseThrow(() -> new IllegalArgumentException("Message not found"));
-
-        msg.update(request.content());
-        return MessageDto.from(msg);
-    }
-
-    @Override
-    public void delete(UUID messageId) {
-        messageRepo.deleteById(messageId);
-    }
-
-    @Override
-    public MessageDto find(UUID id) {
-        return messageRepo.findById(id)
+    public MessageDto find(UUID messageId) {
+        return messageRepository.findById(messageId)
                 .map(MessageDto::from)
                 .orElseThrow(() -> new IllegalArgumentException("Message not found"));
     }
 
     @Override
-    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, int page, int size) {
-        var paging = PageRequest.of(page, size);
-        var result = messageRepo.findAllByChannelIdOrderByCreatedAtDesc(channelId, paging);
+    public PageResponse<MessageDto> findAllByChannelId(
+            UUID channelId,
+            Pageable pageable
+    ) {
+        var slice = messageRepository.findAllByChannelIdWithAuthor(
+                channelId,
+                Instant.now(),
+                pageable
+        );
+        Instant nextCursor = null;
+        if (!slice.getContent().isEmpty()) {
+            nextCursor = slice.getContent()
+                    .get(slice.getContent().size() - 1)
+                    .getCreatedAt();
+        }
 
-        return PageResponseMapper.fromPage(result, MessageDto::from);
+        var dtoSlice = slice.map(MessageDto::from);
+        return pageResponseMapper.fromSlice(dtoSlice, nextCursor);
+
+
     }
+
+
+    @Override
+    public MessageDto update(UUID messageId, MessageUpdateRequest request) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new IllegalArgumentException("Message not found"));
+
+        message.update(request.newContent());
+        return MessageDto.from(message);
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        messageRepository.deleteById(messageId);
+    }
+
 }

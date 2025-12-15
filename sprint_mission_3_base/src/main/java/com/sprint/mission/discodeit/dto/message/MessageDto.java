@@ -13,9 +13,11 @@ public record MessageDto(
         return new MessageDto(
                 m.getId(),
                 m.getContent(),
-                m.getUser().getId(),
+                m.getAuthor().getId(),
                 m.getChannel().getId(),
-                m.getBinaryContent() != null ? m.getBinaryContent().getId() : null
+                m.getAttachments().isEmpty()
+                        ? null
+                        : m.getAttachments().get(0).getId()
         );
     }
 }
