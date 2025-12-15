@@ -5,10 +5,8 @@ import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.discodietException.auth.InvalidCredentialsException;
-import com.sprint.mission.discodeit.global.exception.discodietException.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +18,6 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
-
     private final UserMapper userMapper;
 
     @Transactional
@@ -35,10 +31,6 @@ public class BasicAuthService implements AuthService {
         }
 
         UserStatus userStatus = user.getUserStatus();
-        if (userStatus == null) {
-            throw UserStatusNotFoundException.byUserId(user.getId());
-        }
-
         userStatus.update(Instant.now());
 
         return userMapper.toResponseDto(user);
