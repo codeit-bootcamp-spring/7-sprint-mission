@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -17,19 +18,18 @@ import com.sprint.mission.discodeit.service.dto.response.MessageDto;
 import com.sprint.mission.discodeit.service.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.mapper.MessageMapper;
-import com.sprint.mission.discodeit.service.mapper.MessagePageResponseMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -42,7 +42,6 @@ public class MessageService {
     private final ChannelRepository channelRepository;
     private final MessageAttachmentRepository attachmentRepository;
     private final MessageMapper mapper;
-    private final MessagePageResponseMapper pageMapper;
     private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentManager binaryContentManager;
 
@@ -67,7 +66,7 @@ public class MessageService {
             for (MultipartFile file : attachments) {
                 BinaryContent content = binaryContentManager.saveFileAndMeta(file);
                 MessageAttachment messageAttachment = new MessageAttachment(message, content);
-                MessageAttachment save1 = attachmentRepository.save(messageAttachment);
+                attachmentRepository.save(messageAttachment);
                 dto.addAttachment(binaryContentMapper.toDto(content));
             }
         }
@@ -75,6 +74,7 @@ public class MessageService {
         return dto;
     }
 
+    @Transactional
     public MessageDto updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
         log.info("MessageService.updateMessage");
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, new HashMap<>()));
@@ -98,21 +98,44 @@ public class MessageService {
     }
 
 
-    public PageResponse<MessageDto> getAllByChannelId(UUID channelId, Pageable pageable) {
-        Page<MessageDto> map = messageRepository.findAllByChannelId(channelId, pageable)
+    @Transactional(readOnly = true)
+    public PageResponse<MessageDto> getAllByChannelId(
+            UUID channelId,
+            Instant cursor,
+            int size,
+            String sort) {
+        List<Message> messages = messageRepository.findAllByChannelId(channelId, size + 1, sort, cursor);
+
+        boolean hasNext = messages.size() > size;
+        int endIndex = Math.min(messages.size(), size);
+        List<Message> list = messages.subList(0, endIndex);
+
+
+        List<UUID> messageIds = list.stream()
+                .map(BaseEntity::getId)
+                .toList();
+
+        Map<UUID, List<BinaryContentDto>> collect = attachmentRepository.findAllWithBinaryContentByMessageIds(messageIds)
+                .stream()
+                .collect(Collectors.groupingBy(messageAttachment -> messageAttachment.getMessage().getId(),
+                        Collectors.mapping(messageAttachment -> binaryContentMapper.toDto(messageAttachment.getAttachment()), Collectors.toList())));
+
+        List<MessageDto> result = list.stream()
                 .map(message -> {
                     MessageDto dto = mapper.toDto(message);
-//                    List<MessageAttachment> allByMessageId = attachmentRepository.findAllWithBinaryContentByMessageId(message.getId());
-//                    for (MessageAttachment messageAttachment : allByMessageId) {
-//                        BinaryContentDto content = binaryContentMapper.toDto(messageAttachment.getAttachment());
-//                        dto.addAttachment(content);
-//                    }
+                    if (collect.containsKey(message.getId()))
+                        dto.setAttachments(collect.get(message.getId()));
                     return dto;
-                });
-// 지그 N+1문제 터지고 있음. message를 가져오는 거 까지는 문제가 없지만, 각 메세지 마다 attachmentRepository.findAllWith~ 호출중.
-        //
+                }).toList();
 
-        return pageMapper.fromPage(map);
+        MessageDto last = result.isEmpty() ? null : result.get(result.size() - 1);
+        Long totalElements = messageRepository.getTotalElementsByChannelId(channelId);
+        return new PageResponse<MessageDto>(
+                result,
+                last,
+                result.size(),
+                hasNext,
+                totalElements);
     }
 
 }

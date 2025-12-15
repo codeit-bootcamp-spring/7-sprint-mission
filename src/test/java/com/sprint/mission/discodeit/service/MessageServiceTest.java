@@ -14,7 +14,6 @@ import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.dto.response.MessageDto;
 import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.mapper.MessageMapper;
-import com.sprint.mission.discodeit.service.mapper.MessagePageResponseMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -52,8 +51,6 @@ public class MessageServiceTest {
     private MessageAttachmentRepository attachmentRepository;
     @Mock
     private MessageMapper mapper;
-    @Spy
-    private MessagePageResponseMapper pageMapper = new MessagePageResponseMapper();
     @Spy
     private BinaryContentMapper binaryContentMapper = Mappers.getMapper(BinaryContentMapper.class);
     @Mock
@@ -226,8 +223,8 @@ public class MessageServiceTest {
             MessageUpdateRequest request = new MessageUpdateRequest("newContent");
 
             //when
-           assertThatThrownBy(()-> messageService.updateMessage(messageId, request))
-                   .isInstanceOf(MessageNotFoundException.class);
+            assertThatThrownBy(() -> messageService.updateMessage(messageId, request))
+                    .isInstanceOf(MessageNotFoundException.class);
 
             //then
             then(messageRepository).should().findById(messageId);
@@ -240,7 +237,7 @@ public class MessageServiceTest {
     class DeleteMessage {
         @Test
         @DisplayName("메세지 삭제 성공")
-        void deleteMessageSuccess (){
+        void deleteMessageSuccess() {
             //given
             UUID messageId = UUID.randomUUID();
             User user = new User("test@gmail.com", "1234", "test");
@@ -261,11 +258,11 @@ public class MessageServiceTest {
             then(binaryContentManager).should().deleteFile(binaryContent);
             then(attachmentRepository).should().deleteByMessageId(messageId);
             then(messageRepository).should().deleteById(messageId);
-         }
+        }
 
         @Test
         @DisplayName("메세지 삭제 성공2")
-        void deleteMessageSuccess_noFile (){
+        void deleteMessageSuccess_noFile() {
             //given
             UUID messageId = UUID.randomUUID();
             User user = new User("test@gmail.com", "1234", "test");
@@ -290,7 +287,7 @@ public class MessageServiceTest {
     class FindMessages {
         @Test
         @DisplayName("채널 별 메세지 조회 성공")
-        void findByChannelSuccess (){
+        void findByChannelSuccess() {
             //given
 
 
@@ -299,6 +296,6 @@ public class MessageServiceTest {
 
             //then
 
-         }
+        }
     }
 }
