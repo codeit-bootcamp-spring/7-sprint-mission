@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DiscodeitException.class)
     public ResponseEntity<ErrorResponse> DiscodeitException(DiscodeitException e) {
-        ErrorResponse errorResponse = errorResponseMapper.toErrorResponse(e);
+        ErrorResponse errorResponse = errorResponseMapper.toErrorResponseDto(e);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
@@ -34,14 +34,14 @@ public class GlobalExceptionHandler {
                         details.put(error.getField(), error.getDefaultMessage())
                 );
 
-        ErrorResponse errorResponse = errorResponseMapper.toErrorResponse(e, ErrorCode.VALIDATION_ERROR, details);
+        ErrorResponse errorResponse = errorResponseMapper.toErrorResponseDto(e, ErrorCode.VALIDATION_ERROR, details);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         Map<String, Object> details = new HashMap<>();
-        ErrorResponse errorResponse = errorResponseMapper.toErrorResponse(e, ErrorCode.INTERNAL_SERVER_ERROR, details);
+        ErrorResponse errorResponse = errorResponseMapper.toErrorResponseDto(e, ErrorCode.INTERNAL_SERVER_ERROR, details);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 }

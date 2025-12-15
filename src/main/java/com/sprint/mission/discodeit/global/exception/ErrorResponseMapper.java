@@ -20,7 +20,7 @@ public interface ErrorResponseMapper {
             target = "status",
             expression = "java(e.getErrorCode().getStatus().value())"
     )
-    ErrorResponse toErrorResponse(DiscodeitException e);
+    ErrorResponse toErrorResponseDto(DiscodeitException e);
 
     @Mapping(target = "timestamp", expression = "java(Instant.now())")
     @Mapping(target = "code", source = "errorCode")
@@ -34,7 +34,7 @@ public interface ErrorResponseMapper {
             target = "status",
             expression = "java(errorCode.getStatus().value())"
     )
-    ErrorResponse toErrorResponse(
+    ErrorResponse toErrorResponseDto(
             Exception e,
             ErrorCode errorCode,
             Map<String, Object> details
