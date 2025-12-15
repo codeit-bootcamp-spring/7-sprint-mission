@@ -79,6 +79,7 @@ class ChannelServiceIntegrationTest {
 
         @Test
         @DisplayName("[예외 케이스] 존재하지 않는 유저 삽입")
+        @Transactional
         void createIllegalUser_Fail(){
             //given
             UserDto illegalUser = userService.createUser(TestFixture.userCreateFactory(),null);
@@ -111,6 +112,7 @@ class ChannelServiceIntegrationTest {
 
         @Test
         @DisplayName("[예외 케이스] public 채널 생성 실패")
+        @Transactional
         void createPublicChannel_Fail() {
             //given
 
@@ -219,6 +221,7 @@ class ChannelServiceIntegrationTest {
 
         @Test
         @DisplayName("[예외 케이스] 채널 내용 변경 실패")
+        @Transactional
         void patchChannel_Fail() {
             //given
             ChannelPatchRequestDto channelPatchRequestDto = TestFixture.channelPatchFactory();
