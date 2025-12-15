@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,7 @@ public class ChannelController implements ChannelApi {
 
     @Override
     @PostMapping
-    public ResponseEntity<ChannelDto> create(
-            @RequestBody ChannelCreateRequest request
-    ) {
+    public ResponseEntity<ChannelDto> create(@Valid @RequestBody ChannelCreateRequest request) {
         ChannelDto createdChannel = channelService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
@@ -32,7 +31,7 @@ public class ChannelController implements ChannelApi {
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> update(
             @PathVariable UUID channelId,
-            @RequestBody ChannelUpdateRequest request
+            @Valid @RequestBody ChannelUpdateRequest request
     ) {
         ChannelDto updatedChannel = channelService.update(channelId, request);
         return ResponseEntity.ok(updatedChannel);
@@ -40,9 +39,7 @@ public class ChannelController implements ChannelApi {
 
     @Override
     @DeleteMapping("/{channelId}")
-    public ResponseEntity<Void> delete(
-            @PathVariable UUID channelId
-    ) {
+    public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity.noContent().build();
     }
