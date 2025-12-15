@@ -3,6 +3,11 @@ spring:
     active: dev
   config:
     import: optional:classpath:actuator.yml
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
 logging:
   level:
     root: INFO

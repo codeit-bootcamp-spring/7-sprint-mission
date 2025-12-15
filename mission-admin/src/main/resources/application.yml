@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: mission-admin
+
+server:
+  port: 9090
+
+

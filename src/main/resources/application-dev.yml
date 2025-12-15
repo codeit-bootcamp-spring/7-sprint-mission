@@ -15,6 +15,10 @@ spring:
         show_sql: true
         format_sql: true
     open-in-view: false
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
 discodeit:
   repository:
     type: file
@@ -23,7 +27,7 @@ discodeit:
     local:
       root-path: "${user.home}/Documents/discodeit/jpaData"
 server:
-  port: ${PORT:9090}
+  port: ${PORT:8080}
 
 springdoc:
   swagger-ui:

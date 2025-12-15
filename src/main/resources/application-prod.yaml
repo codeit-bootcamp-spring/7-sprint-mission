@@ -15,6 +15,11 @@ spring:
         show_sql: true
         format_sql: true
     open-in-view: false
+  boot:
+    admin:
+      client:
+        url: ${SPRINT_BOOT_ADMIN_CLIENT_URL}
+
 discodeit:
   repository:
     type: file
