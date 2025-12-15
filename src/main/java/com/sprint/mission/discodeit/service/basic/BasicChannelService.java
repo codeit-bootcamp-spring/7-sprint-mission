@@ -48,7 +48,7 @@ public class BasicChannelService implements ChannelService {
         Channel saved = channelRepository.save(channel);
 
         log.info("공개 채널 생성 완료: channelId = {}, channelName = {}", saved.getId(), saved.getChannelName());
-        return channelMapper.toResponseDto(channel);
+        return channelMapper.toResponseDto(saved);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class BasicChannelService implements ChannelService {
                 ));
 
         log.info("비공개 채널 생성 완료: channelId = {}", saved.getId());
-        return channelMapper.toResponseDto(channel);
+        return channelMapper.toResponseDto(saved);
     }
 
     @Override
@@ -103,10 +103,10 @@ public class BasicChannelService implements ChannelService {
         validateChannelNameDuplicate(request.newName());
 
         channel.update(request.newName(), request.newDescription());
-        channelRepository.save(channel);
+        Channel saved = channelRepository.save(channel);
 
         log.info("채널 수정 완료: channelId = {}", channelId);
-        return channelMapper.toResponseDto(channel);
+        return channelMapper.toResponseDto(saved);
     }
 
     @Override
@@ -170,9 +170,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     private void validateChannelNameDuplicate(String name) {
-        boolean exists = channelRepository.findAll().stream()
-                .filter(c -> c.getChannelName() != null)
-                .anyMatch(c -> c.getChannelName().equals(name));
+        boolean exists = channelRepository.existsByChannelName(name);
 
         if(exists) {
             throw new ChannelNameAlreadyExistsException(
