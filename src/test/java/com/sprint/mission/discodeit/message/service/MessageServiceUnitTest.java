@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.message.service;
 
 import com.sprint.mission.discodeit.TestFixture;
 import com.sprint.mission.discodeit.dto.request.message.MessagePatchRequestDto;
+import com.sprint.mission.discodeit.dto.response.PageResponseDto;
 import com.sprint.mission.discodeit.dto.response.PageResponseDtoBasic;
 import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.entity.*;
@@ -21,10 +22,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,6 +81,8 @@ public class MessageServiceUnitTest {
     private ReadStatus readStatus;
     private MessageAttachment messageAttachment;
     private Page<Message> page;
+    private Slice<Message> slice;
+    private PageResponseDto<MessageDto> pageResponseDto;
 
 
     @BeforeEach
@@ -95,6 +98,23 @@ public class MessageServiceUnitTest {
         readStatus = ReadStatus.createReadStatusFactory(user,channel);
         messageAttachment = new MessageAttachment(message,binaryContent);
         page = Page.empty();
+        pageResponseDto = new PageResponseDto<>(
+                null,
+                null,
+                10,
+                false,
+                30L
+        );
+        slice = new PageImpl<>(List.of(message),PageRequest.of(0,10),30L);
+        messageDto = new MessageDto(
+                message.getId(),
+                message.getCreatedAt(),
+                message.getUpdatedAt(),
+                message.getContent(),
+                channel.getId(),
+                null,
+                null
+        );
     }
     @Test
     @DisplayName("[정상 케이스] 메세지 생성 성공")
@@ -221,6 +241,44 @@ public class MessageServiceUnitTest {
     }
 
     @Test
+    @DisplayName("[정상 케이스] 채널 id로 메세지 조회 성공2")
+    void readAllMessageByChannelId_TargetPage_Success() {
+
+        given(channelRepository.existsById(any(UUID.class))).willReturn(true);
+        given(messageRepository.findByChannelId(any(UUID.class),any(Pageable.class)))
+                .willReturn(new PageImpl<>(List.of(message),PageRequest.of(0,10),8848L));
+
+        given(messageMapper.toDto(any(Message.class)))
+        .willReturn(messageDto);
+
+        given(pageResponseBasicMapper.fromPage(any(Page.class)))
+        .willReturn(new PageResponseDtoBasic<>(
+                List.of(messageDto),
+                1557,
+                1557,
+                false,
+                8848L
+        ));
+
+        PageResponseDtoBasic<MessageDto> response = messageService.findallByChannelId(
+                UUID.randomUUID(),
+                Pageable.ofSize(10)
+        );
+
+        assertThat(response.totalElements()).isEqualTo(8848L);
+        assertThat(response.size()).isEqualTo(1557);
+        assertThat(response.hasNext()).isEqualTo(false);
+
+        then(messageRepository).should(times(1))
+                .findByChannelId(any(UUID.class),any(Pageable.class));
+        then(pageResponseBasicMapper)
+                .should(times(1)).fromPage(any(Page.class));
+        then(messageMapper).should(times(1)).toDto(any(Message.class));
+        then(channelRepository).should(times(1)).existsById(any(UUID.class));
+
+    }
+
+    @Test
     @DisplayName("[예외 케이스] 채널 id로 메세지 조회 실패")
     void readAllMessageByChannelId_Fail() {
 
@@ -230,4 +288,65 @@ public class MessageServiceUnitTest {
         then(messageRepository).should(never())
                 .findByChannelId(any(UUID.class),any(Pageable.class));
     }
+
+    @Test
+    @DisplayName("[정상 케이스] 채널 id로 메세지 조회 슬라이스 커서 (커서가 null일때) ")
+    void findAllByChannelIdWithCursor_Success() {
+
+        given(messageRepository.findByChannelIdAndCreatedAtAfter(
+                any(UUID.class),any( Instant.class),any(Pageable.class)
+        ))
+                .willReturn(slice);
+        given(messageMapper.toDto(any(Message.class)))
+                .willReturn(messageDto);
+        given(pageResponseMapper.fromSlice(any(),any()))
+                .willReturn(pageResponseDto);
+
+        PageResponseDto<MessageDto> response = messageService.findallByChannelIdWithCursor(
+                UUID.randomUUID(),
+                null,
+                Pageable.ofSize(10)
+        );
+
+        assertThat(response.size()).isEqualTo(pageResponseDto.size());
+        assertThat(response.hasNext()).isEqualTo(pageResponseDto.hasNext());
+        assertThat(response.totalElements()).isEqualTo(pageResponseDto.totalElements());
+
+        then(messageRepository).should(times(1))
+                .findByChannelIdAndCreatedAtAfter(any(UUID.class),any( Instant.class),any(Pageable.class));
+        then(messageMapper).should(times(1)).toDto(any(Message.class));
+        then(pageResponseMapper).should(times(1)).fromSlice(any(),any());
+
+    }
+
+    @Test
+    @DisplayName("[정상 케이스] 채널 id로 메세지 조회 슬라이스 커서 (커서가 null 아닐때) ")
+    void findAllByChannelIdWithCursor_WithCursor_Success() {
+
+        given(messageRepository.findByChannelIdAndCreatedAtAfter(
+                any(UUID.class),any( Instant.class),any(Pageable.class)
+        ))
+                .willReturn(slice);
+        given(messageMapper.toDto(any(Message.class)))
+                .willReturn(messageDto);
+        given(pageResponseMapper.fromSlice(any(),any()))
+                .willReturn(pageResponseDto);
+
+        PageResponseDto<MessageDto> response = messageService.findallByChannelIdWithCursor(
+                UUID.randomUUID(),
+                Instant.now().toString(),
+                Pageable.ofSize(10)
+        );
+
+        assertThat(response.size()).isEqualTo(pageResponseDto.size());
+        assertThat(response.hasNext()).isEqualTo(pageResponseDto.hasNext());
+        assertThat(response.totalElements()).isEqualTo(pageResponseDto.totalElements());
+
+        then(messageRepository).should(times(1))
+                .findByChannelIdAndCreatedAtAfter(any(UUID.class),any( Instant.class),any(Pageable.class));
+        then(messageMapper).should(times(1)).toDto(any(Message.class));
+        then(pageResponseMapper).should(times(1)).fromSlice(any(),any());
+
+    }
+
 }

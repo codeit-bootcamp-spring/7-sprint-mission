@@ -31,9 +31,9 @@ public class BasicBinaryContentService implements BinaryContentService {
                 binaryContentCreateRequestDto.getContentType(),
                 binaryContentCreateRequestDto.getSize()
         );
-        binaryContentRepository.save(binaryContent);
+        BinaryContent saved = binaryContentRepository.save(binaryContent);
         binaryContentStorage.put(binaryContent.getId(),binaryContentCreateRequestDto.getBytes());
-        return BinaryStruct.INSTANCE.toDto(binaryContent);
+        return BinaryStruct.INSTANCE.toDto(saved);
 
 
     }

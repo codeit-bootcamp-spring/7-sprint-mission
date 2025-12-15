@@ -117,8 +117,6 @@ public class BasicMessageService implements MessageService {
         if(!channelRepository.existsById(channelId)) throw new ChannelNotExistException(channelId);
         Page<Message> targetPage = messageRepository.findByChannelId(channelId,pageable);
         if(targetPage.isEmpty()) return pageResponseBasicMapper.fromPage(Page.empty());
-        Message message = targetPage.getContent().get(0);
-        MessageDto messageDto = messageMapper.toDto(message);
         Page<MessageDto> targetPageDto = targetPage.map(messageMapper::toDto);
         return pageResponseBasicMapper.fromPage(targetPageDto);
     }
