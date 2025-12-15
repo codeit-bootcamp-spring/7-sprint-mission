@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -249,6 +250,8 @@ class ChannelServiceTest {
             String newName = "newName";
             String newDescription = "newDescription";
 
+            ArgumentCaptor<Channel> channelCaptor = ArgumentCaptor.forClass(Channel.class);
+
             Channel beforeChannel = new Channel(
                     "beforeName",
                     ChannelType.PUBLIC,
@@ -285,8 +288,13 @@ class ChannelServiceTest {
             assertThat(response).isNotNull();
 
             verify(channelRepository, times(1)).findById(channelId);
-            verify(channelRepository, times(1)).save(any(Channel.class));
+            verify(channelRepository, times(1)).save(channelCaptor.capture());
             verify(channelMapper, times(1)).toResponseDto(any(Channel.class));
+
+            Channel captureChannel = channelCaptor.getValue();
+
+            assertThat(captureChannel.getChannelName()).isEqualTo(newName);
+            assertThat(captureChannel.getDescription()).isEqualTo(newDescription);
         }
 
         @Test

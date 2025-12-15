@@ -334,8 +334,11 @@ class UserServiceTest {
             verify(userMapper, times(1)).toResponseDto(any(User.class));
 
             User captureUser = userCaptor.getValue();
-
             BinaryContent captureBinaryContent = binaryContentCaptor.getValue();
+
+            assertThat(captureUser.getUsername()).isEqualTo(newUsername);
+            assertThat(captureUser.getEmail()).isEqualTo(newEmail);
+            assertThat(captureUser.getPassword()).isEqualTo(newPassword);
             assertThat(captureBinaryContent).isSameAs(captureUser.getProfile());
         }
 
