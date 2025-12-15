@@ -9,9 +9,10 @@ public class ReadStatusAlreadyExistsException extends ReadStatusException {
         super(ErrorCode.READ_STATUS_ALREADY_EXIST);
     }
 
-    public static ReadStatusAlreadyExistsException byId(UUID readStatusId) {
+    public static ReadStatusAlreadyExistsException byUserAndChannelId(UUID userId, UUID channelId) {
         ReadStatusAlreadyExistsException readStatusAlreadyException = new ReadStatusAlreadyExistsException();
-        readStatusAlreadyException.updateDetail("readStatusId", readStatusId);
+        readStatusAlreadyException.updateDetail("userId", userId);
+        readStatusAlreadyException.updateDetail("channelId", channelId);
         return readStatusAlreadyException;
     }
 
