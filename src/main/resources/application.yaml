@@ -13,8 +13,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 500MB
-      max-request-size: 500MB
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 springdoc:
   swagger-ui:
@@ -26,3 +26,44 @@ springdoc:
 
   api-docs:
     path: /my-api # Swagger가 우리 api의 정보를 얻어오기 위해 요청하는 url
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers #, evn # 꼭 필요한 것만 노출!
+      base-path: /management # 경로도 바꿔서 숨
+
+  endpoint:
+    health:
+      show-details: always # 개발 환경에서는 always, 운영에서는 when-authorized
+  info:
+    env:
+      enabled: true
+
+  server:
+    port: 9020 # Actuator 전용 포트 (방화벽으로 막음)
+
+info:
+  app:
+    name: Discodeit
+    java-version: ${java.version}
+    java-spring-boot-version: 3.4.0
+    encoding: UTF-8
+
+  configs:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}
+
