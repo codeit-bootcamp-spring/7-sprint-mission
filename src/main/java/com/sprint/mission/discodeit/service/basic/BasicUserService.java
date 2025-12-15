@@ -117,20 +117,20 @@ public class BasicUserService implements UserService{
             email = userRequest.newEmail();
             password = userRequest.newPassword();
 
-            // username, email 중복 검사
-            validateUsernameDuplicate(username);
-            validateEmailDuplicate(email);
+            // username, email 중복 검사 (사용자의 기존 정보인 경우 제외)
+            if(!user.getUsername().equals(username)) validateUsernameDuplicate(username);
+            if(!user.getEmail().equals(email)) validateEmailDuplicate(email);
         }
 
         // 선택적 프로필 이미지 처리
         BinaryContent profileImage = saveProfileImage(user.getProfile(), profileRequest);
 
         user.update(username, email, password, profileImage);
-        userRepository.save(user);
+        User saved = userRepository.save(user);
 
-        log.info("사용자 정보 수정 완료: userId = {}, username = {}", user.getId(), user.getUsername());
+        log.info("사용자 정보 수정 완료: userId = {}, username = {}", saved.getId(), saved.getUsername());
 
-        return userMapper.toResponseDto(user);
+        return userMapper.toResponseDto(saved);
     }
 
     @Override
@@ -161,8 +161,7 @@ public class BasicUserService implements UserService{
     private void validateUsernameDuplicate(String username) {
         log.debug("username 중복 검증 시작");
 
-        boolean exists = userRepository.findAll().stream()
-                .anyMatch(u -> u.getUsername().equals(username));
+        boolean exists = userRepository.existsByUsername(username);
 
         if (exists) {
             throw new UsernameAlreadyExistsException(
@@ -175,8 +174,7 @@ public class BasicUserService implements UserService{
     private void validateEmailDuplicate(String email) {
         log.debug("이메일 중복 검증 시작");
 
-        boolean exists = userRepository.findAll().stream().
-                anyMatch(u -> u.getEmail().equals(email));
+         boolean exists = userRepository.existsByEmail(email);
 
         if (exists) {
             throw new EmailAlreadyExistsException(
@@ -206,11 +204,11 @@ public class BasicUserService implements UserService{
                 request.contentType()
         );
 
-        binaryContentRepository.save(newProfile);
-        binaryContentStorage.put(newProfile.getId(), request.bytes());
+        BinaryContent saved = binaryContentRepository.save(newProfile);
+        binaryContentStorage.put(saved.getId(), request.bytes());
 
-        log.info("프로필 이미지 저장 완료: {}", newProfile.getFileName());
+        log.info("프로필 이미지 저장 완료: {}", saved.getFileName());
 
-        return newProfile;
+        return saved;
     }
 }
