@@ -9,8 +9,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.global.exception.CustomException;
-import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.discodietException.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.global.exception.discodietException.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -51,10 +52,10 @@ public class BasicMessageService implements MessageService {
                                             List<CreateBinaryContentDto> createBinaryContentDtos) {
 
         User author = userRepository.findById(createMessageDto.authorId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> UserNotFoundException.byId(createMessageDto.authorId()));
 
         Channel channel = channelRepository.findById(createMessageDto.channelId())
-                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> ChannelNotFoundException.byId(createMessageDto.channelId()));
 
         List<BinaryContent> attachments;
         if (createBinaryContentDtos == null) {
@@ -67,9 +68,8 @@ public class BasicMessageService implements MessageService {
                                 .size(createBinaryContentDto.size())
                                 .contentType(createBinaryContentDto.contentType())
                                 .build();
-
-                        binaryContentStorage.put(binaryContent.getId(), createBinaryContentDto.bytes());
                         binaryContentRepository.save(binaryContent);
+                        binaryContentStorage.put(binaryContent.getId(), createBinaryContentDto.bytes());
 
                         return binaryContent;
                     }
@@ -92,7 +92,7 @@ public class BasicMessageService implements MessageService {
     @Transactional(readOnly = true)
     public MessageResponseDto getMessage(UUID messageId) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
+                .orElseThrow(() -> MessageNotFoundException.byId(messageId));
 
         return messageMapper.toResponseDto(message);
     }
@@ -125,10 +125,9 @@ public class BasicMessageService implements MessageService {
     @Transactional
     public MessageResponseDto updateMessage(UUID messageId, UpdateMessageDto updateMessageDto) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
+                .orElseThrow(() -> MessageNotFoundException.byId(messageId));
 
         message.messageUpdate(updateMessageDto.newContent());
-        messageRepository.save(message);
 
         return messageMapper.toResponseDto(message);
     }
@@ -137,7 +136,7 @@ public class BasicMessageService implements MessageService {
     @Transactional
     public void deleteMessage(UUID messageId) {
         if (!messageRepository.existsById(messageId))
-            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
+            throw MessageNotFoundException.byId(messageId);
 
         messageRepository.deleteById(messageId);
     }

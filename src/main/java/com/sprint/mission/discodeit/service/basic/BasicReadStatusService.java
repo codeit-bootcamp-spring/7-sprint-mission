@@ -6,8 +6,10 @@ import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponseDt
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.global.exception.CustomException;
-import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.discodietException.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.global.exception.discodietException.readStatus.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.global.exception.discodietException.readStatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -32,16 +34,17 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public ReadStatusResponseDto createReadStatus(CreateReadStatusDto createReadStatusDto) {
         User user = userRepository.findById(createReadStatusDto.userId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> UserNotFoundException.byId(createReadStatusDto.userId()));
 
         Channel channel = channelRepository.findById(createReadStatusDto.channelId())
-                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> ChannelNotFoundException.byId(createReadStatusDto.channelId()));
 
+        // TODO: 성능 낭비로 코드 개선
         if (readStatusRepository.findAllByUserId(createReadStatusDto.userId())
                 .stream().anyMatch(
                         readStatus -> readStatus.getChannel().getId()
                                 .equals(createReadStatusDto.channelId()))) {
-            throw new CustomException(ErrorCode.READ_STATUS_ALREADY_EXIST);
+            throw ReadStatusAlreadyExistsException.byUserAndChannelId(createReadStatusDto.userId(), createReadStatusDto.channelId());
         }
 
         ReadStatus readStatus = ReadStatus.builder()
@@ -59,7 +62,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public ReadStatusResponseDto getReadStatus(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new CustomException(ErrorCode.READ_STATUS_NOT_FOUND));
+                .orElseThrow(() -> ReadStatusNotFoundException.byId(readStatusId));
 
         return ReadStatusResponseDto.from(readStatus);
     }
@@ -76,7 +79,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public ReadStatusResponseDto updateReadStatus(UUID readStatusId, UpdateReadStatusDto updateReadStatusDto) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new CustomException(ErrorCode.READ_STATUS_NOT_FOUND));
+                .orElseThrow(() -> ReadStatusNotFoundException.byId(readStatusId));
         readStatus.update(updateReadStatusDto.newLastReadAt());
 
         return ReadStatusResponseDto.from(readStatus);
@@ -86,7 +89,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public void deleteReadStatus(UUID readStatusId) {
         if (!readStatusRepository.existsById(readStatusId)) {
-            throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
+            throw ReadStatusNotFoundException.byId(readStatusId);
         }
         readStatusRepository.deleteById(readStatusId);
     }

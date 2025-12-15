@@ -8,8 +8,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.enums.ChannelType;
-import com.sprint.mission.discodeit.global.exception.CustomException;
-import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.discodietException.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.global.exception.discodietException.channel.PrivateChannelUpdateException;
+import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -58,7 +59,7 @@ public class BasicChannelService implements ChannelService {
 
         createPrivateChannelDto.participantIds().forEach(userId -> {
             User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                    .orElseThrow(() -> UserNotFoundException.byId(userId));
 
             ReadStatus readStatus = ReadStatus.builder()
                     .user(user)
@@ -77,7 +78,7 @@ public class BasicChannelService implements ChannelService {
     @Transactional(readOnly = true)
     public ChannelResponseDto getChannel(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> ChannelNotFoundException.byId(channelId));
 
         return channelMapper.toResponseDto(channel);
     }
@@ -88,7 +89,7 @@ public class BasicChannelService implements ChannelService {
         // user가 참여한 채널 ID 조회
         List<UUID> channelIds = readStatusRepository.findAllByUserIdWithChannel(userId)
                 .stream()
-                .map(rs -> rs.getChannel().getId())
+                .map(readStatus -> readStatus.getChannel().getId())
                 .toList();
 
         // channelIds(참여 채널들) + PUBLIC 채널 조회
@@ -106,10 +107,10 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelResponseDto updateChannel(UUID channelId, UpdateChannelDto updateChannelDto) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> ChannelNotFoundException.byId(channelId));
 
         if (channel.getType().equals(ChannelType.PRIVATE)) {
-            throw new CustomException(ErrorCode.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED);
+            throw PrivateChannelUpdateException.notAllowed(channelId);
         }
 
         channel.updateChannel(updateChannelDto.newName(), updateChannelDto.newDescription());
@@ -121,10 +122,10 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public void deleteChannel(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> ChannelNotFoundException.byId(channelId));
 
         // 채널이 삭제되면, 연관 데이터 readStatus, message도 삭제
-        channelRepository.deleteById(channelId);
+        channelRepository.delete(channel);
         readStatusRepository.deleteAllByChannelId(channelId);
         messageRepository.deleteAllByChannelId(channelId);
 
