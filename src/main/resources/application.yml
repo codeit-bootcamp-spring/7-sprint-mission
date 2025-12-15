@@ -30,6 +30,7 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
     root: info
+    #    org.springframework.transaction: debug
 
 #  file:
 #    name: app.log
