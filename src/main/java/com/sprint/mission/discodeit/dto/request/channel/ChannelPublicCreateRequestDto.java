@@ -14,6 +14,7 @@ public record ChannelPublicCreateRequestDto(
         @NotBlank(message = "Public Channel name")
         String name,
 
+        @NotBlank(message = "Public Channel description")
         String description
 ) {
 
