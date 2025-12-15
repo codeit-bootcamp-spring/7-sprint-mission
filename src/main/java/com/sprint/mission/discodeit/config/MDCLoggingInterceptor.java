@@ -7,16 +7,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.UUID;
+
 @Configuration
 public class MDCLoggingInterceptor implements HandlerInterceptor {
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        MDC.put("request_id", request.getHeader("X-Request-Id"));
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        String requestId = UUID.randomUUID().toString();
+        MDC.put("requestId", requestId);
+        MDC.put("requestUri", request.getRequestURI());
+        MDC.put("requestMethod", request.getMethod());
+        response.setHeader("Discodeit-Request-Id", requestId);
+        return true;
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex){
         MDC.clear();
     }
 
