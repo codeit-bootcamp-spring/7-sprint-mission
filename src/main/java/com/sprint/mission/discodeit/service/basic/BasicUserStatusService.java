@@ -32,15 +32,6 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusMapper userStatusMapper;
 
     @Override
-    public void updateByUserId(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(()-> new UserNotExistException(userId));
-        UUID userStatusId = user.getUserStatus().getId();
-        UserStatus userStatus = userStatusRepository.findById(userStatusId).orElseThrow(()->new UserStatusNotExistException(userStatusId));
-        userStatusRepository.save(userStatus);
-
-    }
-
-    @Override
     @Transactional
     public UserStatusDto createUserStatus(UserStatusCreateRequestDto userStatusCreateRequestDto) {
         UUID userId = userStatusCreateRequestDto.userId();
@@ -68,8 +59,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     public UserStatusDto patchUserStatus(UUID userId, UserStatusPatchRequestDto dto) {
         User user = userRepository.findById(userId).orElseThrow(()->new UserNotExistException(userId));
-        UserStatus userStatus = userStatusRepository.findAll().stream().filter(x->x.getUser().getId()
-                .equals(userId)).findFirst()
+        UserStatus userStatus = userStatusRepository.findAll().stream().filter(x->x.getUser().getId().equals( userId)).findFirst()
                 .orElseThrow(()->new UserStatusNotMatchException(userId));
         userStatus.setLastActiveAt(dto.newLastActiveAt());
         userStatusRepository.save(userStatus);
