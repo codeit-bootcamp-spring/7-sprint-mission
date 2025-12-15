@@ -5,8 +5,10 @@ import com.sprint.mission.discodeit.dto.request.authService.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.login.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
@@ -50,10 +53,10 @@ class AuthServiceIntegrationTest {
 
     @Test
     @DisplayName("[예외 케이스] DB에 없는 유저 로그인")
-    void checkLoginNotValidUser() throws IOException {
+    void checkLoginNotValidUser() {
 
-        assertThrows(IllegalArgumentException.class, () -> authService.checkLoginUser(new LoginRequestDto("notValidUser"
-                , "notValidPassword")));
+        assertThatThrownBy(()->authService.checkLoginUser(new LoginRequestDto("not_exist_user","123456")))
+                .isInstanceOf(UserNotExistException.class);
 
     }
 }
