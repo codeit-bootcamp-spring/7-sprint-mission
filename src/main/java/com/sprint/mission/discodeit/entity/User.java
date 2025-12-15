@@ -70,10 +70,10 @@ public class User extends BaseUpdatableEntity{
         String str = super.toString();
 
         return "User{" +
-                "userId='" + username + '\'' +
+                str +
+                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                str +
                 '}';
     }
 }
