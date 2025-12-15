@@ -1,8 +1,8 @@
 -- channel 테이블 추가
 CREATE TABLE channels (
     id          uuid,
-	created_at  timestamptz NOT NULL,
-	updated_at  timestamptz,
+	created_at  timestamp with time zone NOT NULL,
+	updated_at  timestamp with time zone,
 	name        varchar(100),
 	description varchar(500),
 	type        varchar(10) NOT NULL,
@@ -14,11 +14,10 @@ CREATE TABLE channels (
 -- binary_contents 테이블 추가
 CREATE TABLE binary_contents (
 	id           uuid,
-	created_at   timestamptz NOT NULL,
+	created_at   timestamp with time zone NOT NULL,
 	file_name    varchar(255) NOT NULL,
 	size         bigint NOT NULL,
 	content_type varchar(100) NOT NULL,
-	bytes        bytea NOT NULL,
 
 	PRIMARY KEY (id)
 );
@@ -26,8 +25,8 @@ CREATE TABLE binary_contents (
 -- user 테이블 추가
 CREATE TABLE users (
 	id          uuid,
-	created_at  timestamptz NOT NULL,
-	updated_at  timestamptz,
+	created_at  timestamp with time zone NOT NULL,
+	updated_at  timestamp with time zone,
 	username    varchar(50) NOT NULL UNIQUE,
 	email       varchar(100) NOT NULL UNIQUE,
 	password    varchar(60) NOT NULL,
@@ -41,10 +40,10 @@ CREATE TABLE users (
 -- user_statuses 테이블 추가
 CREATE TABLE user_statuses (
 	id             uuid,
-	created_at     timestamptz NOT NULL,
-	updated_at     timestamptz,
+	created_at     timestamp with time zone NOT NULL,
+	updated_at     timestamp with time zone,
 	user_id        uuid        NOT NULL UNIQUE,
-	last_active_at timestamptz NOT NULL,
+	last_active_at timestamp with time zone NOT NULL,
 
 	PRIMARY KEY (id),
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
@@ -53,11 +52,11 @@ CREATE TABLE user_statuses (
 -- read_statuses 테이블 생성
 CREATE TABLE read_statuses (
 	id           uuid,
-	created_at   timestamptz NOT NULL,
-	updated_at   timestamptz,
+	created_at   timestamp with time zone NOT NULL,
+	updated_at   timestamp with time zone,
 	user_id      uuid NOT NULL,
 	channel_id   uuid NOT NULL,
-	last_read_at timestamptz NOT NULL,
+	last_read_at timestamp with time zone NOT NULL,
 
 	PRIMARY KEY (id),
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
@@ -68,8 +67,8 @@ CREATE TABLE read_statuses (
 -- messages 테이블 생성
 CREATE TABLE messages (
 	id         uuid,
-	created_at timestamptz NOT NULL,
-	updated_at timestamptz,
+	created_at timestamp with time zone NOT NULL,
+	updated_at timestamp with time zone,
 	content    text,
 	channel_id uuid NOT NULL,
 	author_id  uuid,
