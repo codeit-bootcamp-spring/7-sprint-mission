@@ -66,7 +66,10 @@ class UserServiceTest {
             when(userRepository.save(any(User.class)))
                     .thenReturn(testUser);
 
-            UserDto result = new UserDto(null, "test", "test@codeit.com", null, null);
+            UserDto result = UserDto.builder()
+                    .username("test")
+                    .email("test@codeit.com")
+                    .build();
             when(userMapper.toDto(any(User.class))).thenReturn(result);
 
             // when
@@ -138,22 +141,26 @@ class UserServiceTest {
                     .build();
             ReflectionTestUtils.setField(user, "id", userId);
 
-            UserUpdateRequest update = new UserUpdateRequest("newName", "new@email.com", null);
+            UserUpdateRequest update
+                    = new UserUpdateRequest("newName", "new@email.com", null);
 
             when(userRepository.findById(userId)).thenReturn(Optional.of(user));
             when(userRepository.findByEmail(update.newEmail())).thenReturn(Optional.empty());
             when(userRepository.findByUsername(update.newUsername())).thenReturn(Optional.empty());
 
 
-            UserDto result = new UserDto(null, "newName", "new@email.com", null, null);
+            UserDto result = UserDto.builder()
+                    .username("newName")
+                    .email("new@email.com")
+                    .build();
             when(userMapper.toDto(any(User.class))).thenReturn(result);
 
             // when
             userService.updateUserInfo(userId, update, null);
 
             // then
-            assertThat(result.email()).isEqualTo(update.newEmail());
-            assertThat(result.username()).isEqualTo(update.newUsername());
+            assertThat(result.email()).isEqualTo("new@email.com");
+            assertThat(result.username()).isEqualTo("newName");
             verify(userRepository, times(1)).findByEmail("new@email.com");
             verify(userRepository, times(1)).findByUsername("newName");
             verify(userMapper, times(1)).toDto(any(User.class));

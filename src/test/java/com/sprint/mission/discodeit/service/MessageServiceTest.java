@@ -83,8 +83,11 @@ class MessageServiceTest {
             when(channelRepository.findById(channelId)).thenReturn(Optional.of(testChannel));
 
             MessageDto result
-                    = new MessageDto(null, null, null, "test",
-                    channelId, userDto, null);
+                    = MessageDto.builder()
+                    .content("test")
+                    .channelId(channelId)
+                    .author(userDto)
+                    .build();
             when(messageMapper.toDto(any(Message.class))).thenReturn(result);
 
             // when
@@ -148,7 +151,8 @@ class MessageServiceTest {
             MessageCreateRequest request = MessageCreateRequest.builder()
                     .authorId(userId)
                     .channelId(channelId)
-                    .content("test").build();
+                    .content("test")
+                    .build();
             when(channelRepository.findById(channelId)).thenReturn(Optional.empty());
             // when & then
             assertThatThrownBy(() -> messageService.createMessage(request, null))
@@ -179,10 +183,13 @@ class MessageServiceTest {
             MessageUpdateRequest request = MessageUpdateRequest.builder()
                     .newContent("new").build();
 
-            UserDto userDto = new UserDto(userId, null, null, null, null);
-            MessageDto result
-                    = new MessageDto(messageId, null, null, "new",
-                    channelId, userDto, null);
+            UserDto userDto = UserDto.builder().id(userId).build();
+            MessageDto result = MessageDto.builder()
+                    .id(messageId)
+                    .content("new")
+                    .author(userDto)
+                    .channelId(channelId)
+                    .build();
             when(messageMapper.toDto(any(Message.class))).thenReturn(result);
 
             // when

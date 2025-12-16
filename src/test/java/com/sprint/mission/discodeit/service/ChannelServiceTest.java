@@ -52,8 +52,11 @@ class ChannelServiceTest {
             Channel testChannel = new Channel("공개채널", "공지사항", ChannelType.PUBLIC);
             when(channelRepository.save(any(Channel.class))).thenReturn(testChannel);
 
-            ChannelDto result
-                    = new ChannelDto(null, ChannelType.PUBLIC, "공개채널", "공지사항", null, null);
+            ChannelDto result = ChannelDto.builder()
+                    .name("공개채널")
+                    .description("공지사항")
+                    .type(ChannelType.PUBLIC)
+                    .build();
             when(channelMapper.toDto(any(Channel.class))).thenReturn(result);
 
             // when
@@ -76,8 +79,7 @@ class ChannelServiceTest {
             Channel testChannel = new Channel(null, null, ChannelType.PRIVATE);
             when(channelRepository.save(any(Channel.class))).thenReturn(testChannel);
 
-            ChannelDto result
-                    = new ChannelDto(null, ChannelType.PRIVATE, null, null, null, null);
+            ChannelDto result = ChannelDto.builder().type(ChannelType.PRIVATE).build();
             when(channelMapper.toDto(any(Channel.class))).thenReturn(result);
 
             // when
@@ -107,7 +109,12 @@ class ChannelServiceTest {
 
             PublicChannelUpdateRequest request = new PublicChannelUpdateRequest("newName", "newDesc");
 
-            ChannelDto result = new ChannelDto(channelId, ChannelType.PUBLIC, "newName", "newDesc", null, null);
+            ChannelDto result = ChannelDto.builder()
+                    .id(channelId)
+                    .type(ChannelType.PUBLIC)
+                    .name("newName")
+                    .description("newDesc")
+                    .build();
             when(channelMapper.toDto(any(Channel.class))).thenReturn(result);
 
             // when
