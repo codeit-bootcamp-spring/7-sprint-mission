@@ -82,6 +82,13 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> UserNotFoundException.byId(userId));
 
+        if (userRepository.findByUsername(updateUserDto.newUsername()).isPresent()) {
+            throw UserAlreadyExistsException.byUsername(updateUserDto.newUsername());
+        }
+        if (userRepository.findByEmail(updateUserDto.newEmail()).isPresent()) {
+            throw UserAlreadyExistsException.byEmail(updateUserDto.newEmail());
+        }
+
         BinaryContent profile = createBinaryContentDto
                 .map(this::saveBinaryContent)
                 .orElse(null);
