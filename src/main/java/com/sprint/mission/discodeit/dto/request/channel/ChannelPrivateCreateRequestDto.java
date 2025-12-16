@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto.request.channel;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import static com.sprint.mission.discodeit.service.util.StaticString.*;
 
 public record ChannelPrivateCreateRequestDto(
 
-        @NotNull(message = "ChannelPrivate participantIds")
+        @NotEmpty(message = "사설 채널 생성시 유저 목록은 필수값입니다")
         HashSet<UUID> participantIds,
         String name ,
         String description ,

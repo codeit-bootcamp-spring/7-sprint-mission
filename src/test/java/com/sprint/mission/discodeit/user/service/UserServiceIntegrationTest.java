@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -57,7 +58,7 @@ class UserServiceIntegrationTest {
         @Test
         @DisplayName("[정상 케이스] 유저 생성")
         @Transactional
-        void createUser() throws IOException {
+        void createUser(){
             //given
             UserCreateRequestDto userCreateRequestDto = TestFixture.userCreateFactory();
 
@@ -115,6 +116,7 @@ class UserServiceIntegrationTest {
             UserDto userDto = userService.createUser(TestFixture.userCreateFactory(),null);
             UserUpdateRequest userPatchRequestDto = TestFixture.userUpdateFactory();
 
+
             //when
             assertThatThrownBy(()
                     ->userService.patchUser(userDto.id(),userPatchRequestDto,
@@ -157,7 +159,7 @@ class UserServiceIntegrationTest {
         @Test
         @DisplayName("[정상 케이스] 유저 전체 조회")
         @Transactional
-        void findAllUsers() throws IOException {
+        void findAllUsers(){
             //given
             UserCreateRequestDto userCreateRequestDto = TestFixture.userCreateFactory();
             UserCreateRequestDto userCreateRequestDto2 = TestFixture.userCreateFactory();

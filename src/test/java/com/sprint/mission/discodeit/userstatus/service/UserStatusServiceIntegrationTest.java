@@ -38,7 +38,7 @@ class UserStatusServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] userstatus 변경")
-    void patchUserStatus() throws IOException {
+    void patchUserStatus(){
 
         //given
         UserCreateRequestDto userDto1 = TestFixture.userCreateFactory();

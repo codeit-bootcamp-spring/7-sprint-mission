@@ -17,10 +17,10 @@ public record MessageCreateRequestDto(
 
         String content,
 
-        @NotNull(message = "message author id")
+        @NotNull(message = "작성자 id는 필수값입니다")
         UUID authorId,
 
-        @NotNull(message = "message channel id")
+        @NotNull(message = "채널 id는 필수값입니다")
         UUID channelId
 ) {
 

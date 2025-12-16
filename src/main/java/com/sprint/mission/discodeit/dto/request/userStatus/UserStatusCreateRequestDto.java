@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public record UserStatusCreateRequestDto(
 
-        @NotNull(message = "UserStatus userId")
+        @NotNull(message = "유저 id는 필수값입니다")
         UUID userId,
 
         Instant lastOnlineTime

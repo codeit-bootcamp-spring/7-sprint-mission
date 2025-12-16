@@ -42,7 +42,7 @@ class ReadStatusServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] readStatus 생성")
-    void createReadStatus() throws IOException {
+    void createReadStatus(){
         //given
         UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
         ChannelDto privateChannel = channelService.createPrivateChannel(new ChannelPrivateCreateRequestDto(
@@ -62,7 +62,7 @@ class ReadStatusServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] 유저 id로 조회")
-    void findAllyByUserId() throws IOException {
+    void findAllyByUserId() {
         //given
         UserDto userDto =userService.createUser(TestFixture.userCreateFactory(),null);
         ChannelDto publicChannel = channelService.createPublicChannel(TestFixture.channelPublicCreateFactory());
@@ -99,7 +99,7 @@ class ReadStatusServiceIntegrationTest {
 
     @Test
     @DisplayName("[정상 케이스] readStatus 변경")
-    void patchReadStatus() throws IOException {
+    void patchReadStatus() {
         //given
         UserDto user = userService.createUser(TestFixture.userCreateFactory(), null);
         ChannelDto privateChannel = channelService.createPrivateChannel(new ChannelPrivateCreateRequestDto(

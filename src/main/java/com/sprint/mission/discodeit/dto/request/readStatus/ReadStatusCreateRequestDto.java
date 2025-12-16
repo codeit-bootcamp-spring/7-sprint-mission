@@ -11,10 +11,10 @@ import java.util.UUID;
 
 public record ReadStatusCreateRequestDto(
 
-        @NotNull(message = "ReadStatus channel id")
+        @NotNull(message = "ReadStatus 채널 id는 필수값입니다")
         UUID channelId,
 
-        @NotNull(message = "ReadStatus user id")
+        @NotNull(message = "ReadStatus 유저 id는 필수값입니다")
         UUID userId,
 
         Instant lastReadAt
