@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    // 이메일(아이디) 중복 확인용
+    // 이메일 중복 확인용
     Optional<User> findByEmail(String email);
 
     // 닉네임 중복 확인용
@@ -18,5 +18,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.profile " +
             "LEFT JOIN FETCH u.status")
-    List<User> findAllWithProfile();
+    List<User> findAllWithProfileAndStatus();
 }

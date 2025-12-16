@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> findAllUsers() {
-        return userRepository.findAllWithProfile().stream()
+        return userRepository.findAllWithProfileAndStatus().stream()
                 .map(userMapper::toDto).collect(Collectors.toList());
     }
 
