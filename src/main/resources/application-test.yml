@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -12,7 +12,14 @@ spring:
     properties:
       hibernate:
         format_sql: true # SQL 포맷팅
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        generate_statistics: true
 
   h2:
     console:
       enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
