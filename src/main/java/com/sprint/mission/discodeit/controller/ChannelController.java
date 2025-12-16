@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.response.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
+@Slf4j
 public class ChannelController {
     private final ChannelService channelService;
 
@@ -23,6 +25,7 @@ public class ChannelController {
     @ResponseStatus(HttpStatus.CREATED)
     public ChannelResponseDto createPublic(
             @Valid @RequestBody PublicChannelCreateRequestDto requestDto) {
+        log.debug("Received request to create public channel.");
         return channelService.createPublic(requestDto);
     }
 
@@ -30,12 +33,14 @@ public class ChannelController {
     @ResponseStatus(HttpStatus.CREATED)
     public ChannelResponseDto createPrivate(
             @Valid @RequestBody PrivateChannelCreateRequestDto requestDto) {
+        log.debug("Received request to create private channel.");
         return channelService.createPrivate(requestDto);
     }
 
     @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
     public ChannelResponseDto update(@Valid @RequestBody ChannelUpdateRequestDto requestDto,
                                      @PathVariable("channelId") UUID channelId) {
+        log.debug("Received request to update channel.");
         return channelService.update(channelId, requestDto);
     }
 /*
@@ -49,12 +54,14 @@ public class ChannelController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
     public void delete(@PathVariable("channelId") UUID channelId) {
+        log.debug("Received request to delete channel.");
         channelService.delete(channelId);
     }
     
     @RequestMapping(method = RequestMethod.GET)
     public List<ChannelResponseDto> getAllByUserId(
             @RequestParam(name = "userId") UUID userId) {
+        log.debug("Received request to get all channels by user id.");
         return channelService.getAllByUserId(userId);
     }
 

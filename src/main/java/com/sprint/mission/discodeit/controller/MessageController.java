@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.response.page.PageResponseDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RequestMapping("/api/messages")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MessageController {
     private final MessageService messageService;
 
@@ -29,22 +31,26 @@ public class MessageController {
     public MessageResponseDto create(
             @Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto messageCreateRequestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
+        log.debug("Received request to create message.");
         return messageService.create(messageCreateRequestDto, attachments);
     }
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.GET)
     public MessageResponseDto get(@PathVariable("messageId") UUID messageId) {
+        log.debug("Received request to get message.");
         return messageService.get(messageId);
     }
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
     public MessageResponseDto update(@PathVariable("messageId") UUID messageId,
                                      @Valid @RequestBody MessageUpdateRequestDto messageUpdateRequestDto) {
+        log.debug("Received request to update message.");
         return messageService.update(messageId, messageUpdateRequestDto);
     }
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
     public void delete(@PathVariable("messageId") UUID messageId) {
+        log.debug("Received request to delete message.");
         messageService.delete(messageId);
     }
 
@@ -67,6 +73,7 @@ public class MessageController {
                     direction = Sort.Direction.DESC
             ) Pageable pageable
     ) {
+        log.debug("Received request to get all messages.");
         return messageService.getPageByChannelId(channelId, pageable);
     }
 }
