@@ -48,7 +48,7 @@ info:
   app:
     name: Discodeit
     java-version: ${java.version}
-    java-spring-boot-version: 3.4.0
+    java-spring-boot-version: 3.4.10
     encoding: UTF-8
 
   configs:

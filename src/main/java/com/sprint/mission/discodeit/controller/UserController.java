@@ -9,11 +9,11 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,8 +32,9 @@ public class UserController {
             @Valid @RequestPart("userCreateRequest") UserCreateRequest userRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profileImage
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userService.createUser(userRequestDto, profileImage));
+        UserDto userDto = userService.createUser(userRequestDto, profileImage);
+        return ResponseEntity.created(URI.create("/api/users/" + userDto.id()))
+                .body(userDto);
     }
 
     // 사용자 전체 조회 (/users)
