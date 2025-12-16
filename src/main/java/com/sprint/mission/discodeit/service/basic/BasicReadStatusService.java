@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
@@ -32,6 +34,8 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusResponseDto create(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
         UUID userId = Objects.requireNonNull(readStatusCreateRequestDto.userId());
         UUID channelId = Objects.requireNonNull(readStatusCreateRequestDto.channelId());
+
+        log.debug("Creating read status: userId {} ", userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
@@ -49,12 +53,14 @@ public class BasicReadStatusService implements ReadStatusService {
 
         ReadStatus readstatus = new ReadStatus(user, channel, readAt);
         ReadStatus save = readStatusRepository.save(readstatus);
+        log.info("유저 읽기 상태가 생성되었습니다.");
 
         return readStatusMapper.toDto(save);
     }
 
     @Override
     public ReadStatusResponseDto get(UUID id) {
+        log.debug("Getting read status: readStatus Id = {} ", id);
         ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
         return readStatusMapper.toDto(readStatus);
@@ -62,6 +68,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public List<ReadStatusResponseDto> getAllByUserId(UUID userId) {
+        log.debug("Getting read status by userId: userId = {} ", userId);
         return readStatusRepository.findAllByUserId(Objects.requireNonNull(userId))
                 .stream()
                 .map(rs -> readStatusMapper.toDto(rs))
@@ -71,6 +78,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     @Override
     public ReadStatusResponseDto update(UUID id, ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
+        log.debug("Updating read status: readStatus Id = {} ", id);
         ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
 
@@ -82,15 +90,18 @@ public class BasicReadStatusService implements ReadStatusService {
         }
 
         ReadStatus save = readStatusRepository.save(readStatus);
+        log.info("유저 읽기 상태가 수정되었습니다.");
         return readStatusMapper.toDto(save);
     }
 
     @Transactional
     @Override
     public boolean delete(UUID id) {
+        log.debug("Deleting read status: readStatus Id = {} ", id);
         ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
         readStatusRepository.delete(readStatus);
+        log.info("유저 읽기 상태가 제거되었습니다.");
         return true;
     }
 }

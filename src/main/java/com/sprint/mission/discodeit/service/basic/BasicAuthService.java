@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
@@ -29,7 +31,9 @@ public class BasicAuthService implements AuthService {
     @Transactional
     @Override
     public UserResponseDto login(AuthLoginRequestDto authLoginRequestDto) {
+        log.debug("Login Request");
         if (authLoginRequestDto == null) {
+            log.warn("Auth Login rejected: Invalid request");
             throw new IllegalArgumentException("Invalid request");
         }
         String username = authLoginRequestDto.username() == null ? "" : authLoginRequestDto.username().trim();
@@ -41,6 +45,7 @@ public class BasicAuthService implements AuthService {
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
         if(user.passwordMatch(password)) {
+            log.debug("Checking password for user: username = {}", username);
             throw new IllegalArgumentException("Wrong password.");
         }
 
@@ -50,13 +55,16 @@ public class BasicAuthService implements AuthService {
                 }, () -> userStatusRepository.save(new UserStatus(user))
                 );
 
+        log.info("로그인에 성공하였습니다.");
         return userMapper.toDto(user, true);
     }
 
     @Transactional
     @Override
     public void logout(UUID userId) {
+        log.debug("Logout Request");
         if(userId == null) {
+            log.warn("Logout rejected: Invalid request");
             throw new IllegalArgumentException("Invalid request");
         }
 
@@ -68,5 +76,6 @@ public class BasicAuthService implements AuthService {
             status.setLastActiveAt(past);
         } );
 
+        log.info("로그아웃에 성공하였습니다.");
     }
 }

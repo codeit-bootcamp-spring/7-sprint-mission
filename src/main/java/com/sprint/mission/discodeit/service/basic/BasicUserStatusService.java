@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
@@ -30,13 +32,16 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatusResponseDto create(UserStatusCreateRequestDto userStatusCreateRequestDto) {
         UUID userId = Objects.requireNonNull(userStatusCreateRequestDto.userId());
 
+        log.debug("Creating user status: userId = {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
         if(user == null) {
             throw new IllegalArgumentException("User not found");
         }
+
         if(userStatusRepository.existsByUserId(userId)) {
+            log.warn("Create user status rejected: already exists: userId = {}", userId);
             throw new IllegalStateException("UserStatus already exists");
         }
 
@@ -47,6 +52,7 @@ public class BasicUserStatusService implements UserStatusService {
         userStatus.setLastActiveAt(statusAt);
 
         UserStatus save = userStatusRepository.save(userStatus);
+        log.info("유저 상태가 생성되었습니다.");
 
         return userStatusMapper.toDto(save);
     }
@@ -55,6 +61,9 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusResponseDto update(UserStatusUpdateRequestDto userStatusUpdateRequestDto) {
         UUID id = Objects.requireNonNull(userStatusUpdateRequestDto.id());
+
+        log.debug("Updating user status. user statusId = {}", id);
+
         UserStatus userStatus = userStatusRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
 
@@ -66,12 +75,15 @@ public class BasicUserStatusService implements UserStatusService {
 
         UserStatus save = userStatusRepository.save(userStatus);
 
+        log.info("유저 상태가 변경되었습니다.");
         return userStatusMapper.toDto(save);
     }
 
     @Transactional
     @Override
-    public UserStatusResponseDto updateByUserId(UUID userId, UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
+    public UserStatusResponseDto updateByUserId(UUID userId,
+                                                UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
+        log.debug("Updating user status by user id {}", userId);
         UserStatus userStatus = userStatusRepository.findByUserId(Objects.requireNonNull(userId))
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
 
@@ -87,6 +99,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusResponseDto get(UUID id) {
+        log.debug("Getting user status {}", id);
         UserStatus userStatus = userStatusRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
 
@@ -95,6 +108,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public List<UserStatusResponseDto> getAll() {
+        log.debug("Getting all user status");
         List<UserStatus> all = userStatusRepository.findAll();
 
         return all.stream().map(userStatus -> userStatusMapper.toDto(userStatus))
@@ -104,10 +118,12 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     @Override
     public boolean delete(UUID id) {
-        if(!userStatusRepository.existsByUserId(id)) {
+        log.debug("Deleting user status: userStatusId = {}", id);
+        if(!userStatusRepository.existsById(id)) {
             return false;
         }
         userStatusRepository.deleteById(Objects.requireNonNull(id));
+        log.info("유저 상태가 제거되었습니다.");
         return true;
     }
 }

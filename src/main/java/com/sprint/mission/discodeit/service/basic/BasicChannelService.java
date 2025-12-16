@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
@@ -37,6 +39,11 @@ public class BasicChannelService implements ChannelService {
                 channelCreateRequestDto.type() == null ?
                         ChannelType.PUBLIC : channelCreateRequestDto.type();
 
+        log.debug("Creating Public Channel. name = {}, type = {}, slowMode = {}, hasDescription = {}",
+                channelCreateRequestDto.name(), channelType, slowMode,
+                channelCreateRequestDto.description() != null);
+
+
         Channel channel = new Channel(
                 channelType,
                 channelCreateRequestDto.name(),
@@ -48,6 +55,7 @@ public class BasicChannelService implements ChannelService {
         Channel save = channelRepository.save(channel);
         List<User> userList = participants(save);
 
+        log.info("채널이 생성되었습니다.");
         return channelMapper.toDto(save,lastMessageAt(save),userList,userOnlineMap(userList));
     }
 
@@ -60,6 +68,8 @@ public class BasicChannelService implements ChannelService {
         ChannelType channelType =
                 channelCreateRequestDto.type() == null ?
                         ChannelType.PRIVATE : channelCreateRequestDto.type();
+
+        log.debug("Creating Private Channel: type = {}, slowMode = {}", channelType, slowMode);
 
         Channel channel = new Channel(
                 channelType,
@@ -80,19 +90,15 @@ public class BasicChannelService implements ChannelService {
             }
         }
 
-        Instant lastMessageAt = messageRepository.findByChannelId(save.getId())
-                .stream()
-                .map(message -> message.getCreatedAt())
-                .max(Comparator.naturalOrder())
-                .orElse(null);
-
         List<User> userList = participants(save);
 
+        log.info("1:1 채널이 생성되었습니다.");
         return channelMapper.toDto(save,lastMessageAt(save), userList, userOnlineMap(userList));
     }
 
     @Override
     public ChannelResponseDto get(UUID channelId) {
+        log.debug("Getting Channel: channelId = {}", channelId);
         Channel channel = channelRepository.findById(Objects.requireNonNull(channelId))
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
 
@@ -108,6 +114,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelResponseDto> getAll() {
+        log.debug("Getting All Channels");
         return channelRepository.findAll().stream()
                 .map(channel -> channelMapper.toDto(channel,
                         lastMessageAt(channel),
@@ -118,6 +125,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelResponseDto> getAllByUserId(UUID userId) {
+        log.debug("Getting All By User Id: userId = {}", userId);
         List<ReadStatus> users = readStatusRepository.findAllByUserId(userId);
         Set<UUID> joinedChannelIds = new HashSet<>();
         for (ReadStatus readStatus : users) {
@@ -141,30 +149,44 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public ChannelResponseDto update(UUID channelId, ChannelUpdateRequestDto channelUpdateRequestDto) {
+        log.debug("Updating Channel: channelId = {}, hasName = {}, hasDescription = {}, hasSlowMode = {}",
+                channelId, channelUpdateRequestDto.newName() != null,
+                channelUpdateRequestDto.newDescription() != null,
+                channelUpdateRequestDto.slowModeSeconds() != null);
         Channel channel = channelRepository.findById(Objects.requireNonNull(channelId))
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
+
         if(channel.isPrivateChannel()) {
+            log.warn("Update channel rejected: Private channel. channelId = {}", channelId);
             throw new IllegalArgumentException("Private channel is not allowed to update");
         }
+
         if(channelUpdateRequestDto.newName() != null) {
             channel.rename(channelUpdateRequestDto.newName());
+            log.debug("Updating Channel name {} ", channel.getName());
         }
+
         if(channelUpdateRequestDto.newDescription() != null) {
             channel.changeChannelDescription(channelUpdateRequestDto.newDescription());
+            log.debug("Updating Channel description {} ", channel.getDescription());
         }
+
         if(channelUpdateRequestDto.slowModeSeconds() != null) {
             channel.changeSlowModeSeconds(channelUpdateRequestDto.slowModeSeconds());
+            log.debug("Updating Channel description {} ", channel.getDescription());
         }
 
         Channel save = channelRepository.save(channel);
         List<User> userList = participants(channel);
 
+        log.info("채널이 수정되었습니다.");
         return channelMapper.toDto(save,lastMessageAt(save),userList,userOnlineMap(userList));
     }
 
     @Transactional
     @Override
     public void delete(UUID channelId) {
+        log.debug("Deleting Channel: channelId = {}", channelId);
         // 메세지 제거 + 첨부 파일 제거
         List<Message> message = messageRepository.findByChannelId(Objects.requireNonNull(channelId));
         messageRepository.deleteAll(message);
@@ -174,12 +196,14 @@ public class BasicChannelService implements ChannelService {
 
         // 채널 제거
         channelRepository.deleteById(channelId);
+        log.info("채널이 제거되었습니다.");
     }
 
 
     @Transactional
     @Override
     public boolean join(UUID channelId, UUID userId) {
+        log.debug("Joining Channel: channelId = {}, userId = {}", channelId, userId);
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
 
@@ -191,15 +215,18 @@ public class BasicChannelService implements ChannelService {
          }
 
          readStatusRepository.save(new ReadStatus(user, channel, channel.getCreatedAt()));
+        log.info("유저가 채널에 입장하였습니다.");
         return true;
     }
 
     @Transactional
     @Override
     public boolean leave(UUID channelId, UUID userId) {
+        log.debug("Leaving Channel: channelId = {}, userId = {}", channelId, userId);
         return readStatusRepository.findByUserIdAndChannelId(userId, channelId)
                 .map(readStatus -> {
                     readStatusRepository.delete(readStatus);
+                    log.info("유저가 채널을 떠났습니다.");
                     return true;
                 })
                 .orElse(false);
@@ -208,7 +235,9 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public void setSlowModeSeconds(UUID channelId, int slowModeSeconds) {
+        log.debug("Setting Slow Mode Seconds: channelId = {}, slowMode = {}",channelId, slowModeSeconds);
         if(slowModeSeconds < 0) {
+            log.warn("Slow mode rejected: channelId = {}, slowModeSeconds = {}", channelId, slowModeSeconds);
             throw new  IllegalStateException("slowModeSeconds cannot be negative");
         }
         Channel channel = channelRepository.findById(channelId)
@@ -216,6 +245,8 @@ public class BasicChannelService implements ChannelService {
 
         channel.changeSlowModeSeconds(slowModeSeconds);
         channelRepository.save(channel);
+
+        log.info("슬로우모드 설정 완료");
     }
 
     private Instant lastMessageAt(Channel channel) {
@@ -250,7 +281,7 @@ public class BasicChannelService implements ChannelService {
         return userStatusRepository.findAllByUserIdIn(userIds)
                 .stream()
                 .collect(Collectors.toMap(
-                        userStatus -> userStatus.getId(),
+                        userStatus -> userStatus.getUser().getId(),
                         us -> us.isOnlineNow()
                 ));
     }
