@@ -50,12 +50,7 @@ public class BasicUserService implements UserService {
                 .map(this::saveBinaryContent)
                 .orElse(null);
 
-        User user = User.builder()
-                .username(createUserDto.username())
-                .email(createUserDto.email())
-                .password(createUserDto.password())
-                .profile(profile)
-                .build();
+        User user = new User(createUserDto.username(), createUserDto.email(), createUserDto.password(), profile);
 
         userRepository.save(user);
 

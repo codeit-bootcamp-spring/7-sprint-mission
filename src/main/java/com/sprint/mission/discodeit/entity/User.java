@@ -9,7 +9,6 @@ import java.time.Instant;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "users")
 public class User extends BaseUpdatableEntity {
