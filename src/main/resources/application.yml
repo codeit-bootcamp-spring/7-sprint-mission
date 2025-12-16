@@ -28,3 +28,35 @@ springdoc:
     doc-expansion: list
   api-docs:
     path: /my-api
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    encoding: UTF-8
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.0
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    ddl-auto: create
+  storage:
+    type: local
+    local:
+      root-path: ./binaryContents
+  multipart:
+    max-file-size: 10MB
+    max-request-size: 10MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  endpoint:
+    health:
+      show-details: always
+
