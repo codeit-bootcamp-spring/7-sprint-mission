@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
 import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.channel.NotChannelMemberException;
 import com.sprint.mission.discodeit.global.exception.message.MessageNotFoundException;
@@ -11,6 +12,7 @@ import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.PageMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -43,6 +46,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     private final MessageMapper messageMapper;
+    private final PageMapper pageMapper;
 
     private final BinaryContentStorage binaryContentStorage;
 
@@ -126,9 +130,20 @@ public class BasicMessageService implements MessageService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Slice<MessageResponseDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-        return messageRepository.findAllByChannelId(channelId, pageable)
-                .map(message -> messageMapper.toResponseDto(message));
+    public PageResponseDto<MessageResponseDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
+        Slice<MessageResponseDto> messageList;
+
+        if(cursor == null) {
+            messageList = messageRepository.findAllByChannelId(channelId, pageable)
+                    .map(m -> messageMapper.toResponseDto(m));
+
+            return pageMapper.toResponseDto(messageList);
+        }
+
+        messageList = messageRepository.findAllByChannelIdAndCreatedAtBefore(channelId, cursor, pageable)
+                .map(m -> messageMapper.toResponseDto(m));
+
+        return pageMapper.toResponseDto(messageList);
     }
 
     /**

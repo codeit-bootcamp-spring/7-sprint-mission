@@ -4,10 +4,12 @@ import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryConten
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +26,7 @@ public interface MessageService {
     MessageResponseDto find(UUID messageId);
 
     /** 특정 채널에 포함된 모든 메시지 조회 */
-    Slice<MessageResponseDto> findAllByChannelId(UUID channelId, Pageable pageable);
+    PageResponseDto<MessageResponseDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable);
 
     /** 메시지 내용(content)을 수정 */
     MessageResponseDto update(UUID messageId, UpdateMessageRequestDto request);

@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -21,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +32,6 @@ public class MessageController implements MessageControllerDocs {
     private final MessageService messageService;
 
     private final BinaryContentMapper binaryContentMapper;
-    private final PageMapper pageMapper;
 
     // 메시지 생성
     @PostMapping
@@ -78,12 +77,11 @@ public class MessageController implements MessageControllerDocs {
     @GetMapping
     public ResponseEntity<PageResponseDto<MessageResponseDto>> searchMessage(
             @RequestParam UUID channelId,
+            @RequestParam(required = false) Instant cursor,
             @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ){
-        Slice<MessageResponseDto> messageList = messageService.findAllByChannelId(channelId, pageable);
-        PageResponseDto<MessageResponseDto> messageResponse = pageMapper.toResponseDto(messageList);
-
-        return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
+        PageResponseDto<MessageResponseDto> response = messageService.findAllByChannelId(channelId, cursor, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

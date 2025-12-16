@@ -18,8 +18,6 @@ public class PageMapper {
             nextCursor = lastMessage.createdAt();
         }
 
-        System.out.println(nextCursor);
-
         return new PageResponseDto<>(
                 slice.getContent(),
                 nextCursor,
