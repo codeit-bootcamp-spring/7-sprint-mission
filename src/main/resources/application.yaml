@@ -1,28 +1,18 @@
 discodeit:
   storage:
-    type: local       # local일 때만 Bean 등록됨
+    type: local
     local:
-      root-path: .discodeit/storage/data
-  logging:
-    controller:
-      enabled: false # AOP 로깅 ON/OFF
-
-file:
-  path:
-    storage: src/main/resources/Users.ser
+      root-path: .discodeit/storage
 
 spring:
   application:
     name: discodeit
   servlet:
     multipart:
-      maxFileSize: 10MB
-      maxRequestSize: 30MB
+      max-file-size: 10MB
+      max-request-size: 30MB
   profiles:
     active: dev
-
-
-
   jpa:
     database: postgresql
     hibernate:
@@ -35,16 +25,41 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: true
-  # 서버 정보 지정
-  servers:
-    - url: http://localhost:8080
-      description: 로컬 서버
 
 logging:
   level:
     root: info
 
+#Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  info:
+    env:
+      enabled: true # true로 해주지 않으면, info 값은 보이지 않는다.
 
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    java:
+      version: 17
+    springBoot:
+      version: 3.4.0
 
+  config:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}
 
 
