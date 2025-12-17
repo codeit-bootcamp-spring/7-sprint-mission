@@ -52,7 +52,7 @@ public class UserController implements UserControllerDocs {
     @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserResponseDto> updateUser(
             @PathVariable UUID userId,
-            @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
+            @Valid @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
             @RequestPart(name = "profile", required = false) MultipartFile profile
     ) {
         log.info("PATCH /api/users/{} - 사용자 정보 수정 요청", userId);
