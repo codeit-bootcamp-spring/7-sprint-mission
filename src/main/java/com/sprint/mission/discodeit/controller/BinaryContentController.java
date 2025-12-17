@@ -23,8 +23,7 @@ public class BinaryContentController {
 
 
     @GetMapping
-    public ResponseEntity<?> getFile(@RequestParam List<UUID> binaryContentId) {
-
+    public ResponseEntity<List<BinaryContentDto>> getFile(@RequestParam List<UUID> binaryContentId) {
         List<BinaryContentDto> binaryContents = binaryContentService.getBinaryContents(binaryContentId);
         return ResponseEntity.status(HttpStatus.OK).body(binaryContents);
     }

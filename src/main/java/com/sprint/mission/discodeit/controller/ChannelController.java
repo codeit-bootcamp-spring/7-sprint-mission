@@ -41,15 +41,15 @@ public class ChannelController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllChannelByUserId(@RequestParam UUID userId) {
+    public ResponseEntity<List<ChannelDto>> getAllChannelByUserId(@RequestParam UUID userId) {
         List<ChannelDto> allByUser = channelService.getAllByUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(allByUser);
     }
 
     @DeleteMapping("/{channelId}")
-    public ResponseEntity<?> removeChannel(@PathVariable UUID channelId) {
+    public ResponseEntity<Void> removeChannel(@PathVariable UUID channelId) {
         channelService.deleteChannel(channelId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("삭제 성공");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/{channelId}")

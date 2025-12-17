@@ -92,7 +92,7 @@ class MessageRepositoryTest {
     }
 
     @Test
-    @DisplayName("cursor 기준 이전 메시지만 최신순으로 조회된다")
+    @DisplayName("cursor 기준 최신순 조회")
     void findAll_desc_withCursor() {
         // given
         Message m1 = new Message(user, channel, "m1");
@@ -104,7 +104,7 @@ class MessageRepositoryTest {
         em.persist(m3);
         em.flush();
 
-        // 🔑 커서를 m2의 createdAt으로 설정
+        //커서를 m2의 createdAt으로 설정
         Instant cursor = m2.getCreatedAt();
 
         // when

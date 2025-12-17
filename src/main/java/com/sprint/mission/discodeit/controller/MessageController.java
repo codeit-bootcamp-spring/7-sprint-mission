@@ -41,9 +41,9 @@ public class MessageController {
     }
 
     @DeleteMapping("/{messageId}")
-    public ResponseEntity<?> deleteMessage(@PathVariable UUID messageId) {
+    public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
         messageService.deleteMessage(messageId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("삭제 완료");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping

@@ -52,9 +52,9 @@ public class UserController {
 
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User가 성공적으로 삭제됨");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/{userId}/userStatus")
