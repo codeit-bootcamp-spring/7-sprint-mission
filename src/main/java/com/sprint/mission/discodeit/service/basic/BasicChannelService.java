@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.enums.ChannelType;
 import com.sprint.mission.discodeit.global.exception.discodietException.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.discodietException.channel.PrivateChannelUpdateException;
@@ -57,18 +58,27 @@ public class BasicChannelService implements ChannelService {
         Channel channel = Channel.builder().type(ChannelType.PRIVATE).build();
         channelRepository.save(channel);
 
-        createPrivateChannelDto.participantIds().forEach(userId -> {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> UserNotFoundException.byId(userId));
+        // 중복 제거 ParticipantIds
+        // 조회가 되지 않는 user가 존재한다면, throws
+        List<UUID> participantIds = createPrivateChannelDto.participantIds().stream().distinct().toList();
+        List<User> users = userRepository.findAllById(participantIds);
+        List<UUID> foundUserIds = users.stream().map(BaseEntity::getId).toList();
+        List<UUID> notFoundUserIds = participantIds.stream()
+                .filter(participantId -> !foundUserIds.contains(participantId))
+                .toList();
+        if (!notFoundUserIds.isEmpty()) {
+            throw UserNotFoundException.byIds(notFoundUserIds);
+        }
 
-            ReadStatus readStatus = ReadStatus.builder()
-                    .user(user)
-                    .channel(channel)
-                    .lastReadAt(channel.getCreatedAt())
-                    .build();
-
-            readStatusRepository.save(readStatus);
-        });
+        List<ReadStatus> readStatuses = users.stream()
+                .map(user ->
+                        ReadStatus.builder()
+                                .user(user)
+                                .channel(channel)
+                                .lastReadAt(channel.getCreatedAt())
+                                .build())
+                .toList();
+        readStatusRepository.saveAll(readStatuses);
 
         return channelMapper.toResponseDto(channel);
     }
@@ -83,6 +93,9 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toResponseDto(channel);
     }
 
+    // TODO: 여기 부분도 N+1 문제가 심각하게 발생
+    // Return 할 때, 매번 쿼리를 수행하니, 채널만큼 쿼리가 돌아감. 수정 필요
+    // How??
     @Override
     @Transactional(readOnly = true)
     public List<ChannelResponseDto> getAllChannelByUserId(UUID userId) {

@@ -58,6 +58,4 @@ public class User extends BaseUpdatableEntity {
             this.profile = profile;
         }
     }
-
-
 }
