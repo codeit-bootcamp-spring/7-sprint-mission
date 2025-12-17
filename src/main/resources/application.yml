@@ -3,7 +3,7 @@ spring:
     name: discodeit
 
   profiles:
-    active: dev # 기본 dev로 실행되게 설정 (운영 배포시 prod)로 변경
+    active: prod # 기본 dev로 실행되게 설정 (운영 배포시 prod)로 변경
 
   jpa:
     database: postgresql
@@ -20,6 +20,12 @@ spring:
     multipart:
       max-file-size: 1MB
       max-request-size: 10MB
+
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
 
 discodeit:
   storage:
@@ -47,9 +53,6 @@ management:
   info:
     env:
       enabled: true
-
-  server:
-    port: 9090 # Actuator 전용 포트 (방화벽으로 막음)
 
 info:
   app:
