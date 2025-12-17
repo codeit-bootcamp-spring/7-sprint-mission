@@ -211,8 +211,8 @@ class BasicUserServiceTest {
 
             // then
             assertThat(result).isEqualTo(updatedResponseDto);
-            assertThat(result.username()).isEqualTo("updated_test");
-            assertThat(result.email()).isEqualTo("updated@codeit.com");
+            assertThat(result.username()).isEqualTo(updatedResponseDto.username());
+            assertThat(result.email()).isEqualTo(updatedResponseDto.email());
 
             // 실제로 값이 변경되었는가 확인
             assertThat(user.getUsername()).isEqualTo(updateUserDto.newUsername());
