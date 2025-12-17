@@ -6,7 +6,7 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <!--%logger{숫자} : 숫자를 늘리면 패키지 경로를 더 자세하게 출력 가능(30~50자 추천)-->
-            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%X{requestId} | %X{method} | %X{uri}] - %msg%n</pattern>
         </encoder>
         <!-- 콘솔 로그 출력의 문턱은 INFO다. (INFO 레벨보다 낮은 로그는 모두 무시하겠다.) -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -28,7 +28,7 @@
         </rollingPolicy>
 
         <encoder>
-            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%X{requestId} | %X{method} | %X{uri}] - %msg%n</pattern>
         </encoder>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
