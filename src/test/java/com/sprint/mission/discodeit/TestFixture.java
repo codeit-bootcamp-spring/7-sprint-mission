@@ -20,7 +20,7 @@ public class TestFixture {
     public static  UserCreateRequestDto userCreateFactory(){
         return new UserCreateRequestDto(
                 randomString(),
-                randomString(),
+                randomString()+"@"+randomString(),
                 randomString()
         );
     }

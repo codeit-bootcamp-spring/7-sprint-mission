@@ -88,7 +88,7 @@ public class UserControllerSliceTest {
         );
         mockMvc.perform( multipart("/api/users")
                 .file(jsonPart)
-                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
         )
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value("user1"))

@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
@@ -115,7 +116,7 @@ public class MessageControllerSliceTest {
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.details.authorId").value("message author id"))
+                .andExpect(jsonPath("$.details.authorId").value(containsString("작성자")))
                 .andDo(result -> log.info(result.getResponse().getContentAsString()));
 
         then(messageService).should(never()).createMessage(any(MessageCreateRequestDto.class),any());
