@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -86,9 +87,9 @@ public class ChannelServiceUnitTest {
 
         assertThat(response).isEqualTo(channelDto);
 
-        then(channelRepository).should(times(1)).save(any(Channel.class));
-        then(readStatusRepository).should(times(1)).save(any(ReadStatus.class));
-        then(channelMapper).should(times(1)).toDto(any(Channel.class));
+        then(channelRepository).should(times(1)).save(ArgumentCaptor.forClass(Channel.class).capture());
+        then(readStatusRepository).should(times(1)).save(ArgumentCaptor.forClass(ReadStatus.class).capture());
+        then(channelMapper).should(times(1)).toDto(ArgumentCaptor.forClass(Channel.class).capture());
 
     }
 
@@ -116,9 +117,9 @@ public class ChannelServiceUnitTest {
 
         assertThat(response).isEqualTo(channelDto);
 
-        then(channelRepository).should(times(1)).save(any(Channel.class));
-        then(readStatusRepository).should(times(1)).save(any(ReadStatus.class));
-        then(channelMapper).should(times(1)).toDto(any(Channel.class));
+        then(channelRepository).should(times(1)).save(ArgumentCaptor.forClass(Channel.class).capture());
+        then(readStatusRepository).should(times(1)).save(ArgumentCaptor.forClass(ReadStatus.class).capture());
+        then(channelMapper).should(times(1)).toDto(ArgumentCaptor.forClass(Channel.class).capture());
 
     }
 
@@ -147,8 +148,8 @@ public class ChannelServiceUnitTest {
 
         assertThat(response).isEqualTo(channelDto);
 
-        then(channelRepository).should(times(1)).save(any(Channel.class));
-        then(channelMapper).should(times(1)).toDto(any(Channel.class));
+        then(channelRepository).should(times(1)).save(ArgumentCaptor.forClass(Channel.class).capture());
+        then(channelMapper).should(times(1)).toDto(ArgumentCaptor.forClass(Channel.class).capture());
     }
 
     @Test
@@ -160,7 +161,7 @@ public class ChannelServiceUnitTest {
         assertThatThrownBy(()-> channelService.patchChannel(TestFixture.channelPatchFactory(), UUID.randomUUID()))
                 .isInstanceOf(ChannelNotExistException.class);
 
-        then(channelRepository).should(never()).save(any(Channel.class));
+        then(channelRepository).should(never()).save(ArgumentCaptor.forClass(Channel.class).capture());
 
 
     }
@@ -172,7 +173,8 @@ public class ChannelServiceUnitTest {
         willDoNothing().given(channelRepository).deleteById(any(UUID.class));
 
         channelService.deleteChannel(UUID.randomUUID());
-        then(channelRepository).should(times(1)).deleteById(any(UUID.class));
+        then(channelRepository).should(times(1))
+                .deleteById(ArgumentCaptor.forClass(UUID.class).capture());
     }
 
     @Test

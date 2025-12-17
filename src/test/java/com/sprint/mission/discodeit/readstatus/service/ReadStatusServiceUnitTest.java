@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -92,8 +93,8 @@ public class ReadStatusServiceUnitTest {
         assertThat(response.userId()).isEqualTo(readStatusDto.userId());
         assertThat(response.channelId()).isEqualTo(readStatusDto.channelId());
 
-        then(readStatusRepository).should(times(1)).save(any(ReadStatus.class));
-        then(readStatusMapper).should(times(1)).toDto(any(ReadStatus.class));
+        then(readStatusRepository).should(times(1)).save(ArgumentCaptor.forClass(ReadStatus.class).capture());
+        then(readStatusMapper).should(times(1)).toDto(ArgumentCaptor.forClass(ReadStatus.class).capture());
     }
 
     @Test
@@ -101,7 +102,7 @@ public class ReadStatusServiceUnitTest {
     void deleteReadStatus_Success(){
         doNothing().when(readStatusRepository).deleteById(any(UUID.class));
         readStatusService.deleteReadStatus(readStatusDto.id());
-        then(readStatusRepository).should(times(1)).deleteById(any(UUID.class));
+        then(readStatusRepository).should(times(1)).deleteById(ArgumentCaptor.forClass(UUID.class).capture());
 
     }
 
@@ -116,7 +117,7 @@ public class ReadStatusServiceUnitTest {
 
         assertThat(response).containsExactly(readStatusDto);
 
-        then(readStatusMapper).should(times(1)).toDto(any(ReadStatus.class));
+        then(readStatusMapper).should(times(1)).toDto(ArgumentCaptor.forClass(ReadStatus.class).capture());
     }
 
     @Test
@@ -131,8 +132,8 @@ public class ReadStatusServiceUnitTest {
 
         assertThat(response).isEqualTo(readStatusDto);
 
-        then(readStatusRepository).should(times(1)).save(any(ReadStatus.class));
-        then(readStatusMapper).should(times(1)).toDto(any(ReadStatus.class));
+        then(readStatusRepository).should(times(1)).save(ArgumentCaptor.forClass(ReadStatus.class).capture());
+        then(readStatusMapper).should(times(1)).toDto(ArgumentCaptor.forClass(ReadStatus.class).capture());
 
 
     }

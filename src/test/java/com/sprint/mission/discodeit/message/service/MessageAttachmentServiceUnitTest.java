@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -80,7 +81,7 @@ public class MessageAttachmentServiceUnitTest {
         assertThat(response.getBinaryContent()).isEqualTo(binaryContent);
 
         then(messageAttachmentRepository)
-                .should(times(1)).save(any(MessageAttachment.class));
+                .should(times(1)).save(ArgumentCaptor.forClass(MessageAttachment.class).capture());
 
     }
 
@@ -98,7 +99,7 @@ public class MessageAttachmentServiceUnitTest {
         assertThat(response.getBinaryContent()).isEqualTo(binaryContent);
 
         then(messageAttachmentRepository)
-                .should(times(1)).findByMessage(any(Message.class));
+                .should(times(1)).findByMessage(ArgumentCaptor.forClass(Message.class).capture());
     }
 
     @Test
@@ -116,7 +117,7 @@ public class MessageAttachmentServiceUnitTest {
         assertThat(response.getBinaryContent()).isEqualTo(binaryContent);
 
         then(messageAttachmentRepository)
-                .should(times(1)).findByBinaryContent(any(BinaryContent.class));
+                .should(times(1)).findByBinaryContent(ArgumentCaptor.forClass(BinaryContent.class).capture());
 
 
     }

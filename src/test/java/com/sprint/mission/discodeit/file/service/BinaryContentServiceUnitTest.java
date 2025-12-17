@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -69,7 +70,7 @@ public class BinaryContentServiceUnitTest {
         ResponseEntity<?> response = binaryContentService.downloadFile(binaryContentId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        then(binaryContentStorage).should(times(1)).download(any(BinaryContentDto.class));
+        then(binaryContentStorage).should(times(1)).download(ArgumentCaptor.forClass(BinaryContentDto.class).capture());
 
     }
 
@@ -85,7 +86,7 @@ public class BinaryContentServiceUnitTest {
         assertThat(response.fileName()).isEqualTo(binaryContent.getFileName());
         assertThat(response.size()).isEqualTo(binaryContent.getSize());
 
-        then(binaryContentRepository).should(times(1)).findById(any(UUID.class));
+        then(binaryContentRepository).should(times(1)).findById(ArgumentCaptor.forClass(UUID.class).capture());
 
 
     }
@@ -111,7 +112,7 @@ public class BinaryContentServiceUnitTest {
         assertThat(response.fileName()).isEqualTo(binaryContent.getFileName());
         assertThat(response.size()).isEqualTo(binaryContent.getSize());
 
-        then(binaryContentRepository).should(times(1)).save(any(BinaryContent.class));
+        then(binaryContentRepository).should(times(1)).save(ArgumentCaptor.forClass(BinaryContent.class).capture());
         then(binaryContentStorage).should(times(1)).put(any(), any(byte[].class));
 
     }

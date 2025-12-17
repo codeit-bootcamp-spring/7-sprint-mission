@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -90,8 +91,8 @@ public class UserStatusServiceUnitTest {
 
         //then
 
-        then(userStatusRepository).should(times(1)).save(any(UserStatus.class));
-        then(userRepository).should(times(1)).save(any(User.class));
+        then(userStatusRepository).should(times(1)).save(ArgumentCaptor.forClass(UserStatus.class).capture());
+        then(userRepository).should(times(1)).save(ArgumentCaptor.forClass(User.class).capture());
 
 
     }
@@ -116,8 +117,8 @@ public class UserStatusServiceUnitTest {
         assertThat(response).isEqualTo(userStatusDto);
         assertThat(response.userId()).isEqualTo(userId);
 
-        then(userStatusRepository).should(times(1)).save(any(UserStatus.class));
-        then(userStatusMapper).should(times(1)).toDto(any(UserStatus.class));
+        then(userStatusRepository).should(times(1)).save(ArgumentCaptor.forClass(UserStatus.class).capture());
+        then(userStatusMapper).should(times(1)).toDto(ArgumentCaptor.forClass(UserStatus.class).capture());
 
     }
 
@@ -127,6 +128,6 @@ public class UserStatusServiceUnitTest {
         doNothing().when(userStatusRepository).deleteById(any(UUID.class));
         userStatusService.deleteUserStatus(userId);
         then(userStatusRepository).should(times(1))
-                .deleteById(any(UUID.class));
+                .deleteById(ArgumentCaptor.forClass(UUID.class).capture());
     }
 }

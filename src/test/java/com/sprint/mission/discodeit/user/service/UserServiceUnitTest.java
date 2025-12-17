@@ -18,6 +18,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,6 +31,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -102,9 +105,9 @@ public class UserServiceUnitTest {
 
         assertThat(response).isEqualTo(userDto1);
 
-        verify(userRepository,times(1)).save(any(User.class));
-        verify(binaryContentRepository,times(1)).save(any(BinaryContent.class));
-        verify(userStatusRepository,times(1)).save(any(UserStatus.class));
+        verify(userRepository,times(1)).save(ArgumentCaptor.forClass(User.class).capture());
+        verify(binaryContentRepository,times(1)).save(ArgumentCaptor.forClass(BinaryContent.class).capture());
+        verify(userStatusRepository,times(1)).save(ArgumentCaptor.forClass(UserStatus.class).capture());
     }
 
     @Test
@@ -152,8 +155,8 @@ public class UserServiceUnitTest {
 
         assertThat(response).isEqualTo(userDto1);
 
-        verify(userRepository,times(1)).save(any(User.class));
-        verify(binaryContentRepository,times(1)).save(any(BinaryContent.class));
+        verify(userRepository,times(1)).save(ArgumentCaptor.forClass(User.class).capture());
+        verify(binaryContentRepository,times(1)).save(ArgumentCaptor.forClass(BinaryContent.class).capture());
 
 
     }
@@ -190,7 +193,7 @@ public class UserServiceUnitTest {
 
         userService.deleteUser(UUID.randomUUID());
 
-        verify(userRepository,times(1)).deleteById(any(UUID.class));
+        verify(userRepository,times(1)).deleteById(ArgumentCaptor.forClass(UUID.class).capture());
     }
 
     @Test
@@ -200,5 +203,6 @@ public class UserServiceUnitTest {
         assertThatThrownBy(()->userService.deleteUser(UUID.randomUUID()))
                 .isInstanceOf(UserNotExistException.class);
 
+        then(userRepository).should(never()).deleteById(any(UUID.class));
     }
 }

@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -130,6 +131,8 @@ public class MessageServiceUnitTest {
     given(messageAttachmentRepository.save(any(MessageAttachment.class))).willReturn(messageAttachment);
     given(messageMapper.toDto(any(Message.class))).willReturn(messageDto);
 
+
+
         MessageDto response = messageService.createMessage(TestFixture.messageCreateFactory(UUID.randomUUID(), UUID.randomUUID()),
                 List.of(new MockMultipartFile("file",
                         "test.txt", "text/plain", "Hello, World!".getBytes()))
@@ -137,11 +140,15 @@ public class MessageServiceUnitTest {
 
         assertThat(response).isEqualTo(messageDto);
 
-        then(messageRepository).should(times(1)).save(any(Message.class));
-        then(binaryContentRepository).should(times(1)).save(any(BinaryContent.class));
+        ArgumentCaptor<Message> messageArgumentCaptor = ArgumentCaptor.forClass(Message.class);
+        ArgumentCaptor<BinaryContent> binaryContentArgumentCaptor = ArgumentCaptor.forClass(BinaryContent.class);
+        ArgumentCaptor<MessageAttachment> messageAttachmentArgumentCaptor = ArgumentCaptor.forClass(MessageAttachment.class);
+
+        then(messageRepository).should(times(1)).save(messageArgumentCaptor.capture());
+        then(binaryContentRepository).should(times(1)).save(binaryContentArgumentCaptor.capture());
         then(binaryContentStorage).should(times(1)).put(any(),any(byte[].class));
-        then(messageAttachmentRepository).should(times(1)).save(any(MessageAttachment.class));
-        then(messageMapper).should(times(1)).toDto(any(Message.class));
+        then(messageAttachmentRepository).should(times(1)).save(messageAttachmentArgumentCaptor.capture());
+        then(messageMapper).should(times(1)).toDto(messageArgumentCaptor.capture());
     }
 
     @Test
@@ -176,7 +183,7 @@ public class MessageServiceUnitTest {
 
         assertThat(response).isEqualTo(messageDto);
 
-        then(messageRepository).should(times(1)).save(any(Message.class));
+        then(messageRepository).should(times(1)).save(ArgumentCaptor.forClass(Message.class).capture());
     }
 
     @Test
@@ -201,7 +208,7 @@ public class MessageServiceUnitTest {
         given(messageRepository.existsById(any(UUID.class))).willReturn(true);
         willDoNothing().given(messageRepository).deleteById(any(UUID.class));
         messageService.deleteMessage(UUID.randomUUID());
-        then(messageRepository).should(times(1)).deleteById(any(UUID.class));
+        then(messageRepository).should(times(1)).deleteById(ArgumentCaptor.forClass(UUID.class).capture());
 
     }
 
@@ -230,9 +237,10 @@ public class MessageServiceUnitTest {
         assertThat(response).isEqualTo(null);
 
         then(messageRepository).should(times(1))
-                .findByChannelId(any(UUID.class),any(Pageable.class));
+                .findByChannelId(ArgumentCaptor.forClass(UUID.class).capture()
+                        ,ArgumentCaptor.forClass(Pageable.class).capture());
         then(pageResponseBasicMapper)
-                .should(times(1)).fromPage(any(Page.class));
+                .should(times(1)).fromPage(ArgumentCaptor.forClass(Page.class).capture());
 
     }
 
@@ -266,8 +274,8 @@ public class MessageServiceUnitTest {
         assertThat(response.hasNext()).isEqualTo(false);
 
         then(pageResponseBasicMapper)
-                .should(times(1)).fromPage(any(Page.class));
-        then(messageMapper).should(times(1)).toDto(any(Message.class));
+                .should(times(1)).fromPage(ArgumentCaptor.forClass(Page.class).capture());
+        then(messageMapper).should(times(1)).toDto(ArgumentCaptor.forClass(Message.class).capture());
 
     }
 
@@ -279,7 +287,8 @@ public class MessageServiceUnitTest {
                 .isInstanceOf(ChannelNotExistException.class);
 
         then(messageRepository).should(never())
-                .findByChannelId(any(UUID.class),any(Pageable.class));
+                .findByChannelId(ArgumentCaptor.forClass(UUID.class).capture()
+                        ,ArgumentCaptor.forClass(Pageable.class).capture());
     }
 
     @Test
@@ -305,9 +314,13 @@ public class MessageServiceUnitTest {
         assertThat(response.hasNext()).isEqualTo(pageResponseDto.hasNext());
         assertThat(response.totalElements()).isEqualTo(pageResponseDto.totalElements());
 
+        ArgumentCaptor<Instant> instantArgumentCaptor = ArgumentCaptor.forClass(Instant.class);
+        ArgumentCaptor<Pageable> pageableArgumentCaptor = ArgumentCaptor.forClass(Pageable.class);
+        ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
+
         then(messageRepository).should(times(1))
-                .findByChannelIdAndCreatedAtAfter(any(UUID.class),any( Instant.class),any(Pageable.class));
-        then(messageMapper).should(times(1)).toDto(any(Message.class));
+                .findByChannelIdAndCreatedAtAfter(uuidArgumentCaptor.capture(),instantArgumentCaptor.capture(),pageableArgumentCaptor.capture());
+        then(messageMapper).should(times(1)).toDto(ArgumentCaptor.forClass(Message.class).capture());
         then(pageResponseMapper).should(times(1)).fromSlice(any(),any());
 
     }
@@ -335,9 +348,16 @@ public class MessageServiceUnitTest {
         assertThat(response.hasNext()).isEqualTo(pageResponseDto.hasNext());
         assertThat(response.totalElements()).isEqualTo(pageResponseDto.totalElements());
 
+        ArgumentCaptor<Instant> instantArgumentCaptor = ArgumentCaptor.forClass(Instant.class);
+        ArgumentCaptor<Pageable> pageableArgumentCaptor = ArgumentCaptor.forClass(Pageable.class);
+        ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
+
+
         then(messageRepository).should(times(1))
-                .findByChannelIdAndCreatedAtAfter(any(UUID.class),any( Instant.class),any(Pageable.class));
-        then(messageMapper).should(times(1)).toDto(any(Message.class));
+                .findByChannelIdAndCreatedAtAfter(uuidArgumentCaptor.capture(),
+                        instantArgumentCaptor.capture(),
+                        pageableArgumentCaptor.capture());
+        then(messageMapper).should(times(1)).toDto(ArgumentCaptor.forClass(Message.class).capture());
         then(pageResponseMapper).should(times(1)).fromSlice(any(),any());
 
     }
