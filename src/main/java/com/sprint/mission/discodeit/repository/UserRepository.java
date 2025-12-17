@@ -17,7 +17,7 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     // fetch join으로 모든 유저를 조회할 때 프로필 이미지와 상태 정보를 한번에 조회
-    @Query("select u from User u join fetch u.profile join fetch u.status")
+    @Query("select u from User u left join fetch u.profile join fetch u.status")
     List<User> findAllWithProfileAndStatus();
 
     Optional<User> findByUsername(String username);
