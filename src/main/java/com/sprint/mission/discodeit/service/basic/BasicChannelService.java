@@ -36,13 +36,10 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final ChannelMapper channelMapper;
 
-
     @Override
     public List<ChannelDto> readAllChannel() {
         return channelRepository.findAll().stream().map(x->channelMapper.toDto(x)).toList();
     }
-
-
 
     @Override
     @Transactional
@@ -80,7 +77,6 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(channel);
     }
 
-
     @Override
     public void createChannel(Channel channel) {
         channelRepository.save(channel);
@@ -93,8 +89,6 @@ public class BasicChannelService implements ChannelService {
         Channel expectedChannel = channelRepository.findById(channelId).orElseThrow(()->new UserNotExistException(channelId));
         return channelMapper.toDto(expectedChannel);
     }
-
-
 
     @Override
     @Transactional(readOnly = true)

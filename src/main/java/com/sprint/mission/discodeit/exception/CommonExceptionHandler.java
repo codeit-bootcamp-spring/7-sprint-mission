@@ -38,11 +38,11 @@ public class CommonExceptionHandler {
         );
         ErrorResponse errorResponse = new ErrorResponse(
                 Instant.now(),
-                HttpStatus.BAD_REQUEST.toString(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ErrorCode.VALID_FAIL.name(),
+                ErrorCode.VALID_FAIL.getMessage(),
                 details,
                 e.getClass().getName(),
-                HttpStatus.BAD_REQUEST.value()
+                400
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
@@ -65,8 +65,8 @@ public class CommonExceptionHandler {
        log.error("reallyRestExceptionHandler : {}",e.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(
                 Instant.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.toString(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                ErrorCode.INTERNAL_SERVER_ERROR.name(),
+                ErrorCode.INTERNAL_SERVER_ERROR.getMessage(),
                 null,
                 e.getClass().getName(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value()

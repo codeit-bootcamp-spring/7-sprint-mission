@@ -56,8 +56,6 @@ public class BasicMessageService implements MessageService {
     private final PageResponseBasicMapper<MessageDto> pageResponseBasicMapper;
     private final ReadStatusRepository readStatusRepository;
 
-
-
     @Transactional
     public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments   ) {
         UUID channelId = messageCreateRequestDto.channelId();

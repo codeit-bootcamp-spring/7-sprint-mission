@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BinaryContentService Unit Test")
 public class BinaryContentServiceUnitTest {
@@ -39,7 +40,8 @@ public class BinaryContentServiceUnitTest {
     private BasicBinaryContentService binaryContentService;
 
     private BinaryContent binaryContent;
-private UUID binaryContentId;
+    private UUID binaryContentId;
+
     @BeforeEach
     void setUp() {
         binaryContent = new BinaryContent(
@@ -48,15 +50,16 @@ private UUID binaryContentId;
                 "text/plain",
                 10L
         );
-       binaryContentId = UUID.randomUUID();
-        ReflectionTestUtils.setField(binaryContent,"id",binaryContentId);
+        binaryContentId = UUID.randomUUID();
+        ReflectionTestUtils.setField(binaryContent, "id", binaryContentId);
     }
+
     @Test
     @DisplayName("[정상 케이스] 파일 다운로드 성공")
     void downloadFile_Success() {
 
         given(binaryContentRepository.findById(any(UUID.class)))
-        .willReturn(Optional.of(binaryContent));
+                .willReturn(Optional.of(binaryContent));
 
         given(binaryContentStorage.download(any(BinaryContentDto.class)))
                 .willReturn(
@@ -93,7 +96,7 @@ private UUID binaryContentId;
 
         given(binaryContentRepository.save(any(BinaryContent.class)))
                 .willReturn(binaryContent);
-        given(binaryContentStorage.put(any(),any(byte[].class)))
+        given(binaryContentStorage.put(any(), any(byte[].class)))
                 .willReturn(UUID.randomUUID());
 
         var response = binaryContentService.createBinaryContent(
@@ -109,7 +112,7 @@ private UUID binaryContentId;
         assertThat(response.size()).isEqualTo(binaryContent.getSize());
 
         then(binaryContentRepository).should(times(1)).save(any(BinaryContent.class));
-        then(binaryContentStorage).should(times(1)).put(any(),any(byte[].class));
+        then(binaryContentStorage).should(times(1)).put(any(), any(byte[].class));
 
     }
 
