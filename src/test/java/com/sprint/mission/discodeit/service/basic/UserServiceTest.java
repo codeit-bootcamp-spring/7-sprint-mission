@@ -71,8 +71,8 @@ class UserServiceTest {
     class CreateUserTest {
 
         @Test
-        @DisplayName("정상적으로 사용자를 생성할 수 있다")
-        void createUser_Success() throws IOException {
+        @DisplayName("프로필 이미지와 함께 사용자를 생성할 수 있다")
+        void createUser_WithProfile_Success() throws IOException {
             // given
             String email = "choonsik@kakao.com";
             String username = "kimchoonsik";
@@ -160,6 +160,69 @@ class UserServiceTest {
 
             assertThat(captureUser).isSameAs(captureUserStatus.getUser());
             assertThat(captureBinaryContent).isSameAs(captureUser.getProfile());
+        }
+
+        @Test
+        @DisplayName("프로필 이미지 없이 사용자를 생성할 수 있다")
+        void createUser_WithoutProfile_Success() throws IOException {
+            // given
+            String email = "choonsik@kakao.com";
+            String username = "kimchoonsik";
+            String password = "choon1234!@";
+
+            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+            ArgumentCaptor<UserStatus> userStatusCaptor = ArgumentCaptor.forClass(UserStatus.class);
+
+            when(userRepository.existsByUsername(username))
+                    .thenReturn(false);
+
+            when(userRepository.existsByEmail(email))
+                    .thenReturn(false);
+
+            when(userRepository.save(any(User.class)))
+                    .thenAnswer(i -> i.getArgument(0));
+
+            when(userStatusRepository.save(any(UserStatus.class)))
+                    .thenAnswer(i -> i.getArgument(0));
+
+            when(userMapper.toResponseDto(any(User.class)))
+                    .thenAnswer(i -> {
+                        User user = i.getArgument(0);
+                        return new UserResponseDto(
+                                user.getId(),
+                                user.getUsername(),
+                                user.getEmail(),
+                                null,
+                                user.getStatus().isOnline()
+                        );
+                    });
+
+            // RequestDto 생성
+            CreateUserRequestDto userRequestDto =
+                    new CreateUserRequestDto(
+                            email,
+                            username,
+                            password
+                    );
+
+            // when
+            UserResponseDto response = userService.create(userRequestDto, null);
+
+            // then
+            assertThat(response).isNotNull();
+            assertThat(response.email()).isEqualTo(email);
+            assertThat(response.username()).isEqualTo(username);
+
+            verify(userRepository, times(1)).save(userCaptor.capture());
+            verify(userStatusRepository, times(1)).save(userStatusCaptor.capture());
+            verify(binaryContentRepository, never()).save(any(BinaryContent.class));
+            verify(binaryContentStorage, never()).put(any(UUID.class), any(byte[].class));
+            verify(userMapper, times(1)).toResponseDto(any(User.class));
+
+            User captureUser = userCaptor.getValue();
+            UserStatus captureUserStatus = userStatusCaptor.getValue();
+
+            assertThat(captureUser).isSameAs(captureUserStatus.getUser());
         }
 
         @Test
@@ -339,6 +402,91 @@ class UserServiceTest {
             assertThat(captureUser.getUsername()).isEqualTo(newUsername);
             assertThat(captureUser.getEmail()).isEqualTo(newEmail);
             assertThat(captureUser.getPassword()).isEqualTo(newPassword);
+            assertThat(captureBinaryContent).isSameAs(captureUser.getProfile());
+        }
+
+        @Test
+        @DisplayName("정상적으로 사용자의 프로필 이미지만 수정할 수 있다")
+        void updateUser_OnlyProfile_Success() throws IOException {
+            // given
+            UUID userId = UUID.randomUUID();
+            UUID beforeProfileId = UUID.randomUUID();
+            UUID afterProfileId = UUID.randomUUID();
+
+            String username = "test1";
+            String email = "test1@naver.com";
+            String password = "test1234";
+
+            MockMultipartFile mockFile = mockFile();
+
+            // 기존 사용자 정보
+            BinaryContent profile = new BinaryContent(
+                    mockFile.getOriginalFilename(),
+                    mockFile.getSize(),
+                    mockFile.getContentType()
+            );
+            ReflectionTestUtils.setField(profile, "id", beforeProfileId);
+
+            User beforeUser = new User(
+                    username,
+                    email,
+                    password,
+                    profile
+            );
+            ReflectionTestUtils.setField(beforeUser, "id", userId);
+            ReflectionTestUtils.setField(beforeUser, "status", new UserStatus(beforeUser));
+
+            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+            ArgumentCaptor<BinaryContent> binaryContentCaptor = ArgumentCaptor.forClass(BinaryContent.class);
+
+            when(userRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(beforeUser));
+
+            when(binaryContentRepository.save(any(BinaryContent.class)))
+                    .thenAnswer(i -> {
+                        BinaryContent entity = i.getArgument(0);
+                        ReflectionTestUtils.setField(entity, "id", afterProfileId);
+                        return entity;
+                    });
+
+            when(binaryContentStorage.put(any(UUID.class), any(byte[].class)))
+                    .thenReturn(afterProfileId);
+
+            when(userRepository.save(any(User.class)))
+                    .thenAnswer(i -> i.getArgument(0));
+
+            when(userMapper.toResponseDto(any(User.class)))
+                    .thenReturn(mock(UserResponseDto.class));
+
+            // RequestDto 생성
+            CreateBinaryContentRequestDto profileRequest =
+                    new CreateBinaryContentRequestDto(
+                            mockFile.getOriginalFilename(),
+                            mockFile.getSize(),
+                            mockFile.getContentType(),
+                            mockFile.getBytes()
+                    );
+
+
+            // when
+            UserResponseDto response = userService.update(userId, null, profileRequest);
+
+            // then
+            assertThat(response).isNotNull();
+
+            verify(userRepository, times(1)).findById(userId);
+            verify(binaryContentRepository, times(1)).deleteById(beforeProfileId);
+            verify(binaryContentRepository, times(1)).save(binaryContentCaptor.capture());
+            verify(binaryContentStorage, times(1)).put(eq(afterProfileId), any(byte[].class));
+            verify(userRepository, times(1)).save(userCaptor.capture());
+            verify(userMapper, times(1)).toResponseDto(any(User.class));
+
+            User captureUser = userCaptor.getValue();
+            BinaryContent captureBinaryContent = binaryContentCaptor.getValue();
+
+            assertThat(captureUser.getUsername()).isEqualTo(username);
+            assertThat(captureUser.getEmail()).isEqualTo(email);
+            assertThat(captureUser.getPassword()).isEqualTo(password);
             assertThat(captureBinaryContent).isSameAs(captureUser.getProfile());
         }
 
