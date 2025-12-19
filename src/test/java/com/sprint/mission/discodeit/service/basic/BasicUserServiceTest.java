@@ -199,7 +199,7 @@ class BasicUserServiceTest {
                     true
             );
 
-            when(userMapper.toResponseDto(any(User.class)))
+            when(userMapper.toResponseDto(user))
                     .thenReturn(updatedResponseDto);
 
             // when
