@@ -365,6 +365,9 @@ class BasicChannelServiceTest {
             ChannelResponseDto result = channelService.updateChannel(publicChannel.getId(), updateChannelDto);
 
             // then
+            assertThat(publicChannel.getName()).isEqualTo(updateChannelDto.newName());
+            assertThat(publicChannel.getDescription()).isEqualTo(updateChannelDto.newDescription());
+
             assertThat(result).isEqualTo(updatedChannelResponseDto);
             assertThat(result.type()).isEqualTo(updatedChannelResponseDto.type());
             assertThat(result.id()).isEqualTo(updatedChannelResponseDto.id());
