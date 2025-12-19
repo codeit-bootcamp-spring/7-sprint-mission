@@ -84,7 +84,7 @@ class UserRepositoryTest {
             // then
             assertThat(result).isNotNull();
             assertThat(result.getEmail()).isEqualTo(user1.getEmail());
-            assertThat(result.getEmail()).isEqualTo(user1.getEmail());
+            assertThat(result.getUsername()).isEqualTo(user1.getUsername());
         }
 
         @Test
