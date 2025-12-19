@@ -194,6 +194,13 @@ class MessageRepositoryTest {
             assertThat(result.getContent()).hasSize(10);
             assertThat(result.hasNext()).isTrue();
             assertThat(result.isFirst()).isTrue();
+
+            result.getContent().forEach(message -> {
+                assertThat(message.getAuthor()).isNotNull();
+                assertThat(message.getAuthor().getUserStatus()).isNotNull();
+                assertThat(message.getAuthor().getProfile()).isNull();
+                assertThat(message.getAttachments()).isNotNull();
+            });
         }
 
         @Test
@@ -219,6 +226,13 @@ class MessageRepositoryTest {
             // then
             assertThat(result.getContent()).hasSize(10);
             assertThat(result.hasNext()).isTrue();
+
+            result.getContent().forEach(message -> {
+                assertThat(message.getAuthor()).isNotNull();
+                assertThat(message.getAuthor().getUserStatus()).isNotNull();
+                assertThat(message.getAuthor().getProfile()).isNull();
+                assertThat(message.getAttachments()).isNotNull();
+            });
         }
 
         @Test
@@ -245,6 +259,13 @@ class MessageRepositoryTest {
             // then
             assertThat(result.getContent()).hasSize(3);
             assertThat(result.hasNext()).isFalse();
+
+            result.getContent().forEach(message -> {
+                assertThat(message.getAuthor()).isNotNull();
+                assertThat(message.getAuthor().getUserStatus()).isNotNull();
+                assertThat(message.getAuthor().getProfile()).isNull();
+                assertThat(message.getAttachments()).isNotNull();
+            });
         }
     }
 
@@ -277,44 +298,32 @@ class MessageRepositoryTest {
                     .content("message2")
                     .build();
 
-            // messsage3만 채널2에서 생성한 메세지
             message3 = Message.builder()
                     .channel(channel1)
                     .author(user1)
                     .content("message3")
                     .build();
+
             entityManager.persist(channel1);
             entityManager.persist(user1);
-            entityManager.persist(message1);
-            entityManager.persist(message2);
-            entityManager.persist(message3);
-        }
 
-
-        // 메세지 생성기
-        private void createMultipleMessagesForLatest(int count) {
-            for (int i = 0; i < count; i++) {
-                Message message = new Message(
-                        "메시지 " + (i + 1),
-                        channel1,
-                        user1,
-                        null
-                );
-                ReflectionTestUtils.setField(message, "createdAt", Instant.now().minusSeconds(i * 100L));
-                messageRepository.save(message);
-
-            }
         }
 
         @Test
         @DisplayName("[정상 케이스] - 채널 별 최신 메세지 조회 성공")
         void findLatestMessageByChannelId_success() {
-            // given
             messageRepository.save(message1);
             messageRepository.save(message2);
             messageRepository.save(message3);
-            entityManager.flush();
-            entityManager.clear();
+
+            /**
+             * 영속화 이후에, 다시 setFiled를 바꿔야함.
+             * 영속화 이전에, createdAt을 바꾸면, jpa내에서 @CreateDate로 인해
+             * 값이 현재시간으로 채워지기 때문
+             */
+            ReflectionTestUtils.setField(message1, "createdAt", Instant.now().minusSeconds(1000L));
+            ReflectionTestUtils.setField(message2, "createdAt", Instant.now().minusSeconds(2000L));
+            ReflectionTestUtils.setField(message3, "createdAt", Instant.now().minusSeconds(3000L));
 
             // when
             List<Message> result = messageRepository.findLatestByChannelId(channel1.getId());
