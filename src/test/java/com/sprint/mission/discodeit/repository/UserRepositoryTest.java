@@ -127,7 +127,7 @@ class UserRepositoryTest {
         }
 
         @Test
-        @DisplayName("[성공] 빈 리스트 반환 - 유저가 없는 경우")
+        @DisplayName("[정상 케이스] 빈 리스트 반환 - 유저가 없는 경우")
         void findAllWithProfileAndStatus_emptyList() {
             // when
             List<User> result = userRepository.findAllWithProfileAndStatus();
@@ -137,7 +137,7 @@ class UserRepositoryTest {
         }
 
         @Test
-        @DisplayName("[성공] Profile이 null인 유저도 조회됨 (LEFT JOIN)")
+        @DisplayName("[정상 케이스] Profile이 null인 유저도 조회됨 (LEFT JOIN)")
         void findAllWithProfileAndStatus_withNullProfile() {
             // given
             User userWithoutProfile = new User("user3", "user3@codeit.com", "password3", null);
