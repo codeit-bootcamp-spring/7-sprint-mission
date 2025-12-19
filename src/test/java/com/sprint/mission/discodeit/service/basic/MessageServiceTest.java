@@ -4,10 +4,12 @@ import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryConten
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.global.exception.channel.NotChannelMemberException;
 import com.sprint.mission.discodeit.global.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.junit.jupiter.api.DisplayName;
@@ -57,6 +59,9 @@ class MessageServiceTest {
 
     @Mock
     private MessageMapper messageMapper;
+
+    @Mock
+    private PageMapper pageMapper;
 
     @Mock
     private BinaryContentStorage binaryContentStorage;
@@ -435,8 +440,20 @@ class MessageServiceTest {
                         );
                     });
 
+            when(pageMapper.toResponseDto(any(Slice.class)))
+                    .thenAnswer(invocation -> {
+                        Slice<MessageResponseDto> s = invocation.getArgument(0);
+                        return new PageResponseDto<>(
+                                s.getContent(),
+                                null,
+                                s.getSize(),
+                                s.hasNext(),
+                                null
+                        );
+                    });
+
             // when
-            Slice<MessageResponseDto> response = messageService.findAllByChannelId(channelId, pageable);
+            PageResponseDto<MessageResponseDto> response = messageService.findAllByChannelId(channelId, null, pageable);
 
             // then
             assertThat(response).isNotNull();
