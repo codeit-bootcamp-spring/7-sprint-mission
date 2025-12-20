@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -192,12 +191,11 @@ class UserControllerTest {
         void deleteUser_Success() throws Exception {
             // given
             UUID userId = UUID.randomUUID();
-            UserDto response = UserDto.builder().build();
-            when(userService.findUserById(userId)).thenReturn(response);
 
             // when & then
             mockMvc.perform(delete("/api/users/" + userId))
                     .andExpect(status().isNoContent());
+            verify(userService).deleteUser(userId);
         }
 
         @Test
