@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.service.dto.response.ChannelDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,41 +22,40 @@ import java.util.UUID;
 public class ChannelController {
 
     private final ChannelService channelService;
-    private final ReadStatusService readStatusService;
-
-
 
     @PostMapping("/public")
-    public ResponseEntity<ChannelDto> createPublicChannel(@RequestBody PublicChannelCreateRequest request) {
+    public ResponseEntity<ChannelDto> createPublicChannel(
+            @Valid @RequestBody PublicChannelCreateRequest request) {
         ChannelDto channelDto = channelService.createPublicChannel(request);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
-
     }
 
     @PostMapping("/private")
-    public ResponseEntity<ChannelDto> createPrivateChannel(@RequestBody PrivateChannelCreateRequest request) {
+    public ResponseEntity<ChannelDto> createPrivateChannel(
+             @Valid @RequestBody PrivateChannelCreateRequest request) {
         ChannelDto channelDto = channelService.createPrivateChannel(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
     }
 
     @GetMapping
-    public ResponseEntity<List<ChannelDto>> getAllChannelByUserId(@RequestParam UUID userId) {
+    public ResponseEntity<List<ChannelDto>> getAllChannelByUserId(
+            @RequestParam UUID userId) {
         List<ChannelDto> allByUser = channelService.getAllByUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(allByUser);
     }
 
     @DeleteMapping("/{channelId}")
-    public ResponseEntity<Void> removeChannel(@PathVariable UUID channelId) {
+    public ResponseEntity<Void> removeChannel(
+            @PathVariable UUID channelId) {
         channelService.deleteChannel(channelId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/{channelId}")
-    public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId, @RequestBody ChannelUpdateRequest request) {
+    public ResponseEntity<ChannelDto> updateChannel(
+            @PathVariable UUID channelId,
+            @RequestBody ChannelUpdateRequest request) {
         ChannelDto channelDto = channelService.updateChannel(channelId, request);
         return ResponseEntity.status(HttpStatus.OK).body(channelDto);
     }
-
-
 }

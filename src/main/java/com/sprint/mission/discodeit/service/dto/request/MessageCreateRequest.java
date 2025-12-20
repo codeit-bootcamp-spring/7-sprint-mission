@@ -11,4 +11,4 @@ public record MessageCreateRequest(
         UUID authorId,
         @NotNull
         UUID channelId
-){}
+) {}

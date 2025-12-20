@@ -35,7 +35,9 @@ public class MessageController {
     }
 
     @PatchMapping("/{messageId}")
-    public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId, @ModelAttribute MessageUpdateRequest messageUpdateRequest) {
+    public ResponseEntity<MessageDto> updateMessage(
+            @PathVariable UUID messageId,
+            @ModelAttribute MessageUpdateRequest messageUpdateRequest) {
         MessageDto messageDto = messageService.updateMessage(messageId, messageUpdateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
     }
@@ -56,6 +58,4 @@ public class MessageController {
 
         return ResponseEntity.status(HttpStatus.OK).body(allByChannelId);
     }
-
-
 }

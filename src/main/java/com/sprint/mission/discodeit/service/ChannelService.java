@@ -67,14 +67,19 @@ public class ChannelService {
 
         List<User> users = userRepository.findAllById(request.participantIds());
         List<ReadStatus> result = new ArrayList<>();
+        List<UserDto> userDtos = new ArrayList<>();
         for (User user : users) {
             ReadStatus readStatus = new ReadStatus(user, save, Instant.now());
             result.add(readStatus);
+            userDtos.add(userMapper.toDto(user));
         }
 
         readStatusRepository.saveAll(result);
 
-        return mapper.toDto(save);
+        ChannelDto dto = mapper.toDto(save);
+        dto.setParticipants(userDtos);
+
+        return dto;
     }
 
     @Transactional

@@ -11,6 +11,12 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
+    @Query("select u from User u" +
+            " left join fetch u.profile" +
+            " where u.id = :userId")
+    Optional<User> findByIdWithBinaryContent(
+            @Param("userId") UUID userId);
+
     boolean existsByEmailOrUsername(String email, String username);
     Optional<User> findByUsername(String username);
 }

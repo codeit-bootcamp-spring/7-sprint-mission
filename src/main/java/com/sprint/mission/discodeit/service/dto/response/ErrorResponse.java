@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.service.dto.response;
 
+import lombok.Getter;
+
 import java.time.Instant;
 import java.util.Map;
 
+@Getter
 public class ErrorResponse {
 
     private Instant timestamp;

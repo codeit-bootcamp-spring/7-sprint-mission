@@ -72,7 +72,7 @@ public class UserService {
     @Transactional
     public UserDto updateUserInfo(UUID id, UserUpdateRequest updateDto, MultipartFile file) {
         log.info("UserService.updateUserInfo");
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, new HashMap<>()));
+        User user = userRepository.findByIdWithBinaryContent(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, new HashMap<>()));
 
         if (updateDto.newUsername() != null) {
             user.updateUsername(updateDto.newUsername());
@@ -85,7 +85,9 @@ public class UserService {
         }
 
         if (file != null) {
-            binaryContentManager.deleteFile(user.getProfile());
+            if(user.getProfile()!=null){
+                binaryContentManager.deleteFile(user.getProfile());
+            }
             BinaryContent content = binaryContentManager.saveFileAndMeta(file);
             user.updateProfile(content);
         }
