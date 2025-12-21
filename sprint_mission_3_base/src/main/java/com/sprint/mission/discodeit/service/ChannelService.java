@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-
     ChannelDto create(ChannelCreateRequest request);
-
     ChannelDto update(UUID channelId, ChannelUpdateRequest request);
-
-    void delete(UUID channelId);
-
-    ChannelDto find(UUID channelId);
-
+    void delete(UUID id);
+    ChannelDto find(UUID id);
     List<ChannelDto> findAll();
+
+    default List<ChannelDto> findByUserId(UUID userId) {
+        return findAll();
+    }
 }
