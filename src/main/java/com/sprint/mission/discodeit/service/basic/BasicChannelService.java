@@ -55,9 +55,6 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelResponseDto createChannel(CreatePrivateChannelDto createPrivateChannelDto) {
-        Channel channel = Channel.builder().type(ChannelType.PRIVATE).build();
-        channelRepository.save(channel);
-
         // 중복 제거 ParticipantIds
         // 조회가 되지 않는 user가 존재한다면, throws
         List<UUID> participantIds = createPrivateChannelDto.participantIds().stream().distinct().toList();
@@ -69,6 +66,9 @@ public class BasicChannelService implements ChannelService {
         if (!notFoundUserIds.isEmpty()) {
             throw UserNotFoundException.byIds(notFoundUserIds);
         }
+
+        Channel channel = Channel.builder().type(ChannelType.PRIVATE).build();
+        channelRepository.save(channel);
 
         List<ReadStatus> readStatuses = users.stream()
                 .map(user ->
