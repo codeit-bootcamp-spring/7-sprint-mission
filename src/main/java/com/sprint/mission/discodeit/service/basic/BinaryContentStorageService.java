@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.BinaryContentException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
@@ -11,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +37,7 @@ public class BinaryContentStorageService implements BinaryContentStorage {
     @PostConstruct
     public void init() throws IOException {
         Files.createDirectories(root);
-        log.info("✅ Files.createDirectories");
+        log.info("✅ Files.createDirectories ok!");
     }
 
     @Override
@@ -46,9 +50,12 @@ public class BinaryContentStorageService implements BinaryContentStorage {
             // 파일 저장
             Files.write(filePath, file.getBytes());  // byte[] -> 실제 파일로 저장
         } catch (IOException e) {
+
+            log.error("🚨파일 저장 실패 - file.name = {}", file.getOriginalFilename());
             throw new RuntimeException("🚨파일 저장 실패 I: " + e);
         }
 
+        log.info("✅ 파일 저장 - file.name = {}", file.getOriginalFilename());
         return binaryContent;
     }
 
@@ -56,18 +63,21 @@ public class BinaryContentStorageService implements BinaryContentStorage {
     public InputStream get(UUID binaryContentId) {
 
         if (binaryContentId == null) {
-            throw new IllegalArgumentException("binaryContentId is null");
+            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION, Map.of("binaryContentId", binaryContentId.toString()));
         }
 
         Path filePath = root.resolve(binaryContentId.toString());
 
         if (!Files.exists(filePath)) {
+            log.error("🚨파일이 존재하지 않습니다: - filePath = {}", filePath);
             throw new NoSuchElementException("파일이 존재하지 않습니다: " + filePath);
         }
 
         try {
+            log.info("✅ 파일 get - binaryContentId = {}", binaryContentId.toString());
             return Files.newInputStream(filePath);   // InputStream 반환
         } catch (IOException e) {
+            log.error("🚨파일 읽기 실패! - filePath = {}", filePath);
             throw new RuntimeException("파일 읽기 실패: " + filePath, e);
         }
     }
@@ -85,13 +95,16 @@ public class BinaryContentStorageService implements BinaryContentStorage {
             String fileName = (null == binaryContent.getFileName()) ? binaryContentId.toString() : binaryContent.getFileName();
             String encoded = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
 
+            log.info("✅ 파일 download! - binaryContentId = {}", binaryContentId.toString());
+
             return ResponseEntity.ok()
                 .contentType(mediaType)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encoded + "\"; filename*=UTF-8''" + encoded)
                 .contentLength((null == binaryContent.getSize()) ? Files.size(filePath) : binaryContent.getSize())
                 .body(new InputStreamResource(inputStream));
         } catch (IOException e) {
-            throw new IllegalArgumentException("🚨download err");
+            log.error("🚨download error! - binaryContentId = {}", binaryContentId.toString());
+            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION, Map.of("binaryContentId", binaryContentId.toString()));
         }
     }
 }

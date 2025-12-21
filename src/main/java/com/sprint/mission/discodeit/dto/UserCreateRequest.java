@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
 public record UserCreateRequest( //all private final
-    @NotNull
+    @NotBlank
     String username,
-    @NotNull
+    @NotBlank
     String email,
-    @NotNull
+    @NotBlank
     String password
 ) {}

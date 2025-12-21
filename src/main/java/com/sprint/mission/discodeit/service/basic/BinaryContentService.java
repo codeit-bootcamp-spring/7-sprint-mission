@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@Transactional // 영속성 컨텍스트
+//@Transactional // 영속성 컨텍스트
 @RequiredArgsConstructor
 public class BinaryContentService implements InterfaceBinaryContentService {
     private final BinaryContentsRepository binaryContentRepository;
@@ -26,22 +26,26 @@ public class BinaryContentService implements InterfaceBinaryContentService {
     private final BinaryContentStorage binaryContentStorage;
 
     @Override
+    @Transactional(readOnly = true)
     public  BinaryContentDto find(UUID binaryContentId) {
 //    [ ] id로 조회합니다.
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
             .orElseThrow(() -> new NoSuchElementException("🚨첨부파일[" + binaryContentId.toString() + "]을 찾을 수 없음"));
 
-        log.info("✅ BinaryContentService.find.binaryContentId = [" + binaryContentId.toString() + "]");
+        log.info("✅binaryContent.find ok! - binaryContentId = {}", binaryContentId);
         return binaryContentMapper.toDto(binaryContent);
     }
+
+
     @Override
+    @Transactional(readOnly = true)
     public List<BinaryContentDto> findAllByIdIn(UUID[] binaryContentIds) {
         List<BinaryContentDto> dtoList = binaryContentRepository.findAll().stream()
             .filter(content -> List.of(binaryContentIds).contains(content.getId()))
             .map(binaryContentMapper::toDto)
+            .peek(dto -> log.info("✅BinaryContentService.findAllByIdIn ok! - binaryContentIds = {}",  dto.id()))
             .toList();
 
-        log.info("✅ BinaryContentService.findAllByIdIn");
         return dtoList;
     }
 

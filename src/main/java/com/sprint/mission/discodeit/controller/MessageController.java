@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
+import static java.awt.SystemColor.info;
+
 import com.sprint.mission.discodeit.mapper.dto.MessageDto;
 import com.sprint.mission.discodeit.page.PageResponseDto;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
@@ -42,9 +44,7 @@ public class MessageController implements MessageDoc {
         @PageableDefault(size = 50,
                         sort = "createdAt, desc",
                         direction = Direction.DESC) Pageable pageable) {
-
         //💎♨️Channel의 Message 목록 조회
-
         PageResponseDto<MessageDto> pageResponseDto = messageService.findAllByChannelId(channelID, pageable);
 
         return ResponseEntity

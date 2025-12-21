@@ -38,7 +38,7 @@ public class User extends BaseUpdatableEntity {
 //    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.REMOVE) // ON DELETE CASCADE
 //    private UserStatus status;
 
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL) // ON DELETE CASCADE
     private UserStatus userStatus;
 

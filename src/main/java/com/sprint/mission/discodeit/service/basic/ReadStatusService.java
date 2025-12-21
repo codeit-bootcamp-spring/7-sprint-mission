@@ -5,12 +5,16 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.Dto_ReadStatusUpdate;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.ReadStatusException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.mapper.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceReadStatusService;
+import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
@@ -31,10 +35,11 @@ public class ReadStatusService implements InterfaceReadStatusService {
     private final ReadStatusesRepository readStatusRepository;
     private final ReadStatusMapper readStatusMapper;
 
+    @Transactional
     public ReadStatusDto create(ReadStatusCreateRequest dtoReadStatus) {
         User user = userRepository.findById(dtoReadStatus.userId()).stream()
             .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("🚨User[" + dtoReadStatus.userId().toString() + "] 를 찾을 수 없음 "));
+            .orElseThrow(() -> new UserNotFoundException(dtoReadStatus.userId()));
 
         Channel channel = channelRepository.findById(dtoReadStatus.channelId()).stream()
             .findFirst()
@@ -47,7 +52,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
             .findFirst();
 
         if (byUserAndChannelId.isPresent()) {
-            throw new IllegalArgumentException("⚠️이미 있는 User + Channel 임!");
+            throw new ReadStatusException(ErrorCode.DUPLICATE_READSTATUS, Map.of("userId", user.getId(), "channelId", channel.getId()));
         }
 
         ReadStatus newReadStatus = new ReadStatus(user
@@ -60,12 +65,13 @@ public class ReadStatusService implements InterfaceReadStatusService {
         return readStatusMapper.toDto(newReadStatus);
     }
 
+    @Transactional(readOnly = true)
     public ReadStatusDto find(UUID statusID) {
         //find
         //[ ] id로 조회합니다.
         ReadStatus readStatus = readStatusRepository.findById(statusID).stream()
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("🚨statusID = [" + statusID.toString() + "] 오류"));
+            .orElseThrow(() -> new ReadStatusException(ErrorCode.READSTATUS_NOT_FOUND, Map.of("statusId", statusID)));
 
         ReadStatusDto dto = readStatusMapper.toDto(readStatus);
         log.info("✅ ReadStatusService.find = [" + dto + "]");
@@ -73,6 +79,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         return dto;
     }
 
+    @Transactional(readOnly = true)
     public List<ReadStatusDto> findAllByUserId(UUID userID) {
         //[ ] userId를 조건으로 조회합니다.
         List<ReadStatus> readStatuses = readStatusRepository.findAll();
@@ -85,6 +92,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         return dtoList;
     }
 
+    @Transactional
     public ReadStatusDto update(UUID readStatusId, Dto_ReadStatusUpdate requestDto) {
         //update
         //[ ] DTO를 활용해 파라미터를 그룹화합니다.
@@ -100,6 +108,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         return readStatusMapper.toDto(readStatus);
     }
 
+    @Transactional
     public void delete(UUID statusID) {
         //delete
         //[ ] id로 삭제합니다.
