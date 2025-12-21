@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 
 import java.util.Objects;
 
@@ -30,7 +31,7 @@ public class BinaryContent extends BaseEntity {
         super();
         this.fileName = Objects.requireNonNull(fileName).trim();
         if(this.fileName.isEmpty() || this.fileName.length() > 255) {
-            throw new IllegalArgumentException("invalid file name");
+            throw new InvalidFileNameException(fileName, "fileName");
         }
         this.contentType = Objects.requireNonNull(contentType);
         this.size = (long) size;
