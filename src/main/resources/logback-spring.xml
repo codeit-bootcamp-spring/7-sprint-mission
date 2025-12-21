@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 로그 패턴 정의 -->
+    <property name="LOG_PATTERN" value="%d{yy-MM-dd HH: mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+    <property name="LOG_PATH" value=".logs"/>
+
+    <!-- 콘솔 출력 설정 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 파일 출력 설정 (일자별 롤링) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/discodeit.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback. core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 일자별 로그 파일 -->
+            <fileNamePattern>${LOG_PATH}/discodeit-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 파일 최대 크기 -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- 30일간 보관 -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 루트 로거 설정 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <!-- 프로파일별 설정:  dev -->
+    <springProfile name="dev">
+        <logger name="com.sprint.mission. discodeit" level="DEBUG"/>
+        <logger name="org. hibernate.SQL" level="DEBUG"/>
+        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>
+    </springProfile>
+
+    <!-- 프로파일별 설정: prod -->
+    <springProfile name="prod">
+        <logger name="com.sprint.mission.discodeit" level="INFO"/>
+        <logger name="org.hibernate. SQL" level="WARN"/>
+    </springProfile>
+
+    <!-- 프로파일별 설정:  test -->
+    <springProfile name="test">
+        <logger name="com.sprint.mission.discodeit" level="DEBUG"/>
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+    </springProfile>
+
+</configuration>
