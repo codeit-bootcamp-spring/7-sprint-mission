@@ -54,7 +54,7 @@ public class ChannelController implements ChannelControllerDocs {
   }
 
   //채널 조회
-// 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
+  // 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
   // api/channels?userId=...
   @GetMapping
   public ResponseEntity<List<ChannelResponseDto>> findUserAllChannels(
