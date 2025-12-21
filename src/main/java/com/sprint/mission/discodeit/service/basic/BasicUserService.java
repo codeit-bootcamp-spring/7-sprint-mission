@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.exception.user.InvalidUserRequestException;
+import com.sprint.mission.discodeit.common.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
@@ -19,9 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-/*
- TODO: 프로필 삭제
- */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -37,20 +37,23 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponseDto create(UserCreateRequestDto userCreateRequestDto,
                                   BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
-        log.debug("Creating user: username = {}, email = {}, hasProfile = {}",
-                userCreateRequestDto.username(), userCreateRequestDto.email(), binaryContentCreateRequestDto != null);
+        if (userCreateRequestDto == null) {
+            throw new InvalidUserRequestException("userCreateRequestDto is null");
+        }
+        log.debug("Creating user: username = {}, email = {}",
+                userCreateRequestDto.username(), userCreateRequestDto.email());
 
         // 요구사항 - 유저 이름과 이메일은 다른 유저와 같으면 안된다.
         if (userRepository.existsByUsername(userCreateRequestDto.username())) {
             log.warn("Create user rejected: user name already exists. username = {}",
                     userCreateRequestDto.username());
-            throw new IllegalArgumentException("존재하는 유저입니다!");
+            throw UserAlreadyExistsException.byUsername(userCreateRequestDto.username());
         }
 
         if (userRepository.existsByEmail(userCreateRequestDto.email())) {
             log.warn("Create user rejected: user email already exists. email = {} ",
                     userCreateRequestDto.email());
-            throw new IllegalArgumentException("존재하는 이메일입니다!");
+            throw UserAlreadyExistsException.byEmail(userCreateRequestDto.email());
         }
 
         BinaryContent profile = null;
@@ -73,7 +76,7 @@ public class BasicUserService implements UserService {
         User save = userRepository.save(user);
 
         // 요구사항 - userStatus 같이 생성
-        userStatusRepository.save(new UserStatus(user));
+        userStatusRepository.save(new UserStatus(save));
 
         boolean online = true;
 
@@ -83,9 +86,12 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto get(UUID userId) {
+        if (userId == null) {
+            throw new InvalidUserRequestException("userId is null");
+        }
         log.debug("Getting user: userId = {}", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         boolean online = isOnline(user.getId());
         return userMapper.toDto(user, online);
     }
@@ -103,10 +109,14 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponseDto update(UUID userId, UserUpdateRequestDto userUpdateRequestDto,
                                   BinaryContentCreateRequestDto binaryContentCreateRequestDto) {
-        log.debug("Updating user: userId = {}, hasProfileUpdate = {}",
-                userId,binaryContentCreateRequestDto != null);
-        User user = userRepository.findById(Objects.requireNonNull(userId))
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+        if (userUpdateRequestDto == null) {
+            throw new InvalidUserRequestException("userUpdateRequestDto is null");
+        }
+        if (userId == null) {
+            throw new InvalidUserRequestException("userId is null");
+        }
+        log.debug("Updating user: userId = {}", userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         // 유저 이름이 비어있지 않고, 기존 이름과 다르다면 수정!
         if(userUpdateRequestDto.newUsername() != null &&
@@ -116,7 +126,7 @@ public class BasicUserService implements UserService {
                     .anyMatch(u -> !u.getId().equals(userId))) {
                 log.warn("Update user rejected: username already exists. userId = {}, newUsername = {}",
                         userId, userUpdateRequestDto.newUsername());
-                throw new IllegalArgumentException("존재하는 유저이름입니다!");
+                throw UserAlreadyExistsException.byUsername(userUpdateRequestDto.newUsername());
             }
             user.setUsername(userUpdateRequestDto.newUsername());
             log.debug("Updating user: userId {}", userId);
@@ -130,7 +140,7 @@ public class BasicUserService implements UserService {
                     .isPresent()) {
                 log.warn("Update user rejected: email already exists. userId = {}, newEmail = {}",
                         userId, userUpdateRequestDto.newEmail());
-                throw new IllegalArgumentException("존재하는 이메일입니다!");
+                throw UserAlreadyExistsException.byEmail(userUpdateRequestDto.newEmail());
             }
             user.setEmail(userUpdateRequestDto.newEmail());
             log.debug("Updating user: userId = {}", userId);
@@ -141,13 +151,13 @@ public class BasicUserService implements UserService {
             log.debug("Updating user password: userId = {}", userId);
         }
 
-        if(binaryContentCreateRequestDto != null){
+        if (binaryContentCreateRequestDto != null) {
             UUID oldProfileId = (user.getProfile()) != null ? user.getProfile().getId() : null;
             BinaryContentResponseDto binaryContentResponseDto = binaryContentService.create(binaryContentCreateRequestDto);
             BinaryContent newProfile = binaryContentRepository.getReferenceById(binaryContentResponseDto.id());
             user.setProfile(newProfile);
 
-            if(oldProfileId != null) {
+            if (oldProfileId != null) {
                 binaryContentService.delete(oldProfileId);
             }
             log.debug("Updating user: userId = {}, oldProfile = {}, newProfile = {}",
@@ -157,27 +167,33 @@ public class BasicUserService implements UserService {
         User save = userRepository.save(user);
         boolean online = isOnline(save.getId());
 
-        log.info("유저 정보가 수정되었습니다.");
+        log.info("유저 정보가 수정되었습니다. userId = {}", save.getId());
         return userMapper.toDto(save, online);
     }
 
     @Transactional
     @Override
     public boolean delete(UUID userid) {
+        if (userid == null) {
+            throw new InvalidUserRequestException("userid is null");
+        }
         log.debug("Deleting user: userId = {}", userid);
         User user = userRepository.findById(userid)
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userid));
 
         userRepository.delete(user);
-        log.info("유저가 삭제되었습니다.");
+        log.info("유저가 삭제되었습니다. userId = {}", userid);
         return true;
     }
 
     // 이름으로 조회
     @Override
     public List<UserResponseDto> getUsersByName(String username) {
+        if (username == null) {
+            throw new InvalidUserRequestException("username is null");
+        }
         log.debug("Getting users by name {}", username);
-        return userRepository.findByUsername(Objects.requireNonNull(username))
+        return userRepository.findByUsername(username)
                 .stream()
                 .map(user -> userMapper.toDto(user, isOnline(user.getId())))
                 .toList();
@@ -186,8 +202,11 @@ public class BasicUserService implements UserService {
     // 이메일로 조회
     @Override
     public Optional<UserResponseDto> getUsersByEmail(String email) {
+        if (email == null) {
+            throw new InvalidUserRequestException("email is null");
+        }
         log.debug("Getting users by email {}", email);
-        return userRepository.findByEmail(Objects.requireNonNull(email))
+        return userRepository.findByEmail(email)
                 .map(user -> userMapper.toDto(user, isOnline(user.getId())));
     }
 
@@ -195,10 +214,13 @@ public class BasicUserService implements UserService {
     @Transactional
     @Override
     public void login(UUID userId) {
+        if (userId == null) {
+            throw new InvalidUserRequestException("userId is null");
+        }
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
-        userStatusRepository.findByUserId(Objects.requireNonNull(userId))
+        userStatusRepository.findByUserId(userId)
                 .ifPresentOrElse(u -> {
                     u.timeUpdated();
                     }, () -> userStatusRepository.save(new UserStatus(user)));
@@ -210,7 +232,10 @@ public class BasicUserService implements UserService {
 
     @Override
     public boolean isOnline(UUID userId) {
-        return userStatusRepository.findByUserId(Objects.requireNonNull(userId))
+        if (userId == null) {
+            throw new InvalidUserRequestException("userId is null");
+        }
+        return userStatusRepository.findByUserId(userId)
                 .map(status -> status.isOnlineNow())
                 .orElse(false);
     }

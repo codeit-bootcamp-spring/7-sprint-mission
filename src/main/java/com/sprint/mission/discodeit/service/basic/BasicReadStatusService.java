@@ -1,5 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exception.readstatus.InvalidReadStatusRequestException;
+import com.sprint.mission.discodeit.common.exception.readstatus.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.common.exception.readstatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.request.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.readstatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.readstatus.ReadStatusResponseDto;
@@ -32,44 +37,61 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     @Override
     public ReadStatusResponseDto create(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
-        UUID userId = Objects.requireNonNull(readStatusCreateRequestDto.userId());
-        UUID channelId = Objects.requireNonNull(readStatusCreateRequestDto.channelId());
+        if (readStatusCreateRequestDto == null) {
+            throw new InvalidReadStatusRequestException("readStatusCreateRequestDto is null");
+        }
+        if (readStatusCreateRequestDto.userId() == null) {
+            throw new InvalidReadStatusRequestException("userId is null");
+        }
+        if (readStatusCreateRequestDto.channelId() == null) {
+            throw new InvalidReadStatusRequestException("channelId is null");
+        }
+
+        UUID userId = readStatusCreateRequestDto.userId();
+        UUID channelId = readStatusCreateRequestDto.channelId();
 
         log.debug("Creating read status: userId {} ", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("Channel not found"));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         Instant readAt = readStatusCreateRequestDto.lastReadAt() != null
                 ? readStatusCreateRequestDto.lastReadAt() :  Instant.now();
 
         if(readStatusRepository.existsByUserIdAndChannelId(userId, channelId)) {
-            throw new IllegalStateException("User already has read status");
+            log.warn("Read status already exists for read status: userId {}, channelId = {} ", userId, channelId);
+            throw new ReadStatusAlreadyExistsException(userId, channelId);
         }
 
 
         ReadStatus readstatus = new ReadStatus(user, channel, readAt);
         ReadStatus save = readStatusRepository.save(readstatus);
-        log.info("유저 읽기 상태가 생성되었습니다.");
+        log.info("유저 읽기 상태가 생성되었습니다. readStatusId = {}", save.getId());
 
         return readStatusMapper.toDto(save);
     }
 
     @Override
     public ReadStatusResponseDto get(UUID id) {
+        if (id == null) {
+            throw new InvalidReadStatusRequestException("id is null");
+        }
         log.debug("Getting read status: readStatus Id = {} ", id);
-        ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
+        ReadStatus readStatus = readStatusRepository.findById(id)
+                .orElseThrow(() -> new ReadStatusNotFoundException(id));
         return readStatusMapper.toDto(readStatus);
     }
 
     @Override
     public List<ReadStatusResponseDto> getAllByUserId(UUID userId) {
+        if (userId == null) {
+            throw new InvalidReadStatusRequestException("userId is null");
+        }
         log.debug("Getting read status by userId: userId = {} ", userId);
-        return readStatusRepository.findAllByUserId(Objects.requireNonNull(userId))
+        return readStatusRepository.findAllByUserId(userId)
                 .stream()
                 .map(rs -> readStatusMapper.toDto(rs))
                 .toList();
@@ -78,9 +100,15 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     @Override
     public ReadStatusResponseDto update(UUID id, ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
+        if (readStatusUpdateRequestDto == null) {
+            throw new InvalidReadStatusRequestException("readStatusUpdateRequestDto is null");
+        }
+        if (id == null) {
+            throw new InvalidReadStatusRequestException("id is null");
+        }
         log.debug("Updating read status: readStatus Id = {} ", id);
-        ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
+        ReadStatus readStatus = readStatusRepository.findById(id)
+                .orElseThrow(() -> new ReadStatusNotFoundException(id));
 
         if (readStatusUpdateRequestDto.newLastReadAt() != null) {
             if(readStatus.getLastReadAt() == null ||
@@ -90,18 +118,21 @@ public class BasicReadStatusService implements ReadStatusService {
         }
 
         ReadStatus save = readStatusRepository.save(readStatus);
-        log.info("유저 읽기 상태가 수정되었습니다.");
+        log.info("유저 읽기 상태가 수정되었습니다. readStatusId = {}", save.getId());
         return readStatusMapper.toDto(save);
     }
 
     @Transactional
     @Override
     public boolean delete(UUID id) {
+        if (id == null) {
+            throw new InvalidReadStatusRequestException("id is null");
+        }
         log.debug("Deleting read status: readStatus Id = {} ", id);
-        ReadStatus readStatus = readStatusRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
+        ReadStatus readStatus = readStatusRepository.findById(id)
+                .orElseThrow(() -> new ReadStatusNotFoundException(id));
         readStatusRepository.delete(readStatus);
-        log.info("유저 읽기 상태가 제거되었습니다.");
+        log.info("유저 읽기 상태가 제거되었습니다. readStatusId = {}", readStatus.getId());
         return true;
     }
 }

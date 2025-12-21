@@ -1,5 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exception.channel.InvalidChannelException;
+import com.sprint.mission.discodeit.common.exception.channel.PrivateChannelUpdateException;
+import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PublicChannelCreateRequestDto;
@@ -55,7 +59,7 @@ public class BasicChannelService implements ChannelService {
         Channel save = channelRepository.save(channel);
         List<User> userList = participants(save);
 
-        log.info("채널이 생성되었습니다.");
+        log.info("채널이 생성되었습니다. channelId = {}", save.getId());
         return channelMapper.toDto(save,lastMessageAt(save),userList,userOnlineMap(userList));
     }
 
@@ -84,7 +88,7 @@ public class BasicChannelService implements ChannelService {
         if(channelCreateRequestDto.participantIds() != null) {
             for(UUID id : channelCreateRequestDto.participantIds()) {
                 User user = userRepository.findById(id)
-                        .orElseThrow(() -> new NoSuchElementException("User not found"));
+                        .orElseThrow(() -> new UserNotFoundException(id));
 
                 readStatusRepository.save(new ReadStatus(user, save, save.getCreatedAt()));
             }
@@ -92,7 +96,7 @@ public class BasicChannelService implements ChannelService {
 
         List<User> userList = participants(save);
 
-        log.info("1:1 채널이 생성되었습니다.");
+        log.info("1:1 채널이 생성되었습니다.  channelId = {}", save.getId());
         return channelMapper.toDto(save,lastMessageAt(save), userList, userOnlineMap(userList));
     }
 
@@ -100,13 +104,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponseDto get(UUID channelId) {
         log.debug("Getting Channel: channelId = {}", channelId);
         Channel channel = channelRepository.findById(Objects.requireNonNull(channelId))
-                .orElseThrow(() -> new NoSuchElementException("Channel not found"));
-
-        Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
-                .stream()
-                .map(message -> message.getCreatedAt())
-                .max(Comparator.naturalOrder())
-                .orElse(null);
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         List<User> userList = participants(channel);
         return channelMapper.toDto(channel,lastMessageAt(channel), userList, userOnlineMap(userList));
@@ -154,11 +152,11 @@ public class BasicChannelService implements ChannelService {
                 channelUpdateRequestDto.newDescription() != null,
                 channelUpdateRequestDto.slowModeSeconds() != null);
         Channel channel = channelRepository.findById(Objects.requireNonNull(channelId))
-                .orElseThrow(() -> new NoSuchElementException("Channel not found"));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         if(channel.isPrivateChannel()) {
             log.warn("Update channel rejected: Private channel. channelId = {}", channelId);
-            throw new IllegalArgumentException("Private channel is not allowed to update");
+            throw new PrivateChannelUpdateException(channelId);
         }
 
         if(channelUpdateRequestDto.newName() != null) {
@@ -179,14 +177,20 @@ public class BasicChannelService implements ChannelService {
         Channel save = channelRepository.save(channel);
         List<User> userList = participants(channel);
 
-        log.info("채널이 수정되었습니다.");
+        log.info("채널이 수정되었습니다. channelId = {}", save.getId());
         return channelMapper.toDto(save,lastMessageAt(save),userList,userOnlineMap(userList));
     }
 
     @Transactional
     @Override
     public void delete(UUID channelId) {
+        if (channelId == null) {
+            throw new InvalidChannelException("channelId is null");
+        }
         log.debug("Deleting Channel: channelId = {}", channelId);
+        if(!channelRepository.existsById(channelId)) {
+            throw new ChannelNotFoundException(channelId);
+        }
         // 메세지 제거 + 첨부 파일 제거
         List<Message> message = messageRepository.findByChannelId(Objects.requireNonNull(channelId));
         messageRepository.deleteAll(message);
@@ -196,7 +200,7 @@ public class BasicChannelService implements ChannelService {
 
         // 채널 제거
         channelRepository.deleteById(channelId);
-        log.info("채널이 제거되었습니다.");
+        log.info("채널이 제거되었습니다. channelId = {}", channelId);
     }
 
 
@@ -205,17 +209,17 @@ public class BasicChannelService implements ChannelService {
     public boolean join(UUID channelId, UUID userId) {
         log.debug("Joining Channel: channelId = {}, userId = {}", channelId, userId);
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("Channel not found"));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         if(readStatusRepository.findByUserIdAndChannelId(userId, channelId).isPresent()) {
              return false;
          }
 
          readStatusRepository.save(new ReadStatus(user, channel, channel.getCreatedAt()));
-        log.info("유저가 채널에 입장하였습니다.");
+        log.info("유저가 채널에 입장하였습니다.  channelId = {}", channelId);
         return true;
     }
 
@@ -241,7 +245,7 @@ public class BasicChannelService implements ChannelService {
             throw new  IllegalStateException("slowModeSeconds cannot be negative");
         }
         Channel channel = channelRepository.findById(channelId)
-                        .orElseThrow(() -> new NoSuchElementException("Channel not found"));
+                        .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         channel.changeSlowModeSeconds(slowModeSeconds);
         channelRepository.save(channel);
