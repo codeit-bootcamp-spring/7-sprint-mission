@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.common.exception.message.InvalidMessageRequestException;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
@@ -49,7 +50,8 @@ public class Message extends BaseUpdatableEntity {
     }
 
     public void setContent(@Nonnull String content) {
-        if(isDeleted){ throw new IllegalStateException("Cannot set content on deleted Message"); }
+        if(isDeleted){ throw new InvalidMessageRequestException("Message has been deleted");
+        }
         if(!content.equals(this.content)){
             this.content = content;
         }

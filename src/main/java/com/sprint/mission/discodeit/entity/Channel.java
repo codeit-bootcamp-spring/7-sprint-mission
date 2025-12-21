@@ -1,5 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.common.exception.channel.ChannelException;
+import com.sprint.mission.discodeit.common.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exception.channel.InvalidChannelException;
+import com.sprint.mission.discodeit.common.exception.channel.InvalidSlowModeException;
+import com.sprint.mission.discodeit.common.exception.message.SlowModeViolationException;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -60,7 +65,8 @@ public class Channel extends BaseUpdatableEntity {
 
     public Channel(ChannelType type, String channelName, boolean privateChannel, int slowModeSeconds, String channelDescription) {
        this.name = channelName;
-       if(type == null) { throw new IllegalArgumentException("type cannot be null"); }
+       if(type == null) { throw new InvalidChannelException("type is null");
+       }
        this.type = type;
        this.slowModeSeconds = slowModeSeconds;
        this.description = channelDescription;
@@ -76,12 +82,19 @@ public class Channel extends BaseUpdatableEntity {
 
     public void changeSlowModeSeconds(int slowModeSeconds) {
         if(slowModeSeconds < 0) {
-            throw new IllegalArgumentException("slowModeSeconds cannot be negative");
+            throw new InvalidSlowModeException(getId(), slowModeSeconds);
         }
         if(this.slowModeSeconds != slowModeSeconds) {
             this.slowModeSeconds = slowModeSeconds;
         }
     }
+
+    public void changeChannelDescription(String channelDescription) {
+        if(!channelDescription.equals(this.description)) {
+            this.description = channelDescription;
+        }
+    }
+}
 /*
     public boolean join(UUID memberId) {
         if(memberId == null) { throw new IllegalArgumentException("memberId cannot be null"); }
@@ -100,9 +113,3 @@ public class Channel extends BaseUpdatableEntity {
 
  */
 
-    public void changeChannelDescription(String channelDescription) {
-        if(!channelDescription.equals(this.description)) {
-            this.description = channelDescription;
-        }
-    }
-}
