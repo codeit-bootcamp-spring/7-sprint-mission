@@ -10,4 +10,8 @@ public class UserNotFoundException extends UserException {
         super(ErrorCode.USER_NOT_FOUND,
                 Map.of("id", id));
     }
+    public UserNotFoundException(String email) {
+        super(ErrorCode.USER_NOT_FOUND,
+                Map.of("email", email));
+    }
 }
