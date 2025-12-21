@@ -185,18 +185,17 @@ class BasicChannelServiceTest {
             );
 
             // given
-            given(channelRepository.save(any(Channel.class)))
-                    .willReturn(privateChannel);
             given(userRepository.findAllById(anyList()))
                     .willReturn(List.of(user1));
+
 
             // when
             assertThatThrownBy(() -> channelService.createChannel(createPrivateChannelDto1))
                     .isInstanceOf(UserNotFoundException.class);
 
             // then
-            then(channelRepository).should().save(any(Channel.class));
             then(userRepository).should().findAllById(anyList());
+            then(channelRepository).should(never()).save(any(Channel.class));
             then(readStatusRepository).should(never()).saveAll(anyList());
             then(channelMapper).should(never()).toResponseDto(any(Channel.class));
         }
