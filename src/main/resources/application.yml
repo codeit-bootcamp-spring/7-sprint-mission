@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: discodeit
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 30MB
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  profiles:
+    active: dev
+
+logging:
+  level:
+    root: info
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage
