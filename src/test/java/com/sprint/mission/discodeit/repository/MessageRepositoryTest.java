@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@EnableJpaAuditing
 @DisplayName("MessageRepository 테스트")
 class MessageRepositoryTest {
     @Autowired
@@ -341,7 +343,7 @@ class MessageRepositoryTest {
             assertThat(result).hasSize(3);
 
             // TODO: 죽어도 여기서 제대로 동작안함.
-//            // 최신순(DESC): m1(5분 전) -> m2(10분 전) -> m3(15분 전)
+            // 최신순(DESC): m1(5분 전) -> m2(10분 전) -> m3(15분 전)
 //            assertThat(result).extracting(Message::getContent)
 //                    .containsExactly("message1", "message2", "message3");
         }
