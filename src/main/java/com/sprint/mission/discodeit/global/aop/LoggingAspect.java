@@ -45,9 +45,9 @@ public class LoggingAspect {
             long duration = System.currentTimeMillis() - start;
 
             if (isInfo)
-                log.info("[{}] {}.{}() Response: {} ({} ms)", layer, className, methodName, result.toString(), duration);
+                log.info("[{}] {}.{}() Response: {} ({} ms)", layer, className, methodName, formatResult(result), duration);
             else
-                log.debug("[{}] {}.{}() Response: {} ({} ms)", layer, className, methodName, result.toString(), duration);
+                log.debug("[{}] {}.{}() Response: {} ({} ms)", layer, className, methodName, formatResult(result), duration);
 
             return result;
         } catch (Exception e) {
@@ -60,7 +60,11 @@ public class LoggingAspect {
 
     private String formatResult(Object result) {
         if (result == null) return "null";
-        String str = result.toString();
-        return str.length() > 500 ? str.substring(0, 500) + "..." : str;
+
+        try {
+            return result.toString();
+        } catch (Exception e) {
+            return "[toString() failed: " + e.getClass().getSimpleName() + "]";
+        }
     }
 }
