@@ -24,33 +24,28 @@ public class ReadStatusController {
     @ResponseStatus(HttpStatus.CREATED)
     public ReadStatusResponseDto create(
             @Valid @RequestBody ReadStatusCreateRequestDto readStatusCreateRequestDto) {
-        log.debug("Received request to create a new read status.");
         return readStatusService.create(readStatusCreateRequestDto);
     }
 
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
-    public ReadStatusResponseDto update(@PathVariable("readStatusId") UUID readStatusId,
+    public ReadStatusResponseDto update(@PathVariable UUID readStatusId,
                                         @Valid @RequestBody ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
-        log.debug("Received request to update a read status.");
         return readStatusService.update(readStatusId ,readStatusUpdateRequestDto);
     }
 
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.GET)
-    public ReadStatusResponseDto get(@PathVariable("readStatusId") UUID readStatusId) {
-        log.debug("Received request to get read status.");
+    public ReadStatusResponseDto get(@PathVariable UUID readStatusId) {
         return readStatusService.get(readStatusId);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public List<ReadStatusResponseDto> getAllByUserId(@RequestParam("userId") UUID userId) {
-        log.debug("Received request to get all read status.");
         return readStatusService.getAllByUserId(userId);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.DELETE)
-    public void delete(@PathVariable(("readStatusId")) UUID readStatusId) {
-        log.debug("Received request to delete read status.");
+    public void delete(@PathVariable UUID readStatusId) {
         readStatusService.delete(readStatusId);
     }
 }

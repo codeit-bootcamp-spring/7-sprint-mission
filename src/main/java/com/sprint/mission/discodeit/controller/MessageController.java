@@ -31,26 +31,23 @@ public class MessageController {
     public MessageResponseDto create(
             @Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto messageCreateRequestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
-        log.debug("Received request to create message.");
         return messageService.create(messageCreateRequestDto, attachments);
     }
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.GET)
     public MessageResponseDto get(@PathVariable("messageId") UUID messageId) {
-        log.debug("Received request to get message.");
         return messageService.get(messageId);
     }
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
     public MessageResponseDto update(@PathVariable("messageId") UUID messageId,
                                      @Valid @RequestBody MessageUpdateRequestDto messageUpdateRequestDto) {
-        log.debug("Received request to update message.");
         return messageService.update(messageId, messageUpdateRequestDto);
     }
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("messageId") UUID messageId) {
-        log.debug("Received request to delete message.");
         messageService.delete(messageId);
     }
 
@@ -73,7 +70,6 @@ public class MessageController {
                     direction = Sort.Direction.DESC
             ) Pageable pageable
     ) {
-        log.debug("Received request to get all messages.");
         return messageService.getPageByChannelId(channelId, pageable);
     }
 }

@@ -19,13 +19,11 @@ public class AuthController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public UserResponseDto login(@Valid @RequestBody AuthLoginRequestDto authLoginRequestDto) {
-        log.debug("Received request to login.");
         return authService.login(authLoginRequestDto);
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public void logout(@RequestParam("userId") UUID userId) {
-        log.debug("Received request to logout.");
         authService.logout(userId);
     }
 }
