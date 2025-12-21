@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
@@ -80,6 +81,7 @@ class BasicMessageServiceTest {
     private BinaryContent binaryContent2;
     private CreateBinaryContentDto createBinaryContentDto1;
     private CreateBinaryContentDto createBinaryContentDto2;
+    private BinaryContentResponseDto binaryContentResponseDto;
 
     @BeforeEach
     void setUp() {
@@ -136,10 +138,19 @@ class BasicMessageServiceTest {
                     .content(createMessageDto.content())
                     .attachments(List.of(binaryContent1))
                     .build();
+
             UUID randomId = UUID.randomUUID();
             ReflectionTestUtils.setField(message, "id", randomId);
             ReflectionTestUtils.setField(message, "createdAt", Instant.now());
             ReflectionTestUtils.setField(message, "updatedAt", Instant.now());
+
+            binaryContentResponseDto = new BinaryContentResponseDto(
+                    binaryContentId1,
+                    binaryContent1.getCreatedAt(),
+                    binaryContent1.getFileName(),
+                    binaryContent1.getSize(),
+                    binaryContent1.getContentType()
+            );
 
             messageResponseDto = new MessageResponseDto(
                     message.getId(),
@@ -148,7 +159,7 @@ class BasicMessageServiceTest {
                     message.getContent(),
                     message.getChannel().getId(),
                     userResponseDto,
-                    List.of(binaryContent1)
+                    List.of(binaryContentResponseDto)
             );
         }
 
