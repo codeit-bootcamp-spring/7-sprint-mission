@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public interface UserStatusService {
     UserStatusResponseDto create(UserStatusCreateRequestDto userStatusCreateRequestDto);
-    UserStatusResponseDto update(UserStatusUpdateRequestDto userStatusUpdateRequestDto);
+    UserStatusResponseDto update(UserStatusUpdateRequestDto userStatusUpdateRequestDto, UUID id);
     UserStatusResponseDto updateByUserId(UUID userId, UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto);
     UserStatusResponseDto get(UUID id);
     List<UserStatusResponseDto> getAll();
