@@ -1,6 +1,6 @@
 spring:
   application:
-    name:  discodeit
+    name: discodeit
   profiles:
     active: dev
   servlet:
@@ -12,16 +12,46 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: . discodeit/storage
+      root-path: .discodeit/storage
 
 springdoc:
   swagger-ui:
     path: /api-docs.html
     display-request-duration: true
-    enabled:  true
+    enabled: true
   api-docs:
     path: /api-docs
 
 logging:
   level:
     root: INFO
+
+# Actuator 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  info:
+    env:
+      enabled: true
+
+# 애플리케이션 정보
+info:
+  application:
+    name:  Discodeit
+    version: 1.7.0
+    java-version: 17
+    spring-boot-version: 3.4.0
+  config:
+    datasource:
+      url: ${spring.datasource.url:not-configured}
+      driver-class-name: ${spring. datasource.driver-class-name:not-configured}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto:not-configured}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage. local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size:  ${spring.servlet.multipart. max-request-size}
