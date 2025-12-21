@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://prod-db-server:5432/discodeit
+    username: ${DB_USERNAME}
+    password:  ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+    open-in-view:  false
+
+server:
+  port:  80
+
+logging:
+  level:
+    com.sprint.mission.discodeit: info
+    org. hibernate.SQL: warn
+    org.hibernate.orm. jdbc.bind: warn
