@@ -1,0 +1,30 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true
+    env:
+      enabled: true
+
+
+  server:
+    port: 9091
+info:
+  app:
+    name: Discodeit
+    description: Discodeit for Spring Boot
+    version: 1.7.0
+    java: 17
+    spring-boot: 3.4.0
+    details:
+      url: jdbc:h2:mem:discodeitdb
+      jpa: ddl-auto
+      storage-config: type,path
+      multipart-config: max-file-size,max-request-size
+
+

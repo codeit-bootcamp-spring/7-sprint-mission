@@ -11,7 +11,6 @@ public interface UserStatusService {
 
     public UserStatusDto createUserStatus(UserStatusCreateRequestDto userStatusCreateRequestDto);
     public void deleteUserStatus(UUID userStatusId);
-    public void updateByUserId(UUID userId);
     public List<UserStatusDto> findAll();
     UserStatusDto patchUserStatus(UUID userId, UserStatusPatchRequestDto dto);
 

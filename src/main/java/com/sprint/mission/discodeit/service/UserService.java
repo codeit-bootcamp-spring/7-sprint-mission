@@ -12,12 +12,12 @@ import java.util.UUID;
 
 public interface UserService {
 
-    UserDto createUser(UserCreateRequestDto userCreateRequestDtoDto, MultipartFile profile) throws IOException;
+    UserDto createUser(UserCreateRequestDto userCreateRequestDtoDto, MultipartFile profile)  ;
     UserDto readUser(UUID userId);
     List<UserDto> readAllUser();
     void deleteUser(UUID userId);
     void resetUserRepository();
     List<UserDto> findAllUsers();
-    UserDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile) throws IOException;
+    UserDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile) ;
 
 }

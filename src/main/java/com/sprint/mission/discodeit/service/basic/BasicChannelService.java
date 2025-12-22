@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateReque
 import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entityElement.ChannelType;
+import com.sprint.mission.discodeit.exception.domain.channel.ChannelNotExistException;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -34,45 +36,46 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final ChannelMapper channelMapper;
 
-
     @Override
     public List<ChannelDto> readAllChannel() {
         return channelRepository.findAll().stream().map(x->channelMapper.toDto(x)).toList();
     }
 
-
-
     @Override
     @Transactional
     public ChannelDto createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
 
-        Channel channel = channelRepository.save(Channel.privateChannelFactory(channelPrivateCreateRequestDto.name(),channelPrivateCreateRequestDto.description()));
-       channelPrivateCreateRequestDto.participantIds().forEach(
+        List<User> userList = channelPrivateCreateRequestDto.participantIds().stream().map(
                 x ->
                 {
-                    User tempUser = userRepository.findById(x).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
-                   readStatusRepository.save(ReadStatus.createReadStatusFactory(tempUser,channel));
+                    User tempUser = userRepository.findById(x).orElseThrow(() -> new UserNotExistException(x));
+                    return tempUser;
                 }
-        );
+        ).toList();
+
+        Channel channel = channelRepository.save(Channel.privateChannelFactory(channelPrivateCreateRequestDto.name(),channelPrivateCreateRequestDto.description()));
+       userList.forEach(x->readStatusRepository.save(ReadStatus.createReadStatusFactory(x,channel)));
         return channelMapper.toDto(channel);
     }
 
     @Override
     @Transactional
     public ChannelDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
-
+        List<User> users = userRepository.findAll();
     Channel channel = channelRepository.save(Channel.publicChannelFactory(
             channelPublicCreateRequestDto.name(),
             channelPublicCreateRequestDto.description()
     ));
-        List<User> users = userRepository.findAll();
+
         users.forEach(x->
             readStatusRepository.save(ReadStatus.createReadStatusFactory(x,channel)
         )
         );
+
+
+        log.info("channel : {} ",channel);
     return channelMapper.toDto(channel);
     }
-
 
     @Override
     public void createChannel(Channel channel) {
@@ -83,11 +86,9 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelDto readChannel(UUID channelId) {
-        Channel expectedChannel = channelRepository.findById(channelId).orElseThrow(()->new IllegalArgumentException("Channel not found"));
+        Channel expectedChannel = channelRepository.findById(channelId).orElseThrow(()->new UserNotExistException(channelId));
         return channelMapper.toDto(expectedChannel);
     }
-
-
 
     @Override
     @Transactional(readOnly = true)
@@ -108,16 +109,19 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID channelID) {
+        if(!channelRepository.existsById(channelID)) throw new ChannelNotExistException(channelID);
+        log.warn("delete channel : {}",channelID);
         channelRepository.deleteById(channelID);
     }
 
     @Override
     @Transactional
     public ChannelDto patchChannel(ChannelPatchRequestDto dto, UUID channelId) {
-        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
+        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new ChannelNotExistException(channelId));
         channel.setDescription(dto.newDescription()==null?channel.getDescription():dto.newDescription());
         channel.setName(dto.newName()==null?channel.getName():dto.newName());
         channelRepository.save(channel);
+        log.info("updated channel : {}",channel);
         return channelMapper.toDto(channel);
     }
 

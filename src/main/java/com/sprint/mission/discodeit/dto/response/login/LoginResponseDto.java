@@ -5,8 +5,6 @@ import lombok.Builder;
 import java.time.Instant;
 import java.util.UUID;
 
-@Builder
-
 public record LoginResponseDto(
         UUID id,
         Instant createdAt,

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.binaryContent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.domain.file.FileNotExistException;
 import com.sprint.mission.discodeit.mapper.mapStruct.BinaryStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,15 +25,15 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     @Transactional
-    public BinaryContentDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto) throws IOException {
+    public BinaryContentDto createBinaryContent(BinaryContentCreateRequestDto binaryContentCreateRequestDto)  {
         BinaryContent binaryContent = new BinaryContent(
                 binaryContentCreateRequestDto.getFileName(),
                 binaryContentCreateRequestDto.getContentType(),
                 binaryContentCreateRequestDto.getSize()
         );
-        binaryContentRepository.save(binaryContent);
+        BinaryContent saved = binaryContentRepository.save(binaryContent);
         binaryContentStorage.put(binaryContent.getId(),binaryContentCreateRequestDto.getBytes());
-        return BinaryStruct.INSTANCE.toDto(binaryContent);
+        return BinaryStruct.INSTANCE.toDto(saved);
 
 
     }
@@ -45,8 +45,8 @@ public class BasicBinaryContentService implements BinaryContentService {
         return  BinaryContentDto.from(
                 binaryContentRepository.findById(binaryContentID)
                         .orElseThrow(
-                                ()->new IllegalArgumentException(
-                                        "존재하지 않는 binaryContent 입니다."))) ;
+                                ()->new FileNotExistException(
+                                        binaryContentID))) ;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public ResponseEntity<?> downloadFile(UUID binaryContentId) throws IOException {
+    public ResponseEntity<?> downloadFile(UUID binaryContentId)  {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow();
         BinaryContentDto binaryContentDto = BinaryStruct.INSTANCE.toDto(binaryContent);
         return binaryContentStorage.download(binaryContentDto);

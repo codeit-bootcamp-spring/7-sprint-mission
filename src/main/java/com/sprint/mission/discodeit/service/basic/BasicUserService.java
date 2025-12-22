@@ -5,6 +5,9 @@ import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.domain.DiscodeitException;
+import com.sprint.mission.discodeit.exception.domain.file.FileByteReadFailException;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
@@ -35,13 +38,18 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    public UserDto createUser(UserCreateRequestDto userCreateRequestDto, MultipartFile profile) throws IOException {
+    public UserDto createUser(UserCreateRequestDto userCreateRequestDto, MultipartFile profile)  {
+        log.debug("createUser : {} Siuuuuu!!!",userCreateRequestDto);
     if(profile!=null) {
         BinaryContent binaryContent = binaryContentRepository.save(
                 new BinaryContent(profile.getName(), profile.getContentType(), profile.getSize())
         );
 
-        binaryContentStorage.put(binaryContent.getId(),profile.getBytes());
+        try {
+            binaryContentStorage.put(binaryContent.getId(),profile.getBytes());
+        } catch (Exception e) {
+            throw new FileByteReadFailException(profile.getName());
+        }
 
         User user = userRepository.save(User.createUserWithProfileFactory(
                 userCreateRequestDto.username(),
@@ -72,7 +80,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDto readUser(UUID userID) {
-        User user = userRepository.findById(userID).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+        User user = userRepository.findById(userID).orElseThrow(() -> new UserNotExistException(userID));
         return userMapper.toDto(user);
     }
 
@@ -84,7 +92,9 @@ public class BasicUserService implements UserService {
 
     @Override
     public void deleteUser(UUID userId) {
-       userRepository.deleteById(userId);
+        if (!userRepository.existsById(userId)) throw new UserNotExistException(userId);
+        log.info("deleteUser : {} info layer",userId);
+        userRepository.deleteById(userId);
     }
 
     @Override
@@ -100,8 +110,9 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    public UserDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile) throws IOException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException(USER_NOT_EXIST));
+    public UserDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile)  {
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotExistException(userId));
         user.setUserName(dto.newUsername()==null?user.getUserName():dto.newUsername());
         user.setPassword(dto.newPassword()==null?user.getPassword():dto.newPassword());
         user.setEmail(dto.newEmail()==null?user.getEmail():dto.newEmail());
@@ -110,11 +121,15 @@ public class BasicUserService implements UserService {
             BinaryContent tmpBinaryContent = binaryContentRepository.save(
                     new BinaryContent(profile.getName(), profile.getContentType(), profile.getSize())
             );
-            binaryContentStorage.put(tmpBinaryContent.getId(),profile.getBytes());
+            try {
+                binaryContentStorage.put(tmpBinaryContent.getId(),profile.getBytes());
+            } catch (Exception e) {
+                throw new FileByteReadFailException(profile.getName());
+            }
             user.setProfile(tmpBinaryContent);
         }
         userRepository.save(user);
-
+        log.debug("patchUser : {} siuuuuuuuu!!!",user);
         return userMapper.toDto(user);
     }
 

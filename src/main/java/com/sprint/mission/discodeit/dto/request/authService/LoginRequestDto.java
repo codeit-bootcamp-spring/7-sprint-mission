@@ -6,10 +6,10 @@ import lombok.Getter;
 
 
 public record LoginRequestDto(
-        @NotBlank(message = "Login UserName")
+        @NotBlank(message = "유저 이름은 필수값입니다")
         String username,
 
-        @NotBlank(message = "Login Password")
+        @NotBlank(message = "비밀번호는 필수값입니다")
         String password
 ) {
 }

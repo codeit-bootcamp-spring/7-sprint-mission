@@ -9,6 +9,11 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.domain.channel.ChannelNotExistException;
+import com.sprint.mission.discodeit.exception.domain.file.FileByteReadFailException;
+import com.sprint.mission.discodeit.exception.domain.message.MessageNotExistException;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotJoinException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseBasicMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
@@ -51,14 +56,13 @@ public class BasicMessageService implements MessageService {
     private final PageResponseBasicMapper<MessageDto> pageResponseBasicMapper;
     private final ReadStatusRepository readStatusRepository;
 
-
-
     @Transactional
-    public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments   ) throws IOException {
-
-        Channel channel2 = channelRepository.findById(messageCreateRequestDto.channelId()).orElseThrow(()->new IllegalArgumentException(CHANNEL_NOT_EXIST));
-        User targetUser = userRepository.findById(messageCreateRequestDto.authorId()).orElseThrow(()->new IllegalArgumentException(USER_NOT_EXIST));
-        if(readStatusRepository.findReadStatusByChannelAndUser(channel2,targetUser)== null) throw(new IllegalArgumentException(USER_NOT_JOINED));
+    public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments   ) {
+        UUID channelId = messageCreateRequestDto.channelId();
+        UUID authorId = messageCreateRequestDto.authorId();
+        Channel channel2 = channelRepository.findById(channelId).orElseThrow(()->new ChannelNotExistException(channelId));
+        User targetUser = userRepository.findById(authorId).orElseThrow(()->new UserNotExistException(authorId));
+        if(readStatusRepository.findReadStatusByChannelAndUser(channel2,targetUser)== null) throw(new UserNotJoinException(channelId,authorId));
 
         Message message;
         message = messageRepository.save(Message.createMessageFactory(
@@ -83,13 +87,14 @@ public class BasicMessageService implements MessageService {
                         }
 
                         catch (IOException e) {
-                            throw new RuntimeException(e);
+                            throw new FileByteReadFailException(x.getName());
                         }
                     }
             );
             message.setAttachments(attachmentList);
             message.setMessageAttachment(messageAttachmentList);
         }
+        log.error("message : {} 일단 에러를 뱉어",message);
 
         return messageMapper.toDto(message);
     }
@@ -99,17 +104,17 @@ public class BasicMessageService implements MessageService {
         return messageRepository.findAll().stream().map(messageMapper::toDto).toList();
     }
     public void deleteMessage(UUID messageId){
+        if(!messageRepository.existsById(messageId)) throw new MessageNotExistException(messageId);
+        log.warn("delete message : {}",messageId);
         messageRepository.deleteById(messageId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PageResponseDtoBasic<MessageDto> findallByChannelId(UUID channelId, Pageable pageable) {
-
+        if(!channelRepository.existsById(channelId)) throw new ChannelNotExistException(channelId);
         Page<Message> targetPage = messageRepository.findByChannelId(channelId,pageable);
         if(targetPage.isEmpty()) return pageResponseBasicMapper.fromPage(Page.empty());
-        Message message = targetPage.getContent().get(0);
-        MessageDto messageDto = messageMapper.toDto(message);
         Page<MessageDto> targetPageDto = targetPage.map(messageMapper::toDto);
         return pageResponseBasicMapper.fromPage(targetPageDto);
     }
@@ -146,9 +151,10 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public MessageDto patchMessage(MessagePatchRequestDto dto, UUID messageId) {
-        Message message = messageRepository.findById(messageId).orElseThrow(()->new IllegalArgumentException("Message not found"));
+        Message message = messageRepository.findById(messageId).orElseThrow(()->new MessageNotExistException(messageId));
         message.setContent(dto.newContent()==null?message.getContent():dto.newContent());
         messageRepository.save(message);
+        log.debug("updated message : {} ",message);
         return messageMapper.toDto(message);
     }
 }

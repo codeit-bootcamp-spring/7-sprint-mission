@@ -17,6 +17,6 @@ public interface BinaryContentService {
     public void deleteBinaryContent(UUID binaryContentId);
     public List<BinaryContent> findAll();
     public void resetBinaryContentService();
-    ResponseEntity<?> downloadFile(UUID binaryContentId) throws IOException;
+    ResponseEntity<?> downloadFile(UUID binaryContentId) ;
 
 }

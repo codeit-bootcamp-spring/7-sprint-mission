@@ -1,0 +1,39 @@
+spring:
+  application:
+    name : discodeit
+  datasource:
+    url: jdbc:h2:mem:discodeitdb;Mode=PostgreSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    open-in-view: false
+discodeit:
+  repository:
+    type: file
+    file-directory: .discodeit
+  storage:
+    local:
+      root-path: "${user.home}/Documents/discodeit/jpaData"
+server:
+  port: ${PORT:9090}
+
+springdoc:
+  swagger-ui:
+    path: /api-docs.html
+    display-request-duration: true
+    enabled: true
+  api-docs:
+    path: /api-docs
+logging:
+  level:
+    root: debug
+    org.hibernate.SQL: info
+    com.sprint.mission.discodeit: debug

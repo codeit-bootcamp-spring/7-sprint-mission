@@ -11,9 +11,10 @@ import java.util.UUID;
 public record ChannelPublicCreateRequestDto(
 
 
-        @NotBlank(message = "Public Channel name")
+        @NotBlank(message = "채널 이름은 필수값입니다")
         String name,
 
+        @NotBlank(message = "채널 설명은 필수값입니다")
         String description
 ) {
 

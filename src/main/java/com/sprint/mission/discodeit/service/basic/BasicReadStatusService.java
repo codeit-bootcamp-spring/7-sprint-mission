@@ -6,6 +6,10 @@ import com.sprint.mission.discodeit.dto.response.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.domain.channel.ChannelNotExistException;
+import com.sprint.mission.discodeit.exception.domain.readStatus.ReadStatusException;
+import com.sprint.mission.discodeit.exception.domain.readStatus.ReadStatusNotExistException;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -37,11 +41,13 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     @Transactional
     public ReadStatusDto createReadStatus(ReadStatusCreateRequestDto readStatusCreateRequestDto) {
+        UUID channelId = readStatusCreateRequestDto.channelId();
+        UUID userId =readStatusCreateRequestDto.userId();
+        Channel targetChannel = channelRepository.findById(channelId)
+                .orElseThrow(()->new ChannelNotExistException(channelId));
 
-        Channel targetChannel = channelRepository.findById(readStatusCreateRequestDto.channelId())
-                .orElseThrow(()->new IllegalArgumentException("존재하지 않는 Channel 입니다."));
-        User targetUser = userRepository.findById(readStatusCreateRequestDto.userId())
-                .orElseThrow(()->new IllegalArgumentException("존재하지 않는 User 입니다."));
+        User targetUser = userRepository.findById(userId)
+                .orElseThrow(()->new UserNotExistException(userId));
         ReadStatus readStatus = ReadStatus.createReadStatusWithDtoFactory
                 (targetUser,targetChannel,readStatusCreateRequestDto.lastReadAt());
         return readStatusMapper.toDto(
@@ -72,7 +78,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     @Transactional
     public ReadStatusDto patchReadStatus(UUID readStatusId, ReadStatusPatchRequestDto readStatusPatchRequestDto) {
-        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 readStatus 입니다."));
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(()->new ReadStatusNotExistException(readStatusId));
         readStatus.setReadLastTime(readStatusPatchRequestDto.newLastReadAt());
         readStatusRepository.save(readStatus);
         return readStatusMapper.toDto(readStatus);

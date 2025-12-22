@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.login;
 import com.sprint.mission.discodeit.dto.request.authService.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.response.login.LoginResponseDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -21,15 +22,15 @@ public class BasicAuthService implements AuthService {
         String password = loginRequestDto.password();
         List<User> userList = userRepository.findAll();
         Optional<User> optionalUser = userList.stream().filter(x -> x.getUserName().equals(userName) && x.getPassword().equals(password)).findFirst();
-        User existUser = optionalUser.orElseThrow(IllegalArgumentException::new);
-        return LoginResponseDto.builder()
-                .id(existUser.getId())
-                .createdAt(existUser.getCreatedAt())
-                .updatedAt(existUser.getUpdatedAt())
-                .username(existUser.getUserName())
-                .email(existUser.getEmail())
-                .password(existUser.getPassword())
-                .profileId(existUser.getProfile()==null?null:existUser.getProfile().getId())
-                .build();
+        User existUser = optionalUser.orElseThrow(()->new UserNotExistException(null));
+        return new LoginResponseDto(
+                existUser.getId(),
+                existUser.getCreatedAt(),
+                existUser.getUpdatedAt(),
+                existUser.getUserName(),
+                existUser.getEmail(),
+                existUser.getPassword(),
+                existUser.getProfile() == null ? null : existUser.getProfile().getId()
+        );
     }
 }

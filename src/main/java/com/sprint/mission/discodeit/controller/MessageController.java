@@ -30,7 +30,7 @@ public class MessageController {
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> createMessage(@Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
                                                     @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
-    ) throws IOException {
+    )  {
         return new ResponseEntity<>(messageService.createMessage(dto, attachments), HttpStatus.CREATED);
     }
 

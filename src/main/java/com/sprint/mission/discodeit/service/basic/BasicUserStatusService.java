@@ -6,11 +6,15 @@ import com.sprint.mission.discodeit.dto.request.userStatus.UserStatusPatchReques
 import com.sprint.mission.discodeit.dto.response.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
+import com.sprint.mission.discodeit.exception.domain.userStatus.UserStatusNotExistException;
+import com.sprint.mission.discodeit.exception.domain.userStatus.UserStatusNotMatchException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.service.UnknownServiceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,17 +32,10 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusMapper userStatusMapper;
 
     @Override
-    public void updateByUserId(UUID userId) {
-        UserStatus userStatus = userStatusRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 userStatus 입니다."));
-        userStatusRepository.save(userStatus);
-
-    }
-
-    @Override
     @Transactional
     public UserStatusDto createUserStatus(UserStatusCreateRequestDto userStatusCreateRequestDto) {
-       User targetUser = userRepository.findById(userStatusCreateRequestDto.userId()).orElseThrow(()->new IllegalArgumentException("존재하지 않는 User 입니다."));
-
+        UUID userId = userStatusCreateRequestDto.userId();
+       User targetUser = userRepository.findById(userId).orElseThrow(()->new UserNotExistException(userId));
         UserStatus userStatus = new UserStatus(targetUser,userStatusCreateRequestDto.lastOnlineTime());
 
         return userStatusMapper.toDto(userStatusRepository.save(userStatus));
@@ -61,10 +58,9 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     @Transactional
     public UserStatusDto patchUserStatus(UUID userId, UserStatusPatchRequestDto dto) {
-        User user = userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 User 입니다."));
-        UserStatus userStatus = userStatusRepository.findAll().stream().filter(x->x.getUser().getId()
-                .equals(userId)).findFirst()
-                .orElseThrow(()->new IllegalArgumentException("존재하지 않는 UserStatus 입니다."));
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotExistException(userId));
+        UserStatus userStatus = userStatusRepository.findAll().stream().filter(x->x.getUser().getId().equals( userId)).findFirst()
+                .orElseThrow(()->new UserStatusNotMatchException(userId));
         userStatus.setLastActiveAt(dto.newLastActiveAt());
         userStatusRepository.save(userStatus);
         userRepository.save(user);
