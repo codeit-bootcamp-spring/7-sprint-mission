@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -14,6 +16,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +26,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Primary
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -35,20 +39,26 @@ public class UserServiceImpl implements UserService {
                           Optional<BinaryContentCreateRequest> profileReq) {
 
         if (userRepository.existsByEmail(req.email())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new UserAlreadyExistsException(req.email());
         }
 
-        User user = User.builder()
-                .name(req.username())
-                .email(req.email())
-                .password(req.password())
-                .build();
+        User user = new User(
+                req.username(),
+                req.email(),
+                req.password(),
+                null
+        );
+
 
         userRepository.save(user);
 
-        profileReq.ifPresent(p -> saveProfile(user, p));
+        profileReq.ifPresent(p -> saveProfileAndReturn(user, p));
 
-        userStatusRepository.save(UserStatus.builder().user(user).build());
+
+        userStatusRepository.save(
+                new UserStatus(user, java.time.Instant.now())
+        );
+
 
         return UserDto.from(user);
     }
@@ -59,20 +69,30 @@ public class UserServiceImpl implements UserService {
                           Optional<BinaryContentCreateRequest> profileReq) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
-        user.update(req.username());
+        BinaryContent newProfile = profileReq
+                .map(p -> saveProfileAndReturn(user, p))
+                .orElse(null);
 
-        profileReq.ifPresent(p -> saveProfile(user, p));
+        user.update(
+                req.newUsername(),
+                req.newEmail(),
+                req.newPassword(),
+                newProfile
+        );
 
         return UserDto.from(user);
     }
 
+
     @Override
-    public UserDto find(UUID userid) {
-        return userRepository.findById(userid)
-                .map(UserDto::from)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public UserDto find(UUID userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        return UserDto.from(user);
     }
 
     @Override
@@ -83,28 +103,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(UUID userid) {
-        userRepository.deleteById(userid);
+    public void delete(UUID userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        userRepository.delete(user);
     }
 
-
-    // ---------------------------------
-    // Private: 프로필 저장
-    // ---------------------------------
-    private void saveProfile(User user, BinaryContentCreateRequest req) {
+    private BinaryContent saveProfileAndReturn(User user, BinaryContentCreateRequest req) {
 
         BinaryContent binary = BinaryContent.builder()
                 .fileName(req.fileName())
                 .contentType(req.contentType())
-                .size(req.bytes().length)
-                .user(user)
+                .size((long) req.bytes().length)
                 .build();
 
-        binaryRepo.save(binary);
 
+        binaryRepo.save(binary);
         storage.put(binary.getId(), req.bytes());
 
-        user.updateProfile(binary);
+        return binary;
     }
-}
 
+}

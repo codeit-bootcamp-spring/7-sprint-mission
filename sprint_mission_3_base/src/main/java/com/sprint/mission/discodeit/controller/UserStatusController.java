@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -15,21 +16,20 @@ public class UserStatusController {
 
     private final UserStatusService userStatusService;
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserStatusDto> findByUserId(@PathVariable UUID userId) {
-
-        var status = userStatusService.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
-
-        return ResponseEntity.ok(UserStatusDto.from(status));
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserStatusDto> getByUserId(@PathVariable UUID userId) {
+        UserStatusDto status = userStatusService.getByUserId(userId);
+        return ResponseEntity.ok(status);
     }
 
-    @PatchMapping("/{userId}")
-    public ResponseEntity<Void> update(@PathVariable UUID userId) {
+    @PatchMapping("/users/{userId}")
+    public ResponseEntity<UserStatusDto> updateByUserId(
+            @PathVariable UUID userId,
+            @RequestBody UserStatusUpdateRequest request
+    ) {
+        UserStatusDto updated =
+                userStatusService.updateByUserId(userId, request);
 
-        userStatusService.update(userId);
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(updated);
     }
-
 }

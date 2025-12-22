@@ -2,17 +2,24 @@ package com.sprint.mission.discodeit.service.jpa;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.channel.ChannelException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
-
+@Primary
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -22,34 +29,51 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public ChannelDto create(ChannelCreateRequest request) {
-        Channel channel = Channel.builder()
-                .name(request.name())
-                .build();
+        if (request.type() == ChannelType.PRIVATE) {
+            if (request.participantIds() == null || request.participantIds().isEmpty()) {
+                throw new ChannelException(
+                        ErrorCode.BAD_REQUEST,
+                        Map.of("reason", "PRIVATE channel requires participantIds")
+                );
+            }
+        }
+
+        Channel channel = new Channel(
+                request.type(),
+                request.name(),
+                null
+        );
 
         channelRepository.save(channel);
         return ChannelDto.from(channel);
     }
 
     @Override
-    public ChannelDto update(ChannelUpdateRequest request) {
+    public ChannelDto update(UUID channelId, ChannelUpdateRequest request) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
-        Channel channel = channelRepository.findById(request.id())
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
+        if (channel.getType() == ChannelType.PRIVATE) {
+            throw new PrivateChannelUpdateException(channelId);
+        }
 
-        channel.update(request.name());
+        channel.update(request.name(), null);
         return ChannelDto.from(channel);
     }
 
     @Override
-    public void delete(UUID id) {      // <-- UUID로 변경됨
+    public void delete(UUID id) {
+        if (!channelRepository.existsById(id)) {
+            throw new ChannelNotFoundException(id);
+        }
         channelRepository.deleteById(id);
     }
 
     @Override
-    public ChannelDto find(UUID id) {  // <-- UUID로 변경됨
+    public ChannelDto find(UUID id) {
         return channelRepository.findById(id)
                 .map(ChannelDto::from)
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(id));
     }
 
     @Override
@@ -60,4 +84,14 @@ public class ChannelServiceImpl implements ChannelService {
                 .toList();
     }
 
+    @Override
+    public List<ChannelDto> findByUserId(UUID userId) {
+        if (userId == null) {
+            throw new ChannelException(ErrorCode.BAD_REQUEST, Map.of("reason", "userId is null"));
+        }
+        return channelRepository.findAllByType(ChannelType.PUBLIC)
+                .stream()
+                .map(ChannelDto::from)
+                .toList();
+    }
 }

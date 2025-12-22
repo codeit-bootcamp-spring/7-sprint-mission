@@ -1,59 +1,53 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.ChannelApi;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-import java.util.List;
-
-@RestController
 @RequiredArgsConstructor
+@RestController
 @RequestMapping("/api/channels")
-public class ChannelController {
+public class ChannelController implements ChannelApi {
 
     private final ChannelService channelService;
 
-    @GetMapping
-    public ResponseEntity<List<ChannelDto>> findAll() {
-        return ResponseEntity.ok(channelService.findAll());
-    }
-    // 채널 생성
+    @Override
     @PostMapping
-    public ResponseEntity<ChannelDto> create(@RequestBody ChannelCreateRequest request) {
-        ChannelDto created = channelService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<ChannelDto> create(@Valid @RequestBody ChannelCreateRequest request) {
+        ChannelDto createdChannel = channelService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
 
-    // 채널 수정
+    @Override
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> update(
-            @PathVariable("channelId") UUID channelId,
-            @RequestBody ChannelUpdateRequest request
+            @PathVariable UUID channelId,
+            @Valid @RequestBody ChannelUpdateRequest request
     ) {
-        // ChannelUpdateRequest는 id + name 사용
-        ChannelUpdateRequest fixedRequest = new ChannelUpdateRequest(channelId, request.name());
-
-        ChannelDto updated = channelService.update(fixedRequest);
-        return ResponseEntity.ok(updated);
+        ChannelDto updatedChannel = channelService.update(channelId, request);
+        return ResponseEntity.ok(updatedChannel);
     }
 
-    // 채널 삭제
+    @Override
     @DeleteMapping("/{channelId}")
-    public ResponseEntity<Void> delete(@PathVariable("channelId") UUID channelId) {
+    public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity.noContent().build();
     }
 
-    // 특정 채널 조회
-    @GetMapping("/{channelId}")
-    public ResponseEntity<ChannelDto> find(@PathVariable("channelId") UUID channelId) {
-        ChannelDto dto = channelService.find(channelId);
-        return ResponseEntity.ok(dto);
+    @Override
+    @GetMapping
+    public ResponseEntity<List<ChannelDto>> findAll() {
+        List<ChannelDto> channels = channelService.findAll();
+        return ResponseEntity.ok(channels);
     }
 }

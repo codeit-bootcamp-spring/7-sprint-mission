@@ -2,10 +2,11 @@ package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+
 import java.util.UUID;
 
 public record UserDto(
-        UUID id,
+        UUID id,            // ✅ UUID → Long
         String username,
         String email,
         String profileUrl
@@ -21,7 +22,7 @@ public record UserDto(
 
         return new UserDto(
                 user.getId(),
-                user.getName(),
+                user.getUsername(),
                 user.getEmail(),
                 profileUrl
         );
