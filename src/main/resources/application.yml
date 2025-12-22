@@ -2,12 +2,8 @@ spring:
   application:
     name: discodeit
 
-  # 데이터베이스 연결 설정값
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-    driver-class-name: org.postgresql.Driver
+  profiles:
+    active: prod # 기본 dev로 실행되게 설정 (운영 배포시 prod)로 변경
 
   jpa:
     database: postgresql
@@ -20,11 +16,22 @@ spring:
         format_sql: true
     open-in-view: false
 
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 10MB
+
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
+
 discodeit:
   storage:
     type: local
     local:
-      root-path: C:/Users/user/Workspace/codeit-sprint-bootcamp/7-sprint-mission/image
+      root-path: ./image
 
 springdoc:
   api-docs:
@@ -33,3 +40,36 @@ springdoc:
     path: /swagger-ui.html
     enabled: true
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+
+  endpoint:
+    health:
+      show-details: always # 개발 환경에서는 always, 운영에서는 when-authorized
+
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    java:
+      version: 17
+    spring-boot:
+      version: 3.4.0
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}

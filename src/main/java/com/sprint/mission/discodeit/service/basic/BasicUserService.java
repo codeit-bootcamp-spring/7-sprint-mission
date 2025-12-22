@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.global.exception.user.EmailAlreadyExistsException;
+import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.global.exception.user.UsernameAlreadyExistsException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
@@ -8,23 +11,24 @@ import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.validator.UserValidator;
-import com.sprint.mission.discodeit.global.exception.custom.CustomException;
-import com.sprint.mission.discodeit.global.exception.custom.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService{
@@ -40,30 +44,18 @@ public class BasicUserService implements UserService{
     @Override
     @Transactional
     public UserResponseDto create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
-        // 1. username/nickname/email 중복 검사
-        if (existsByUsername(userRequest.username())) {
-            throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
-        } else if (existsByEmail(userRequest.email())) {
-            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
-        }
 
-        // 2. 입력된 정보 형태 검증
-        Optional.ofNullable(userRequest.email()).ifPresent(e -> UserValidator.validateEmail(e));
-        Optional.ofNullable(userRequest.password()).ifPresent(pw -> UserValidator.validatePassword(pw));
+        log.debug("신규 사용자 생성 요청: username = {}, email = {}",
+                userRequest.username(), userRequest.email());
 
-        // 3. 선택적 프로필 이미지 처리
-        BinaryContent profileImage = null;
+        // username, email 중복 검사
+        validateUsernameDuplicate(userRequest.username());
+        validateEmailDuplicate(userRequest.email());
 
-        if (Optional.ofNullable(profileRequest).isPresent()) {
-            profileImage = new BinaryContent(
-                    profileRequest.fileName(),
-                    profileRequest.size(),
-                    profileRequest.contentType()
-            );
-            binaryContentRepository.save(profileImage);
-            binaryContentStorage.put(profileImage.getId(), profileRequest.bytes());
-        }
+        // 선택적 프로필 이미지 처리
+        BinaryContent profileImage = saveProfileImage(null, profileRequest);
 
+        // 사용자 생성
         User newUser  = new User(
                 userRequest.username(),
                 userRequest.email(),
@@ -74,8 +66,12 @@ public class BasicUserService implements UserService{
         UserStatus userStatus = new UserStatus(newUser);
         newUser.setStatus(userStatus);
 
-        userRepository.save(newUser);
+        // 사용자 저장
+        User saved = userRepository.save(newUser);
         userStatusRepository.save(userStatus);
+
+        log.info("새 유저 생성 완료: userId = {}, username = {}, email = {}",
+                saved.getId(), saved.getUsername(), saved.getEmail());
 
         return userMapper.toResponseDto(newUser);
     }
@@ -83,7 +79,10 @@ public class BasicUserService implements UserService{
     @Override
     public UserResponseDto find(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(
+                        ErrorCode.USER_NOT_FOUND,
+                        Map.of("userId", userId)
+                ));
 
         return userMapper.toResponseDto(user);
     }
@@ -99,8 +98,14 @@ public class BasicUserService implements UserService{
     @Override
     @Transactional
     public UserResponseDto update(UUID userId, UpdateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
+        
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(
+                        ErrorCode.USER_NOT_FOUND,
+                        Map.of("userId", userId)
+                ));
+
+        log.debug("사용자 정보 수정 요청: userId = {}, username = {}", user.getId(), user.getUsername());
 
         String username = null;
         String email = null;
@@ -112,46 +117,33 @@ public class BasicUserService implements UserService{
             email = userRequest.newEmail();
             password = userRequest.newPassword();
 
-            // 아이디와 닉네임, 이메일 중복 확인
-            if (existsByUsername(username)) {
-                throw new CustomException(ErrorCode.USERNAME_ALREADY_EXISTS);
-            } else if (existsByEmail(email)) {
-                throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
-            }
-
-            // 입력된 정보 형태 검증
-            Optional.ofNullable(email).ifPresent(e -> UserValidator.validateEmail(e));
-            Optional.ofNullable(password).ifPresent(pw -> UserValidator.validatePassword(pw));
+            // username, email 중복 검사 (사용자의 기존 정보인 경우 제외)
+            if(!user.getUsername().equals(username)) validateUsernameDuplicate(username);
+            if(!user.getEmail().equals(email)) validateEmailDuplicate(email);
         }
-        BinaryContent profileImage = null;
 
-        if (Optional.ofNullable(profileRequest).isPresent()) {
-            profileImage = new BinaryContent(
-                    profileRequest.fileName(),
-                    profileRequest.size(),
-                    profileRequest.contentType()
-            );
-
-            // 기존 프로필 이미지 삭제(있는 경우)
-            if(user.getProfile() != null) {
-                binaryContentRepository.deleteById(user.getProfile().getId());
-            }
-
-            binaryContentRepository.save(profileImage);
-            binaryContentStorage.put(profileImage.getId(), profileRequest.bytes());
-        }
+        // 선택적 프로필 이미지 처리
+        BinaryContent profileImage = saveProfileImage(user.getProfile(), profileRequest);
 
         user.update(username, email, password, profileImage);
-        userRepository.save(user);
+        User saved = userRepository.save(user);
 
-        return userMapper.toResponseDto(user);
+        log.info("사용자 정보 수정 완료: userId = {}, username = {}", saved.getId(), saved.getUsername());
+
+        return userMapper.toResponseDto(saved);
     }
 
     @Override
     @Transactional
-    public void delete(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public void delete(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        ErrorCode.USER_NOT_FOUND,
+                        Map.of("userId", userId)
+                ));
+
+        log.debug("사용자 삭제 요청: userId = {}, username = {}", user.getId(), user.getUsername());
+
         BinaryContent profile = user.getProfile();
         UserStatus userStatus = user.getStatus();
 
@@ -161,16 +153,62 @@ public class BasicUserService implements UserService{
         }
 
         userStatusRepository.deleteById(userStatus.getId());
-        userRepository.deleteById(id);
+        userRepository.deleteById(userId);
+
+        log.info("사용자 삭제 완료: userId = {}", userId);
     }
 
-    private boolean existsByUsername(String username) {
-        return userRepository.findAll().stream()
-                .anyMatch(u -> u.getUsername().equals(username));
+    private void validateUsernameDuplicate(String username) {
+        log.debug("username 중복 검증 시작");
+
+        boolean exists = userRepository.existsByUsername(username);
+
+        if (exists) {
+            throw new UsernameAlreadyExistsException(
+                    ErrorCode.USERNAME_ALREADY_EXISTS,
+                    Map.of("username", username)
+            );
+        }
     }
 
-    private boolean existsByEmail(String email) {
-        return userRepository.findAll().stream().
-                anyMatch(u -> u.getEmail().equals(email));
+    private void validateEmailDuplicate(String email) {
+        log.debug("이메일 중복 검증 시작");
+
+         boolean exists = userRepository.existsByEmail(email);
+
+        if (exists) {
+            throw new EmailAlreadyExistsException(
+                    ErrorCode.EMAIL_ALREADY_EXISTS,
+                    Map.of("email", email)
+            );
+        }
+    }
+
+    private BinaryContent saveProfileImage(BinaryContent oldProfile, CreateBinaryContentRequestDto request) {
+        if (request == null) {
+            return null;
+        }
+
+        log.debug("프로필 이미지 저장 시작");
+
+        // 1. 기존 이미지 삭제
+        if (oldProfile != null) {
+            log.info("기존 프로필 이미지 삭제: {}", oldProfile.getFileName());
+            binaryContentRepository.deleteById(oldProfile.getId());
+        }
+
+        // 2. 신규 이미지 저장
+        BinaryContent newProfile = new BinaryContent(
+                request.fileName(),
+                request.size(),
+                request.contentType()
+        );
+
+        BinaryContent saved = binaryContentRepository.save(newProfile);
+        binaryContentStorage.put(saved.getId(), request.bytes());
+
+        log.info("프로필 이미지 저장 완료: {}", saved.getFileName());
+
+        return saved;
     }
 }

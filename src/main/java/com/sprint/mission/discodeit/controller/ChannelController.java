@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
@@ -22,13 +24,22 @@ public class ChannelController implements ChannelControllerDocs {
     // 채널 생성
     @PostMapping("/public")
     public ResponseEntity<ChannelDto> createPublic(@Valid @RequestBody CreatePublicChannelRequestDto requestDto) {
+        log.info("POST /api/channels/public - 공개 채널 생성 요청: channelName = {}", requestDto.name());
+
         ChannelDto createdChannel = channelService.create(requestDto);
+
+        log.info("POST /api/channels/public - 공개 채널 생성 완료: channelId = {}, channelName = {}",
+                createdChannel.id(), createdChannel.name());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
 
     @PostMapping("/private")
     public ResponseEntity<ChannelDto> createPrivate(@RequestBody CreatePrivateChannelRequestDto requestDto) {
+        log.info("POST /api/channels/private - 비공개 채널 생성 요청");
+
         ChannelDto createdChannel = channelService.create(requestDto);
+
+        log.info("POST /api/channels/private - 비공개 채널 생성 완료: channelId = {}", createdChannel.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
 
@@ -36,14 +47,22 @@ public class ChannelController implements ChannelControllerDocs {
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
                                              @RequestBody UpdatePublicChannelRequestDto request) {
+        log.info("PATCH /api/channels/{} - 공개 채널 정보 수정 요청", channelId);
+
         ChannelDto updatedChannel = channelService.update(channelId, request);
+
+        log.info("PATCH /api/channels/{} - 공개 채널 정보 수정 완료", channelId);
         return ResponseEntity.status(HttpStatus.OK).body(updatedChannel);
     }
 
     // 채널 삭제
     @DeleteMapping("/{channelId}")
     public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
+        log.info("DELETE /api/channels/{} - 채널 삭제 요청", channelId);
+
         channelService.delete(channelId);
+
+        log.info("DELETE /api/channels/{} - 채널 삭제 완료", channelId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

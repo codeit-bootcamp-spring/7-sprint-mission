@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -249,6 +250,7 @@ public interface MessageControllerDocs {
     })
     ResponseEntity<PageResponseDto<MessageResponseDto>> searchMessage(
             @RequestParam UUID channelId,
+            @RequestParam(required = false) Instant cursor,
             @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     );

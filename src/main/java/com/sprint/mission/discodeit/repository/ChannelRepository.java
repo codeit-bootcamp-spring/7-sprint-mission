@@ -18,4 +18,6 @@ import java.util.UUID;
  */
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
     List<Channel> findAllByChannelType(ChannelType channelType);
+
+    boolean existsByChannelName(String channelName);
 }

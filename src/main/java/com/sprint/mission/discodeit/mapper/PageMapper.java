@@ -12,13 +12,11 @@ public class PageMapper {
     public <T> PageResponseDto<T> toResponseDto(Slice<T> slice){
         Object nextCursor = null;
 
-        if(slice.getContent().get(0) instanceof MessageResponseDto){
+        if(!slice.getContent().isEmpty() && slice.getContent().get(0) instanceof MessageResponseDto){
             MessageResponseDto lastMessage = (MessageResponseDto) slice.getContent()
                     .get(slice.getContent().size() - 1);
             nextCursor = lastMessage.createdAt();
         }
-
-        System.out.println(nextCursor);
 
         return new PageResponseDto<>(
                 slice.getContent(),

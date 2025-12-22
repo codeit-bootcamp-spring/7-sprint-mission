@@ -11,7 +11,6 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @AllArgsConstructor
-@ToString
 @Entity
 @Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
@@ -24,4 +23,16 @@ public class BinaryContent extends BaseEntity {
 
     @Column(name = "content_type", nullable = false)
     private String contentType;
+
+    @Override
+    public String toString() {
+        String parent = super.toString();
+
+        return "BinaryContent{" +
+                parent +
+                ", fileName='" + fileName + '\'' +
+                ", size=" + size +
+                ", contentType='" + contentType + '\'' +
+                '}';
+    }
 }

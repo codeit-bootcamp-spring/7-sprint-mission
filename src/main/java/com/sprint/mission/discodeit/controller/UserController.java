@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -37,8 +39,12 @@ public class UserController implements UserControllerDocs {
             @Valid @RequestPart("userCreateRequest") CreateUserRequestDto requestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
+        log.info("POST /api/users - 사용자 등록 요청: username = {}", requestDto.username());
+
         CreateBinaryContentRequestDto profileRequestDto = binaryContentMapper.toRequestDto(profile);
         UserResponseDto createdUser = userService.create(requestDto, profileRequestDto);
+
+        log.info("POST /api/users - 사용자 등록 완료: userId = {}, username = {}", createdUser.id(), createdUser.username());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
@@ -46,18 +52,26 @@ public class UserController implements UserControllerDocs {
     @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserResponseDto> updateUser(
             @PathVariable UUID userId,
-            @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
+            @Valid @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
             @RequestPart(name = "profile", required = false) MultipartFile profile
     ) {
+        log.info("PATCH /api/users/{} - 사용자 정보 수정 요청", userId);
+
         CreateBinaryContentRequestDto profileRequestDto = binaryContentMapper.toRequestDto(profile);
         UserResponseDto updatedUser = userService.update(userId, requestDto, profileRequestDto);
+
+        log.info("PATCH /api/users/{} - 사용자 정보 수정 완료", userId);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
     // 사용자 삭제
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        log.info("DELETE /api/users/{} - 사용자 삭제 요청", userId);
+
         userService.delete(userId);
+
+        log.info("DELETE /api/users/{} - 사용자 삭제 완료", userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
