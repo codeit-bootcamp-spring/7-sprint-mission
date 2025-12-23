@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binaryContent.request.BinaryContentGetRequest;
-import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.entity.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import jakarta.validation.Valid;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,19 +16,19 @@ import java.util.UUID;
 public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
+
+    @GetMapping
+    public ResponseEntity<List<BinaryContentDto>> getContents(@RequestParam List<UUID> binaryContentIds) {
+        return ResponseEntity.ok(binaryContentService.getByIds(binaryContentIds));
+    }
 
     @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContentResponse> getContent(@PathVariable UUID binaryContentId) {
+    public ResponseEntity<BinaryContentDto> getContent(@PathVariable UUID binaryContentId) {
         return ResponseEntity.ok(binaryContentService.get(binaryContentId));
     }
-
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentResponse>> getContents(@RequestParam List<UUID> binaryContentIds) {
-        return ResponseEntity.ok(binaryContentService.getAllById(binaryContentIds));
-    }
-
-    @RequestMapping(value = "/getAll", method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentResponse>> getAll() {
-        return ResponseEntity.ok(binaryContentService.getAll());
+    @GetMapping("/{binaryContentId}/download")
+    public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
+        return ResponseEntity.ok(binaryContentStorage.download(binaryContentService.get(binaryContentId)));
     }
 }

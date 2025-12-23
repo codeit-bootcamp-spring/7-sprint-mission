@@ -1,24 +1,30 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.request.MessageGetByChannelIdRequest;
-import com.sprint.mission.discodeit.dto.message.request.*;
-import com.sprint.mission.discodeit.dto.message.response.MessageResponseV2;
-import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.enums.ReceiverType;
 import com.sprint.mission.discodeit.common.exceptions.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.common.exceptions.message.MessageNotFoundException;
-import com.sprint.mission.discodeit.common.exceptions.ReceiverNotFoundException;
 import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
+import com.sprint.mission.discodeit.dto.entity.channel.request.MessageGetRequest;
+import com.sprint.mission.discodeit.dto.entity.message.MessageDto;
+import com.sprint.mission.discodeit.dto.entity.message.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.entity.message.request.MessageEditRequest;
+import com.sprint.mission.discodeit.dto.mapper.MessageMapper;
+import com.sprint.mission.discodeit.dto.mapper.PageResponseMapper;
+import com.sprint.mission.discodeit.dto.page.PageResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,97 +36,64 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Override
-    public List<MessageResponseV2> get(MessageGetRequest dto) {
-        List<Message> messages;
-        if (dto.senderId() != null && dto.receiverId() != null) {
-            messages = messageRepository.findBySenderAndReceiver(
-                    findUser(dto.senderId()),
-                    dto.type() == ReceiverType.USER ?
-                            findUser(dto.receiverId()) : findChannel(UUID.fromString(dto.receiverId())));
-        } else if (dto.senderId() != null) {
-            messages = messageRepository.findBySender(findUser(dto.senderId()));
-        } else {
-            if (dto.type() == ReceiverType.USER) {
-                messages = messageRepository.findByReceiver(findUser(dto.receiverId()));
-            } else {
-                messages = messageRepository.findByReceiver(findChannel(UUID.fromString(dto.receiverId())));
-            }
-        }
-        return messages.stream()
-                .map(MessageResponseV2::toDto)
-                .toList();
-    }
-
-    private Channel findChannel(UUID channelId) {
-        return channelRepository.find(channelId)
-                .orElseThrow(() -> new ChannelNotFoundException(channelId));
-    }
-
-    private User findUser(String userId) {
-        return userRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+    public PageResponse<Message> getAllByChannelId(MessageGetRequest request) {
+        return PageResponseMapper.fromPage(messageRepository.findAllByChannel(
+                channelRepository.findById(request.channelId())
+                        .orElseThrow(() -> new ChannelNotFoundException(request.channelId())),
+                PageRequest.of(
+                        request.pageable().getPageNumber(),
+                        request.pageable().getPageSize(),
+                        request.pageable().getSort()))
+        );
     }
 
     @Override
     public void remove(UUID id) {
-        Message message = messageRepository.find(id)
+        Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new MessageNotFoundException(id));
-        if (!message.getAttachments().isEmpty()) {
-            binaryContentRepository.deleteAll(message.getAttachments());
-        }
+        binaryContentRepository.deleteAll(message.getAttachments());
         messageRepository.delete(message);
     }
 
-    /**
-     * 테스트용 메서드: 마지막으로 추가된 메시지를 반환합니다.
-     *
-     * @return 마지막 메시지
-     */
     @Override
-    public Message getLastMessage() {
-        return messageRepository.findLast().orElseThrow(() -> new MessageNotFoundException("메세지 데이터가 존재하지 않습니다."));
-    }
-
-    @Override
-    public MessageResponseV2 editMessage(UUID id, MessageEditRequest dto) {
-        Message message = messageRepository.find(id)
+    public MessageDto editMessage(UUID id, MessageEditRequest request) {
+        Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new MessageNotFoundException(id));
-        message.setContent(dto.newContent());
-        messageRepository.update(message);
-        return MessageResponseV2.toDto(message);
+        message.setContent(request.newContent());
+        Message savedMessage = messageRepository.save(message);
+        return MessageMapper.toDto(savedMessage);
     }
 
     @Override
-    public List<MessageResponseV2> getAll() {
-        return messageRepository.findAll().stream()
-                .map(MessageResponseV2::toDto)
-                .toList();
-    }
-
-    @Override
-    public List<MessageResponseV2> getAllByChannelId(MessageGetByChannelIdRequest request) {
-        return messageRepository.findByReceiver(channelRepository.find(request.channelId())
-                        .orElseThrow(() -> new ChannelNotFoundException(request.channelId())))
+    public List<MessageDto> getAll() {
+        return messageRepository.findAll()
                 .stream()
-                .map(MessageResponseV2::toDto)
+                .map(MessageMapper::toDto)
                 .toList();
     }
 
     @Override
-    public MessageResponseV2 send(MessageCreateRequestV2 messageCreateRequest, List<MultipartFile> attachments) {
-        Message message = new Message(
-                userRepository.find(messageCreateRequest.authorId())
+    public MessageDto send(MessageCreateRequest messageCreateRequest, List<MultipartFile> attachmentFiles) {
+        Message message = messageRepository.save(new Message(
+                userRepository.findById(messageCreateRequest.authorId())
                         .orElseThrow(() -> new UserNotFoundException(messageCreateRequest.authorId())),
-                ReceiverType.CHANNEL,
-                channelRepository.find(messageCreateRequest.channelId())
+                channelRepository.findById(messageCreateRequest.channelId())
                         .orElseThrow(() -> new ChannelNotFoundException(messageCreateRequest.channelId())),
-                messageCreateRequest.content()
-
-        );
-        messageRepository.save(message);
-        // 파일 저장은 다음 미션때 구현...
-        return MessageResponseV2.toDto(message);
+                messageCreateRequest.content(),
+                attachmentFiles == null ? null : attachmentFiles.stream()
+                        .map(f -> {
+                            try {
+                                BinaryContent saved = binaryContentRepository.save(new BinaryContent(f.getName(), f.getSize(), f.getContentType()));
+                                binaryContentStorage.put(saved.getId(), f.getBytes());
+                                return saved;
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }).toList()
+        ));
+        return MessageMapper.toDto(message);
     }
 }

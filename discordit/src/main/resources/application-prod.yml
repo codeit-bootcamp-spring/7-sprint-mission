@@ -1,0 +1,10 @@
+logging:
+  level:
+    root: info
+server:
+  port: 9090
+
+spring:
+    url: jdbc:postgresql://localhost:8080/discodeit_prod
+    username: discodeit_prod
+    password: discodeit1234

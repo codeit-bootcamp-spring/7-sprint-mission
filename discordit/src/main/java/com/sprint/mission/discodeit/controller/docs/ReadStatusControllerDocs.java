@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller.docs;
 
-import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.dto.entity.readStatus.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.entity.readStatus.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.entity.readStatus.request.ReadStatusUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -25,16 +25,7 @@ public interface ReadStatusControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ResponseEntity<List<ReadStatusResponse>> getByUserId(@RequestParam UUID userId);
-
-    @Operation(
-            summary = "모든 읽음 상태 조회",
-            description = "시스템의 모든 읽음 상태를 조회합니다"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
-    ResponseEntity<List<ReadStatusResponse>> getAll();
+    ResponseEntity<List<ReadStatusDto>> getByUserId(@RequestParam UUID userId);
 
     @Operation(
             summary = "읽음 상태 생성",
@@ -43,7 +34,7 @@ public interface ReadStatusControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "생성 성공")
     })
-    ResponseEntity<ReadStatusResponse> create(@Valid @RequestBody ReadStatusCreateRequest request);
+    ResponseEntity<ReadStatusDto> create(@Valid @RequestBody ReadStatusCreateRequest request);
 
     @Operation(
             summary = "읽음 상태 수정",
@@ -52,5 +43,5 @@ public interface ReadStatusControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공")
     })
-    ResponseEntity<ReadStatusResponse> read(@PathVariable UUID readStatusId, @RequestBody ReadStatusUpdateRequest request);
+    ResponseEntity<ReadStatusDto> read(@PathVariable UUID readStatusId, @RequestBody ReadStatusUpdateRequest request);
 }
