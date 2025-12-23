@@ -2,11 +2,12 @@ package com.sprint.mission.discodeit.dto.messageDto;
 
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
+import lombok.Builder;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-
+@Builder
 public record MessageDto(UUID id,
                          Instant createdAt,
                          Instant updatedAt,

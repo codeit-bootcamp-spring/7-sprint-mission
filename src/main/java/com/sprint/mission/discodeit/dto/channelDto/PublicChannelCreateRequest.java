@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.dto.channelDto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
 
-@Getter
-public class PublicChannelCreateRequest {
-    @NotBlank(message = "채널 이름은 비워둘 수 없습니다.")
-    private String name;
-    private String description;
+public record PublicChannelCreateRequest(
+        @NotBlank(message = "채널 이름은 비워둘 수 없습니다.")
+        String name,
+        String description
+){
 }

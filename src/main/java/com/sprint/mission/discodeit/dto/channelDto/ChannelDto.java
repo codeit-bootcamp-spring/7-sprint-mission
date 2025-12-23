@@ -4,11 +4,13 @@ import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.entityType.ChannelType;
+import lombok.Builder;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Builder
 public record ChannelDto(UUID id,
                          ChannelType type,    // public, private
                          String name,

@@ -2,53 +2,19 @@ spring:
   application:
     name: discodeit
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-    driver-class-name: org.postgresql.Driver
+  profiles:
+    active: test
 
   jpa:
-    database: postgresql
-    hibernate:
-      # DDL 자동 생성 옵션
-      # none: 아무것도 하지 않음 (운영 환경)
-      # create: 기존 테이블 삭제 후 새로 생성
-      # create-drop: 종료 시 테이블 삭제
-      # update: 변경된 스키마만 반영 (개발 환경)
-      # validate: 엔티티와 테이블이 정상 매핑되었는지만 확인
-      ddl-auto: validate
-
+    open-in-view: false
     properties:
       hibernate:
-        show_sql: true  # SQL 실행 콘솔 출력
-        format_sql: true # 출력을 보기 좋게 바꿔줌
-        default_batch_fetch_size: 100  # n+1 문제를 해결하진 않지만 size만큼 한번에 가져옴. 페이징을 위해 사용
-
-    open-in-view: false
+        default_batch_fetch_size: 100
 
   servlet:
     multipart:
-      max-file-size: 500MB    # 기본은 1MB
-      max-request-size: 500MB
-
-logging:
-  level:
-    org:
-      hibernate:
-        orm:
-          jdbc:
-            bind: TRACE # 쿼리 로그 ?값을 보여줌
-
-
-server:
-  port: 8080
-# application.yaml
-discodeit:
-    storage:
-      type: local
-      local:
-        root-path: /Users/apple/Desktop/codeit-7th-develop/DiscodeitUpload
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 springdoc:
   swagger-ui:
@@ -60,4 +26,44 @@ springdoc:
 
   api-docs:
     path: /my-api # Swagger가 우리 api의 정보를 얻어오기 위해 요청하는 url
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers #, evn # 꼭 필요한 것만 노출!
+      base-path: /management # 경로도 바꿔서 숨
+
+  endpoint:
+    health:
+      show-details: always # 개발 환경에서는 always, 운영에서는 when-authorized
+  info:
+    env:
+      enabled: true
+
+  server:
+    port: 9020 # Actuator 전용 포트 (방화벽으로 막음)
+
+info:
+  app:
+    name: Discodeit
+    java-version: ${java.version}
+    java-spring-boot-version: 3.4.10
+    encoding: UTF-8
+
+  configs:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}
 

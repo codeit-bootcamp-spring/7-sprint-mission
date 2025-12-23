@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import java.time.Instant;
 
-@Getter @ToString
+@Getter @ToString(exclude = "user")
 @Entity
 @Table(name = "user_statuses")
 @NoArgsConstructor
