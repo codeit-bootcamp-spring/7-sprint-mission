@@ -178,6 +178,7 @@ public class GlobalExceptionHandler {
         log.error("DiscodeitException: {}", ex.getErrorCode(), ex);
 
         ErrorResponse errorResponse = ex.toErrorResponse();
+        ex.getDetails().put("trace", ex.getStackTrace());
 
         return ResponseEntity
                 .status(ex.getErrorCode().getHttpStatus())
