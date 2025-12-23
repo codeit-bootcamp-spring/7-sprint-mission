@@ -38,6 +38,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDto get(UUID id) {
+        log.info("사용자 조회 요청 들어옴 - {}", id);
         return UserMapper.toDto(userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id)));
     }
@@ -45,6 +46,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
+        log.info("모든 사용자 조회 요청 들어옴");
         return userRepository.findAll().stream()
                 .map(UserMapper::toDto)
                 .toList();
@@ -67,9 +69,9 @@ public class BasicUserService implements UserService {
             log.debug("사용자 프로필 이미지 저장 완료.");
         }
         userRepository.save(user);
-        log.info("사용자 저장 완료 - id : {}", user.getId());
         userStatusRepository.save(new UserStatus(user));
         log.debug("UserStatus 생성 완료.");
+        log.info("사용자 생성 완료 - id : {}", user.getId());
         return UserMapper.toDto(user);
     }
 
