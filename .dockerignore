@@ -1,0 +1,7 @@
+.env.*
+.env
+../build/
+out/
+target/
+*.log
+.DS_Store

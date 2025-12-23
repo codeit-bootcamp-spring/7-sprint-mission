@@ -28,7 +28,7 @@ discodeit:
     local:
       root-path: "${user.home}/Documents/discodeit/jpaData"
 server:
-  port: ${PORT:8084}
+  port: ${PORT:8081}
 
 springdoc:
   swagger-ui:

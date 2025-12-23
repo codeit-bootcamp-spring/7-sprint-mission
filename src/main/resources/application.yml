@@ -12,3 +12,12 @@ logging:
   level:
     root: INFO
 
+---
+
+spring:
+  config:
+    activate:
+      on-profile: docker
+  profiles:
+    active: prod
+
