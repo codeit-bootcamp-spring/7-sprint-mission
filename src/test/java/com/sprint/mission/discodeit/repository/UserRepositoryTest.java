@@ -1,130 +1,162 @@
 package com.sprint.mission.discodeit.repository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import jakarta.persistence.EntityManager;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.ActiveProfiles;
 
-@DataJpaTest // JPA TEST, Transactional 내장
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // H2로 교체하지 않고 postgresql로 테스트
-// @DataJpaTest는 각 테스트가 트랜잭션 환경에서 실행되고 테스트 종료 시 flush가 발생한다.
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
+@ActiveProfiles("test")
+@EnableJpaAuditing
+@DisplayName("UserRepository 테스트")
 class UserRepositoryTest {
+    @Autowired
+    private UserRepository userRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+    @Autowired
+    EntityManager entityManager;
 
-  @Autowired
-  private BinaryContentRepository binaryContentRepository;
-
-  @Test
-  @DisplayName("유저 생성 테스트")
-  void givenUser_whenCreate_thenSuccess() {
-    // give
-    User user = new User("Test1", "test1@codeit.com", "test1234", null);
-    userRepository.save(user);
-
-    // when
-    User findUser = userRepository.findById(user.getId()).orElse(null);
-
-    // then
-    String username = findUser.getUsername();
-    String email = findUser.getEmail();
-    String password = findUser.getPassword();
-
-    assertEquals(user.getUsername(), username);
-    assertEquals(user.getEmail(), email);
-    assertEquals(user.getPassword(), password);
-  }
+    private User user1;
+    private User user2;
+    private BinaryContent profile;
+    private BinaryContent profile2;
 
 
-  // Profile을 가진 유저를 저장할 시, BinaryContents 테이블에도 profile이 저장되어야함.
-  // BinaryContents에서 가져온 id와 저장된 User의 profile_id(fk)가 같아야 함을 보장
-  @Test
-  @DisplayName("유저 생성 테스트 profile 확인")
-  void givenUserWithProfile_whenCreate_thenSuccess() {
-    // given
-    byte[] bytes = {0, 0};
-    BinaryContent binaryContent = new BinaryContent("testFile", 10L, "*/*", bytes);
+    @BeforeEach
+    void setUp() {
+        profile = BinaryContent.builder()
+                .fileName("test1.jpg")
+                .contentType("image/jpeg")
+                .size(1L)
+                .build();
+        profile2 = BinaryContent.builder()
+                .fileName("test1.jpg")
+                .contentType("image/jpeg")
+                .size(1L)
+                .build();
 
-    User user = new User("Test1", "test1@codeit.com", "test1234", binaryContent);
-    userRepository.save(user);
+        user1 = new User("user1", "user1@codiet.com", "user1", profile);
+        user2 = new User("user2", "user2@codiet.com", "user2", profile2);
+    }
 
-    // when
-    User findUser = userRepository.findById(user.getId()).orElse(null);
-    BinaryContent findBinaryContent = binaryContentRepository.findById(binaryContent.getId())
-        .orElse(null);
+    @Nested
+    @DisplayName("유저 검색")
+    class UserFind {
+        @Test
+        @DisplayName("[정상 케이스] - 이름 검색")
+        void findByName_success() {
+            // given
+            userRepository.save(user1);
+            entityManager.flush();
+            entityManager.clear();
 
-    // then
-    assertEquals(findUser.getProfile().getId(), findBinaryContent.getId());
-  }
 
-  @Test
-  @DisplayName("중복 유저 테스트")
-  void givenDuplicatedUser_whenFlush_thenFail() {
-    // given
-    User user1 = new User("Test1", "test1@codeit.com", "test1234", null);
-    userRepository.save(user1);
-    User duplicatedUser = new User("Test1", "test2@codeit.com", "test1234", null);
-    userRepository.save(duplicatedUser);
-    // when
-    // then
-    // flush를 통해 실제 DB에 데이터를 넣어서, UK가 위반되는지 확인
-    assertThrows(DataIntegrityViolationException.class, () -> {
-      userRepository.flush();
-    });
-  }
+            // when
+            User result = userRepository.findByUsername(user1.getUsername()).orElse(null);
 
-  @Test
-  @DisplayName("삭제 테스트")
-  void givenUserWithProfile_whenDeleteUser_thenProfileRemainss() {
-    byte[] bytes = {0, 0};
-    BinaryContent binaryContent = new BinaryContent("testFile", 10L, "*/*", bytes);
-    User user = new User("Test1", "test1@codeit.com", "test1234", binaryContent);
-    userRepository.save(user);
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getUsername()).isEqualTo(user1.getUsername());
+            assertThat(result.getId()).isEqualTo(user1.getId());
+        }
 
-    // when
-    userRepository.delete(user);
-    userRepository.flush();
+        @Test
+        @DisplayName("[정상 케이스] - 이메일 검색")
+        void findByEmail_success() {
+            // given
+            userRepository.save(user1);
+            entityManager.flush();
+            entityManager.clear();
 
-    // then
-    // User를 삭제하게 되면, BinaryContent에 있는 해당 profile은 고아 객체로써 삭제
-    assertEquals(0, userRepository.count());
-    assertEquals(0, binaryContentRepository.count());
+            // when
+            User result = userRepository.findByEmail(user1.getEmail()).orElse(null);
 
-  }
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getEmail()).isEqualTo(user1.getEmail());
+            assertThat(result.getUsername()).isEqualTo(user1.getUsername());
+        }
 
-  @Test
-  @DisplayName("유저 변경 테스트")
-  void givenUserWithProfile_whenUpdateUser_thenSuccess() {
-    // given
-    byte[] bytes = {0, 0};
-    BinaryContent binaryContent = new BinaryContent("testFile", 10L, "*/*", bytes);
-    binaryContentRepository.save(binaryContent);
+        @Test
+        @DisplayName("[정상 케이스] - 존재하지 않는 유저")
+        void findByUsername_notFound() {
+            userRepository.save(user1);
+            // when
+            User result = userRepository.findByUsername("empty user").orElse(null);
 
-    User user = new User("Test1", "test1@codeit.com", "test1234", binaryContent);
-    User savedUser = userRepository.save(user);
+            // then
+            Assertions.assertThat(result).isEqualTo(null);
+        }
 
-    // when
-    // 영속성 컨텍스트에 의해, save를 하지 않아도, 반영이 된다.
-    //    - savedUser는 userRepository.save(user)를 통해 영속성 컨텍스트에 관리되는 엔티티가 됩니다.
-    //    - 이후 savedUser.updateUser(...)로 필드를 변경하면, JPA는 **더티 체킹(dirty checking)**을 통해
-    //      변경된 필드를 감지합니다.
-    //    - 트랜잭션이 끝날 때 flush()가 호출되면서 변경 사항이 DB에 반영됩니다.
-    //    - 따라서 save()를 다시 호출하지 않아도 findById(...)로 조회했을 때 변경된 값이 반영된 상태로 나옵니다.
+    }
 
-    savedUser.updateUser("Test1Update", "test1@codeit.com", "test1234", binaryContent);
-    User updateUser = userRepository.findById(user.getId()).orElse(null);
+    @Nested
+    @DisplayName("유저 검색 - fetch Join")
+    class UserJoin {
+        @Test
+        @DisplayName("[정상 케이스] - 유저와 프로필, status 조회 성공")
+        void findAllWithProfileAndStatus_success() {
+            // given
+            userRepository.save(user1);
+            userRepository.save(user2);
+            entityManager.flush();
+            entityManager.clear();
 
-    // then
-    assertEquals("Test1Update", updateUser.getUsername());
-    assertEquals(updateUser.getId(), savedUser.getId());
-  }
+            // when
+            List<User> result = userRepository.findAllWithProfileAndStatus();
+
+            // then
+            assertThat(result).hasSize(2);
+            assertThat(result).extracting(User::getId).contains(user1.getId(), user2.getId());
+
+            result.forEach(user -> {
+                assertThat(user.getProfile()).isNotNull();
+                assertThat(user.getUserStatus()).isNotNull();
+            });
+
+        }
+
+        @Test
+        @DisplayName("[정상 케이스] 빈 리스트 반환 - 유저가 없는 경우")
+        void findAllWithProfileAndStatus_emptyList() {
+            // when
+            List<User> result = userRepository.findAllWithProfileAndStatus();
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("[정상 케이스] Profile이 null인 유저도 조회됨 (LEFT JOIN)")
+        void findAllWithProfileAndStatus_withNullProfile() {
+            // given
+            User userWithoutProfile = new User("user3", "user3@codeit.com", "password3", null);
+            // profile은 설정하지 않음
+
+            userRepository.save(userWithoutProfile);
+            entityManager.flush();
+            entityManager.clear();
+
+            // when
+            List<User> result = userRepository.findAllWithProfileAndStatus();
+
+            // then
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getProfile()).isNull();
+            assertThat(result.get(0).getUserStatus()).isNotNull();
+        }
+    }
 
 }

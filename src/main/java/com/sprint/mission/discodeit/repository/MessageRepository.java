@@ -1,30 +1,31 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  void deleteAllByChannelId(UUID channelId);
+    void deleteAllByChannelId(UUID channelId);
 
-  @Query(value = "SELECT m FROM Message m "
-      + "LEFT JOIN FETCH m.author a "
-      + "JOIN FETCH a.userStatus "
-      + "LEFT JOIN FETCH a.profile "
-      + "LEFT JOIN FETCH m.attachments at "
-      + "WHERE m.channel.id =:channelId And m.createdAt < :createdAt")
-  Slice<Message> findAllByChannelId(UUID channelId, Instant createdAt, Pageable pageable);
+    @Query(value = "SELECT m FROM Message m "
+            + "LEFT JOIN FETCH m.author a "
+            + "JOIN FETCH a.userStatus "
+            + "LEFT JOIN FETCH a.profile "
+            + "LEFT JOIN FETCH m.attachments at "
+            + "WHERE m.channel.id =:channelId And m.createdAt < :createdAt")
+    Slice<Message> findAllByChannelId(UUID channelId, Instant createdAt, Pageable pageable);
 
-  @Query(value = "SELECT m FROM Message m "
-      + "WHERE m.channel.id = :channelId "
-      + "ORDER BY m.createdAt DESC ")
-  List<Message> findLatestByChannelId(UUID channelId);
+    @Query(value = "SELECT m FROM Message m "
+            + "WHERE m.channel.id = :channelId "
+            + "ORDER BY m.createdAt DESC ")
+    List<Message> findLatestByChannelId(UUID channelId);
 }
 
 // Page<T>

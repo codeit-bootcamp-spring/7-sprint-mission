@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.global.aop;
 
-import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -8,60 +7,64 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Slf4j
 @Aspect
 @Component
 public class LoggingAspect {
 
-  @Around("execution(public * com.sprint.mission.discodeit.controller..*(..))")
-  public Object logController(ProceedingJoinPoint joinPoint) throws Throwable {
-
-    long start = System.currentTimeMillis();
-    // MethodSignature : Signature 하위 인터페이스, 조인포인트가 메서드일 때 사용
-    // Signature 실행되는 메서드의 정보 제공, 리턴, 파라미터타입, 이름 등
-    MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-    String className = signature.getDeclaringTypeName()
-        .substring(signature.getDeclaringTypeName().lastIndexOf('.') + 1);
-    String methodName = signature.getName();
-
-    // Request 값 (파라미터)
-    Object[] args = joinPoint.getArgs();
-    log.info("{}.{}() Request: {}",
-        className,
-        methodName,
-        Arrays.toString(args));
-
-    Object result = null;
-    try {
-      result = joinPoint.proceed(); // 실제 컨트롤러 실행
-      long duration = System.currentTimeMillis() - start; // 성능 측정
-
-      // Response 값
-      log.info("{}.{}() Response: {} ({} ms)",
-          className,
-          methodName,
-          formatResult(result),
-          duration);
-
-      return result;
-    } catch (Exception e) {
-      long duration = System.currentTimeMillis() - start;
-      log.error("{}.{}() Exception: {} ({} ms)",
-          className,
-          methodName,
-          e.getMessage(),
-          duration,
-          e);
-      throw e;
+    @Around("execution(public * com.sprint.mission.discodeit.controller..*(..))")
+    public Object logController(ProceedingJoinPoint joinPoint) throws Throwable {
+        return logExecution(joinPoint, "CONTROLLER", true);
     }
-  }
 
-  private String formatResult(Object result) {
-    if (result == null) {
-      return "null";
+    @Around("execution(public * com.sprint.mission.discodeit.service..*(..))")
+    public Object logService(ProceedingJoinPoint joinPoint) throws Throwable {
+        return logExecution(joinPoint, "SERVICE", false);
     }
-    String str = result.toString();
-    return str.length() > 500 ? str.substring(0, 500) + "..." : str;
-  }
 
+    private Object logExecution(ProceedingJoinPoint joinPoint, String layer, boolean isInfo)
+            throws Throwable {
+        long start = System.currentTimeMillis();
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        String className = signature.getDeclaringTypeName()
+                .substring(signature.getDeclaringTypeName().lastIndexOf('.') + 1);
+        String methodName = signature.getName();
+
+        Object[] args = joinPoint.getArgs();
+
+        if (isInfo)
+            log.info("[{}] {}.{}() Request: {}", layer, className, methodName, Arrays.toString(args));
+        else
+            log.debug("[{}] {}.{}() Request: {}", layer, className, methodName, Arrays.toString(args));
+
+
+        try {
+            Object result = joinPoint.proceed();
+            long duration = System.currentTimeMillis() - start;
+
+            if (isInfo)
+                log.info("[{}] {}.{}() Response: {} ({} ms)", layer, className, methodName, formatResult(result), duration);
+            else
+                log.debug("[{}] {}.{}() Response: {} ({} ms)", layer, className, methodName, formatResult(result), duration);
+
+            return result;
+        } catch (Exception e) {
+            long duration = System.currentTimeMillis() - start;
+            log.warn("[{}] {}.{}() Exception: {} ({} ms)",
+                    layer, className, methodName, e.getMessage(), duration);
+            throw e;
+        }
+    }
+
+    private String formatResult(Object result) {
+        if (result == null) return "null";
+
+        try {
+            return result.toString();
+        } catch (Exception e) {
+            return "[toString() failed: " + e.getClass().getSimpleName() + "]";
+        }
+    }
 }

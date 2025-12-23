@@ -1,0 +1,14 @@
+package com.sprint.mission.discodeit.global.exception.discodietException.user;
+
+import com.sprint.mission.discodeit.global.exception.discodietException.DiscodeitException;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+
+public class UserException extends DiscodeitException {
+    public UserException(ErrorCode errorCode) {
+        super(errorCode);
+    }
+
+    public UserException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode, cause);
+    }
+}
