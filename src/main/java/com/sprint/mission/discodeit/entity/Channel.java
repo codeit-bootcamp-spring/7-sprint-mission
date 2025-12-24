@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
 @Table(name = "channels")
@@ -25,4 +25,12 @@ public class Channel extends BaseUpdatableEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 100)
     private ChannelType type;
+
+    public void updateName(String name){
+        this.name=name;
+    }
+
+    public void updateDescription(String description){
+        this.description=description;
+    }
 }

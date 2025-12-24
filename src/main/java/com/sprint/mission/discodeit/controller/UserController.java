@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.UserDto;
 import com.sprint.mission.discodeit.service.dto.response.UserStatusDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,15 +27,16 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<?> getAllUsers() {
+    public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> result = userService.getAllUsers();
         return ResponseEntity.ok().body(result);
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-                                              @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
-
+    public ResponseEntity<UserDto> createUser(
+            @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+        log.info("createUser");
         UserDto response = userService.createUser(userCreateRequest, profileImage);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -42,22 +44,23 @@ public class UserController {
     @PatchMapping("/{userId}")
     public ResponseEntity<UserDto> updateUser(
             @PathVariable UUID userId,
-            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile) {
         UserDto userDto = userService.updateUserInfo(userId, userUpdateRequest, profile);
         return ResponseEntity.status(HttpStatus.OK).body(userDto);
     }
 
-
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
-        userService.delete(userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User가 성공적으로 삭제됨");
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable UUID userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/{userId}/userStatus")
-    public UserStatusDto markOnline(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request) {
+    public UserStatusDto markOnline(
+            @PathVariable UUID userId,
+            @Valid @RequestBody UserStatusUpdateRequest request) {
         return userService.updateLastActiveAt(userId, request.newLastActiveAt());
     }
-
 }

@@ -19,5 +19,4 @@ public class ChannelDto {
     private ChannelType type;
     private List<UserDto> participants = new ArrayList<>();
     private Instant lastMessageAt;
-
 }

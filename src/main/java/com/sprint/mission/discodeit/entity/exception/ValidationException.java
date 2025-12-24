@@ -11,6 +11,4 @@ public class ValidationException extends RuntimeException {
         super(errorType.getMessage());
         this.errorType = errorType;
     }
-
-
 }

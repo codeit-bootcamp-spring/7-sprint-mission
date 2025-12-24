@@ -1,14 +1,19 @@
 package com.sprint.mission.discodeit.service;
 
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.exception.DuplicateException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.user.LoginPasswordNotMatchException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.binarycontent.BinaryContentManager;
+import com.sprint.mission.discodeit.service.binarycontent.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.UserDto;
@@ -22,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 
 @Slf4j
@@ -33,39 +35,33 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
 
-
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
-    private final BinaryContentService binaryContentService;
+    private final BinaryContentManager binaryContentManager;
     private final ReadStatusRepository readStatusRepository;
     private final UserMapper mapper;
     private final UserStatusMapper userStatusMapper;
 
     @Transactional
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
-
-        if (userRepository.existsByEmail(request.email())) {
-            throw new DuplicateException("이미 등록된 이메일입니다");
-        }
-        if (userRepository.existsByUsername(request.username())) {
-            throw new DuplicateException("이미 등록된 아이디입니다");
+        log.info("UserService.createUser");
+        if (userRepository.existsByEmailOrUsername(request.email(), request.username())) {
+            throw new UserAlreadyExistsException( ErrorCode.DUPLICATE_USER,new HashMap<>());
         }
 
-        User user = new User(request.email(),request.password(),request.username());
-
-
+        User user = new User(request.email(), request.password(), request.username());
         User save = userRepository.save(user);
 
-
         if (file != null && !file.isEmpty()) {
-            BinaryContent content = binaryContentService.put(save.getId(), file);
-            save.setProfile(content);
+            BinaryContent content = binaryContentManager.saveFileAndMeta(file);
+            save.updateProfile(content);
         }
 
         List<ReadStatus> readList = new ArrayList<>();
+        //나중에 1차 캐시 해보기
         channelRepository.findAllByType(ChannelType.PUBLIC)
                 .forEach(channel -> {
-                    ReadStatus readStatus = new ReadStatus(save,channel,Instant.now());
+                    ReadStatus readStatus = new ReadStatus(save, channel);
                     readList.add(readStatus);
                 });
         readStatusRepository.saveAll(readList);
@@ -75,32 +71,38 @@ public class UserService {
 
     @Transactional
     public UserDto updateUserInfo(UUID id, UserUpdateRequest updateDto, MultipartFile file) {
-
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+        log.info("UserService.updateUserInfo");
+        User user = userRepository.findByIdWithBinaryContent(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, new HashMap<>()));
 
         if (updateDto.newUsername() != null) {
-            user.setUsername(updateDto.newUsername());
+            user.updateUsername(updateDto.newUsername());
         }
         if (updateDto.newPassword() != null) {
-            user.setPassword(updateDto.newPassword());
+            user.updatePassword(updateDto.newPassword());
         }
         if (updateDto.newEmail() != null) {
-            user.setPassword(updateDto.newEmail());
+            user.updateEmail(updateDto.newEmail());
         }
 
         if (file != null) {
-            BinaryContent content = binaryContentService.put(user.getId(), file);
-            user.setProfile(content);
+            if(user.getProfile()!=null){
+                binaryContentManager.deleteFile(user.getProfile());
+            }
+            BinaryContent content = binaryContentManager.saveFileAndMeta(file);
+            user.updateProfile(content);
         }
         return mapper.toDto(user);
     }
 
 
     @Transactional
-    public void delete(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+    public void deleteUser(UUID id) {
+        log.info("UserService.deleteUser");
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
+        if (user.getProfile()!=null){
+            binaryContentManager.deleteFile(user.getProfile());
+        }
         userRepository.delete(user);
-        binaryContentService.deleteFile(user.getId());
     }
 
 
@@ -118,9 +120,9 @@ public class UserService {
 
         User user = userRepository
                 .findByUsername(loginId)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+                .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
         if (!user.getPassword().equals(password)) {
-            throw new IllegalArgumentException("비밀번호가 틀립니다");
+            throw new LoginPasswordNotMatchException(ErrorCode.LOGIN_PASSWORD, new HashMap<>());
         }
 
         return mapper.toDto(user);
@@ -131,11 +133,9 @@ public class UserService {
     public UserStatusDto updateLastActiveAt(UUID id, Instant lastActiveAt) {
         User user = userRepository
                 .findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저가 존재하지 않습니다"));
+                .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
 
         user.updateActiveAt(lastActiveAt);
         return userStatusMapper.toDto(user.getUserStatus());
     }
-
-
 }

@@ -21,7 +21,7 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest loginRequest) {
-        UserDto userDto = userService.login(loginRequest.getUsername(), loginRequest.getPassword());
+        UserDto userDto = userService.login(loginRequest.username(), loginRequest.password());
         return ResponseEntity.status(HttpStatus.OK).body(userDto);
     }
 }

@@ -3,10 +3,10 @@ package com.sprint.mission.discodeit.service.dto.request;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-@Data
-public class LoginRequest {
+
+public record LoginRequest(
     @NotEmpty
-    private String username;
+    String username,
     @NotEmpty
-    private String password;
-}
+    String password
+){}

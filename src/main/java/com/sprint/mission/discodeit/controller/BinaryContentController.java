@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.binarycontent.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +23,7 @@ public class BinaryContentController {
 
 
     @GetMapping
-    public ResponseEntity<?> getFile(@RequestParam List<UUID> binaryContentId) {
-
+    public ResponseEntity<List<BinaryContentDto>> getFile(@RequestParam List<UUID> binaryContentId) {
         List<BinaryContentDto> binaryContents = binaryContentService.getBinaryContents(binaryContentId);
         return ResponseEntity.status(HttpStatus.OK).body(binaryContents);
     }
