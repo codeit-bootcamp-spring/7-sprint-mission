@@ -1,70 +1,52 @@
 server:
   port: 4444
 
-discodeit:
-  repository:
-    type: file   # jcf | file
-    file-directory: .discodeit
-
-blog:
-  file-directory: /Users/my05030/Desktop/장미연/7-sprint-mission
-
-
-
+logging:
+  level:
+    root: info
 
 spring:
+  profiles:
+    active: dev
   application:
     name: discodeit
+
+# ===============================
+# Actuator 설정
+# ===============================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  endpoint:
+    health:
+      show-details: always
+
+# ===============================
+# Actuator Info 메타데이터
+# ===============================
+info:
+  app:
+    name: discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring:
+    boot:
+      version: 3.4.0
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    url: ${spring.datasource.url}
+    driver-class-name: ${spring.datasource.driver-class-name}
+
   jpa:
-    # //?? 🚨🚨🚨🚨🚨 리팩토링: OSIV가 비활성화되면, 뷰 레이어에서 지연 로딩이 불가능해집니다. 따라서 지연 로딩이 필요한 엔티티를 조회하는 로직을 서비스 계층으로 옮겨야 합니다.
-    open-in-view: true # OSIV(Open Session In View) HTTP 요청이 끝날 때 영속성 컨텍스트와 데이터베이스 커넥션이 닫히며, 지연 로딩된 엔티티를 사용하는 로직은 서비스 계층 안에서 모두 처리해야
-    database: postgresql
-#    show-sql: true # System.out을 통해 SQL 출력. 운영 환경에서는 권장하지 않음
-    hibernate: # JPA 인터페이스를 구현
-       ddl-auto: create  #update # 변경된 스키마 적용. 컬럼 추가만 반영. 삭제x
-      # format_sql: true # SQL을 보기 좋게 포맷팅 (들여쓰기 등)
-        # use_sql_comments: true # SQL에 주석 추가 (필요 시)
+    ddl-auto: ${spring.jpa.hibernate.ddl-auto}
 
-#logging:
-#  level:
-#    org:
-#      hibernate: # Spring Boot 3.0 이상에서는 org.hibernate.orm.jdbc.bind 사용
-#        SQL: DEBUG # SQL 쿼리 로깅 (로거를 통해 출력)
-#        type:
-#          descriptor:
-#             sql: TRACE # SQL 쿼리에 바인딩되는 파라미터 값 확인
-#        orm:
-#          jdbc:
-#            bind: TRACE # Spring Boot 3.0+ 파라미터 값 확인
+  storage:
+    type: ${storage.type}
+    path: ${storage.path}
 
-
-#logging:
-#  level:
-#    org:
-#      hibernate:
-#    org.hibernate.SQL: debug
-
-## 로그 레벨 설정
-#logging:
-#  level: root=INFO
-#
-#logging:
-#  level: com.example.demo=DEBUG
-#
-## H2 콘솔 활성화 (개발용)
-#spring:
-#  h2: console.enabled=true
-#
-
-
-## application-dev.properties (개발 환경)
-#  server.port=8080
-#  spring.datasource.url=jdbc:h2:mem:testdb
-#
-#  # application-prod.properties (운영 환경)
-#  server.port=80
-#  spring.datasource.url=jdbc:mysql://prod-server/mydb
+  multipart:
+    max-file-size: ${spring.servlet.multipart.max-file-size}
+    max-request-size: ${spring.servlet.multipart.max-request-size}

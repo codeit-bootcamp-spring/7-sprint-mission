@@ -24,11 +24,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 🔥 추가 필수
 public abstract class BaseEntity {
     @Id
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "uuid", updatable = false, nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "created_at") // , updatable = false ???
+    @Column(name = "created_at", columnDefinition = "timestamp with time zone", updatable = false, nullable = false)
     @CreatedDate
     private Instant createdAt;
 }

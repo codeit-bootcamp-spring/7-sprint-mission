@@ -1,14 +1,17 @@
 package com.sprint.mission.discodeit.mapper.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 public record UserUpdateRequest(
-    @NotNull
+    @NotBlank
     String newUsername,
-//        @NotBlank(message = "Email is mandatory")
-//        @Email(message = "Email is invalid")
-//        @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$", content = "Email is invalid")
-    @NotNull
+
+    @Email(message = "Email is invalid")
+    @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
+    @NotBlank
     String newEmail,
 
     String newPassword) {

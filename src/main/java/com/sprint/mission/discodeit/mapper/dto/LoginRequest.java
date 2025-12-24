@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.mapper.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record LoginRequest( //all private final
-                            @NotNull
+                            @NotBlank
     String username,
-                            @NotNull
+                            @NotBlank
     String password
 ) { }

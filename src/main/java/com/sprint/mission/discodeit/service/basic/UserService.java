@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.exception.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
@@ -16,7 +18,6 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
-@Transactional // 영속성 컨텍스트
+//@Transactional // 영속성 컨텍스트
 //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 @RequiredArgsConstructor //@Repository 있어야 등록시켜 줌!!
 public class UserService implements InterfaceUserService {
@@ -47,6 +48,7 @@ public class UserService implements InterfaceUserService {
 //    2. 필드 주입(Field Injection) : Setter 메서드를 사용
 //    3. 수정자 주입(Setter Injection) : 간단하지만 테스트 어려워서 지양
 
+    @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest, Optional<MultipartFile> optionalProfileFile) {
 //    public User create(String newUsername, Optional<BufferedImage> profileImageBytes) {
@@ -56,11 +58,11 @@ public class UserService implements InterfaceUserService {
 //        [ ] username과 email은 다른 유저와 같으면 안됩니다.
 //        [ ] UserStatus를 같이 생성합니다.
         if (userRepository.findUserByUsername(userCreateRequest.username()).isPresent()) {
-            throw new IllegalArgumentException("🚨create : 동일한 newUsername [" + userCreateRequest.username() + "] 사용햐는 User 가 이미 존재함");
+            throw  new UserAlreadyExistsException("userName", userCreateRequest.username());
         }
 
         if(userRepository.findUserByEmail(userCreateRequest.email()).isPresent()) {
-            throw new IllegalArgumentException("🚨create : 동일한 newEmail [" + userCreateRequest.email() + "] 사용햐는 User 가 이미 존재함");
+            throw  new UserAlreadyExistsException("email", userCreateRequest.email());
         }
 
         BinaryContent profile = optionalProfileFile
@@ -91,17 +93,17 @@ public class UserService implements InterfaceUserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto find(UUID userID) {
 //        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
 //        [ ] 패스워드 정보는 제외하세요.
-        String message = "🚨 find.userID = [" + userID.toString() + "] 오류";
         User user = userRepository
             .findById(userID)
-            .orElseThrow(() -> new IllegalArgumentException(message));
+            .orElseThrow(() -> new UserNotFoundException(userID));
 
         UserStatus userStatus = userStatusRepository
             .findUserStatusByUserId(userID)
-            .orElseThrow(() -> new IllegalArgumentException(message));
+            .orElseThrow(() -> new UserStatusNotFoundException(userID));
 
         log.info("✅ UserService.findAllByChannelId = [" + user.getUsername() + "] online = [" + userStatus.isOnline() + "]");
 
@@ -109,6 +111,7 @@ public class UserService implements InterfaceUserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> findAll() {
 //        DTO를 활용하여:
 //        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
@@ -134,6 +137,7 @@ public class UserService implements InterfaceUserService {
         return dtoList;
     }
 
+    @Transactional
     @Override
     public UserDto update(UUID userId, UserUpdateRequest dtoUserUpdate, Optional<MultipartFile> optionalProfileFile) {
 //        [ ] 선택적으로 프로필 이미지를 대체할 수 있습니다.
@@ -143,18 +147,18 @@ public class UserService implements InterfaceUserService {
         log.info("✅ UserService.update.id = [" + userId.toString() + "] / dto_userCreate = [" + dtoUserUpdate.toString() + "]");
 
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("🚨User [" + userId.toString() + "]를 찾을 수 없음"));
+            .orElseThrow(() -> new UserNotFoundException(userId));
 
         String userName = user.getUsername();
 
         if (!userId.equals(user.getId())
                 && userRepository.findUserByUsername(dtoUserUpdate.newUsername()).isPresent()) {
-            throw new IllegalArgumentException("🚨 같은 newUsername [" + dtoUserUpdate.newUsername() + "]을 사용하는 User가 이미 존재함");
+            throw new UserAlreadyExistsException("username", dtoUserUpdate.newUsername());
         }
 
         if (!userId.equals(user.getId())
                 && userRepository.findUserByEmail(dtoUserUpdate.newEmail()).isPresent()) {
-            throw new IllegalArgumentException("🚨 같은 newEmail [" + dtoUserUpdate.newEmail() + "]을 사용하는 User가 이미 존재함");
+            throw new UserAlreadyExistsException("email", dtoUserUpdate.newEmail());
         }
 
         BinaryContent profile = optionalProfileFile.map(file -> {
@@ -189,11 +193,12 @@ public class UserService implements InterfaceUserService {
         return userMapper.toDto(user);
     }
 
+    @Transactional
     @Override
     public void delete(UUID userID) {
 //        [ ] 관련된 도메인도 같이 삭제합니다.
         User user = userRepository.findById(userID)
-            .orElseThrow(() -> new NoSuchElementException("🚨User [" + userID.toString() + "] 를 찾을 수 없음"));
+            .orElseThrow(() -> new UserNotFoundException(userID));
 
         Optional<UserStatus> optionalStatus = userStatusRepository.findUserStatusByUserId(user.getId());
         if (optionalStatus.isPresent()) {
@@ -204,7 +209,7 @@ public class UserService implements InterfaceUserService {
 //            log.error("🚨UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
 //        }
 
-        if (user.getProfile().getId() != null) {
+        if (user.getProfile() != null && user.getProfile().getId() != null) {
             Optional<BinaryContent> optionalContents = binaryContentRepository.findById(user.getProfile().getId());
             if (optionalContents.isPresent()) {
                 binaryContentRepository.deleteById(optionalContents.get().getId());

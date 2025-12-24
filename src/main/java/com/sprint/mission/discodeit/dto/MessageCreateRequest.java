@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
+import lombok.Getter;
 
-
-// 🚫 편의상 변경. CamelCase 위반 -> 추후 수정 할꺼예용~
 public record MessageCreateRequest( //all private final,
-    @NotNull
+//    @NotBlank - err
     String content,
     @NotNull
     UUID channelId,

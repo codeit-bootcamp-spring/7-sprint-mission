@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.mapper.dto;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 public record PublicChannelCreateRequest( //all private final
-                                          @NotNull
+                                          @NotBlank
     String name,
-                                          @NotNull
+                                          @NotBlank
     String description
 ) {
     public static PublicChannelCreateRequest from(String channelName, String description) {
