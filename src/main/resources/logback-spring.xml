@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- log를 '어디에' 기록할까? CONSOLE에 대한 설정-->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <!-- encoder, log를 어떤식으로 출력할지 .시간, log레벨(-5) 왼쪽으로 공백 5칸, thread(현재 작업하고 쓰레드이름), 지금 이 Log을 남긴 클래스를 최대 36자로 표현, msg 사용자가 직접 메시지 출력-->
+      <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] %logger{36} - %msg%n</pattern>
+    </encoder>
+    <!-- 콘솔 log 출력의 문턱은 INFO (INFO 레벨보다 낮은 log는 모두 무시) -->
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+  </appender>
+
+  <!-- FILE에 대한 설정-->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- 경로 설정 -->
+    <file>/Users/apple/Desktop/java/7-sprint-mission/.logs/discodeit.log</file>
+
+    <!-- rollingPolicy file 분리 정책 설정 -->
+    <!-- 날짜 바뀔 때 (자정 기준) 동작, 로그 파일 분리 -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>
+        /Users/apple/Desktop/java/7-sprint-mission/logs/app-%d{yyyy-MM-dd}.%i.log
+      </fileNamePattern>
+      <maxFileSize>10MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+
+    <encoder>
+      <!-- DD -> day of year(1년중에 며칠), dd -> day of month (1달중에 며칠) -->
+      <!-- HH -> 24h, hh -> 12h (a 마커 써야함) -->
+      <!-- MM -> Month, mm -> Minute -->
+      <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] %logger{36} - %msg%n</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>DEBUG</level>
+    </filter>
+  </appender>
+
+  <!-- yml에 쓴거랑 동일 -->
+  <!--    <logger name="com.example.loggingdemo" level="DEBUG" />-->
+  <!--    <logger name="org.springframework.web" level="WARN" />-->
+
+  <!-- 기본 log 레벨 설정 -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
+
+</configuration>

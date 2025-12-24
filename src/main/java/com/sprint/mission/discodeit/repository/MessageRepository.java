@@ -17,6 +17,4 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   @Query("SELECT m.createdAt FROM Message m WHERE m.channel.id = :channelId ORDER BY m.createdAt DESC LIMIT 1")
   Optional<Instant> findLastMessageAtByChannelId(UUID channelId);
-
-  void deleteByChannelId(UUID channelId);
 }

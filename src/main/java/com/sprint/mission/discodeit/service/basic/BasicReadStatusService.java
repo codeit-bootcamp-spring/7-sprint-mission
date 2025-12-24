@@ -8,6 +8,10 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.DuplicateReadStatusException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -42,14 +46,14 @@ public class BasicReadStatusService implements ReadStatusService {
     );
 
     if (exist.isPresent()) {
-      throw new IllegalArgumentException("이미 존재합니다.");
+      throw new DuplicateReadStatusException(request.userId(), request.channelId());
     }
 
     Channel channel = channelRepository.findById(request.channelId())
-        .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다."));
+        .orElseThrow(() -> new ChannelNotFoundException(request.channelId()));
 
     User user = userRepository.findById(request.userId())
-        .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        .orElseThrow(() -> new UserNotFoundException(request.userId()));
 
     ReadStatus readStatus = new ReadStatus(
         user,
@@ -78,7 +82,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusResponseDto updateReadStatus(UUID readStatusId,
       UpdateReadStatusDto request) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new IllegalArgumentException("ReadStatus를 찾을 수 없습니다."));
+        .orElseThrow(() -> new ReadStatusNotFoundException());
 
     readStatus.updateReadTime(request.newLastReadAt());
 
@@ -95,6 +99,6 @@ public class BasicReadStatusService implements ReadStatusService {
   // 중복 메서드 만들기
   private ReadStatus getReadStatus(UUID readStatusId) {
     return readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new IllegalArgumentException("ReadStatus를 찾을 수 없습니다."));
+        .orElseThrow(() -> new ReadStatusNotFoundException());
   }
 }

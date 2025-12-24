@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController implements UserControllerDocs {
 
   private final UserService userService;
@@ -42,6 +44,7 @@ public class UserController implements UserControllerDocs {
       @Valid
       @RequestPart("userCreateRequest") CreateUserRequestDto userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+    log.info("POST /api/users - 유저 생성 요청");
     UserResponseDto user = userService.createUser(userCreateRequest, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
@@ -59,6 +62,7 @@ public class UserController implements UserControllerDocs {
       @Valid @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UpdateUserDto userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+    log.info("PATCH /api/users/{} - 유저 수정 요청", userId);
     UserResponseDto user = userService.updateUser(userId, userUpdateRequest, profile);
     return ResponseEntity.status(HttpStatus.OK).body(user);
   }
@@ -66,6 +70,7 @@ public class UserController implements UserControllerDocs {
   //사용자를 삭제할 수 있다. * 해결
   @DeleteMapping(value = "/{userId}")
   public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+    log.info("DELETE /api/users/{} - 유저 삭제 요청", userId);
     userService.deleteUser(userId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
