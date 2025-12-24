@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   datasource:
@@ -10,8 +10,8 @@ spring:
 
   jpa:
     database: postgresql
-    hibernate:
-      ddl-auto: validate
+#    hibernate:
+#      ddl-auto: validate
     properties:
       hibernate:
         show_sql: true

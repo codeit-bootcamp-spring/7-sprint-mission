@@ -1,0 +1,30 @@
+# 빌드 아티팩트 디렉터리 제외
+build/
+
+# IDE 및 OS별 임시/설정 파일 제외
+.idea/
+.vscode/
+.settings/
+.project
+.classpath
+*.iml
+
+# Git 관련 파일 및 디렉터리 제외
+.git/
+.gitignore
+
+# 로그 파일 제외
+*.log
+logs/
+
+# Dockerfile 및 .dockerignore 자체 제외 (Dockerfile에서 COPY 명령을 사용할 때 충돌 방지)
+Dockerfile
+.dockerignore
+
+# 기타 불필요한 파일 및 디렉터리
+temp/
+docs/
+README.md
+LICENSE
+
+.env
