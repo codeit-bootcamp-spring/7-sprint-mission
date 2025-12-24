@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.response.readstatus.ReadStatusResponseDt
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/readStatuses")
 @RequiredArgsConstructor
+@Slf4j
 public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
@@ -26,13 +28,13 @@ public class ReadStatusController {
     }
 
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
-    public ReadStatusResponseDto update(@PathVariable("readStatusId") UUID readStatusId,
+    public ReadStatusResponseDto update(@PathVariable UUID readStatusId,
                                         @Valid @RequestBody ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
         return readStatusService.update(readStatusId ,readStatusUpdateRequestDto);
     }
 
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.GET)
-    public ReadStatusResponseDto get(@PathVariable("readStatusId") UUID readStatusId) {
+    public ReadStatusResponseDto get(@PathVariable UUID readStatusId) {
         return readStatusService.get(readStatusId);
     }
 
@@ -43,7 +45,7 @@ public class ReadStatusController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.DELETE)
-    public void delete(@PathVariable(("readStatusId")) UUID readStatusId) {
+    public void delete(@PathVariable UUID readStatusId) {
         readStatusService.delete(readStatusId);
     }
 }

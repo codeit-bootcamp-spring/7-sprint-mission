@@ -2,66 +2,77 @@ package com.sprint.mission.discodeit.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
-import java.util.NoSuchElementException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    public record ErrorResponse(
-            Instant timestamp,
-            int status,
-            String error,
-            String message
-    ) {
-        public static ErrorResponse of(HttpStatus status, String message) {
-            return new ErrorResponse(
-                    Instant.now(),
-                    status.value(),
-                    status.getReasonPhrase(),
-                    message
-            );
-        }
-    }
+    @ExceptionHandler(DiscodeitException.class)
+    public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {
+        ErrorCode code = e.getErrorCode() != null ? e.getErrorCode() : ErrorCode.INTERNAL_ERROR;
+        HttpStatus status = code.getStatus();
+        String message = code.getMessage();
+//        HttpStatus status = mapStatus(e.getErrorCode());
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> illegalArgumentHandler(IllegalArgumentException exception) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        return ResponseEntity.status(status).body(ErrorResponse.of(status, exception.getMessage()));
-    }
+        ErrorResponse body = ErrorResponse.from(
+                e.getTimestamp(),
+                e.getErrorCode(),
+                message,
+                e.getDetails(),
+                e.getClass().getSimpleName(),
+                status.value()
+        );
 
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponse> illegalStateHandler(IllegalStateException exception) {
-        HttpStatus status = HttpStatus.CONFLICT;
-        return ResponseEntity.status(status).body(ErrorResponse.of(status, exception.getMessage()));
-    }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ErrorResponse> noSuchElementException(NoSuchElementException exception) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
-        return ResponseEntity.status(status).body(ErrorResponse.of(status, exception.getMessage()));
+        return ResponseEntity.status(status).body(body);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException exception) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        String message = exception.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .findFirst()
-                .map(error -> error.getField() + " : " + error.getDefaultMessage())
-                .orElse("Validation Error");
+    public ResponseEntity<ErrorResponse> methodArgumentNotValidException(
+            MethodArgumentNotValidException exception) {
+        ErrorCode code = ErrorCode.INVALID_REQUEST;
+        HttpStatus status = code.getStatus();
 
-        return ResponseEntity.status(status).body(ErrorResponse.of(status, message));
+        Map<String, Object> details = new LinkedHashMap<>();
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+        for (FieldError error : exception.getBindingResult().getFieldErrors()) {
+            // 동일 필드에 에러가 여러개면 첫 번째만 유지
+            fieldErrors.putIfAbsent(error.getField(), error.getDefaultMessage());
+        }
+        details.put("fieldErrors", fieldErrors);
+
+        ErrorResponse body = ErrorResponse.from(
+                Instant.now(),
+                code,
+                code.getMessage(),
+                details,
+                exception.getClass().getSimpleName(),
+                status.value()
+        );
+
+        return ResponseEntity.status(status).body(body);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> exceptionHandler(Exception exception) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        return ResponseEntity.status(status).body(ErrorResponse.of(status, exception.getMessage()));
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception exception) {
+        ErrorCode code = ErrorCode.INTERNAL_ERROR;
+        HttpStatus status = code.getStatus();
+
+        ErrorResponse body = ErrorResponse.from(
+                Instant.now(),
+                code,
+                code.getMessage(),
+                Map.of(),
+                exception.getClass().getSimpleName(),
+                status.value()
+        );
+
+        return ResponseEntity.status(status).body(body);
     }
 }

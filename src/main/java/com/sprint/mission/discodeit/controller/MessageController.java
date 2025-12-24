@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.response.page.PageResponseDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RequestMapping("/api/messages")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MessageController {
     private final MessageService messageService;
 
@@ -44,6 +46,7 @@ public class MessageController {
     }
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("messageId") UUID messageId) {
         messageService.delete(messageId);
     }

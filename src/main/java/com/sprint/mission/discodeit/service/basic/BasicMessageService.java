@@ -1,5 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.exception.channel.ChannelMemberNotFoundException;
+import com.sprint.mission.discodeit.common.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exception.channel.InvalidSlowModeException;
+import com.sprint.mission.discodeit.common.exception.message.InvalidMessageRequestException;
+import com.sprint.mission.discodeit.common.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.common.exception.message.SlowModeViolationException;
+import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
@@ -13,10 +20,9 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +35,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
@@ -43,39 +50,59 @@ public class BasicMessageService implements MessageService {
     @Transactional
     @Override
     public MessageResponseDto create(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments) {
-        UUID channelId = Objects.requireNonNull(messageCreateRequestDto.channelId());
-        UUID authorId = Objects.requireNonNull(messageCreateRequestDto.authorId());
-        String content = Objects.requireNonNull(messageCreateRequestDto.content());
+        if (messageCreateRequestDto == null ) {
+            throw new InvalidMessageRequestException("messageCreateRequestDto is null");
+        }
+        if (messageCreateRequestDto.channelId() == null) {
+            throw new InvalidMessageRequestException("channelId is null");
+        }
+        if (messageCreateRequestDto.authorId() == null) {
+            throw new InvalidMessageRequestException("authorId is null");
+        }
+        if (messageCreateRequestDto.content() == null) {
+            throw new InvalidMessageRequestException("content is null");
+        }
+        UUID channelId = messageCreateRequestDto.channelId();
+        UUID authorId = messageCreateRequestDto.authorId();
+        String content = messageCreateRequestDto.content();
+
+        log.debug("Creating message: channelId = {}, authorId = {}, contentLength = {} ",
+                channelId, authorId, content.length());
 
         Channel channel =  channelRepository.findById(messageCreateRequestDto.channelId())
-                .orElseThrow(()-> new NoSuchElementException("Channel not found"));
+                .orElseThrow(()-> new ChannelNotFoundException(channelId));
 
         User user = userRepository.findById(messageCreateRequestDto.authorId()).orElseThrow(()
-                -> new NoSuchElementException("User not found"));
+                -> new UserNotFoundException(authorId));
 
         boolean exist = readStatusRepository.existsByUserIdAndChannelId(authorId, channelId);
 
         if(channel.isPrivateChannel() && !exist) {
-            throw new NoSuchElementException("Member not found");
+            log.warn("Create message rejected: not a member of a private channel. channelId = {}, authorId = {}",
+                    channelId, authorId);
+            throw new ChannelMemberNotFoundException(channelId, authorId);
         }
 
         if(!channel.isPrivateChannel() && !exist) {
             Instant readAt = channel.getCreatedAt() != null
                     ? channel.getCreatedAt() : Instant.now();
             readStatusRepository.save(new ReadStatus(user,channel, readAt));
+            log.debug("ReadStatus created for public channel. channelId = {}, userId = {}",
+                    channelId, authorId);
         }
 
 
         int slow = channel.getSlowModeSeconds();
         if ( slow < 0 ) {
-            throw new IllegalStateException("SlowModeSeconds must be >= 0");
+            log.warn("Create message rejected: slow mode = {} ", slow);
+            throw new InvalidSlowModeException(channelId, slow);
         }
 
         if ( slow > 0 ) {
             Instant timeNow = Instant.now();
 
             Optional<Instant> last = messageRepository
-                    .findByChannelIdAndAuthorId(messageCreateRequestDto.channelId(),messageCreateRequestDto.authorId())
+                    .findByChannelIdAndAuthorId(channelId,authorId)
                     .stream()
                     .filter(m -> !m.isDeleted())
                     .map(m -> m.getCreatedAt())
@@ -85,26 +112,25 @@ public class BasicMessageService implements MessageService {
                 Instant nextAllowed = last.get().plusSeconds(slow);
                 if(timeNow.isBefore(nextAllowed)) {
                     long waitSeconds = Duration.between(timeNow, nextAllowed).toSeconds();
-                    throw new IllegalStateException("SlowMode wait : " + waitSeconds + "s");
+                    log.warn("SlowMode violation : waitSeconds = {} ", waitSeconds);
+                    throw new SlowModeViolationException(channelId, authorId, waitSeconds);
                 }
             }
         }
 
         List<BinaryContent> attachmentList = new ArrayList<>();
         if(attachments != null) {
+            log.debug("Create message attachment, channelId = {}, authorId = {}", channelId, authorId);
             for(MultipartFile file : attachments) {
                 if (file != null && !file.isEmpty()) {
                     BinaryContentCreateRequestDto dto = BinaryContentCreateRequestDto.from(file);
                     BinaryContentResponseDto save = binaryContentService.create(dto);
 
-                    BinaryContent attachment = binaryContentRepository.findById(save.id())
-                            .orElseThrow(() -> new NoSuchElementException("BinaryContent not found"));
+                    BinaryContent attachment = binaryContentRepository.getReferenceById(save.id());
                     attachmentList.add(attachment);
                 }
             }
         }
-
-
 
         Message message = new Message(
                 content,
@@ -114,90 +140,141 @@ public class BasicMessageService implements MessageService {
         );
 
         Message save = messageRepository.save(message);
+        log.info("메세지가 생성되었습니다. messageId = {}", save.getId());
 
         return messageMapper.toDto(save, isAuthorOnline(user));
     }
 
     @Override
     public MessageResponseDto get(UUID messageId) {
-        Message message = messageRepository.findById(Objects.requireNonNull(messageId))
-                .orElseThrow(() -> new NoSuchElementException("Message not found"));
+        if (messageId == null) {
+            throw new InvalidMessageRequestException("messageId is null");
+        }
+        log.debug("Getting message by id : messageId = {}", messageId);
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new MessageNotFoundException(messageId));
 
         return messageMapper.toDto(message, isAuthorOnline(message.getAuthor()));
     }
 
     @Override
     public List<MessageResponseDto> getAll() {
+        log.debug("Getting all messages");
         List<Message> messages = messageRepository.findAll();
         return messageMapper.toDtoList(messages, authorOnlineMap(messages));
     }
 
     @Override
     public List<MessageResponseDto> getAllByChannelId(UUID channelId) {
-        List<Message> messages = messageRepository.findByChannelId(Objects.requireNonNull(channelId));
+        if (channelId == null) {
+            throw new InvalidMessageRequestException("channelId is null");
+        }
+        log.debug("Getting all messages by channel id: channelId = {}", channelId);
+        List<Message> messages = messageRepository.findByChannelId(channelId);
         return messageMapper.toDtoList(messages, authorOnlineMap(messages));
     }
 
     @Transactional
     @Override
     public MessageResponseDto update(UUID messageId, MessageUpdateRequestDto messageUpdateRequestDto) {
-        Message message = messageRepository.findById(Objects.requireNonNull(messageId))
-                .orElseThrow(() -> new NoSuchElementException("Message not found"));
+        if (messageId == null) {
+            throw new InvalidMessageRequestException("messageId is null");
+        }
+        if (messageUpdateRequestDto == null) {
+            throw new InvalidMessageRequestException("messageUpdateRequestDto is null");
+        }
+
+        log.debug("Updating message. messageId = {}, hasNewContent = {}",
+                messageId, messageUpdateRequestDto.newContent() != null);
+
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new MessageNotFoundException(messageId));
 
         if(messageUpdateRequestDto.newContent() != null) {
             message.setContent(messageUpdateRequestDto.newContent());
         }
 
         Message save = messageRepository.save(message);
+        log.info("메세지가 수정되었습니다. messageId = {}", message.getId());
         return messageMapper.toDto(save, isAuthorOnline(message.getAuthor()));
     }
 
     @Transactional
     @Override
     public boolean delete(UUID messageId) {
-        Message message = messageRepository.findById(Objects.requireNonNull(messageId))
-                .orElseThrow(() -> new NoSuchElementException("Message not found"));
+        if (messageId == null) {
+            throw new InvalidMessageRequestException("messageId is null");
+        }
+        log.debug("Deleting message: messageId = {}", messageId);
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new MessageNotFoundException(messageId));
         messageRepository.delete(message);
+        log.info("메세지가 제거되었습니다. messageId = {}", message.getId());
         return true;
     }
 
     // 특정 작성자별 메세지 조회
     @Override
     public List<MessageResponseDto> getMessagesByAuthor(UUID authorId) {
-        List<Message> messages = messageRepository.findByAuthorId(Objects.requireNonNull(authorId));
+        if (authorId == null) {
+            throw new InvalidMessageRequestException("authorId is null");
+        }
+        log.debug("Getting messages by author id: authorId = {}", authorId);
+        List<Message> messages = messageRepository.findByAuthorId(authorId);
         return messageMapper.toDtoList(messages, authorOnlineMap(messages));
     }
 
     // 특정 채널의 특정 작성자 메세지 조회
     @Override
     public List<MessageResponseDto> getMessagesByChannelAndAuthor(UUID channelId, UUID authorId) {
-        List<Message> messages = messageRepository.findByChannelIdAndAuthorId(
-                Objects.requireNonNull(channelId),
-                Objects.requireNonNull(authorId));
+        if (channelId == null) {
+            throw new InvalidMessageRequestException("channelId is null");
+        }
+        if (authorId == null) {
+            throw new InvalidMessageRequestException("authorId is null");
+        }
+        log.debug("Getting messages by channel and author id: channelId = {}, authorId = {}",
+                channelId, authorId);
+        List<Message> messages = messageRepository.findByChannelIdAndAuthorId(channelId, authorId);
         return messageMapper.toDtoList(messages, authorOnlineMap(messages));
     }
 
     // 특정 키워드 검색
     @Override
     public List<MessageResponseDto> searchByKeyword(String keyword) {
+        if (keyword == null) {
+            throw new InvalidMessageRequestException("keyword is null");
+        }
+        log.debug("Getting messages by keyword: keyword = {}", keyword);
         List<Message> messages = messageRepository
-                .findByContentContainingIgnoreCase(Objects.requireNonNull(keyword));
+                .findByContentContainingIgnoreCase(keyword);
         return messageMapper.toDtoList(messages, authorOnlineMap(messages));
     }
 
     @Override
-    public PageResponseDto<MessageResponseDto> getPageByChannelId(UUID ChannelId, Pageable pageable) {
-        Objects.requireNonNull(ChannelId);
+    public PageResponseDto<MessageResponseDto> getPageByChannelId(UUID channelId, Pageable pageable) {
+        if (channelId == null) {
+            throw new InvalidMessageRequestException("channelId is null");
+        }
+        if (pageable == null) {
+            throw new InvalidMessageRequestException("pageable is null");
+        }
 
-        Slice<Message> slice = messageRepository.findByChannelIdOrderByCreatedAtDesc(ChannelId, pageable);
+        log.debug("Getting Page messages: channelId = {}, pageable = {}", channelId, pageable);
+
+        Slice<Message> slice = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
 
         Slice<MessageResponseDto> sliceDto = slice.map(message -> messageMapper.toDto(message, isAuthorOnline(message.getAuthor())));
 
         return pageResponseMapper.fromSlice(sliceDto);
     }
 
-    ///////////// HELPER ///////////////////////////
     private Map<UUID, Boolean> authorOnlineMap(List<Message> messages) {
+        if (messages == null) {
+            throw new InvalidMessageRequestException("messages is null");
+        }
+
+        log.debug("Getting author online map");
         Set<UUID> authorIds = messages.stream()
                 .map(m -> m.getAuthor())
                 .filter(u -> u != null)
@@ -218,6 +295,7 @@ public class BasicMessageService implements MessageService {
     }
 
     private boolean isAuthorOnline(User author) {
+        log.debug("Checking if author is online");
         if (author == null) {
             return false;
         }

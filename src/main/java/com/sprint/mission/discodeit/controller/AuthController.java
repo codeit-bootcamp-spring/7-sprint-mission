@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
 import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private final AuthService authService;
 

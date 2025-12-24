@@ -1,0 +1,54 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:discodeit_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+
+  sql:
+    init:
+      mode: never
+
+logging:
+  level:
+    root: INFO
+    com.sprint.mission.discodeit: DEBUG
+    org.hibernate.sql: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: ./build/test-binary-storage
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+
+  endpoint:
+    health:
+      show-details: always
+
+  info:
+    env:
+      enabled: true
+
+server:
+  port: 8888

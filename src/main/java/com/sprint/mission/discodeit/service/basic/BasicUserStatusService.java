@@ -1,5 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exception.userstatus.InvalidUserStatusRequestException;
+import com.sprint.mission.discodeit.common.exception.userstatus.UserStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.common.exception.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateByUserIdRequestDto;
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateRequestDto;
@@ -11,6 +15,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +25,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
@@ -30,14 +36,13 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatusResponseDto create(UserStatusCreateRequestDto userStatusCreateRequestDto) {
         UUID userId = Objects.requireNonNull(userStatusCreateRequestDto.userId());
 
+        log.debug("Creating user status: userId = {}", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
-        if(user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
         if(userStatusRepository.existsByUserId(userId)) {
-            throw new IllegalStateException("UserStatus already exists");
+            log.warn("Create user status rejected: already exists: userId = {}", userId);
+            throw new UserStatusAlreadyExistsException(userId);
         }
 
         Instant statusAt = userStatusCreateRequestDto.lastActiveAt() == null
@@ -47,16 +52,22 @@ public class BasicUserStatusService implements UserStatusService {
         userStatus.setLastActiveAt(statusAt);
 
         UserStatus save = userStatusRepository.save(userStatus);
+        log.info("유저 상태가 생성되었습니다. userStatusId = {}", save.getId());
 
         return userStatusMapper.toDto(save);
     }
 
     @Transactional
     @Override
-    public UserStatusResponseDto update(UserStatusUpdateRequestDto userStatusUpdateRequestDto) {
-        UUID id = Objects.requireNonNull(userStatusUpdateRequestDto.id());
+    public UserStatusResponseDto update(UserStatusUpdateRequestDto userStatusUpdateRequestDto, UUID id) {
+        if (id == null ) {
+            throw new InvalidUserStatusRequestException("id is null");
+        }
+
+        log.debug("Updating user status. user statusId = {}", id);
+
         UserStatus userStatus = userStatusRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
+                .orElseThrow(() -> new UserStatusNotFoundException(id));
 
         if (userStatusUpdateRequestDto.lastActiveAt() != null
                 && (userStatus.getLastActiveAt() == null
@@ -66,14 +77,17 @@ public class BasicUserStatusService implements UserStatusService {
 
         UserStatus save = userStatusRepository.save(userStatus);
 
+        log.info("유저 상태가 변경되었습니다. userStatusId = {}", save.getId());
         return userStatusMapper.toDto(save);
     }
 
     @Transactional
     @Override
-    public UserStatusResponseDto updateByUserId(UUID userId, UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
+    public UserStatusResponseDto updateByUserId(UUID userId,
+                                                UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto) {
+        log.debug("Updating user status by user id {}", userId);
         UserStatus userStatus = userStatusRepository.findByUserId(Objects.requireNonNull(userId))
-                .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
+                .orElseThrow(() -> new UserStatusNotFoundException(userId));
 
         if(userStatusUpdateByUserIdRequestDto.newLastActiveAt() != null
                 && (userStatusUpdateByUserIdRequestDto.newLastActiveAt()
@@ -82,19 +96,22 @@ public class BasicUserStatusService implements UserStatusService {
         }
         UserStatus save = userStatusRepository.save(userStatus);
 
+        log.info("유저 상태가 변경되었습니다. userStatusId = {}", save.getId());
         return userStatusMapper.toDto(save);
     }
 
     @Override
     public UserStatusResponseDto get(UUID id) {
+        log.debug("Getting user status {}", id);
         UserStatus userStatus = userStatusRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
+                .orElseThrow(() -> new UserStatusNotFoundException(id));
 
         return userStatusMapper.toDto(userStatus);
     }
 
     @Override
     public List<UserStatusResponseDto> getAll() {
+        log.debug("Getting all user status");
         List<UserStatus> all = userStatusRepository.findAll();
 
         return all.stream().map(userStatus -> userStatusMapper.toDto(userStatus))
@@ -104,10 +121,12 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     @Override
     public boolean delete(UUID id) {
-        if(!userStatusRepository.existsByUserId(id)) {
-            return false;
+        log.debug("Deleting user status: userStatusId = {}", id);
+        if(!userStatusRepository.existsById(id)) {
+            throw new UserStatusNotFoundException(id);
         }
         userStatusRepository.deleteById(Objects.requireNonNull(id));
+        log.info("유저 상태가 제거되었습니다. userStatusId = {}", id);
         return true;
     }
 }

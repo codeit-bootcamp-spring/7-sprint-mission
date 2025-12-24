@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.exception.auth.InvalidAuthCredentialsException;
+import com.sprint.mission.discodeit.common.exception.auth.InvalidAuthRequestException;
+import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.request.auth.AuthLoginRequestDto;
 import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
@@ -9,18 +12,19 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
@@ -29,19 +33,28 @@ public class BasicAuthService implements AuthService {
     @Transactional
     @Override
     public UserResponseDto login(AuthLoginRequestDto authLoginRequestDto) {
+        log.debug("Login Request");
         if (authLoginRequestDto == null) {
-            throw new IllegalArgumentException("Invalid request");
+            log.warn("Auth Login rejected: Invalid request");
+            throw new InvalidAuthRequestException("Auth Login rejected: Invalid request");
         }
-        String username = authLoginRequestDto.username() == null ? "" : authLoginRequestDto.username().trim();
-        String password = authLoginRequestDto.password() == null ? "" : authLoginRequestDto.password();
+        if (authLoginRequestDto.username() == null) {
+            throw new InvalidAuthRequestException("username is null");
+        }
+        if (authLoginRequestDto.password() == null) {
+            throw new InvalidAuthRequestException("password is null");
+        }
+        String username = authLoginRequestDto.username().trim();
+        String password = authLoginRequestDto.password();
 
         User user = userRepository.findByUsername(username)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new InvalidAuthCredentialsException(username));
 
-        if(user.passwordMatch(password)) {
-            throw new IllegalArgumentException("Wrong password.");
+        if(!user.passwordMatch(password)) {
+            log.warn("Checking password for user: userId = {}", user.getId());
+            throw new InvalidAuthCredentialsException(username);
         }
 
         userStatusRepository.findByUserId(user.getId())
@@ -50,23 +63,30 @@ public class BasicAuthService implements AuthService {
                 }, () -> userStatusRepository.save(new UserStatus(user))
                 );
 
+        log.info("로그인에 성공하였습니다. userId = {}", user.getId());
         return userMapper.toDto(user, true);
     }
 
     @Transactional
     @Override
     public void logout(UUID userId) {
+        log.debug("Logout Request");
         if(userId == null) {
-            throw new IllegalArgumentException("Invalid request");
+            log.warn("Logout rejected: Invalid request");
+            throw new InvalidAuthRequestException("Logout rejected: Invalid request");
         }
 
-        userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user id."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("Logout failed: User not found");
+                    return new UserNotFoundException(userId);
+                });
 
         userStatusRepository.findByUserId(userId).ifPresent(status -> {
             Instant past = Instant.now().minus(Duration.ofMinutes(10));
             status.setLastActiveAt(past);
         } );
 
+        log.info("로그아웃에 성공하였습니다. userId = {}", userId);
     }
 }

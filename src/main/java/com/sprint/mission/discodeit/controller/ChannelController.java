@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.response.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
+@Slf4j
 public class ChannelController {
     private final ChannelService channelService;
 
