@@ -21,12 +21,6 @@ spring:
       max-file-size: 1MB
       max-request-size: 10MB
 
-  boot:
-    admin:
-      client:
-        instance:
-          name: discodeit
-
 discodeit:
   storage:
     type: local
