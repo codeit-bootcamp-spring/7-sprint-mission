@@ -17,7 +17,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - local-storage:/data
+      - local-storage:${STORAGE_LOCAL_ROOT_PATH:-/storage}
     networks:
       - mission-network
 
