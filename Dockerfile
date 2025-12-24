@@ -1,4 +1,4 @@
-FROM amazoncorretto:17 As build1
+FROM amazoncorretto:17-alpine AS build1
 
 WORKDIR /app
 
@@ -8,11 +8,11 @@ RUN chmod +x ./gradlew
 
 RUN ./gradlew clean build -x test
 
-from amazoncorretto:17
+from amazoncorretto:17-alpine
 
 COPY --from=build1 /app/build/libs/*.jar app.jar
 
-ENTRYPOINT ["sh","-c", "java${JVM_OPTS:-}","-jar","app-${PROJECT_NAME:-discodeit}-${PROJECT_VERSION:-latest}.jar"]
+ENTRYPOINT ["sh", "-c", "exec java $JVM_OPTS -jar app.jar --spring.profiles.active=prod"]
 
 ENV TZ = Asia/Seoul
 

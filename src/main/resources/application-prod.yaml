@@ -2,9 +2,9 @@ spring:
   application:
     name : discodeit
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
@@ -26,9 +26,10 @@ discodeit:
     file-directory: .discodeit
   storage:
     local:
-      root-path: "${user.home}/Documents/discodeit/jpaData"
+      root-path: /data
 server:
   port: ${PORT:8081}
+  address: 0.0.0.0
 
 springdoc:
   swagger-ui:

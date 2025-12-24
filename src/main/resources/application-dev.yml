@@ -25,7 +25,7 @@ discodeit:
     file-directory: .discodeit
   storage:
     local:
-      root-path: "${user.home}/Documents/discodeit/jpaData"
+      root-path: /data
 server:
   port: ${PORT:8080}
 
