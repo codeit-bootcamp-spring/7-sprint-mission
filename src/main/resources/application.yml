@@ -3,7 +3,7 @@ spring:
     name: discodeit
 
   profiles:
-    active: prod # 기본 dev로 실행되게 설정 (운영 배포시 prod)로 변경
+    active: prod, docker # 기본 dev로 실행되게 설정 (운영 배포시 prod)로 변경
 
   jpa:
     database: postgresql
