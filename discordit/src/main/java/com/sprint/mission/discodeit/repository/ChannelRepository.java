@@ -2,18 +2,24 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-public interface ChannelRepository {
-    void save(Channel channel);
-    void update(Channel channel);
-    Optional<Channel> find(UUID uuid);
-    List<Channel> findAll();
+public interface ChannelRepository extends JpaRepository<Channel, UUID> {
+
+    // TODO 이렇게 전체 enum 명시해도 괜찮은가요?
+    @Query("""
+            select c from Channel c
+            where c.type = com.sprint.mission.discodeit.common.enums.ChannelScope.PUBLIC""")
     List<Channel> findAllPublic();
+
+    @Query("""
+            select c from Channel c
+            where :user member of c.participants
+                        and c.type = com.sprint.mission.discodeit.common.enums.ChannelScope.PRIVATE""")
     List<Channel> findAllPrivateByUser(User user);
-    void deleteById(UUID uuid);
-    boolean existsById(UUID uuid);
+
 }

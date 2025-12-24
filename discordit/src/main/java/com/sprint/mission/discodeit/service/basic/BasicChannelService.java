@@ -1,13 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.request.*;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseV2;
-import com.sprint.mission.discodeit.dto.channel.response.DetailedChannelResponse;
-import com.sprint.mission.discodeit.dto.user.response.UserResponse;
-import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.enums.ChannelScope;
 import com.sprint.mission.discodeit.common.exceptions.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
+import com.sprint.mission.discodeit.dto.entity.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.entity.channel.request.ChannelMemberRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.response.ChannelParticipantIdsResponse;
+import com.sprint.mission.discodeit.dto.entity.user.UserDto;
+import com.sprint.mission.discodeit.dto.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.dto.mapper.UserMapper;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.common.enums.ChannelScope;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -18,9 +26,13 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 
 @Service
 @RequiredArgsConstructor
@@ -32,130 +44,113 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public ChannelResponseV2 createPublicChannel(PublicChannelCreateRequest dto) {
-        Channel channel = Channel.newPublicChannel(
+    public ChannelDto createPublicChannel(PublicChannelCreateRequest dto) {
+        Channel channel = Channel.createPublicChannel(
                 dto.name(),
                 dto.description()
         );
         channelRepository.save(channel);
-        return ChannelResponseV2.toDto(channel);
+        return ChannelMapper.toDto(channel, getLastMassageAt(channel));
     }
 
     @Override
-    public ChannelResponseV2 createPrivateChannel(PrivateChannelCreateRequest dto) {
-        Channel channel = Channel.newPrivateChannel(
+    public ChannelParticipantIdsResponse createPrivateChannel(PrivateChannelCreateRequest dto) {
+        Channel channel = Channel.createPrivateChannel(
                 dto.participantIds().stream()
-                        .map(u -> userRepository.find(u)
+                        .map(u -> userRepository.findById(u)
                                 .orElseThrow(() -> new UserNotFoundException(u)))
                         .collect(Collectors.toSet())
         );
-        return ChannelResponseV2.toDto(channel);
+        return ChannelParticipantIdsResponse.toDto(channel);
     }
 
+
     @Override
-    public ChannelResponseV2 update(UUID channelId, ChannelUpdateRequest dto) {
-        Channel channel = channelRepository.find(channelId)
-                .orElseThrow(() -> new ChannelNotFoundException(channelId));
-        if (channel.getScope() == ChannelScope.PRIVATE) {
+    public ChannelDto update(UUID id, ChannelUpdateRequest dto) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new ChannelNotFoundException(id));
+        if (channel.getType() == ChannelScope.PRIVATE) {
             throw new IllegalArgumentException("Private 채널은 수정할 수 없습니다.");
         }
 
         if (dto.newName() != null) {
-            channel.setChannelName(dto.newName());
+            channel.setName(dto.newName());
         }
 
         if (dto.newDescription() != null) {
             channel.setDescription(dto.newDescription());
         }
 
-        channelRepository.update(channel);
-        return ChannelResponseV2.toDto(channel);
+        channelRepository.save(channel);
+        return ChannelMapper.toDto(channel, getLastMassageAt(channel));
     }
 
     @Override
-    public void delete(UUID channelId) {
-        Channel channel = channelRepository.find(channelId)
-                .orElseThrow(() -> new ChannelNotFoundException(channelId));
-        channelRepository.deleteById(channelId);
-        messageRepository.deleteAllByReceiver(channel);
+    public void delete(UUID id) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new ChannelNotFoundException(id));
+        channelRepository.deleteById(id);
+        messageRepository.deleteAllByChannel(channel);
         readStatusRepository.deleteAllByChannel(channel);
     }
 
     @Override
-    public List<ChannelResponseV2> getAll() {
+    public List<ChannelDto> getAll() {
         return channelRepository.findAll().stream()
-                .map(ChannelResponseV2::toDto)
+                .map(channel -> ChannelMapper.toDto(channel, getLastMassageAt(channel)))
                 .toList();
     }
 
     @Override
-    public List<DetailedChannelResponse> getAllVisibleByUser(UUID userUuid) {
-        User user = userRepository.find(userUuid)
-                .orElseThrow(() -> new UserNotFoundException(userUuid));
+    public List<ChannelDto> getAllVisibleByUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
         return Stream.concat(channelRepository.findAllPublic().stream(), channelRepository.findAllPrivateByUser(user).stream())
                 .map(c -> {
-                    Optional<Message> last = messageRepository.findLast(c);
+                    Optional<Message> last = messageRepository.findLastByChannel(c);
                     Instant lastMessageAt = null;
                     if (last.isPresent()) {
                         lastMessageAt = last.get().getCreatedAt();
                     }
-                    return DetailedChannelResponse.toDto(c, lastMessageAt);
+                    return ChannelMapper.toDto(c, lastMessageAt);
                 })
                 .toList();
     }
 
     @Override
-    public ChannelResponseV2 getById(UUID uuid) {
-        return ChannelResponseV2.toDto(channelRepository.find(uuid)
-                .orElseThrow(() -> new ChannelNotFoundException(uuid)));
+    public ChannelDto get(UUID id) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new ChannelNotFoundException(id));
+        return ChannelMapper.toDto(channel
+        , getLastMassageAt(channel));
     }
 
     @Override
-    public List<UserResponse> getAllMembers(UUID uuid) {
-        return channelRepository.find(uuid)
-                .orElseThrow(() -> new ChannelNotFoundException(uuid)).getMembers().stream()
-                .map(UserResponse::toDto)
+    public List<UserDto> getAllParticipants(UUID id) {
+        return channelRepository.findById(id)
+                .orElseThrow(() -> new ChannelNotFoundException(id)).getParticipants().stream()
+                .map(UserMapper::toDto)
                 .toList();
     }
 
     @Override
-    public List<UserResponse> getAllModerators(UUID uuid) {
-        return channelRepository.find(uuid)
-                .orElseThrow(() -> new ChannelNotFoundException(uuid)).getModerators().stream()
-                .map(UserResponse::toDto)
-                .toList();
-    }
-
-    @Override
-    public void addMember(ChannelMemberRequest dto) {
-        List<User> users = userRepository.findAllByUuids(dto.userUuids());
-        Channel channel = channelRepository.find(dto.channelId())
+    public void addParticipant(ChannelMemberRequest dto) {
+        List<User> users = userRepository.findAllById(dto.userUuids());
+        Channel channel = channelRepository.findById(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()));
-        channel.addMembers(new HashSet<>(users));
-        channelRepository.update(channel);
+        channel.addParticipant(new HashSet<>(users));
     }
 
     @Override
-    public void addModerator(ChannelMemberRequest dto) {
-        List<User> users = userRepository.findAllByUuids(dto.userUuids());
-        channelRepository.find(dto.channelId())
+    public void removeParticipant(ChannelMemberRequest dto) {
+        List<User> users = userRepository.findAllById(dto.userUuids());
+        channelRepository.findById(dto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
-                .addModerators(new HashSet<>(users));
+                .removeParticipant(new HashSet<>(users));
     }
 
-    @Override
-    public void deleteMember(ChannelMemberRequest dto) {
-        List<User> users = userRepository.findAllByUuids(dto.userUuids());
-        channelRepository.find(dto.channelId())
-                .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
-                .deleteMember(new HashSet<>(users));
-    }
-
-    @Override
-    public void deleteModerator(ChannelMemberRequest dto) {
-        List<User> users = userRepository.findAllByUuids(dto.userUuids());
-        channelRepository.find(dto.channelId())
-                .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
-                .deleteModerator(new HashSet<>(users));
+    private Instant getLastMassageAt(Channel channel) {
+        Optional<Message> lastByChannel = messageRepository.findLastByChannel(channel);
+        return lastByChannel.map(BaseUpdatableEntity::getUpdatedAt).orElse(null);
     }
 }

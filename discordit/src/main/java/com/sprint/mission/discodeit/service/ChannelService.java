@@ -1,31 +1,34 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.channel.request.*;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseV2;
-import com.sprint.mission.discodeit.dto.channel.response.DetailedChannelResponse;
-import com.sprint.mission.discodeit.dto.user.response.UserResponse;
+import com.sprint.mission.discodeit.dto.entity.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.entity.channel.request.ChannelMemberRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.response.ChannelParticipantIdsResponse;
+import com.sprint.mission.discodeit.dto.entity.user.UserDto;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    ChannelResponseV2 createPublicChannel(PublicChannelCreateRequest dto); // 초기 운영자 한명일때
-    ChannelResponseV2 createPrivateChannel(PrivateChannelCreateRequest dto); // 초기 운영자 한명일때
+    ChannelDto createPublicChannel(PublicChannelCreateRequest dto); // 초기 운영자 한명일때
 
-    ChannelResponseV2 update(UUID channelId, ChannelUpdateRequest dto);
+    ChannelParticipantIdsResponse createPrivateChannel(PrivateChannelCreateRequest dto); // 초기 운영자 한명일때
 
-    void delete(UUID channelID);
+    ChannelDto update(UUID id, ChannelUpdateRequest dto);
 
-    List<UserResponse> getAllMembers(UUID uuid);
-    List<UserResponse> getAllModerators(UUID uuid);
+    void addParticipant(ChannelMemberRequest dto);
 
-    ChannelResponseV2 getById(UUID uuid);
-    List<ChannelResponseV2> getAll();
+    void removeParticipant(ChannelMemberRequest dto);
 
-    List<DetailedChannelResponse> getAllVisibleByUser(UUID userUuid);
+    ChannelDto get(UUID id);
 
-    void addMember(ChannelMemberRequest dto);
-    void addModerator(ChannelMemberRequest dto);
-    void deleteMember(ChannelMemberRequest dto);
-    void deleteModerator(ChannelMemberRequest dto);
+    List<ChannelDto> getAll();
+
+    List<UserDto> getAllParticipants(UUID id);
+
+    List<ChannelDto> getAllVisibleByUser(UUID userId);
+
+    void delete(UUID id);
 }

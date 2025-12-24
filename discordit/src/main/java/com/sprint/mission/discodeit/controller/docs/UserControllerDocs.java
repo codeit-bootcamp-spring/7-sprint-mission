@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.controller.docs;
 
-import com.sprint.mission.discodeit.dto.user.request.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.user.response.SimpleUserResponse;
-import com.sprint.mission.discodeit.dto.user.response.UserResponseV2;
-import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponse;
+import com.sprint.mission.discodeit.dto.entity.user.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.entity.user.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.entity.user.response.UserResponse;
+import com.sprint.mission.discodeit.dto.entity.userStatus.request.UserStatusUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -31,7 +29,7 @@ public interface UserControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ResponseEntity<List<SimpleUserResponse>> getAll();
+    ResponseEntity<List<UserResponse>> getAll();
 
     @Operation(
             summary = "모든 사용자 조회 (상세)",
@@ -40,7 +38,7 @@ public interface UserControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ResponseEntity<List<UserResponseV2>> getDetailedAll();
+    ResponseEntity<List<UserResponse>> getDetailedAll();
 
     @Operation(
             summary = "사용자 회원가입",
@@ -49,7 +47,7 @@ public interface UserControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "회원가입 성공")
     })
-    ResponseEntity<UserResponseV2> signIn(@Valid @RequestBody UserCreateRequest request);
+    ResponseEntity<UserResponse> signIn(@Valid @RequestBody UserCreateRequest request);
 
     @Operation(
             summary = "사용자 삭제",
@@ -67,7 +65,7 @@ public interface UserControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공")
     })
-    ResponseEntity<UserResponseV2> update(@PathVariable UUID userId, @Valid @RequestPart UserUpdateRequest userUpdateRequest, @RequestPart(required = false) MultipartFile profile);
+    ResponseEntity<UserResponse> update(@PathVariable UUID userId, @Valid @RequestPart(name = "userUpdateRequest") UserUpdateRequest userUpdateRequest, @RequestPart(name = "profile", required = false) MultipartFile profile);
 
     @Operation(
             summary = "사용자 상태 수정",
@@ -77,22 +75,4 @@ public interface UserControllerDocs {
             @ApiResponse(responseCode = "200", description = "수정 성공")
     })
     ResponseEntity<Instant> updateUserStatus(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request);
-
-    @Operation(
-            summary = "모든 사용자 상태 조회",
-            description = "시스템의 모든 사용자 상태를 조회합니다"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
-    ResponseEntity<List<UserStatusResponse>> getAllUserStatus();
-
-    @Operation(
-            summary = "특정 사용자 조회",
-            description = "ID로 특정 사용자를 조회합니다"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
-    ResponseEntity<UserResponseV2> get(@RequestParam UUID id);
 }

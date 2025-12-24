@@ -1,27 +1,27 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "binary_contents")
 @Getter
+@AllArgsConstructor
 public class BinaryContent extends BaseEntity {
-    private Instant uploadedAt;
-    private String fileUrl;
 
-    public BinaryContent(String fileUrl) {
-        this.uploadedAt = Instant.now();
-        this.fileUrl = fileUrl;
-    }
+    @Column(nullable = false)
+    String fileName;
 
-    public static BinaryContent fromDto(UUID id, Instant createdAt, Instant updatedAt,
-                                        Instant uploadedAt, String fileUrl) {
-        BinaryContent c = new BinaryContent(fileUrl);
-        c.uuid = id;
-        c.createdAt = createdAt;
-        c.updatedAt = updatedAt;
-        c.uploadedAt = uploadedAt;
-        return c;
-    }
+    @Column(nullable = false)
+    Long size;
+
+    @Column(nullable = false)
+    String contentType;
 }

@@ -1,116 +1,67 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.enums.ChannelScope;
-import com.sprint.mission.discodeit.enums.ChannelType;
-import lombok.Getter;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.common.enums.ChannelScope;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.time.Instant;
 import java.util.*;
 
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Channel extends BaseEntity implements Receivable {
+@Table(name = "channels")
+public class Channel extends BaseEntity {
 
-    private String channelName;
-    private final ChannelScope scope;
-    private ChannelType type;
+    @Setter
+    private String name;
+
+    @Column(nullable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
+    private ChannelScope type;
+
+    @Setter
     private String description;
 
-    private final Set<User> members = new HashSet<>(); // 채널 등록 멤버 목록
-    private final Set<User> moderators = new HashSet<>();// 운영진
 
-    // 기존 코드와의 호환성을 위해 남김
-    private Channel(ChannelScope scope) {
-        this.scope = scope;
+    @ManyToMany
+    @JoinTable(
+            name = "channel_participants",
+            joinColumns = @JoinColumn(name = "channel_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> participants = new HashSet<>();
+
+    public static Channel createPublicChannel(String name, String description) {
+        Channel c= new Channel();
+        c.name = name;
+        c.type = ChannelScope.PUBLIC;
+        c.description = description;
+        c.participants = new HashSet<>();
+        return c;
     }
 
-    public static Channel newPublicChannel(String channelName, String description) {
-        Channel channel = new Channel(ChannelScope.PUBLIC);
-        channel.channelName = channelName;
-        channel.description = description;
-        return channel;
+    public static Channel createPrivateChannel(Set<User> participants) {
+        Channel c = new Channel();
+        c.type = ChannelScope.PRIVATE;
+        c.participants = new HashSet<>();
+        c.participants.addAll(participants);
+        return c;
     }
 
-    public static Channel newPrivateChannel(Set<User> members) {
-        Channel channel = new Channel(ChannelScope.PRIVATE);
-        channel.channelName = null;
-        channel.members.addAll(members);
-        return channel;
+    public void addParticipant(User user) {
+        participants.add(user);
     }
 
-
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
-        update();
+    public void addParticipant(HashSet<User> users) {
+        participants.addAll(users);
     }
 
-    public void setMembers(Set<User> members) {
-        this.members.clear();
-        this.members.addAll(members);
-        update();
+    public void removeParticipant(User user) {
+        participants.remove(user);
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-        update();
+    public void removeParticipant(HashSet<User> user) {
+        participants.removeAll(user);
     }
-
-    public void addMember(User user){
-        this.members.add(user);
-        update();
-    }
-    public void addMembers(Set<User> user){
-        this.members.addAll(user);
-        update();
-    }
-
-    public void deleteMember(User user) {
-        this.members.remove(user);
-        update();
-    }
-
-    public void deleteMember(Set<User> users) {
-        this.members.removeAll(users);
-        update();
-    }
-
-    public void addModerators(Set<User> moderators) {
-        this.moderators.addAll(moderators);
-        this.members.addAll(moderators);
-        update();
-    }
-
-    public void addModerator(User user){
-        this.members.add(user);
-        this.moderators.add(user);
-        update();
-    }
-
-    public void deleteModerator(User user) {
-        this.moderators.remove(user);
-        update();
-    }
-
-    public void deleteModerator(Set<User> users) {
-        this.moderators.removeAll(users);
-        update();
-    }
-
-    public String getDisplayName() {
-        return channelName;
-    }
-
-    // TODO: 시그니처 수정
-    public static Channel fromDto(UUID uuid, Instant createdAt, Instant updatedAt,
-                                  String channelName, String description, ChannelScope scope, ChannelType type,
-                                  Set<User> moderators, Set<User> members) {
-        Channel channel = new Channel(scope);
-        channel.createdAt = createdAt;
-        channel.uuid = uuid;
-        channel.description = description;
-        channel.setMembers(members);
-        channel.updatedAt = updatedAt;
-        channel.channelName = channelName;
-        return channel;
-    }
-
 }

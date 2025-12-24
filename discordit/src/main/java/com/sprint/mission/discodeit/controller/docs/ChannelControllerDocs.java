@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller.docs;
 
-import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.channel.request.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.channel.request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseV2;
-import com.sprint.mission.discodeit.dto.channel.response.DetailedChannelResponse;
+import com.sprint.mission.discodeit.dto.entity.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.entity.channel.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.entity.channel.response.ChannelParticipantIdsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,16 +27,16 @@ public interface ChannelControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "채널 생성 성공")
     })
-    ResponseEntity<ChannelResponseV2> createPublic(@Valid @RequestBody PublicChannelCreateRequest request);
+    ResponseEntity<ChannelDto> createPublic(@Valid @RequestBody PublicChannelCreateRequest request);
 
     @Operation(
             summary = "Private 채널 생성",
-            description = "새로운 비공개 채널을 생성합니다"
+            description = "새로운 비공개 채널을 생성합니다. 참여자 ID 목록을 반환합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "채널 생성 성공")
     })
-    ResponseEntity<ChannelResponseV2> createPrivate(@Valid @RequestBody PrivateChannelCreateRequest request);
+    ResponseEntity<ChannelParticipantIdsResponse> createPrivate(@Valid @RequestBody PrivateChannelCreateRequest request);
 
     @Operation(
             summary = "채널 수정",
@@ -45,7 +45,7 @@ public interface ChannelControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "채널 수정 성공")
     })
-    ResponseEntity<ChannelResponseV2> updatePublic(@PathVariable UUID channelId, @Valid @RequestBody ChannelUpdateRequest request);
+    ResponseEntity<ChannelDto> updatePublic(@PathVariable UUID channelId, @Valid @RequestBody ChannelUpdateRequest request);
 
     @Operation(
             summary = "채널 삭제",
@@ -63,14 +63,5 @@ public interface ChannelControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    ResponseEntity<List<DetailedChannelResponse>> getVisibleChannel(@RequestParam UUID userId);
-
-    @Operation(
-            summary = "모든 채널 조회",
-            description = "시스템의 모든 채널을 조회합니다"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
-    ResponseEntity<List<ChannelResponseV2>> getAll();
+    ResponseEntity<List<ChannelDto>> getVisibleChannel(@RequestParam UUID userId);
 }

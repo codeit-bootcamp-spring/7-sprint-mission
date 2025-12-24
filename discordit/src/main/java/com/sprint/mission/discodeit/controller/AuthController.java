@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.auth.request.UserLoginRequest;
-import com.sprint.mission.discodeit.dto.auth.response.UserLoginResponse;
+import com.sprint.mission.discodeit.dto.entity.auth.request.UserLoginRequest;
+import com.sprint.mission.discodeit.dto.entity.auth.response.UserLoginResponse;
 import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

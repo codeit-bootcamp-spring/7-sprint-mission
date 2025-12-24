@@ -1,9 +1,23 @@
 package com.sprint.mission.discodeit.common.exceptions.user;
 
+import com.sprint.mission.discodeit.common.enums.ErrorCode;
+import com.sprint.mission.discodeit.common.exceptions.DiscodeitException;
 import com.sprint.mission.discodeit.entity.User;
 
-public class UserStatusAlreadyExistException extends RuntimeException {
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+
+public class UserStatusAlreadyExistException extends DiscodeitException {
     public UserStatusAlreadyExistException(User user) {
-        super(user.getUserId() + "의 UserStatus는 이미 존재합니다.");
+        super(Instant.now(), ErrorCode.ALREADY_EXISTS, createDetails(user));
+    }
+
+    private static Map<String, Object> createDetails(User user) {
+        Map<String, Object> details = new HashMap<>();
+        details.put("userId", user.getId());
+        details.put("username", user.getUsername());
+        details.put("resource", "UserStatus");
+        return details;
     }
 }

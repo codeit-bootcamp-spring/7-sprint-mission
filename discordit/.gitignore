@@ -38,4 +38,8 @@ out/
 /.agents/
 /.github/
 /docs/
-/src/main/java/com/sprint/mission/discodeit/config/DataMaker.java
+
+### Windows ###
+nul
+/.logs/
+/src/main/resources/application-dev.yml

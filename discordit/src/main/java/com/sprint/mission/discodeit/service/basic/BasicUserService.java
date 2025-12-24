@@ -1,102 +1,122 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.request.*;
-import com.sprint.mission.discodeit.dto.user.response.UserResponseV2;
+import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
+import com.sprint.mission.discodeit.dto.entity.user.UserDto;
+import com.sprint.mission.discodeit.dto.entity.user.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.entity.user.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.mapper.UserMapper;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.enums.OnlineStatus;
-import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryContentNotFoundException;
-import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Primary
+@Slf4j
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final BinaryContentStorage binaryContentStorage;
+    private final UserStatusService userStatusService;
+    private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserResponseV2 get(UUID id) {
-        return UserResponseV2.toDto(userRepository.find(id)
+    public UserDto get(UUID id) {
+        return UserMapper.toDto(userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id)));
     }
 
 
     @Override
-    public List<UserResponseV2> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(UserResponseV2::toDto)
+                .map(UserMapper::toDto)
                 .toList();
     }
 
     @Override
-    public List<UserResponseV2> getOnlineUsers() {
-        return userRepository.findAll().stream()
-                .filter(u -> u.getOnlineStatus() != OnlineStatus.OFFLINE)
-                .map(UserResponseV2::toDto)
-                .toList();
-    }
-
-
-    @Override
-    public UserResponseV2 signIn(UserCreateRequest dto) {
-        User user = new User(dto.id(), dto.passwd(), dto.email(), dto.displayName());
-        if (dto.profileImageId() != null) {
-            user.setProfileImage(binaryContentRepository.findById(dto.profileImageId())
-                    .orElseThrow(() -> new BinaryContentNotFoundException(dto.profileImageId())));
+    public UserDto signIn(UserCreateRequest dto, MultipartFile profile) {
+        log.info("사용자 생성 요청 들어옴 - username : {}", dto.username());
+        User user = new User(dto.username(), dto.password(), dto.email());
+        log.debug("사용자 생성 완료 - id : {}", user.getId());
+        if (profile != null) {
+            BinaryContent binaryContent = new BinaryContent(profile.getName(), profile.getSize(), profile.getContentType());
+            binaryContentRepository.save(binaryContent);
+            try {
+                binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            user.setProfile(binaryContent);
+            log.debug("사용자 프로필 이미지 저장 완료.");
         }
         userRepository.save(user);
-        return UserResponseV2.toDto(user);
+        log.info("사용자 저장 완료 - id : {}", user.getId());
+        userStatusRepository.save(new UserStatus(user));
+        log.debug("UserStatus 생성 완료.");
+        return UserMapper.toDto(user);
     }
 
     @Override
-    public UserResponseV2 update(UUID id, UserUpdateRequest dto, MultipartFile profile) {
-        User user = userRepository.find(id)
+    public UserDto update(UUID id, UserUpdateRequest dto, MultipartFile profile) {
+        log.info("사용자 정보 수정 요청 들어옴 - id : {}", id);
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         if (dto.newPassword() != null) {
-            user.setPasswd(dto.newPassword());
+            user.setPassword(dto.newPassword());
+            log.debug("{}의 비밀번호 수정 완료",user.getUsername());
         }
         if (dto.newUsername() != null) {
-            user.setDisplayName(dto.newUsername());
+            user.setUsername(dto.newUsername());
+            log.debug("{}로 아이디 수정 완료",user.getUsername());
         }
         if (dto.newEmail() != null) {
             user.setEmail(dto.newEmail());
+            log.debug("{}의 이메일 수정 완료",user.getUsername());
         }
 
-        // 프로필 저장은 다음 미션에..
-//        if (profile != null) {
-//            if (user.getProfileImage() != null) {
-//                binaryContentRepository.delete(user.getProfileImage());
-//            }
-//            BinaryContent content = new BinaryContent(profile);
-//            binaryContentRepository.save(content);
-//            user.setProfileImage(content);
-//        }
-        userRepository.update(user);
-        return UserResponseV2.toDto(user);
+        if (profile != null) {
+            BinaryContent binaryContent = new BinaryContent(profile.getName(), profile.getSize(), profile.getContentType());
+            try {
+                binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        userRepository.save(user);
+        log.info("회원 정보 수정 완료 - id : {}",user.getId());
+        return UserMapper.toDto(user);
     }
 
     @Override
     public void delete(UUID id) {
-        User user = userRepository.find(id)
+        log.info("사용자 삭제 요청 들어옴 - id : {}", id);
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         userRepository.delete(user);
+        log.debug("사용자 삭제 완료 - id : {}", id);
         readStatusRepository.deleteAllByUser(user);
-        if (user.getProfileImage() != null) {
-            binaryContentRepository.delete(user.getProfileImage());
+        log.debug("관련된 UserStatus 삭제 완료");
+        if (user.getProfile() != null) {
+            binaryContentRepository.delete(user.getProfile());
+            log.debug("삭제된 사용자의 프로필 이미지 삭제 완료");
         }
+        log.info("사용자 삭제 완료");
     }
 }

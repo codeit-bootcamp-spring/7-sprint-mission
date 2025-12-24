@@ -1,9 +1,18 @@
 spring:
   application:
     name: discordit
+  profiles:
+    active: dev
   jackson:
     serialization:
       write-dates-as-timestamps: false
+    time-zone: Asia/Seoul
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+
 
 validation:
   user:
@@ -19,19 +28,9 @@ validation:
     email-regex: "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
 user-status:
   online-threshold-minutes: 5
-data:
-  path:
-    project-dir: "C:\\Users\\hyo37\\Documents\\7-sprint-mission\\discordit\\src\\main\\java\\com\\sprint\\mission\\discodeit"
-    base-dir: "/repository/file/data"
-    file:
-      channel: "${data.path.project-dir}${data.path.base-dir}/channel.sav"
-      user: "${data.path.project-dir}${data.path.base-dir}/user.sav"
-      message: "${data.path.project-dir}${data.path.base-dir}/message.sav"
-      binary-content: "${data.path.project-dir}${data.path.base-dir}/binary-content.sav"
-      read-status: "${data.path.project-dir}${data.path.base-dir}/read-status.sav"
-      user-status: "${data.path.project-dir}${data.path.base-dir}/user-status.sav"
+logging:
+  level:
+    root: info
+  logback:
+    rollingpolicy:
 
-dummy-data:
-  enabled: true
-  skip-if-present: true
-  clean-before-seed: true
