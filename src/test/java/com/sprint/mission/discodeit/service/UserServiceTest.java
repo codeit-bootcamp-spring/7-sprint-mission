@@ -37,7 +37,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("OrderService 테스트")
+@DisplayName("UserService 테스트")
 class UserServiceTest {
 
     @Spy
@@ -161,7 +161,7 @@ class UserServiceTest {
             BinaryContent oldProfile = new BinaryContent(null, null, 10);
             user.updateProfile(oldProfile);
 
-            when(userRepository.findById(userId))
+            when(userRepository.findByIdWithBinaryContent(userId))
                     .thenReturn(Optional.of(user));
 
             UserUpdateRequest updateRequest =
@@ -194,7 +194,7 @@ class UserServiceTest {
         void updateUserInfoFail() {
             //given
             UUID userId = UUID.randomUUID();
-            when(userRepository.findById(userId))
+            when(userRepository.findByIdWithBinaryContent(userId))
                     .thenReturn(Optional.empty());
 
             UserUpdateRequest updateRequest =
