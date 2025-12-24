@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit-app
+    ports:
+      - "8081:80"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod,docker
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - discodeit-app-data:/app/image
+    depends_on: # 서비스 시작 순서 제어
+      postgres:
+        condition: service_healthy # postgres가 health check를 통과할 때까지 대기
+    networks:
+      - discodeit-network
+
+  postgres:
+    image: postgres:16
+    container_name: discodeit-postgres
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - discodeit-postgres-data:/var/lib/postgresql/data
+      - ./src/main/resources:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - discodeit-network
+
+# 볼륨 정의
+volumes:
+  discodeit-app-data:
+    driver: local
+  discodeit-postgres-data:
+    driver: local # 볼륨 데이터를 호스트의 로컬에 저장하겠다
+
+# 네트워크 설정
+# 컨테이너 간의 상호작용을 위한 네트워크를 정의합니다
+networks:
+  discodeit-network:
+    driver: bridge
