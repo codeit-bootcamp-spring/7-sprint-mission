@@ -42,4 +42,5 @@ out/
 ### Windows ###
 nul
 /.logs/
-/src/main/resources/application-dev.yml
+/http/
+/.claude/
