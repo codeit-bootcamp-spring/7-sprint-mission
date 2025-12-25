@@ -14,11 +14,13 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
@@ -28,6 +30,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     public ReadStatusDto create(ReadStatusCreateRequest dto) {
+        log.info("읽음 상태 요청 들어옴. \n\t유저\t : {}\n\t채널\t : {}\n\t", dto.userId(), dto.channelId());
         ReadStatus readStatus = new ReadStatus(
                 userRepository.findById(dto.userId())
                         .orElseThrow(() -> new UserNotFoundException(dto.userId())),
@@ -35,31 +38,38 @@ public class BasicReadStatusService implements ReadStatusService {
                         .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()))
         );
         readStatusRepository.save(readStatus);
+        log.info("읽음 상태 생성 완료. ");
         return ReadStatusMapper.toDto(readStatus);
     }
 
     @Override
     public ReadStatusDto update(UUID id, ReadStatusUpdateRequest dto) {
+        log.info("읽음 상태 업데이트 요청 들어옴.");
         ReadStatus readStatus = readStatusRepository.findById(id)
                 .orElseThrow(() -> new ReadStatusNotFoundException(id));
         readStatus.updateLastReadAt(dto.newLastReadAt());
+        log.info("읽음 상태 업데이트 완료.");
         return ReadStatusMapper.toDto(readStatus);
     }
 
     public ReadStatusDto get(UUID uuid) {
+        log.info("읽음 상태 조회 요청 들어옴.");
         return ReadStatusMapper.toDto(readStatusRepository.findById(uuid)
                 .orElseThrow(() -> new ReadStatusNotFoundException(uuid)));
     }
 
-    public List<ReadStatusDto> getAllByUserId(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    public List<ReadStatusDto> getAllByUserId(UUID userId) {
+        log.info("유저 전체 읽음 상태 조회 요청 들어옴 - user : {}", userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         return readStatusRepository.findAllByUser(user).stream()
                 .map(ReadStatusMapper::toDto)
                 .toList();
     }
 
     public void delete(UUID uuid) {
+        log.warn("읽음 상태 제거 요청 들어옴 - {}", uuid);
         readStatusRepository.deleteById(uuid);
+        log.info("읽음 상태 제거 완료");
     }
 
 
