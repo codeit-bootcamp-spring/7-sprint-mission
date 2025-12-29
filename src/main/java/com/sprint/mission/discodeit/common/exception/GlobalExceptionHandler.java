@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.common.exception;
 
+import org.springframework.core.NestedExceptionUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -56,6 +58,28 @@ public class GlobalExceptionHandler {
                 status.value()
         );
 
+        return ResponseEntity.status(status).body(body);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+        ErrorCode code = ErrorCode.INTERNAL_ERROR;
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        Throwable root = NestedExceptionUtils.getMostSpecificCause(e);
+
+        Map<String, Object> details = new LinkedHashMap<>();
+        details.put("rootCause", root == null ? null : root.getClass().getSimpleName());
+        details.put("rootMessage", root == null ? null : root.getMessage());
+
+        ErrorResponse body = ErrorResponse.from(
+                Instant.now(),
+                code,
+                "데이터 무결성 제약조건 위반",
+                details,
+                e.getClass().getSimpleName(),
+                status.value()
+        );
         return ResponseEntity.status(status).body(body);
     }
 
