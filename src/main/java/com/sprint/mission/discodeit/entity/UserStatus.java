@@ -4,11 +4,10 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.Instant;
 
-@Getter @ToString(exclude = "user")
+@Getter
 @Entity
 @Table(name = "user_statuses")
 @NoArgsConstructor
