@@ -8,12 +8,15 @@ RUN chmod +x ./gradlew
 
 RUN ./gradlew clean build -x test
 
-from amazoncorretto:17-alpine
+FROM amazoncorretto:17-alpine
 
-COPY --from=build1 /app/build/libs/*.jar app.jar
+ENV SPRING_PROFILES_ACTIVE=prod
 
-ENTRYPOINT ["sh", "-c", "exec java $JVM_OPTS -jar app.jar --spring.profiles.active=prod"]
-
-ENV TZ = Asia/Seoul
+ENV TZ=Asia/Seoul
 
 RUN apk add --no-cache curl tzdata
+COPY --from=build1 /app/build/libs/*.jar app.jar
+
+ENTRYPOINT ["sh", "-c", "exec java $JVM_OPTS -jar app.jar"]
+
+
