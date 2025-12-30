@@ -2,6 +2,7 @@ name: Test Setting
 
 on:
   push:
+    branches: [ main ]
 
 jobs:
   build:
