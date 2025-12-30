@@ -54,7 +54,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         this.secretkey = awsProperties.getS3SecretKey();
         this.region = awsProperties.getS3Region();
         this.bucket = awsProperties.getS3Bucket();
-        this.expirationSeconds = awsProperties.getS3PreSignedUrlExpiration();
+        this.expirationSeconds = awsProperties.getS3PresignedUrlExpiration();
 
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accesskey,secretkey);
         this.s3Client = S3Client.builder()

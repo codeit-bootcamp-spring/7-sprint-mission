@@ -15,6 +15,6 @@ public class AwsProperties {
     private String s3SecretKey;
     private String s3Region;
     private String s3Bucket;
-    private int s3PreSignedUrlExpiration;
+    private int s3PresignedUrlExpiration;
 
 }
