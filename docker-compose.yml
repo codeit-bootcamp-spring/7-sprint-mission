@@ -1,30 +1,45 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  db:
-    image: postgres:16
-    container_name: postgres
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+  discodeit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit
     ports:
-      - "5433:5432"
+      - "8081:8080"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  app:
-    image: ianian1290/my-app:1.0.0
-    container_name: app
-    ports:
-      - "8080:8080"
+      - discodeit-storage:/app/storage
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      DISCODEIT_STORAGE: /app/storage
+#      JAVA_OPTS: -Xms200m -Xmx400m
     depends_on:
-      - db
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16
+    container_name: discodeit-postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - discodeit-postgres-data:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  pgdata:
+  discodeit-storage:
+    driver: local
+  discodeit-postgres-data:

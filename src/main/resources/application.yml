@@ -23,19 +23,13 @@ spring:
       enabled: true            # 멀티파트 기능 활성화
       max-file-size: 10MB      # 파일 하나의 최대 크기
       max-request-size: 20MB   # 전체 요청 크기
-  boot:
-    admin:
-      client:
-        instance:
-          name: discodeit
+#Spring Boot Admin
+#  boot:
+#    admin:
+#      client:
+#        instance:
+#          name: discodeit
 
-
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
-    root: info
-    #    org.springframework.transaction: debug
 
 #  file:
 #    name: app.log
@@ -43,10 +37,7 @@ logging:
 
 
 discodeit:
-  storage:
-    type: local
-    local:
-      root-path: data/uploads
+  storage: storage
 
 springdoc:
   swagger-ui:

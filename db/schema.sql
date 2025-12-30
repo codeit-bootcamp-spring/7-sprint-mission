@@ -3,7 +3,7 @@ create table binary_contents
     binary_content_id uuid primary key,
     file_name         varchar(100)                        not null,
     file_type         varchar(50)                         not null,
-    file_size         bigint                              not null,
+    file_size         bigint                                not null,
     created_at        timestamp default current_timestamp not null
 );
 

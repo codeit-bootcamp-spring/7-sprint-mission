@@ -21,7 +21,7 @@ public class LocalBinaryContentStorge implements BinaryContentStorage {
     private final Path ROOT_PATH; // 루트 폴더
 
     public LocalBinaryContentStorge(
-            @Value("${discodeit.storage.local.root-path}") String ROOT_PATH) {
+            @Value("${discodeit.storage}") String ROOT_PATH) {
         this.ROOT_PATH = Path.of(ROOT_PATH);
     }
 
