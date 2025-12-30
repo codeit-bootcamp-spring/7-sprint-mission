@@ -1,20 +1,29 @@
 # ---------- Build Stage ----------
 # Amazon Corretto 17를 베이스 이미지로 사용
-FROM amazoncorretto:17 AS build
+FROM eclipse-temurin:17-jdk AS build
 
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 프로젝트 파일 컨테이너로 복사
-# .dockerignore에 설정된 파일 제외
-COPY . .
+# Gradle 의존성 파일 복사
+COPY gradlew .
+COPY gradle ./gradle
+COPY build.gradle settings.gradle ./
 
-# gradle wrapper 파일 실행 권한 설정 및 빌드 실행
+# gradle wrapper 파일 실행 권한 설정
 RUN chmod +x ./gradlew
-RUN ./gradlew clean build -x test
+
+# gradle 의존성 다운로드 (캐싱)
+RUN ./gradlew dependencies --no-daemon
+
+# 소스코드 복사
+COPY src ./src
+
+#빌드 실행
+RUN ./gradlew clean build -x test --no-daemon
 
 # ---------- Runtime Stage ----------
-FROM amazoncorretto:17
+FROM eclipse-temurin:17-jre
 
 # 작업 디렉토리 설정
 WORKDIR /app
