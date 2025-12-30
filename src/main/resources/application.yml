@@ -5,7 +5,7 @@ spring:
   jpa:
     database: postgresql
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
       default_batch_fetch_size: 100
     properties: # SQL 로그 관련 설정 값
       hibernate:
