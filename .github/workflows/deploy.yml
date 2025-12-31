@@ -108,20 +108,20 @@ jobs:
           container-name: ${{ env.ECS_CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
-      - name: Set ECS task desired count
-        run: |
-          aws ecs update-service \
-           --cluster $ECS_CLUSTER \
-           --service $ECS_SERVICE \
-           --task-definition ${{ steps.task-def-update.outputs.task-definition }} \
-           --desired-count 1
-
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def-update.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
+
+      - name: Set ECS task desired count
+        run: |
+          aws ecs update-service \
+           --cluster $ECS_CLUSTER \
+           --service $ECS_SERVICE \
+           --task-definition $task_definition \
+           --desired-count 1
 
       - name: Deployment result
         run: |
