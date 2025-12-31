@@ -2,10 +2,9 @@
 name: CD - Deploy to ECS
 
 on:
-  workflow_run:
-    workflows: [CI - Test]
-    types:
-      - completed
+  push:
+    branches:
+      - 조성만-sprint8
 
 # 해당 워크플로우에서 자주 사용할만한 값을 환경변수로 등록해놓고 사용 가능.
 env:
@@ -24,6 +23,13 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - name: Wait for CI to succeed
+        uses: fountainhead/action-wait-for-check@v1.2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: CI - Test
+          ref: ${{ github.sha }}
+
       # AWS 자격증명 설정
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
