@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
-public class CommonExceptionHandler {
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(DiscodeitException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(DiscodeitException e){
         log.warn(buildLogMessage(e));
-        return ErrorResponse.error(e);
+        return ErrorResponse.of(e);
     }
 
     private String buildLogMessage(DiscodeitException e) {
@@ -59,13 +59,13 @@ public class CommonExceptionHandler {
                 details.put(error.getField(), error.getDefaultMessage())
         );
 
-        return ErrorResponse.error(ErrorCode.VALIDATION_ERROR, details, e);
+        return ErrorResponse.of(ErrorCode.VALIDATION_ERROR, details, e);
     }
 
     // 준비 되지 않은 예외 발생시 처리할 메서드
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> exceptionHandler(Exception e) {
         log.error("[Exception] 예기치 못한 오류 발생: {}", e.getMessage());
-        return ErrorResponse.error(ErrorCode.UNHANDLED_EXCEPTION, e);
+        return ErrorResponse.of(ErrorCode.UNHANDLED_EXCEPTION, e);
     }
 }
