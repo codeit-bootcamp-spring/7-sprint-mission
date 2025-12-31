@@ -111,6 +111,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
                 .bucket(bucketName)
                 .responseContentType(contentType)
                 .key(key)
+                .responseContentDisposition("attachment; filename=\"" + key + "\"")
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
