@@ -74,6 +74,8 @@ jobs:
     needs: build-and-push
     name: Deploy
     runs-on: ubuntu-22.04
+    env:
+      IMAGE_URI: ${{ needs.build-and-push.outputs.image }}
 
     steps:
       # AWS CLI 설정 (ECS 클러스터 접근)
@@ -116,7 +118,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ needs.build-and-push.outputs.image }}
+          image: ${{ env.IMAGE_URI }}
 
       # 기존 서비스 중단 (프리티어 리소스 고려)
       - name: Stop ECS Service
