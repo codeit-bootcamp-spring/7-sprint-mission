@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/github/BetterCodings/7-sprint-mission/graph/badge.svg?token=TT2OOP3ZE5)](https://codecov.io/github/BetterCodings/7-sprint-mission)
+[![codecov](https://codecov.io/github/BetterCodings/7-sprint-mission/branch/%EC%A1%B0%EC%84%B1%EB%A7%8C-sprint8/graph/badge.svg?token=TT2OOP3ZE5)](https://codecov.io/github/BetterCodings/7-sprint-mission)
 
 # Getting Started
 
