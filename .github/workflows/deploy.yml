@@ -21,6 +21,8 @@ jobs:
   build-and-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-22.04
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
 
     steps:
       - name: Wait for CI to succeed
@@ -114,7 +116,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.image }}
+          image: ${{ needs.build-and-push.outputs.image }}
 
       # 기존 서비스 중단 (프리티어 리소스 고려)
       - name: Stop ECS Service
