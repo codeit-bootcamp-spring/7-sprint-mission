@@ -46,6 +46,10 @@ jobs:
               --username AWS \
               --password-stdin public.ecr.aws
 
+      # 코드 체크아웃
+      - name: checkout
+        uses: actions/checkout@v4
+
       # Docker 이미지 빌드 & ECR push
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
