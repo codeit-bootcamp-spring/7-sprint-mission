@@ -19,7 +19,7 @@ env:
 
 jobs:
   deploy:
-    name: Build & Push Docker Image
+    name: Deploy to ECS
     runs-on: ubuntu-22.04
 
     steps:
@@ -114,8 +114,8 @@ jobs:
       - name: Stop ECS Service
         run: |
           aws ecs update-service \
-            --cluster $ECS_CLUSTER
-            --service $ECS_SERVICE
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
             --desired-count 0
 
       # ECS Service에 새 Task Definition 배포
