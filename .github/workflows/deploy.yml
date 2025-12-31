@@ -72,6 +72,12 @@ jobs:
           
           echo "image=$ECR_REPOSITORY_URI:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+      - name: Stop current task in cluster
+        run: |
+          aws ecs stop-task \
+          --cluster $ECS_CLUSTER \
+          --task $ECS_TASK_DEFINITION
+
       - name: Set ECS task desired count
         run: |
             aws ecs update-service \
@@ -121,9 +127,7 @@ jobs:
       - name: Deployment result
         run: |
           echo "Deploy Success!!"
-          echo "Image : $ECR_REPOSITORY_URI"
-          echo "Service : $ECS_SERVICE"
-          echo "Cluster : $ECS_CLUSTER"
+          echo "Siuuuuuuuu!!"
       
           
       
