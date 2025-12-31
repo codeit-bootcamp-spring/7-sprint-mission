@@ -8,6 +8,7 @@ on:
 # 위크플로우에서 실행될 작업을 정의
 jobs:
   test:
+    name: CI Test Job
     runs-on: ubuntu-22.04
 
     steps:

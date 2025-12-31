@@ -26,7 +26,7 @@ jobs:
         uses: fountainhead/action-wait-for-check@v1.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: CI - Test
+          checkName: CI Test Job
           ref: ${{ github.sha }}
 
       # AWS 자격증명 설정
