@@ -120,7 +120,7 @@ jobs:
           aws ecs update-service \
            --cluster $ECS_CLUSTER \
            --service $ECS_SERVICE \
-           --task-definition $task_definition \
+           --task-definition $ECS_TASK_DEFINITION \
            --desired-count 1
 
       - name: Deployment result
