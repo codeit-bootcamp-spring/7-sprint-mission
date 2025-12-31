@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/github/BetterCodings/7-sprint-mission/graph/badge.svg?token=TT2OOP3ZE5)](https://codecov.io/github/BetterCodings/7-sprint-mission)
+
 # Getting Started
 
 ### Reference Documentation
