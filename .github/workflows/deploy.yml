@@ -100,14 +100,6 @@ jobs:
           
           mv task-definition-clean.json task-definition.json
 
-      - name: Set ECS task desired count
-        run: |
-          aws ecs update-service \
-           --cluster $ECS_CLUSTER \
-           --service $ECS_SERVICE \
-           --task-definition $ECS_TASK_DEFINITION \
-           --desired-count 1
-
       - name: Update new task definition
         id: task-def-update
         uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -116,6 +108,13 @@ jobs:
           container-name: ${{ env.ECS_CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
+      - name: Set ECS task desired count
+        run: |
+          aws ecs update-service \
+           --cluster $ECS_CLUSTER \
+           --service $ECS_SERVICE \
+           --task-definition $ECS_TASK_DEFINITION \
+           --desired-count 1
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -123,7 +122,6 @@ jobs:
           task-definition: ${{ steps.task-def-update.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
 
       - name: Deployment result
         run: |
