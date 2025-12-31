@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,6 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.InputStream;
-import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
 
@@ -65,7 +65,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
         return ResponseEntity
                 .status(HttpStatus.FOUND)  // 302 리다이렉트
-                .location(URI.create(presignedUrl))
+                .header(HttpHeaders.LOCATION, presignedUrl)
                 .build();
 
     }
@@ -75,6 +75,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
                 .bucket(bucket)
                 .key(key)
                 .responseContentType(contentType)
+                .responseContentDisposition("attachment; filename=\"" + key + "\"")
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
