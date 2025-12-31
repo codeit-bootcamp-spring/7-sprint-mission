@@ -74,18 +74,11 @@ jobs:
 
       - name: Stop current task in cluster
         run: |
-          aws ecs stop-task \
-          --cluster $ECS_CLUSTER \
-          --task $ECS_TASK_DEFINITION
-
-      - name: Set ECS task desired count
-        run: |
-            aws ecs update-service \
-             --cluster $ECS_CLUSTER \
-             --service $ECS_SERVICE \
-             --task-definition $ECS_TASK_DEFINITION \
-             --desired-count 1
-
+          aws ecs update-service \
+           --cluster $ECS_CLUSTER \
+           --service $ECS_SERVICE \
+           --task-definition $ECS_TASK_DEFINITION \
+           --desired-count 0
 
       - name: current task definition
         run : |
@@ -106,6 +99,14 @@ jobs:
           )' task-definition.json > task-definition-clean.json
           
           mv task-definition-clean.json task-definition.json
+
+      - name: Set ECS task desired count
+        run: |
+          aws ecs update-service \
+           --cluster $ECS_CLUSTER \
+           --service $ECS_SERVICE \
+           --task-definition $ECS_TASK_DEFINITION \
+           --desired-count 1
 
       - name: Update new task definition
         id: task-def-update

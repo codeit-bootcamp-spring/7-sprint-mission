@@ -110,7 +110,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         String fileName = binaryContentDto.fileName();
         String uniqueName = binaryContentDto.id()+"_"+fileName;
 
-        String presignedUrl = generatePresignedUrl(uniqueName, binaryContentDto.contentType());
+        String presignedUrl = generatePresignedUrl(uniqueName,fileName, binaryContentDto.contentType());
         return ResponseEntity
                 .status(HttpStatus.SEE_OTHER)
                 .location(URI.create(presignedUrl))
@@ -121,12 +121,13 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         return this.s3Client;
     }
 
-    String generatePresignedUrl(String key, String contentType){
+    String generatePresignedUrl(String key,String fileName, String contentType){
 
         GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(bucket)
                 .responseContentType(contentType)
                 .key(key)
+                .responseContentDisposition("attachment; filename=\"" + fileName + "\"")
                 .build();
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofSeconds(expirationSeconds))
