@@ -38,9 +38,12 @@ jobs:
           aws-region: us-east-1 # Public ECR 배포 위함
 
       # ECR 로그인
-      - name: Login to AWS ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: Login to Public ECR
+        run: |
+          aws ecr-public get-login-password \
+            | docker login \
+              --username AWS \
+              --password-stdin public.ecr.aws
 
       # Docker 이미지 빌드 & ECR push
       - name: Build, tag, and push image to Amazon ECR
