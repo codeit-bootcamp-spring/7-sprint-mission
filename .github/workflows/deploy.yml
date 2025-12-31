@@ -127,6 +127,14 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
+      # ECS Service 재시작 (Task 1개 실행)
+      - name: Start ECS Service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 1
+
       # 배포 완료 메시지
       - name: Deployment result
         run: |
