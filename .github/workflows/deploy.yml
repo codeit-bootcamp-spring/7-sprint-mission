@@ -72,6 +72,33 @@ jobs:
           
           echo "image=$ECR_REPOSITORY_URI:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+      - name: Stop current task in cluster
+        run: |
+          aws ecs update-service \
+           --cluster $ECS_CLUSTER \
+           --service $ECS_SERVICE \
+           --task-definition $ECS_TASK_DEFINITION \
+           --desired-count 0
+
+      - name: current task definition
+        run : |
+          aws ecs describe-task-definition \
+          --task-definition $ECS_TASK_DEFINITION \
+          --query taskDefinition > task-definition.json
+          
+          sudo apt-get update && sudo apt-get install -y jq
+          jq 'del(
+            .taskDefinitionArn,
+            .revision,
+            .status,
+            .requiresAttributes,
+            .compatibilities,
+            .registeredAt,
+            .registeredBy,
+            .enableFaultInjection
+          )' task-definition.json > task-definition-clean.json
+          
+          mv task-definition-clean.json task-definition.json
 
       - name: Update new task definition
         id: task-def-update
@@ -81,19 +108,12 @@ jobs:
           container-name: ${{ env.ECS_CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
-      - name: Stop current task in cluster
+      - name: Set ECS task desired count
         run: |
           aws ecs update-service \
            --cluster $ECS_CLUSTER \
            --service $ECS_SERVICE \
-           --task-definition $ECS_TASK_DEFINITION \
-           --desired-count 0
-      - name : Start new task in cluster
-        run: |
-          aws ecs update-service \
-           --cluster $ECS_CLUSTER \
-           --service $ECS_SERVICE \
-           --task-definition ${{steps.task-def-update.outputs.task-definition}} \
+           --task-definition ${{ steps.task-def-update.outputs.task-definition }} \
            --desired-count 1
 
       - name: Deploy to ECS
