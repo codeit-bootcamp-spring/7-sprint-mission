@@ -18,11 +18,9 @@ env:
 
 
 jobs:
-  build-and-push:
+  deploy:
     name: Build & Push Docker Image
     runs-on: ubuntu-22.04
-    outputs:
-      image: ${{ steps.build-image.outputs.image }}
 
     steps:
       - name: Wait for CI to succeed
@@ -70,14 +68,6 @@ jobs:
           # 다음 스텝에서 사용할 수 있도록 출력
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-  deploy:
-    needs: build-and-push
-    name: Deploy
-    runs-on: ubuntu-22.04
-    env:
-      IMAGE_URI: ${{ needs.build-and-push.outputs.image }}
-
-    steps:
       # AWS CLI 설정 (ECS 클러스터 접근)
       - name: Configure AWS credentials (ECS)
         uses: aws-actions/configure-aws-credentials@v4
@@ -118,7 +108,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ env.IMAGE_URI }}
+          image: ${{ steps.build-image.outputs.image }}
 
       # 기존 서비스 중단 (프리티어 리소스 고려)
       - name: Stop ECS Service
