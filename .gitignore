@@ -5,6 +5,7 @@ build/
 !**/src/test/**/build/
 .env
 .gitignore
+*.env
 ### IntelliJ IDEA ###
 .idea
 .idea/
