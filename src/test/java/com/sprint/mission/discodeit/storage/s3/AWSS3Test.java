@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.stoarge.s3;
+package com.sprint.mission.discodeit.storage.s3;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
