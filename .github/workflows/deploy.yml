@@ -6,6 +6,8 @@ on:
     workflows: ["CI - Test"]
     types:
       - completed
+    branches:
+      - 조성만-sprint8
 
 # 해당 워크플로우에서 자주 사용할만한 값을 환경변수로 등록해놓고 사용 가능.
 env:
