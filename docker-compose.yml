@@ -14,11 +14,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - STORAGE_TYPE=${STORAGE_TYPE}
       - STORAGE_LOCAL_ROOT_PATH=${STORAGE_LOCAL_ROOT_PATH}
-      - AWS_S3_ACCESS_KEY=${AWS_S3_ACCESS_KEY}
-      - AWS_S3_SECRET_KEY=${AWS_S3_SECRET_KEY}
-      - AWS_S3_REGION=${AWS_S3_REGION}
-      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
-      - AWS_S3_PRESIGNED_URL_EXPIRATION=${AWS_S3_PRESIGNED_URL_EXPIRATION}
+    volumes:
+      - discodeit-app-data:/app/image
     depends_on: # 서비스 시작 순서 제어
       postgres:
         condition: service_healthy # postgres가 health check를 통과할 때까지 대기
@@ -49,6 +46,8 @@ services:
 volumes:
   discodeit-postgres-data:
     driver: local # 볼륨 데이터를 호스트의 로컬에 저장하겠다
+  discodeit-app-data:
+    driver: local
 
 # 네트워크 설정
 # 컨테이너 간의 상호작용을 위한 네트워크를 정의합니다
