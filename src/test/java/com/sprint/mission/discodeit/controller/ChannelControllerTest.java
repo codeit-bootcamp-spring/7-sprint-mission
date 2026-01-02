@@ -70,7 +70,7 @@ class ChannelControllerTest {
     @Test
     @DisplayName("공개 채널 생성 - 이름 누락으로 실패")
     void createPublicChannel_Fail_ValidationError() throws Exception {
-        // given: 이름 누락
+        // given
         CreatePublicChannelRequestDto requestDto =
                 new CreatePublicChannelRequestDto(null, "description");
 
