@@ -39,8 +39,6 @@ public class UserController implements UserControllerDocs {
             @Valid @RequestPart("userCreateRequest") CreateUserRequestDto requestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        log.info("POST /api/users - 사용자 등록 요청: username = {}", requestDto.username());
-
         CreateBinaryContentRequestDto profileRequestDto = binaryContentMapper.toRequestDto(profile);
         UserResponseDto createdUser = userService.create(requestDto, profileRequestDto);
 
@@ -55,8 +53,6 @@ public class UserController implements UserControllerDocs {
             @Valid @RequestPart(name = "userUpdateRequest", required = false) UpdateUserRequestDto requestDto,
             @RequestPart(name = "profile", required = false) MultipartFile profile
     ) {
-        log.info("PATCH /api/users/{} - 사용자 정보 수정 요청", userId);
-
         CreateBinaryContentRequestDto profileRequestDto = binaryContentMapper.toRequestDto(profile);
         UserResponseDto updatedUser = userService.update(userId, requestDto, profileRequestDto);
 
@@ -67,8 +63,6 @@ public class UserController implements UserControllerDocs {
     // 사용자 삭제
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
-        log.info("DELETE /api/users/{} - 사용자 삭제 요청", userId);
-
         userService.delete(userId);
 
         log.info("DELETE /api/users/{} - 사용자 삭제 완료", userId);
