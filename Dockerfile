@@ -1,5 +1,5 @@
 # 첫번째 스테이지 -> 빌드 영역
-FROM amazoncorretto:17 as Build
+FROM amazoncorretto:17 AS build
 
 # 작업 폴더 지정 (이제부터 컨테이너 안의 /app 이라는 폴더에서 작업할게!)
 WORKDIR /app
@@ -21,7 +21,7 @@ WORKDIR /app
 
 # build라는 별칭으로 만들어진 첫번째 스테이지에서
 # .jar로 끝나는 파일을 app.jar로 복사해서 이미지에 세팅
-COPY --from=build /app/build/libs/*.jar ./build/libs/
+COPY --from=build /app/build/libs/*.jar app.jar
 
 #환경변수 설정
 ENV TZ=Asia/Seoul
@@ -32,4 +32,4 @@ ENV PROJECT_VERSION=1.2-M8
 # 80 포트를 노출
 EXPOSE 80
 
-ENTRYPOINT exec java -jar ./build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar
+ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS} -jar app.jar"]
