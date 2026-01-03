@@ -19,7 +19,7 @@ spring:
 
   sql:
     init:
-      mode: always
+      mode: never
 
 discodeit:
   storage:
