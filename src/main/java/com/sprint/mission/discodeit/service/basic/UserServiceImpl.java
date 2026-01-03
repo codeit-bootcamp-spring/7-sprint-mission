@@ -40,23 +40,28 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserCreateRequest requestDto, MultipartFile profileImage) {
-        log.debug("회원가입 요청 - email: {}, username: {}", requestDto.email(), requestDto.username());
-        userRepository.findByEmail(requestDto.email()).ifPresent(user
-                -> {
-            log.warn("회원가입 실패 - 중복된 이메일: {}", requestDto.email());
-            throw new DuplicateEmailException(requestDto.email()); });
 
-        userRepository.findByUsername(requestDto.username()).ifPresent(user
+        // email, 닉네임 공백 제거
+        String email = requestDto.email().replace(" ", "");
+        String username = requestDto.username().trim();
+
+        log.debug("회원가입 요청 - email: {}, username: {}", email, username);
+        userRepository.findByEmail(email).ifPresent(user
                 -> {
-            log.warn("회원가입 실패 - 중복된 유저이름: {}", requestDto.username());
-            throw new DuplicateNameException(requestDto.username()); });
+            log.warn("회원가입 실패 - 중복된 이메일: {}", email);
+            throw new DuplicateEmailException(email); });
+
+        userRepository.findByUsername(username).ifPresent(user
+                -> {
+            log.warn("회원가입 실패 - 중복된 유저이름: {}", username);
+            throw new DuplicateNameException(username); });
 
         BinaryContent profile = saveProfileImage(profileImage);
 
         // 유저 생성
         User newUser = User.builder()
-                .email(requestDto.email())
-                .username(requestDto.username())
+                .email(email)
+                .username(username)
                 .password(requestDto.password())
                 .build();
 
@@ -135,23 +140,27 @@ public class UserServiceImpl implements UserService {
         }
 
         if (updateDto.newUsername() != null && !updateDto.newUsername().isBlank()) {
-            userRepository.findByUsername(updateDto.newUsername()).ifPresent(existingUser -> {
+            String newUsername = updateDto.newUsername().trim();
+
+            userRepository.findByUsername(newUsername).ifPresent(existingUser -> {
                 if (!existingUser.getId().equals(user.getId())) {
-                    log.warn("유저 수정 실패 - 중복된 유저이름: {}", updateDto.newUsername());
-                    throw new DuplicateNameException(updateDto.newUsername());
+                    log.warn("유저 수정 실패 - 중복된 유저이름: {}", newUsername);
+                    throw new DuplicateNameException(newUsername);
                 }
             });
-            user.updateUsername(updateDto.newUsername());
+            user.updateUsername(newUsername);
         }
 
         if (updateDto.newEmail() != null && !updateDto.newEmail().isBlank()) {
-            userRepository.findByEmail(updateDto.newEmail()).ifPresent(existingUser -> {
+            String newEmail = updateDto.newEmail().replace(" ", "");
+
+            userRepository.findByEmail(newEmail).ifPresent(existingUser -> {
                 if (!existingUser.getId().equals(user.getId())) {
-                    log.warn("유저 수정 실패 - 중복된 이메일: {}", updateDto.newEmail());
-                    throw new DuplicateEmailException(updateDto.newEmail());
+                    log.warn("유저 수정 실패 - 중복된 이메일: {}", newEmail);
+                    throw new DuplicateEmailException(newEmail);
                 }
             });
-            user.updateEmail(updateDto.newEmail());
+            user.updateEmail(newEmail);
         }
 
         if (updateDto.newPassword() != null && !updateDto.newPassword().isBlank()) {
