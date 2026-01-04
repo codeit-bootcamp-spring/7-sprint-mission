@@ -22,7 +22,7 @@ WORKDIR /app
 
 # 4. 빌드 스테이지에서 생성된 JAR 파일만 추출
 # 환경 변수 PROJECT_NAME, VERSION은 하드코딩보다 빌드 시점에 유연하게 대처 가능합니다.
-COPY --from=builder /app/build/libs/discodeit-1.2-M8.jar app.jar
+COPY --from=build /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
 
 EXPOSE 80
 
