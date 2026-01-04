@@ -5,112 +5,133 @@ on:
     branches:
       - release
 
+# 과제 요구사항: GitHub Variables 사용
 env:
-  # GitHub Variables에 저장된 값들을 참조
-  AWS_REGION: ${{ vars.AWS_REGION }}
-  ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
-  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
-  ECS_TASK_DEFINITION_NAME: ${{ vars.ECS_TASK_DEFINITION }}
+  AWS_REGION: ${{ vars.AWS_REGION }}                     # ap-northeast-2
+  ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}     # public.ecr.aws/xxxx/repo
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}                   # discodeit-cluster
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}                   # discodeit-service
+  ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}   # discodeit-task
   CONTAINER_NAME: discodeit-app
 
 jobs:
   deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
+    name: Deploy to ECS
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout code
+      # 1. 코드 체크아웃
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup JDK 17
+      # workflow가 실행될 때마다 매번 라이브러리를 새로 받으면 오래걸리겠죠?
+      # 저번에 썼던 게 있다면 그걸 그대로 써서 시간을 절약합니다.
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'gradle'
+          cache: 'gradle' # 이 한 줄로 Gradle 캐싱이 활성화됩니다.
 
-      - name: Build with Gradle
-        run: |
-          chmod +x ./gradlew
-          ./gradlew clean build -x test
-
-      # 1. Public ECR 로그인을 위해 us-east-1 리전으로 인증
-      - name: Configure AWS credentials for Public ECR
+      # 2. AWS 인증 (Public ECR 전용, us-east-1)
+      - name: Configure AWS credentials (Public ECR)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: us-east-1
 
-      - name: Login to Amazon Public ECR
-        id: login-ecr-public
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registry-type: public
+      # 3. Public ECR 로그인
+      - name: Login to Public ECR
+        run: |
+          aws ecr-public get-login-password \
+            | docker login \
+              --username AWS \
+              --password-stdin public.ecr.aws
 
-      # 2. Docker 이미지 빌드 & ECR push
-      - name: Build, tag, and push image to Amazon ECR
+      # 4. Docker 이미지 빌드 및 푸시
+      - name: Build and Push Docker Image
         id: build-image
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t ${{ env.ECR_REPOSITORY_URI }}:latest -t ${{ env.ECR_REPOSITORY_URI }}:$IMAGE_TAG .
-          docker push ${{ env.ECR_REPOSITORY_URI }}:latest
-          docker push ${{ env.ECR_REPOSITORY_URI }}:$IMAGE_TAG
-          echo "image=${{ env.ECR_REPOSITORY_URI }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker build \
+            -t $ECR_REPOSITORY_URI:$IMAGE_TAG \
+            -t $ECR_REPOSITORY_URI:latest .
 
-      # 3. ECS 작업을 위해 실제 서비스 리전(ap-northeast-2)으로 재설정
-      - name: Configure AWS credentials for ECS
+          docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
+          docker push $ECR_REPOSITORY_URI:latest
+
+          echo "image=$ECR_REPOSITORY_URI:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      # 5. AWS 인증 (ECS 클러스터 리전)
+      - name: Configure AWS credentials (ECS)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
 
-      # 4. 프리티어 자원 부족 방지: 기존 서비스 중지
-      - name: Stop existing ECS service
+      # 6. 기존 Task Definition 다운로드 및 정리
+      - name: Download and Clean Task Definition
         run: |
-          echo "Stopping ECS service in cluster: ${{ env.ECS_CLUSTER }}"
-          echo "Service: ${{ env.ECS_SERVICE }}"
-          echo "Region: ${{ env.AWS_REGION }}"
-          
-          aws ecs update-service \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --service ${{ env.ECS_SERVICE }} \
-            --desired-count 0
-          
-          echo "Waiting for service to stabilize..."
-          aws ecs wait services-stable \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --services ${{ env.ECS_SERVICE }}
+          sudo apt-get update && sudo apt-get install -y jq
 
-      # 5. Task Definition 다운로드 및 jq를 이용한 정밀 세척
-      - name: Download and Clean task definition
-        run: |
           aws ecs describe-task-definition \
-            --task-definition ${{ env.ECS_TASK_DEFINITION_NAME }} \
+            --task-definition $ECS_TASK_DEFINITION \
             --query taskDefinition > task-definition.json
-          
-          # 불필요한 필드를 제거하여 등록 가능한 형태로 변환
-          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .enableFaultInjection)' task-definition.json > clean-task-definition.json
-          
-          cat clean-task-definition.json
 
-      # 6. 새 이미지 주소를 태스크 정의에 반영
-      - name: Fill in the new image ID in task definition
+          jq 'del(
+            .taskDefinitionArn,
+            .revision,
+            .status,
+            .requiresAttributes,
+            .compatibilities,
+            .registeredAt,
+            .registeredBy,
+            .enableFaultInjection
+          )' task-definition.json > clean-task-definition.json
+
+          mv clean-task-definition.json task-definition.json
+
+      # 7. 새 이미지로 Task Definition 렌더링
+      - name: Render New Task Definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: clean-task-definition.json
+          task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
-      # 7. ECS Service에 배포 및 가동 (desired-count를 1로 복구)
-      - name: Deploy to Amazon ECS
+      # 8. 프리티어 고려: 기존 서비스 중단
+      - name: Stop ECS Service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 0
+
+      # 9. 새 Task Definition으로 서비스 업데이트
+      - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+
+      # 10. 서비스 재기동
+      - name: Start ECS Service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 1
+
+      # 배포 완료 메시지
+      - name: Deploy result
+        run: |
+          echo "Deployment completed successfully!"
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Service: ${{ env.ECS_SERVICE }}"
+          echo "Cluster: ${{ env.ECS_CLUSTER }}"
