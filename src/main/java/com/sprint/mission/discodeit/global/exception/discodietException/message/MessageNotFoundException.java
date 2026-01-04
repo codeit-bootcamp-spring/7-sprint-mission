@@ -5,13 +5,11 @@ import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import java.util.UUID;
 
 public class MessageNotFoundException extends MessageException {
-    public MessageNotFoundException() {
-        super(ErrorCode.MESSAGE_NOT_FOUND);
+    public MessageNotFoundException(String key, Object value) {
+        super(ErrorCode.MESSAGE_NOT_FOUND, key, value);
     }
 
     public static MessageNotFoundException byId(UUID messageId) {
-        MessageNotFoundException messageNotFoundException = new MessageNotFoundException();
-        messageNotFoundException.updateDetail("messageId", messageId);
-        return messageNotFoundException;
+        return new MessageNotFoundException("messageId", messageId);
     }
 }

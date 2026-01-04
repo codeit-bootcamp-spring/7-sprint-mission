@@ -5,13 +5,11 @@ import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import java.util.UUID;
 
 public class ReadStatusNotFoundException extends ReadStatusException {
-    public ReadStatusNotFoundException() {
-        super(ErrorCode.READ_STATUS_NOT_FOUND);
+    public ReadStatusNotFoundException(String key, Object value) {
+        super(ErrorCode.READ_STATUS_NOT_FOUND, key, value);
     }
 
     public static ReadStatusNotFoundException byId(UUID readStatusId) {
-        ReadStatusNotFoundException readStatusNotFoundException = new ReadStatusNotFoundException();
-        readStatusNotFoundException.updateDetail("readStatusId", readStatusId);
-        return readStatusNotFoundException;
+        return new ReadStatusNotFoundException("readStatusId", readStatusId);
     }
 }

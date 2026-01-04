@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.global.exception.discodietException.DiscodeitException;
-import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.discodietException.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -44,7 +43,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContentResponseDto getBinaryContent(UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new DiscodeitException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
+                .orElseThrow(() -> BinaryContentNotFoundException.byId(binaryContentId));
 
         return binaryContentMapper.toResponseDto(binaryContent);
     }
@@ -62,7 +61,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public void deleteBinaryContent(UUID binaryContentId) {
         if (!binaryContentRepository.existsById(binaryContentId)) {
-            throw new DiscodeitException(ErrorCode.BINARY_CONTENT_NOT_FOUND);
+            throw BinaryContentNotFoundException.byId(binaryContentId);
         }
 
         binaryContentRepository.deleteById(binaryContentId);
