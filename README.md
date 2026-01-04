@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/mij9929/7-sprint-mission/graph/badge.svg?token=C1KY1IJZTD)](https://codecov.io/gh/mij9929/7-sprint-mission)
+[![codecov](https://codecov.io/gh/mij9929/7-sprint-mission/graph/badge.svg?token=C1KY1IJZTD&branch=이정훈-sprint8)](https://codecov.io/gh/mij9929/7-sprint-mission/tree/이정훈-sprint8)
 
 # Getting Started
 
