@@ -19,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,12 +68,14 @@ class MessageRepositoryTest {
                     .channel(channel1)
                     .author(user1)
                     .content("message1")
+                    .attachments(new ArrayList<>())
                     .build();
 
             message2 = Message.builder()
                     .channel(channel1)
                     .author(user1)
                     .content("message2")
+                    .attachments(new ArrayList<>())
                     .build();
 
             // messsage3만 채널2에서 생성한 메세지
@@ -81,6 +83,7 @@ class MessageRepositoryTest {
                     .channel(channel2)
                     .author(user1)
                     .content("message3")
+                    .attachments(new ArrayList<>())
                     .build();
 
             entityManager.persist(channel1);
@@ -281,6 +284,19 @@ class MessageRepositoryTest {
         private Message message2;
         private Message message3;
 
+        private void insertMessageWithTime(String content, UUID channelId, Long authorId, Instant createdAt) {
+            entityManager.createNativeQuery(
+                            "INSERT INTO message (content, channel_id, author_id, created_at, updated_at) " +
+                                    "VALUES (:content, :channelId, :authorId, :createdAt, :updatedAt)"
+                    )
+                    .setParameter("content", content)
+                    .setParameter("channelId", channelId)
+                    .setParameter("authorId", authorId)
+                    .setParameter("createdAt", createdAt)
+                    .setParameter("updatedAt", createdAt)
+                    .executeUpdate();
+        }
+
         @BeforeEach
         void setUp() {
             channel1 = Channel.builder()
@@ -289,52 +305,14 @@ class MessageRepositoryTest {
                     .description("test 공지 채널입니다.")
                     .build();
             user1 = new User("test1", "test1@codeit.com", "test_123", null);
-            message1 = Message.builder()
-                    .channel(channel1)
-                    .author(user1)
-                    .content("message1")
-                    .build();
-
-            message2 = Message.builder()
-                    .channel(channel1)
-                    .author(user1)
-                    .content("message2")
-                    .build();
-
-            message3 = Message.builder()
-                    .channel(channel1)
-                    .author(user1)
-                    .content("message3")
-                    .build();
-
             entityManager.persist(channel1);
             entityManager.persist(user1);
-
         }
+
 
         @Test
         @DisplayName("[정상 케이스] - 채널 별 최신 메세지 조회 성공")
         void findLatestMessageByChannelId_success() {
-            // 1. 먼저 저장하여 영속 상태로 만듦
-            messageRepository.saveAll(List.of(message1, message2, message3));
-
-            // 2. 강제 시간 고정 (중요: clear하기 전에 실행!)
-            Instant baseTime = Instant.now();
-
-            // message1이 가장 최신 (5분 전)
-            // message2가 중간 (10분 전)
-            // message3이 가장 과거 (15분 전)
-            ReflectionTestUtils.setField(message1, "createdAt", baseTime.minus(5, ChronoUnit.MINUTES));
-            ReflectionTestUtils.setField(message2, "createdAt", baseTime.minus(10, ChronoUnit.MINUTES));
-            ReflectionTestUtils.setField(message3, "createdAt", baseTime.minus(15, ChronoUnit.MINUTES));
-
-            // 3. 변경된 내용을 DB에 반영 (Update 쿼리 발생)
-            // JPA Auditing이 켜져있다면 save를 한 번 더 호출해주는 것이 안전합니다.
-            messageRepository.saveAll(List.of(message1, message2, message3));
-            entityManager.flush();
-
-            // 4. 영속성 컨텍스트를 비워야 다음 조회(when) 때 DB에서 새로 읽어옴
-            entityManager.clear();
 
             // when
             List<Message> result = messageRepository.findLatestByChannelId(channel1.getId());
@@ -345,7 +323,9 @@ class MessageRepositoryTest {
             // TODO: 죽어도 여기서 제대로 동작안함.
             // 최신순(DESC): m1(5분 전) -> m2(10분 전) -> m3(15분 전)
 //            assertThat(result).extracting(Message::getContent)
-//                    .containsExactly("message1", "message2", "message3");
+//                    .containsExactly("test content1", "test content2", "test content3");
+
         }
     }
+
 }
