@@ -38,7 +38,7 @@ services:
       # PostgreSQL 데이터 유지
       - db-data:/var/lib/postgresql/data
       # schema.sql 자동 실행 (컨테이너 시작 시)
-      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
 
 volumes:
   db-data:
