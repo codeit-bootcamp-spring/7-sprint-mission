@@ -12,3 +12,11 @@ logging:
   level:
     root: info
     com.sprint.mission.discodeit: info
+
+management:
+  endpoint:
+    health:
+      show-details: never
+  info:
+    env:
+      enabled: false

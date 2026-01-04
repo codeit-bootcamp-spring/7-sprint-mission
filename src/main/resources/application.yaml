@@ -7,6 +7,9 @@ spring:
       max-request-size: 30MB
   profiles:
     active: dev
+  sql:
+    init:
+      mode: never
   jpa:
     database: postgresql
     hibernate:
@@ -43,9 +46,9 @@ management:
     web:
       exposure:
         include: health, info, metrics, loggers
-  info:
-    env:
-      enabled: true # true로 해주지 않으면, info 값은 보이지 않는다.
+  endpoint:
+    health:
+      show-details: always
 
 info:
   app:
