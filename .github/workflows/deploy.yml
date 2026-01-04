@@ -1,9 +1,12 @@
 name: CD - Deploy to ECS
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
-      - release # 요구사항: release 브랜치 푸시 시 실행
+      - release  #
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
