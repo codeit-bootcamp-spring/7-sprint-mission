@@ -24,6 +24,12 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build and Test with Gradle
+        env:
+          # GitHub Secrets에 저장된 변수명을 그대로 환경 변수로 매핑
+          AWS_S3_ACCESS_KEY: ${{ secrets.AWS_S3_ACCESS_KEY }}
+          AWS_S3_SECRET_KEY: ${{ secrets.AWS_S3_SECRET_KEY }}
+          AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         # test와 리포트 생성을 한 번에 수행
         run: ./gradlew test jacocoTestReport
 
