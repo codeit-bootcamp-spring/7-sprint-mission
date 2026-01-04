@@ -1,20 +1,18 @@
 name: CD - Deploy to ECS
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
-      - release  #
+      - release
 
 env:
+  # GitHub Variables에 저장된 값들을 참조
   AWS_REGION: ${{ vars.AWS_REGION }}
   ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
   ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
   ECS_SERVICE: ${{ vars.ECS_SERVICE }}
   ECS_TASK_DEFINITION_NAME: ${{ vars.ECS_TASK_DEFINITION }}
-  CONTAINER_NAME: discodeit-app # ECS Task Definition에 설정된 컨테이너 이름 확인 필요
+  CONTAINER_NAME: discodeit-app
 
 jobs:
   deploy:
@@ -37,7 +35,7 @@ jobs:
           chmod +x ./gradlew
           ./gradlew clean build -x test
 
-      # 1. Public ECR 로그인을 위한 AWS 설정 (us-east-1)
+      # 1. Public ECR 로그인을 위해 us-east-1 리전으로 인증
       - name: Configure AWS credentials for Public ECR
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -62,7 +60,7 @@ jobs:
           docker push ${{ env.ECR_REPOSITORY_URI }}:$IMAGE_TAG
           echo "image=${{ env.ECR_REPOSITORY_URI }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      # 3. ECS 작업을 위한 AWS 리전 재설정 (ap-northeast-2)
+      # 3. ECS 작업을 위해 실제 서비스 리전(ap-northeast-2)으로 재설정
       - name: Configure AWS credentials for ECS
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -70,23 +68,36 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # 4. 프리티어 고려: 기존 서비스 중단 (desired-count 0)
+      # 4. 프리티어 자원 부족 방지: 기존 서비스 중지
       - name: Stop existing ECS service
         run: |
-          aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} \
-                                 --service ${{ env.ECS_SERVICE }} \
-                                 --desired-count 0
+          echo "Stopping ECS service in cluster: ${{ env.ECS_CLUSTER }}"
+          echo "Service: ${{ env.ECS_SERVICE }}"
+          echo "Region: ${{ env.AWS_REGION }}"
+          
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --desired-count 0
+          
+          echo "Waiting for service to stabilize..."
+          aws ecs wait services-stable \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }}
 
-      # 5. 현재 Task Definition 다운로드 및 정리
+      # 5. Task Definition 다운로드 및 jq를 이용한 정밀 세척
       - name: Download and Clean task definition
         run: |
-          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION_NAME }} \
-                                           --query taskDefinition > task-definition.json
+          aws ecs describe-task-definition \
+            --task-definition ${{ env.ECS_TASK_DEFINITION_NAME }} \
+            --query taskDefinition > task-definition.json
           
-          # 불필요한 필드 제거 (jq 사용)
-          cat task-definition.json | jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .enableFaultInjection)' > clean-task-definition.json
+          # 불필요한 필드를 제거하여 등록 가능한 형태로 변환
+          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .enableFaultInjection)' task-definition.json > clean-task-definition.json
+          
+          cat clean-task-definition.json
 
-      # 6. Task Definition에 새 이미지 반영
+      # 6. 새 이미지 주소를 태스크 정의에 반영
       - name: Fill in the new image ID in task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -95,7 +106,7 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
-      # 7. ECS Service에 새 Task Definition 배포 (desired-count 1로 복구)
+      # 7. ECS Service에 배포 및 가동 (desired-count를 1로 복구)
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
