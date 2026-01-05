@@ -68,4 +68,3 @@ class ChannelApiIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 }
-//ㄴㅇ
