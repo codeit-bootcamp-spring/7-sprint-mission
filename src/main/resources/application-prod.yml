@@ -18,7 +18,7 @@ spring:
       on-profile: prod
 
 server:
-  port: 8181
+  port: 8081
 
 logging:
   level:
