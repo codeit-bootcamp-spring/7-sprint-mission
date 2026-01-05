@@ -171,7 +171,7 @@ class BasicUserServiceTest {
         assertThatThrownBy(() -> userService.update(userId, userUpdateRequestDto, null))
                 .isInstanceOf(UserAlreadyExistsException.class);
 
-        then(userRepository).should().findByEmail("dlguddlf@gmail.com");
+        then(userRepository).should().findByEmail("dlguddlf3@gmail.com");
         then(userRepository).should(never()).save(any());
         then(userMapper).shouldHaveNoInteractions();
 
