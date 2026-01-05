@@ -16,7 +16,9 @@ RUN ./gradlew clean build -x test
 ##############################################3
 
 # 두번째 스테이지 -> 실행 영역
-FROM amazoncorretto:17
+# FROM amazoncorretto:17
+# 심화 이미지 최적화 slim
+FROM amazoncorretto:17-alpine
 WORKDIR /app
 
 # build라는 별칭으로 만들어진 첫번째 스테이지에서
