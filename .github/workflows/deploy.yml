@@ -41,8 +41,6 @@ env:
   # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: speing-app           # set this to the name of the container in the
   # containerDefinitions section of your task definition
-  PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
-  PROJECT_VERSION: ${{ secrets.PROJECT_VERSION }}
 
 
 # 워크플로우에서 실행될 작업을 정의
@@ -104,7 +102,11 @@ jobs:
           IMAGE_TAG: ${{ github.sha }} # Git commit hash를 이미지 태그로 사용
         run: |
           # Docker 이미지 빌드
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build \
+          --build-arg PROJECT_NAME=$PROJECT_NAME \
+          --build-arg PROJECT_VERSION=$PROJECT_VERSION \
+          -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           
           # ECR에 푸시
