@@ -41,7 +41,8 @@ env:
   # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: speing-app           # set this to the name of the container in the
   # containerDefinitions section of your task definition
-
+  PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
+  PROJECT_VERSION: ${{ secrets.PROJECT_VERSION }}
 
 # 워크플로우에서 실행될 작업을 정의
 jobs:
