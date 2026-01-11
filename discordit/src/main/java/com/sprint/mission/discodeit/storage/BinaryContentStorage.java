@@ -5,13 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
-import java.util.UUID;
+import java.nio.file.Path;
 
 @Component
 public interface BinaryContentStorage {
-    UUID put(UUID binaryContentId, byte[] content);
+    Path put(String fileName, byte[] content);
 
-    InputStream get(UUID binaryContentId);
+    InputStream get(String fileName);
 
     ResponseEntity<?> download(BinaryContentDto dto);
 }

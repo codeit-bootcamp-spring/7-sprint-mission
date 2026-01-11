@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.common.exceptions.message;
 
 import com.sprint.mission.discodeit.common.enums.ErrorCode;
-import com.sprint.mission.discodeit.common.exceptions.DiscodeitException;
 
-import java.util.Map;
+import java.util.UUID;
 
-public class MessageNotFoundException extends DiscodeitException {
-
-    public MessageNotFoundException(Map<String, Object> details) {
-        super(ErrorCode.NOT_FOUND, details);
+public class MessageNotFoundException extends MessageException {
+    public MessageNotFoundException(UUID id) {
+        super(id, ErrorCode.NOT_FOUND);
     }
 }

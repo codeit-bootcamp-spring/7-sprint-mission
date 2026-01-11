@@ -30,7 +30,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 (long) dto.bytes().length,
                 dto.type()
         );
-        binaryContentStorage.put(content.getId(), dto.bytes());
+        binaryContentStorage.put(dto.fileName(), dto.bytes());
         contentRepository.save(content);
         log.info("파일 저장 완료 : {}", content.getId());
         return BinaryContentMapper.toDto(content);

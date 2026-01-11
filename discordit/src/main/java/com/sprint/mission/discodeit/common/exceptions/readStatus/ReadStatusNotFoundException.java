@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.common.exceptions.readStatus;
 
 import com.sprint.mission.discodeit.common.enums.ErrorCode;
-import com.sprint.mission.discodeit.common.exceptions.DiscodeitException;
+import com.sprint.mission.discodeit.entity.User;
 
-import java.util.Map;
+import java.util.UUID;
 
-public class ReadStatusNotFoundException extends DiscodeitException {
-    public ReadStatusNotFoundException(Map<String, Object> details) {
-        super(ErrorCode.NOT_FOUND, details);
+public class ReadStatusNotFoundException extends ReadStatusException {
+    public ReadStatusNotFoundException(UUID id) {
+        super(id, ErrorCode.NOT_FOUND);
     }
+
+
 }

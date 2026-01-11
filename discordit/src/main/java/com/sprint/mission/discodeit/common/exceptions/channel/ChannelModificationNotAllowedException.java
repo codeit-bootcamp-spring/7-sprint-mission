@@ -1,12 +1,17 @@
 package com.sprint.mission.discodeit.common.exceptions.channel;
 
 import com.sprint.mission.discodeit.common.enums.ErrorCode;
-import com.sprint.mission.discodeit.common.exceptions.DiscodeitException;
 
 import java.util.Map;
+import java.util.UUID;
 
-public class ChannelModificationNotAllowedException extends DiscodeitException {
-    public ChannelModificationNotAllowedException(Map<String, Object> details) {
-        super(ErrorCode.CHANNEL_MODIFICATION_NOT_ALLOWED, details);
+public class ChannelModificationNotAllowedException extends ChannelException {
+    public ChannelModificationNotAllowedException(UUID id, Map<String, Object> details) {
+        super(ErrorCode.ALREADY_EXISTS, details);
+        this.getDetails().put("id", id);
+    }
+
+    public ChannelModificationNotAllowedException(UUID id) {
+        super(id, ErrorCode.ALREADY_EXISTS);
     }
 }

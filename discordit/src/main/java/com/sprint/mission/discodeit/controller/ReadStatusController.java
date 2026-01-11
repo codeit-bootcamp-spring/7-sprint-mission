@@ -30,8 +30,7 @@ public class ReadStatusController {
     }
 
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
-    public ResponseEntity<ReadStatusDto> read(@PathVariable UUID readStatusId, @RequestBody ReadStatusUpdateRequest request) {
-
+    public ResponseEntity<ReadStatusDto> read(@PathVariable UUID readStatusId, @Valid @RequestBody ReadStatusUpdateRequest request) {
         return ResponseEntity.ok(readStatusService.update(readStatusId, request));
     }
 

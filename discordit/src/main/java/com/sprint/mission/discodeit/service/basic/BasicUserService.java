@@ -58,10 +58,10 @@ public class BasicUserService implements UserService {
         User user = new User(dto.username(), dto.password(), dto.email());
         log.debug("사용자 생성 완료 - id : {}", user.getId());
         if (profile != null) {
-            BinaryContent binaryContent = new BinaryContent(profile.getName(), profile.getSize(), profile.getContentType());
+            BinaryContent binaryContent = new BinaryContent(profile.getOriginalFilename(), profile.getSize(), profile.getContentType());
             binaryContentRepository.save(binaryContent);
             try {
-                binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+                binaryContentStorage.put(profile.getOriginalFilename(), profile.getBytes());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -94,9 +94,9 @@ public class BasicUserService implements UserService {
         }
 
         if (profile != null) {
-            BinaryContent binaryContent = new BinaryContent(profile.getName(), profile.getSize(), profile.getContentType());
+            BinaryContent binaryContent = new BinaryContent(profile.getOriginalFilename(), profile.getSize(), profile.getContentType());
             try {
-                binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+                binaryContentStorage.put(profile.getOriginalFilename(), profile.getBytes());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

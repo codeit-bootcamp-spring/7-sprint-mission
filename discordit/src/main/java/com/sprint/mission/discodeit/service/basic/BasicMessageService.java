@@ -99,7 +99,7 @@ public class BasicMessageService implements MessageService {
                         .map(f -> {
                             try {
                                 BinaryContent saved = binaryContentRepository.save(new BinaryContent(f.getName(), f.getSize(), f.getContentType()));
-                                binaryContentStorage.put(saved.getId(), f.getBytes());
+                                binaryContentStorage.put(saved.getFileName(), f.getBytes());
                                 return saved;
                             } catch (IOException e) {
                                 throw new RuntimeException(e);

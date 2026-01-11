@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.common.exceptions.binaryContent;
 
 import com.sprint.mission.discodeit.common.enums.ErrorCode;
-import com.sprint.mission.discodeit.common.exceptions.DiscodeitException;
 
-import java.util.Map;
+import java.util.UUID;
 
-public class BinaryContentAlreadyExistException extends DiscodeitException {
-    public BinaryContentAlreadyExistException(Map<String, Object> details) {
-        super(ErrorCode.ALREADY_EXISTS, details);
+public class BinaryContentAlreadyExistException extends BinaryContentException {
+    public BinaryContentAlreadyExistException(UUID id) {
+        super(id, ErrorCode.ALREADY_EXISTS);
+    }
+
+    public BinaryContentAlreadyExistException(String fileName) {
+        super(fileName, ErrorCode.ALREADY_EXISTS);
     }
 }

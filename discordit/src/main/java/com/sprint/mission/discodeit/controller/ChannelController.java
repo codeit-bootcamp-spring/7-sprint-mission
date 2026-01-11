@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.entity.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.entity.channel.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.entity.channel.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.entity.channel.request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.entity.channel.response.ChannelParticipantIdsResponse;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public class ChannelController {
     }
 
     @RequestMapping(value = "/private", method = RequestMethod.POST)
-    public ResponseEntity<ChannelParticipantIdsResponse> createPrivate(@Valid @RequestBody PrivateChannelCreateRequest request) {
+    public ResponseEntity<ChannelDto> createPrivate(@Valid @RequestBody PrivateChannelCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPrivateChannel(request));
     }
 

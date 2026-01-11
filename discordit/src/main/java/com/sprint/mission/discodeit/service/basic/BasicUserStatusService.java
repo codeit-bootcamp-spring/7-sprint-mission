@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
-import com.sprint.mission.discodeit.common.exceptions.user.UserStatusNotExistException;
+import com.sprint.mission.discodeit.common.exceptions.userStatus.UserStatusNotExistException;
 import com.sprint.mission.discodeit.dto.entity.userStatus.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.entity.userStatus.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.entity.userStatus.response.UserStatusUpdateResponse;

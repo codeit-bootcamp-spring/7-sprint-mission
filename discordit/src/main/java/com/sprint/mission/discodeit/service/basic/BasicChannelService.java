@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.enums.ChannelScope;
 import com.sprint.mission.discodeit.common.exceptions.channel.ChannelModificationNotAllowedException;
 import com.sprint.mission.discodeit.common.exceptions.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
@@ -8,7 +9,6 @@ import com.sprint.mission.discodeit.dto.entity.channel.request.ChannelMemberRequ
 import com.sprint.mission.discodeit.dto.entity.channel.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.entity.channel.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.entity.channel.request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.entity.channel.response.ChannelParticipantIdsResponse;
 import com.sprint.mission.discodeit.dto.entity.user.UserDto;
 import com.sprint.mission.discodeit.dto.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.dto.mapper.UserMapper;
@@ -16,7 +16,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.common.enums.ChannelScope;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -53,13 +52,13 @@ public class BasicChannelService implements ChannelService {
                 dto.name(),
                 dto.description()
         );
-        channelRepository.save(channel);
-        log.info("공개 채널 생성 완료. id - {}", channel.getId());
-        return ChannelMapper.toDto(channel, getLastMassageAt(channel));
+        Channel saved = channelRepository.save(channel);
+        log.info("공개 채널 생성 완료. id - {}", saved.getId());
+        return ChannelMapper.toDto(saved, getLastMassageAt(saved));
     }
 
     @Override
-    public ChannelParticipantIdsResponse createPrivateChannel(PrivateChannelCreateRequest dto) {
+    public ChannelDto createPrivateChannel(PrivateChannelCreateRequest dto) {
         log.info("비공개 채널 생성 요청 들어옴.");
         Channel channel = Channel.createPrivateChannel(
                 dto.participantIds().stream()
@@ -67,8 +66,9 @@ public class BasicChannelService implements ChannelService {
                                 .orElseThrow(() -> new UserNotFoundException(u)))
                         .collect(Collectors.toSet())
         );
-        log.info("비공개 채널 생성 완료. id - {}", channel.getId());
-        return ChannelParticipantIdsResponse.toDto(channel);
+        Channel saved = channelRepository.save(channel);
+        log.info("비공개 채널 생성 완료. id - {}", saved.getId());
+        return ChannelMapper.toDto(saved, getLastMassageAt(saved));
     }
 
 

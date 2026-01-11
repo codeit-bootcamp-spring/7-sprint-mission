@@ -25,7 +25,6 @@ public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> getAll() {
         return ResponseEntity.ok(userService.getAllUsers());
@@ -49,7 +48,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-    public ResponseEntity<UserStatusUpdateResponse> updateUserStatus(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request) {
+    public ResponseEntity<UserStatusUpdateResponse> updateUserStatus(@PathVariable UUID userId, @Valid @RequestBody UserStatusUpdateRequest request) {
         return ResponseEntity.ok(userStatusService.updateByUser(userId, request));
     }
 }

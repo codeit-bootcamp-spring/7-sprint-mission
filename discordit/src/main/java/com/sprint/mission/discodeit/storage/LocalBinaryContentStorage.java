@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
 
 @Component
 @ConditionalOnProperty(
@@ -53,49 +52,51 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public UUID put(UUID binaryContentId, byte[] content) {
-        Path path = resolvePath(binaryContentId);
+    public Path put(String fileName, byte[] content) {
+        log.info("파일 저장 요청 들어옴. 파일이름 : {}", fileName);
+        Path path = fileDir.resolve(fileName);
         if (Files.exists(path)) {
-            throw new BinaryContentAlreadyExistException(binaryContentId);
+            log.error("동일한 파일 이름이 존재해 파일 저장 실패");
+            throw new BinaryContentAlreadyExistException(fileName);
         }
         try {
+            log.info("파일 저장 디렉터리가 없어서 생성함");
             Files.write(path, content);
         } catch (IOException e) {
+            log.error("IOException 발생 : {}", e.getMessage());
             throw new RuntimeException(e);
         }
-        return binaryContentId;
+        log.debug("파일 생성 성공. 파일 이름 : {}", fileName);
+        return path;
     }
 
     @Override
-    public InputStream get(UUID binaryContentId) {
-        if (Files.notExists(resolvePath(binaryContentId))) {
-            throw new BinaryContentNotFoundException(binaryContentId);
+    public InputStream get(String fileName) {
+        log.info("파일 조회 요청 들어옴");
+        if (Files.notExists(fileDir.resolve(fileName))) {
+            log.error("존재하지 않는 파일 이름으로 조회 실패");
+            throw new BinaryContentNotFoundException(fileName);
         }
         try {
-            return Files.newInputStream(resolvePath(binaryContentId));
+            log.debug("파일 조회 성공");
+            return Files.newInputStream(fileDir.resolve(fileName));
         } catch (IOException e) {
+            log.error("IOException 발생 : {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public ResponseEntity<Resource> download(BinaryContentDto dto) {
+        log.info("파일 다운로드 요청 들어옴");
         BinaryContent binaryContent = binaryContentRepository.findById(dto.id())
                 .orElseThrow(() -> new BinaryContentNotFoundException(dto.id()));
+        log.debug("파일 다운로드 성공");
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + binaryContent.getFileName() + "\"")
                 .contentType(MediaType.parseMediaType(binaryContent.getContentType()))
                 .contentLength(binaryContent.getSize())
-                .body(new InputStreamResource(get(binaryContent.getId())));
-    }
-
-    /**
-     * 파일의 실제 저장 위치에 대한 규칙을 정의함
-     * @param uuid 파일의 uuid
-     * @return 그 파일이 저장될 Path
-     */
-    public Path resolvePath(UUID uuid) {
-        return fileDir.resolve(uuid.toString());
+                .body(new InputStreamResource(get(dto.fileName())));
     }
 }
