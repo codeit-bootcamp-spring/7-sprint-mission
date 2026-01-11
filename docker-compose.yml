@@ -1,7 +1,7 @@
 version: '3.8' # Dodcker Compose 파일 형식 버전. 대부분 3.8 많이 씀
 services: # 실행할 여러 컨테이너들을 정의
   app: # 해당 컨테이너 서비스 이름 정의
-    image: discodeit
+    image: local-slim
     build: # 이미 있다면 image: 라고 쓰고 직접 이미지를 만들때는 build 사용
       context: . # 현재 경로에서 빌드
       dockerfile: Dockerfile # 어떤 도커파일을 쓸지 명시

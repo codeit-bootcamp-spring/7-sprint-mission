@@ -29,7 +29,7 @@ name: Deploy to Amazon ECS
 on:
   push:
     branches:
-      - "*"
+      - release
 
 # 해당 워크플로우에서 자주 사용할 만한 값을 환경변수로 등록해 놓고 사용 가능
 env:

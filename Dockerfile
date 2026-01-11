@@ -1,4 +1,4 @@
-FROM amazoncorretto:17 AS build
+FROM amazoncorretto:17-alpine AS build
 ARG PROJECT_NAME
 ARG PROJECT_VERSION
 
@@ -20,7 +20,7 @@ RUN ./gradlew clean build -x test
 ######################################
 
 # 두번째 스테이지 -> 실행 영역
-FROM amazoncorretto:17
+FROM amazoncorretto:17-alpine
 WORKDIR /app
 # 컨테이너 포트 80 명시
 EXPOSE 80
@@ -31,7 +31,7 @@ COPY --from=build /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
 
 # 타임존 설정
 ENV TZ=Asia/Seoul
-RUN yum update -y && yum install -y tzdata curl && yum clean all
+RUN apk add --no-cache tzdata curl
 
 # JVM_OPTS 설정
 ENV JVM_OPTS=""
