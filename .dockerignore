@@ -1,0 +1,8 @@
+.git/
+.idea/
+build/
+image/
+logs/
+.gitignore
+*.iml
+*.env

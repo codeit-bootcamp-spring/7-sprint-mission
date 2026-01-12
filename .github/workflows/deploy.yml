@@ -1,0 +1,144 @@
+
+name: CD - Deploy to ECS
+
+on:
+  push:
+    branches:
+      - 조성만-sprint8
+
+# 해당 워크플로우에서 자주 사용할만한 값을 환경변수로 등록해놓고 사용 가능.
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+  ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
+  CONTAINER_NAME: discodeit-app
+
+
+jobs:
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Wait for CI to succeed
+        uses: fountainhead/action-wait-for-check@v1.2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: CI Test Job
+          ref: ${{ github.sha }}
+
+
+      # AWS 자격증명 설정
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # Public ECR 배포 위함
+
+      # ECR 로그인
+      - name: Login to Public ECR
+        run: |
+          aws ecr-public get-login-password \
+            | docker login \
+              --username AWS \
+              --password-stdin public.ecr.aws
+
+      # 코드 체크아웃
+      - name: checkout
+        uses: actions/checkout@v4
+
+      # Docker 이미지 빌드 & ECR push
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          IMAGE_TAG: ${{ github.sha }}  # Git commit hash를 이미지 태그로 사용
+        run: |
+          # Docker 이미지 빌드
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          # ECR에 푸시
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          # 다음 스텝에서 사용할 수 있도록 출력
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      # AWS CLI 설정 (ECS 클러스터 접근)
+      - name: Configure AWS credentials (ECS)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 현재 Task Definition 다운로드
+      - name: Download current task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition $ECS_TASK_DEFINITION \
+            --query taskDefinition > task-definition.json
+          
+          # AWS ECS에서 Task Definition을 다운로드할 때 읽기 전용 필드들이 포함되는데
+          # 이걸 마지막 스텝에서 그대로 등록하려 하면 에러가 발생.
+          # 읽기 전용 필드들을 제거해주는 작업을 진행.
+          sudo apt-get update && sudo apt-get install -y jq
+          
+          jq 'del(
+            .taskDefinitionArn,
+            .revision,
+            .status,
+            .requiresAttributes,
+            .compatibilities,
+            .registeredAt,
+            .registeredBy,
+            .enableFaultInjection
+          )' task-definition.json > task-definition-clean.json
+          
+          mv task-definition-clean.json task-definition.json
+
+      # Task Definition에 새 이미지 반영
+      - name: Fill in the new image ID in task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      # 기존 서비스 중단 (프리티어 리소스 고려)
+      - name: Stop ECS Service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 0
+
+      # ECS Service에 새 Task Definition 배포
+      - name: Deploy to Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      # ECS Service 재시작 (Task 1개 실행)
+      - name: Start ECS Service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 1
+
+      # 배포 완료 메시지
+      - name: Deployment result
+        run: |
+          echo "Deployment completed successfully!"
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Service: ${{ env.ECS_SERVICE }}"
+          echo "Cluster: ${{ env.ECS_CLUSTER }}"

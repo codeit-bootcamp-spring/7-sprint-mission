@@ -98,9 +98,8 @@ class UserControllerTest {
     @Test
     @DisplayName("사용자 등록 - 실패 (잘못된 이메일)")
     void createUser_InvalidEmail_Failure() throws Exception {
-        // 잘못된 이메일 입력
         CreateUserRequestDto requestDto = new CreateUserRequestDto(
-                "invalid-email", // 유효하지 않은 이메일
+                "invalid-email",
                 "testuser",
                 "password123"
         );

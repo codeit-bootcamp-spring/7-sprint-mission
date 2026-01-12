@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.openapi.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
-import com.sprint.mission.discodeit.mapper.PageMapper;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
@@ -39,8 +38,6 @@ public class MessageController implements MessageControllerDocs {
             @RequestPart("messageCreateRequest") CreateMessageRequestDto requestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
-        log.info("POST /api/messages - 메시지 생성 요청");
-
         List<CreateBinaryContentRequestDto> attachmentRequests = binaryContentMapper.toRequestDto(attachments);
         MessageResponseDto createdMessage = messageService.create(requestDto, attachmentRequests);
 
@@ -54,8 +51,6 @@ public class MessageController implements MessageControllerDocs {
             @PathVariable UUID messageId,
             @Valid @RequestBody UpdateMessageRequestDto requestDto
     ) {
-        log.info("PATCH /api/messages/{} - 메시지 수정 요청", messageId);
-
         MessageResponseDto updatedMessage = messageService.update(messageId, requestDto);
 
         log.info("PATCH /api/messages/{} - 메시지 수정 완료", messageId);
@@ -65,8 +60,6 @@ public class MessageController implements MessageControllerDocs {
     // 메시지 삭제
     @DeleteMapping("/{messageId}")
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
-        log.info("DELETE /api/messages/{} - 메시지 삭제 요청", messageId);
-
         messageService.delete(messageId);
 
         log.info("DELETE /api/messages/{} - 메시지 삭제 완료", messageId);

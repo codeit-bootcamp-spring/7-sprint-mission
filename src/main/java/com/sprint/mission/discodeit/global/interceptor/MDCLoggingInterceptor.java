@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.global.config;
+package com.sprint.mission.discodeit.global.interceptor;
 
 
 import jakarta.servlet.http.HttpServletRequest;
