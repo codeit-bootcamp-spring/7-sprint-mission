@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  app:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - local-storage:${STORAGE_LOCAL_ROOT_PATH:-/storage}
+    networks:
+      - mission-network
+
+  postgres:
+    image: postgres:16
+    container_name: discodeit-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      POSTGRES_DB: ${SPRING_DATASOURCE_DB}
+
+    volumes:
+      - mission-postgres-data:/var/lib/postgresql/data
+    command: >
+      -c shared_buffers=128MB 
+      -c max_connections=50
+    healthcheck: ##컨테이너가 정상적인지 주기적으로 호가인
+      test: [ "CMD-SHELL", "pg_isready -U discodeit_user -d discodeit" ] #헬스 체크를 위해 실행한 명령어
+      interval: 10s #10초마다 체크
+      timeout: 5s # 5초 안에 응답 없으면 unhealthy
+      retries: 5 # 5번 실해하면 unhealthy 상태로 판정
+    networks:
+      - mission-network
+
+volumes:
+  mission-postgres-data:
+    driver: local
+  local-storage:
+    driver: local
+
+
+networks:
+  mission-network:
+    driver: bridge

@@ -2,9 +2,9 @@ spring:
   application:
     name : discodeit
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
@@ -25,10 +25,18 @@ discodeit:
     type: file
     file-directory: .discodeit
   storage:
+    type: ${STORAGE_TYPE:local}
     local:
-      root-path: "${user.home}/Documents/discodeit/jpaData"
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:/storage}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
 server:
-  port: ${PORT:8084}
+  port: ${PORT:8081}
+  address: 0.0.0.0
 
 springdoc:
   swagger-ui:

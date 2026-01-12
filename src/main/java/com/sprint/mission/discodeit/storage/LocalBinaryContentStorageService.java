@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.exception.domain.file.FileReadFailException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,9 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorageService implements BinaryContentStorage {
+
     @Value( "${discodeit.storage.local.root-path}")
     private String root;
 
@@ -66,7 +69,7 @@ public class LocalBinaryContentStorageService implements BinaryContentStorage {
 
     @PostConstruct
     void init()  {
-        Path tempPath = Path.of(root);
+        Path tempPath = Path.of(root).toAbsolutePath().normalize();
             if(!Files.exists(tempPath)) {
                 try {
                     Files.createDirectories(tempPath);
@@ -78,7 +81,7 @@ public class LocalBinaryContentStorageService implements BinaryContentStorage {
 
     Path resolvePath(UUID fileId){
 
-            Path tempPath = Path.of(root);
+            Path tempPath = Path.of(root).toAbsolutePath().normalize();
             return tempPath.resolve(fileId.toString());
         }
 
