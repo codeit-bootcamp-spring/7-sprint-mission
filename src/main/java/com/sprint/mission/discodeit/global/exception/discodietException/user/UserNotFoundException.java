@@ -6,31 +6,23 @@ import java.util.List;
 import java.util.UUID;
 
 public class UserNotFoundException extends UserException {
-    public UserNotFoundException() {
-        super(ErrorCode.USER_NOT_FOUND);
+    public UserNotFoundException(String key, Object value) {
+        super(ErrorCode.USER_NOT_FOUND, key, value);
     }
 
     public static UserNotFoundException byId(UUID userId) {
-        UserNotFoundException userNotFoundException = new UserNotFoundException();
-        userNotFoundException.updateDetail("userId", userId);
-        return userNotFoundException;
+        return new UserNotFoundException("userId", userId);
     }
 
     public static UserNotFoundException byUsername(String username) {
-        UserNotFoundException userNotFoundException = new UserNotFoundException();
-        userNotFoundException.updateDetail("username", username);
-        return userNotFoundException;
+        return new UserNotFoundException("username", username);
     }
 
     public static UserNotFoundException byEmail(String email) {
-        UserNotFoundException userNotFoundException = new UserNotFoundException();
-        userNotFoundException.updateDetail("email", email);
-        return userNotFoundException;
+        return new UserNotFoundException("email", email);
     }
 
     public static UserNotFoundException byIds(List<UUID> userIds) {
-        UserNotFoundException userNotFoundException = new UserNotFoundException();
-        userNotFoundException.updateDetail("userIds", userIds);
-        return userNotFoundException;
+        return new UserNotFoundException("userIds", userIds);
     }
 }

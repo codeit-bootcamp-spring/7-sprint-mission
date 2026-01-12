@@ -5,15 +5,13 @@ import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import java.util.UUID;
 
 public class ReadStatusAlreadyExistsException extends ReadStatusException {
-    public ReadStatusAlreadyExistsException() {
-        super(ErrorCode.READ_STATUS_ALREADY_EXIST);
+    public ReadStatusAlreadyExistsException(String key, Object value) {
+        super(ErrorCode.READ_STATUS_ALREADY_EXIST, key, value);
     }
 
     public static ReadStatusAlreadyExistsException byUserAndChannelId(UUID userId, UUID channelId) {
-        ReadStatusAlreadyExistsException readStatusAlreadyException = new ReadStatusAlreadyExistsException();
-        readStatusAlreadyException.updateDetail("userId", userId);
-        readStatusAlreadyException.updateDetail("channelId", channelId);
-        return readStatusAlreadyException;
+        String key = userId + " " + channelId;
+        return new ReadStatusAlreadyExistsException("userid, channelId", key);
     }
 
 

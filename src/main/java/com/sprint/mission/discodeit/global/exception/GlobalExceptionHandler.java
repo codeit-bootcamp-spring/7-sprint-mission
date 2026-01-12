@@ -4,12 +4,15 @@ import com.sprint.mission.discodeit.global.exception.discodietException.Discodei
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,12 +32,14 @@ public class GlobalExceptionHandler {
     // Validation에 대한 에러 핸들러
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
-        Map<String, Object> details = new HashMap<>();
-
-        e.getBindingResult().getFieldErrors()
-                .forEach(error ->
-                        details.put(error.getField(), error.getDefaultMessage())
-                );
+        Map<String, Object> details = e.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fe -> Objects.requireNonNullElse(
+                                fe.getDefaultMessage(),
+                                "알려지지 않은 에러"
+                        )
+                ));
 
         ErrorResponse errorResponse = errorResponseMapper.toErrorResponseDto(e, ErrorCode.VALIDATION_ERROR, details);
         logResponse(errorResponse);

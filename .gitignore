@@ -1,5 +1,7 @@
-README.md
+.env
 .gradle
+*.log
+.discodeit
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/

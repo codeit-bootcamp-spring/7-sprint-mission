@@ -5,11 +5,11 @@ import com.sprint.mission.discodeit.global.exception.ErrorCode;
 
 public class ChannelException extends DiscodeitException {
 
-    public ChannelException(ErrorCode errorCode) {
-        super(errorCode);
+    public ChannelException(ErrorCode errorCode, String key, Object value) {
+        super(errorCode, key, value);
     }
 
-    public ChannelException(ErrorCode errorCode, Throwable cause) {
-        super(errorCode, cause);
+    public ChannelException(ErrorCode errorCode, String key, Object value, Throwable cause) {
+        super(errorCode, key, value, cause);
     }
 }

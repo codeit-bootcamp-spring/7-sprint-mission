@@ -1,0 +1,47 @@
+services:
+  app:
+    build:
+      context: .          # 애플리케이션 Dockerfile 위치
+      dockerfile: Dockerfile
+    container_name: discodeit-container
+    environment:
+      - PROJECT_NAME=${PROJECT_NAME}
+      - PROJECT_VERSION=${PROJECT_VERSION}
+      - SPRING_PROFILES_ACTIVE=prod
+      - STORAGE_TYPE=${STORAGE_TYPE}
+      - JVM_OPTS=${JVM_OPTS}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - DISCODEIT_STORAGE_LOCAL_ROOT_PATH=${STORAGE_PATH}
+      - AWS_S3_ACCESS_KEY=${AWS_S3_ACCESS_KEY}
+      - AWS_S3_SECRET_KEY=${AWS_S3_SECRET_KEY}
+      - AWS_S3_REGION=${AWS_S3_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+    ports:
+      - "8081:80"
+    volumes:
+      - storage_data:${STORAGE_PATH}
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: discodeit-db
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      # PostgreSQL 데이터 유지
+      - db-data:/var/lib/postgresql/data
+      # schema.sql 자동 실행 (컨테이너 시작 시)
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+
+volumes:
+  db-data:
+    driver: local
+  storage_data:
+    driver: local

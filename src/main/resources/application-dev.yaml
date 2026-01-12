@@ -1,12 +1,7 @@
 server:
-  port: 8081
+  port: 9090
 
 spring:
-  boot:
-    admin:
-      client:
-        url: http://localhost:9090
-
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -19,3 +14,11 @@ logging:
     com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
