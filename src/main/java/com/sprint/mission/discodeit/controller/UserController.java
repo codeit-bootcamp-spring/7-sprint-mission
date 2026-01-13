@@ -35,9 +35,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDto> createUser(
             @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+            @RequestPart(value = "profile", required = false) MultipartFile profile) {
         log.info("createUser");
-        UserDto response = userService.createUser(userCreateRequest, profileImage);
+        UserDto response = userService.createUser(userCreateRequest, profile);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

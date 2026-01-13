@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.config.JpaAuditingConfig;
 import com.sprint.mission.discodeit.config.QuerydslConfig;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -15,7 +16,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test") // active 설정이 따로 있으면 넣어줘야 함
-@Import(QuerydslConfig.class)
+@Import({ QuerydslConfig.class, JpaAuditingConfig.class })
 @DataJpaTest
 @DisplayName("channelRepository 테스트")
 class ChannelRepositoryTest {

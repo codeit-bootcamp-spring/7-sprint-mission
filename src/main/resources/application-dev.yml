@@ -1,23 +1,22 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
   jpa:
-    database: h2
+    database: postgresql
     hibernate:
-      ddl-auto: create-drop
-  h2:
-    console:
-      enabled: true
+      ddl-auto: validate
+#Spring Boot Admin
+#  boot:
+#    admin:
+#      client:
+#        url: http://localhost:9090
+
 logging:
   level:
-    root: info #나중에 debug
-
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: data/uploads
-
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+    root: info
+    #    org.springframework.transaction: debug
