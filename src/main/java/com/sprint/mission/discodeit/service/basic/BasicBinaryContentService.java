@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Slf4j
@@ -27,6 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentStorage binaryContentStorage;
+//    private final S3PrivateFileService s3PrivateFileService;
 
     @Override
     @Transactional
@@ -41,7 +41,13 @@ public class BasicBinaryContentService implements BinaryContentService {
         saved = binaryContentRepository.save(binaryContent);
         try {
             binaryContentStorage.put(saved.getId(), command.bytes());
+
+            // 만약 presigned url을 사용한다면 굳이 DB에 url을 저장할 필요가 없다.
+            // 파일명(객체 key)을 DB에 저장하고 데이터를 불러올 일이있다면 그때마다 presigned url을 얻어서 프론트에게 전달
+//            String url = s3PrivateFileService.uploadToFolder(command, "users/profile/");// TODO: s3업로드이후 url 값에 대해서 기존 코드 말고 쓰고 해당 필드 컬럼 어떻게 할지 정할것
+
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new RuntimeException("파일 저장 파일 실패", e);
         }
         // 키id로 값 bytes 저장

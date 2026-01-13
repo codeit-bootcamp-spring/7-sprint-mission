@@ -3,8 +3,10 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-data/
+/data/
 .env
+**/src/**/application-local.yml
+**/src/test/**/application-test-local.yml
 
 ### IntelliJ IDEA ###
 .idea
@@ -50,5 +52,5 @@ META-INF/
 org/
 
 ### Local storage ###
-storage/
+/storage/
 .logs/

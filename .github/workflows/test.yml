@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+# 프로젝트 실행에 필요한 환경변수 추가할 것
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}              # set this to your preferred AWS region
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY}}           # set this to your Amazon ECR repository name
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Test + JaCoCo report
+        run: ./gradlew test jacocoTestReport
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.CODECOV_TOKEN }}

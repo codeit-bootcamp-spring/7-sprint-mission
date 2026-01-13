@@ -1,9 +1,13 @@
 version: '3.8' # Dodcker Compose 파일 형식 버전. 대부분 3.8 많이 씀
 services: # 실행할 여러 컨테이너들을 정의
   app: # 해당 컨테이너 서비스 이름 정의
+    image: local-slim
     build: # 이미 있다면 image: 라고 쓰고 직접 이미지를 만들때는 build 사용
       context: . # 현재 경로에서 빌드
       dockerfile: Dockerfile # 어떤 도커파일을 쓸지 명시
+      args:
+        PROJECT_NAME: discodeit
+        PROJECT_VERSION: 1.2-M8
     container_name: spring-app
     environment:
       SPRING_PROFILES_ACTIVE: docker
@@ -11,16 +15,25 @@ services: # 실행할 여러 컨테이너들을 정의
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_BOOT_ADMIN_CLIENT_URL: ${SPRING_BOOT_ADMIN_CLIENT_URL}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_S3_REGION: ${AWS_S3_REGION}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      AWS_S3_PRESIGNED_URL_EXPIRATION: ${AWS_S3_PRESIGNED_URL_EXPIRATION}
+      STORAGE_LOCAL_ROOT_PATH: ${STORAGE_LOCAL_ROOT_PATH}
+      STORAGE_TYPE: ${STORAGE_TYPE}
       JAVA_OPTS: "-Xmx400m -Xms200m" # JVM 메모리 설정
+    volumes:
+      - app-storage:/app/storage
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 10s
       timeout: 3s
       retries: 10
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on: # 동작순서를 의존성으로 설정한다
-      postgres: # postgres라는 동작에 의존하고 이게 될때까지 위의서비스는 대기 
+      postgres: # postgres라는 동작에 의존하고 이게 될때까지 위의서비스는 대기
         condition: service_healthy # 해당 서비스(postgres)가 healthy해야만 동작하도록 조건 추가 및 대기
       redis:
         condition: service_started # healthcheck와 상관없이 단순 컨테이너가 시작하기만 하면 되는 조건
@@ -57,7 +70,7 @@ services: # 실행할 여러 컨테이너들을 정의
     container_name: redis-cache
     ports:
       - "6379:6379"
-    command: redis-server --appendonly yes --maxmemory 100mb --mexmemory-policy allkeys-lru # 레디스 메모리 제한
+    command: redis-server --appendonly yes --maxmemory 100mb --maxmemory-policy allkeys-lru # 레디스 메모리 제한
     volumes:
       - redis-data:/data
     healthcheck:
@@ -70,6 +83,8 @@ services: # 실행할 여러 컨테이너들을 정의
 
 # 볼륨 정의
 volumes:
+  app-storage:
+    driver: local
   my-postgres-data:
     driver: local # 볼륨 데이터를 호스트의 로컬에 저장
   redis-data:

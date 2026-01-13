@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    # 컨텍스트마다 DB 이름을 다르게 → schema.sql 여러 번 실행돼도 충돌 없음
+    url: jdbc:h2:mem:testdb-${random.uuid};MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      # data.sql 쓰면 그것도 지정
+
+  jpa:
+    hibernate:
+      ddl-auto: none   # schema.sql로만 만든다 (요구사항 “스키마 새로 생성”은 schema.sql로 달성)
+
+  cloud:
+    aws:
+      credentials:
+        accessKey: ${AWS_ACCESS_KEY_ID}
+        secretKey: ${AWS_SECRET_ACCESS_KEY}
+      region:
+        static: ${AWS_S3_REGION}
+      s3:
+        bucket: ${AWS_S3_BUCKET}
+        presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # 기본값 10분
+
+discodeit:
+  storage:
+    type: s3  # <= 여기 값이 'local'일 때만 LocalBinaryContentStorage를 빈으로 등록, s3 이면 S3BinaryContentStorage 빈 등록
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+    org.springframework.jdbc.datasource.init: debug

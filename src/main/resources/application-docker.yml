@@ -1,5 +1,4 @@
 spring:
-  # 기본 프로필 (로컬 개발용)
   datasource:
 #    url: jdbc:postgresql://host.docker.internal:5433/postgres
     url: ${SPRING_DATASOURCE_URL}
@@ -13,7 +12,7 @@ spring:
 
   sql:
     init:
-      mode: always # schema.sql, data.sql 사용여부
+      mode: never # schema.sql, data.sql 사용여부, 배포이후 서버껏다킬때 날라가면 안되기떄문
 
   h2:
     console:

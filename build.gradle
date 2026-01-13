@@ -6,17 +6,13 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '0.0.1-SNAPSHOT'
+version = '1.2-M8'
 description = 'Demo project for Spring Boot'
 
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
-}
-
-bootJar {
-    archiveFileName = "app.jar"
 }
 
 test {
@@ -69,7 +65,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
     // AWS SDK for java
     implementation platform('software.amazon.awssdk:bom:2.20.56')
-    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:s3:2.31.7'
     implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.5'
     compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

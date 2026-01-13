@@ -1,1 +1,1 @@
-김태언
+[![codecov](https://codecov.io/gh/Taeeon-kim/7-sprint-mission/branch/main/graph/badge.svg)](https://codecov.io/gh/Taeeon-kim/7-sprint-mission)

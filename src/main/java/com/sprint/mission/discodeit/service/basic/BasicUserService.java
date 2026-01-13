@@ -55,14 +55,14 @@ public class BasicUserService implements UserService {
         }
 
         UUID profileBinaryId = userSignupCommand.profile().map(binaryContentService::uploadBinaryContent).orElse(null); // NOTE: 서비스 의존은 지양해야하지만, 순환참조 없고 해당 서비스가 다른 서비스에 의존하는게 아니면 공통된건 사용해도 좋고, 오히려 Service라는 이름보단 -Uploader @Component로 구성하는게 나을수도있다.
-        BinaryContent binaryContent = (profileBinaryId != null)
-                ? binaryContentRepository.getReferenceById(profileBinaryId) // TODO: getReference로 유지할지 findBy로 갈지 검토
+        BinaryContent binaryContentReference = (profileBinaryId != null)
+                ? binaryContentRepository.getReferenceById(profileBinaryId) // NOTE: 위의 update 반환값으로 BinaryId를 받고 실제 엔티티 DB조회 필요없이 id만 가진 프록시 객체로 활용하기위해 유지
                 : null;
 
         User newUser = User.create(userSignupCommand.username(),
                 userSignupCommand.email(),
                 userSignupCommand.password(),
-                binaryContent
+                binaryContentReference
         );
 
         // NOTE: user객체 생성후 userStatus도 넣어서 cascade 영향으로 같이 insert되도록
@@ -114,11 +114,11 @@ public class BasicUserService implements UserService {
 
         UUID profileBinaryId = updateCommand.profile().map(binaryContentService::uploadBinaryContent).orElse(null);
 
-        BinaryContent binaryContent = (profileBinaryId != null)
-                ? binaryContentRepository.getReferenceById(profileBinaryId) // TODO: getReference로 유지할지 findBy로 갈지 검토
+        BinaryContent binaryContentReference = (profileBinaryId != null)
+                ? binaryContentRepository.getReferenceById(profileBinaryId) // NOTE: 위의 update 반환값으로 BinaryId를 받고 실제 엔티티 DB조회 필요없이 id만 가진 프록시 객체로 활용하기위해 유지
                 : null;
 
-        UserUpdateParams params = UserUpdateParams.from(updateCommand, binaryContent); // 경계분리
+        UserUpdateParams params = UserUpdateParams.from(updateCommand, binaryContentReference); // 경계분리
         userById.update(params);
         userRepository.save(userById);// user repository 사용 책임 분리
 

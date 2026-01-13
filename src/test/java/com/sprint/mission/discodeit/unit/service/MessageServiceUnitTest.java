@@ -340,7 +340,6 @@ public class MessageServiceUnitTest {
             then(messageRepository).should().findAllByChannelId(channelId, pageable, cursor);
             then(messageMapper).should().toDto(m1);
             then(messageMapper).should().toDto(m2);
-
         }
 
         @Test

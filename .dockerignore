@@ -1,0 +1,38 @@
+# ===== Git =====
+.git
+.gitignore
+
+# ===== Gradle / Maven =====
+.gradle
+build
+target
+
+# ===== IDE =====
+.idea
+.vscode
+*.iml
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Logs =====
+*.log
+logs
+.log
+
+# ===== Node (프론트 섞인 경우) =====
+node_modules
+
+# ===== Test / Temp =====
+out
+tmp
+temp
+
+# ===== Docker =====
+Dockerfile
+docker-compose.yml
+
+# ===== Docs =====
+README.md
+*.md
