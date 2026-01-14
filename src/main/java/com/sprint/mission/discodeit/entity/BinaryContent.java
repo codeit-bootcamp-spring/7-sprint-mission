@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 
-@Getter @ToString
+@Getter
 @Entity
 @Table(name = "binary_contents")
 @NoArgsConstructor

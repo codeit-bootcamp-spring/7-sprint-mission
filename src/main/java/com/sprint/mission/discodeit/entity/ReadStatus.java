@@ -4,11 +4,10 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.Instant;
 
-@Getter @ToString
+@Getter
 @Entity
 @Table(name = "read_statuses", uniqueConstraints = {
         @UniqueConstraint(

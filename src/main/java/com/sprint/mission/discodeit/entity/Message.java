@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @ToString
+@Getter
 @Entity
 @Table(name = "messages")
 @NoArgsConstructor

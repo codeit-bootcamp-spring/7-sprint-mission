@@ -32,7 +32,7 @@ public class BinaryContentController {
     }
 
     @RequestMapping(value = "/{id}/download", method = RequestMethod.GET)
-    public ResponseEntity<Resource> downloadById(@PathVariable UUID id) {
+    public ResponseEntity<?> downloadById(@PathVariable UUID id) {
         BinaryContentDto dto = binaryContentService.findBinaryContentById(id);
 
         return binaryContentStorage.download(dto);

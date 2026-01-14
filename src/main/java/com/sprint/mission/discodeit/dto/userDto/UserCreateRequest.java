@@ -15,7 +15,8 @@ public record UserCreateRequest(
         String email,
 
         @NotBlank(message = "비밀번호는 공백일 수 없습니다.")
-        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$", message = "비밀번호 형식이 올바르지 않습니다.")
+        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$",
+                message = "비밀번호 형식이 올바르지 않습니다.\n비밀번호는 8자 이상(대소문자, 숫자, 특수문자 모두 포함), 15자 이하입니다.")
         String password
 ) {
 }

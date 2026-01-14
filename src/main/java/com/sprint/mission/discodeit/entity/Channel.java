@@ -10,7 +10,7 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @ToString
+@Getter
 @Entity
 @Table(name = "channels")
 @NoArgsConstructor
