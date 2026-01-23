@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import com.sprint.mission.discodeit.common.exception.user.InvalidUserRequestException;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -39,24 +40,31 @@ public class User extends BaseUpdatableEntity {
     }
 
     public void setUsername(String username) {
-        String v = VerifiedUtils.verifyName(username);
-        if (!v.equals(this.username)) {
-            this.username = v;
+        if (username.length() > 20 || username.length() < 2) {
+            throw new InvalidUserRequestException("name length must be between 2 and 20 characters");
+        }
+        if (!username.equals(this.username)) {
+            this.username = username;
         }
     }
 
     public void setPassword(String password) {
-        String v = VerifiedUtils.verifyPassword(password);
-        if (!v.equals(this.password)) {
-            this.password = v;
+        if(password.length() < 7 || password.length() > 50) {
+            throw new InvalidUserRequestException("password length must be between 7 and 50 characters");
+        }
+        if (!password.equals(this.password)) {
+            this.password = password;
         }
     }
 
 
     public void setEmail(String email) {
-        String v = VerifiedUtils.verifyEmail(email);
-        if (!v.equals(this.email)) {
-            this.email = v;
+        String s = email.trim();
+        if(!s.contains("@")) {
+            throw new InvalidUserRequestException("email must contain '@'");
+        }
+        if (!s.equals(this.email)) {
+            this.email = s;
         }
     }
 

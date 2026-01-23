@@ -17,6 +17,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
+.env
 .idea
 .idea/modules.xml
 .idea/jarRepositories.xml

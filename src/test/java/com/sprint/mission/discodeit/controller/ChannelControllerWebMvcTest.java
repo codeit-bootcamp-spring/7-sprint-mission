@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.common.exception.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.dto.request.channel.PublicChannelCreateRequestDto;
