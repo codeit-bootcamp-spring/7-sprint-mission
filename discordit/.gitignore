@@ -38,9 +38,4 @@ out/
 /.agents/
 /.github/
 /docs/
-
-### Windows ###
-nul
-/.logs/
-/http/
-/.claude/
+/.env

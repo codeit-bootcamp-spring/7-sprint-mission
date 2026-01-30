@@ -11,13 +11,17 @@
             </encoder>
         </appender>
 
-        <root level="DEBUG">
+        <root level="INFO">
             <appender-ref ref="CONSOLE" />
         </root>
 
-        <!-- 개발 시 SQL 확인 -->
+        <!-- 내 프로젝트: DEBUG -->
+        <logger name="com.sprint.mission.discodeit" level="DEBUG" />
+
+        <!-- SQL 쿼리 -->
         <logger name="org.hibernate.SQL" level="DEBUG" />
-        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+        <!-- SQL 파라미터 -->
+        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" />
     </springProfile>
 
     <!-- ==================== 운영 환경 (prod) ==================== -->
@@ -61,8 +65,5 @@
         <logger name="org.hibernate.SQL" level="WARN" />
         <logger name="org.springframework" level="WARN" />
     </springProfile>
-
-    <!-- ==================== 공통 설정 ==================== -->
-    <logger name="com.sprint.mission.discodeit" level="DEBUG" />
 
 </configuration>
