@@ -12,6 +12,6 @@ logging:
   level:
     root: info
     com.sprint.mission.discodeit: debug
-    com.sprint.mission.discodeit.global.config.SecurityConfig: trace
+    com.sprint.mission.discodeit.global.config.com.sprint.mission.discodeit.security.config.SecurityConfig: trace
     org.hibernate.sql: debug
     org.hibernate.type.descriptor.sql: trace
