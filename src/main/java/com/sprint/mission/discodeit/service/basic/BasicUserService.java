@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.global.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.global.exception.user.UsernameAlreadyExistsException;
@@ -63,7 +64,8 @@ public class BasicUserService implements UserService{
                 userRequest.username(),
                 userRequest.email(),
                 passwordEncoder.encode(userRequest.password()),
-                profileImage
+                profileImage,
+                Role.USER
         );
 
         UserStatus userStatus = new UserStatus(newUser);
