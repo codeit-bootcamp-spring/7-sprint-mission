@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.global.config.security.handler;
+package com.sprint.mission.discodeit.global.config.security;
 
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
