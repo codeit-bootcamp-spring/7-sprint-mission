@@ -130,7 +130,7 @@ public interface UserControllerDocs {
                     )
             )
     })
-    UserResponseDto createMultipart(
+    ResponseEntity<UserResponseDto> createMultipart(
             @RequestPart("userCreateRequest") UserCreateRequestDto userCreateRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile);
 //    UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, UUID userId);

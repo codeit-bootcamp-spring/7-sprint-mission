@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -25,5 +28,12 @@ public class AuthController {
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public void logout(@RequestParam("userId") UUID userId) {
         authService.logout(userId);
+    }
+
+    @GetMapping("/csrf-token")
+    public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken) {
+        String tokenValue = csrfToken.getToken();
+        log.debug("CSRF 토큰 요청: {}", tokenValue);
+        return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).build();
     }
 }
