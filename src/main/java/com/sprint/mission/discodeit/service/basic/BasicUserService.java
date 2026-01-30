@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
 
     private final UserMapper userMapper;
 
@@ -48,7 +50,8 @@ public class BasicUserService implements UserService {
                 .map(this::saveBinaryContent)
                 .orElse(null);
 
-        User user = new User(createUserDto.username(), createUserDto.email(), createUserDto.password(), profile);
+        String encryptedPassword = passwordEncoder.encode(createUserDto.password());
+        User user = new User(createUserDto.username(), createUserDto.email(), encryptedPassword, profile);
 
         userRepository.save(user);
 
@@ -77,7 +80,7 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
-                                      Optional<CreateBinaryContentDto> createBinaryContentDto) {
+            Optional<CreateBinaryContentDto> createBinaryContentDto) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> UserNotFoundException.byId(userId));

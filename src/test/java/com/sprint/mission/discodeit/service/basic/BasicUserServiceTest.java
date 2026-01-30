@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -37,6 +38,8 @@ class BasicUserServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserMapper userMapper;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private BasicUserService userService;
@@ -135,10 +138,14 @@ class BasicUserServiceTest {
         @DisplayName("[정상 케이스] - 유저 생성")
         void createUser_success() {
             // given
+            String rawPassword = createUserDto.password();
+            String encodedPassword = "encoded_password"; // 가짜 암호화 결과값
             given(userRepository.findByUsername(createUserDto.username()))
                     .willReturn(Optional.empty());
             given(userRepository.findByEmail(createUserDto.email()))
                     .willReturn(Optional.empty());
+            given(passwordEncoder.encode(rawPassword))
+                    .willReturn(encodedPassword);
             given(userRepository.save(any(User.class)))
                     .willReturn(user);
             given(userMapper.toResponseDto(any(User.class)))
