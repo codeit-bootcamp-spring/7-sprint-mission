@@ -7,7 +7,7 @@ spring:
   jpa:
     database: postgresql
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     properties:
       hibernate:
         show_sql: true
@@ -15,6 +15,9 @@ spring:
   config:
     activate:
       on-profile: dev
+  sql:
+    init:
+      mode: always
 
 server:
   port: 8282
@@ -25,3 +28,4 @@ logging:
     com.sprint.mission.discodeit: DEBUG
     org.hibernate.sql: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.security: TRACE
