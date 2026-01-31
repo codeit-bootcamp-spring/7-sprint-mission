@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,13 +34,19 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserStatus userStatus;
 
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     public User(String username, String email, String password, BinaryContent profile) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.profile = profile;
         this.userStatus = new UserStatus(this, Instant.now()); // 영속성 전이로, UserStatus 생성
+        this.role = Role.USER;
     }
+
 
     // equals에서 발생할 npe에 대한 문제
     // username!= null이 통과하면 username은 null이 아니라는 보장성이 생김
