@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.doc.AuthDocs;
+import com.sprint.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.global.config.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +39,13 @@ public class AuthController implements AuthDocs {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 로그인하지 않은 경우, UnAuthorized return;
         }
         UserResponseDto userResponseDto = details.getUserResponseDto();
-        return ResponseEntity.ok(userResponseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
+    }
+
+    @PutMapping("/role")
+    public ResponseEntity<UserResponseDto> updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest) {
+        UserResponseDto userResponseDto = authService.updateRole(userRoleUpdateRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }
 
 }

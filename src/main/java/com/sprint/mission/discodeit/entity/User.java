@@ -47,6 +47,10 @@ public class User extends BaseUpdatableEntity {
         this.role = Role.USER;
     }
 
+    public void updateRole(Role role) {
+        this.role = role;
+    }
+
 
     // equals에서 발생할 npe에 대한 문제
     // username!= null이 통과하면 username은 null이 아니라는 보장성이 생김
