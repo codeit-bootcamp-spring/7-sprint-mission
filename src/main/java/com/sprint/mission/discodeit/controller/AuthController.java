@@ -33,6 +33,9 @@ public class AuthController implements AuthDocs {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDto> getUserSession(@AuthenticationPrincipal DiscodeitUserDetails details) {
+        if (details == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 로그인하지 않은 경우, UnAuthorized return;
+        }
         UserResponseDto userResponseDto = details.getUserResponseDto();
         return ResponseEntity.ok(userResponseDto);
     }
