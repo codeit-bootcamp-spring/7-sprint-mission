@@ -39,6 +39,7 @@ logging:
     com.sprint.mission: debug
     # SQL 로그 (유지)
     org.hibernate.SQL: debug
+    org.springframework.security: TRACE #⭐️ 각 요청마다 통과하는 필터 목록을 확인할 수 있습니다.
 
 
 
