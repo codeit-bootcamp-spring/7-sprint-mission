@@ -24,7 +24,8 @@ public class UserMapper {
                 user.getUsername(),
                 user.getEmail(),
                 profile,
-                isOnline
+                isOnline,
+                user.getRole()
         );
     }
 }

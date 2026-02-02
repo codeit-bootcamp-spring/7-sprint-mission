@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.userDto.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.role.Role;
 import com.sprint.mission.discodeit.exception.binaryContent.FileOperationFailedException;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateNameException;
@@ -67,6 +69,7 @@ public class UserServiceImpl implements UserService {
                 .email(email)
                 .username(username)
                 .password(encodedPassword)
+                .role(Role.USER)
                 .build();
 
         newUser.updateProfile(profile);
@@ -173,6 +176,19 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         log.info("유저 정보 수정 완료: {}", user.getId());
+        return userMapper.toDto(user);
+    }
+
+    @Override
+    public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
+        User user = userRepository.findById(roleUpdateRequest.userId())
+                .orElseThrow(() -> new UserNotFoundException(roleUpdateRequest.userId()));
+
+        Role oldRole = user.getRole();
+
+        user.updateRole(roleUpdateRequest.newRole());
+        userRepository.save(user);
+        log.info("유저 {} 권한 변경: {} -> {}", user.getUsername(), oldRole ,roleUpdateRequest.newRole());
         return userMapper.toDto(user);
     }
 
