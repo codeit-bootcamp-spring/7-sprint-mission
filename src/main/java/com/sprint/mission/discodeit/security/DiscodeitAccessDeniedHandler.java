@@ -32,7 +32,22 @@ public class DiscodeitAccessDeniedHandler implements AccessDeniedHandler {
                 ? request.getUserPrincipal().getName()
                 : "anonymous";
 
-        throw new InSufficientAccessException(username);
+        if(request.getHeader("Accept")!=null && request.getHeader("Accept").contains("application/json"))
+        {
+            response.setContentType("application/json;charset=UTF-8");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            ErrorResponse errorResponse = new ErrorResponse(
+                    Instant.now(),
+                    ErrorCode.ACCESS_DENIED_ERROR.name(),
+                    ErrorCode.ACCESS_DENIED_ERROR.getMessage(),
+                    new HashMap<>() {{
+                        put("username", username);
+                    }},
+                    "SomeThing",
+                    403
+            );
+           response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        }
 
     }
 }

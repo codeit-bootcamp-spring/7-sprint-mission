@@ -32,7 +32,18 @@ public class DiscodeitAuthenticationEntryPoint implements AuthenticationEntryPoi
                          AuthenticationException authException) throws IOException, ServletException {
         log.warn("DiscodeitAuthenticationEntryPoint Called : {}", authException.getMessage());
 
-        throw new  UnAuthorizedException();
+
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType("application/json");
+        ErrorResponse errorResponse = new ErrorResponse(
+                Instant.now(),
+                ErrorCode.UNAUTHORIZED_ERROR.name(),
+                ErrorCode.UNAUTHORIZED_ERROR.getMessage(),
+                new HashMap<>(),
+                "Something",
+                401
+        );
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
 
     }
 }

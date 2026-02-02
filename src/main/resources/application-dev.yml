@@ -45,6 +45,14 @@ discodeit:
 
 server:
   port: ${PORT:8080}
+  servlet:
+    session:
+      tracking-modes: cookie,url
+      timeout: 30m
+      cookie:
+        http-only: true
+        secure: false
+        same-site: lax
 
 springdoc:
   swagger-ui:

@@ -57,7 +57,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.save(User.createUserWithProfileFactory(
                 userCreateRequestDto.username(),
                 userCreateRequestDto.email(),
-                userCreateRequestDto.password(),
+               password,
                 binaryContent
         ));
 
@@ -71,7 +71,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.save(
                 User.createUserFactory(userCreateRequestDto.username()
                         , userCreateRequestDto.email()
-                        , userCreateRequestDto.password())
+                        , password)
         );
 
         UserStatus targetUserStatus = userStatusRepository.save(
