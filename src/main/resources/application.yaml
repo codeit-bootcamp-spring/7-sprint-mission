@@ -29,6 +29,12 @@ discodeit:
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
 
+  account:
+    admin-email: ${ADMIN_EMAIL:admin@codeit.com}
+    admin-name: ${ADMIN_NAME:admin}
+    admin-pass: ${ADMIN_PASS:admin}
+
+
 
 springdoc:
   api-docs:
