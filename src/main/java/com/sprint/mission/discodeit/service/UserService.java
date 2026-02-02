@@ -21,6 +21,7 @@ import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.mapper.UserStatusMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +41,7 @@ public class UserService {
     private final ReadStatusRepository readStatusRepository;
     private final UserMapper mapper;
     private final UserStatusMapper userStatusMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
@@ -48,7 +50,8 @@ public class UserService {
             throw new UserAlreadyExistsException( ErrorCode.DUPLICATE_USER,new HashMap<>());
         }
 
-        User user = new User(request.email(), request.password(), request.username());
+        String encodedPassword = passwordEncoder.encode(request.password());
+        User user = new User(request.email(), encodedPassword, request.username());
         User save = userRepository.save(user);
 
         if (file != null && !file.isEmpty()) {
@@ -57,7 +60,6 @@ public class UserService {
         }
 
         List<ReadStatus> readList = new ArrayList<>();
-        //나중에 1차 캐시 해보기
         channelRepository.findAllByType(ChannelType.PUBLIC)
                 .forEach(channel -> {
                     ReadStatus readStatus = new ReadStatus(save, channel);
@@ -120,12 +122,11 @@ public class UserService {
         User user = userRepository
                 .findByUsername(loginId)
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
-        if (!user.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new LoginPasswordNotMatchException(ErrorCode.LOGIN_PASSWORD, new HashMap<>());
         }
 
         return mapper.toDto(user);
-
     }
 
     @Transactional

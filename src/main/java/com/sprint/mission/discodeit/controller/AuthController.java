@@ -7,19 +7,24 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth/login")
-public class LoginController {
+@RequestMapping("/api/auth")
+public class AuthController {
 
     private final UserService userService;
 
-    @PostMapping
+    //커스텀 CsrfTokenRequestHandler가 이미 .getToken()을 하고 있기 때문에 아무 내용이 없어도 쿠키는 구워짐
+    @GetMapping("/csrf-token")
+    public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken) {
+        String tokenValue = csrfToken.getToken();
+        return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).build();
+    }
+
+    @PostMapping("/login")
     public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest loginRequest) {
         UserDto userDto = userService.login(loginRequest.username(), loginRequest.password());
         return ResponseEntity.status(HttpStatus.OK).body(userDto);

@@ -5,10 +5,3 @@ spring:
     database: postgresql
     hibernate:
       ddl-auto: validate
-#Spring Boot Admin
-#  boot:
-#    admin:
-#      client:
-#        url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
-
-

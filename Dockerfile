@@ -19,4 +19,3 @@ EXPOSE 80
 #ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
 #ENTRYPOINT ["java", "-jar", "app.jar"]
 ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS} -jar app.jar"]
-#형일님이 알려준 거
