@@ -64,7 +64,8 @@ public class UserController implements UserDoc {
         UserDto resUser = userService.create(dtoUser, Optional.ofNullable(file));
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
+//            .status(HttpStatus.CREATED)
+            .status(HttpStatus.OK)  //!! 응답: 200 UserDto
             .body(resUser);
     }
 
