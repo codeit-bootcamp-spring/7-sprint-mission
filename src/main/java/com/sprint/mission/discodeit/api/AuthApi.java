@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.ErrorResponse;
 
 @Tag(name = "Auth API", description = "인증 관련 API")
@@ -28,4 +29,6 @@ public interface AuthApi {
             )
     })
     ResponseEntity<UserResponseDto> login(AuthLoginRequestDto authLoginRequestDto);
+
+    ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken);
 }
