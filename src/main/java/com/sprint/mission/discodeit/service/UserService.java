@@ -4,21 +4,24 @@ import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryConten
 import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
 
-  UserResponseDto createUser(CreateUserDto createUserDto,
-      Optional<CreateBinaryContentDto> createBinaryContentDto);
+    UserResponseDto createUser(CreateUserDto createUserDto,
+            Optional<CreateBinaryContentDto> createBinaryContentDto);
 
-  UserResponseDto getUser(UUID uuid);
+    UserResponseDto getUser(UUID uuid);
 
-  List<UserResponseDto> getAllUsers();
+    List<UserResponseDto> getAllUsers();
 
-  UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
-      Optional<CreateBinaryContentDto> createBinaryContentDto);
+    UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
+            Optional<CreateBinaryContentDto> createBinaryContentDto);
 
-  void deleteUser(UUID uuid);
+    void deleteUser(UUID uuid);
+
+    UserResponseDto initAdmin(String adminEmail, String adminName, String adminPass);
 }
