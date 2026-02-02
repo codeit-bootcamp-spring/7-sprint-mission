@@ -47,7 +47,7 @@ public class UserIntegrationTest extends IntegrationTest{
                 .andExpect(status().isCreated());
         // then
         User savedUser = userRepository.findByEmail("test@codeit.com")
-                .orElseThrow(() -> new UserNotFoundException("test@codeit.com"));
+                .orElseThrow(() -> UserNotFoundException.byEmail("test@codeit.com"));
         assertThat(savedUser.getUsername()).isEqualTo("test");
 
     }
