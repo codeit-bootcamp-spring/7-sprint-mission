@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,11 +36,13 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
     private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public UserDto createUser(UserCreateRequestDto userCreateRequestDto, MultipartFile profile)  {
         log.debug("createUser : {} Siuuuuu!!!",userCreateRequestDto);
+        String password = passwordEncoder.encode(userCreateRequestDto.password());
     if(profile!=null) {
         BinaryContent binaryContent = binaryContentRepository.save(
                 new BinaryContent(profile.getName(), profile.getContentType(), profile.getSize())

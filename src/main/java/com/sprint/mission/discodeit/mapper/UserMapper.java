@@ -27,7 +27,8 @@ public class UserMapper {
                 user.getEmail(),
                 binaryContentDto,
                 binaryContentId,
-                user.getUserStatus().isUserOnline()
+                user.getUserStatus().isUserOnline(),
+                user.getRole()
         );
     }
     public List<UserDto> idsToDto(List<UUID> ids){
