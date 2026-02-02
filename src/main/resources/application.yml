@@ -23,6 +23,7 @@ spring:
       enabled: true            # 멀티파트 기능 활성화
       max-file-size: 10MB      # 파일 하나의 최대 크기
       max-request-size: 20MB   # 전체 요청 크기
+
 #Spring Boot Admin
 #  boot:
 #    admin:
@@ -37,8 +38,16 @@ spring:
 
 
 discodeit:
-  storage: storage
-
+  storage:
+    type: ${STORAGE_TYPE:local}
+    local:
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:storage}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
 springdoc:
   swagger-ui:
     path: /api-docs-ui.html # UI page 경로
@@ -62,8 +71,7 @@ management:
     env:
       enabled: true
   server:
-    port: 8081 # Actuator 전용 포트 (방화벽으로 막음)
-
+    port: 8081 # Actuator 전용 포트 (방화벽으로 막음
 info:
   app:
     name: Discodeit

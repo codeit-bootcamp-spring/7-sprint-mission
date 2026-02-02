@@ -27,27 +27,13 @@ public class BinaryContentManager {
     private final BinaryContentRepository binaryContentRepository;
 
     public BinaryContent saveFileAndMeta(MultipartFile file) {
-        UUID id = UUID.randomUUID();
-        try {
-            binaryContentStorage.put(id, file.getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        UUID fileName = binaryContentStorage.put(file);
         BinaryContent binaryContent = new BinaryContent(
-                id.toString(),
+                fileName.toString(),
                 file.getContentType(),
                 file.getSize());
         binaryContentRepository.save(binaryContent);
         return binaryContentRepository.save(binaryContent);
-    }
-
-    private void validateContentType(String contentType) {
-        if (contentType == null ||
-                !(contentType.equals("image/png")
-                        || contentType.equals("image/jpeg")
-                        || contentType.equals("image/gif"))) {
-            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다: " + contentType);
-        }
     }
 
 
