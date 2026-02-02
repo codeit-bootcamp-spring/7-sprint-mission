@@ -27,6 +27,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
 
-        objectMapper.writeValue(response.getWriter(), userDetails);
+        objectMapper.writeValue(response.getWriter(), userDetails.getUserDto());
     }
 }
