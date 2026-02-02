@@ -8,9 +8,11 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ import java.util.UUID;
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     private final UserMapper  userMapper;
+    private final SessionRegistry sessionRegistry;
 
     @Override
     public LoginResponseDto checkLoginUser(LoginRequestDto loginRequestDto) {
@@ -50,5 +53,19 @@ public class BasicAuthService implements AuthService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotExistException(userId));
         user.updateUserRole(newRole);
         return userMapper.toDto(user);
+    }
+
+    @Override
+    @Transactional
+    public boolean isUserOnline(UUID userId) {
+
+        List<Object> principals = sessionRegistry.getAllPrincipals();
+        Optional<Object> userDetails = principals.stream().filter(x -> ((DiscodeitUserDetails) x)
+                        .getUserDto().id()
+                        .equals(userId))
+                .findFirst();
+
+        return userDetails.isPresent();
+
     }
 }

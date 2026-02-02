@@ -1,22 +1,26 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.security.DiscodeitAccessDeniedHandler;
-import com.sprint.mission.discodeit.security.DiscodeitAuthenticationEntryPoint;
-import com.sprint.mission.discodeit.security.LoginSuccessHandler;
-import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
+import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.repository.JpaPersistenceTokenRepository;
+import com.sprint.mission.discodeit.security.service.CustomPersistentTokenRememberMe;
+import com.sprint.mission.discodeit.security.service.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.security.service.LoginFailureHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.RememberMeDsl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
@@ -28,9 +32,17 @@ public class SecurityConfig {
     private final HttpStatusReturningLogoutSuccessHandler logoutSuccessHandler;
     private final DiscodeitAccessDeniedHandler accessDeniedHandler;
     private final DiscodeitAuthenticationEntryPoint authenticationEntryPoint;
+    private final SessionRegistry sessionRegistry;
+    private final CustomLogOutHandler logOutHandler;
+    private final JpaPersistenceTokenRepository tokenRepository;
+    private final DiscodeitUserDetailsService  userDetailsService;
+
+
+    @Value("${rememberme.key}")
+    private String rememberMeKey;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, RoleHierarchy roleHierarchy) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, RoleHierarchy roleHierarchy, PersistentTokenBasedRememberMeServices rememberMeServices) throws Exception {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -45,7 +57,9 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(logOutHandler)
                         .logoutSuccessHandler(logoutSuccessHandler)
+
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/h2-console/**").permitAll()
@@ -61,9 +75,23 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionConcurrency(
+                                cur -> cur
+                                        .maximumSessions(1)
+                                        .sessionRegistry(sessionRegistry)
+                        )
                 )
                 .headers(headers ->
                         headers.frameOptions(frame -> frame.sameOrigin())
+                )
+                .rememberMe( rember -> rember
+                        .key(rememberMeKey)
+                        .rememberMeServices(rememberMeServices)
+                        .tokenRepository(tokenRepository)
+                        .tokenValiditySeconds(60*60*24*14)
+                        .userDetailsService(userDetailsService)
+                        .useSecureCookie(false)
+
                 )
         ;
         return http.build();

@@ -5,13 +5,12 @@ import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.domain.file.FileByteReadFailException;
 import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,7 +30,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UserService Unit Test")
@@ -45,9 +42,6 @@ public class UserServiceUnitTest {
     private BinaryContentRepository binaryContentRepository;
 
     @Mock
-    private UserStatusRepository userStatusRepository;
-
-    @Mock
     private UserMapper userMapper;
 
     @Mock
@@ -58,21 +52,20 @@ public class UserServiceUnitTest {
 
     private User user1;
     private BinaryContent binaryContent1;
-    private UserStatus userStatus1;
     private UserDto userDto1;
 
     @BeforeEach
     void setUp() {
         user1 = User.createUserFactory("Ronaldo","siuuu@gmail.com","1234");
         binaryContent1 = new BinaryContent("siuuFile","text/plain",10L);
-         userStatus1 = new UserStatus(user1, Instant.now());
         userDto1 = new UserDto(
                 user1.getId(),
                 user1.getUserName(),
                 user1.getEmail(),
                 null,
                 null,
-                true
+                true,
+                Role.USER
         );
     }
 
@@ -88,8 +81,6 @@ public class UserServiceUnitTest {
 
         when(userRepository.save(any(User.class)))
                 .thenReturn(user1);
-        when(userStatusRepository.save(any(UserStatus.class)))
-                .thenReturn(userStatus1);
 
         when(userMapper.toDto(any(User.class)))
         .thenReturn(userDto1);
@@ -107,7 +98,6 @@ public class UserServiceUnitTest {
 
         verify(userRepository,times(1)).save(ArgumentCaptor.forClass(User.class).capture());
         verify(binaryContentRepository,times(1)).save(ArgumentCaptor.forClass(BinaryContent.class).capture());
-        verify(userStatusRepository,times(1)).save(ArgumentCaptor.forClass(UserStatus.class).capture());
     }
 
     @Test

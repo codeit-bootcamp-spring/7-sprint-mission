@@ -33,7 +33,6 @@ import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EX
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
@@ -61,9 +60,6 @@ public class BasicUserService implements UserService {
                 binaryContent
         ));
 
-        user.setUserStatus(userStatusRepository.save(
-                new UserStatus(user,Instant.now())
-        ));
 
 
         return userMapper.toDto(user);
@@ -73,11 +69,6 @@ public class BasicUserService implements UserService {
                         , userCreateRequestDto.email()
                         , password)
         );
-
-        UserStatus targetUserStatus = userStatusRepository.save(
-                new UserStatus(user,Instant.now())
-        );
-        user.setUserStatus(targetUserStatus);
         return userMapper.toDto(user);
     }
 

@@ -66,3 +66,6 @@ logging:
     root: INFO
     org.hibernate.SQL: info
     com.sprint.mission.discodeit: debug
+
+rememberme:
+  key: rememberMeKey
