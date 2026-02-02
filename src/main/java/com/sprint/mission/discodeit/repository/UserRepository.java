@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository;
 
 import com.fasterxml.jackson.databind.deser.std.NumberDeserializers;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.security.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,4 +19,13 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findOneUser(@Param("userIds") List<UUID> userIds);
 
     Optional<User> findByUserName(String userName);
+
+    @Query(
+            value = """
+ select exists (
+ select 1 from users u where u.role = :role
+ )
+""" ,nativeQuery = true
+    )
+    Boolean existsUsersByRole(@Param("role") Role role);
 }

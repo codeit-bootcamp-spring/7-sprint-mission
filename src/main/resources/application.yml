@@ -12,3 +12,7 @@ logging:
   level:
     root: INFO
     org.springframework.security: trace
+
+admin:
+  email: admin@naver.com
+  password: admin1234

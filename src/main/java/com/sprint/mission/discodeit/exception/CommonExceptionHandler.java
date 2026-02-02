@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.exception.domain.DiscodeitException;
+import com.sprint.mission.discodeit.exception.domain.auth.AuthException;
 import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -47,18 +48,19 @@ public class CommonExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-//    @ExceptionHandler(UserNotExistException.class)
-//    public ResponseEntity<ErrorResponse> userNotFoundExceptionHandler(UserNotExistException e){
-//        ErrorResponse errorResponse = new ErrorResponse(
-//                e.getTimestamp(),
-//                e.getErrorCode().toString(),
-//                e.getMessage(),
-//                e.getDetails(),
-//                e.getClass().getName(),
-//                400
-//        );
-//        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-//    }
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorResponse> authExceptionHandler(AuthException e){
+        ErrorResponse errorResponse = new ErrorResponse(
+                Instant.now(),
+                e.getErrorCode().name(),
+                e.getErrorCode().getMessage(),
+                e.getDetails(),
+                e.getClass().getName(),
+                400
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> reallyRestExceptionHandler(Exception e){

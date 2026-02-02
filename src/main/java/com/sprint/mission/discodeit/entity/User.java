@@ -48,6 +48,10 @@ public class User extends BaseUpdatableEntity implements Serializable {
         return new User(userName,email,password,Role.USER,null,null);
     }
 
+    public void updateUserRole(Role role){
+        this.role = role;
+    }
+
 
 
 }

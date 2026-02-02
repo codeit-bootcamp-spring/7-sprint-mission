@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.request.authService.LoginRequestDto;
+import com.sprint.mission.discodeit.dto.request.user.UserRoleUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.login.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
@@ -43,5 +44,14 @@ public class LoginController {
             )
     {
         return new ResponseEntity<>(userDetails.getUserDto(), HttpStatus.OK);
+    }
+
+    @PutMapping("/role")
+    public ResponseEntity<UserDto> updateUserRole(
+            @Valid @RequestBody UserRoleUpdateRequestDto requestDto
+            ){
+
+        UserDto userDto = authService.updateUserRole(requestDto);
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 }
