@@ -1,13 +1,17 @@
 spring:
   application:
     name : discodeit
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
   datasource:
     url: jdbc:h2:mem:discodeitdb
     username: sa
     password:
     driver-class-name: org.h2.Driver
   jpa:
-    database: postgresql
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
     properties:
@@ -19,6 +23,11 @@ spring:
     admin:
       client:
         url: http://localhost:9090
+
+  security:
+    user:
+      name: user
+
 discodeit:
   repository:
     type: file
@@ -33,6 +42,7 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+
 server:
   port: ${PORT:8080}
 
