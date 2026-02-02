@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.dto.channelDto.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channelDto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channelDto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.entityType.ChannelType;
+import com.sprint.mission.discodeit.entity.role.ChannelType;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
