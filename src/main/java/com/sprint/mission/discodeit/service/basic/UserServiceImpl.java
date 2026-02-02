@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapper userMapper;
     private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
 
     // 생성
     @Override
@@ -58,11 +60,13 @@ public class UserServiceImpl implements UserService {
 
         BinaryContent profile = saveProfileImage(profileImage);
 
+        String encodedPassword = passwordEncoder.encode(requestDto.password());
+
         // 유저 생성
         User newUser = User.builder()
                 .email(email)
                 .username(username)
-                .password(requestDto.password())
+                .password(encodedPassword)
                 .build();
 
         newUser.updateProfile(profile);
