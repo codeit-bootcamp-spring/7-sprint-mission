@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.security.LoginFailureHandler;
+import com.sprint.mission.discodeit.security.LoginSuccessHandler;
 import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
 import javax.swing.Spring;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -47,7 +50,11 @@ import org.springframework.security.web.session.DisableEncodeUrlFilter;
 
 @Configuration
 //@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginFailureHandler loginFailureHandler;
 
 //    👉 Spring Boot 3.x / Security 6 기준
 //    ✔ BCryptPasswordEncoder
@@ -93,6 +100,9 @@ public class SecurityConfig {
 
             .formLogin(login -> login
                 .loginProcessingUrl("/api/auth/login")
+                .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandler)
+                .permitAll()
             )
             .httpBasic(basic -> basic.disable())
 
