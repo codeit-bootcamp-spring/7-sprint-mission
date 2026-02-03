@@ -11,11 +11,9 @@ import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +34,6 @@ import java.util.stream.Collectors;
 public class BasicUserService implements UserService{
 
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
 
     private final UserMapper userMapper;
@@ -68,12 +65,8 @@ public class BasicUserService implements UserService{
                 Role.USER
         );
 
-        UserStatus userStatus = new UserStatus(newUser);
-        newUser.setStatus(userStatus);
-
         // 사용자 저장
         User saved = userRepository.save(newUser);
-        userStatusRepository.save(userStatus);
 
         log.info("새 유저 생성 완료: userId = {}, username = {}, email = {}",
                 saved.getId(), saved.getUsername(), saved.getEmail());
@@ -95,7 +88,7 @@ public class BasicUserService implements UserService{
     @Override
     public List<UserResponseDto> findAll() {
         // fetch join 적용
-        return userRepository.findAllWithProfileAndStatus().stream()
+        return userRepository.findAllWithProfile().stream()
                 .map(u -> userMapper.toResponseDto(u))
                 .collect(Collectors.toList());
     }
@@ -150,14 +143,12 @@ public class BasicUserService implements UserService{
         log.debug("사용자 삭제 요청: userId = {}, username = {}", user.getId(), user.getUsername());
 
         BinaryContent profile = user.getProfile();
-        UserStatus userStatus = user.getStatus();
 
         // 프로필 이미지 삭제(있는 경우)
         if(user.getProfile() != null) {
             binaryContentRepository.deleteById(profile.getId());
         }
 
-        userStatusRepository.deleteById(userStatus.getId());
         userRepository.deleteById(userId);
 
         log.info("사용자 삭제 완료: userId = {}", userId);

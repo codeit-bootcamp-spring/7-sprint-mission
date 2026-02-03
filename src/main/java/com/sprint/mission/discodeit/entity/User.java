@@ -37,22 +37,12 @@ public class User extends BaseUpdatableEntity{
     )
     private BinaryContent profile;
 
-    // DB 테이블에 저장하지 않는 필드
-    // mappedBy 속성 적용시 외래키를 가지고 있지 않아
-    // 객체 존재 확인을 위해 기본적을 EAGER로 동작
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserStatus status;
-
     public User(String username, String email, String password, BinaryContent profile, Role role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.profile = profile;
         this.role = role;
-    }
-
-    public void setStatus(UserStatus status) {
-        this.status = status;
     }
 
     public void update(String username, String email, String password, BinaryContent profile) {

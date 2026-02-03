@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.security.config.SessionStatusChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserMapper {
     private final BinaryContentMapper binaryContentMapper;
+    private final SessionStatusChecker sessionStatusChecker;
 
     public UserResponseDto toResponseDto(User user){
         return new UserResponseDto(
@@ -16,7 +18,7 @@ public class UserMapper {
                 user.getUsername(),
                 user.getEmail(),
                 binaryContentMapper.toResponseDto(user.getProfile()),
-                user.getStatus().isOnline(),
+                sessionStatusChecker.isOnline(user.getUsername()),
                 user.getRole()
         );
     }

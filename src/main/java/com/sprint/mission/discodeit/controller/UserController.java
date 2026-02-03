@@ -6,10 +6,7 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
-import com.sprint.mission.discodeit.dto.userstatus.request.UpdateUserStatusRequestDto;
-import com.sprint.mission.discodeit.dto.userstatus.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +26,6 @@ import java.util.UUID;
 public class UserController implements UserControllerDocs {
 
     private final UserService userService;
-    private final UserStatusService userStatusService;
 
     private final BinaryContentMapper binaryContentMapper;
 
@@ -74,15 +70,5 @@ public class UserController implements UserControllerDocs {
     public ResponseEntity<List<UserResponseDto>> searchUsers() {
         List<UserResponseDto> users = userService.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(users);
-    }
-
-    // 사용자 온라인 업데이트
-    @PatchMapping("/{userId}/userStatus")
-    public ResponseEntity<UserStatusResponseDto> onlineUser(
-            @PathVariable UUID userId,
-            @RequestBody UpdateUserStatusRequestDto request
-    ) {
-        UserStatusResponseDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(updatedUserStatus);
     }
 }

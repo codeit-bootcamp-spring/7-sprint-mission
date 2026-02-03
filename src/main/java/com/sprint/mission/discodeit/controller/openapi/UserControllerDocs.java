@@ -4,10 +4,7 @@ package com.sprint.mission.discodeit.controller.openapi;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
-import com.sprint.mission.discodeit.dto.userstatus.request.UpdateUserStatusRequestDto;
-import com.sprint.mission.discodeit.dto.userstatus.response.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -243,60 +240,4 @@ public interface UserControllerDocs {
             )
     })
     ResponseEntity<List<UserResponseDto>> searchUsers();
-
-    @Operation(
-            summary = "사용자 온라인 업데이트",
-            description = """
-                    기존 사용자의 온라인 상태(최근 접속 시간)를 갱신 합니다.
-                    
-                    ## 요청 경로(Path Variable)
-                    - userId : 사용자 고유 식별자(UUID)
-                    
-                    ## 요청 본문(JSON)
-                    - newLastActiveAt : 최근 온라인 시각
-                    
-                    ## 응답 데이터
-                    - 성공 시 사용자 정보가 반환됩니다.
-                    """
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "사용자 온라인 업데이트 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = UserStatus.class),
-                            examples = @ExampleObject(
-                                    value = """
-                                            {
-                                                "userId": "bea5f619-f39c-4604-8105-70d0f8e8a2a4",
-                                                "id": "8c3cac58-5bc6-4d18-ad75-ff72dd6baecb",
-                                                "createdAt": "2025-11-11T08:41:15.377166100Z",
-                                                "updatedAt": "2025-11-11T08:45:12.728357500Z",
-                                                "lastActiveAt": "2025-11-11T02:17:35Z",
-                                                "online": false
-                                            }
-                                            """
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "존재하지 않는 사용자 온라인 업데이트 요청",
-                    content = @Content(
-                            mediaType = "applicaton/json",
-                            schema = @Schema(implementation = com.sprint.mission.discodeit.global.dto.ApiResponse.class),
-                            examples = @ExampleObject(
-                                    value = """
-                                            {
-                                                "status": "NOT_FOUND",
-                                                "message": "user status가 존재하지 않습니다.",
-                                                "data": null
-                                            }
-                                            """
-                            )
-                    )
-            )
-    })
-    ResponseEntity<UserStatusResponseDto> onlineUser(UUID userId, UpdateUserStatusRequestDto request);
 }
