@@ -5,6 +5,6 @@ import lombok.Getter;
 @Getter
 public enum Role {
     ADMIN,
-    CHANNEL_MANGER,
+    CHANNEL_MANAGER,
     USER
 }

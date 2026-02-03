@@ -11,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -43,7 +40,8 @@ public class AuthController implements AuthDocs {
     }
 
     @PutMapping("/role")
-    public ResponseEntity<UserResponseDto> updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest) {
+    public ResponseEntity<UserResponseDto> updateUserRole(@RequestBody UserRoleUpdateRequest userRoleUpdateRequest) {
+        log.info("권한 수정 요청");
         UserResponseDto userResponseDto = authService.updateRoleForAdmin(userRoleUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }
