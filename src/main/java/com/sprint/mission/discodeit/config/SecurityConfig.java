@@ -88,8 +88,12 @@ public class SecurityConfig {
 //            DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CsrfFilter, LogoutFilter,                                                                                                                                    RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
 //            .formLogin(form -> form.disable()) // ✅ 로그인 비활성화 (CSR이니까)
             // formLogin 을 기본값으로 활성화하고, 추가된 필터를 확인해보세요.
-            .formLogin(Customizer.withDefaults())
+//            .formLogin(Customizer.withDefaults())
 //            DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CsrfFilter, LogoutFilter, UsernamePasswordAuthenticationFilter, DefaultResourcesFilter, DefaultLoginPageGeneratingFilter, DefaultLogoutPageGeneratingFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
+
+            .formLogin(login -> login
+                .loginProcessingUrl("/api/auth/login")
+            )
             .httpBasic(basic -> basic.disable())
 
             // ✅ H2 콘솔용
