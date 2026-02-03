@@ -18,7 +18,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
      * N+1문제 개선, 유저 전체 조회
      */
     @Query(value = "SELECT u FROM User u "
-            + "LEFT JOIN FETCH u.profile "
-            + "LEFT JOIN FETCH u.userStatus")
-    List<User> findAllWithProfileAndStatus();
+            + "LEFT JOIN FETCH u.profile")
+    List<User> findAllWithProfile();
 }

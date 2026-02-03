@@ -238,7 +238,7 @@ class BasicUserServiceTest {
         @DisplayName("[정상 케이스] - 모든 유저 조회 성공")
         void readUser_all_success() {
             // given
-            given(userRepository.findAllWithProfileAndStatus())
+            given(userRepository.findAllWithProfile())
                     .willReturn(List.of(user, user2, user3));
             given(userMapper.toResponseDto(user))
                     .willReturn(userResponseDto);
@@ -253,7 +253,7 @@ class BasicUserServiceTest {
             assertThat(result).hasSize(3);
             assertThat(result).isEqualTo(List.of(userResponseDto, userResponseDto2, userResponseDto3));
 
-            then(userRepository).should().findAllWithProfileAndStatus();
+            then(userRepository).should().findAllWithProfile();
             then(userMapper).should(times(3)).toResponseDto(any(User.class));
 
         }
