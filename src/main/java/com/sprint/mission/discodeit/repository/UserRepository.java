@@ -15,17 +15,11 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    @Query("select user from User user left join fetch user.userStatus left join fetch user.profile where user.id in :userIds")
+    @Query("select user from User user where user.id in :userIds")
     List<User> findOneUser(@Param("userIds") List<UUID> userIds);
 
-    Optional<User> findByUserName(String userName);
+    Optional<User> findById(UUID id);
 
-    @Query(
-            value = """
- select exists (
- select 1 from users u where u.role = :role
- )
-""" ,nativeQuery = true
-    )
-    Boolean existsUsersByRole(@Param("role") Role role);
+    Optional<User> findByUserName(String userName);
+    Optional<User> findByRole(Role role);
 }

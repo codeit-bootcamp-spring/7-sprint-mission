@@ -32,7 +32,7 @@ public class AdminInitializer {
     @EventListener(ApplicationReadyEvent.class)
     public void initialize(){
 
-        if(userRepository.existsUsersByRole(Role.ADMIN)) return;
+        if(userRepository.findByRole(Role.ADMIN).isPresent()) return;
         UserCreateRequestDto requestDto = new UserCreateRequestDto(
                 "ADMIN",
                 adminEmail,

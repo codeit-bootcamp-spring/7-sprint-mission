@@ -20,7 +20,8 @@ public interface PersistenceLoginRepository extends JpaRepository<PersistenceLog
     @Modifying
     @Query("delete from PersistenceLogin p where p.userId =:userId")
     void deleteByUserId(@Param("userId") UUID userId);
-    
+
+    @Modifying
     @Query("delete from PersistenceLogin p where p.lastUsed< :cutoff")
     void deleteByLastUsedBefore(@Param("cutoff") Instant cutoff);
     

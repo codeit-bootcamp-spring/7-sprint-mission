@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Optional;
@@ -54,20 +55,18 @@ public class JpaPersistenceTokenRepository implements PersistentTokenRepository 
     }
 
     @Override
+    @Transactional
     public void removeUserTokens(String username) {
+        UUID userId = UUID.fromString(username);
 
-    }
-
-
-    public void removeUserTokensByUserId(UUID userId) {
         long count = repository.countByUserId(userId);
         if(count > 0){
             repository.deleteByUserId(userId);
         }
         else{
-            log.info("삭제할 remember-me 토큰 없음! 사용자 : {}",userId);
+            log.info("삭제할 remember-me 토큰 없음! 사용자 : {}",username);
         }
-
     }
+
 
 }

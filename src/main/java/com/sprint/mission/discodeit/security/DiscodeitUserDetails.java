@@ -32,7 +32,7 @@ public class DiscodeitUserDetails implements UserDetails {
     @Override
     public String getUsername() {
 
-        return userDto.username();
+        return userDto.id().toString();
     }
 
     @Override

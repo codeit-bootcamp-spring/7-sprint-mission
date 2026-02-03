@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.*;
 import com.sprint.mission.discodeit.security.repository.JpaPersistenceTokenRepository;
-import com.sprint.mission.discodeit.security.service.CustomPersistentTokenRememberMe;
 import com.sprint.mission.discodeit.security.service.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.security.service.LoginFailureHandler;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.RememberMeDsl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
@@ -33,7 +31,6 @@ public class SecurityConfig {
     private final DiscodeitAccessDeniedHandler accessDeniedHandler;
     private final DiscodeitAuthenticationEntryPoint authenticationEntryPoint;
     private final SessionRegistry sessionRegistry;
-    private final CustomLogOutHandler logOutHandler;
     private final JpaPersistenceTokenRepository tokenRepository;
     private final DiscodeitUserDetailsService  userDetailsService;
 
@@ -42,7 +39,7 @@ public class SecurityConfig {
     private String rememberMeKey;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, RoleHierarchy roleHierarchy, PersistentTokenBasedRememberMeServices rememberMeServices) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, RoleHierarchy roleHierarchy) throws Exception {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -57,7 +54,6 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
-                        .addLogoutHandler(logOutHandler)
                         .logoutSuccessHandler(logoutSuccessHandler)
 
                 )
@@ -86,7 +82,6 @@ public class SecurityConfig {
                 )
                 .rememberMe( rember -> rember
                         .key(rememberMeKey)
-                        .rememberMeServices(rememberMeServices)
                         .tokenRepository(tokenRepository)
                         .tokenValiditySeconds(60*60*24*14)
                         .userDetailsService(userDetailsService)

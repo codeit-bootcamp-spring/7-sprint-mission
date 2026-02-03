@@ -10,7 +10,7 @@ import java.util.Base64;
 import java.util.UUID;
 
 @Entity
-@Table(name = "persistence_logins",
+@Table(name = "persistent_logins",
         indexes = @Index(name= "idx_persistence_logins_username",columnList = "username")
 )
 @NoArgsConstructor
