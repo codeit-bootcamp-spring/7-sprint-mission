@@ -14,6 +14,7 @@ public enum ErrorCode {
 
     //AUTH
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "로그인 요청이 실패하였습니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // CHANNEL
     CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "채널을 찾을 수 없습니다."),

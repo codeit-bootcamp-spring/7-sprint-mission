@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.global.config;
 
+import com.sprint.mission.discodeit.global.config.security.handler.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.global.config.security.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.global.config.security.handler.LoginSuccessHandler;
 import com.sprint.mission.discodeit.global.config.security.handler.SpaCsrfTokenRequestHandler;
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,10 +22,12 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,6 +57,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .accessDeniedHandler(accessDeniedHandler)
                 );
 
         return http.build();
