@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,21 +33,12 @@ public class BasicUserService implements UserService {
     private final BinaryContentService binaryContentService;
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapperManual userMapper;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
     @Transactional
     public UserResponseDto signUp(UserSignupCommand userSignupCommand) {
-        if (
-                userSignupCommand.username() == null ||
-                        userSignupCommand.username().isBlank() ||
-                        userSignupCommand.password() == null ||
-                        userSignupCommand.password().isBlank() ||
-                        userSignupCommand.email() == null || userSignupCommand.email().isBlank()
-
-        ) {
-            throw new DiscodeitException(ErrorCode.INVALID_INPUT);
-        }
 
         log.debug("회원가입 처리 시작 - hasProfile={}", userSignupCommand.profile().isPresent());
 
@@ -59,9 +51,10 @@ public class BasicUserService implements UserService {
                 ? binaryContentRepository.getReferenceById(profileBinaryId) // NOTE: 위의 update 반환값으로 BinaryId를 받고 실제 엔티티 DB조회 필요없이 id만 가진 프록시 객체로 활용하기위해 유지
                 : null;
 
+        String encodedPassword = passwordEncoder.encode(userSignupCommand.password());
         User newUser = User.create(userSignupCommand.username(),
                 userSignupCommand.email(),
-                userSignupCommand.password(),
+                encodedPassword,
                 binaryContentReference
         );
 

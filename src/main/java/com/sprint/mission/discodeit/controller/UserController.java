@@ -34,7 +34,7 @@ public class UserController implements UserApi {
         UserResponseDto responseDto = userService.signUp(command);
         log.info("회원가입 성공 - userId={}", responseDto.id());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @Override

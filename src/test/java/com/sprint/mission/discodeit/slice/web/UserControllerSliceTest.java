@@ -1,33 +1,42 @@
 package com.sprint.mission.discodeit.slice.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.config.SecurityConfig;
 import com.sprint.mission.discodeit.controller.UserController;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentUploadCommand;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserSignupCommand;
 import com.sprint.mission.discodeit.dto.user.UserSignupRequestDto;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
+@Import(SecurityConfig.class)
 public class UserControllerSliceTest {
     @Autowired
     MockMvc mockMvc;
@@ -97,6 +106,69 @@ public class UserControllerSliceTest {
                     .andExpect(status().isBadRequest());
         }
     }
+    @Nested
+    @DisplayName("signup")
+    class UserSignup {
+
+        @Test
+        void signup_then_success() throws Exception {
+            // given
+            final String uri = "/api/users";
+            UUID expectedId = UUID.randomUUID();
+            User user = User.create("test22", "emaile@edsd.com", "password", null);
+
+            // dto
+            UserSignupRequestDto request = UserSignupRequestDto.builder()
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .password(user.getPassword())
+                    .build();
+            String requestJson = objectMapper.writeValueAsString(request);
+
+            MockMultipartFile multipartFile = new MockMultipartFile(
+                    "userCreateRequest",
+                    "userCreateRequest.json",
+                    MediaType.APPLICATION_JSON_VALUE,
+                    requestJson.getBytes(StandardCharsets.UTF_8)
+            );
+
+
+            when(userService.signUp(any())).thenReturn(new UserResponseDto(
+                    expectedId,
+                    user.getUsername(),
+                    user.getEmail(),
+                    null,
+                    true,
+                    user.getCreatedAt(),
+                    user.getUpdatedAt()
+            ));
+
+            // when
+            ResultActions actions = mockMvc.perform(
+                    multipart(uri)
+                            .file(multipartFile)
+                            .with(csrf())
+                            .characterEncoding("UTF-8")
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .accept(MediaType.APPLICATION_JSON)
+
+            );
+
+
+            actions
+                    .andExpect(status().isOk())
+                    .andExpect(result -> {
+                        String responseBody = result.getResponse().getContentAsString();
+                        assertNotNull(responseBody);
+                    })
+                    .andExpect(jsonPath("$.id").value(expectedId.toString()))
+                    .andExpect(jsonPath("$.username").value(user.getUsername()))
+                    .andExpect(jsonPath("$.email").value(user.getEmail()));
+        }
+
+
+    }
+
 
     @Nested
     class CreateUserSuccess {

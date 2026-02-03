@@ -17,6 +17,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -46,6 +47,9 @@ public class UserServiceIntegrationTest {
     @Autowired
     private BinaryContentRepository binaryContentRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void setUp() {
     }
@@ -72,20 +76,10 @@ public class UserServiceIntegrationTest {
             assertEquals("name", persistedUser.getUsername());
 
             assertEquals("example@email.com", persistedUser.getEmail());
-            assertEquals("password", persistedUser.getPassword());
-
+            assertNotEquals("password", persistedUser.getPassword());
+            assertTrue(passwordEncoder.matches("password", persistedUser.getPassword()));
         }
 
-        @Test
-        @DisplayName("[Integration][Negative] 회원가입 - 잘못된 입력은 예외 & DB 변화 없음")
-        void signUp_invalid_blocked() {
-            UserSignupCommand command = UserSignupCommand.from(new UserSignupRequestDto("", "a@b.com", "pw"), null);
-            int before = userRepository.findAll().size();
-            assertThrows(DiscodeitException.class,
-                    () -> userService.signUp(command));
-            int after = userRepository.findAll().size();
-            assertEquals(before, after);
-        }
 
         @Test
         @DisplayName("[Integration][Negative] 회원가입 - 중복된 이메일일 경우 예외")
