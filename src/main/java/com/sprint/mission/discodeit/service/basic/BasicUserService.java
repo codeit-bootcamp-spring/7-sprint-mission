@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,6 +86,8 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN') or principal.username == #userId.toString() ")
     public void deleteUser(UUID userId) {
         if (!userRepository.existsById(userId)) throw new UserNotExistException(userId);
         log.info("deleteUser : {} info layer",userId);
@@ -104,6 +107,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize( "principal.username == #userId.toString() or hasRole('ADMIN')")
     public UserDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile)  {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotExistException(userId));
