@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.jpa.UserStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ public class UserService implements InterfaceUserService {
     private final BinaryContentsRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
 //    @Autowired
 //    EntityManager em;
@@ -80,9 +82,12 @@ public class UserService implements InterfaceUserService {
             })
             .orElse(null);
 
+        String password = userCreateRequest.password();
+        String encodePassword = passwordEncoder.encode(password); //!! 🛠️
+
         User newUser = new User(userCreateRequest.username(),
             userCreateRequest.email(),
-            userCreateRequest.password(),
+            encodePassword,
             profile);
 
         newUser.initUserStatus();

@@ -76,7 +76,7 @@ public class SecurityConfig {
                 .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 // 토큰 발급 API는 예외 처리
                 .ignoringRequestMatchers(
-                    "/api/csrf"
+                    "/api/csrf", "/h2-console/**", "/api/auth/**"
                 )
             )
 
@@ -84,12 +84,17 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 정적 리소스 및 공통 경로 허용
                 .requestMatchers("/", "/index.html", "/static/**", "/assets/**", "/favicon.ico").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/users").permitAll() //!! 🛠️
                 // 인증/인가 관련 API 허용 (예시)
                 .requestMatchers("/api/auth/**").permitAll()
                 // Swagger UI 및 API 문서 허용
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
                 // 그 외 모든 요청은 인증 필요
-                .anyRequest().authenticated()
+                .requestMatchers("/h2-console/**", "/session-expired").permitAll()
+//                // 그 외 모든 /api/** 요청은 인증 필요
+                .requestMatchers("/api/**").authenticated()
+                // 나머지 요청은 모두 허용 (SPA 라우팅 대응)
+                .anyRequest().permitAll()
             )
 
 //            DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CsrfFilter, LogoutFilter,                                                                                                                                    RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
@@ -102,6 +107,13 @@ public class SecurityConfig {
                 .loginProcessingUrl("/api/auth/login")
                 .successHandler(loginSuccessHandler)
                 .failureHandler(loginFailureHandler)
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/api/auth/logout")   // ⭐ 핵심
+//                .logoutSuccessHandler(logoutSuccessHandler) // 있으면
+//                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                 .permitAll()
             )
             .httpBasic(basic -> basic.disable())
