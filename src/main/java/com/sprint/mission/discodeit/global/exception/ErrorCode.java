@@ -30,11 +30,7 @@ public enum ErrorCode {
 
     // BINARY_CONTENT
     BINARY_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Binary Content를 찾을 수 없습니다."),
-
-    // USER_STATUS
-    USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "UserStatus를 찾을 수 없습니다."),
-    USER_STATUS_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 존재하는 UserStatus입니다."),
-
+    
     // INTERNAL
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 
