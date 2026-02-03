@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.global.dto.ErrorResponse;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -16,11 +17,10 @@ import java.time.Instant;
 import java.util.Collections;
 
 @Component
+@RequiredArgsConstructor
 public class LoginFailureHandler implements AuthenticationFailureHandler {
 
-    private final ObjectMapper objectMapper = JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .build();
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,

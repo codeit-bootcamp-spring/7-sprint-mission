@@ -13,6 +13,9 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,7 @@ public class BasicChannelService implements ChannelService {
     // API 스펙에 맞는 공개 채널 및 비공개 채널 생성 메서드 추가
     @Override
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelDto create(CreatePublicChannelRequestDto request) {
         String name = request.name();
         String description = request.description();
@@ -81,6 +85,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelDto update(UUID channelId, UpdatePublicChannelRequestDto request) {
 
         log.debug("채널 수정 요청: channelId = {}", channelId);
@@ -149,11 +154,19 @@ public class BasicChannelService implements ChannelService {
 
         log.debug("채널 삭제 요청: channelId = {}", channelId);
 
-        channelRepository.findById(channelId)
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelNotFoundException(
                         ErrorCode.CHANNEL_NOT_FOUND,
                         Map.of("channelId", channelId)
                 ));
+
+        if(channel.getChannelType() == ChannelType.PUBLIC){
+            if (SecurityContextHolder.getContext().getAuthentication()
+                    .getAuthorities().stream()
+                    .noneMatch(a -> a.getAuthority().equals("CHANNEL_MANAGER"))) {
+                throw new AuthorizationDeniedException("권한이 없습니다.");
+            }
+        }
 
         // 채널 메시지 연관 파일 UUID 저장
         List<UUID> binaryContentIds = messageRepository.findAllByChannelId(channelId).stream()
