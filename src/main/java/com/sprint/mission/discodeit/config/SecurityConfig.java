@@ -97,7 +97,9 @@ public class SecurityConfig {
 //                // 그 외 모든 /api/** 요청은 인증 필요
                 .requestMatchers("/api/**").authenticated()
                 // 나머지 요청은 모두 허용 (SPA 라우팅 대응)
-                .anyRequest().permitAll()
+//                .anyRequest().permitAll()
+                // 그 외 모든 요청은 인증 필요
+                .anyRequest().authenticated()
             )
 
 //            DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CsrfFilter, LogoutFilter,                                                                                                                                    RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
