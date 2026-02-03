@@ -120,6 +120,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelResponseDto updateChannel(UUID channelId, UpdateChannelDto updateChannelDto) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> ChannelNotFoundException.byId(channelId));
@@ -135,6 +136,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public void deleteChannel(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> ChannelNotFoundException.byId(channelId));
