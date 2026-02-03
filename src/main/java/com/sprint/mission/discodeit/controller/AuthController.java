@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +35,22 @@ public class AuthController { //  implements AuthDoc
             .status(HttpStatus.NON_AUTHORITATIVE_INFORMATION) // 203
             .build();
     }
+
+    // 세션ID를 통해 사용자의 기본 정보(UserDto)를 가져올 수 있도록 정의한 API
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> me(@AuthenticationPrincipal DiscodeitUserDetails userDetails) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserDto userDto = userDetails.getUser();
+
+        log.debug("✅ me : {}", userDto.username());
+
+        return ResponseEntity.ok(userDto);
+    }
+
 
     @PostMapping
     public ResponseEntity<String> test() {
