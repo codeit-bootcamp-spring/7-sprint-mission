@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +24,18 @@ public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public UserResponseDto login(AuthLoginRequestDto request) {
         log.debug("로그인 시도 username={}", request.username());
-        User findUser = userRepository.findByUsernameAndPassword(
-                        request.username(),
-                        request.password())
+        User findUser = userRepository.findByUsername(
+                        request.username())
                 .orElseThrow(AuthInvalidCredentialsException::new);
+        if (!passwordEncoder.matches(request.password(), findUser.getPassword())) {
+            throw new AuthInvalidCredentialsException();
+        }
         log.debug("사용자 조회 성공 userId={}", findUser.getId());
         // TODO: userState를 null이 아닌 online 값으로 추가
         UserStatus userStatus = userStatusRepository.findByUserId(findUser.getId()).orElseThrow(() -> new UserStatusNotFoundByUserIdException(findUser.getId()));

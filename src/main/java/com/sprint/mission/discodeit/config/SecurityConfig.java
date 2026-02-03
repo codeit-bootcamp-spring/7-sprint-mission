@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -23,14 +23,11 @@ public class SecurityConfig {
 
 
     @Bean
-    ApplicationRunner dumpSecurityFilters(FilterChainProxy proxy) {
+    ApplicationRunner debugUserDetailsService(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         return args -> {
-            System.out.println("=== Security Filters ===");
-            proxy.getFilterChains().forEach(chain -> {
-                chain.getFilters().forEach(filter ->
-                        System.out.println(filter.getClass().getName())
-                );
-            });
+            System.out.println("UserDetailsService: " + userDetailsService.getClass());
+            System.out.println("passwordEncoder = " + passwordEncoder.getClass());
+
         };
     }
 
@@ -40,13 +37,19 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                                .requestMatchers("/api/auth/login").permitAll()
-                                .anyRequest().authenticated()
+                                .requestMatchers("/", "/api/auth/login").permitAll()
+                                .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**")// H2는 CSRF 검증 제외
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-                );
+                )
+                .headers(headers ->
+                        headers.frameOptions(frameOptions -> frameOptions.sameOrigin()) // 클릭재킹 거부(iframe) 같은 주소를 가진 프레임(iframe) 주소라면 허용, 이건 기본 서버사이드 일때 h2화면인 iframe으로 되어있어서 허용할려고하느거고 실제 분리된 프론트에선 피료없음
+                )
+//                .formLogin(Customizer.withDefaults())
+        ;
 
         return http.build();
     }
