@@ -7,10 +7,10 @@ import java.util.UUID;
 public class BinaryContentNotFoundException extends BinaryContentException {
 
     public BinaryContentNotFoundException(UUID id) {
-        super(id, ErrorCode.NOT_FOUND);
+        super(id, ErrorCode.FILE_NOT_FOUND);
     }
 
     public BinaryContentNotFoundException(String fileName) {
-        super(fileName, ErrorCode.NOT_FOUND);
+        super(fileName, ErrorCode.FILE_NOT_FOUND);
     }
 }
