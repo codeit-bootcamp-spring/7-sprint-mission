@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.binaryContent.s3.S3StorageDownloadException;
+import com.sprint.mission.discodeit.common.exceptions.binaryContent.s3.S3StorageException;
+import com.sprint.mission.discodeit.common.exceptions.binaryContent.s3.S3StorageUploadException;
 import com.sprint.mission.discodeit.dto.entity.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -61,7 +64,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
             );
         } catch (SdkClientException e) {
             log.warn("파일 업로드에 실패함 : {}", file.getFileName());
-            throw new
+            throw new S3StorageUploadException(uuid);
         }
         log.info("S3 파일 업로드 완료 : {}", file.getFileName());
         return uuid;
@@ -75,8 +78,9 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
                     .key(fileName)
                     .build()
             );
-        } catch (Exception e) {
-
+        } catch (S3StorageException e) {
+            log.warn("파일 다운로드에 실패함");
+            throw new S3StorageDownloadException(fileName);
         }
     }
 
@@ -87,7 +91,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
                     .header(HttpHeaders.LOCATION, generatePresignedUrl(dto.fileName()))
                     .build();
         } catch (Exception e) {
-
+            throw new S3StorageDownloadException(dto.fileName());
         }
     }
 

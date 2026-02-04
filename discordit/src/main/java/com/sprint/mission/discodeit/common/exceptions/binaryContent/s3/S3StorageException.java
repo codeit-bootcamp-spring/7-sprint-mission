@@ -6,17 +6,17 @@ import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryConten
 import java.util.Map;
 import java.util.UUID;
 
-public class S3Exception extends BinaryContentException {
+public class S3StorageException extends BinaryContentException {
 
-    public S3Exception(ErrorCode errorCode, Map<String, Object> details) {
+    public S3StorageException(ErrorCode errorCode, Map<String, Object> details) {
         super(errorCode, details);
     }
 
-    public S3Exception(UUID id, ErrorCode errorCode) {
+    public S3StorageException(UUID id, ErrorCode errorCode) {
         super(id, errorCode);
     }
 
-    public S3Exception(String fileName, ErrorCode errorCode) {
+    public S3StorageException(String fileName, ErrorCode errorCode) {
         super(fileName, errorCode);
     }
 }

@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.common.enums.ErrorCode;
 
 import java.util.UUID;
 
-public class S3UploadException extends S3Exception{
-    public S3UploadException(UUID id) {
+public class S3StorageUploadException extends S3StorageException {
+    public S3StorageUploadException(UUID id) {
         super(id, ErrorCode.UPLOAD_FAILED);
     }
 }
