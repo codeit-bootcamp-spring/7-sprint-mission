@@ -1,6 +1,7 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit.security.access;
 
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;

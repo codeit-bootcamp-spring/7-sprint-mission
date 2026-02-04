@@ -150,23 +150,16 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER') and @channelSecurity.isPublic(#channelId, authentication)")
     public void delete(UUID channelId) {
 
         log.debug("채널 삭제 요청: channelId = {}", channelId);
 
-        Channel channel = channelRepository.findById(channelId)
+        channelRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelNotFoundException(
                         ErrorCode.CHANNEL_NOT_FOUND,
                         Map.of("channelId", channelId)
                 ));
-
-        if(channel.getChannelType() == ChannelType.PUBLIC){
-            if (SecurityContextHolder.getContext().getAuthentication()
-                    .getAuthorities().stream()
-                    .noneMatch(a -> a.getAuthority().equals("ROLE_CHANNEL_MANAGER"))) {
-                throw new AuthorizationDeniedException("권한이 없습니다.");
-            }
-        }
 
         // 채널 메시지 연관 파일 UUID 저장
         List<UUID> binaryContentIds = messageRepository.findAllByChannelId(channelId).stream()
