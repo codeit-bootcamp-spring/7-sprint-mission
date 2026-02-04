@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.security.config;
 
 import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.repository.JpaPersistentTokenRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,7 +27,9 @@ public class SecurityConfig {
                                            LoginFailureHandler loginFailureHandler,
                                            CustomAuthenticationEntryPoint authenticationEntryPoint,
                                            CustomAccessDeniedHandler accessDeniedHandler,
-                                           SessionRegistry sessionRegistry) throws Exception {
+                                           SessionRegistry sessionRegistry,
+                                           DiscodeitUserDetailsService userDetailsService,
+                                           JpaPersistentTokenRepository persistentTokenRepository) throws Exception {
 
         http
                 .authorizeHttpRequests(auth -> auth
@@ -51,6 +54,7 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+                        .deleteCookies("JSESSIONID", "remember-me")
                         .permitAll()
                 )
                 .csrf(csrf -> csrf
@@ -66,6 +70,15 @@ public class SecurityConfig {
                                 .maximumSessions(1)
                                 .sessionRegistry(sessionRegistry)
                         )
+                )
+                .rememberMe(remember -> remember
+                        .key("DiscodeitRememberMeSecretKey2026")
+                        .tokenValiditySeconds(60 * 60 * 24 * 14)
+                        .userDetailsService(userDetailsService)
+                        .rememberMeParameter("remember-me")
+                        .rememberMeCookieName("remember-me")
+                        .useSecureCookie(false) // 개발 환경
+                        .tokenRepository(persistentTokenRepository)
                 );
 
         return http.build();
