@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 
 @Component
 @ConditionalOnProperty(
@@ -52,12 +53,16 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public Path put(String fileName, byte[] content) {
-        log.info("파일 저장 요청 들어옴. 파일이름 : {}", fileName);
-        Path path = fileDir.resolve(fileName);
+    public UUID put(UUID uuid, byte[] content) {
+        log.info("파일 저장 요청 들어옴 : {}", uuid);
+
+        BinaryContent file = binaryContentRepository.findById(uuid)
+                .orElseThrow(() -> new BinaryContentNotFoundException(uuid));
+
+        Path path = fileDir.resolve(file.getFileName());
         if (Files.exists(path)) {
             log.error("동일한 파일 이름이 존재해 파일 저장 실패");
-            throw new BinaryContentAlreadyExistException(fileName);
+            throw new BinaryContentAlreadyExistException(uuid);
         }
         try {
             log.info("파일 저장 디렉터리가 없어서 생성함");
@@ -66,8 +71,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             log.error("IOException 발생 : {}", e.getMessage());
             throw new RuntimeException(e);
         }
-        log.debug("파일 생성 성공. 파일 이름 : {}", fileName);
-        return path;
+        log.debug("파일 생성 성공. 파일 이름 : {}", file.getFileName());
+        return uuid;
     }
 
     @Override
@@ -98,5 +103,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
                 .contentType(MediaType.parseMediaType(binaryContent.getContentType()))
                 .contentLength(binaryContent.getSize())
                 .body(new InputStreamResource(get(dto.fileName())));
+    }
+
+    @Override
+    public void delete(String filename) {
+        binaryContentRepository.deleteByFileName(filename);
     }
 }

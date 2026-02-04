@@ -58,14 +58,14 @@ public class BasicUserService implements UserService {
         User user = new User(dto.username(), dto.password(), dto.email());
         log.debug("사용자 생성 완료 - id : {}", user.getId());
         if (profile != null) {
-            BinaryContent binaryContent = new BinaryContent(profile.getOriginalFilename(), profile.getSize(), profile.getContentType());
-            binaryContentRepository.save(binaryContent);
+            BinaryContent saved = new BinaryContent(profile.getOriginalFilename(), profile.getSize(), profile.getContentType());
+            binaryContentRepository.save(saved);
             try {
-                binaryContentStorage.put(profile.getOriginalFilename(), profile.getBytes());
+                binaryContentStorage.put(saved.getId(), profile.getBytes());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            user.setProfile(binaryContent);
+            user.setProfile(saved);
             log.debug("사용자 프로필 이미지 저장 완료.");
         }
         userRepository.save(user);
@@ -94,10 +94,11 @@ public class BasicUserService implements UserService {
         }
 
         if (profile != null) {
-            BinaryContent binaryContent = new BinaryContent(profile.getOriginalFilename(), profile.getSize(), profile.getContentType());
+            BinaryContent saved = new BinaryContent(profile.getOriginalFilename(), profile.getSize(), profile.getContentType());
             try {
-                binaryContentStorage.put(profile.getOriginalFilename(), profile.getBytes());
+                binaryContentStorage.put(saved.getId(), profile.getBytes());
             } catch (IOException e) {
+                log.warn("파일 저장 중 예상치 못한 오류 발생");
                 throw new RuntimeException(e);
             }
         }

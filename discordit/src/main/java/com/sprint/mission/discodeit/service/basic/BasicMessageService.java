@@ -98,8 +98,8 @@ public class BasicMessageService implements MessageService {
                 attachmentFiles == null ? null : attachmentFiles.stream()
                         .map(f -> {
                             try {
-                                BinaryContent saved = binaryContentRepository.save(new BinaryContent(f.getName(), f.getSize(), f.getContentType()));
-                                binaryContentStorage.put(saved.getFileName(), f.getBytes());
+                                BinaryContent saved = binaryContentRepository.save(new BinaryContent(f.getOriginalFilename(), f.getSize(), f.getContentType()));
+                                binaryContentStorage.put(saved.getId(), f.getBytes());
                                 return saved;
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
