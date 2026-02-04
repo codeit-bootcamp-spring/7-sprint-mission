@@ -163,7 +163,7 @@ public class BasicChannelService implements ChannelService {
         if(channel.getChannelType() == ChannelType.PUBLIC){
             if (SecurityContextHolder.getContext().getAuthentication()
                     .getAuthorities().stream()
-                    .noneMatch(a -> a.getAuthority().equals("CHANNEL_MANAGER"))) {
+                    .noneMatch(a -> a.getAuthority().equals("ROLE_CHANNEL_MANAGER"))) {
                 throw new AuthorizationDeniedException("권한이 없습니다.");
             }
         }
