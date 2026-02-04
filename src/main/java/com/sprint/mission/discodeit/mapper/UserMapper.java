@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.global.config.security.config.SessionManager;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /***
  * 컴파일 시점에 코드를 생성하여 런타임에서 안정성을 보장합니다.
@@ -14,11 +16,12 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper(componentModel = "spring", uses = {BinaryContentMapper.class})
 // componetModel을 spring으로 지정해줘야 bean으로 등록할 수 있음.
-public interface UserMapper {
-
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+public abstract class UserMapper {
+    @Autowired
+    protected SessionManager sessionManager;
 
     //  source = from (입력)
     //  target = to (출력)
-    UserResponseDto toResponseDto(User user);
+    @Mapping(target = "online", expression = "java(sessionManager.isOnlineByUserId(user.getId()))")
+    public abstract UserResponseDto toResponseDto(User user);
 }
