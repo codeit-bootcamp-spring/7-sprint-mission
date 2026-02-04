@@ -36,9 +36,10 @@ public enum ErrorCode {
     STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "상태 정보를 찾을 수 없습니다."),
     STATUS_ALREADY_EXISTS(HttpStatus.CONFLICT, "S002", "상태 정보가 이미 존재합니다."),
 
-
     // Auth
-    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", "아이디 또는 비밀번호가 틀렸습니다.");
+    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", "아이디 또는 비밀번호가 틀렸습니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "A002", "권한이 부족합니다"),
+    LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, "A003", "로그인이 필요합니다.");
 
     private final HttpStatus status;
     private final String code;

@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -171,7 +172,8 @@ public class UserServiceImpl implements UserService {
         }
 
         if (updateDto.newPassword() != null && !updateDto.newPassword().isBlank()) {
-            user.updatePassword(updateDto.newPassword());
+            String newPassword = passwordEncoder.encode(updateDto.newPassword());
+            user.updatePassword(newPassword);
         }
 
         userRepository.save(user);
@@ -180,6 +182,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
         User user = userRepository.findById(roleUpdateRequest.userId())
                 .orElseThrow(() -> new UserNotFoundException(roleUpdateRequest.userId()));
@@ -191,7 +195,6 @@ public class UserServiceImpl implements UserService {
         log.info("유저 {} 권한 변경: {} -> {}", user.getUsername(), oldRole ,roleUpdateRequest.newRole());
         return userMapper.toDto(user);
     }
-
 
     // 삭제
     @Override
