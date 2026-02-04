@@ -21,6 +21,7 @@ public class UserMapper {
             .email(user.getEmail())
             .profile(profile)
             .online(user.getUserStatus().isOnline())
+            .role(user.getRole())
             .build();
     }
 }

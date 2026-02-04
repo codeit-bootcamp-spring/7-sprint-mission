@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
@@ -15,6 +17,7 @@ import com.sprint.mission.discodeit.repository.jpa.UserStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
@@ -50,6 +53,28 @@ public class UserService implements InterfaceUserService {
 //    2. 필드 주입(Field Injection) : Setter 메서드를 사용
 //    3. 수정자 주입(Setter Injection) : 간단하지만 테스트 어려워서 지양
 
+    @Transactional
+    @Override
+    public void createAdminUser() {
+        boolean isAdmin = userRepository.existsByRole(Role.ADMIN);
+        if (!isAdmin) {
+
+            String password = "admin123";
+            String encodePassword = passwordEncoder.encode(password); //!! 🛠️
+
+            User newUser = new User("admin123",
+                "admin123@mail.com",
+                encodePassword,
+                null);
+
+            newUser.setRole(Role.ADMIN);
+            newUser.initUserStatus();
+
+            userRepository.save(newUser);
+        }
+    }
+
+    //    @PreAuthorize("hasRole('USER')")
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest, Optional<MultipartFile> optionalProfileFile) {
@@ -227,5 +252,15 @@ public class UserService implements InterfaceUserService {
 
         userRepository.deleteById(userID);
         log.info("✅ ⛔️ UserService.userRepository.deleteById [" + user.getUsername() + "] 완료 ️⛔️");
+    }
+
+    @Override
+    public UserDto userRoleUpdateRequest(UserRoleUpdateRequest userRoleUpdateRequest) {
+
+        User user = userRepository.findById(userRoleUpdateRequest.userId())
+            .orElseThrow(() -> new UserNotFoundException(userRoleUpdateRequest.userId()));
+        user.setRole(userRoleUpdateRequest.newRole());
+
+        return userMapper.toDto(user);
     }
 }

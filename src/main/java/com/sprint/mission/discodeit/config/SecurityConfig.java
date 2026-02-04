@@ -94,8 +94,9 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
                 // 그 외 모든 요청은 인증 필요
                 .requestMatchers("/h2-console/**", "/session-expired").permitAll()
+                .requestMatchers("/api/users/**").hasRole("USER")
 //                // 그 외 모든 /api/** 요청은 인증 필요
-                .requestMatchers("/api/**").authenticated()
+//                .requestMatchers("/api/**").authenticated()
                 // 나머지 요청은 모두 허용 (SPA 라우팅 대응)
 //                .anyRequest().permitAll()
                 // 그 외 모든 요청은 인증 필요

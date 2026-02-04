@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -29,6 +31,10 @@ public class User extends BaseUpdatableEntity {
 
     @Column(nullable = false, length = 60)
     private String password;
+
+    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
 
     @OneToOne(fetch = FetchType.LAZY) // (orphanRemoval = false) // ON DELETE SET NULL
     @JoinColumn(name = "profile_id", nullable = true)

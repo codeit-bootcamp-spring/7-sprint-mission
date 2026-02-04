@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.mapper.dto;
 
+import com.sprint.mission.discodeit.entity.Role;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -9,6 +10,7 @@ public record UserDto( //all private final
     String username,
     String email,
     BinaryContentDto profile,
-    Boolean online
+    Boolean online,
+    Role role
 ){
 }

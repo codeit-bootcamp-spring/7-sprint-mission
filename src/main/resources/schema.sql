@@ -39,6 +39,7 @@ CREATE TABLE users(
 	email varchar(100) NOT NULL,
 	PASSWORD varchar(60) NOT NULL,
 	profile_id UUID,
+    role varchar(20) NOT NULL
 	CONSTRAINT users_pk PRIMARY KEY (id),
 	CONSTRAINT users_username_uk UNIQUE (username),
 	CONSTRAINT users_email_uk UNIQUE (email),
@@ -46,8 +47,11 @@ CREATE TABLE users(
 	CONSTRAINT users_profile_id_fk FOREIGN KEY (profile_id) REFERENCES public.binary_contents(id) ON DELETE SET NULL
 );
 
+ALTER TABLE users
+    ADD role varchar(20) NOT NULL;
 
 DROP TABLE users;
+
 
 
 CREATE TABLE user_statuses(
@@ -126,6 +130,9 @@ DROP TABLE message_attachments;
 
 
 
+
+
+
 ---- ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅
 TRUNCATE TABLE binary_contents;
 TRUNCATE TABLE users;
@@ -158,5 +165,6 @@ DROP TABLE message_attachments;
 
 SELECT u.id, us.id FROM users u, user_statuses us ON u.id = us.user_id;
 SELECT * FROM user_statuses;
+
 
 \dt;
