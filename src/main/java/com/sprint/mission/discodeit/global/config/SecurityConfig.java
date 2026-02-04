@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.global.config;
 
+import com.sprint.mission.discodeit.global.config.security.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.global.config.security.handler.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.global.config.security.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.global.config.security.handler.LoginSuccessHandler;
 import com.sprint.mission.discodeit.global.config.security.handler.SpaCsrfTokenRequestHandler;
+import com.sprint.mission.discodeit.global.config.security.repository.JpaPersistentTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +32,8 @@ public class SecurityConfig {
     private final LoginFailureHandler loginFailureHandler;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final SessionRegistry sessionRegistry;
+    private final JpaPersistentTokenRepository persistentTokenRepository;
+    private final DiscodeitUserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -52,7 +56,8 @@ public class SecurityConfig {
                         .failureHandler(loginFailureHandler))
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
-                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT)))
+                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+                        .deleteCookies("JSESSIONID", "remember-me"))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
@@ -67,6 +72,15 @@ public class SecurityConfig {
                                 .maxSessionsPreventsLogin(false) // 새 로그인 시 이전 세션 만료, true: 새 로그인 시 차단
                                 .sessionRegistry(sessionRegistry)
                         )
+                )
+                .rememberMe(remember -> remember
+                        .key("test-key")
+                        .tokenRepository(persistentTokenRepository)
+                        .tokenValiditySeconds(60 * 60 * 24)
+                        .userDetailsService(userDetailsService)
+                        .rememberMeParameter("remember-me")
+                        .rememberMeCookieName("remember-me")
+                        .useSecureCookie(false)
                 );
 
         return http.build();
