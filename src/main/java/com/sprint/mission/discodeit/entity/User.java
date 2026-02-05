@@ -26,10 +26,6 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private BinaryContent profile;
 
-    @OneToOne(mappedBy = "user", orphanRemoval = true,
-            cascade = CascadeType.ALL, optional = false)
-    private UserStatus status;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role;
@@ -59,11 +55,7 @@ public class User extends BaseUpdatableEntity {
     public void updateProfile(BinaryContent profile) {
         this.profile = profile;
     }
-
-    public void updateStatus(UserStatus status) {
-        this.status = status;
-    }
-
+    
     public void updateRole(Role role) {
         this.role = role;
     }

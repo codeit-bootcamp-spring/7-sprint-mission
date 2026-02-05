@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.role.Role;
 import com.sprint.mission.discodeit.exception.binaryContent.FileOperationFailedException;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
@@ -15,6 +14,7 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     // 생성
     @Override
@@ -74,12 +76,10 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         newUser.updateProfile(profile);
-        UserStatus status = new UserStatus(newUser);
-        newUser.updateStatus(status);
 
         userRepository.save(newUser);
         log.info("회원가입 완료 - userId: {}", newUser.getId());
-        return userMapper.toDto(newUser);
+        return userMapper.toDto(newUser, false);
     }
 
     private BinaryContent saveProfileImage(MultipartFile profileImage) {
@@ -111,15 +111,21 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
-        return userMapper.toDto(user);
+        boolean isOnline = authService.isOnline(userId);
+        return userMapper.toDto(user, isOnline);
     }
 
     // 전체출력
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> findAllUsers() {
-        return userRepository.findAllWithProfileAndStatus().stream()
-                .map(userMapper::toDto).collect(Collectors.toList());
+
+        List<User> users = userRepository.findAll();
+        Set<UUID> onlineUserIds = authService.getOnlineUserIds();
+
+        return users.stream()
+                .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
+                .collect(Collectors.toList());
     }
 
     // --- 수정 ---
@@ -178,12 +184,14 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         log.info("유저 정보 수정 완료: {}", user.getId());
-        return userMapper.toDto(user);
+        boolean isOnline = authService.isOnline(userId);
+
+        return userMapper.toDto(user, isOnline);
     }
 
     @Override
     @Transactional
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
         User user = userRepository.findById(roleUpdateRequest.userId())
                 .orElseThrow(() -> new UserNotFoundException(roleUpdateRequest.userId()));
@@ -192,8 +200,12 @@ public class UserServiceImpl implements UserService {
 
         user.updateRole(roleUpdateRequest.newRole());
         userRepository.save(user);
+        authService.expireUserSession(user.getId());
+
         log.info("유저 {} 권한 변경: {} -> {}", user.getUsername(), oldRole ,roleUpdateRequest.newRole());
-        return userMapper.toDto(user);
+        boolean isOnline = authService.isOnline(user.getId());
+
+        return userMapper.toDto(user, isOnline);
     }
 
     // 삭제

@@ -19,15 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
                                      role varchar(20) NOT NULL
 );
 
-ALTER TABLE users ADD role varchar(20) NOT NULL Default 'USER';
------------------- user_statuses ---------------
-CREATE TABLE IF NOT EXISTS user_statuses (
-                                             id UUID PRIMARY KEY,
-                                             created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-                                             updated_at TIMESTAMP WITH TIME ZONE,
-                                             user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                                             last_active_at TIMESTAMP WITH TIME ZONE NOT NULL
-);
+-- ALTER TABLE users ADD role varchar(20) NOT NULL Default 'USER';
 
 -------------------- channels -------------------
 CREATE TABLE IF NOT EXISTS channels (

@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +19,6 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-    private final UserStatusService userStatusService;
 
     // 사용자 등록 (/users)
     // 200 반환
@@ -62,13 +58,5 @@ public class UserController {
             @RequestPart(value = "profile",  required = false) MultipartFile profileImage
     ) {
         return ResponseEntity.ok(userService.updateUserInfo(userId,userUpdateDto,profileImage));
-    }
-
-    // 사용자 온라인 상태 업데이트  (/users/userId/online)
-    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-    public ResponseEntity<UserStatusDto> onlineUpdate(
-            @PathVariable UUID userId,
-            @Valid @RequestBody UserStatusUpdateRequest updateDto) {
-        return ResponseEntity.ok(userStatusService.updateStatusByUserId(userId, updateDto));
     }
 }
