@@ -30,13 +30,18 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 20)
+    private UserRole role;
+
     protected User() {}
 
-    public User(String username, String password, String email, BinaryContent profile) {
+    public User(String username, String passwordHash, String email, BinaryContent profile, UserRole role) {
         this.username = Objects.requireNonNull(username);
-        this.password = Objects.requireNonNull(password);
+        setPasswordHash(Objects.requireNonNull(passwordHash));
         this.email = Objects.requireNonNull(email);
         this.profile = profile;
+        this.role = Objects.requireNonNull(role);
     }
 
     public void setUsername(String username) {
@@ -48,15 +53,18 @@ public class User extends BaseUpdatableEntity {
         }
     }
 
-    public void setPassword(String password) {
-        if(password.length() < 7 || password.length() > 50) {
+    public void setPasswordHash(String passwordHash) {
+        if (passwordHash == null) {
+            throw new InvalidUserRequestException("password is null");
+        }
+        boolean looksLikeBcrypt = passwordHash.startsWith("$2a$") || passwordHash.startsWith("$2b$") || passwordHash.startsWith("$2y$");
+        if (!looksLikeBcrypt || passwordHash.length() != 60) {
             throw new InvalidUserRequestException("password length must be between 7 and 50 characters");
         }
-        if (!password.equals(this.password)) {
-            this.password = password;
+        if (!passwordHash.equals(this.password)) {
+            this.password = passwordHash;
         }
     }
-
 
     public void setEmail(String email) {
         String s = email.trim();
@@ -74,13 +82,12 @@ public class User extends BaseUpdatableEntity {
         }
     }
 
-    public void update(String username, String password, String email) {
+    public void update(String username, String email) {
         if (username != null) setUsername(username);
-        if (password != null) setPassword(password);
         if (email != null) setEmail(email);
     }
 
-    public boolean passwordMatch(String password) {
-        return this.password.equals(password);
+    public void updateRole(UserRole role) {
+        this.role = Objects.requireNonNull(role);
     }
 }

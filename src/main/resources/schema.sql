@@ -16,6 +16,7 @@ CREATE TABLE users (
     email       VARCHAR(100)    NOT NULL UNIQUE,
     password    VARCHAR(60)     NOT NULL,
     profile_id  UUID	        UNIQUE,
+    role        VARCHAR(20)     NOT NULL,
 
     CONSTRAINT fk_users_profile
         FOREIGN KEY(profile_id)
