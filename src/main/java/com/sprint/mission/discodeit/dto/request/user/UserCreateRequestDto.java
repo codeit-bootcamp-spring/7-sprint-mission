@@ -10,7 +10,7 @@ public record UserCreateRequestDto(
         String username,
 
         @NotBlank(message = "비밀번호가 필요합니다.")
-        @Size(min = 4, max = 20)
+        @Size(min = 7, max = 50)
         String password,
 
         @NotBlank(message = "email이 필요합니다.")
