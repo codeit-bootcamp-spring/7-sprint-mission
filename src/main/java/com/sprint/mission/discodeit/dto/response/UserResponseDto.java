@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.response;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.enum_.Role;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -14,7 +15,8 @@ public record UserResponseDto(
     String username, // 유저 이름
     String email, // 이메일
     BinaryContentResponseDto profile,
-    Boolean online //온라인 상태
+    Boolean online, //온라인 상태
+    Role role
 ) {
 
 }

@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.CreateUserCommand;
-import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.update.UpdateUserCommand;
 import com.sprint.mission.discodeit.dto.update.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -16,7 +13,6 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
@@ -39,7 +35,6 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
-  private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
   private final BinaryContentStorage storage;
   private final PasswordEncoder passwordEncoder;

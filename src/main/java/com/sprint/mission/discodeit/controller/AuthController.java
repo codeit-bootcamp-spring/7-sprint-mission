@@ -1,20 +1,29 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.docs.AuthControllerDocs;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 @Slf4j
 public class AuthController implements AuthControllerDocs {
+
+  private final AuthService authService;
 
   @GetMapping("csrf-token")
   public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken) {
@@ -31,5 +40,13 @@ public class AuthController implements AuthControllerDocs {
 
     UserResponseDto userDto = userDetails.getUserDto();
     return ResponseEntity.ok(userDto);
+  }
+
+  @PutMapping("/role")
+  public ResponseEntity<UserResponseDto> updateUserRole(
+      @Valid @RequestBody RoleUpdateRequest request) {
+
+    UserResponseDto updateRoleUser = authService.updateUserRole(request);
+    return ResponseEntity.ok(updateRoleUser);
   }
 }

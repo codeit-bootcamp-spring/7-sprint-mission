@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 
-import com.sprint.mission.discodeit.dto.response.LoginResponseDto;
-import com.sprint.mission.discodeit.dto.request.LoginRequestDto;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.user.LoginNotMatchException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -16,20 +17,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
-
+  private final UserMapper userMapper;
 
   @Override
-  @Transactional(readOnly = true)
-  public LoginResponseDto login(LoginRequestDto request) {
-    String username = request.username();
-    String password = request.password();
+  @Transactional
+  public UserResponseDto updateUserRole(RoleUpdateRequest request) {
 
-    User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> new LoginNotMatchException());
+    User user = userRepository.findById(request.userId())
+        .orElseThrow(() -> new UserNotFoundException(request.userId()));
 
-    if (!user.getPassword().equals(password)) {
-      throw new LoginNotMatchException();
-    }
-    return LoginResponseDto.from(user);
+    user.updateRole(request.newRole());
+
+    User saved = userRepository.save(user);
+    return userMapper.toDto(saved);
   }
 }
