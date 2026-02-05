@@ -99,4 +99,22 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(status).body(body);
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException exception) {
+        ErrorCode code = ErrorCode.INVALID_REQUEST;
+        HttpStatus status = code.getStatus();
+
+        ErrorResponse body = ErrorResponse.from(
+                Instant.now(),
+                code,
+                code.getMessage(),
+                Map.of(),
+                exception.getClass().getSimpleName(),
+                status.value()
+        );
+
+        return ResponseEntity.status(status).body(body);
+    }
+
 }

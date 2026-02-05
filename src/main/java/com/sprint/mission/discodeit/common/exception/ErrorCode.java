@@ -44,6 +44,7 @@ public enum ErrorCode {
     AUTH_INVALID_REQUEST(HttpStatus.BAD_REQUEST,"로그인 요청이 올바르지 않습니다."),
     AUTH_USER_NOT_FOUND(HttpStatus.NOT_FOUND,"로그인 사용자를 찾을 수 없습니다."),
     AUTH_WRONG_PASSWORD(HttpStatus.BAD_REQUEST,"비밀번호가 올바르지 않습니다."),
+    AUTH_ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
 
     // common
     INVALID_REQUEST(HttpStatus.BAD_REQUEST,"요청이 올바르지 않습니다."),
