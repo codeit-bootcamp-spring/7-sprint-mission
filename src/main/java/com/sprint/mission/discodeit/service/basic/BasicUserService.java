@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.common.exception.user.InvalidUserRequestException;
 import com.sprint.mission.discodeit.common.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.dto.request.auth.UserRoleUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
@@ -17,6 +18,8 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapper userMapper;
     private final BinaryContentService binaryContentService;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
@@ -65,11 +69,14 @@ public class BasicUserService implements UserService {
             profile = binaryContentRepository.getReferenceById(binaryContentResponseDto.id());
         }
 
+        String hashedPassword = passwordEncoder.encode(userCreateRequestDto.password());
+
         User user = new User(
                 userCreateRequestDto.username(),
-                userCreateRequestDto.password(),
+                hashedPassword,
                 userCreateRequestDto.email(),
-                profile
+                profile,
+                UserRole.USER
         );
 
 
@@ -105,6 +112,7 @@ public class BasicUserService implements UserService {
                 .toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Override
     public UserResponseDto update(UUID userId, UserUpdateRequestDto userUpdateRequestDto,
@@ -147,7 +155,7 @@ public class BasicUserService implements UserService {
         }
 
         if(userUpdateRequestDto.newPassword() != null) {
-            user.setPassword(userUpdateRequestDto.newPassword());
+            user.setPasswordHash(passwordEncoder.encode(userUpdateRequestDto.newPassword()));
             log.debug("Updating user password: userId = {}", userId);
         }
 
@@ -238,5 +246,50 @@ public class BasicUserService implements UserService {
         return userStatusRepository.findByUserId(userId)
                 .map(status -> status.isOnlineNow())
                 .orElse(false);
+    }
+
+    @Override
+    public UserResponseDto getMe(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        Boolean online = userStatusRepository.findByUserId(userId)
+                .map(us -> us.isOnlineNow())
+                .orElse(false);
+        return  userMapper.toDto(user, online);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    @Override
+    public UserResponseDto updateRole(UserRoleUpdateRequestDto userRoleUpdateRequestDto) {
+        if (userRoleUpdateRequestDto == null) {
+            throw new InvalidUserRequestException("userRoleUpdateRequestDto is null");
+        }
+
+        if (userRoleUpdateRequestDto.newRole() == null) {
+            throw new InvalidUserRequestException("newRole is null");
+        }
+
+        if (userRoleUpdateRequestDto.userId() == null) {
+            throw new InvalidUserRequestException("userId is null");
+        }
+
+        UUID userId = userRoleUpdateRequestDto.userId();
+        UserRole newRole = userRoleUpdateRequestDto.newRole();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        if (user.getRole() == newRole) {
+            boolean online = isOnline(userId);
+            return userMapper.toDto(user, online);
+        }
+
+        user.updateRole(newRole);
+        User saved = userRepository.save(user);
+
+        boolean online = isOnline(saved.getId());
+
+        log.info("User role updated. userId = {}, newRole = {}",  saved.getId(), newRole);
+        return userMapper.toDto(saved, online);
     }
 }
