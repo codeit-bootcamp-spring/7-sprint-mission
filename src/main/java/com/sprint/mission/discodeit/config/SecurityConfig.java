@@ -95,6 +95,15 @@ public class SecurityConfig {
                         )
                         .sessionFixation().changeSessionId()
                 )
+
+                .rememberMe(rememberMe -> rememberMe
+                        .key("remember-me-key")
+                        .tokenValiditySeconds(60 * 60 * 24 * 7) // 7일
+                        .userDetailsService(userDetailsService)
+                        .rememberMeParameter("remember-me")
+                        .rememberMeCookieName("remember-me")
+                        .useSecureCookie(false)
+                )
         ;
 
         return http.build();
