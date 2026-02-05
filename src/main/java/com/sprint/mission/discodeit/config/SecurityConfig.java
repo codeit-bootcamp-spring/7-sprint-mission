@@ -22,8 +22,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+
+import javax.sql.DataSource;
 
 @Configuration
 @RequiredArgsConstructor
@@ -36,6 +40,7 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final DiscodeitUserDetailsService userDetailsService;
+    private final DataSource dataSource;
 
 
     @Bean
@@ -100,6 +105,7 @@ public class SecurityConfig {
                         .key("remember-me-key")
                         .tokenValiditySeconds(60 * 60 * 24 * 7) // 7일
                         .userDetailsService(userDetailsService)
+                        .tokenRepository(tokenRepository())
                         .rememberMeParameter("remember-me")
                         .rememberMeCookieName("remember-me")
                         .useSecureCookie(false)
@@ -135,5 +141,13 @@ public class SecurityConfig {
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();
+    }
+
+    // Spring 제공 JDBC기반 토큰 저장소
+    @Bean
+    public PersistentTokenRepository tokenRepository() {
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(dataSource);
+        return jdbcTokenRepository;
     }
 }
