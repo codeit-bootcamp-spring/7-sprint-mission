@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateCommand;
 import com.sprint.mission.discodeit.dto.user.UserUpdateParams;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.type.Role;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserDuplicateException;
@@ -56,7 +57,7 @@ public class BasicUserService implements UserService {
                 userSignupCommand.email(),
                 encodedPassword,
                 binaryContentReference,
-                "USER"
+                Role.USER
         );
 
         // NOTE: user객체 생성후 userStatus도 넣어서 cascade 영향으로 같이 insert되도록
