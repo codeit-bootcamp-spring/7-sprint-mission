@@ -38,4 +38,19 @@ public class UserMapperManual {
         );
     }
 
+    public UserResponseDto toAuthDto(User user) {
+        if (user == null) return null;
+
+        return new UserResponseDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                null,
+                null,
+                user.getRole(),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
+    }
+
 }
