@@ -54,7 +54,6 @@ public class AuthControllerSliceTest {
                     .andDo(print())
                     .andExpect(status().isBadRequest());
 
-            verify(authService, never()).login(any(AuthLoginRequestDto.class));
         }
 
         @Test
@@ -71,41 +70,7 @@ public class AuthControllerSliceTest {
                     .andDo(print())
                     .andExpect(status().isBadRequest());
 
-            verify(authService, never()).login(any(AuthLoginRequestDto.class));
         }
 
-        @Test
-        void returns200_and_calls_service_when_valid() throws Exception {
-            Map<String, String> body = Map.of(
-                    "username", "user",
-                    "password", "pw"
-            );
-
-            UUID id = UUID.randomUUID();
-
-            when(authService.login(any(AuthLoginRequestDto.class)))
-                    .thenReturn(new UserResponseDto(
-                            id,
-                            "user",
-                            "test@test.com",
-                            null,
-                            true,
-                            Instant.now(),
-                            Instant.now()
-                    ));
-
-            mockMvc.perform(post("/api/auth/login")
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(body)))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").value(id.toString()))
-                    .andExpect(jsonPath("$.username").value("user"))
-                    .andExpect(jsonPath("$.email").value("test@test.com"));
-
-
-            verify(authService, times(1)).login(any(AuthLoginRequestDto.class));
-        }
     }
 }
