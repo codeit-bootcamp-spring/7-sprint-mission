@@ -132,6 +132,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize("#userId == authentication.principal.id")
     public UserDto updateUserInfo(UUID userId, UserUpdateRequest updateDto, MultipartFile profileImage) {
 
         log.debug("회원 정보 수정 요청 - userId: {}", userId);
@@ -193,6 +194,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
+
         User user = userRepository.findById(roleUpdateRequest.userId())
                 .orElseThrow(() -> new UserNotFoundException(roleUpdateRequest.userId()));
 
@@ -211,6 +213,7 @@ public class UserServiceImpl implements UserService {
     // 삭제
     @Override
     @Transactional
+    @PreAuthorize("#userId == authentication.principal.id")
     public void deleteUser(UUID userId) {
 
         log.info("유저 삭제 요청: {}", userId);
