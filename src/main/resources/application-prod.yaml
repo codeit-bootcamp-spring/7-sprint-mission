@@ -15,6 +15,7 @@ logging:
   level:
     com.sprint.mission.discodeit: info
     org.hibernate.SQL: info
+    org.com.codeit.security: DEBUG
 
 management:
   endpoint:
