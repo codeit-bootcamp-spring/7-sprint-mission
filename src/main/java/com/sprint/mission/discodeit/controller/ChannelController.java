@@ -40,13 +40,6 @@ public class ChannelController {
                                      @PathVariable("channelId") UUID channelId) {
         return channelService.update(channelId, requestDto);
     }
-/*
-    @RequestMapping(value = "/{channelId}", method = RequestMethod.GET)
-    public ChannelResponseDto get(@PathVariable("channelId") UUID channelId) {
-        return channelService.get(channelId);
-    }
-
- */
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
@@ -59,19 +52,4 @@ public class ChannelController {
             @RequestParam(name = "userId") UUID userId) {
         return channelService.getAllByUserId(userId);
     }
-
-    /*
-    @RequestMapping(value = "/{channelId}/join", method = RequestMethod.POST)
-    public void join(@PathVariable("channelId") UUID channelId,
-                     @RequestParam("userId") UUID userId) {
-        channelService.join(channelId, userId);
-    }
-
-    @RequestMapping(value = "{channelId}/leave", method = RequestMethod.POST)
-    public void leave(@PathVariable("channelId") UUID channelId,
-                      @RequestParam("userId") UUID userId) {
-        channelService.leave(channelId, userId);
-    }
-
-     */
 }
