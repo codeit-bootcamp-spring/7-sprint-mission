@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
 import com.sprint.mission.discodeit.security.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.LoginSuccessHandler;
 import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
@@ -43,13 +44,26 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
         http.authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                                .requestMatchers("/", "/api/auth/login").permitAll()
-                                .anyRequest().permitAll()
+
+                                .requestMatchers(    "/",
+                                        "/index.html",
+                                        "/favicon.ico",
+                                        "/assets/**",
+                                        "/error",
+                                        "/.well-known/**",
+                                        "/api/auth/login",
+                                        "/api/auth/csrf-token",
+                                        "/api/auth/logout",
+                                        "/swagger-ui.html",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/h2-console/**").permitAll()
+                                .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/h2-console/**")// H2는 CSRF 검증 제외
@@ -67,6 +81,9 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
                 )
         ;
 
