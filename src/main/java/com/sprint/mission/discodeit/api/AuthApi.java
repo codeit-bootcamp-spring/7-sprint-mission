@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.api;
 
+import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,4 +18,6 @@ public interface AuthApi {
     ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken);
 
     ResponseEntity<Map<String, Object>> getSessionInfo(HttpSession session);
+
+    ResponseEntity<UserResponseDto> updateUserRole(RoleUpdateRequest request);
 }

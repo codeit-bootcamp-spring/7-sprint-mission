@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.entity.type.Role;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,6 +34,10 @@ public class DiscodeitUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return userResponseDto.username();
+    }
+
+    public Role getRole() {
+        return userResponseDto.role();
     }
 
     @Override

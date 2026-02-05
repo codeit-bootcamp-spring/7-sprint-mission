@@ -64,6 +64,14 @@ public class User extends BaseUpdatableEntity {
 
     }
 
+    public boolean updateRole(Role role) {
+        if (role != null) {
+            this.role = role;
+            return true;
+        }
+        return false;
+    }
+
     private boolean updateProfile(BinaryContent profile) {
         if (profile != null) {
             this.profile = profile;
