@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -67,6 +67,7 @@ public class SecurityConfig {
                 .requestMatchers("/api-docs.html", "/swagger-ui/**", "/swagger-ui.html",
                     "/v3/api-docs/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/", "/*.html", "/*.css", "/*.js", "/assets/**").permitAll()
                 .anyRequest().authenticated()
         );
 
