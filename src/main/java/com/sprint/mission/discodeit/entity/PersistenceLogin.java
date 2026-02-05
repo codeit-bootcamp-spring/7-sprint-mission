@@ -41,11 +41,12 @@ public class PersistenceLogin {
         return Base64.getEncoder().encodeToString(randomBytes);
     }
 
-    public PersistenceLogin(UUID userId){
+    public PersistenceLogin(UUID userId,String token){
         this.series = UUID.randomUUID().toString();
         this.userId = userId;
-        this.token = generateToken();
+        this.token = token;
         this.lastUsed = Instant.now();
 
     }
+
 }

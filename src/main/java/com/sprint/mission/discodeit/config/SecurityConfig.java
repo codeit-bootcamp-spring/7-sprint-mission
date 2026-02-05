@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -59,6 +60,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/users").permitAll()
                         .requestMatchers("/api/auth/csrf-token").permitAll()
                         .requestMatchers("/api/auth/logout").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
@@ -85,6 +87,8 @@ public class SecurityConfig {
                         .tokenRepository(tokenRepository)
                         .tokenValiditySeconds(60*60*24*14)
                         .userDetailsService(userDetailsService)
+                        .rememberMeCookieName("remember-me")
+                        .rememberMeParameter("remember-me")
                         .useSecureCookie(false)
 
                 )

@@ -11,7 +11,6 @@ spring:
     password:
     driver-class-name: org.h2.Driver
   jpa:
-    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
     properties:
@@ -19,6 +18,7 @@ spring:
         show_sql: true
         format_sql: true
     open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
   boot:
     admin:
       client:

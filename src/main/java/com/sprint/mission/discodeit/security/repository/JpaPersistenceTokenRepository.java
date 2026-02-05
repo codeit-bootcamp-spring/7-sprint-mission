@@ -21,7 +21,12 @@ public class JpaPersistenceTokenRepository implements PersistentTokenRepository 
 
     @Override
     public void createNewToken(PersistentRememberMeToken token) {
-        PersistenceLogin entity = new PersistenceLogin(UUID.fromString(token.getUsername()));
+        log.info("token id {}", token.getUsername());
+
+        PersistenceLogin entity = new PersistenceLogin(
+                UUID.fromString(token.getUsername()),
+                        token.getTokenValue()
+                );
         repository.save(entity);
     }
 
