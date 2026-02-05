@@ -25,6 +25,12 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             + "WHERE m.channel.id = :channelId "
             + "ORDER BY m.createdAt DESC ")
     List<Message> findLatestByChannelId(UUID channelId);
+
+    // jpql은 exist를 지원하지 않음. 대체: count(m) > 0
+    @Query(value = "SELECT COUNT(m) > 0 FROM Message m " +
+            "WHERE m.id = :messageId " +
+            "AND m.author.id = :authorId ")
+    boolean existsByIdAndAuthorId(UUID messageId, UUID authorId);
 }
 
 // Page<T>

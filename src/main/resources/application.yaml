@@ -34,6 +34,9 @@ discodeit:
     admin-name: ${ADMIN_NAME:admin}
     admin-pass: ${ADMIN_PASS:admin}
 
+  remember-me:
+    key: ${REMEMBER_ME_KEY:test-key}
+
 
 
 springdoc:

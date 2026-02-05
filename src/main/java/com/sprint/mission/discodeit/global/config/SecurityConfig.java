@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.global.config.security.handler.LoginSuccessH
 import com.sprint.mission.discodeit.global.config.security.handler.SpaCsrfTokenRequestHandler;
 import com.sprint.mission.discodeit.global.config.security.repository.JpaPersistentTokenRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -34,6 +35,9 @@ public class SecurityConfig {
     private final SessionRegistry sessionRegistry;
     private final JpaPersistentTokenRepository persistentTokenRepository;
     private final DiscodeitUserDetailsService userDetailsService;
+
+    @Value("${discodeit.remember-me.key}")
+    private String rememberMeKey;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -74,7 +78,7 @@ public class SecurityConfig {
                         )
                 )
                 .rememberMe(remember -> remember
-                        .key("test-key")
+                        .key(rememberMeKey)
                         .tokenRepository(persistentTokenRepository)
                         .tokenValiditySeconds(60 * 60 * 24)
                         .userDetailsService(userDetailsService)

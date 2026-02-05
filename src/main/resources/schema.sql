@@ -113,16 +113,14 @@ ALTER TABLE users
 
 CREATE TABLE persistent_logins
 (
-    series    varchar(64) NOT NULL,
-    username  varchar(64) NOT NULL,
-    token     varchar(64) NOT NULL,
-    last_used timestamp with time zone   NOT NULL,
+    series    varchar(64)              NOT NULL,
+    username  varchar(64)              NOT NULL,
+    token     varchar(64)              NOT NULL,
+    last_used timestamp with time zone NOT NULL,
     CONSTRAINT pk_persistent_logins PRIMARY KEY (series)
 );
 
 -- 성능 최적화: username으로 조회 가능
 -- 사용자의 모든 Remember-Me 토큰 조회 시 사용
 CREATE INDEX IF NOT EXISTS idx_persistent_logins_username
-    ON persistent_logins(username);
-
-drop table persistent_logins;
+    ON persistent_logins (username);
