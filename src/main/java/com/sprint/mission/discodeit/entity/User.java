@@ -31,7 +31,6 @@ public class User extends BaseUpdatableEntity {
     private UserStatus status;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 20)
     private UserRole role;
 
     protected User() {}
