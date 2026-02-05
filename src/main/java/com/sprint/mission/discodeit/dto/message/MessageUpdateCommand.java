@@ -10,7 +10,7 @@ public record MessageUpdateCommand(
     public static MessageUpdateCommand from(MessageUpdateRequestDto requestDto, UUID messageId) {
         return new MessageUpdateCommand(
                 messageId,
-                requestDto.content()
+                requestDto.newContent()
         );
     }
 }

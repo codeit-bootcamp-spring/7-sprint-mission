@@ -5,6 +5,6 @@ import lombok.Builder;
 
 @Builder
 public record MessageUpdateRequestDto(
-        @NotBlank String content
+        @NotBlank String newContent
 ) {
 }
