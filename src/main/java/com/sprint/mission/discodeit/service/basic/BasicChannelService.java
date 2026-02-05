@@ -21,6 +21,7 @@ import com.sprint.mission.discodeit.service.reader.ChannelReader;
 import com.sprint.mission.discodeit.service.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,10 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize("""
+                   (#command.type() == T(com.sprint.mission.discodeit.entity.type.ChannelType).PUBLIC)
+                   ? hasRole('CHANNEL_MANAGER') : true
+                   """)
     public ChannelResponseDto createChannel(ChannelCreateCommand command) {
 
         log.info("채널 생성 시도 type={} title={} members={}",
