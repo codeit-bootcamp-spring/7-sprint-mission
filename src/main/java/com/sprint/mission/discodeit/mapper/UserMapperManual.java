@@ -32,6 +32,7 @@ public class UserMapperManual {
                 user.getEmail(),
                 binaryContentResponseDto,
                 userActiveStatus == UserActiveStatus.ONLINE,
+                user.getRole(),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );

@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.security.LoginFailureHandler;
+import com.sprint.mission.discodeit.security.LoginSuccessHandler;
 import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +16,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginFailureHandler loginFailureHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -48,7 +55,11 @@ public class SecurityConfig {
                 .headers(headers ->
                         headers.frameOptions(frameOptions -> frameOptions.sameOrigin()) // 클릭재킹 거부(iframe) 같은 주소를 가진 프레임(iframe) 주소라면 허용, 이건 기본 서버사이드 일때 h2화면인 iframe으로 되어있어서 허용할려고하느거고 실제 분리된 프론트에선 피료없음
                 )
-//                .formLogin(Customizer.withDefaults())
+                .formLogin(login -> login
+                        .loginProcessingUrl("/api/auth/login")
+                        .successHandler(loginSuccessHandler)
+                        .failureHandler(loginFailureHandler)
+                )
         ;
 
         return http.build();

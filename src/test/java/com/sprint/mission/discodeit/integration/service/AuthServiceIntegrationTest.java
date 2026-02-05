@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.integration.service;
 
-import com.sprint.mission.discodeit.dto.auth.AuthLoginRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.auth.AuthInvalidCredentialsException;

@@ -11,6 +11,7 @@ public record UserResponseDto(
         String email,
         BinaryContentResponseDto profile,
         Boolean online,
+        String role,
         Instant createdAt,
         Instant updatedAt
 ) {

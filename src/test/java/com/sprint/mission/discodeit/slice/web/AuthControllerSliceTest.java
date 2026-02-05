@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.slice.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.config.SecurityConfig;
 import com.sprint.mission.discodeit.controller.AuthController;
-import com.sprint.mission.discodeit.dto.auth.AuthLoginRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.service.AuthService;
 import org.junit.jupiter.api.Nested;

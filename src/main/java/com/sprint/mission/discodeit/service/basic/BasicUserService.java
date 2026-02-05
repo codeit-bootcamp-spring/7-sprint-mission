@@ -55,7 +55,8 @@ public class BasicUserService implements UserService {
         User newUser = User.create(userSignupCommand.username(),
                 userSignupCommand.email(),
                 encodedPassword,
-                binaryContentReference
+                binaryContentReference,
+                "USER"
         );
 
         // NOTE: user객체 생성후 userStatus도 넣어서 cascade 영향으로 같이 insert되도록
