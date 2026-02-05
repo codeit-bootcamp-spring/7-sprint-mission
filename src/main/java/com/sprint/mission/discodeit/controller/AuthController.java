@@ -27,7 +27,6 @@ public class AuthController implements AuthApi {
     @Override
     @GetMapping("/me")
     public ResponseEntity<UserResponseDto> getMe(@AuthenticationPrincipal DiscodeitUserDetails principal) {
-        System.out.println("principal = " + principal.getUserResponseDto());
         UUID id = principal.getUserResponseDto().id();
         UserResponseDto userResponseDto = userService.getUserById(id);
         return ResponseEntity.ok(userResponseDto);

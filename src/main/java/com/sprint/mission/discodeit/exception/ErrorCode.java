@@ -11,6 +11,7 @@ public enum ErrorCode {
     CONFLICT("이미 존재합니다.", HttpStatus.CONFLICT, "CM-003"),
     INVALID_STATE("요청을 처리할 수 없는 상태입니다.", HttpStatus.CONFLICT, "CM-004"),
     INTERNAL_SERVER_ERROR("", HttpStatus.INTERNAL_SERVER_ERROR, "CM-005"),
+    UNAUTHORIZED("인증 실패하였습니다.", HttpStatus.UNAUTHORIZED, "CM-006"),
 
     // User
     USER_NOT_FOUND("유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND, "U-001"),
