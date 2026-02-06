@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 // 권한 부족 처리 -> 로그인은 했지만, 관리자 페이지에 일반 유저가 접근하는 등의 행동을 했을 때 실행.
-public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler { //⭐️ .requestMatchers.hasRole 검사
 
     @Override
     public void handle(HttpServletRequest request,
@@ -36,7 +36,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                 {
                   "status": 403,
                   "error": "FORBIDDEN",
-                  "message": "권한이 없습니다."
+                  "message": "🚨권한이 없습니다. - 403 FORBIDDEN"
                 }
             """);
         } else {

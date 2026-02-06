@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -54,7 +55,7 @@ public class SecurityConfig {
     // RoleHierarchy를 매개변수로 선언하면 filterChain에서 권한 계층이 적용됩니다. (빈은 사전에 등록되어있어야 합니다.)
     public SecurityFilterChain filterChain(HttpSecurity http,
                                             RoleHierarchy roleHierarchy,
-                                           CustomAccessDeniedHandler accessDeniedHandler,
+                                           CustomAccessDeniedHandler accessDeniedHandler, //⭐️ hasRole 검사
                                            CustomAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
         http
@@ -99,7 +100,7 @@ public class SecurityConfig {
 //                .requestMatchers("/api/auth/**").permitAll()
 //                // Swagger UI 및 API 문서 허용
 //                // 그 외 모든 요청은 인증 필요
-//                .requestMatchers("/api/users/**").hasRole("USER")
+                .requestMatchers("/api/users/**").hasRole("USER")  //⭐️ AccessDeniedHandler 에서 검사
 ////                // 그 외 모든 /api/** 요청은 인증 필요
 ////                .requestMatchers("/api/**").authenticated()
 //                // 나머지 요청은 모두 허용 (SPA 라우팅 대응)

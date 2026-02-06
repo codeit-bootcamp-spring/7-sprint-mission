@@ -4,6 +4,7 @@ import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -13,6 +14,27 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @ResponseBody
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    //⭐️ @preAuthorize("hasRole('')") 검사
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(
+        AuthorizationDeniedException e
+    ) {
+        log.debug("🚨AuthorizationDeniedException: @preAuthorize(\"hasRole('')\") 검사 : " + e.getMessage(), e);
+
+        ErrorResponse response = new ErrorResponse(
+            Instant.now(),
+            "🚨FORBIDDEN",
+            "🚨 " + e.getMessage(),
+            null,
+            AuthorizationDeniedException.class.getSimpleName(),
+            HttpStatus.FORBIDDEN.value()
+        );
+
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(response);
+    }
 
     // @Valid 유효성 검사 실패시. 인가-권한적용 실패시 403 응답을 반환하세요
     @ExceptionHandler(MethodArgumentNotValidException.class)
