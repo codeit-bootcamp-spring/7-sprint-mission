@@ -7,13 +7,10 @@ import com.sprint.mission.discodeit.mapper.dto.UserStatusDto;
 import com.sprint.mission.discodeit.service.InterfaceBinaryContentService;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import com.sprint.mission.discodeit.service.InterfaceUserStatusService;
-import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import com.sprint.mission.discodeit.swaggerDocs.UserDoc;
 import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
-import com.sprint.mission.discodeit.service.basic.UserService;
-import com.sprint.mission.discodeit.service.basic.UserStatusService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,7 +40,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController implements UserDoc {
     private final InterfaceUserService userService;
     private final InterfaceBinaryContentService binaryContentService;
-    private final InterfaceUserStatusService userStatusService;
     private final UserMapper userMapper;
 
     //!! @Valid 검증 == dependencies 'spring-boot-starter-validation'
@@ -94,29 +91,5 @@ public class UserController implements UserDoc {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(resUser);
-    }
-
-    @PatchMapping("/{userId}/userStatus")
-    public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
-        @PathVariable("userId") UUID userId,
-        @Valid @RequestBody UserStatusUpdateRequest lastActiveAtRequest) {
-
-        //💎User 온라인 상태 업데이트
-        UserStatusDto userStatusDto = userStatusService.updateUserStatus(userId, lastActiveAtRequest.newLastActiveAt());
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(userStatusDto);
-    }
-
-    @PutMapping("/role")
-    public ResponseEntity<UserDto> roleUpdateRequest( @Valid @RequestBody UserRoleUpdateRequest userRoleUpdateRequest
-        ) {
-
-        UserDto userDto =  userService.userRoleUpdateRequest(userRoleUpdateRequest);
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(userDto);
     }
 }

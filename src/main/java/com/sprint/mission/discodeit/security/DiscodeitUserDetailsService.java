@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;

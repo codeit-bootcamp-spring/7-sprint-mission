@@ -253,14 +253,4 @@ public class UserService implements InterfaceUserService {
         userRepository.deleteById(userID);
         log.info("✅ ⛔️ UserService.userRepository.deleteById [" + user.getUsername() + "] 완료 ️⛔️");
     }
-
-    @Override
-    public UserDto userRoleUpdateRequest(UserRoleUpdateRequest userRoleUpdateRequest) {
-
-        User user = userRepository.findById(userRoleUpdateRequest.userId())
-            .orElseThrow(() -> new UserNotFoundException(userRoleUpdateRequest.userId()));
-        user.setRole(userRoleUpdateRequest.newRole());
-
-        return userMapper.toDto(user);
-    }
 }

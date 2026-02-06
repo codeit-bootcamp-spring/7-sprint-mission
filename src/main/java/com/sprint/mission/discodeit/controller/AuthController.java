@@ -1,14 +1,21 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.service.InterfaceAuthService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,9 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController { //  implements AuthDoc
 
-//    private final InterfaceAuthService authService;
+    private final InterfaceAuthService authService;
 
 //⭐️    CsrfToken 파라미터를 메서드 인자로 선언하면, HandlerMethodArgumentResolver를 통해 자동으로 주입됩니다. (공식문서)
 //⭐️    GET 요청에는 CSRF 인증이 이루어지지 않기 때문에 토큰이 초기화되지 않습니다. 따라서 명시적으로 메소드에서 토큰을 호출합니다.
@@ -48,7 +56,9 @@ public class AuthController { //  implements AuthDoc
 
         log.debug("✅ me : {}", userDto.username());
 
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userDto);
     }
 
 
@@ -72,4 +82,16 @@ public class AuthController { //  implements AuthDoc
 //            .status(HttpStatus.OK)
 //            .body(userDto);
 //    }
+
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/role")
+    public ResponseEntity<UserDto> roleUpdateRequest( @Valid @RequestBody UserRoleUpdateRequest userRoleUpdateRequest) {
+
+        UserDto userDto =  authService.userRoleUpdateRequest(userRoleUpdateRequest);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userDto);
+    }
 }

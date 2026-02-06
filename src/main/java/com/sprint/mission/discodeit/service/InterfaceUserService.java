@@ -18,5 +18,4 @@ public interface InterfaceUserService {
     List<UserDto> findAll();             // 모두 읽기
     UserDto update(UUID userId, UserUpdateRequest _userUpdateRequest, Optional<MultipartFile> profileFile); // 수정
     void delete(UUID userID);   // 삭제
-    UserDto userRoleUpdateRequest(UserRoleUpdateRequest userRoleUpdateRequest);
 }

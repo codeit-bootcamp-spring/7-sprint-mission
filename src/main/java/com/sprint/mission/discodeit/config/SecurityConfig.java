@@ -1,37 +1,22 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.security.CustomAccessDeniedHandler;
+import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
 import com.sprint.mission.discodeit.security.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.LoginSuccessHandler;
 import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
-import javax.swing.Spring;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.access.ExceptionTranslationFilter;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter;
-import org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter;
-import org.springframework.security.web.authentication.ui.DefaultResourcesFilter;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfFilter;
-import org.springframework.security.web.header.HeaderWriterFilter;
-import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
-import org.springframework.security.web.session.DisableEncodeUrlFilter;
 
 // DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters:
 // DisableEncodeUrlFilter,
@@ -54,22 +39,23 @@ import org.springframework.security.web.session.DisableEncodeUrlFilter;
 @Configuration
 //@EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
 
-//    👉 Spring Boot 3.x / Security 6 기준
-//    ✔ BCryptPasswordEncoder
-//    ✔ salt 자동 처리
-//    ✔ 같은 비밀번호여도 매번 다른 해시 생성
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    // RoleHierarchy를 매개변수로 선언하면 filterChain에서 권한 계층이 적용됩니다. (빈은 사전에 등록되어있어야 합니다.)
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                            RoleHierarchy roleHierarchy,
+                                           CustomAccessDeniedHandler accessDeniedHandler,
+                                           CustomAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
         http
             // ✅ CSRF 설정
@@ -82,25 +68,48 @@ public class SecurityConfig {
                     "/api/csrf", "/h2-console/**", "/api/auth/**"
                 )
             )
-
             // ✅ 인증/인가
+//            다음의 요청은 인증하지 않도록 설정하세요.
+//            Csrf Token 발급
+//            회원가입
+//            로그인
+//            로그아웃
+//            API가 아닌 요청(Swagger, Actuator 등)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/csrf-token", "/api/auth"
+                ).permitAll() // 토큰 발급용 엔드포인트는 로그인 없이 접근 가능
+
+                .requestMatchers("/actuator/**"
+                ).permitAll()
+
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"
+                ).permitAll()
+
+                .requestMatchers("/h2-console/**", "/session-expired"
+                ).permitAll()
+
                 // 정적 리소스 및 공통 경로 허용
-                .requestMatchers("/", "/index.html", "/static/**", "/assets/**", "/favicon.ico").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/users").permitAll() //!! 🛠️
-                // 인증/인가 관련 API 허용 (예시)
-                .requestMatchers("/api/auth/**").permitAll()
-                // Swagger UI 및 API 문서 허용
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
-                // 그 외 모든 요청은 인증 필요
-                .requestMatchers("/h2-console/**", "/session-expired").permitAll()
-                .requestMatchers("/api/users/**").hasRole("USER")
-//                // 그 외 모든 /api/** 요청은 인증 필요
-//                .requestMatchers("/api/**").authenticated()
-                // 나머지 요청은 모두 허용 (SPA 라우팅 대응)
-//                .anyRequest().permitAll()
-                // 그 외 모든 요청은 인증 필요
+                .requestMatchers("/", "/index.html", "/static/**", "/assets/**", "/favicon.ico"
+                ).permitAll()
+
+
+                .requestMatchers("/api/users/**").permitAll()
+//                .requestMatchers(HttpMethod.POST, "/api/users").permitAll() //!! 🛠️
+//                // 인증/인가 관련 API 허용 (예시)
+//                .requestMatchers("/api/auth/**").permitAll()
+//                // Swagger UI 및 API 문서 허용
+//                // 그 외 모든 요청은 인증 필요
+//                .requestMatchers("/api/users/**").hasRole("USER")
+////                // 그 외 모든 /api/** 요청은 인증 필요
+////                .requestMatchers("/api/**").authenticated()
+//                // 나머지 요청은 모두 허용 (SPA 라우팅 대응)
+////                .anyRequest().permitAll()
+//                // 그 외 모든 요청은 인증 필요
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(authenticationEntryPoint) // 인증
+                .accessDeniedHandler(accessDeniedHandler) // 인가
             )
 
 //            DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CsrfFilter, LogoutFilter,                                                                                                                                    RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter

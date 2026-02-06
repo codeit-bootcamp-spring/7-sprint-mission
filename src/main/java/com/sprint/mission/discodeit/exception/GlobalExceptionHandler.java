@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
 import java.time.Instant;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +12,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @ResponseBody
 @RestControllerAdvice
-public class ErrorExceptionHandler {
+public class GlobalExceptionHandler {
 
-    // @Valid 유효성 검사 실패시
+    // @Valid 유효성 검사 실패시. 인가-권한적용 실패시 403 응답을 반환하세요
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(e.getMessage(), e);
