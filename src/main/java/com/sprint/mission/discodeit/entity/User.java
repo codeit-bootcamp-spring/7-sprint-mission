@@ -30,8 +30,6 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
     private BinaryContent profile; // TODO: 아직 로직상 profileId로 쓰고있을수도잇으니 이부분 추후 요구사항의 Profile 객체로 변경
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserStatus userStatus; // 1:1 양방향
 
     @Builder
     private User(String nickname, String email, String password, BinaryContent profile, Role role) {
@@ -104,12 +102,5 @@ public class User extends BaseUpdatableEntity {
         }
         return false;
     }
-
-    // 편의 메서드 추가
-    public void initUserStatus() {
-        if (this.userStatus == null) {
-            this.userStatus = new UserStatus(this);
-        }
-    }
-
+    
 }

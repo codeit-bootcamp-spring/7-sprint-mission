@@ -63,8 +63,6 @@ public class BasicUserService implements UserService {
                 Role.USER
         );
 
-        // NOTE: user객체 생성후 userStatus도 넣어서 cascade 영향으로 같이 insert되도록
-        newUser.initUserStatus();
         User savedUser = userRepository.save(newUser);
 
         log.info("회원가입 완료 - userId={}, hasProfile={}", savedUser.getId(), profileBinaryId != null);
