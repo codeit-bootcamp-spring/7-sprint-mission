@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
-import com.sprint.mission.discodeit.security.LoginFailureHandler;
-import com.sprint.mission.discodeit.security.LoginSuccessHandler;
-import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
+import com.sprint.mission.discodeit.security.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -44,13 +41,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            CustomAuthenticationEntryPoint authenticationEntryPoint,
+            CustomAccessDeniedHandler accessDeniedHandler
+            ) throws Exception {
 
         http.authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
 
-                                .requestMatchers(    "/",
+                                .requestMatchers("/",
                                         "/index.html",
                                         "/favicon.ico",
                                         "/assets/**",
@@ -63,6 +64,9 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/h2-console/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/channels/public").hasRole("CHANNEL_MANAGER") // 웹 레벨(filter)에서 처리, 만약 서비스 유스케이스에 @PreAuthorize 쓰면 메서드보안 레벨이라 전역예외쪽으로 빠짐
+                                .requestMatchers(HttpMethod.PATCH,  "/api/channels/**").hasRole("CHANNEL_MANAGER")
+                                .requestMatchers(HttpMethod.DELETE,"/api/channels/**").hasRole("CHANNEL_MANAGER")
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf
@@ -84,6 +88,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
         ;
 

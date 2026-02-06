@@ -44,10 +44,6 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
-    @PreAuthorize("""
-                   (#command.type() == T(com.sprint.mission.discodeit.entity.type.ChannelType).PUBLIC)
-                   ? hasRole('CHANNEL_MANAGER') : true
-                   """)
     public ChannelResponseDto createChannel(ChannelCreateCommand command) {
 
         log.info("채널 생성 시도 type={} title={} members={}",

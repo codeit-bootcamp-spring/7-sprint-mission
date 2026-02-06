@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -19,31 +19,32 @@ import java.util.Map;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint { // NOTE: 인증되지 않고 접근시 처리를 위한 엔트리포인트
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        log.warn("인증되지 않은 요청이 보호된 리소스에 접근함 (AuthenticationEntryPoint)");
-        log.warn("Unauthorized access: method={}, uri={}",
-                request.getMethod(),
-                request.getRequestURI());
-        log.warn("메세지: {}", authException.getMessage());
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        String username = request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : "anonymous";
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        log.warn("Access Denied: User ={} attempted to access : method={}, uri={}",
+                username, request.getMethod(), request.getRequestURI());
+
+
         response.setContentType("application/json;charset=UTF-8");
-        ErrorCode code = ErrorCode.UNAUTHORIZED;
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        ErrorCode code = ErrorCode.FORBIDDEN;
 
         ErrorResponse body = new ErrorResponse(
                 Instant.now(),
                 code.getCode(),
                 code.getMessage(),
                 Map.of(),
-                CustomAuthenticationEntryPoint.class.getSimpleName(),
+                CustomAccessDeniedHandler.class.getSimpleName(),
                 code.getStatus().value()
         );
 
         objectMapper.writeValue(response.getWriter(), body);
+
     }
 }
