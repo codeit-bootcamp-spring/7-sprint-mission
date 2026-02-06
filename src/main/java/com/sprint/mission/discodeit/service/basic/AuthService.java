@@ -19,9 +19,14 @@ import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.InterfaceAuthService;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService implements InterfaceAuthService {
     private final UsersRepository userRepository;
     private final UserMapper userMapper;
+    private final SessionRegistry sessionRegistry;
 
 //    @Transactional(readOnly = true)
 //    @Override
@@ -58,9 +64,29 @@ public class AuthService implements InterfaceAuthService {
         User user = userRepository.findById(userRoleUpdateRequest.userId())
             .orElseThrow(() -> new UserNotFoundException(userRoleUpdateRequest.userId()));
 
-        user.setRole(userRoleUpdateRequest.newRole());
+        user.updateRole(userRoleUpdateRequest.newRole());
 
+        // 현재 로그인 중이라면 세션 무효화
+        expireUserSessions(user.getId());
 
         return userMapper.toDto(user);
+    }
+
+    private void expireUserSessions(UUID userId) {
+
+        for (Object principal : sessionRegistry.getAllPrincipals()) {
+
+            if (principal instanceof DiscodeitUserDetails userDetails) {
+                if (userDetails.getUser().id().equals(userId)) {
+
+                    List<SessionInformation> sessions =
+                        sessionRegistry.getAllSessions(principal, false);
+
+                    for (SessionInformation session : sessions) {
+                        session.expireNow();
+                    }
+                }
+            }
+        }
     }
 }

@@ -12,7 +12,6 @@ import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface InterfaceUserService {
-    void createAdminUser();
     UserDto create(UserCreateRequest userDt, Optional<MultipartFile> profileFile);
     UserDto find(UUID userID);      // 읽기
     List<UserDto> findAll();             // 모두 읽기

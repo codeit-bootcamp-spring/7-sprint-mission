@@ -17,7 +17,6 @@ import com.sprint.mission.discodeit.repository.jpa.UserStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
@@ -52,27 +51,6 @@ public class UserService implements InterfaceUserService {
 //    1. 생성자 주입(Constructor Injection) : 생성자가 1개만 있을 경우에 @Autowired를 생략 가능
 //    2. 필드 주입(Field Injection) : Setter 메서드를 사용
 //    3. 수정자 주입(Setter Injection) : 간단하지만 테스트 어려워서 지양
-
-    @Transactional
-    @Override
-    public void createAdminUser() {
-        boolean isAdmin = userRepository.existsByRole(Role.ADMIN);
-        if (!isAdmin) {
-
-            String password = "admin123";
-            String encodePassword = passwordEncoder.encode(password); //!! 🛠️
-
-            User newUser = new User("admin123",
-                "admin123@mail.com",
-                encodePassword,
-                null);
-
-            newUser.setRole(Role.ADMIN);
-            newUser.initUserStatus();
-
-            userRepository.save(newUser);
-        }
-    }
 
     //    @PreAuthorize("hasRole('USER')")
     @Transactional

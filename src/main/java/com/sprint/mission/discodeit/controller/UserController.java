@@ -60,7 +60,6 @@ public class UserController implements UserDoc {
         @RequestPart(value = "profile", required = false) MultipartFile file) {
 
         //💎User 등록
-        userService.createAdminUser();
         UserDto resUser = userService.create(dtoUser, Optional.ofNullable(file));
 
         return ResponseEntity
