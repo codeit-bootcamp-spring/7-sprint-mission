@@ -51,7 +51,7 @@ public class AuthService implements InterfaceAuthService {
 //        return userMapper.toDto(user);
 //    }
 
-    @Transactional(readOnly = true)
+    @Transactional
     @Override
     public UserDto userRoleUpdateRequest(UserRoleUpdateRequest userRoleUpdateRequest) {
 
@@ -59,6 +59,7 @@ public class AuthService implements InterfaceAuthService {
             .orElseThrow(() -> new UserNotFoundException(userRoleUpdateRequest.userId()));
 
         user.setRole(userRoleUpdateRequest.newRole());
+
 
         return userMapper.toDto(user);
     }

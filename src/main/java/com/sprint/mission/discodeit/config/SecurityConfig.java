@@ -11,11 +11,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -45,6 +47,7 @@ public class SecurityConfig {
 
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
+    private final SessionRegistry sessionRegistry;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -59,7 +62,7 @@ public class SecurityConfig {
                                            CustomAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
         http
-            // ✅ CSRF 설정
+            // ✅ CSRF 설정. 쿠키 쓸 경우  = 위조 링크 클릭 -> 쿠키 전달해서 -> 위조된 요청보내
             .csrf(csrf -> csrf
                 //디폴트 구현체 HttpSessionCsrfTokenRepository -> 구현체를 CookieCsrfTokenRepository로 설정
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -134,8 +137,28 @@ public class SecurityConfig {
             )
             .httpBasic(basic -> basic.disable())
 
-            // ✅ H2 콘솔용
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+            .headers(headers -> headers
+                // ✅ H2 콘솔용 = 같은 사이트에서 iframe을 사용하는 것을 허용해 달라.
+                .frameOptions(frame -> frame.sameOrigin())
+            )
+            .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) -> JWT는 세션 안씁니다.
+                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+//                    .invalidSessionUrl("/session-expired") // 세션 만료시 이동할 URL
+
+                    // 동시성 관련 설정은 이 블록 안에서 작성한다.
+                    .sessionConcurrency(concurrency -> concurrency
+                        .maximumSessions(1) // 한 사용자 당 최대 세션 수
+                        .maxSessionsPreventsLogin(false) // false: 새 로그인 시 이전 세션 만료, true: 이미 로그인 되어있다면 새 로그인 차단
+                        .sessionRegistry(sessionRegistry)
+//                        .expiredUrl("/session-expired")
+                    )
+
+                    .sessionFixation().changeSessionId() // 세션 ID만 변경하고 세션 객체는 그대로 유지
+//                        .sessionFixation().migrateSession() // 새 세션을 생성해서 기존 세션의 모든 속성을 복사 후 기존 세션 무효화
+//                        .sessionFixation().newSession() // 새 세션을 생성, 기존 데이터 유지되지 않음!
+//                        .sessionFixation().none() // 사용하지 마세요. 아무것도 안 합니다.
+            );
 
         return http.build();
     }

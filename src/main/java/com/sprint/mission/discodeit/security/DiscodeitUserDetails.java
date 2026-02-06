@@ -50,6 +50,8 @@ public class DiscodeitUserDetails implements UserDetails {
         return userDto;
     }
 
+    //⭐️ 동일한 계정으로 동시 로그인할 수 없도록 설정
+    //⭐️ 세션의 동일성을 보장하기 위해 DiscodeitUserDetails의 equals(), hashcode() 메소드를 오버라이딩하세요.
     /*
     크롬 로그인: User 객체 A (ID: user, 주소: 0x10)
     사파리 로그인: User 객체 B (ID: user 주소: 0x20)
