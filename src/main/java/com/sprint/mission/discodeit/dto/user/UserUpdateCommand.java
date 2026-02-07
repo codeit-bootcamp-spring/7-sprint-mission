@@ -20,7 +20,7 @@ public record UserUpdateCommand (
                 .map(BinaryContentUploadCommand::from);
         return new UserUpdateCommand(
                 id,
-                requestDto.newUserName(),
+                requestDto.newUsername(),
                 requestDto.newEmail(),
                 requestDto.newPassword(),
                 profile
