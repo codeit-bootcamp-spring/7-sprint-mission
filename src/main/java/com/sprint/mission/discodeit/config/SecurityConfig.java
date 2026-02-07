@@ -102,6 +102,8 @@ public class SecurityConfig {
                         )
                         .sessionFixation().changeSessionId() // 명시해놓기, 세션 Id만 변경하고 세션 객체는 그대로 유지
                 )
+                .rememberMe(remember -> remember
+                        .key("spring-mission-remember-me-key"))
         ;
 
         return http.build();
