@@ -81,6 +81,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize(" #userId == principal.userResponseDto.id ")
     public void deleteUser(UUID userId) {
         if (userId == null) { // NOTE: 서비스 레이어 public API라 컨트롤러 외 테스트, 배치, 이벤트 핸들러에서 요청 가능하므로 최소 필수 가드로 남김
             throw new DiscodeitException(ErrorCode.INVALID_INPUT);
@@ -95,6 +96,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize("#updateCommand.id() == principal.userResponseDto.id")
     public UserResponseDto updateUser(UserUpdateCommand updateCommand) {
         if (updateCommand.id() == null) { // NOTE: update 는 부분 변경이므로 userId만 가드, 나머지는 Null 허용으로 미변경 정책으로 봄
             // NOTE: 서비스 레이어 public API라 컨트롤러 외 테스트, 배치, 이벤트 핸들러에서 요청 가능하므로 최소 필수 가드로 남김

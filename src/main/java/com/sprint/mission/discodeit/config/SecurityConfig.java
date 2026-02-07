@@ -103,7 +103,11 @@ public class SecurityConfig {
                         .sessionFixation().changeSessionId() // 명시해놓기, 세션 Id만 변경하고 세션 객체는 그대로 유지
                 )
                 .rememberMe(remember -> remember
-                        .key("spring-mission-remember-me-key"))
+                        .key("spring-mission-remember-me-key")
+                        .tokenValiditySeconds(60 * 60 * 24 * 7) // 7일
+                        // NOTE: Customizer.withDefaults() 가 기본이라 다 설정되어있지만 바꿀려는부분만 이렇게 key, tokenValiditySeconds를 넣어준것, 저거 안넣어도 기본값으로 알아서 해주긴함
+                )
+
         ;
 
         return http.build();
