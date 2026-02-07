@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.enums.ChannelType;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.global.exception.discodietException.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.discodietException.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
@@ -110,8 +111,8 @@ class BasicChannelServiceTest {
         );
 
 
-        userResponseDto1 = new UserResponseDto(user1.getId(), user1.getUsername(), user1.getEmail(), null, true);
-        userResponseDto2 = new UserResponseDto(user2.getId(), user2.getUsername(), user2.getEmail(), null, true);
+        userResponseDto1 = new UserResponseDto(user1.getId(), user1.getUsername(), user1.getEmail(), null, true, Role.USER);
+        userResponseDto2 = new UserResponseDto(user2.getId(), user2.getUsername(), user2.getEmail(), null, true, Role.USER);
 
 
         privateChannelResponseDto = new ChannelResponseDto(

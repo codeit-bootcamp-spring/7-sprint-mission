@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResp
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.global.exception.ErrorResponseMapperImpl;
 import com.sprint.mission.discodeit.global.exception.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.global.exception.discodietException.message.MessageNotFoundException;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -37,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(MessageController.class)
 @Import({GlobalExceptionHandler.class, ErrorResponseMapperImpl.class})
+@AutoConfigureMockMvc(addFilters = false)
 @DisplayName("메세지 Controller 테스트")
 class MessageControllerTest {
     @Autowired
@@ -67,7 +70,7 @@ class MessageControllerTest {
             createMessageDto = new CreateMessageDto("content", userId, channelId);
 
             messageId = UUID.randomUUID();
-            author = new UserResponseDto(userId, "test", "test@codeit.com", null, true);
+            author = new UserResponseDto(userId, "test", "test@codeit.com", null, true, Role.USER);
             binaryContentId = UUID.randomUUID();
             attachment = new BinaryContentResponseDto(
                     binaryContentId,

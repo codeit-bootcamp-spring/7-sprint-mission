@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.enums.ChannelType;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.global.exception.ErrorResponseMapperImpl;
 import com.sprint.mission.discodeit.global.exception.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.global.exception.discodietException.channel.ChannelNotFoundException;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -39,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ChannelController.class)
 @Import({GlobalExceptionHandler.class, ErrorResponseMapperImpl.class})
+@AutoConfigureMockMvc(addFilters = false)
 @DisplayName("채널 Controller 테스트")
 class ChannelControllerTest {
     @Autowired
@@ -74,14 +77,16 @@ class ChannelControllerTest {
                 "test",
                 "test@codeit.com",
                 null,
-                true
+                true,
+                Role.USER
         );
         userResponseDto2 = new UserResponseDto(
                 userId2,
                 "test2",
                 "test2@codeit.com",
                 null,
-                true
+                true,
+                Role.USER
         );
 
         createPublicChannelDto = new CreatePublicChannelDto("test", "test_desc");
@@ -236,3 +241,4 @@ class ChannelControllerTest {
         }
     }
 }
+

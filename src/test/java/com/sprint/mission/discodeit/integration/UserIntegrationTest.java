@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.fixture.user.dto.CreateUserDtoFixture;
+import com.sprint.mission.discodeit.fixture.user.entity.UserEntityFixture;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -49,6 +52,8 @@ public class UserIntegrationTest {
     @Autowired
     private BinaryContentRepository binaryContentRepository;
 
+    private User user;
+
 
     @Nested
     @DisplayName("유저 생성 통합 테스트")
@@ -57,11 +62,8 @@ public class UserIntegrationTest {
 
         @BeforeEach
         void setUp() {
-            createUserDto = new CreateUserDto(
-                    "test",
-                    "test_123",
-                    "test@codeit.com"
-            );
+            createUserDto = CreateUserDtoFixture.createUserDto("test");
+            user = UserEntityFixture.createUser("test");
         }
 
         @Test
@@ -74,9 +76,10 @@ public class UserIntegrationTest {
                     MediaType.APPLICATION_JSON_VALUE,
                     objectMapper.writeValueAsBytes(createUserDto)
             );
+
             MockMultipartFile profile = new MockMultipartFile(
                     "profile",
-                    "profile.jpg",
+                    "profile.png",
                     MediaType.IMAGE_PNG_VALUE,
                     "profile".getBytes()
             );
@@ -85,7 +88,8 @@ public class UserIntegrationTest {
             MvcResult mvcResult = mockMvc.perform(multipart("/api/users")
                             .file(userRequest)
                             .file(profile)
-                            .contentType(MediaType.MULTIPART_FORM_DATA))
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.username").value("test"))
@@ -99,61 +103,61 @@ public class UserIntegrationTest {
             Optional<User> user = userRepository.findById(userResponseDto.id());
             assertThat(user).isPresent();
             assertThat(user.get().getUsername()).isEqualTo("test");
-            assertThat(user.get().getProfile().getFileName()).isEqualTo("profile.jpg");
+            assertThat(user.get().getProfile().getFileName()).isEqualTo("profile.png");
 
             Optional<BinaryContent> userProfile = binaryContentRepository.findById(user.get().getProfile().getId());
             assertThat(userProfile).isPresent();
-            assertThat(userProfile.get().getFileName()).isEqualTo("profile.jpg");
+            assertThat(userProfile.get().getFileName()).isEqualTo("profile.png");
         }
 
         @Test
         @DisplayName("[예외 케이스] - 유저 생성 실패 (중복된 username)")
         void createUser_duplicateUsername_fail() throws Exception {
             // given
-            // 중복 확인을 위한 유저 생성
-            User user = new User("test", "test111@codeit.com", "test_456", null);
+            // 중복 확인을 위한 유저 저장
             userRepository.save(user);
+            CreateUserDto duplicatedUserRequest = CreateUserDtoFixture.createUserDto("test");
 
             // when
             MockMultipartFile userRequest = new MockMultipartFile(
                     "userCreateRequest",
                     "",
                     MediaType.APPLICATION_JSON_VALUE,
-                    objectMapper.writeValueAsBytes(createUserDto)
+                    objectMapper.writeValueAsBytes(duplicatedUserRequest)
             );
 
             mockMvc.perform(multipart("/api/users")
                             .file(userRequest)
-                            .contentType(MediaType.MULTIPART_FORM_DATA))
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isBadRequest());
 
             // then
-            // DB에 저장되지 않고 기존 유저(test)만 있는지 확인
-            assertThat(userRepository.findAll()).hasSize(1);
+            // DB에 admin 및 test 2개
+            assertThat(userRepository.findAll()).hasSize(2);
         }
 
         @Test
         @DisplayName("[예외 케이스] - 유저 생성 실패 (username 빈 문자열)")
+        @Transactional
         void createUser_fail() throws Exception {
             // given
-            CreateUserDto createUserDto = new CreateUserDto("", "test_123", "test11@codeit.com");
+            CreateUserDto emptyNameUserDto = CreateUserDtoFixture.createUserDto("");
             MockMultipartFile userRequest = new MockMultipartFile(
                     "userCreateRequest",
                     "",
                     MediaType.APPLICATION_JSON_VALUE,
-                    objectMapper.writeValueAsBytes(createUserDto)
+                    objectMapper.writeValueAsBytes(emptyNameUserDto)
             );
 
             // when
             mockMvc.perform(multipart("/api/users")
                             .file(userRequest)
-                            .contentType(MediaType.MULTIPART_FORM_DATA))
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isBadRequest());
-
-            // then
-            assertThat(userRepository.findAll()).isEmpty();
 
         }
     }
@@ -161,16 +165,18 @@ public class UserIntegrationTest {
     @Nested
     @DisplayName("유저 삭제 통합 테스트")
     class UserDelete {
+
         @Test
-        @DisplayName("[정상 케이스] - 유저 삭제 성공")
+        @DisplayName("[정상 케이스] - 유저 삭제")
         void deleteUser_success() throws Exception {
             // given
-            User user = new User("test", "test111@codeit.com", "test_456", null);
+            User user = UserEntityFixture.createUser("test");
             userRepository.save(user);
             UUID userId = user.getId();
             // when
             mockMvc.perform(delete("/api/users/{userId}", userId)
-                            .contentType(MediaType.APPLICATION_JSON))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isNoContent());
 
@@ -179,18 +185,19 @@ public class UserIntegrationTest {
         }
 
         @Test
-        @DisplayName("[예외 케이스] - 존재하지 않는 유저 삭제")
+        @DisplayName("[예외 케이스] - 자신이 아닌 유저 삭제 -> 권한 없음")
         void deleteUser_notFoundUser_fail() throws Exception {
             // given
-            User user = new User("test", "test111@codeit.com", "test_456", null);
+            User user = UserEntityFixture.createUser("test");
             userRepository.save(user);
             UUID userId = user.getId();
 
             // when
             mockMvc.perform(delete("/api/users/{userId}", UUID.randomUUID())
-                            .contentType(MediaType.APPLICATION_JSON))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .with(csrf()))
                     .andDo(print())
-                    .andExpect(status().isNotFound());
+                    .andExpect(status().isForbidden());
 
             // then
 

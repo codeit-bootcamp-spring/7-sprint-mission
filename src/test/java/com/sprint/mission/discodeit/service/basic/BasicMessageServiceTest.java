@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.enums.ChannelType;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.global.exception.discodietException.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.discodietException.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
@@ -93,7 +94,8 @@ class BasicMessageServiceTest {
                 author.getUsername(),
                 author.getEmail(),
                 null,
-                true
+                true,
+                Role.USER
         );
         channel = Channel.builder()
                 .type(ChannelType.PUBLIC)
@@ -109,7 +111,7 @@ class BasicMessageServiceTest {
                 channelId
         );
 
-        userResponseDto = new UserResponseDto(authorId, author.getUsername(), author.getEmail(), null, true);
+        userResponseDto = new UserResponseDto(authorId, author.getUsername(), author.getEmail(), null, true, Role.USER);
     }
 
     @Nested

@@ -123,7 +123,6 @@ class UserRepositoryTest {
 
             result.forEach(user -> {
                 assertThat(user.getProfile()).isNotNull();
-                assertThat(user.getUserStatus()).isNotNull();
             });
 
         }
@@ -155,7 +154,6 @@ class UserRepositoryTest {
             // then
             assertThat(result).hasSize(1);
             assertThat(result.get(0).getProfile()).isNull();
-            assertThat(result.get(0).getUserStatus()).isNotNull();
         }
     }
 

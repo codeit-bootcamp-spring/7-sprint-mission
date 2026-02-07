@@ -200,7 +200,6 @@ class MessageRepositoryTest {
 
             result.getContent().forEach(message -> {
                 assertThat(message.getAuthor()).isNotNull();
-                assertThat(message.getAuthor().getUserStatus()).isNotNull();
                 assertThat(message.getAuthor().getProfile()).isNull();
                 assertThat(message.getAttachments()).isNotNull();
             });
@@ -232,7 +231,6 @@ class MessageRepositoryTest {
 
             result.getContent().forEach(message -> {
                 assertThat(message.getAuthor()).isNotNull();
-                assertThat(message.getAuthor().getUserStatus()).isNotNull();
                 assertThat(message.getAuthor().getProfile()).isNull();
                 assertThat(message.getAttachments()).isNotNull();
             });
@@ -265,7 +263,6 @@ class MessageRepositoryTest {
 
             result.getContent().forEach(message -> {
                 assertThat(message.getAuthor()).isNotNull();
-                assertThat(message.getAuthor().getUserStatus()).isNotNull();
                 assertThat(message.getAuthor().getProfile()).isNull();
                 assertThat(message.getAttachments()).isNotNull();
             });
