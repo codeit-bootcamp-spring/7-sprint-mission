@@ -29,3 +29,15 @@ logging:
         type:
           descriptor:
             sql: trace
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: ./build/tmp/test-storage
+
+app:
+  admin:
+    username: admin
+    email: a@a.a
+    password: 1234

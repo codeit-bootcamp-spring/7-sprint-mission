@@ -11,11 +11,13 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     // 이메일 중복 확인용
-    Optional<User> findByEmail(String email);
+    boolean existsByEmail(String email);
 
     // 닉네임 중복 확인용
-    Optional<User> findByUsername(String userName);
+    boolean existsByUsername(String userName);
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.profile")
     List<User> findAllWithProfile();
+
+    Optional<User> findByUsername(String username);
 }

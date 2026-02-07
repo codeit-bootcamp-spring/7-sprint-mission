@@ -53,15 +53,15 @@ public class UserServiceImpl implements UserService {
         String username = requestDto.username().trim();
 
         log.debug("회원가입 요청 - email: {}, username: {}", email, username);
-        userRepository.findByEmail(email).ifPresent(user
-                -> {
+        if (userRepository.existsByEmail(email)) {
             log.warn("회원가입 실패 - 중복된 이메일: {}", email);
-            throw new DuplicateEmailException(email); });
+            throw new DuplicateEmailException(email);
+        }
 
-        userRepository.findByUsername(username).ifPresent(user
-                -> {
+        if (userRepository.existsByUsername(username)) {
             log.warn("회원가입 실패 - 중복된 유저이름: {}", username);
-            throw new DuplicateNameException(username); });
+            throw new DuplicateNameException(username);
+        }
 
         BinaryContent profile = saveProfileImage(profileImage);
 
@@ -142,51 +142,62 @@ public class UserServiceImpl implements UserService {
                     return new UserNotFoundException(userId);
                 });
 
+        boolean isChanged = false;
+
         if (profileImage != null && !profileImage.isEmpty()) {
             // 기존 프로필사진 확인
             BinaryContent oldProfile = user.getProfile();
-            UUID oldProfileId = oldProfile != null ? user.getProfile().getId() : null;
             // 업데이트
             user.updateProfile(saveProfileImage(profileImage));
             // 기존 프로필 삭제
-            if (oldProfileId != null) {
-                binaryContentRepository.deleteById(oldProfileId);
+            if (oldProfile != null) {
+                binaryContentRepository.deleteById(oldProfile.getId());
             }
+            isChanged = true;
         }
 
         if (updateDto.newUsername() != null && !updateDto.newUsername().isBlank()) {
             String newUsername = updateDto.newUsername().trim();
 
-            userRepository.findByUsername(newUsername).ifPresent(existingUser -> {
-                if (!existingUser.getId().equals(user.getId())) {
+            if (!user.getUsername().equals(newUsername)) {
+                if (userRepository.existsByUsername(newUsername)) {
                     log.warn("유저 수정 실패 - 중복된 유저이름: {}", newUsername);
                     throw new DuplicateNameException(newUsername);
                 }
-            });
-            user.updateUsername(newUsername);
+
+                user.updateUsername(newUsername);
+                isChanged = true;
+            }
         }
 
         if (updateDto.newEmail() != null && !updateDto.newEmail().isBlank()) {
             String newEmail = updateDto.newEmail().replace(" ", "");
 
-            userRepository.findByEmail(newEmail).ifPresent(existingUser -> {
-                if (!existingUser.getId().equals(user.getId())) {
+            if (!user.getEmail().equals(newEmail)) {
+                if (userRepository.existsByEmail(newEmail)) {
                     log.warn("유저 수정 실패 - 중복된 이메일: {}", newEmail);
                     throw new DuplicateEmailException(newEmail);
                 }
-            });
-            user.updateEmail(newEmail);
+
+                user.updateEmail(newEmail);
+                isChanged = true;
+            }
         }
 
         if (updateDto.newPassword() != null && !updateDto.newPassword().isBlank()) {
-            String newPassword = passwordEncoder.encode(updateDto.newPassword());
-            user.updatePassword(newPassword);
+
+            if (!passwordEncoder.matches(updateDto.newPassword(), user.getPassword())) {
+                String newPassword = passwordEncoder.encode(updateDto.newPassword());
+                user.updatePassword(newPassword);
+                isChanged = true;
+            }
         }
 
-        userRepository.save(user);
-        log.info("유저 정보 수정 완료: {}", user.getId());
+        if (isChanged) {
+            userRepository.save(user);
+            log.info("유저 정보 수정 완료: {}", user.getId());
+        }
         boolean isOnline = authService.isOnline(userId);
-
         return userMapper.toDto(user, isOnline);
     }
 
@@ -204,7 +215,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         authService.expireUserSession(user.getId());
 
-        log.info("유저 {} 권한 변경: {} -> {}", user.getUsername(), oldRole ,roleUpdateRequest.newRole());
+        log.info("유저 {} 권한 변경: {} -> {}", user.getUsername(), oldRole, roleUpdateRequest.newRole());
         boolean isOnline = authService.isOnline(user.getId());
 
         return userMapper.toDto(user, isOnline);

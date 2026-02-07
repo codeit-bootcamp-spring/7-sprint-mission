@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.10'
 	id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'com.sprint.mission'
@@ -22,6 +23,42 @@ configurations {
 
 repositories {
 	mavenCentral()
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+    dependsOn test // 테스트가 끝나면 리포트 생성
+
+    reports {
+        html.required = true
+        xml.required = true
+        csv.required = false // CSV는 보통 잘 안 봐서 뺌 (선택)
+    }
+
+    // 리포트 생성 시 제외할 파일들
+    def Qdomains = []
+    for (qPattern in '**/QA'..'**/QZ') {
+        Qdomains.add(qPattern + '*')
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "**/*Application*",
+                    "**/config/**",
+                    "**/dto/**",
+                    "**/entity/**",
+                    "**/exception/**",
+                    "**/mapper/**",
+                    "**/*Request*",
+                    "**/*Response*",
+                    "**/generated/**"
+            ] + Qdomains)
+        }))
+    }
 }
 
 dependencies {

@@ -38,3 +38,9 @@ logging:
     com.discodeit.security: TRACE
     org.hibernate.SQL: TRACE
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+app:
+  admin:
+    username: admin
+    email: a@a.a
+    password: 1234
