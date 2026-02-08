@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -134,6 +135,7 @@ public class UserService implements InterfaceUserService {
 
     @Transactional
     @Override
+    @PreAuthorize("#userId == authentication.principal.user.id") // SpEL
     public UserDto update(UUID userId, UserUpdateRequest dtoUserUpdate, Optional<MultipartFile> optionalProfileFile) {
 //        [ ] 선택적으로 프로필 이미지를 대체할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
@@ -184,6 +186,7 @@ public class UserService implements InterfaceUserService {
 
     @Transactional
     @Override
+    @PreAuthorize("#userID == authentication.principal.user.id") // SpEL
     public void delete(UUID userID) {
 //        [ ] 관련된 도메인도 같이 삭제합니다.
         User user = userRepository.findById(userID)

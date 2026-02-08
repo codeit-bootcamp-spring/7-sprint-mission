@@ -32,6 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -99,6 +100,7 @@ public class MessageService implements InterfaceMessageService {
 
     @Override
     @Transactional
+    @PreAuthorize("@messageAuth.isOwner(#messageID, authentication)")
     public void deleteMessage(UUID messageID) {
       Message message = messageRepository
           .findById(messageID)
@@ -132,6 +134,7 @@ public class MessageService implements InterfaceMessageService {
 
     @Override
     @Transactional
+    @PreAuthorize("@messageAuth.isOwner(#messageId, authentication)") // SpEL
     public MessageDto updateMessage(UUID messageId, Dto_MessageUpdate requestDto) {
         // [ ] DTO를 활용해 파라미터를 그룹화합니다.
         // 수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터
