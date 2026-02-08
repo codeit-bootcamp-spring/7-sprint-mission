@@ -150,7 +150,10 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasRole('CHANNEL_MANAGER') and @channelSecurity.isPublic(#channelId, authentication)")
+    @PreAuthorize("""
+        @channelSecurity.isPrivate(#channelId)
+        or hasRole('CHANNEL_MANAGER')
+    """)
     public void delete(UUID channelId) {
 
         log.debug("채널 삭제 요청: channelId = {}", channelId);
