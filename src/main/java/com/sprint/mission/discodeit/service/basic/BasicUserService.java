@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +74,8 @@ public class BasicUserService implements UserService {
             userCreateRequest.username(),
             userCreateRequest.email(),
             encodedPassword,
-            nullableProfile);
+            nullableProfile,
+            Role.USER);
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(user, now);
 
@@ -141,7 +145,7 @@ public class BasicUserService implements UserService {
         .orElse(null);
 
     String newPassword = userUpdateRequest.newPassword();
-    user.update(newUsername, newEmail, newPassword, nullableProfile);
+    user.update(newUsername, newEmail, newPassword, nullableProfile, null);
 
     log.info("사용자 수정 완료: id={}", userId);
     return userMapper.toDto(user);
@@ -159,4 +163,23 @@ public class BasicUserService implements UserService {
     userRepository.deleteById(userId);
     log.info("사용자 삭제 완료: id={}", userId);
   }
+
+    @Transactional
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserDto updateRole(UserRoleUpdateRequest request) {
+        log.debug("사용자 권한 변경 시작: userId={}, role={}",
+                request.userId(), request.newRole());
+
+        User user = userRepository.findById(request.userId())
+                .orElseThrow(() -> UserNotFoundException.withId(request.userId()));
+
+        user.updateRole(request.newRole());
+
+        log.info("사용자 권한 변경 완료: userId={}, role={}",
+                user.getId(), user.getRole());
+
+        return userMapper.toDto(user);
+    }
+
 }
