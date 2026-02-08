@@ -1,13 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.common.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.dto.request.auth.UserRoleUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
@@ -28,11 +23,6 @@ import java.util.UUID;
 public class AuthController {
     private final AuthService authService;
     private final UserService userService;
-
-    @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public void logout(@RequestParam("userId") UUID userId) {
-        authService.logout(userId);
-    }
 
     @GetMapping("/csrf-token")
     public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken) {
