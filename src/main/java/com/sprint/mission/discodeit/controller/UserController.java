@@ -3,11 +3,8 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateByUserIdRequestDto;
 import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.response.userstatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +23,6 @@ import java.util.UUID;
 @Slf4j
 public class UserController implements UserControllerDocs {
     private final UserService userService;
-    private final UserStatusService userStatusService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponseDto> createMultipart(
@@ -63,13 +59,5 @@ public class UserController implements UserControllerDocs {
     @RequestMapping(method = RequestMethod.GET)
     public List<UserResponseDto> getAll() {
         return userService.getAll();
-    }
-
-    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-    public UserStatusResponseDto updateUserStatusByUserId(
-            @PathVariable("userId") UUID userId,
-            @Valid @RequestBody UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto
-    ) {
-        return userStatusService.updateByUserId(userId, userStatusUpdateByUserIdRequestDto);
     }
 }

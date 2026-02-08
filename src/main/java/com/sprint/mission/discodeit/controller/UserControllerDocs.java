@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateByUserIdRequestDto;
 import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.response.userstatus.UserStatusResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -138,5 +136,4 @@ public interface UserControllerDocs {
     void delete(UUID userId);
     List<UserResponseDto> getAll();
 //    ResponseEntity<List<UserResponseDto>> findAll();
-    UserStatusResponseDto updateUserStatusByUserId(UUID userId,UserStatusUpdateByUserIdRequestDto userStatusUpdateByUserIdRequestDto);
 }

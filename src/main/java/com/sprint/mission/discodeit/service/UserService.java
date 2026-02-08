@@ -26,9 +26,6 @@ public interface UserService {
     boolean delete(UUID userid);
     List<UserResponseDto> getUsersByName(String username);
     Optional<UserResponseDto> getUsersByEmail(String email);
-    void login(UUID userId);
-    void logout(UUID userId);
-    boolean isOnline(UUID userId);
     UserResponseDto getMe(UUID userId);
 
     UserResponseDto updateRole(UserRoleUpdateRequestDto userRoleUpdateRequestDto);
