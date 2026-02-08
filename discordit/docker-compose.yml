@@ -21,6 +21,9 @@ services:
       - AWS_S3_BUCKET=${AWS_S3_BUCKET}
       - AWS_S3_PRESIGNED_URL_EXPIRATION=${AWS_S3_PRESIGNED_URL_EXPIRATION}
       - JVM_OPTS=${JVM_OPTS}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     volumes:
       - app_storage:/app/storage
     depends_on:
