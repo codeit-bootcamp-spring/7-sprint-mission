@@ -12,7 +12,7 @@ spring:
   jpa:
     database: postgresql
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -48,15 +48,17 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
-springdoc:
-  swagger-ui:
-    path: /api-docs-ui.html # UI page 경로
-    tags-sorter: alpha # 태그 정렬 방식 (알파벳순)
-    operations-sorter: method # 메서드 정렬 방식
-    display-request-duration: true # 요청에 소요된 시간 표시
-    doc-expansion: list # 문서 펼침 상태 (none, list, full)
-  api-docs:
-    path: /my-api # Swagger가 우리 API의 정보를 얻어오기 위해서 요청하는 url
+
+#springdoc:
+#  packages-to-scan: com.sprint.mission.discodeit
+#  swagger-ui:
+#    path: /api-docs-ui.html # UI page 경로
+#    tags-sorter: alpha # 태그 정렬 방식 (알파벳순)
+#    operations-sorter: method # 메서드 정렬 방식
+#    display-request-duration: true # 요청에 소요된 시간 표시
+#    doc-expansion: list # 문서 펼침 상태 (none, list, full)
+#  api-docs:
+#    path: /my-api # Swagger가 우리 API의 정보를 얻어오기 위해서 요청하는 url
 
 management:
   endpoints:

@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.service.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ public class ChannelService {
     private final ChannelMapper mapper;
     private final UserMapper userMapper;
 
+    @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
     @Transactional
     public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
         log.info("ChannelService.createPublicChannel");
@@ -59,6 +61,7 @@ public class ChannelService {
         return mapper.toDto(save);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
     @Transactional
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
         log.info("ChannelService.createPrivateChannel");
@@ -82,6 +85,7 @@ public class ChannelService {
         return dto;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
     @Transactional
     public ChannelDto updateChannel(UUID channelId, ChannelUpdateRequest requestDto) {
         log.info("ChannelService.updateChannel");
@@ -97,6 +101,7 @@ public class ChannelService {
         return mapper.toDto(channel);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
     @Transactional
     public void deleteChannel(UUID id) {
         log.info("ChannelService.deleteChannel");

@@ -40,7 +40,7 @@ public class BinaryContentManager {
     public void deleteFile(BinaryContent binaryContent) {
         String fileName = binaryContent.getFileName();
         binaryContentStorage.deleteFile(fileName);
-        binaryContentRepository.delete(binaryContent);
+//        binaryContentRepository.delete(binaryContent);
     }
 
     public BinaryContent getBinaryContent(UUID binaryContentId){

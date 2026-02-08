@@ -18,6 +18,7 @@ create table users
     profile_id     uuid,
     created_at     timestamp default current_timestamp not null,
     updated_at     timestamp,
+    role varchar(20) NOT NULL  DEFAULT 'USER' CHECK (role IN ('USER', 'CHANNEL_MANAGER', 'ADMIN'))
 
     constraint fk_users_binary_contents
         foreign key (profile_id)

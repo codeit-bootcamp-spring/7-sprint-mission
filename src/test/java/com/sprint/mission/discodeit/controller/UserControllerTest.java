@@ -16,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -52,6 +55,7 @@ public class UserControllerTest {
     class CreateUser {
         @Test
         @DisplayName("유저 생성 성공")
+        @WithMockUser(username = "testUser", roles = "USER")
         void createUser_success() throws Exception {
             //given
             UserCreateRequest userCreateRequest = new UserCreateRequest("test@email.com", "1234", "test");
@@ -68,31 +72,34 @@ public class UserControllerTest {
                     objectMapper.writeValueAsBytes(userCreateRequest)
             );
 
-            MockMultipartFile profileImage = new MockMultipartFile(
-                    "profileImage",
+            MockMultipartFile profile = new MockMultipartFile(
+                    "profile",
                     "test.png",
                     "image/png",
                     "fake image data".getBytes()
             );
-            given(userService.createUser(userCreateRequest, profileImage))
+            given(userService.createUser(any(UserCreateRequest.class), any(MultipartFile.class)))
                     .willReturn(response);
+            System.out.println("response = " + response);
 
             //when
             mockMvc.perform(multipart("/api/users")
-                            .file(profileImage)
+                            .file(profile)
                             .file(userCreateRequestPart)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
-                    )
+                            .with(csrf())
+                    ).andDo(print())
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.id").value(userId.toString()))
                     .andExpect(jsonPath("$.username").value(userCreateRequest.username()));
 
             //then
-            then(userService).should().createUser(userCreateRequest, profileImage);
+            then(userService).should().createUser(userCreateRequest, profile);
         }
 
         @Test
         @DisplayName("유저 생성 실패 - 이미 존재하는 이메일")
+        @WithMockUser(username = "testUser", roles = "USER")
         void createUser_fail_duplicateEmail() throws Exception {
             // given
             UserCreateRequest userCreateRequest =
@@ -113,6 +120,7 @@ public class UserControllerTest {
                             multipart("/api/users")
                                     .file(userCreateRequestPart)
                                     .accept(MediaType.APPLICATION_JSON)
+                                    .with(csrf())
                     )
                     .andDo(print())
                     .andExpect(jsonPath("$.code").value("DUPLICATE_USER"))
@@ -279,57 +287,6 @@ public class UserControllerTest {
                                     })
                                     .contentType(MediaType.MULTIPART_FORM_DATA)
                                     .accept(MediaType.APPLICATION_JSON)
-                    )
-                    .andDo(print())
-                    .andExpect(status().isBadRequest());
-
-            then(userService).shouldHaveNoInteractions();
-        }
-    }
-
-
-    @Nested
-    @DisplayName("유저 상태")
-    class UserStatus {
-        @Test
-        @DisplayName("유저 상태 업데이트 성공")
-        void markOnline_success() throws Exception {
-            //given
-            UUID userId = UUID.randomUUID();
-            Instant lastActiveAt = Instant.now();
-            UserStatusUpdateRequest userStatusUpdateRequest = new UserStatusUpdateRequest(lastActiveAt);
-
-            UserStatusDto response = new UserStatusDto();
-            response.setUserId(userId);
-            response.setLastActiveAt(lastActiveAt);
-
-            given(userService.updateLastActiveAt(userId, lastActiveAt))
-                    .willReturn(response);
-
-            //when
-            mockMvc.perform(patch("/api/users/{userId}/userStatus", userId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(userStatusUpdateRequest)))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.userId").value(userId.toString()))
-                    .andExpect(jsonPath("$.lastActiveAt").exists());
-
-            //then
-            then(userService).should()
-                    .updateLastActiveAt(userId, lastActiveAt);
-        }
-
-        @Test
-        @DisplayName("유저 상태 업데이트 실패")
-        void updateUserStatus_fail() throws Exception {
-            // given
-            UUID userId = UUID.randomUUID();
-
-            // when & then
-            mockMvc.perform(
-                            patch("/api/users/{userId}/userStatus", userId)
-                                    .contentType(MediaType.APPLICATION_JSON)
                     )
                     .andDo(print())
                     .andExpect(status().isBadRequest());

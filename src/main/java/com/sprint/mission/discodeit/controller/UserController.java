@@ -2,10 +2,8 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.UserDto;
-import com.sprint.mission.discodeit.service.dto.response.UserStatusDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,12 +53,5 @@ public class UserController {
             @PathVariable UUID userId) {
         userService.deleteUser(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @PatchMapping("/{userId}/userStatus")
-    public UserStatusDto markOnline(
-            @PathVariable UUID userId,
-            @Valid @RequestBody UserStatusUpdateRequest request) {
-        return userService.updateLastActiveAt(userId, request.newLastActiveAt());
     }
 }

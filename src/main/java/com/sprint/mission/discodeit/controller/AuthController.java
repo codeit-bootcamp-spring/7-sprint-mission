@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.service.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.UserDto;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +27,23 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).build();
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest loginRequest) {
-        UserDto userDto = userService.login(loginRequest.username(), loginRequest.password());
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getCurrentUser(
+            @AuthenticationPrincipal DiscodeitUserDetails userDetails) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(userDetails.getUserDto());
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PutMapping("/role")
+    public ResponseEntity<UserDto> updateRole(
+            @RequestBody RoleUpdateRequest roleUpdateRequest){
+
+        UserDto userDto = userService.updateRole(roleUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(userDto);
     }
 }

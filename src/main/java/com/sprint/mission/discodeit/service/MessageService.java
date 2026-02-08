@@ -20,6 +20,7 @@ import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.mapper.MessageMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MessageService {
 
     private final MessageRepository messageRepository;
@@ -46,7 +48,6 @@ public class MessageService {
     private final BinaryContentManager binaryContentManager;
 
 
-    @Transactional
     public MessageDto sendMessage(MessageCreateRequest request, List<MultipartFile> attachments) {
         log.info("MessageService.sendMessage");
         User user =
@@ -74,17 +75,16 @@ public class MessageService {
         return dto;
     }
 
-    @Transactional
+    @PreAuthorize("@messageGuard.isAuthor(#messageId, authentication.principal.userDto.id)")
     public MessageDto updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
         log.info("MessageService.updateMessage");
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, new HashMap<>()));
         message.updateContent(messageUpdateRequest.newContent());
+        System.out.println("messageUpdateRequest = " + messageUpdateRequest.newContent());
         return mapper.toDto(message);
-
-
     }
 
-    @Transactional
+    @PreAuthorize("@messageGuard.isAuthor(#messageId, authentication.principal.userDto.id)")
     public void deleteMessage(UUID messageId) {
         log.info("MessageService.deleteMessage");
         List<MessageAttachment> list = attachmentRepository.findAllWithBinaryContentByMessageId(messageId);
@@ -93,6 +93,7 @@ public class MessageService {
         for (MessageAttachment attachment : list) {
             binaryContentManager.deleteFile(attachment.getAttachment());
         }
+        // cascade = CascadeType.REMOVE 때문에 수동으로 삭제를 해주면 오히려 오류가 남
         attachmentRepository.deleteByMessageId(messageId);
         messageRepository.deleteById(messageId);
     }
