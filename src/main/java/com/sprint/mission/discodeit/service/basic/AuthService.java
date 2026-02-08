@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,7 @@ public class AuthService implements InterfaceAuthService {
 //        return userMapper.toDto(user);
 //    }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Override
     public UserDto userRoleUpdateRequest(UserRoleUpdateRequest userRoleUpdateRequest) {

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.security.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.LoginSuccessHandler;
 import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -52,6 +53,9 @@ public class SecurityConfig {
     private final DiscodeitUserDetailsService userDetailsService;
     private final JpaPersistentTokenRepository persistentTokenRepository;
 
+    @Value("${security.remember-me.key}")
+    private String rememberMeKey;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -71,9 +75,9 @@ public class SecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 // 토큰 발급 API는 예외 처리
-                .ignoringRequestMatchers(
-                    "/api/csrf", "/h2-console/**", "/api/auth/**"
-                )
+//                .ignoringRequestMatchers(
+//                    "/api/csrf", "/h2-console/**", "/api/auth/**"
+//                )
             )
             // ✅ 인증/인가
 //            다음의 요청은 인증하지 않도록 설정하세요.
@@ -83,7 +87,7 @@ public class SecurityConfig {
 //            로그아웃
 //            API가 아닌 요청(Swagger, Actuator 등)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/csrf-token", "/api/auth"
+                .requestMatchers("/api/auth/csrf-token"
                 ).permitAll() // 토큰 발급용 엔드포인트는 로그인 없이 접근 가능
 
                 .requestMatchers("/actuator/**"
@@ -92,21 +96,14 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"
                 ).permitAll()
 
-                .requestMatchers("/h2-console/**", "/session-expired"
+                .requestMatchers("/h2-console/**"
                 ).permitAll()
 
                 // 정적 리소스 및 공통 경로 허용
                 .requestMatchers("/", "/index.html", "/static/**", "/assets/**", "/favicon.ico"
                 ).permitAll()
 
-
-                .requestMatchers("/api/users/**").permitAll()
-//                .requestMatchers(HttpMethod.POST, "/api/users").permitAll() //!! 🛠️
-//                // 인증/인가 관련 API 허용 (예시)
-//                .requestMatchers("/api/auth/**").permitAll()
-//                // Swagger UI 및 API 문서 허용
-//                // 그 외 모든 요청은 인증 필요
-                .requestMatchers("/api/users/**").hasRole("USER")  //⭐️ AccessDeniedHandler 에서 검사
+//                .requestMatchers("/api/users/**").hasRole("USER")  //⭐️ AccessDeniedHandler 에서 검사 {"code":"401","message":"NO_LOGIN"} 떠야해!
 ////                // 그 외 모든 /api/** 요청은 인증 필요
 ////                .requestMatchers("/api/**").authenticated()
 //                // 나머지 요청은 모두 허용 (SPA 라우팅 대응)
@@ -168,7 +165,7 @@ public class SecurityConfig {
                 .tokenValiditySeconds(60 * 60 * 24 * 14) // 14일
                 .userDetailsService(userDetailsService)
                 .tokenRepository(persistentTokenRepository)
-                .key("discodeit-remember-me-key") // ⭐ 고정된 서버 키
+                .key(rememberMeKey)
             );
 
         return http.build();

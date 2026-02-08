@@ -84,7 +84,6 @@ public class AuthController { //  implements AuthDoc
 //    }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/role")
     public ResponseEntity<UserDto> roleUpdateRequest( @Valid @RequestBody UserRoleUpdateRequest userRoleUpdateRequest) {
 
