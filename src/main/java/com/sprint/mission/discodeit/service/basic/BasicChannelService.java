@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.common.exception.channel.ChannelNotFoundExce
 import com.sprint.mission.discodeit.common.exception.channel.InvalidChannelException;
 import com.sprint.mission.discodeit.common.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.common.security.SessionOnlineChecker;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PublicChannelCreateRequestDto;
@@ -32,7 +33,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
-    private final UserStatusRepository userStatusRepository;
+    private final SessionOnlineChecker sessionOnlineChecker;
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
@@ -282,15 +283,6 @@ public class BasicChannelService implements ChannelService {
                 .map(user -> user.getId())
                 .collect(Collectors.toSet());
 
-        if (userIds.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        return userStatusRepository.findAllByUserIdIn(userIds)
-                .stream()
-                .collect(Collectors.toMap(
-                        userStatus -> userStatus.getUser().getId(),
-                        us -> us.isOnlineNow()
-                ));
+        return sessionOnlineChecker.onlineMap(userIds);
     }
 }
