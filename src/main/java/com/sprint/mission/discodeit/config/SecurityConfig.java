@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.security.*;
 import com.sprint.mission.discodeit.security.repository.JpaPersistenceTokenRepository;
 import com.sprint.mission.discodeit.security.service.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.security.service.LoginFailureHandler;
+import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,41 +19,43 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
-@Configuration
-@EnableMethodSecurity
-@RequiredArgsConstructor
-public class SecurityConfig {
-    private final LoginFailureHandler loginFailureHandler;
-    private final LoginSuccessHandler loginSuccessHandler;
-    private final HttpStatusReturningLogoutSuccessHandler logoutSuccessHandler;
-    private final DiscodeitAccessDeniedHandler accessDeniedHandler;
-    private final DiscodeitAuthenticationEntryPoint authenticationEntryPoint;
-    private final SessionRegistry sessionRegistry;
-    private final JpaPersistenceTokenRepository tokenRepository;
-    private final DiscodeitUserDetailsService  userDetailsService;
+        @Slf4j
+        @Configuration
+        @EnableMethodSecurity
+        @RequiredArgsConstructor
+        public class SecurityConfig {
+            private final LoginFailureHandler loginFailureHandler;
+            private final LoginSuccessHandler loginSuccessHandler;
+            private final HttpStatusReturningLogoutSuccessHandler logoutSuccessHandler;
+            private final DiscodeitAccessDeniedHandler accessDeniedHandler;
+            private final DiscodeitAuthenticationEntryPoint authenticationEntryPoint;
+            private final SessionRegistry sessionRegistry;
+            private final JpaPersistenceTokenRepository tokenRepository;
+            private final DiscodeitUserDetailsService  userDetailsService;
 
 
-    @Value("${rememberme.key}")
-    private String rememberMeKey;
+            @Value("${rememberme.key}")
+            private String rememberMeKey;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, RoleHierarchy roleHierarchy) throws Exception {
-        http
-                .csrf(csrf -> csrf
+            @Bean
+            public SecurityFilterChain filterChain(HttpSecurity http, RoleHierarchy roleHierarchy) throws Exception {
+                http
+                        .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-                        .ignoringRequestMatchers("/h2-console/**")
+                        .ignoringRequestMatchers("/h2-console/**","/")
                 )
-                .formLogin(Customizer.withDefaults())
                 .formLogin(login -> login
                         .loginProcessingUrl("/api/auth/login")
                         .successHandler(loginSuccessHandler)
                         .failureHandler(loginFailureHandler)
+                        .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
@@ -93,7 +97,11 @@ public class SecurityConfig {
 
                 )
         ;
-        return http.build();
+                DefaultSecurityFilterChain chain = http.build();
+                for (Filter filter:chain.getFilters()){
+                    log.info("기본 필터 리스트 : {}",filter.getClass().getName());
+                }
+                return chain;
     }
 
     @Bean
