@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,21 +50,39 @@ public class User extends BaseUpdatableEntity {
     }
 
 
-    @Setter(AccessLevel.PROTECTED)
-    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL) // ON DELETE CASCADE
-    private UserStatus userStatus;
-
-    public void initUserStatus() {
-        if (this.userStatus == null) {
-            this.userStatus = new UserStatus(this, java.time.Instant.now());
-            log.info("✅✅✅status = [" + this.userStatus.toString() + "]");
-        }
-    }
+//    @Setter(AccessLevel.PROTECTED)
+//    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL) // ON DELETE CASCADE
+//    private UserStatus userStatus;
+//
+//    public void initUserStatus() {
+//        if (this.userStatus == null) {
+//            this.userStatus = new UserStatus(this, java.time.Instant.now());
+//            log.info("✅✅✅status = [" + this.userStatus.toString() + "]");
+//        }
+//    }
 
     public User(String username, String email, String password, BinaryContent profile) {
         this.username = username;
         this.email = email;
         this.password = password;
+
+        if (this.profile != profile) {
+            this.profile = null;
+        }
         this.profile = profile;
+    }
+
+    public void updateFrom(UserUpdateRequest dtoUserUpdate, BinaryContent profile) {
+        if (this.profile != profile) {
+            this.profile = null;
+        }
+        this.profile = profile;
+
+        this.username = dtoUserUpdate.newUsername();
+        this.email = dtoUserUpdate.newEmail();
+
+        if (null != dtoUserUpdate.newPassword()) {
+            this.password = dtoUserUpdate.newPassword();
+        }
     }
 }

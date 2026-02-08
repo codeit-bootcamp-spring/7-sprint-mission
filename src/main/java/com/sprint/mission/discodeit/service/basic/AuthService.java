@@ -72,21 +72,14 @@ public class AuthService implements InterfaceAuthService {
         return userMapper.toDto(user);
     }
 
-    private void expireUserSessions(UUID userId) {
+    @Transactional
+    public void expireUserSessions(UUID userId) {
 
-        for (Object principal : sessionRegistry.getAllPrincipals()) {
-
-            if (principal instanceof DiscodeitUserDetails userDetails) {
-                if (userDetails.getUser().id().equals(userId)) {
-
-                    List<SessionInformation> sessions =
-                        sessionRegistry.getAllSessions(principal, false);
-
-                    for (SessionInformation session : sessions) {
-                        session.expireNow();
-                    }
-                }
-            }
-        }
+        sessionRegistry.getAllPrincipals().stream()
+            .filter(DiscodeitUserDetails.class::isInstance)
+            .map(DiscodeitUserDetails.class::cast)
+            .filter(userDetails -> userDetails.getUser().id().equals(userId))
+            .flatMap(userDetails -> sessionRegistry.getAllSessions(userDetails, false).stream())
+            .forEach(SessionInformation::expireNow);
     }
 }

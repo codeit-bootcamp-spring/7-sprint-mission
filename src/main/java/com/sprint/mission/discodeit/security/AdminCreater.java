@@ -17,21 +17,39 @@ public class AdminCreater implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        createAdmin();
+        createDefUser();
+    }
+
+    private void createAdmin() {
+
         boolean isAdmin = userRepository.existsByRole(Role.ADMIN);
         if (!isAdmin) {
 
-            String password = "admin123";
-            String encodePassword = passwordEncoder.encode(password); //!! 🛠️
+            String name = "admin123";
+            String encodePassword = passwordEncoder.encode(name); //!! 🛠️
 
-            User newUser = new User("admin123",
-                "admin123@mail.com",
+            User newUser = new User(name,
+                name + "@mail.com",
                 encodePassword,
                 null);
 
-            newUser.setRole(Role.ADMIN);
-            newUser.initUserStatus();
-
+            newUser.updateRole(Role.ADMIN);
             userRepository.save(newUser);
         }
+    }
+
+    private void createDefUser() {
+
+        String name = "1";
+        String encodePassword = passwordEncoder.encode(name); //!! 🛠️
+
+        User newUser = new User(name,
+            name + "@mail.com",
+            encodePassword,
+            null);
+
+        newUser.updateRole(Role.USER);
+        userRepository.save(newUser);
     }
 }
