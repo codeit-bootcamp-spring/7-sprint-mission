@@ -14,6 +14,9 @@ public enum ErrorCode {
     ALREADY_EXISTS("이미 존재하는 값입니다.", HttpStatus.BAD_REQUEST),
     CHANNEL_MODIFICATION_NOT_ALLOWED("해당 채널은 수정이 불가능합니다.", HttpStatus.BAD_REQUEST),
 
+    // 401 Unauthorized
+    INVALID_CREDENTIALS("아이디 또는 비밀번호가 올바르지 않습니다.", HttpStatus.UNAUTHORIZED),
+
     // 404 Not Found
     NOT_FOUND("존재하지 않는 값입니다.", HttpStatus.NOT_FOUND),
     FILE_NOT_FOUND("존재하지 않는 파일입니다.", HttpStatus.NOT_FOUND),

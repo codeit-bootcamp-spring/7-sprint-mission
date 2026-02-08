@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     profile_id UUID,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    role varchar(20) not null default 'USER'
 
     CONSTRAINT fk_users_profile FOREIGN KEY (profile_id)
         REFERENCES binary_contents(id) ON DELETE SET NULL

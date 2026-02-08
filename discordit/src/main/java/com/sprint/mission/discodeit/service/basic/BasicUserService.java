@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.enums.Roles;
 import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.entity.user.UserDto;
 import com.sprint.mission.discodeit.dto.entity.user.request.UserCreateRequest;
@@ -17,6 +18,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +37,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentStorage binaryContentStorage;
     private final UserStatusService userStatusService;
     private final UserStatusRepository userStatusRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto get(UUID id) {
@@ -55,7 +58,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto signIn(UserCreateRequest dto, MultipartFile profile) {
         log.info("사용자 생성 요청 들어옴 - username : {}", dto.username());
-        User user = new User(dto.username(), dto.password(), dto.email());
+        User user = new User(dto.username(), passwordEncoder.encode(dto.password()), dto.email());
         log.debug("사용자 생성 완료 - id : {}", user.getId());
         if (profile != null) {
             BinaryContent saved = new BinaryContent(profile.getOriginalFilename(), profile.getSize(), profile.getContentType());
@@ -81,7 +84,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         if (dto.newPassword() != null) {
-            user.setPassword(dto.newPassword());
+            user.setPassword(passwordEncoder.encode(dto.newPassword()));
             log.debug("{}의 비밀번호 수정 완료",user.getUsername());
         }
         if (dto.newUsername() != null) {
@@ -121,5 +124,13 @@ public class BasicUserService implements UserService {
             log.debug("삭제된 사용자의 프로필 이미지 삭제 완료");
         }
         log.info("사용자 삭제 완료");
+    }
+
+    @Override
+    public UserDto updateRole(UUID id, Roles role) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        user.updateRole(role);
+        return UserMapper.toDto(user);
     }
 }

@@ -32,7 +32,6 @@ public class UserController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> signIn(@Valid @RequestPart UserCreateRequest userCreateRequest, @RequestPart(value = "profile", required = false) MultipartFile profile) {
-
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.signIn(userCreateRequest, profile));
     }
 
