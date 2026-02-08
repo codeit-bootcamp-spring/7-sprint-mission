@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDiscodeit(DiscodeitException e) {
         HttpStatus status = statusMapper.map(e.getErrorCode());
         return ResponseEntity.status(status).body(new ErrorResponse(
-                e.getTimestamp(),
+                e.getTimestamp().toString(),
                 e.getErrorCode().name(),
                 e.getErrorCode().getMessage(),
                 e.getDetails(),
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
 
         HttpStatus status = statusMapper.map(ErrorCode.VALIDATION_FAILED);
         return ResponseEntity.status(status).body(new ErrorResponse(
-                Instant.now(),
+                Instant.now().toString(),
                 ErrorCode.VALIDATION_FAILED.name(),
                 ErrorCode.VALIDATION_FAILED.getMessage(),
                 details,
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBadJson(HttpMessageNotReadableException e) {
         HttpStatus status = statusMapper.map(ErrorCode.BAD_REQUEST);
         return ResponseEntity.status(status).body(new ErrorResponse(
-                Instant.now(),
+                Instant.now().toString(),
                 ErrorCode.BAD_REQUEST.name(),
                 "Request body is invalid or unreadable.",
                 Map.of(),
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUnknown(Exception e) {
         HttpStatus status = statusMapper.map(ErrorCode.INTERNAL_ERROR);
         return ResponseEntity.status(status).body(new ErrorResponse(
-                Instant.now(),
+                Instant.now().toString(),
                 ErrorCode.INTERNAL_ERROR.name(),
                 ErrorCode.INTERNAL_ERROR.getMessage(),
                 Map.of(),

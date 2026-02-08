@@ -10,13 +10,17 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
 
 logging:
   level:
     root: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.security: TRACE

@@ -1,60 +1,76 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.security.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User {
 
-public class User extends BaseUpdatableEntity {
+    @Id
+    private UUID id;
 
-  @Column(length = 50, nullable = false, unique = true)
-  private String username;
-  @Column(length = 100, nullable = false, unique = true)
-  private String email;
-  @Column(length = 60, nullable = false)
-  private String password;
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "profile_id", columnDefinition = "uuid")
-  private BinaryContent profile;
-  @JsonManagedReference
-  @Setter(AccessLevel.PROTECTED)
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  private UserStatus status;
+    @Column(nullable = true)
+    private String username;
 
-  public User(String username, String email, String password, BinaryContent profile) {
-    this.username = username;
-    this.email = email;
-    this.password = password;
-    this.profile = profile;
-  }
+    @Column(nullable = false, unique = true)
+    private String email;
 
-  public void update(String newUsername, String newEmail, String newPassword,
-      BinaryContent newProfile) {
-    if (newUsername != null && !newUsername.equals(this.username)) {
-      this.username = newUsername;
+    @Column(nullable = false)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private UserStatus status;
+
+    public User(UUID id, String username, String email, String password, UserRole role) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
-    if (newEmail != null && !newEmail.equals(this.email)) {
-      this.email = newEmail;
+
+    public User(String username, String email, String password, BinaryContent profile) {
+        this.id = UUID.randomUUID();
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.profile = profile;
+        this.role = UserRole.USER;
     }
-    if (newPassword != null && !newPassword.equals(this.password)) {
-      this.password = newPassword;
+
+    public void update(String username, String email, String password, BinaryContent profile) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.profile = profile;
     }
-    if (newProfile != null) {
-      this.profile = newProfile;
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
-  }
 }

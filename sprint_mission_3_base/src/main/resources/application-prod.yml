@@ -1,12 +1,12 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://prod-db:5432/discodeit
-    username: discodeit_user
-    password: discodeit_prod_pw
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
   jpa:
     hibernate:
