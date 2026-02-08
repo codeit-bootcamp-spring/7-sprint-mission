@@ -39,7 +39,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     @Transactional
-    @PreAuthorize( "hasRole('CHANNEL_MANAGER')")
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelDto createPublicChannel(PublicChannelCreateRequest requestDto) {
 
         log.debug("공개 채널 생성 요청 - name: {}, description: {}",
