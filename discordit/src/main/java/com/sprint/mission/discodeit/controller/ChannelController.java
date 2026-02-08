@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,24 +19,29 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class ChannelController {
     private final ChannelService channelService;
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @RequestMapping(value = "/public", method = RequestMethod.POST)
     public ResponseEntity<ChannelDto> createPublic(@Valid @RequestBody PublicChannelCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPublicChannel(request));
     }
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @RequestMapping(value = "/private", method = RequestMethod.POST)
     public ResponseEntity<ChannelDto> createPrivate(@Valid @RequestBody PrivateChannelCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPrivateChannel(request));
     }
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
     public ResponseEntity<ChannelDto> updatePublic(@PathVariable UUID channelId, @Valid @RequestBody ChannelUpdateRequest request) {
         return ResponseEntity.ok().body(channelService.update(channelId, request));
     }
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> removeChannel(@PathVariable UUID channelId) {
         channelService.delete(channelId);

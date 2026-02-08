@@ -9,6 +9,7 @@ public class UserMapper {
     public static UserDto toDto(User user) {
         return new UserDto(
                 user.getId(),
+                user.getRole(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getProfile() == null ? null : BinaryContentMapper.toDto(user.getProfile()),
