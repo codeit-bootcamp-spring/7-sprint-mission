@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.data.UserStatusDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.*;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -102,6 +99,14 @@ public class UserController implements UserApi {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedUserStatus);
+  }
+
+  @PatchMapping("/role")
+  public ResponseEntity<UserDto> updateRole(
+          @RequestBody UserRoleUpdateRequest request
+  ) {
+    UserDto updated = userService.updateRole(request);
+    return ResponseEntity.ok(updated);
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
