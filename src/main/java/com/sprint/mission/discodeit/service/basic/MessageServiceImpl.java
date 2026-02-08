@@ -66,13 +66,13 @@ public class MessageServiceImpl implements MessageService {
                     .contentType(file.getContentType())
                     .build();
 
-            binaryContentRepository.save(binaryContent);
-            attachments.add(binaryContent);
+            BinaryContent savedBinary = binaryContentRepository.save(binaryContent);
+            attachments.add(savedBinary);
             try {
-                binaryContentStorage.put(binaryContent.getId(), file.getBytes());
+                binaryContentStorage.put(savedBinary.getId(), file.getBytes());
             } catch (IOException e) {
-                log.warn("파일 업로드 실패: {}", binaryContent.getId());
-                throw new FileOperationFailedException(binaryContent.getId());
+                log.warn("파일 업로드 실패: {}", savedBinary.getId());
+                throw new FileOperationFailedException(savedBinary.getId());
             }
         }
         return attachments;
