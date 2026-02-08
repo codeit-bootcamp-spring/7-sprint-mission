@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserRole;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
@@ -22,7 +20,6 @@ public class AdminAccountInitConfig {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserStatusRepository userStatusRepository;
 
     @Bean
     public ApplicationRunner initAdminAccountRunner() {
@@ -51,8 +48,6 @@ public class AdminAccountInitConfig {
         );
 
         User saved = userRepository.save(admin);
-
-        userStatusRepository.save(new UserStatus(saved));
 
         log.warn("[AdminInit] ADMIN 계정이 없어 새로 생성했습니다. admin_username={}, admin_email={}",
                 admin.getUsername(), admin.getEmail());
