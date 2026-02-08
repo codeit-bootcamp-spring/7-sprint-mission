@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.repository.jpa.JpaPersistentTokenRepository;
 import com.sprint.mission.discodeit.security.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.security.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.LoginSuccessHandler;
 import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
@@ -47,6 +49,8 @@ public class SecurityConfig {
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final SessionRegistry sessionRegistry;
+    private final DiscodeitUserDetailsService userDetailsService;
+    private final JpaPersistentTokenRepository persistentTokenRepository;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -157,6 +161,14 @@ public class SecurityConfig {
 //                        .sessionFixation().migrateSession() // 새 세션을 생성해서 기존 세션의 모든 속성을 복사 후 기존 세션 무효화
 //                        .sessionFixation().newSession() // 새 세션을 생성, 기존 데이터 유지되지 않음!
 //                        .sessionFixation().none() // 사용하지 마세요. 아무것도 안 합니다.
+            )
+            .rememberMe(remember -> remember
+                .rememberMeCookieName("remember-me") // 쿠키 이름
+                .rememberMeParameter("remember-me") // HTML 폼 파라미터 이름 (체크박스의 name과 정확히 일치하게 작성!)
+                .tokenValiditySeconds(60 * 60 * 24 * 14) // 14일
+                .userDetailsService(userDetailsService)
+                .tokenRepository(persistentTokenRepository)
+                .key("discodeit-remember-me-key") // ⭐ 고정된 서버 키
             );
 
         return http.build();
