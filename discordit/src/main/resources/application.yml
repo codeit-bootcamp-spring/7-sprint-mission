@@ -38,6 +38,9 @@ admin:
   username: ${ADMIN_USERNAME}
   password: ${ADMIN_PASSWORD}
   email: ${ADMIN_EMAIL}
+remember-me:
+  key: ${REMEMBER_ME_KEY}
+  token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
 aws:
   s3:
     access-key: ${AWS_S3_ACCESS_KEY}

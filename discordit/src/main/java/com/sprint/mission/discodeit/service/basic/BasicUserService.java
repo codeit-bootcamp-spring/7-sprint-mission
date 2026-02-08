@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.config.SessionManager;
 import com.sprint.mission.discodeit.common.enums.Roles;
 import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.entity.user.UserDto;
@@ -8,13 +9,9 @@ import com.sprint.mission.discodeit.dto.entity.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.mapper.UserMapper;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,16 +30,15 @@ public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final ReadStatusRepository readStatusRepository;
     private final BinaryContentStorage binaryContentStorage;
-    private final UserStatusService userStatusService;
-    private final UserStatusRepository userStatusRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SessionManager sessionManager;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto get(UUID id) {
         log.info("사용자 조회 요청 들어옴 - {}", id);
-        return UserMapper.toDto(userRepository.findById(id)
+        return userMapper.toDto(userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id)));
     }
 
@@ -51,7 +47,7 @@ public class BasicUserService implements UserService {
     public List<UserDto> getAllUsers() {
         log.info("모든 사용자 조회 요청 들어옴");
         return userRepository.findAll().stream()
-                .map(UserMapper::toDto)
+                .map(userMapper::toDto)
                 .toList();
     }
 
@@ -72,10 +68,8 @@ public class BasicUserService implements UserService {
             log.debug("사용자 프로필 이미지 저장 완료.");
         }
         userRepository.save(user);
-        userStatusRepository.save(new UserStatus(user));
-        log.debug("UserStatus 생성 완료.");
         log.info("사용자 생성 완료 - id : {}", user.getId());
-        return UserMapper.toDto(user);
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -107,7 +101,7 @@ public class BasicUserService implements UserService {
         }
         userRepository.save(user);
         log.info("회원 정보 수정 완료 - id : {}",user.getId());
-        return UserMapper.toDto(user);
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -117,8 +111,6 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
         userRepository.delete(user);
         log.debug("사용자 삭제 완료 - id : {}", id);
-        readStatusRepository.deleteAllByUser(user);
-        log.debug("관련된 UserStatus 삭제 완료");
         if (user.getProfile() != null) {
             binaryContentRepository.delete(user.getProfile());
             log.debug("삭제된 사용자의 프로필 이미지 삭제 완료");
@@ -131,6 +123,9 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         user.updateRole(role);
-        return UserMapper.toDto(user);
+        sessionManager.invalidateUserSessions(user.getUsername());
+        return userMapper.toDto(user);
     }
+
+
 }

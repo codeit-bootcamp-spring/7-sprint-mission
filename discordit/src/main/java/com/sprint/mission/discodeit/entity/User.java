@@ -35,10 +35,6 @@ public class User extends BaseEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private BinaryContent profile;
 
-    @Transient
-    @Setter
-    private Boolean online;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Roles role;
@@ -48,6 +44,7 @@ public class User extends BaseEntity {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.role = Roles.USER;
     }
 
     public void updateRole(Roles role) {

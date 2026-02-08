@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.common.config;
 
 import com.sprint.mission.discodeit.common.handler.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,6 +28,12 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Value("${remember-me.key}")
+    private String rememberMeKey;
+
+    @Value("${remember-me.token-validity-seconds}")
+    private int rememberMeTokenValiditySeconds;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -59,10 +66,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, LoginSuccessHandler loginSuccessHandler, LoginFailureHandler loginFailureHandler, AuthenticationDeniedHandler authenticationDeniedHandler, AuthenticationEntryPointHandler authenticationEntryPointHandler) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            LoginSuccessHandler loginSuccessHandler,
+            LoginFailureHandler loginFailureHandler,
+            AuthenticationDeniedHandler authenticationDeniedHandler,
+            AuthenticationEntryPointHandler authenticationEntryPointHandler, SessionRegistry sessionRegistry) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers(
                                 "/",
                                 "/api/auth/login",
@@ -93,6 +106,17 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPointHandler)
                         .accessDeniedHandler(authenticationDeniedHandler))
+                .sessionManagement(management -> management
+                        .sessionConcurrency(concurrency -> concurrency
+                                .maximumSessions(1)
+                                .maxSessionsPreventsLogin(false)
+                                .sessionRegistry(sessionRegistry)
+                        )
+                )
+                .rememberMe(remember -> remember
+                        .key(rememberMeKey)
+                        .tokenValiditySeconds(rememberMeTokenValiditySeconds)
+                        .rememberMeParameter("remember-me"))
                 .build();
     }
 

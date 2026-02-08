@@ -11,5 +11,5 @@ public record UserDto (
         String username,
         String email,
         BinaryContentDto profile,
-        Boolean online
+        boolean online
 ) { }
