@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository;
+/*package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,3 +12,5 @@ public interface UserStatusRepository extends JpaRepository<UserStatus, UUID> {
     boolean existsByUserId(UUID userId);
     List<UserStatus> findAllByUserIdIn(Iterable<UUID> userId);
 }
+
+ */

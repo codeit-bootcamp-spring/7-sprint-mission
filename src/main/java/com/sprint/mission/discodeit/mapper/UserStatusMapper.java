@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.mapper;
+/*package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.response.userstatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -29,3 +29,4 @@ public class UserStatusMapper {
                 .toList();
     }
 }
+ */

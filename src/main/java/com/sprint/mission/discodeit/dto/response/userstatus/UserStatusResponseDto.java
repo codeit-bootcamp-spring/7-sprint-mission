@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.response.userstatus;
+/*package com.sprint.mission.discodeit.dto.response.userstatus;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 
@@ -11,3 +11,5 @@ public record UserStatusResponseDto(
         Instant lastActiveAt
 ) {
 }
+
+ */

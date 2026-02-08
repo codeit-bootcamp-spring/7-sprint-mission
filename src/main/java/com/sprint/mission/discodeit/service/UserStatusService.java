@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service;
+/*package com.sprint.mission.discodeit.service;
 
 
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusCreateRequestDto;
@@ -18,3 +18,5 @@ public interface UserStatusService {
     List<UserStatusResponseDto> getAll();
     boolean delete(UUID id);
 }
+
+ */
