@@ -19,6 +19,7 @@ public class DiscodeitException extends RuntimeException{
         this.errorCode = errorCode;
         this.details = details;
         this.details.put("entity", entity.getSimpleName());
+        this.details.put("description", errorCode.getDescription());
     }
 
     public DiscodeitException(Class<?> entity, ErrorCode errorCode) {
