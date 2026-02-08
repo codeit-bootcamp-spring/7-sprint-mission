@@ -39,6 +39,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final MessageMapper messageMapper;
 
     @Override
     public PageResponse<Message> getAllByChannelId(MessageGetRequest request) {
@@ -71,7 +72,7 @@ public class BasicMessageService implements MessageService {
         message.setContent(request.newContent());
         Message savedMessage = messageRepository.save(message);
         log.info("메세지 수정 완료.");
-        return MessageMapper.toDto(savedMessage);
+        return messageMapper.toDto(savedMessage);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class BasicMessageService implements MessageService {
         log.info("모든 메세지 조회 요청 들어옴.");
         return messageRepository.findAll()
                 .stream()
-                .map(MessageMapper::toDto)
+                .map(messageMapper::toDto)
                 .toList();
     }
 
@@ -107,6 +108,6 @@ public class BasicMessageService implements MessageService {
                         }).toList()
         ));
         log.info("메세지 발신 완료.");
-        return MessageMapper.toDto(message);
+        return messageMapper.toDto(message);
     }
 }

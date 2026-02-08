@@ -15,11 +15,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DiscodeitUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-        return new DiscodeitUserDetails(UserMapper.toDto(user), user.getPassword());
+        return new DiscodeitUserDetails(userMapper.toDto(user), user.getPassword());
     }
 }

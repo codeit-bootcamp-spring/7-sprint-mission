@@ -44,6 +44,8 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final UserMapper userMapper;
+    private final ChannelMapper channelMapper;
 
     @Override
     public ChannelDto createPublicChannel(PublicChannelCreateRequest dto) {
@@ -54,7 +56,7 @@ public class BasicChannelService implements ChannelService {
         );
         Channel saved = channelRepository.save(channel);
         log.info("공개 채널 생성 완료. id - {}", saved.getId());
-        return ChannelMapper.toDto(saved, getLastMassageAt(saved));
+        return channelMapper.toDto(saved, getLastMassageAt(saved));
     }
 
     @Override
@@ -68,7 +70,7 @@ public class BasicChannelService implements ChannelService {
         );
         Channel saved = channelRepository.save(channel);
         log.info("비공개 채널 생성 완료. id - {}", saved.getId());
-        return ChannelMapper.toDto(saved, getLastMassageAt(saved));
+        return channelMapper.toDto(saved, getLastMassageAt(saved));
     }
 
 
@@ -92,7 +94,7 @@ public class BasicChannelService implements ChannelService {
 
         channelRepository.save(channel);
         log.info("채널 수정 완료");
-        return ChannelMapper.toDto(channel, getLastMassageAt(channel));
+        return channelMapper.toDto(channel, getLastMassageAt(channel));
     }
 
     @Override
@@ -112,7 +114,7 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelDto> getAll() {
         log.info("모든 채널 조회 요청 들어옴.");
         return channelRepository.findAll().stream()
-                .map(channel -> ChannelMapper.toDto(channel, getLastMassageAt(channel)))
+                .map(channel -> channelMapper.toDto(channel, getLastMassageAt(channel)))
                 .toList();
     }
 
@@ -128,7 +130,7 @@ public class BasicChannelService implements ChannelService {
                     if (last.isPresent()) {
                         lastMessageAt = last.get().getCreatedAt();
                     }
-                    return ChannelMapper.toDto(c, lastMessageAt);
+                    return channelMapper.toDto(c, lastMessageAt);
                 })
                 .toList();
     }
@@ -138,7 +140,7 @@ public class BasicChannelService implements ChannelService {
         log.info("채널 조회 요청 들어옴 - {}", id);
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new ChannelNotFoundException(id));
-        return ChannelMapper.toDto(channel
+        return channelMapper.toDto(channel
         , getLastMassageAt(channel));
     }
 
@@ -147,7 +149,7 @@ public class BasicChannelService implements ChannelService {
         log.info("채널의 모든 참가자 조회 요청 들어옴. - {}", id);
         return channelRepository.findById(id)
                 .orElseThrow(() -> new ChannelNotFoundException(id)).getParticipants().stream()
-                .map(UserMapper::toDto)
+                .map(userMapper::toDto)
                 .toList();
     }
 
