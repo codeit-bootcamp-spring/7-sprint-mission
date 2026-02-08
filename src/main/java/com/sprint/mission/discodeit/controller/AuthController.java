@@ -47,9 +47,6 @@ public class AuthController {
 
     @PutMapping("/role")
     public ResponseEntity<UserResponseDto> role(@RequestBody UserRoleUpdateRequest request) {
-
-        System.out.println("request: " + request);
-
         if (request == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
