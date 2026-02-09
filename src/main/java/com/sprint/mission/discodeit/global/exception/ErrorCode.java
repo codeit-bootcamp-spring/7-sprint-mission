@@ -65,7 +65,14 @@ public enum ErrorCode {
     FILE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 중 오류가 발생했습니다."),
     FILE_READ_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 읽기 중 오류가 발생했습니다."),
 
-    UNHANDLED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "처리되지 않은 예외가 발생했습니다.");
+    UNHANDLED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "처리되지 않은 예외가 발생했습니다."),
+
+    //===== JWT =====//
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"토큰이 만료되었습니다. 다시 로그인해주세요."),
+    UNSUPPORTED_TOKEN(HttpStatus.BAD_REQUEST,"지원되지 않는 토큰 형식입니다."),
+    MALFORMED_TOKEN(HttpStatus.BAD_REQUEST,"잘못된 토큰 형식입니다."),
+    INVALID_SIGNATURE(HttpStatus.FORBIDDEN,"토큰 서명 검증에 실패했습니다."),
+    EMPTY_OR_INVALID_TOKEN(HttpStatus.BAD_REQUEST,"토큰이 비어 있거나 유효하지 않습니다.");
 
     private final HttpStatus status;
     private final String message;

@@ -73,3 +73,9 @@ info:
     multipart:
       max-file-size: ${spring.servlet.multipart.max-file-size}
       max-request-size: ${spring.servlet.multipart.max-request-size}
+
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForJwtTokenGeneration1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
+  access-token-expiration: 900000
+  refresh-token-expiration: 1209600000
+  issuer: jwt-demo-api
