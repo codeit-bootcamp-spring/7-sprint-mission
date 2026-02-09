@@ -14,11 +14,18 @@ import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.security.service.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.WebUtils;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -108,12 +115,33 @@ public class BasicAuthService implements AuthService {
 
     @Transactional(readOnly = true)
     @Override
-    public JwtDto refreshToken(String refreshToken){
-        UUID userId = jwtTokenProvider.getUserIdFromToken(refreshToken);
+    public JwtDto refreshToken(HttpServletRequest request, HttpServletResponse response){
+
+        Cookie refreshToken = WebUtils.getCookie(request, "REFRESH_TOKEN");
+        String refreshTokenValue = refreshToken.getValue();
+
+
+
+        UUID userId = jwtTokenProvider.getUserIdFromToken(refreshTokenValue);
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotExistException(userId));
-        if(!jwtTokenProvider.isTokenValid(refreshToken)) throw new InSufficientAccessException("invalid refresh token");
+        if(!jwtTokenProvider.isTokenValid(refreshTokenValue)) throw new InSufficientAccessException("invalid refresh token");
+
         String newAccessToken = jwtTokenProvider.generateAccessToken(user);
         UserDto newUserDto = userMapper.toDto(user);
+        Date refreshTokenExpirationDate = jwtTokenProvider.getRefreshTokenExpirationDate(refreshTokenValue);
+        Instant tmp =  refreshTokenExpirationDate.toInstant();
+        long seconds = Duration.between(Instant.now(),tmp).getSeconds();
+
+                String newRefreshToken = jwtTokenProvider.updateRefreshToken(user,refreshTokenExpirationDate);
+
+        Cookie refreshCookie = new Cookie("REFRESH_TOKEN", newRefreshToken);
+
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(Math.toIntExact(seconds));
+        refreshCookie.setSecure(false);
+        refreshCookie.setHttpOnly(true);
+
+        response.addCookie(refreshCookie);
 
         return new JwtDto(
                 newUserDto,

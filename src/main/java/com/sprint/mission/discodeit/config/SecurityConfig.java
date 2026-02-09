@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.*;
 import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
-import com.sprint.mission.discodeit.security.repository.JpaPersistenceTokenRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import com.sprint.mission.discodeit.security.service.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.security.service.LoginFailureHandler;
 import jakarta.servlet.Filter;
@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
         @Slf4j
@@ -33,11 +31,11 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
         public class SecurityConfig {
             private final LoginFailureHandler loginFailureHandler;
             private final JwtLoginSuccessHandler  jwtLoginSuccessHandler;
+            private final JwtLogoutHandler jwtLogoutHandler;
             private final HttpStatusReturningLogoutSuccessHandler logoutSuccessHandler;
             private final DiscodeitAccessDeniedHandler accessDeniedHandler;
             private final DiscodeitAuthenticationEntryPoint authenticationEntryPoint;
             private final SessionRegistry sessionRegistry;
-            private final JpaPersistenceTokenRepository tokenRepository;
             private final DiscodeitUserDetailsService  userDetailsService;
 
 
@@ -61,6 +59,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler(logoutSuccessHandler)
+                        .addLogoutHandler(jwtLogoutHandler)
 
                 )
                 .authorizeHttpRequests(authorize -> authorize
@@ -82,16 +81,6 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
                 )
                 .headers(headers ->
                         headers.frameOptions(frame -> frame.sameOrigin())
-                )
-                .rememberMe( rember -> rember
-                        .key(rememberMeKey)
-                        .tokenRepository(tokenRepository)
-                        .tokenValiditySeconds(60*60*24*14)
-                        .userDetailsService(userDetailsService)
-                        .rememberMeCookieName("remember-me")
-                        .rememberMeParameter("remember-me")
-                        .useSecureCookie(false)
-
                 )
         ;
                 DefaultSecurityFilterChain chain = http.build();

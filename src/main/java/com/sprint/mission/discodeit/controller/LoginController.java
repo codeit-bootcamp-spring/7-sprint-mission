@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.security.service.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,6 @@ import org.springframework.web.util.WebUtils;
 public class LoginController {
 
     private final AuthService authService;
-    private final JwtTokenProvider  jwtTokenProvider;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto dto){
@@ -41,14 +41,6 @@ public class LoginController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<UserDto> getUserInfo(
-            @AuthenticationPrincipal DiscodeitUserDetails userDetails
-            )
-    {
-        return new ResponseEntity<>(userDetails.getUserDto(), HttpStatus.OK);
-    }
-
     @PutMapping("/role")
     public ResponseEntity<UserDto> updateUserRole(
             @Valid @RequestBody UserRoleUpdateRequestDto requestDto
@@ -60,13 +52,11 @@ public class LoginController {
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtDto> refreshToken(
-            HttpServletRequest request
+            HttpServletRequest request,
+            HttpServletResponse response
     ){
-        Cookie refreshToken = WebUtils.getCookie(request, "REFRESH_TOKEN");
 
-        String refreshTokenValue = refreshToken.getValue();
-        JwtDto jwtDto = authService.refreshToken(refreshTokenValue);
-        log.debug("refreshToken : {}", refreshTokenValue);
+        JwtDto jwtDto = authService.refreshToken(request,response);
         return new ResponseEntity<>(jwtDto,HttpStatus.OK);
 
     }

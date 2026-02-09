@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.request.user.UserRoleUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.jwt.JwtDto;
 import com.sprint.mission.discodeit.dto.response.login.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -21,5 +23,5 @@ public interface AuthService {
     String createRefreshToken(LoginRequestDto loginRequestDto);
 
     @Transactional(readOnly = true)
-    JwtDto refreshToken(String refreshToken);
+    JwtDto refreshToken(HttpServletRequest request, HttpServletResponse response);
 }

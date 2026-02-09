@@ -68,6 +68,22 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String updateRefreshToken(User user,Date expirationDate){
+
+        return Jwts.builder()
+                .header()
+                .type("JWT")
+                .and()
+                .issuer(user.getUserName())
+                .subject(user.getEmail())
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(expirationDate)
+                .claim("user_id",user.getId())
+                .claim("token_type","refresh")
+                .signWith(getSecretKey())
+                .compact();
+    }
+
     public long getAccessTokenExpirationTime(){
         return jwtProperties.getAccessTokenExpiration()/1000;
     }
@@ -114,5 +130,14 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
         return claims.get("user_id",UUID.class);
+    }
+
+    public Date getRefreshTokenExpirationDate(String refreshToken){
+        Claims claims = Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(refreshToken)
+                .getPayload();
+        return claims.getExpiration();
     }
 }
