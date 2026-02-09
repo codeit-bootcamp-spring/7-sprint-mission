@@ -33,7 +33,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         UserResponseDto userResponseDto = userDetails.getUserResponseDto();
 
-
         response.setStatus(200);
         response.setContentType("application/json;charset=UTF-8");
 
