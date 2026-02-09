@@ -12,12 +12,14 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.domain.channel.ChannelNotExistException;
 import com.sprint.mission.discodeit.exception.domain.file.FileByteReadFailException;
 import com.sprint.mission.discodeit.exception.domain.message.MessageNotExistException;
+import com.sprint.mission.discodeit.exception.domain.role.InvalidAccessException;
 import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.exception.domain.user.UserNotJoinException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseBasicMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.subTable.MessageAttachment;
@@ -25,6 +27,8 @@ import com.sprint.mission.discodeit.subTable.MessageAttachment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -104,6 +108,7 @@ public class BasicMessageService implements MessageService {
         return messageRepository.findAll().stream().map(messageMapper::toDto).toList();
     }
     public void deleteMessage(UUID messageId){
+        if (!checkAuthor(messageId)) throw new InvalidAccessException();
         if(!messageRepository.existsById(messageId)) throw new MessageNotExistException(messageId);
         log.warn("delete message : {}",messageId);
         messageRepository.deleteById(messageId);
@@ -151,10 +156,21 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public MessageDto patchMessage(MessagePatchRequestDto dto, UUID messageId) {
+
+        if (!checkAuthor(messageId)) throw new InvalidAccessException();
         Message message = messageRepository.findById(messageId).orElseThrow(()->new MessageNotExistException(messageId));
         message.setContent(dto.newContent()==null?message.getContent():dto.newContent());
         messageRepository.save(message);
         log.debug("updated message : {} ",message);
         return messageMapper.toDto(message);
+    }
+
+    private boolean checkAuthor(UUID messageId){
+        Message message = messageRepository.findById(messageId).orElseThrow(()->new MessageNotExistException(messageId));
+        User author = message.getAuthor();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        DiscodeitUserDetails userDetails = (DiscodeitUserDetails) principal;
+        return author.getId().equals(userDetails.getUserDto().id());
+
     }
 }

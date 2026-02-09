@@ -15,6 +15,8 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,14 +34,15 @@ import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EX
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
     private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public UserDto createUser(UserCreateRequestDto userCreateRequestDto, MultipartFile profile)  {
         log.debug("createUser : {} Siuuuuu!!!",userCreateRequestDto);
+        String password = passwordEncoder.encode(userCreateRequestDto.password());
     if(profile!=null) {
         BinaryContent binaryContent = binaryContentRepository.save(
                 new BinaryContent(profile.getName(), profile.getContentType(), profile.getSize())
@@ -54,13 +57,10 @@ public class BasicUserService implements UserService {
         User user = userRepository.save(User.createUserWithProfileFactory(
                 userCreateRequestDto.username(),
                 userCreateRequestDto.email(),
-                userCreateRequestDto.password(),
+               password,
                 binaryContent
         ));
 
-        user.setUserStatus(userStatusRepository.save(
-                new UserStatus(user,Instant.now())
-        ));
 
 
         return userMapper.toDto(user);
@@ -68,13 +68,8 @@ public class BasicUserService implements UserService {
         User user = userRepository.save(
                 User.createUserFactory(userCreateRequestDto.username()
                         , userCreateRequestDto.email()
-                        , userCreateRequestDto.password())
+                        , password)
         );
-
-        UserStatus targetUserStatus = userStatusRepository.save(
-                new UserStatus(user,Instant.now())
-        );
-        user.setUserStatus(targetUserStatus);
         return userMapper.toDto(user);
     }
 
@@ -91,6 +86,8 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN') or principal.username == #userId.toString() ")
     public void deleteUser(UUID userId) {
         if (!userRepository.existsById(userId)) throw new UserNotExistException(userId);
         log.info("deleteUser : {} info layer",userId);
@@ -110,6 +107,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize( "principal.username == #userId.toString() or hasRole('ADMIN')")
     public UserDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile)  {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotExistException(userId));

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto.response.user;
 
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.security.Role;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -13,6 +14,7 @@ public record UserDto(
         String email,
         BinaryContentDto profile,
         UUID profileId,
-        Boolean online
+        Boolean online,
+        Role role
 ) {
 }

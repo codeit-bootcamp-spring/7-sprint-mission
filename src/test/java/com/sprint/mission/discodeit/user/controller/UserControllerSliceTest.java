@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.user.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.sprint.mission.discodeit.TestFixture;
@@ -8,9 +7,8 @@ import com.sprint.mission.discodeit.controller.UserController;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,15 +46,11 @@ public class UserControllerSliceTest {
     @MockitoBean
     UserService userService;
 
-    @MockitoBean
-    UserStatusService userStatusService;
-
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new ParameterNamesModule());
 
     private UserDto userDto;
     private User user;
-    private UserStatus userStatus;
 
     @BeforeEach
     void setUp() {
@@ -67,7 +61,8 @@ public class UserControllerSliceTest {
                 user.getEmail(),
                 null,
                 null,
-                true
+                true,
+                Role.USER
         );
     }
 
