@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.security.config;
 
 import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.repository.JpaPersistentTokenRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,13 +25,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-                                           LoginSuccessHandler loginSuccessHandler,
                                            LoginFailureHandler loginFailureHandler,
                                            CustomAuthenticationEntryPoint authenticationEntryPoint,
                                            CustomAccessDeniedHandler accessDeniedHandler,
-                                           SessionRegistry sessionRegistry,
                                            DiscodeitUserDetailsService userDetailsService,
-                                           JpaPersistentTokenRepository persistentTokenRepository) throws Exception {
+                                           JpaPersistentTokenRepository persistentTokenRepository,
+                                           JwtLoginSuccessHandler jwtLoginSuccessHandler) throws Exception {
 
         http
                 .authorizeHttpRequests(auth -> auth
@@ -47,7 +48,7 @@ public class SecurityConfig {
                 )
                 .formLogin(login -> login
                         .loginProcessingUrl("/api/auth/login") // 로그인 처리 url
-                        .successHandler(loginSuccessHandler) // 로그인 인증 성공
+                        .successHandler(jwtLoginSuccessHandler) // 로그인 인증 성공
                         .failureHandler(loginFailureHandler) // 로그인 인증 실패
                         .permitAll()
                 )
@@ -66,10 +67,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .sessionManagement(management -> management
-                        .sessionConcurrency(concurrency -> concurrency
-                                .maximumSessions(1)
-                                .sessionRegistry(sessionRegistry)
-                        )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .rememberMe(remember -> remember
                         .key("DiscodeitRememberMeSecretKey2026")
