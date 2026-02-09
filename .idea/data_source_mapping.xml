@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourcePerFileMappings">
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/e6a04f2a-59b9-4cfd-b602-d788cc816215/console.sql" value="e6a04f2a-59b9-4cfd-b602-d788cc816215" />
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/e6a04f2a-59b9-4cfd-b602-d788cc816215/console_1.sql" value="e6a04f2a-59b9-4cfd-b602-d788cc816215" />
+    <file url="file://$PROJECT_DIR$/sprint_mission_3_base/src/main/resources/schema.sql" value="e6a04f2a-59b9-4cfd-b602-d788cc816215" />
+  </component>
+</project>

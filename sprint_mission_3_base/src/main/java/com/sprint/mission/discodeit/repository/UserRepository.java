@@ -9,14 +9,17 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-  Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
 
-  boolean existsByEmail(String email);
+    boolean existsByEmail(String email);
 
-  boolean existsByUsername(String username);
+    boolean existsByUsername(String username);
 
-  @Query("SELECT u FROM User u "
-      + "LEFT JOIN FETCH u.profile "
-      + "JOIN FETCH u.status")
-  List<User> findAllWithProfileAndStatus();
+    @Query("""
+            select distinct u
+            from User u
+            left join fetch u.profile
+            left join fetch u.status
+            """)
+    List<User> findAllWithProfileAndStatus();
 }

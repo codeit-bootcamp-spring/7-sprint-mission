@@ -2,17 +2,15 @@ package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-
 import java.util.UUID;
 
 public record UserDto(
-        UUID id,            // ✅ UUID → Long
+        UUID id,
         String username,
         String email,
         String profileUrl
 ) {
     public static UserDto from(User user) {
-
         String profileUrl = null;
 
         BinaryContent profile = user.getProfile();
@@ -20,9 +18,11 @@ public record UserDto(
             profileUrl = "/api/binaryContents/" + profile.getId() + "/download";
         }
 
+        String username = user.getUsername() == null ? "" : user.getUsername();
+
         return new UserDto(
                 user.getId(),
-                user.getUsername(),
+                username,
                 user.getEmail(),
                 profileUrl
         );

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.jpa;
 
-import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -15,13 +15,14 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
-
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -34,31 +35,38 @@ public class UserServiceImpl implements UserService {
     private final BinaryContentRepository binaryRepo;
     private final BinaryContentStorage storage;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     public UserDto create(UserCreateRequest req,
                           Optional<BinaryContentCreateRequest> profileReq) {
+
+        if (userRepository.existsByUsername(req.username())) {
+            throw new UserAlreadyExistsException(req.username());
+        }
 
         if (userRepository.existsByEmail(req.email())) {
             throw new UserAlreadyExistsException(req.email());
         }
 
+        String encodedPassword = passwordEncoder.encode(req.password());
+
         User user = new User(
                 req.username(),
                 req.email(),
-                req.password(),
+                encodedPassword,
                 null
         );
 
-
         userRepository.save(user);
 
-        profileReq.ifPresent(p -> saveProfileAndReturn(user, p));
-
+        profileReq.ifPresent(p -> {
+            BinaryContent savedProfile = saveProfileAndReturn(user, p);
+        });
 
         userStatusRepository.save(
-                new UserStatus(user, java.time.Instant.now())
+                new UserStatus(user, Instant.now())
         );
-
 
         return UserDto.from(user);
     }
@@ -75,16 +83,18 @@ public class UserServiceImpl implements UserService {
                 .map(p -> saveProfileAndReturn(user, p))
                 .orElse(null);
 
+        String newPassword = req.newPassword();
+        String encodedNewPassword = (newPassword != null) ? passwordEncoder.encode(newPassword) : null;
+
         user.update(
                 req.newUsername(),
                 req.newEmail(),
-                req.newPassword(),
+                encodedNewPassword,
                 newProfile
         );
 
         return UserDto.from(user);
     }
-
 
     @Override
     public UserDto find(UUID userId) {
@@ -119,11 +129,9 @@ public class UserServiceImpl implements UserService {
                 .size((long) req.bytes().length)
                 .build();
 
-
         binaryRepo.save(binary);
         storage.put(binary.getId(), req.bytes());
 
         return binary;
     }
-
 }
