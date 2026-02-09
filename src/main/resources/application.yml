@@ -16,3 +16,9 @@ logging:
 admin:
   email: admin@naver.com
   password: admin1234
+
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForJwtTokenGeneration1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
+  access-token-expiration: 900000      # 60 * 60 * 15
+  refresh-token-expiration: 1209600000 # 60 * 60 * 24 * 2
+  issuer: jwt-demo-api

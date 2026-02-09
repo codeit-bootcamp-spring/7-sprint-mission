@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.repository.JpaPersistenceTokenRepository;
 import com.sprint.mission.discodeit.security.service.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.security.service.LoginFailureHandler;
@@ -31,7 +32,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
         @RequiredArgsConstructor
         public class SecurityConfig {
             private final LoginFailureHandler loginFailureHandler;
-            private final LoginSuccessHandler loginSuccessHandler;
+            private final JwtLoginSuccessHandler  jwtLoginSuccessHandler;
             private final HttpStatusReturningLogoutSuccessHandler logoutSuccessHandler;
             private final DiscodeitAccessDeniedHandler accessDeniedHandler;
             private final DiscodeitAuthenticationEntryPoint authenticationEntryPoint;
@@ -53,7 +54,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
                 )
                 .formLogin(login -> login
                         .loginProcessingUrl("/api/auth/login")
-                        .successHandler(loginSuccessHandler)
+                        .successHandler(jwtLoginSuccessHandler)
                         .failureHandler(loginFailureHandler)
                         .permitAll()
                 )
@@ -65,6 +66,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/users").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/auth/refresh").permitAll()
                         .requestMatchers("/api/auth/csrf-token").permitAll()
                         .requestMatchers("/api/auth/logout").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
@@ -76,12 +78,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
                         .authenticationEntryPoint(authenticationEntryPoint)
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .sessionConcurrency(
-                                cur -> cur
-                                        .maximumSessions(1)
-                                        .sessionRegistry(sessionRegistry)
-                        )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .headers(headers ->
                         headers.frameOptions(frame -> frame.sameOrigin())
