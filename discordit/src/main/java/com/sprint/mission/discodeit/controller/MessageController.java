@@ -35,13 +35,13 @@ public class MessageController {
     }
 
     @DeleteMapping("/{messageId}")
-    public ResponseEntity<Void> remove(@RequestParam UUID messageId) {
+    public ResponseEntity<Void> remove(@PathVariable UUID messageId) {
         messageService.remove(messageId);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{messageId}")
-    public ResponseEntity<MessageDto> edit(@RequestParam UUID messageId, @Valid @RequestBody MessageEditRequest request) {
+    public ResponseEntity<MessageDto> edit(@PathVariable UUID messageId, @Valid @RequestBody MessageEditRequest request) {
         return ResponseEntity.ok(messageService.editMessage(messageId, request));
     }
 }
