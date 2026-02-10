@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DiscodeitException.class)
     public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException ex) {
-        log.error("DiscodeitException: {}", ex.getErrorCode(), ex);
+        log.error("[{}] {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return ResponseEntity
                 .status(ex.getErrorCode().getHttpStatus())
                 .body(from(ex));
@@ -28,8 +28,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
-        log.error(ex.getClass().getSimpleName(), ex);
-        log.error(ex.getMessage(), ex);
+        log.error("[{}] {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
 
         Map<String, Object> details = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -45,8 +44,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentsExceptions(
             IllegalArgumentException ex) {
-        log.error(ex.getClass().getSimpleName(), ex);
-        log.error(ex.getMessage(), ex);
+        log.error("[{}] {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
 
 
         Map<String, Object> details = new HashMap<>();
@@ -56,24 +54,10 @@ public class GlobalExceptionHandler {
                 .body(from(ex, HttpStatus.BAD_REQUEST, details));
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex) {
-        log.error(ex.getClass().getSimpleName(), ex);
-        log.error(ex.getMessage(), ex);
-
-        Map<String, Object> details = new HashMap<>();
-        details.put("message", ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(from(ex, HttpStatus.INTERNAL_SERVER_ERROR, details));
-    }
-
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(
             Exception ex) {
-        log.error(ex.getClass().getSimpleName(), ex);
-        log.error(ex.getMessage(), ex);
+        log.error("[{}] {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
 
         Map<String, Object> details = new HashMap<>();
         details.put("message", ex.getMessage());
