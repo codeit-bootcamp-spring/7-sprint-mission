@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +24,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final LoginSuccessHandler loginSuccessHandler;
+    private final JwtLoginSuccessHandler jwtLoginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final SessionRegistry sessionRegistry;
 
@@ -53,7 +54,6 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-
                                 .requestMatchers("/",
                                         "/index.html",
                                         "/favicon.ico",
@@ -62,6 +62,7 @@ public class SecurityConfig {
                                         "/.well-known/**",
                                         "/api/auth/login",
                                         "/api/auth/csrf-token",
+                                        "api/auth/refresh",
                                         "/api/auth/logout",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",
@@ -82,7 +83,7 @@ public class SecurityConfig {
                 )
                 .formLogin(login -> login
                         .loginProcessingUrl("/api/auth/login")
-                        .successHandler(loginSuccessHandler)
+                        .successHandler(jwtLoginSuccessHandler)
                         .failureHandler(loginFailureHandler)
                 )
                 .logout(logout -> logout
@@ -94,13 +95,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .sessionManagement(management -> management
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 명시해 놓기
-                        .sessionConcurrency(concurrency -> concurrency
-                                .sessionRegistry(sessionRegistry)
-                                .maximumSessions(1) // 사용자 당 동시 최대 세션수
-                                .maxSessionsPreventsLogin(false) // false:새 로그인시 이전 세션 만료
-                        )
-                        .sessionFixation().changeSessionId() // 명시해놓기, 세션 Id만 변경하고 세션 객체는 그대로 유지
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .rememberMe(remember -> remember
                         .key("spring-mission-remember-me-key")
