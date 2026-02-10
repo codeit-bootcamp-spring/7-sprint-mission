@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,12 +24,14 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicReadStatusService implements ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
+    @Transactional
     public ReadStatusDto create(ReadStatusCreateRequest dto) {
         log.info("읽음 상태 요청 들어옴. \n\t유저\t : {}\n\t채널\t : {}\n\t", dto.userId(), dto.channelId());
         ReadStatus readStatus = new ReadStatus(
@@ -43,6 +46,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    @Transactional
     public ReadStatusDto update(UUID id, ReadStatusUpdateRequest dto) {
         log.info("읽음 상태 업데이트 요청 들어옴.");
         ReadStatus readStatus = readStatusRepository.findById(id)

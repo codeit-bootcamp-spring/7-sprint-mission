@@ -27,6 +27,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
@@ -82,15 +83,15 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
         if (dto.newPassword() != null) {
             user.setPassword(passwordEncoder.encode(dto.newPassword()));
-            log.debug("{}의 비밀번호 수정 완료",user.getUsername());
+            log.debug("{}의 비밀번호 수정 완료", user.getUsername());
         }
         if (dto.newUsername() != null) {
             user.setUsername(dto.newUsername());
-            log.debug("{}로 아이디 수정 완료",user.getUsername());
+            log.debug("{}로 아이디 수정 완료", user.getUsername());
         }
         if (dto.newEmail() != null) {
             user.setEmail(dto.newEmail());
-            log.debug("{}의 이메일 수정 완료",user.getUsername());
+            log.debug("{}의 이메일 수정 완료", user.getUsername());
         }
 
         if (profile != null) {
@@ -105,7 +106,7 @@ public class BasicUserService implements UserService {
             }
         }
         userRepository.save(user);
-        log.info("회원 정보 수정 완료 - id : {}",user.getId());
+        log.info("회원 정보 수정 완료 - id : {}", user.getId());
         return userMapper.toDto(user);
     }
 
@@ -114,16 +115,16 @@ public class BasicUserService implements UserService {
         log.info("사용자 삭제 요청 들어옴 - id : {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
-        userRepository.delete(user);
-        log.debug("사용자 삭제 완료 - id : {}", id);
         if (user.getProfile() != null) {
             binaryContentRepository.delete(user.getProfile());
             log.debug("삭제된 사용자의 프로필 이미지 삭제 완료");
         }
-        log.info("사용자 삭제 완료");
+        userRepository.delete(user);
+        log.debug("사용자 삭제 완료 - id : {}", id);
     }
 
     @Override
+    @Transactional
     public UserDto updateRole(UUID id, Roles role) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));

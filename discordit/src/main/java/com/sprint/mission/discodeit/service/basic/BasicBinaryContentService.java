@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,11 +19,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository contentRepository;
     private final BinaryContentStorage binaryContentStorage;
 
+    @Transactional
     public BinaryContentDto create(BinaryContentCreateRequest dto) {
         log.info("파일 생성 요청 들어옴 : {} {}", dto.fileName(), dto.type());
         BinaryContent content = new BinaryContent(

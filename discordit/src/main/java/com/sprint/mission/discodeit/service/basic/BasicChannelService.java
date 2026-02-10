@@ -23,8 +23,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -37,8 +37,8 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-@Primary
 @Slf4j
+@Transactional(readOnly = true)
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
@@ -48,6 +48,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelMapper channelMapper;
 
     @Override
+    @Transactional
     public ChannelDto createPublicChannel(PublicChannelCreateRequest dto) {
         log.info("공개 채널 생성 요청 들어옴. - {}", dto.name());
         Channel channel = Channel.createPublicChannel(
@@ -60,6 +61,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest dto) {
         log.info("비공개 채널 생성 요청 들어옴.");
         Channel channel = Channel.createPrivateChannel(
@@ -75,6 +77,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
+    @Transactional
     public ChannelDto update(UUID id, ChannelUpdateRequest dto) {
         log.info("채널 정보 수정 요청 들어옴. id - {}", id);
         Channel channel = channelRepository.findById(id)
@@ -98,16 +101,17 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
         log.warn("채널 삭제 요청 들어옴. id - {}", id);
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new ChannelNotFoundException(id));
-        channelRepository.deleteById(id);
-        log.warn("채널 삭제 완료");
-        messageRepository.deleteAllByChannel(channel);
-        log.warn("채널 메세지 삭제 완료");
         readStatusRepository.deleteAllByChannel(channel);
         log.warn("채널 읽음 상태 삭제 완료");
+        messageRepository.deleteAllByChannel(channel);
+        log.warn("채널 메세지 삭제 완료");
+        channelRepository.deleteById(id);
+        log.warn("채널 삭제 완료");
     }
 
     @Override
@@ -141,7 +145,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new ChannelNotFoundException(id));
         return channelMapper.toDto(channel
-        , getLastMassageAt(channel));
+                , getLastMassageAt(channel));
     }
 
     @Override
@@ -154,6 +158,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public void addParticipant(ChannelMemberRequest dto) {
         log.info("채널 참가자 {} 명 추가 요청 들어옴. - {}", dto.userUuids().size(), dto.channelId());
         List<User> users = userRepository.findAllById(dto.userUuids());
@@ -165,6 +170,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public void removeParticipant(ChannelMemberRequest dto) {
         log.info("채널 참가자 {} 명 제외 요청 들어옴 - {}", dto.userUuids().size(), dto.channelId());
         List<User> users = userRepository.findAllById(dto.userUuids());
