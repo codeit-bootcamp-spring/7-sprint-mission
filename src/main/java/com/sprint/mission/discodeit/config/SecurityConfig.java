@@ -64,7 +64,7 @@ public class SecurityConfig {
                                         "/.well-known/**",
                                         "/api/auth/login",
                                         "/api/auth/csrf-token",
-                                        "api/auth/refresh",
+                                        "/api/auth/refresh",
                                         "/api/auth/logout",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",

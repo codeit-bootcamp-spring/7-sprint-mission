@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.api;
 
+import com.sprint.mission.discodeit.dto.auth.JwtDto;
 import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
@@ -16,6 +17,8 @@ public interface AuthApi {
     ResponseEntity<UserResponseDto> getMe(DiscodeitUserDetails principal);
 
     ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken);
+
+    ResponseEntity<JwtDto> refreshAccessToken(String refreshToken);
 
     ResponseEntity<Map<String, Object>> getSessionInfo(HttpSession session);
 
