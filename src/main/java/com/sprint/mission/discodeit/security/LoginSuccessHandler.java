@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
+//스프린트9
+//@Component
 @RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 

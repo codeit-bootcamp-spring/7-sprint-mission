@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+//@Component
 public class UserSessionRegistry {
 
     private final Map<UUID, Object> userIndex = new ConcurrentHashMap<>();
