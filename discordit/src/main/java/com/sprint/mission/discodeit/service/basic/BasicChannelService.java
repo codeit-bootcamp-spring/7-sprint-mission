@@ -57,7 +57,7 @@ public class BasicChannelService implements ChannelService {
         );
         Channel saved = channelRepository.save(channel);
         log.info("공개 채널 생성 완료. id - {}", saved.getId());
-        return channelMapper.toDto(saved, getLastMassageAt(saved));
+        return channelMapper.toDto(saved, getLastMessageAt(saved));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class BasicChannelService implements ChannelService {
         );
         Channel saved = channelRepository.save(channel);
         log.info("비공개 채널 생성 완료. id - {}", saved.getId());
-        return channelMapper.toDto(saved, getLastMassageAt(saved));
+        return channelMapper.toDto(saved, getLastMessageAt(saved));
     }
 
 
@@ -97,7 +97,7 @@ public class BasicChannelService implements ChannelService {
 
         channelRepository.save(channel);
         log.info("채널 수정 완료");
-        return channelMapper.toDto(channel, getLastMassageAt(channel));
+        return channelMapper.toDto(channel, getLastMessageAt(channel));
     }
 
     @Override
@@ -118,7 +118,7 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelDto> getAll() {
         log.info("모든 채널 조회 요청 들어옴.");
         return channelRepository.findAll().stream()
-                .map(channel -> channelMapper.toDto(channel, getLastMassageAt(channel)))
+                .map(channel -> channelMapper.toDto(channel, getLastMessageAt(channel)))
                 .toList();
     }
 
@@ -145,7 +145,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new ChannelNotFoundException(id));
         return channelMapper.toDto(channel
-                , getLastMassageAt(channel));
+                , getLastMessageAt(channel));
     }
 
     @Override
@@ -181,7 +181,7 @@ public class BasicChannelService implements ChannelService {
         log.info("삭제 완료. 현재 인원 {} 명", channel.getParticipants().size());
     }
 
-    private Instant getLastMassageAt(Channel channel) {
+    private Instant getLastMessageAt(Channel channel) {
         log.info("채널 마지막 메세지 시점 조회 요청 들어옴 - {}", channel.getId());
         Optional<Message> lastByChannel = messageRepository.findLastByChannel(channel);
         return lastByChannel.map(BaseUpdatableEntity::getUpdatedAt).orElse(null);
