@@ -13,7 +13,6 @@ import com.sprint.mission.discodeit.service.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.UserDto;
 import com.sprint.mission.discodeit.service.mapper.UserMapper;
-import com.sprint.mission.discodeit.service.mapper.UserStatusMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,8 +41,6 @@ class UserServiceTest {
 
     @Spy
     private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
-    @Spy
-    private final UserStatusMapper userStatusMapper = Mappers.getMapper(UserStatusMapper.class);
     @Mock
     private UserRepository userRepository;
     @Mock

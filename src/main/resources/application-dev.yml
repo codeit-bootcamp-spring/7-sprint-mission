@@ -16,6 +16,7 @@ spring:
 
 logging:
   level:
+#    org.springframework.security: TRACE
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
     root: info

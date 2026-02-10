@@ -16,4 +16,6 @@ COPY --from=build /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
 
 EXPOSE 80
 
-ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+#ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+#ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS} -jar app.jar"]

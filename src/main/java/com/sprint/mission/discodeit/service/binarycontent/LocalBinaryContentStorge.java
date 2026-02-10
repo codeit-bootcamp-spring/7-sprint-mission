@@ -21,7 +21,7 @@ public class LocalBinaryContentStorge implements BinaryContentStorage {
     private final Path ROOT_PATH; // 루트 폴더
 
     public LocalBinaryContentStorge(
-            @Value("${discodeit.storage}") String ROOT_PATH) {
+            @Value("${discodeit.storage.local.root-path}") String ROOT_PATH) {
         this.ROOT_PATH = Path.of(ROOT_PATH);
     }
 
@@ -37,29 +37,27 @@ public class LocalBinaryContentStorge implements BinaryContentStorage {
     }
 
     @Override
-    public InputStream get(UUID id) {
-        Path filePath = ROOT_PATH.resolve(id.toString());
-        InputStream inputStream;
+    public UUID put(MultipartFile file) {
+        String contentType = file.getContentType();
+        validateContentType(contentType);
+        String fileName = UUID.randomUUID().toString();
+        Path filePath = ROOT_PATH.resolve(fileName);
         try {
-            inputStream = Files.newInputStream(filePath);
+            file.transferTo(filePath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return inputStream;
+        return UUID.fromString(fileName);
     }
 
-    @Override
-    public UUID put(UUID uuid, byte[] bytes) {
-        Path filePath = ROOT_PATH.resolve(uuid.toString());
-        try {
-            Files.write(filePath, bytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private void validateContentType(String contentType) {
+        if (contentType == null ||
+                !(contentType.equals("image/png")
+                        || contentType.equals("image/jpeg")
+                        || contentType.equals("image/gif"))) {
+            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다: " + contentType);
         }
-        return uuid;
     }
-
-
 
     @Override
     public UrlResource getUrlResource(String fileName) {

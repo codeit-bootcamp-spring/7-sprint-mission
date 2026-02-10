@@ -6,11 +6,8 @@ import jakarta.validation.constraints.Size;
 
 public record UserUpdateRequest(
         @Email
-        @NotNull
         String newEmail,
-        @NotNull
         @Size(min=4)
         String newUsername,
-        @NotNull
         String newPassword
 ){}
