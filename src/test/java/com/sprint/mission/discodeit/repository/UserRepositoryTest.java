@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.role.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,8 +30,8 @@ class UserRepositoryTest {
         @DisplayName("성공: 이메일로 조회할 수 있다.")
         void findByEmail_Success() {
             // given
-            userRepository.save(new User("user1@naver.com", "Qwer1234!", "user1"));
-            userRepository.save(new User("user2@naver.com", "Asdf1234!", "user2"));
+            userRepository.save(new User("user1@naver.com", "Qwer1234!", "user1", Role.USER));
+            userRepository.save(new User("user2@naver.com", "Asdf1234!", "user2", Role.USER));
 
             // when
             Optional<User> found = userRepository.findByEmail("user1@naver.com");
@@ -56,22 +57,22 @@ class UserRepositoryTest {
     @Nested
     @DisplayName("직접 작성한 JPQL 검증")
     class ManualQuery {
-        
+
         @Test
         @DisplayName("프로필과 상태로 조회한다.")
         void findAllWithProfileAndStatus() {
             // given
-            userRepository.save(new User("user1@naver.com", "Qwer1234!", "user1"));
-            userRepository.save(new User("user2@naver.com", "Asdf1234!", "user2"));
-            
+            userRepository.save(new User("user1@naver.com", "Qwer1234!", "user1", Role.USER));
+            userRepository.save(new User("user2@naver.com", "Asdf1234!", "user2", Role.USER));
+
             // when
-            List<User> users = userRepository.findAllWithProfileAndStatus();
-            
+            List<User> users = userRepository.findAllWithProfile();
+
             // then
             assertThat(users).hasSize(2);
             assertThat(users.get(0).getUsername()).isEqualTo("user1");
             assertThat(users.get(1).getUsername()).isEqualTo("user2");
-            
+
         }
     }
 }

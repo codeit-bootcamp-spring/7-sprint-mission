@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,13 +66,13 @@ public class MessageServiceImpl implements MessageService {
                     .contentType(file.getContentType())
                     .build();
 
-            binaryContentRepository.save(binaryContent);
-            attachments.add(binaryContent);
+            BinaryContent savedBinary = binaryContentRepository.save(binaryContent);
+            attachments.add(savedBinary);
             try {
-                binaryContentStorage.put(binaryContent.getId(), file.getBytes());
+                binaryContentStorage.put(savedBinary.getId(), file.getBytes());
             } catch (IOException e) {
-                log.warn("파일 업로드 실패: {}", binaryContent.getId());
-                throw new FileOperationFailedException(binaryContent.getId());
+                log.warn("파일 업로드 실패: {}", savedBinary.getId());
+                throw new FileOperationFailedException(savedBinary.getId());
             }
         }
         return attachments;
@@ -154,6 +155,7 @@ public class MessageServiceImpl implements MessageService {
     // Message Update
     @Override
     @Transactional
+    @PreAuthorize("@messageSecurityService.isOwner(#messageId, authentication.principal.id)")
     public MessageDto updateMessage(UUID messageId, MessageUpdateRequest updateDto) {
 
         log.debug("메시지 수정 요청: {}", messageId);
@@ -177,6 +179,7 @@ public class MessageServiceImpl implements MessageService {
     // Message Delete
     @Override
     @Transactional
+    @PreAuthorize("@messageSecurityService.isOwner(#messageId, authentication.principal.id)")
     public void deleteMessage(UUID id) {
         log.info("메시지 삭제 요청: {}", id);
         messageRepository.findById(id)

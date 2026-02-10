@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.role.Role;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,16 +26,17 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private BinaryContent profile;
 
-    @OneToOne(mappedBy = "user", orphanRemoval = true,
-            cascade = CascadeType.ALL, optional = false)
-    private UserStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role;
 
     @Builder
-    public User(String email, String password, String username) {
+    public User(String email, String password, String username, Role role) {
         this.username = username;       // 특수문자 불가
         this.email = email;             // 받을때 @ 있는지 확인
         this.password = password;       // 8자리 이상
         this.profile = null;
+        this.role = role;
     }
 
     // Update
@@ -53,8 +55,8 @@ public class User extends BaseUpdatableEntity {
     public void updateProfile(BinaryContent profile) {
         this.profile = profile;
     }
-
-    public void updateStatus(UserStatus status) {
-        this.status = status;
+    
+    public void updateRole(Role role) {
+        this.role = role;
     }
 }

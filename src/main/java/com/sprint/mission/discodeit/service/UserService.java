@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.userDto.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
@@ -20,6 +21,9 @@ public interface UserService {
 
     // 수정
     UserDto updateUserInfo(UUID userId, UserUpdateRequest updateDto, MultipartFile profileImage);
+
+    // 권한 변경
+    UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest);
 
     // 삭제
     void deleteUser(UUID userId); // 삭제 메서드 추가 (성공 여부 반환)

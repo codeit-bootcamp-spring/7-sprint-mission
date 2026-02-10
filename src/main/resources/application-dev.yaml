@@ -21,8 +21,26 @@ spring:
         show_sql: true
         format_sql: true
 
+  security:
+    user:
+      name: user
+
 discodeit:
   storage:
     type: local
     local:
       root-path: "${user.home}/Desktop/DiscodeitUpload_dev"
+
+# Logging
+logging:
+  level:
+    org.springframework.security: TRACE
+    com.discodeit.security: TRACE
+    org.hibernate.SQL: TRACE
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+app:
+  admin:
+    username: admin
+    email: a@a.a
+    password: 1234

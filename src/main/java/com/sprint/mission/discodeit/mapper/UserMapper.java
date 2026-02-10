@@ -12,10 +12,8 @@ public class UserMapper {
 
     private final BinaryContentMapper binaryContentMapper;
 
-    public UserDto toDto(User user) {
+    public UserDto toDto(User user, boolean isOnline) {
 
-        // Optional = false
-        boolean isOnline = user.getStatus().isOnline();
         // BinaryMapper내부에서 검사
         BinaryContentDto profile = binaryContentMapper.toDto(user.getProfile());
 
@@ -24,7 +22,8 @@ public class UserMapper {
                 user.getUsername(),
                 user.getEmail(),
                 profile,
-                isOnline
+                isOnline,
+                user.getRole()
         );
     }
 }

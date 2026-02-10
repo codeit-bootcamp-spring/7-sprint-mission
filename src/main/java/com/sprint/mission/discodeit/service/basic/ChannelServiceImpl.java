@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.dto.channelDto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.entityType.ChannelType;
+import com.sprint.mission.discodeit.entity.role.ChannelType;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelDto createPublicChannel(PublicChannelCreateRequest requestDto) {
 
         log.debug("공개 채널 생성 요청 - name: {}, description: {}",
@@ -111,6 +113,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize( "hasRole('CHANNEL_MANAGER')")
     public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest updateDto) {
 
         log.debug("채널 수정 요청 - channelId: {}", channelId);
@@ -135,6 +138,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize( "hasRole('CHANNEL_MANAGER')")
     public void deleteChannel(UUID id) {
         log.info("채널 삭제 요청: {}", id);
         channelRepository.findById(id)
@@ -144,6 +148,5 @@ public class ChannelServiceImpl implements ChannelService {
                         });
         log.info("채널 삭제 성공: {}", id);
         channelRepository.deleteById(id);
-
     }
 }
