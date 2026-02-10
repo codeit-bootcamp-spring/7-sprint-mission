@@ -27,8 +27,6 @@ validation:
       min-length: 3
       max-length: 10
     email-regex: "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
-user-status:
-  online-threshold-minutes: 5
 logging:
   level:
     root: info

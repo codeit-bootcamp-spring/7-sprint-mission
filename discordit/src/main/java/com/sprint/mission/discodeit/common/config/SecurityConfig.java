@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.common.config;
 
+import com.sprint.mission.discodeit.common.config.properties.SecurityProperties;
 import com.sprint.mission.discodeit.common.handler.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,11 +29,7 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Value("${remember-me.key}")
-    private String rememberMeKey;
-
-    @Value("${remember-me.token-validity-seconds}")
-    private int rememberMeTokenValiditySeconds;
+    private final SecurityProperties properties;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -114,8 +110,8 @@ public class SecurityConfig {
                         )
                 )
                 .rememberMe(remember -> remember
-                        .key(rememberMeKey)
-                        .tokenValiditySeconds(rememberMeTokenValiditySeconds)
+                        .key(properties.key())
+                        .tokenValiditySeconds(properties.tokenValiditySeconds())
                         .rememberMeParameter("remember-me"))
                 .build();
     }

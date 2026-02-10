@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.storage;
 
+import com.sprint.mission.discodeit.common.config.properties.LocalStorageProperties;
 import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryContentAlreadyExistException;
 import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.dto.entity.binaryContent.BinaryContentDto;
@@ -7,7 +8,6 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -32,8 +32,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     private final BinaryContentRepository binaryContentRepository;
     private final Path fileDir;
 
-    public LocalBinaryContentStorage(@Value("${discodeit.storage.local.file-path}") String fileDir, BinaryContentRepository binaryContentRepository) {
-        this.fileDir = Path.of(fileDir);
+    public LocalBinaryContentStorage(LocalStorageProperties localStorageProperties, BinaryContentRepository binaryContentRepository) {
+        this.fileDir = Path.of(localStorageProperties.filePath());
         this.binaryContentRepository = binaryContentRepository;
     }
 

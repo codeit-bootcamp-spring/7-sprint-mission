@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.common.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.sprint.mission.discodeit.common.config.properties.AwsS3Properties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,21 +16,16 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
         name = "discodeit.storage.type",
         havingValue = "s3"
 )
+@RequiredArgsConstructor
 public class S3Config {
-    @Value("${aws.s3.access-key}")
-    private String accessKey;
 
-    @Value("${aws.s3.secret-key}")
-    private String secretKey;
-
-    @Value("${aws.s3.region}")
-    private String region;
+    private final AwsS3Properties properties;
 
     @Bean
     public S3Client s3Client() {
 
         return S3Client.builder()
-                .region(Region.of(region))
+                .region(Region.of(properties.region()))
                 .credentialsProvider(credentialsProvider())
                 .build();
     }
@@ -37,12 +33,12 @@ public class S3Config {
     @Bean
     public S3Presigner s3Presigner() {
         return S3Presigner.builder()
-                .region(Region.of(region))
+                .region(Region.of(properties.region()))
                 .credentialsProvider(credentialsProvider())
                 .build();
     }
 
     private StaticCredentialsProvider credentialsProvider() {
-        return StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
+        return StaticCredentialsProvider.create(AwsBasicCredentials.create(properties.accessKey(), properties.SecretKey()));
     }
 }

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.storage;
 
+import com.sprint.mission.discodeit.common.config.properties.AwsS3Properties;
 import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.common.exceptions.binaryContent.s3.S3StorageDownloadException;
 import com.sprint.mission.discodeit.common.exceptions.binaryContent.s3.S3StorageException;
@@ -9,7 +10,6 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,12 +38,8 @@ import java.util.UUID;
 public class S3BinaryContentStorage implements BinaryContentStorage {
 
     private final S3Presigner s3Presigner;
+    private final AwsS3Properties s3Properties;
     private final BinaryContentRepository binaryContentRepository;
-    @Value("${aws.s3.bucket}")
-    private String bucket;
-
-    @Value("${aws.s3.presigned-url-expiration}")
-    private Long expiration;
 
 
     private final S3Client s3Client;
@@ -57,7 +53,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
             s3Client.putObject(
                     PutObjectRequest.builder()
                             .key(file.getFileName())
-                            .bucket(bucket)
+                            .bucket(s3Properties.bucket())
                             .contentType(file.getContentType())
                             .build(),
                     RequestBody.fromBytes(content)
@@ -74,7 +70,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     public InputStream get(String fileName) {
         try {
             return s3Client.getObject(GetObjectRequest.builder()
-                    .bucket(bucket)
+                    .bucket(s3Properties.bucket())
                     .key(fileName)
                     .build()
             );
@@ -101,7 +97,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
             s3Client.deleteObject(
                     DeleteObjectRequest.builder()
                             .key(fileName)
-                            .bucket(bucket)
+                            .bucket(s3Properties.bucket())
                             .build()
             );
         } catch (Exception e) {
@@ -111,9 +107,9 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
     private String generatePresignedUrl(String key) {
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofSeconds(expiration))
+                .signatureDuration(Duration.ofSeconds(s3Properties.presignedUrlExpiration()))
                 .getObjectRequest(GetObjectRequest.builder()
-                        .bucket(bucket)
+                        .bucket(s3Properties.bucket())
                         .key(key)
                         .build())
                 .build();
