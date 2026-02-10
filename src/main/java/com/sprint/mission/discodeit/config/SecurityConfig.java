@@ -41,6 +41,7 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtLogoutHandler jwtLogoutHandler;
     private final DataSource dataSource;
 
 
@@ -81,7 +82,8 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
-                        .deleteCookies("JSESSIONID")
+                        .deleteCookies("REFRESH_TOKEN")
+                        .addLogoutHandler(jwtLogoutHandler)
                         .permitAll()
                 )
 
