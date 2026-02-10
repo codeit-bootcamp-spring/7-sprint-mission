@@ -14,6 +14,7 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
@@ -21,10 +22,10 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import javax.sql.DataSource;
@@ -39,7 +40,7 @@ public class SecurityConfig {
     private final LoginFailureHandler loginFailureHandler;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
-    private final DiscodeitUserDetailsService userDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final DataSource dataSource;
 
 
@@ -49,7 +50,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
                 .authorizeHttpRequests(auth -> auth
@@ -57,7 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/assets/**").permitAll()
                         .requestMatchers("/api/auth/csrf-token").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/logout").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/logout", "/api/auth/refresh").permitAll()
                         .requestMatchers("/api-doc-ui.html", "/my-api/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/management/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
@@ -65,11 +66,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers(PathRequest.toH2Console())
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-                )
+                .csrf(AbstractHttpConfigurer::disable)
+
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
@@ -87,6 +85,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
 
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
@@ -94,16 +94,6 @@ public class SecurityConfig {
 
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-
-                .rememberMe(rememberMe -> rememberMe
-                        .key("remember-me-key")
-                        .tokenValiditySeconds(60 * 60 * 24 * 7) // 7일
-                        .userDetailsService(userDetailsService)
-                        .tokenRepository(tokenRepository())
-                        .rememberMeParameter("remember-me")
-                        .rememberMeCookieName("remember-me")
-                        .useSecureCookie(false)
                 )
         ;
 

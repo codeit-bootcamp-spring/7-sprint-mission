@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.jwt.JwtDto;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
+import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.io.IOException;
 public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthService authService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -31,24 +31,7 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
         DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
         UserDto userDto = userDetails.getUserDto();
 
-        String accessToken = jwtTokenProvider.createAccessToken(userDto);
-        String refreshToken = jwtTokenProvider.createRefreshToken(userDto);
-
-        // "REFRESH_TOKEN"이라는 이름의 쿠키 생성
-        Cookie refreshCookie = new Cookie("REFRESH_TOKEN", refreshToken);
-        refreshCookie.setHttpOnly(true);  // 자바스크립트로 접근 불가 (XSS 방어)
-        refreshCookie.setSecure(false);    // HTTPS 환경에서만 전송 (로컬 개발시는 false로 테스트 가능)
-        refreshCookie.setPath("/");       // 모든 경로에서 쿠키 전송
-        refreshCookie.setMaxAge(7 * 24 * 60 * 60); // 7일 (초 단위) - 리프레시 토큰 유효기간과 맞춤
-
-        // 응답에 쿠키 추가
-        response.addCookie(refreshCookie);
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        JwtDto jwtDto = new JwtDto(userDto, accessToken);
+        JwtDto jwtDto = authService.rotateRefreshToken(userDto, response);
         objectMapper.writeValue(response.getWriter(), jwtDto);
 
         log.info("로그인 성공: {}", userDto.username());

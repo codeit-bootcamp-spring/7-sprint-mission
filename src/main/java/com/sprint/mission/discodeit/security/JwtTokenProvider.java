@@ -108,4 +108,8 @@ public class JwtTokenProvider {
             return false;
         }
     }
+
+    public String getUsername(String token) {
+        return validateToken(token).getSubject();
+    }
 }
