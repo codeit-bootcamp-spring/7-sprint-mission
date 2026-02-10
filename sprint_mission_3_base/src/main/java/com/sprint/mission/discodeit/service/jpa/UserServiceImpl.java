@@ -38,8 +38,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDto create(UserCreateRequest req,
-                          Optional<BinaryContentCreateRequest> profileReq) {
+    public UserDto create(UserCreateRequest req, Optional<BinaryContentCreateRequest> profileReq) {
 
         if (userRepository.existsByUsername(req.username())) {
             throw new UserAlreadyExistsException(req.username());
@@ -58,18 +57,19 @@ public class UserServiceImpl implements UserService {
                 null
         );
 
-        userRepository.save(user);
-
         profileReq.ifPresent(p -> {
-            BinaryContent savedProfile = saveProfileAndReturn(user, p);
+            BinaryContent profile = saveProfileAndReturn(user, p);
+            user.setProfile(profile);
         });
 
-        userStatusRepository.save(
-                new UserStatus(user, Instant.now())
-        );
+        UserStatus status = new UserStatus(user, Instant.now());
+        user.setStatus(status);
+
+        userRepository.save(user);
 
         return UserDto.from(user);
     }
+
 
     @Override
     public UserDto update(UUID id,

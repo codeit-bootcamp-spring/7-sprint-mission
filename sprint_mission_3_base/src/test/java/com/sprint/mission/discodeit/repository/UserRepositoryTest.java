@@ -33,7 +33,6 @@ class UserRepositoryTest {
     private BinaryContentRepository binaryContentRepository;
 
     @TestConfiguration
-    @EnableJpaAuditing
     static class TestAuditingConfig {
     }
 
