@@ -27,6 +27,7 @@ import java.util.UUID;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtRegistry jwtRegistry;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -34,7 +35,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwt = extractJwtFromRequest(request);
+
             if (jwt != null && jwtTokenProvider.isTokenValid(jwt)) {
+
+                if (!jwtRegistry.hasActiveJwtInformationByAccessToken(jwt)) {
+                    log.warn("Registry에 존재하지 않는 JWT");
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+
                 authenticateUser(jwt, request);
             }
         } catch (Exception e) {

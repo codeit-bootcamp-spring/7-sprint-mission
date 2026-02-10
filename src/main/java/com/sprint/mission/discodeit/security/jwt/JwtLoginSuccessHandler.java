@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import jakarta.servlet.ServletException;
@@ -25,6 +26,8 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtRegistry jwtRegistry;
+    private final UserMapper userMapper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -36,11 +39,19 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
+        User user = userRepository.findyByUsernameWithProfile(userDetails.getUsername())
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         String accessToken = jwtTokenProvider.generateAccessToken(user);
         String refreshToken = jwtTokenProvider.generateRefreshToken(user);
+
+        // 동시 로그인 제한 및 새로운 JWT 토큰 등록
+        jwtRegistry.invalidateJwtInformationByUserId(user.getId());
+        jwtRegistry.registerJwtInformation(new JwtInformation(
+                userMapper.toResponseDto(user),
+                accessToken,
+                refreshToken
+        ));
 
         Cookie refreshTokenCookie = new Cookie("REFRESH_TOKEN", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
