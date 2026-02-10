@@ -19,6 +19,10 @@ public class DiscodeitUserDetails implements UserDetails {
     private final UserResponseDto userResponseDto;
     private final String password;
 
+    public static DiscodeitUserDetails fromJwt(UserResponseDto userResponseDto) {
+        return new DiscodeitUserDetails(userResponseDto, null);
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 유저의 권한은(Role)을 리턴하는 곳
