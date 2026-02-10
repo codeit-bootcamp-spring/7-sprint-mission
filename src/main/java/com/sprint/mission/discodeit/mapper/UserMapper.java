@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.mapStruct.BinaryStruct;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Component;
@@ -19,8 +20,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class UserMapper {
     private final UserRepository userRepository;
-    private final SessionRegistry  sessionRegistry;
-
+    private final JwtRegistry jwtRegistry;
 
     public UserDto toDto(User user){
         BinaryContentDto binaryContentDto = user.getProfile()==null ?null:BinaryStruct.INSTANCE.toDto(user.getProfile());
@@ -42,13 +42,7 @@ public class UserMapper {
 
     private boolean isUserOnline(UUID userId) {
 
-        List<Object> principals = sessionRegistry.getAllPrincipals();
-        Optional<Object> userDetails = principals.stream().filter(x -> ((DiscodeitUserDetails) x)
-                        .getUserDto().id()
-                        .equals(userId))
-                .findFirst();
-
-        return userDetails.isPresent();
+        return jwtRegistry.hasActiveJwtInformationByUserId(userId);
 
     }
 }

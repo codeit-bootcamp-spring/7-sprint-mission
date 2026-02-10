@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.filter.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import com.sprint.mission.discodeit.security.service.DiscodeitUserDetailsService;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -37,7 +39,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
             private final DiscodeitAuthenticationEntryPoint authenticationEntryPoint;
             private final SessionRegistry sessionRegistry;
             private final DiscodeitUserDetailsService  userDetailsService;
-
+            private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
             @Value("${rememberme.key}")
             private String rememberMeKey;
@@ -62,6 +64,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
                         .addLogoutHandler(jwtLogoutHandler)
 
                 )
+                        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/users").permitAll()
