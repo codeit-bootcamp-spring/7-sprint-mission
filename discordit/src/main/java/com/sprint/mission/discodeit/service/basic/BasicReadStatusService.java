@@ -30,6 +30,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final ReadStatusMapper readStatusMapper;
 
     @Transactional
     public ReadStatusDto create(ReadStatusCreateRequest dto) {
@@ -42,7 +43,7 @@ public class BasicReadStatusService implements ReadStatusService {
         );
         readStatusRepository.save(readStatus);
         log.info("읽음 상태 생성 완료. ");
-        return ReadStatusMapper.toDto(readStatus);
+        return readStatusMapper.toDto(readStatus);
     }
 
     @Override
@@ -53,12 +54,12 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(() -> new ReadStatusNotFoundException(id));
         readStatus.updateLastReadAt(dto.newLastReadAt());
         log.info("읽음 상태 업데이트 완료.");
-        return ReadStatusMapper.toDto(readStatus);
+        return readStatusMapper.toDto(readStatus);
     }
 
     public ReadStatusDto get(UUID uuid) {
         log.info("읽음 상태 조회 요청 들어옴.");
-        return ReadStatusMapper.toDto(readStatusRepository.findById(uuid)
+        return readStatusMapper.toDto(readStatusRepository.findById(uuid)
                 .orElseThrow(() -> new ReadStatusNotFoundException(uuid)));
     }
 
@@ -66,7 +67,7 @@ public class BasicReadStatusService implements ReadStatusService {
         log.info("유저 전체 읽음 상태 조회 요청 들어옴 - user : {}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         return readStatusRepository.findAllByUser(user).stream()
-                .map(ReadStatusMapper::toDto)
+                .map(readStatusMapper::toDto)
                 .toList();
     }
 

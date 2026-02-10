@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.dto.mapper;
 import com.sprint.mission.discodeit.dto.page.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PageResponseMapper {
-    public static <T> PageResponse<T> fromSlice(Slice<T> slice) {
+    public <T> PageResponse<T> fromSlice(Slice<T> slice) {
         return new PageResponse<>(
                 slice.getContent(),
                 slice.getNumber(),
@@ -15,7 +17,7 @@ public class PageResponseMapper {
         );
     }
 
-    public static <T> PageResponse<T> fromPage(Page<T> page) {
+    public <T> PageResponse<T> fromPage(Page<T> page) {
         return new PageResponse<>(
                 page.getContent(),
                 page.getNumber(),

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserMapper {
     private final SessionManager sessionManager;
+    private final BinaryContentMapper binaryContentMapper;
 
     public UserDto toDto(User user) {
         return new UserDto(
@@ -17,7 +18,7 @@ public class UserMapper {
                 user.getRole(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfile() == null ? null : BinaryContentMapper.toDto(user.getProfile()),
+                user.getProfile() == null ? null : binaryContentMapper.toDto(user.getProfile()),
                 sessionManager.isOnline(user.getUsername())
         );
     }

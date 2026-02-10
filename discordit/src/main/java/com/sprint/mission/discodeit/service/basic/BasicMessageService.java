@@ -40,11 +40,12 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
+    private final PageResponseMapper pageResponseMapper;
 
     @Override
     public PageResponse<Message> getAllByChannelId(MessageGetRequest request) {
         log.info("채널 전체 메세지 조회 요청 들어옴. - 채널 {} ", request.channelId());
-        return PageResponseMapper.fromPage(messageRepository.findAllByChannel(
+        return pageResponseMapper.fromPage(messageRepository.findAllByChannel(
                 channelRepository.findById(request.channelId())
                         .orElseThrow(() -> new ChannelNotFoundException(request.channelId())),
                 PageRequest.of(

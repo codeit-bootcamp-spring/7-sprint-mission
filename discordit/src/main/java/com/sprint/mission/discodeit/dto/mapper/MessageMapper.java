@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MessageMapper {
     private final UserMapper userMapper;
+    private final BinaryContentMapper binaryContentMapper;
 
     public MessageDto toDto(Message message) {
         return new MessageDto(
@@ -20,7 +21,7 @@ public class MessageMapper {
                 userMapper.toDto(message.getAuthor()),
                 message.getAttachments() == null ? null :
                         message.getAttachments().stream()
-                                .map(BinaryContentMapper::toDto)
+                                .map(binaryContentMapper::toDto)
                                 .toList()
         );
     }

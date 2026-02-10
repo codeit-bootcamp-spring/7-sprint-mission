@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BinaryContentMapper {
-    public static BinaryContentDto toDto(BinaryContent binaryContent) {
+    public BinaryContentDto toDto(BinaryContent binaryContent) {
         return new BinaryContentDto(
                 binaryContent.getId(),
                 binaryContent.getFileName(),
