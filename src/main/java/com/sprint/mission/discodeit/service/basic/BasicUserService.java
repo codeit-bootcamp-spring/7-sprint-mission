@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.global.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.global.exception.user.UsernameAlreadyExistsException;
@@ -10,15 +11,15 @@ import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +35,13 @@ import java.util.stream.Collectors;
 public class BasicUserService implements UserService{
 
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
 
     private final UserMapper userMapper;
 
     private final BinaryContentStorage binaryContentStorage;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -59,16 +61,13 @@ public class BasicUserService implements UserService{
         User newUser  = new User(
                 userRequest.username(),
                 userRequest.email(),
-                userRequest.password(),
-                profileImage
+                passwordEncoder.encode(userRequest.password()),
+                profileImage,
+                Role.USER
         );
-
-        UserStatus userStatus = new UserStatus(newUser);
-        newUser.setStatus(userStatus);
 
         // 사용자 저장
         User saved = userRepository.save(newUser);
-        userStatusRepository.save(userStatus);
 
         log.info("새 유저 생성 완료: userId = {}, username = {}, email = {}",
                 saved.getId(), saved.getUsername(), saved.getEmail());
@@ -90,15 +89,16 @@ public class BasicUserService implements UserService{
     @Override
     public List<UserResponseDto> findAll() {
         // fetch join 적용
-        return userRepository.findAllWithProfileAndStatus().stream()
+        return userRepository.findAllWithProfile().stream()
                 .map(u -> userMapper.toResponseDto(u))
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
+    @PreAuthorize("#userId == authentication.principal.getUserDto.id")
     public UserResponseDto update(UUID userId, UpdateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
-        
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
                         ErrorCode.USER_NOT_FOUND,
@@ -135,6 +135,7 @@ public class BasicUserService implements UserService{
 
     @Override
     @Transactional
+    @PreAuthorize("#userId == authentication.principal.getUserDto.id")
     public void delete(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -145,14 +146,12 @@ public class BasicUserService implements UserService{
         log.debug("사용자 삭제 요청: userId = {}, username = {}", user.getId(), user.getUsername());
 
         BinaryContent profile = user.getProfile();
-        UserStatus userStatus = user.getStatus();
 
         // 프로필 이미지 삭제(있는 경우)
         if(user.getProfile() != null) {
             binaryContentRepository.deleteById(profile.getId());
         }
 
-        userStatusRepository.deleteById(userStatus.getId());
         userRepository.deleteById(userId);
 
         log.info("사용자 삭제 완료: userId = {}", userId);

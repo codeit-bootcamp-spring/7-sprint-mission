@@ -31,6 +31,7 @@ CREATE TABLE users (
 	email       varchar(100) NOT NULL UNIQUE,
 	password    varchar(60) NOT NULL,
 	profile_id  uuid  UNIQUE,
+	role varchar(20) NOT NULL,
 
 	PRIMARY KEY (id),
 	FOREIGN KEY (profile_id) REFERENCES binary_contents (id) ON DELETE SET NULL
@@ -86,3 +87,28 @@ CREATE TABLE message_attachments (
 	FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE,
 	FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE
 );
+
+-- Remember-Me 토큰 저장 테이블
+CREATE TABLE IF NOT EXISTS persistent_logins (
+    -- 시리즈 식별자 (Primary Key)
+    -- UUID 형식, 로그인 세션마다 고유
+    series VARCHAR(64) PRIMARY KEY,
+
+    -- 사용자명
+    -- User 테이블의 username과 연결
+    username VARCHAR(64) NOT NULL,
+
+    -- 인증 토큰
+    -- 매번 변경되는 토큰, SecureRandom 생성
+    token VARCHAR(64) NOT NULL,
+
+    -- 마지막 사용 시간
+    -- 토큰이 마지막으로 사용된 시각
+    -- 오래된 토큰 정리에 사용
+    last_used TIMESTAMP NOT NULL
+);
+
+-- 성능 최적화: username으로 조회 가능
+-- 사용자의 모든 Remember-Me 토큰 조회 시 사용
+CREATE INDEX IF NOT EXISTS idx_persistent_logins_username
+    ON persistent_logins(username);

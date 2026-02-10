@@ -20,6 +20,10 @@ public class User extends BaseUpdatableEntity{
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     // 프로필 삭제시 profile_id 컬럼을 null로 세팅
     // 유저 삭제시 프로필은 함께 삭제
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -33,21 +37,12 @@ public class User extends BaseUpdatableEntity{
     )
     private BinaryContent profile;
 
-    // DB 테이블에 저장하지 않는 필드
-    // mappedBy 속성 적용시 외래키를 가지고 있지 않아
-    // 객체 존재 확인을 위해 기본적을 EAGER로 동작
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserStatus status;
-
-    public User(String username, String email, String password, BinaryContent profile) {
+    public User(String username, String email, String password, BinaryContent profile, Role role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.profile = profile;
-    }
-
-    public void setStatus(UserStatus status) {
-        this.status = status;
+        this.role = role;
     }
 
     public void update(String username, String email, String password, BinaryContent profile) {
@@ -62,6 +57,12 @@ public class User extends BaseUpdatableEntity{
         }
         if (profile != null && !profile.equals(this.profile)) {
             this.profile = profile;
+        }
+    }
+
+    public void updateRole(Role role) {
+        if (role != null && !role.equals(this.role)) {
+            this.role = role;
         }
     }
 

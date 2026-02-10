@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.global.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sprint.mission.discodeit.global.exception.DiscodeitException;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import java.util.Collections;
 import java.util.Map;
 
 public record ErrorResponse (
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         Instant timestamp,
         String code,
         String message,
