@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.storage;
 import com.sprint.mission.discodeit.common.config.properties.LocalStorageProperties;
 import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryContentAlreadyExistException;
 import com.sprint.mission.discodeit.common.exceptions.binaryContent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.common.exceptions.binaryContent.fileStorage.FileStorageIOException;
 import com.sprint.mission.discodeit.dto.entity.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -69,7 +70,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             Files.write(path, content);
         } catch (IOException e) {
             log.error("IOException 발생 : {}", e.getMessage());
-            throw new RuntimeException(e);
+            throw new FileStorageIOException(file.getId());
         }
         log.debug("파일 생성 성공. 파일 이름 : {}", file.getFileName());
         return uuid;

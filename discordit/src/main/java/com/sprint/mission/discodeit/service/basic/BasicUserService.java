@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.common.config.SessionManager;
 import com.sprint.mission.discodeit.common.enums.Roles;
+import com.sprint.mission.discodeit.common.exceptions.binaryContent.fileStorage.FileStorageIOException;
 import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.entity.user.UserDto;
 import com.sprint.mission.discodeit.dto.entity.user.request.UserCreateRequest;
@@ -65,7 +66,7 @@ public class BasicUserService implements UserService {
             try {
                 binaryContentStorage.put(saved.getId(), profile.getBytes());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new FileStorageIOException(saved.getId());
             }
             user.setProfile(saved);
             log.debug("사용자 프로필 이미지 저장 완료.");

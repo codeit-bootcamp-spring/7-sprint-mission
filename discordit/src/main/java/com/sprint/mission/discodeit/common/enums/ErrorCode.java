@@ -28,7 +28,8 @@ public enum ErrorCode {
     // 500 Internal Server Error,
     INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     UPLOAD_FAILED("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    DOWNLOAD_FAILED("파일 다운로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    DOWNLOAD_FAILED("파일 다운로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_SAVE_FAILED("파일 저장에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String description;
     private final HttpStatus httpStatus;
