@@ -20,7 +20,6 @@ public enum ErrorCode {
     MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "M001", "메시지를 찾을 수 없습니다."),
     MESSAGE_NOT_EMPTY(HttpStatus.UNPROCESSABLE_ENTITY, "M002", "메시지는 비어있을 수 없습니다."),
 
-
     // BinaryContent
     DIRECTORY_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "B001", "디렉토리 생성에 실패했습니다."),
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "B002", "파일을 찾을 수 없습니다."),
@@ -39,7 +38,11 @@ public enum ErrorCode {
     // Auth
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A001", "아이디 또는 비밀번호가 틀렸습니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "A002", "권한이 부족합니다"),
-    LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, "A003", "로그인이 필요합니다.");
+    LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, "A003", "로그인이 필요합니다."),
+
+    // Token
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "T001", "유효하지 않은 토큰입니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "T002", "만료된 토큰입니다.");
 
     private final HttpStatus status;
     private final String code;
