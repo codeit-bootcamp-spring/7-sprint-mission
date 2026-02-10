@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

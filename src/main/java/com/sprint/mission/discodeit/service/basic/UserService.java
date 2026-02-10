@@ -2,19 +2,21 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.exception.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
-import com.sprint.mission.discodeit.repository.jpa.UserStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +34,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor //@Repository 있어야 등록시켜 줌!!
 public class UserService implements InterfaceUserService {
     private final UsersRepository userRepository;
-    private final UserStatusesRepository userStatusRepository;
     private final BinaryContentsRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final SessionRegistry sessionRegistry;
+    private final AuthService authService;
 
 //    @Autowired
 //    EntityManager em;
@@ -48,6 +52,7 @@ public class UserService implements InterfaceUserService {
 //    2. 필드 주입(Field Injection) : Setter 메서드를 사용
 //    3. 수정자 주입(Setter Injection) : 간단하지만 테스트 어려워서 지양
 
+    //    @PreAuthorize("hasRole('USER')")
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest, Optional<MultipartFile> optionalProfileFile) {
@@ -80,12 +85,13 @@ public class UserService implements InterfaceUserService {
             })
             .orElse(null);
 
+        String password = userCreateRequest.password();
+        String encodePassword = passwordEncoder.encode(password); //!! 🛠️
+
         User newUser = new User(userCreateRequest.username(),
             userCreateRequest.email(),
-            userCreateRequest.password(),
+            encodePassword,
             profile);
-
-        newUser.initUserStatus();
 
         userRepository.save(newUser);
 
@@ -101,12 +107,6 @@ public class UserService implements InterfaceUserService {
             .findById(userID)
             .orElseThrow(() -> new UserNotFoundException(userID));
 
-        UserStatus userStatus = userStatusRepository
-            .findUserStatusByUserId(userID)
-            .orElseThrow(() -> new UserStatusNotFoundException(userID));
-
-        log.info("✅ UserService.findAllByChannelId = [" + user.getUsername() + "] online = [" + userStatus.isOnline() + "]");
-
         return userMapper.toDto(user);
     }
 
@@ -116,29 +116,26 @@ public class UserService implements InterfaceUserService {
 //        DTO를 활용하여:
 //        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
 //        [ ] 패스워드 정보는 제외하세요.
-        List<UserDto> dtoList = new ArrayList<>(){};
-        List<User> users = userRepository.findAll();
-        List<UserStatus> userStatusList = userStatusRepository.findAll();
 
-        for (User user : users) {
-            UserStatus userStatus = userStatusList.stream()
-                  .filter(status -> status.getUser().getId() != null
-                      && status.getUser().getId().equals(user.getId()))
-                  .findFirst()
-                  .orElse(null);
+        return userRepository.findAll().stream()
+            .map(userMapper::toDto)
+            .toList();
+    }
 
-            if (userStatus != null) {
-                UserDto dto = userMapper.toDto(user);
-                dtoList.add(dto);
-                log.info("✅ UserService.findAll = [" + user.getUsername() + "] online = [" + userStatus.isOnline() + "]");
-            }
-        }
+    private List<DiscodeitUserDetails> getDiscodeitUserDetails(User user) {
 
-        return dtoList;
+        return sessionRegistry.getAllPrincipals()
+            .stream()
+            .filter(DiscodeitUserDetails.class::isInstance)
+            .map(DiscodeitUserDetails.class::cast)
+            .filter(userDetails -> userDetails.getUser().id().equals(user.getId()))
+//                .map(discodeitUserDetail -> dtoList.add(discodeitUserDetail.getUserDto()))
+            .toList();
     }
 
     @Transactional
     @Override
+    @PreAuthorize("#userId == authentication.principal.user.id") // SpEL
     public UserDto update(UUID userId, UserUpdateRequest dtoUserUpdate, Optional<MultipartFile> optionalProfileFile) {
 //        [ ] 선택적으로 프로필 이미지를 대체할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
@@ -178,13 +175,7 @@ public class UserService implements InterfaceUserService {
             })
             .orElse(null);
 
-        user.setProfile(profile);
-        user.setUsername(dtoUserUpdate.newUsername());
-        user.setEmail(dtoUserUpdate.newEmail());
-
-        if (null != dtoUserUpdate.newPassword()) {
-            user.setPassword(dtoUserUpdate.newPassword());
-        }
+        user.updateFrom(dtoUserUpdate, profile);
 
         //!! 순서 유의_II
         userRepository.save(user);
@@ -195,19 +186,19 @@ public class UserService implements InterfaceUserService {
 
     @Transactional
     @Override
+    @PreAuthorize("#userID == authentication.principal.user.id") // SpEL
     public void delete(UUID userID) {
 //        [ ] 관련된 도메인도 같이 삭제합니다.
         User user = userRepository.findById(userID)
             .orElseThrow(() -> new UserNotFoundException(userID));
 
-        Optional<UserStatus> optionalStatus = userStatusRepository.findUserStatusByUserId(user.getId());
-        if (optionalStatus.isPresent()) {
-            userStatusRepository.deleteById(optionalStatus.get().getId());
-            log.info("✅ UserService.userStatusRepository.deleteById = [" + user.getUsername() + "]");
-        }
-//        else {
-//            log.error("🚨UserService.userStatusRepository.deleteById = [" + user.getUserName() + "]");
+//        Optional<UserStatus> optionalStatus = userStatusRepository.findUserStatusByUserId(user.getId());
+//        if (optionalStatus.isPresent()) {
+//            userStatusRepository.deleteById(optionalStatus.get().getId());
+//            log.info("✅ UserService.userStatusRepository.deleteById = [" + user.getUsername() + "]");
 //        }
+
+        authService.expireUserSessions(userID);
 
         if (user.getProfile() != null && user.getProfile().getId() != null) {
             Optional<BinaryContent> optionalContents = binaryContentRepository.findById(user.getProfile().getId());

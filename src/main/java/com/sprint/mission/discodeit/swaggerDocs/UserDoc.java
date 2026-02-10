@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.swaggerDocs;
 
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
-import com.sprint.mission.discodeit.mapper.dto.UserStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -122,29 +120,4 @@ public interface UserDoc {
         @Parameter(description = "수정할 User ID") @PathVariable("userId") UUID userId,
         @Parameter(description = "User 업데이트 정보 (JSON)") @RequestPart(value = "userUpdateRequest") UserUpdateRequest dtoUser,
         @Parameter(description = "새로운 프로필 이미지 파일 (선택 사항)") @RequestPart(value = "profile", required = false) MultipartFile file);
-
-
-    /**
-     * PATCH /api/users/{userId}/userStatus - User 온라인 상태 업데이트
-     */
-    @Operation(summary = "User 온라인 상태 업데이트")
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "User 온라인 상태가 성공적으로 업데이트됨",
-            content = @Content(
-                schema = @Schema(implementation = UserDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "해당 User의 UserStatus를 찾을 수 없음",
-            content = @Content(
-                examples = @ExampleObject(value = "UserStatus with userId {userId} not found")
-            )
-        )
-    })
-    ResponseEntity<UserStatusDto> updateUserStatusByUserId(
-        @Parameter(description = "상태를 변경할 User ID") @PathVariable("userId") UUID userId,
-        @org.springframework.web.bind.annotation.RequestBody UserStatusUpdateRequest userStatusUpdate);
 }

@@ -18,6 +18,10 @@ import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceChannelService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -39,7 +43,7 @@ public class ChannelService implements InterfaceChannelService {
     private final ChannelMapper channelMapper;
 
 //    @Transactional(readOnly = true)
-    private List<ReadStatus> saveToReadStatusRepostitory( Channel channel, List<UUID> participantIds) {
+    private List<ReadStatus> saveToReadStatusRepository( Channel channel, List<UUID> participantIds) {
 
         List<ReadStatus> readStatusList = new ArrayList<>();
 
@@ -56,6 +60,7 @@ public class ChannelService implements InterfaceChannelService {
         return readStatusList;
     }
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
     public ChannelDto createPublic(PublicChannelCreateRequest dtoCreateChannel) {
@@ -85,7 +90,7 @@ public class ChannelService implements InterfaceChannelService {
         channelRepository.save(channel);
         log.info("✅createPrivate.channelRepository.save.ok! - channel.id = {}", channel.getId().toString());
 
-        List<ReadStatus> list = saveToReadStatusRepostitory(channel, dtoCreateChannel.participantIds());
+        List<ReadStatus> list = saveToReadStatusRepository(channel, dtoCreateChannel.participantIds());
 
         return channelMapper.toDto(channel);
     }
@@ -98,16 +103,15 @@ public class ChannelService implements InterfaceChannelService {
 //        [ ] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
 //        [ ] PUBLIC 채널 목록은 전체 조회합니다.
 //        [ ] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
-        List<Channel> allChannel = channelRepository.findAll();
         List<ChannelDto> resChannelFinds = new ArrayList<>();
 
-        allChannel.stream()
-            .filter(channel -> channel.getType() == PUBLIC)
+        channelRepository.findByType(PUBLIC) //findPublicChannels()
+            .stream()
             .peek(channel -> log.info("✅ findAllByUserId.[✅ PUBLIC] = [" + channel.getName() + "]"))
             .forEach(channel -> resChannelFinds.add(channelMapper.toDto(channel)));
 
-        allChannel.stream()
-            .filter(channel -> channel.getType() == PRIVATE)
+        channelRepository.findByType(PRIVATE)
+            .stream()
             .filter(channel -> readStatusRepository.findReadStatusByUserIdAndChannelId(userID, channel.getId()).isPresent())
             .peek(channel -> log.info("✅ findAllByUserId.[🅰️ PRIVATE]. userID = [" + userID.toString() + "]"))
             .forEach(channel -> resChannelFinds.add(channelMapper.toDto(channel)));
@@ -116,6 +120,8 @@ public class ChannelService implements InterfaceChannelService {
         return resChannelFinds;
     }
 
+
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
     public ChannelDto update(UUID channelId, ChannelDto_Update channelDtoUpdate) {
@@ -146,15 +152,32 @@ public class ChannelService implements InterfaceChannelService {
         Channel findedChannel = channelRepository.findById(channelID)
             .orElseThrow(() -> new channelNotFoundException(channelID));
 
-        channelRepository.deleteById(findedChannel.getId());
+        //⭐️ 퍼블릭 채널 생성, 수정, 삭제는 CHANNEL_MANAGER 권한을 가져야합니다.
+        if(findedChannel.getType() == PUBLIC) {
 
-        readStatusRepository.findAll().stream()
-          .filter(readStatus -> readStatus.getChannel().getId().equals(channelID))
-          .forEach(readStatus -> readStatusRepository.deleteById(readStatus.getId()));
+            //⭐️ Spring Security 역할 체크
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            boolean isAdmin = authentication
+                .getAuthorities()
+                .stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CHANNEL_MANAGER"));
+
+            if (!isAdmin) {
+
+                throw new AuthorizationDeniedException("권한이 없습니다.");
+            }
+        }
 
         messageRepository.findAll().stream()
           .filter(message -> message.getChannel().getId().equals(channelID))
           .forEach(message -> messageRepository.deleteById(message.getId()));
+
+        readStatusRepository.findAll().stream()
+            .filter(readStatus -> readStatus.getChannel().getId().equals(channelID))
+            .forEach(readStatus -> readStatusRepository.deleteById(readStatus.getId()));
+
+        channelRepository.deleteById(findedChannel.getId());
 
         log.info("✅ ChannelService.delete = [" + findedChannel.getName() + "] 채널 삭제");
     }
