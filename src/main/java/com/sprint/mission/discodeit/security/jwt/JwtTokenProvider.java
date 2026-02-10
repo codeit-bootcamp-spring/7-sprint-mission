@@ -43,7 +43,6 @@ public class JwtTokenProvider {
                 .claim("userId", user.getId())
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole())
-                .claim("profile", user.getProfile())
                 .claim("token_type", "access")
                 .signWith(getSecretKey())
                 .compact();

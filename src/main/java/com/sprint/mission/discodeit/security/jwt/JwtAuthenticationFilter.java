@@ -1,13 +1,9 @@
 package com.sprint.mission.discodeit.security.jwt;
 
-import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,7 +27,6 @@ import java.util.UUID;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final BinaryContentMapper binaryContentMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -40,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = extractJwtFromRequest(request);
             if (jwt != null && jwtTokenProvider.isTokenValid(jwt)) {
-
+                authenticateUser(jwt, request);
             }
         } catch (Exception e) {
             log.error("JWT 인증 실패: {}", e.getMessage());
@@ -52,17 +47,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void authenticateUser(String jwt, HttpServletRequest request) {
         Claims claims = jwtTokenProvider.validateToken(jwt);
 
-        UUID userId = claims.get("userId", UUID.class);
+        UUID userId = UUID.fromString(claims.get("userId", String.class));
         String username = claims.getSubject();
         String email = claims.get("email", String.class);
-        BinaryContent profile = claims.get("profile", BinaryContent.class);
-        Role role = claims.get("role", Role.class);
+        Role role = Role.valueOf(claims.get("role", String.class));
 
         UserResponseDto dto = new UserResponseDto(
                 userId,
                 username,
                 email,
-                binaryContentMapper.toResponseDto(profile),
+                null,
                 true,
                 role
         );

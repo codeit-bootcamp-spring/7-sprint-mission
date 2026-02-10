@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.security.config;
 
 import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
-import com.sprint.mission.discodeit.security.repository.JpaPersistentTokenRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
@@ -28,14 +30,15 @@ public class SecurityConfig {
                                            LoginFailureHandler loginFailureHandler,
                                            CustomAuthenticationEntryPoint authenticationEntryPoint,
                                            CustomAccessDeniedHandler accessDeniedHandler,
-                                           DiscodeitUserDetailsService userDetailsService,
-                                           JpaPersistentTokenRepository persistentTokenRepository,
-                                           JwtLoginSuccessHandler jwtLoginSuccessHandler) throws Exception {
+                                           JwtLoginSuccessHandler jwtLoginSuccessHandler,
+                                           JwtAuthenticationFilter jwtAuthenticationFilter,
+                                           JwtLogoutHandler jwtLogoutHandler) throws Exception {
 
         http
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/","/index.html", "/assets/**").permitAll()
-                        .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/logout").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users").permitAll()
                         .requestMatchers("/swagger-ui/**", "/actuator/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
@@ -55,7 +58,8 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
-                        .deleteCookies("JSESSIONID", "remember-me")
+                        .addLogoutHandler(jwtLogoutHandler)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
                 .csrf(csrf -> csrf
@@ -68,15 +72,6 @@ public class SecurityConfig {
                 )
                 .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .rememberMe(remember -> remember
-                        .key("DiscodeitRememberMeSecretKey2026")
-                        .tokenValiditySeconds(60 * 60 * 24 * 14)
-                        .userDetailsService(userDetailsService)
-                        .rememberMeParameter("remember-me")
-                        .rememberMeCookieName("remember-me")
-                        .useSecureCookie(false) // 개발 환경
-                        .tokenRepository(persistentTokenRepository)
                 );
 
         return http.build();
