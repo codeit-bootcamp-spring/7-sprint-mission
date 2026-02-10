@@ -18,6 +18,10 @@ services:
       - AWS_S3_SECRET_KEY=${AWS_S3_SECRET_KEY}
       - AWS_S3_REGION=${AWS_S3_REGION}
       - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_NAME=${ADMIN_NAME}
+      - ADMIN_PASS=${ADMIN_PASS}
+      - REMEMBER_ME_KEY=${REMEMBER_ME_KEY}
     ports:
       - "8081:80"
     volumes:

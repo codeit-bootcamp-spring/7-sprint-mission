@@ -23,6 +23,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +50,7 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public MessageResponseDto createMessage(CreateMessageDto createMessageDto,
-                                            List<CreateBinaryContentDto> createBinaryContentDtos) {
+            List<CreateBinaryContentDto> createBinaryContentDtos) {
 
         User author = userRepository.findById(createMessageDto.authorId())
                 .orElseThrow(() -> UserNotFoundException.byId(createMessageDto.authorId()));
@@ -123,6 +124,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
+    @PreAuthorize("@messageSecurity.isOwner(#messageId, authentication)")
     public MessageResponseDto updateMessage(UUID messageId, UpdateMessageDto updateMessageDto) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> MessageNotFoundException.byId(messageId));
@@ -134,6 +136,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
+    @PreAuthorize("@messageSecurity.isOwner(#messageId, authentication)")
     public void deleteMessage(UUID messageId) {
         if (!messageRepository.existsById(messageId))
             throw MessageNotFoundException.byId(messageId);

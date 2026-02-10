@@ -115,7 +115,7 @@ class UserRepositoryTest {
             entityManager.clear();
 
             // when
-            List<User> result = userRepository.findAllWithProfileAndStatus();
+            List<User> result = userRepository.findAllWithProfile();
 
             // then
             assertThat(result).hasSize(2);
@@ -123,7 +123,6 @@ class UserRepositoryTest {
 
             result.forEach(user -> {
                 assertThat(user.getProfile()).isNotNull();
-                assertThat(user.getUserStatus()).isNotNull();
             });
 
         }
@@ -132,7 +131,7 @@ class UserRepositoryTest {
         @DisplayName("[정상 케이스] 빈 리스트 반환 - 유저가 없는 경우")
         void findAllWithProfileAndStatus_emptyList() {
             // when
-            List<User> result = userRepository.findAllWithProfileAndStatus();
+            List<User> result = userRepository.findAllWithProfile();
 
             // then
             assertThat(result).isEmpty();
@@ -150,12 +149,11 @@ class UserRepositoryTest {
             entityManager.clear();
 
             // when
-            List<User> result = userRepository.findAllWithProfileAndStatus();
+            List<User> result = userRepository.findAllWithProfile();
 
             // then
             assertThat(result).hasSize(1);
             assertThat(result.get(0).getProfile()).isNull();
-            assertThat(result.get(0).getUserStatus()).isNotNull();
         }
     }
 

@@ -4,6 +4,10 @@ import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.enums.Role;
+import com.sprint.mission.discodeit.fixture.user.dto.CreateUserDtoFixture;
+import com.sprint.mission.discodeit.fixture.user.dto.UserResponseDtoFixture;
+import com.sprint.mission.discodeit.fixture.user.entity.UserEntityFixture;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -16,7 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +33,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("User Service 테스트")
 class BasicUserServiceTest {
@@ -37,6 +40,8 @@ class BasicUserServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserMapper userMapper;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private BasicUserService userService;
@@ -54,72 +59,18 @@ class BasicUserServiceTest {
 
     @BeforeEach
     void setUp() {
-        createUserDto = new CreateUserDto(
-                "test",
-                "test@codeit.com",
-                "test_123"
-        );
-        createUserDto2 = new CreateUserDto(
-                "test2",
-                "test2@codeit.com",
-                "test_456"
-        );
-        createUserDto3 = new CreateUserDto(
-                "test3",
-                "test3@codeit.com",
-                "test_789"
-        );
 
+        createUserDto = CreateUserDtoFixture.createUserDto("test1");
+        createUserDto2 = CreateUserDtoFixture.createUserDto("test2");
+        createUserDto3 = CreateUserDtoFixture.createUserDto("test3");
 
-        user = new User(
-                createUserDto.username(),
-                createUserDto.email(),
-                createUserDto.password(),
-                null
-        );
-        user2 = new User(
-                createUserDto2.username(),
-                createUserDto2.email(),
-                createUserDto2.password(),
-                null
-        );
-        user3 = new User(
-                createUserDto3.username(),
-                createUserDto3.email(),
-                createUserDto3.password(),
-                null
-        );
+        user = UserEntityFixture.createUser(createUserDto.username());
+        user2 = UserEntityFixture.createUser(createUserDto2.username());
+        user3 = UserEntityFixture.createUser(createUserDto3.username());
 
-        UUID userId = UUID.randomUUID();
-        ReflectionTestUtils.setField(user, "id", userId);
-        UUID userId2 = UUID.randomUUID();
-        ReflectionTestUtils.setField(user2, "id", userId2);
-        UUID userId3 = UUID.randomUUID();
-        ReflectionTestUtils.setField(user3, "id", userId3);
-
-
-        userResponseDto = new UserResponseDto(
-                userId,
-                user.getUsername(),
-                user.getEmail(),
-                null,
-                true
-        );
-        userResponseDto2 = new UserResponseDto(
-                userId2,
-                user2.getUsername(),
-                user2.getEmail(),
-                null,
-                true
-        );
-        userResponseDto3 = new UserResponseDto(
-                userId3,
-                user3.getUsername(),
-                user3.getEmail(),
-                null,
-                true
-        );
-
+        userResponseDto = UserResponseDtoFixture.createUserResponse(user.getId(), user.getEmail(), user.getUsername());
+        userResponseDto2 = UserResponseDtoFixture.createUserResponse(user.getId(), user.getEmail(), user.getUsername());
+        userResponseDto3 = UserResponseDtoFixture.createUserResponse(user.getId(), user.getEmail(), user.getUsername());
 
         updateUserDto = new UpdateUserDto(
                 "updated_test",
@@ -135,10 +86,15 @@ class BasicUserServiceTest {
         @DisplayName("[정상 케이스] - 유저 생성")
         void createUser_success() {
             // given
+            String rawPassword = createUserDto.password();
+            String encodedPassword = "encoded_password"; // 가짜 암호화 결과값
+
             given(userRepository.findByUsername(createUserDto.username()))
                     .willReturn(Optional.empty());
             given(userRepository.findByEmail(createUserDto.email()))
                     .willReturn(Optional.empty());
+            given(passwordEncoder.encode(rawPassword))
+                    .willReturn(encodedPassword);
             given(userRepository.save(any(User.class)))
                     .willReturn(user);
             given(userMapper.toResponseDto(any(User.class)))
@@ -231,7 +187,7 @@ class BasicUserServiceTest {
         @DisplayName("[정상 케이스] - 모든 유저 조회 성공")
         void readUser_all_success() {
             // given
-            given(userRepository.findAllWithProfileAndStatus())
+            given(userRepository.findAllWithProfile())
                     .willReturn(List.of(user, user2, user3));
             given(userMapper.toResponseDto(user))
                     .willReturn(userResponseDto);
@@ -246,7 +202,7 @@ class BasicUserServiceTest {
             assertThat(result).hasSize(3);
             assertThat(result).isEqualTo(List.of(userResponseDto, userResponseDto2, userResponseDto3));
 
-            then(userRepository).should().findAllWithProfileAndStatus();
+            then(userRepository).should().findAllWithProfile();
             then(userMapper).should(times(3)).toResponseDto(any(User.class));
 
         }
@@ -272,7 +228,8 @@ class BasicUserServiceTest {
                     "updated_test",
                     "updated@codeit.com",
                     null,
-                    true
+                    true,
+                    Role.USER
             );
 
             given(userMapper.toResponseDto(user))

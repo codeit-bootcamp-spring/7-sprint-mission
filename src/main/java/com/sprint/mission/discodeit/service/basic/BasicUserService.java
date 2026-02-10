@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -15,6 +16,8 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
 
     private final UserMapper userMapper;
 
@@ -48,7 +52,8 @@ public class BasicUserService implements UserService {
                 .map(this::saveBinaryContent)
                 .orElse(null);
 
-        User user = new User(createUserDto.username(), createUserDto.email(), createUserDto.password(), profile);
+        String encryptedPassword = passwordEncoder.encode(createUserDto.password());
+        User user = new User(createUserDto.username(), createUserDto.email(), encryptedPassword, profile);
 
         userRepository.save(user);
 
@@ -67,7 +72,7 @@ public class BasicUserService implements UserService {
     @Transactional(readOnly = true)
     @Override
     public List<UserResponseDto> getAllUsers() {
-        List<User> users = userRepository.findAllWithProfileAndStatus();
+        List<User> users = userRepository.findAllWithProfile();
 
         return users.stream()
                 .map(userMapper::toResponseDto)
@@ -76,8 +81,9 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize("#userId == authentication.principal.userResponseDto.id")
     public UserResponseDto updateUser(UUID userId, UpdateUserDto updateUserDto,
-                                      Optional<CreateBinaryContentDto> createBinaryContentDto) {
+            Optional<CreateBinaryContentDto> createBinaryContentDto) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> UserNotFoundException.byId(userId));
@@ -104,11 +110,29 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize("#userId == authentication.principal.userResponseDto.id")
     public void deleteUser(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> UserNotFoundException.byId(userId));
 
         userRepository.delete(user);
+    }
+
+    @Transactional
+    public UserResponseDto initAdmin(String adminEmail, String adminName, String adminPass) {
+        return userRepository.findByEmail(adminEmail)
+                .map(user -> {
+                    // 만약 해당 계정이 존재하는데 Admin이 아니라면
+                    // Admin으로 권한 변경
+                    if (!user.getRole().equals(Role.ADMIN)) {
+                        user.updateRole(Role.ADMIN);
+                    }
+                    return userMapper.toResponseDto(user);
+                })
+                .orElseGet(() -> {
+                    CreateUserDto createUserDto = new CreateUserDto(adminName, adminPass, adminEmail);
+                    return createUser(createUserDto, Optional.empty());
+                });
     }
 
     private BinaryContent saveBinaryContent(CreateBinaryContentDto createBinaryContentDto) {

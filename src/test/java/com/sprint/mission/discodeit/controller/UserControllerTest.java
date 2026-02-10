@@ -5,18 +5,18 @@ import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResp
 import com.sprint.mission.discodeit.dto.user.request.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
-import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.response.UserStatusResponseDto;
+import com.sprint.mission.discodeit.fixture.user.dto.CreateUserDtoFixture;
+import com.sprint.mission.discodeit.fixture.user.dto.UserResponseDtoFixture;
 import com.sprint.mission.discodeit.global.exception.ErrorResponseMapperImpl;
 import com.sprint.mission.discodeit.global.exception.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -46,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(UserController.class)
 @Import({GlobalExceptionHandler.class, ErrorResponseMapperImpl.class})
+@AutoConfigureMockMvc(addFilters = false)
 @DisplayName("User Controller 테스트")
 class UserControllerTest {
     @Autowired
@@ -57,37 +58,6 @@ class UserControllerTest {
     @MockitoBean
     private UserService userService; // 서비스 레이어 모킹
 
-    @MockitoBean
-    private UserStatusService userStatusService;
-
-    private UUID userId;
-    private CreateUserDto createUserDto;
-    private UserResponseDto userResponseDto;
-    private BinaryContentResponseDto binaryContentResponseDto;
-    private UpdateUserDto updateUserDto;
-
-    @BeforeEach
-    void setup() {
-        userId = UUID.randomUUID();
-        createUserDto = new CreateUserDto(
-                "test",
-                "test_123",
-                "test@codeit.com"
-        );
-        updateUserDto = new UpdateUserDto(
-                "updated_test",
-                "updated@codeit.com",
-                "updated_123"
-        );
-        userResponseDto = new UserResponseDto(
-                userId,
-                "test",
-                "test@codeit.com",
-                null,
-                true
-        );
-    }
-
     @Nested
     @DisplayName("유저 생성 테스트")
     class UserCreate {
@@ -95,6 +65,10 @@ class UserControllerTest {
         @DisplayName("[정상 케이스] - 유저 생성 성공 - 프로필 없음")
         void createUser_notProfile_success() throws Exception {
             // given
+            CreateUserDto createUserDto = CreateUserDtoFixture.createUserDto();
+            UUID userId = UUID.randomUUID();
+            UserResponseDto userResponseDto = UserResponseDtoFixture.createUserResponse(userId, createUserDto.email(), createUserDto.username());
+
             MockMultipartFile userRequest = new MockMultipartFile(
                     "userCreateRequest",
                     "",
@@ -108,7 +82,9 @@ class UserControllerTest {
             // when & then
             mockMvc.perform(multipart("/api/users")
                             .file(userRequest)
-                            .contentType(MediaType.MULTIPART_FORM_DATA))
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                    )
+
                     .andDo(print())
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.id").value(userId.toString()))
@@ -121,22 +97,18 @@ class UserControllerTest {
         @Test
         @DisplayName("[정상 케이스] - 유저 생성 성공 - 프로필 포함")
         void createUser_withProfile_success() throws Exception {
-
-            binaryContentResponseDto = new BinaryContentResponseDto(
+            // given
+            BinaryContentResponseDto binaryContentResponseDto = new BinaryContentResponseDto(
                     UUID.randomUUID(),
                     Instant.now(),
                     "profile.jpg",
                     1L,
                     MediaType.IMAGE_JPEG_VALUE
             );
-            userResponseDto = new UserResponseDto(
-                    userId,
-                    "test",
-                    "test@codeit.com",
-                    binaryContentResponseDto,
-                    true
-            );
-            // given
+            CreateUserDto createUserDto = CreateUserDtoFixture.createUserDto();
+            UUID userId = UUID.randomUUID();
+            UserResponseDto userResponseDto = UserResponseDtoFixture.createUserResponseWithProfile(userId, createUserDto.email(), createUserDto.username(), binaryContentResponseDto);
+
             MockMultipartFile userRequest = new MockMultipartFile(
                     "userCreateRequest",
                     "",
@@ -171,7 +143,7 @@ class UserControllerTest {
         @DisplayName("[예외 케이스] - 유저 생성 실패 (request 필드 누락)")
         void createUser_fail() throws Exception {
 
-            createUserDto = new CreateUserDto(
+            CreateUserDto createUserDto = new CreateUserDto(
                     "", // username이 빈칸인 경우
                     "test_123",
                     "test@codeit.com"
@@ -198,25 +170,19 @@ class UserControllerTest {
     @Nested
     @DisplayName("전체 유저 조회 테스트")
     class GetAllUser {
+        private UserResponseDto userResponseDto1;
         private UserResponseDto userResponseDto2;
         private UserResponseDto userResponseDto3;
 
         @BeforeEach
         void setup() {
-            userResponseDto2 = new UserResponseDto(
-                    userId,
-                    "test2",
-                    "test2@codeit.com",
-                    null,
-                    true
-            );
-            userResponseDto3 = new UserResponseDto(
-                    userId,
-                    "test3",
-                    "test3@codeit.com",
-                    null,
-                    true
-            );
+            UUID userId1 = UUID.randomUUID();
+            UUID userId2 = UUID.randomUUID();
+            UUID userId3 = UUID.randomUUID();
+
+            userResponseDto1 = UserResponseDtoFixture.createUserResponse(userId1, "test1@codeit.com", "tester1");
+            userResponseDto2 = UserResponseDtoFixture.createUserResponse(userId2, "test2@codeit.com", "tester2");
+            userResponseDto3 = UserResponseDtoFixture.createUserResponse(userId3, "test3@codeit.com", "tester3");
         }
 
         @Test
@@ -225,7 +191,7 @@ class UserControllerTest {
 
             // given
             given(userService.getAllUsers())
-                    .willReturn(List.of(userResponseDto, userResponseDto2, userResponseDto3));
+                    .willReturn(List.of(userResponseDto1, userResponseDto2, userResponseDto3));
 
             // when & then
             mockMvc.perform(get("/api/users")
@@ -233,7 +199,6 @@ class UserControllerTest {
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(3)));
-
         }
 
         @Test
@@ -262,6 +227,7 @@ class UserControllerTest {
         @DisplayName("[정상 케이스] - 유저 삭제 성공")
         void deleteUser_success() throws Exception {
             // given
+            UUID userId = UUID.randomUUID();
             willDoNothing().given(userService).deleteUser(any());
 
             // when & then
@@ -301,6 +267,7 @@ class UserControllerTest {
     class UserUpdate {
         private UpdateUserDto updateUserDto;
         private UserResponseDto updatedUserResponseDto;
+        private UUID userId;
 
         @BeforeEach
         void setup() {
@@ -309,14 +276,8 @@ class UserControllerTest {
                     "new_test@codeit.com",
                     "new_test_123"
             );
-
-            updatedUserResponseDto = new UserResponseDto(
-                    userId,
-                    "new_test",
-                    "new_test_123",
-                    null,
-                    true
-            );
+            userId = UUID.randomUUID();
+            updatedUserResponseDto = UserResponseDtoFixture.createUserResponse(userId, updateUserDto.newEmail(), updateUserDto.newUsername());
         }
 
         @Test
@@ -332,6 +293,7 @@ class UserControllerTest {
 
             given(userService.updateUser(eq(userId), any(UpdateUserDto.class), any(Optional.class)))
                     .willReturn(updatedUserResponseDto);
+
             // when & then
             mockMvc.perform(multipart("/api/users/{userId}", userId)
                             .file(userRequest)
@@ -378,46 +340,6 @@ class UserControllerTest {
                     .andExpect(status().isNotFound());
 
             then(userService).should().updateUser(eq(notFoundId), any(UpdateUserDto.class), argThat(Optional::isEmpty));
-        }
-    }
-
-    @Nested
-    @DisplayName("유저 상태 업데이트 테스트")
-    class UpdateUserStatus {
-
-        private UpdateUserStatusDto updateUserStatusDto;
-        private UserStatusResponseDto userStatusResponseDto;
-
-        @BeforeEach
-        void setup() {
-            UUID userStatusId = UUID.randomUUID();
-            updateUserStatusDto = new UpdateUserStatusDto(Instant.now());
-            userStatusResponseDto = new UserStatusResponseDto(
-                    userStatusId,
-                    Instant.now(),
-                    Instant.now(),
-                    userId,
-                    Instant.now().minusSeconds(10),
-                    false
-            );
-        }
-
-        @Test
-        @DisplayName("[정상 케이스] - 유저 상태 수정 성공")
-        void updateUserStatus_success() throws Exception {
-            // given
-            given(userStatusService.updateStatusByUserId(eq(userId), any(UpdateUserStatusDto.class)))
-                    .willReturn(userStatusResponseDto);
-
-            // when & then
-            mockMvc.perform(patch("/api/users/{userId}/userStatus", userId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateUserStatusDto)))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.online").value(false));
-
-            then(userStatusService).should().updateStatusByUserId(eq(userId), any(UpdateUserStatusDto.class));
         }
     }
 }

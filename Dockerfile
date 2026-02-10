@@ -1,5 +1,5 @@
 # Stage 1: Build Stage
-FROM amazoncorretto:17-al2-jdk AS build  <-- 'builder'를 'build'로 수정
+FROM amazoncorretto:17-al2-jdk AS build
 WORKDIR /app
 
 # 1. 의존성 캐싱을 위해 설정 파일만 먼저 복사

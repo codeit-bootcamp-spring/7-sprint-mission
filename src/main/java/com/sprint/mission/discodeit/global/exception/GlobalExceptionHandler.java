@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.global.exception.discodietException.Discodei
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,6 +43,14 @@ public class GlobalExceptionHandler {
                 ));
 
         ErrorResponse errorResponse = errorResponseMapper.toErrorResponseDto(e, ErrorCode.VALIDATION_ERROR, details);
+        logResponse(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> accessDeniedException(Exception e) {
+        Map<String, Object> details = new HashMap<>();
+        ErrorResponse errorResponse = errorResponseMapper.toErrorResponseDto(e, ErrorCode.ACCESS_DENIED, details);
         logResponse(errorResponse);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
