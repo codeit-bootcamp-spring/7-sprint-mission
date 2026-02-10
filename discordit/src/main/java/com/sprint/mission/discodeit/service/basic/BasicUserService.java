@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -51,6 +52,7 @@ public class BasicUserService implements UserService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public UserDto signIn(UserCreateRequest dto, MultipartFile profile) {
         log.info("사용자 생성 요청 들어옴 - username : {}", dto.username());
@@ -73,6 +75,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto update(UUID id, UserUpdateRequest dto, MultipartFile profile) {
         log.info("사용자 정보 수정 요청 들어옴 - id : {}", id);
         User user = userRepository.findById(id)
@@ -92,8 +95,10 @@ public class BasicUserService implements UserService {
 
         if (profile != null) {
             BinaryContent saved = new BinaryContent(profile.getOriginalFilename(), profile.getSize(), profile.getContentType());
+            binaryContentRepository.save(saved);
             try {
                 binaryContentStorage.put(saved.getId(), profile.getBytes());
+                user.setProfile(saved);
             } catch (IOException e) {
                 log.warn("파일 저장 중 예상치 못한 오류 발생");
                 throw new RuntimeException(e);
