@@ -24,31 +24,31 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
-    @RequestMapping(value = "/public", method = RequestMethod.POST)
+    @PostMapping("/public")
     public ResponseEntity<ChannelDto> createPublic(@Valid @RequestBody PublicChannelCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPublicChannel(request));
     }
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
-    @RequestMapping(value = "/private", method = RequestMethod.POST)
+    @PostMapping( "/private")
     public ResponseEntity<ChannelDto> createPrivate(@Valid @RequestBody PrivateChannelCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPrivateChannel(request));
     }
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
-    @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
+    @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> updatePublic(@PathVariable UUID channelId, @Valid @RequestBody ChannelUpdateRequest request) {
         return ResponseEntity.ok().body(channelService.update(channelId, request));
     }
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
-    @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
+    @DeleteMapping("/{channelId}")
     public ResponseEntity<Void> removeChannel(@PathVariable UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity<List<ChannelDto>> getVisibleChannel(@RequestParam UUID userId) {
         return ResponseEntity.ok(channelService.getAllVisibleByUser(userId));
     }

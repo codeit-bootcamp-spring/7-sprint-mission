@@ -23,7 +23,7 @@ public class BinaryContentController {
         return ResponseEntity.ok(binaryContentService.getByIds(binaryContentIds));
     }
 
-    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+    @GetMapping("/{binaryContentId}")
     public ResponseEntity<BinaryContentDto> getContent(@PathVariable UUID binaryContentId) {
         return ResponseEntity.ok(binaryContentService.get(binaryContentId));
     }

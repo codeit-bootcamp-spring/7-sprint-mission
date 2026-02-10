@@ -21,7 +21,7 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity<List<UserDto>> getAll() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
@@ -31,13 +31,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.signIn(userCreateRequest, profile));
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+    @DeleteMapping("/{userId}")
     public ResponseEntity<Void> delete(@RequestParam UUID userId) {
         userService.delete(userId);
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> update(@PathVariable UUID userId, @Valid @RequestPart(name = "userUpdateRequest") UserUpdateRequest userUpdateRequest, @RequestPart(name = "profile", required = false) MultipartFile profile) {
         return ResponseEntity.ok(userService.update(userId, userUpdateRequest, profile));
     }
