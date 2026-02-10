@@ -72,7 +72,7 @@ public enum ErrorCode {
     UNSUPPORTED_TOKEN(HttpStatus.BAD_REQUEST,"지원되지 않는 토큰 형식입니다."),
     MALFORMED_TOKEN(HttpStatus.BAD_REQUEST,"잘못된 토큰 형식입니다."),
     INVALID_SIGNATURE(HttpStatus.FORBIDDEN,"토큰 서명 검증에 실패했습니다."),
-    EMPTY_OR_INVALID_TOKEN(HttpStatus.BAD_REQUEST,"토큰이 비어 있거나 유효하지 않습니다.");
+    EMPTY_OR_INVALID_TOKEN(HttpStatus.UNAUTHORIZED,"토큰이 비어 있거나 유효하지 않습니다.");
 
     private final HttpStatus status;
     private final String message;
