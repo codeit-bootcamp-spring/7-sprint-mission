@@ -2,9 +2,18 @@ logging:
   level:
     root: info
 server:
-  port: 9090
+  port: 80
+
+discodeit:
+  storage:
+    type: s3
 
 spring:
-    url: jdbc:postgresql://localhost:8080/discodeit_prod
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit_prod
     username: discodeit_prod
     password: discodeit1234
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false

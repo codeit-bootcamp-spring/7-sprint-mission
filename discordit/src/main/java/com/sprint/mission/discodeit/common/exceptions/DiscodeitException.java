@@ -2,26 +2,27 @@ package com.sprint.mission.discodeit.common.exceptions;
 
 import com.sprint.mission.discodeit.common.enums.ErrorCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 
-@RequiredArgsConstructor
 @Getter
 public class DiscodeitException extends RuntimeException{
-    private final Instant timestamp;
+    private final Instant timestamp = Instant.now();
     private final ErrorCode errorCode;
-    private final Map<String, Object> details;
+    protected final Map<String, Object> details;
 
-    public ErrorResponse toErrorResponse() {
-        return ErrorResponse.builder()
-                .timestamp(timestamp)
-                .code(errorCode.name())
-                .message(errorCode.getDescription())
-                .details(details)
-                .exceptionType(this.getClass().getSimpleName())
-                .status(errorCode.getHttpStatus().value())
-                .build();
+    public DiscodeitException(Class<?> entity, ErrorCode errorCode, Map<String, Object> details) {
+        this.errorCode = errorCode;
+        this.details = details;
+        this.details.put("entity", entity.getSimpleName());
+        this.details.put("description", errorCode.getDescription());
     }
+
+    public DiscodeitException(Class<?> entity, ErrorCode errorCode) {
+        this(entity, errorCode, new HashMap<>());
+    }
+
+
 }

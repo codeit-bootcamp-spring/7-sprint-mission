@@ -10,7 +10,6 @@ import java.util.UUID;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-    // TODO 이렇게 전체 enum 명시해도 괜찮은가요?
     @Query("""
             select c from Channel c
             where c.type = com.sprint.mission.discodeit.common.enums.ChannelScope.PUBLIC""")

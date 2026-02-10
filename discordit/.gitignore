@@ -38,8 +38,4 @@ out/
 /.agents/
 /.github/
 /docs/
-
-### Windows ###
-nul
-/.logs/
-/src/main/resources/application-dev.yml
+/.env

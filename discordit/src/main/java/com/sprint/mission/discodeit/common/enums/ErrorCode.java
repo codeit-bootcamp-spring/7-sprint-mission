@@ -12,12 +12,24 @@ public enum ErrorCode {
     INVALID_REQUEST_BODY("요청 본문을 읽을 수 없습니다.", HttpStatus.BAD_REQUEST),
     ILLEGAL_ARGUMENT("잘못된 인자입니다.", HttpStatus.BAD_REQUEST),
     ALREADY_EXISTS("이미 존재하는 값입니다.", HttpStatus.BAD_REQUEST),
+    CHANNEL_MODIFICATION_NOT_ALLOWED("해당 채널은 수정이 불가능합니다.", HttpStatus.BAD_REQUEST),
+
+    // 401 Unauthorized
+    INVALID_CREDENTIALS("아이디 또는 비밀번호가 올바르지 않습니다.", HttpStatus.UNAUTHORIZED),
+    UNAUTHORIZED("인증이 필요합니다.", HttpStatus.UNAUTHORIZED),
+
+    // 403 Forbidden
+    FORBIDDEN("접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
 
     // 404 Not Found
     NOT_FOUND("존재하지 않는 값입니다.", HttpStatus.NOT_FOUND),
+    FILE_NOT_FOUND("존재하지 않는 파일입니다.", HttpStatus.NOT_FOUND),
 
-    // 500 Internal Server Error
-    INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    // 500 Internal Server Error,
+    INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    UPLOAD_FAILED("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    DOWNLOAD_FAILED("파일 다운로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_SAVE_FAILED("파일 저장에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String description;
     private final HttpStatus httpStatus;

@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+    <!-- 기본 콘솔 appender (프로파일 활성화 전에도 동작) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 기본 root logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
     <!-- ==================== 개발 환경 (local, dev) ==================== -->
     <springProfile name="local,dev">
-        <!-- 콘솔 출력 -->
-        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-                <charset>UTF-8</charset>
-            </encoder>
-        </appender>
-
-        <root level="DEBUG">
+        <root level="info">
             <appender-ref ref="CONSOLE" />
         </root>
 
-        <!-- 개발 시 SQL 확인 -->
+        <!-- 내 프로젝트: DEBUG -->
+        <logger name="com.sprint.mission.discodeit" level="DEBUG" />
+
+        <!-- Hibernate 전체: INFO (내부 동작 로그 숨김) -->
+        <logger name="org.hibernate" level="INFO" />
+
+        <!-- SQL 쿼리 -->
         <logger name="org.hibernate.SQL" level="DEBUG" />
-        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+        <!-- SQL 파라미터 -->
+        <logger name="org.hibernate.orm.jdbc.bind" level="DEBUG" />
+        <!-- 결과 그래프만 DEBUG -->
+        <logger name="org.hibernate.orm.results.graph" level="DEBUG" />
+
     </springProfile>
 
     <!-- ==================== 운영 환경 (prod) ==================== -->
@@ -52,7 +67,7 @@
             </encoder>
         </appender>
 
-        <root level="INFO">
+        <root level="DEBUG">
             <appender-ref ref="FILE" />
             <appender-ref ref="ERROR_FILE" />
         </root>
@@ -61,8 +76,5 @@
         <logger name="org.hibernate.SQL" level="WARN" />
         <logger name="org.springframework" level="WARN" />
     </springProfile>
-
-    <!-- ==================== 공통 설정 ==================== -->
-    <logger name="com.sprint.mission.discodeit" level="DEBUG" />
 
 </configuration>

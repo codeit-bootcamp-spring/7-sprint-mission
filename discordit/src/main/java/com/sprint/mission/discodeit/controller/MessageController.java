@@ -34,14 +34,14 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageService.send(messageCreateRequest, attachments));
     }
 
-    @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> remove(@RequestParam UUID messageId) {
+    @DeleteMapping("/{messageId}")
+    public ResponseEntity<Void> remove(@PathVariable UUID messageId) {
         messageService.remove(messageId);
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
-    public ResponseEntity<MessageDto> edit(@RequestParam UUID messageId, @Valid @RequestBody MessageEditRequest request) {
+    @PatchMapping("/{messageId}")
+    public ResponseEntity<MessageDto> edit(@PathVariable UUID messageId, @Valid @RequestBody MessageEditRequest request) {
         return ResponseEntity.ok(messageService.editMessage(messageId, request));
     }
 }

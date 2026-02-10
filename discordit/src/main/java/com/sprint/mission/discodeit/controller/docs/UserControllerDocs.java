@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller.docs;
 import com.sprint.mission.discodeit.dto.entity.user.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.entity.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.entity.user.response.UserResponse;
-import com.sprint.mission.discodeit.dto.entity.userStatus.request.UserStatusUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,13 +64,4 @@ public interface UserControllerDocs {
             @ApiResponse(responseCode = "200", description = "수정 성공")
     })
     ResponseEntity<UserResponse> update(@PathVariable UUID userId, @Valid @RequestPart(name = "userUpdateRequest") UserUpdateRequest userUpdateRequest, @RequestPart(name = "profile", required = false) MultipartFile profile);
-
-    @Operation(
-            summary = "사용자 상태 수정",
-            description = "사용자의 활동 상태를 수정합니다"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "수정 성공")
-    })
-    ResponseEntity<Instant> updateUserStatus(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request);
 }

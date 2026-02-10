@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.entity.user.UserDto;
 import com.sprint.mission.discodeit.dto.entity.user.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.entity.user.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.entity.userStatus.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.entity.userStatus.response.UserStatusUpdateResponse;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,33 +20,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final UserStatusService userStatusService;
 
-
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity<List<UserDto>> getAll() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> signIn(@Valid @RequestPart UserCreateRequest userCreateRequest, @RequestPart(value = "profile", required = false) MultipartFile profile) {
-
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.signIn(userCreateRequest, profile));
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> delete(@RequestParam UUID userId) {
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID userId) {
         userService.delete(userId);
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> update(@PathVariable UUID userId, @Valid @RequestPart(name = "userUpdateRequest") UserUpdateRequest userUpdateRequest, @RequestPart(name = "profile", required = false) MultipartFile profile) {
         return ResponseEntity.ok(userService.update(userId, userUpdateRequest, profile));
-    }
-
-    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-    public ResponseEntity<UserStatusUpdateResponse> updateUserStatus(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request) {
-        return ResponseEntity.ok(userStatusService.updateByUser(userId, request));
     }
 }

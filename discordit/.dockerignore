@@ -1,0 +1,49 @@
+# Gradle
+.gradle/
+gradle.properties
+!gradle/wrapper/
+
+# Build outputs (컨테이너에서 새로 빌드)
+build/
+target/
+out/
+*.class
+*.jar
+
+# IDE
+.idea/
+
+# IDE
+.idea
+*.iml
+.vscode
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+docs/
+*.md
+
+# HTTP test files
+http/
+
+# Storage (runtime data)
+storage/
+
+# Test sources
+src/test/
+
+# 환경 설정
+.env
+
+# OS 파일
+.DS_Store
+Thumbs.db
+
+# Docker 관련 (재귀 복사 방지)
+Dockerfile*
+docker-compose*
+.dockerignore

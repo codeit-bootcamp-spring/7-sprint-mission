@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.common.enums.Roles;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -34,13 +35,19 @@ public class User extends BaseEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private BinaryContent profile;
 
-    @Transient
-    @Setter
-    private Boolean online;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Roles role;
+
 
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.role = Roles.USER;
+    }
+
+    public void updateRole(Roles role) {
+        this.role = role;
     }
 }

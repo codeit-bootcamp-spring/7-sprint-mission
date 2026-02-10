@@ -1,22 +1,18 @@
 package com.sprint.mission.discodeit.common.exceptions.channel;
 
 import com.sprint.mission.discodeit.common.enums.ErrorCode;
-import com.sprint.mission.discodeit.common.exceptions.DiscodeitException;
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class ChannelNotFoundException extends DiscodeitException {
-    public ChannelNotFoundException(UUID uuid) {
-        super(Instant.now(), ErrorCode.NOT_FOUND, createDetails(uuid));
+public class ChannelNotFoundException extends ChannelException {
+    public ChannelNotFoundException(UUID id, Map<String, Object> details) {
+        super(ErrorCode.ALREADY_EXISTS, details);
+        this.getDetails().put("id", id);
     }
 
-    private static Map<String, Object> createDetails(UUID channelId) {
-        Map<String, Object> details = new HashMap<>();
-        details.put("channelId", channelId);
-        details.put("resource", "Channel");
-        return details;
+    public ChannelNotFoundException(UUID id) {
+        super(id, ErrorCode.ALREADY_EXISTS);
     }
+
 }

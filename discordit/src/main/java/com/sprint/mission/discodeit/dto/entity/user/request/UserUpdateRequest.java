@@ -11,7 +11,7 @@ public record UserUpdateRequest(
         String newUsername,
 
         @Schema(description = "새 이메일", example = "newemail@example.com", nullable = true)
-        @Email
+        @Email(message = "이메일 형식이 올바르지 않습니다.")
         @Nullable
         String newEmail,
 
