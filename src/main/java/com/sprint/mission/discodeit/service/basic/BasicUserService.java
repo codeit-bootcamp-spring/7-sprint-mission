@@ -1,22 +1,27 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserSignupCommand;
 import com.sprint.mission.discodeit.dto.user.UserUpdateCommand;
 import com.sprint.mission.discodeit.dto.user.UserUpdateParams;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.type.Role;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserDuplicateException;
 import com.sprint.mission.discodeit.mapper.UserMapperManual;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,21 +37,12 @@ public class BasicUserService implements UserService {
     private final BinaryContentService binaryContentService;
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapperManual userMapper;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
     @Transactional
     public UserResponseDto signUp(UserSignupCommand userSignupCommand) {
-        if (
-                userSignupCommand.username() == null ||
-                        userSignupCommand.username().isBlank() ||
-                        userSignupCommand.password() == null ||
-                        userSignupCommand.password().isBlank() ||
-                        userSignupCommand.email() == null || userSignupCommand.email().isBlank()
-
-        ) {
-            throw new DiscodeitException(ErrorCode.INVALID_INPUT);
-        }
 
         log.debug("회원가입 처리 시작 - hasProfile={}", userSignupCommand.profile().isPresent());
 
@@ -59,14 +55,14 @@ public class BasicUserService implements UserService {
                 ? binaryContentRepository.getReferenceById(profileBinaryId) // NOTE: 위의 update 반환값으로 BinaryId를 받고 실제 엔티티 DB조회 필요없이 id만 가진 프록시 객체로 활용하기위해 유지
                 : null;
 
+        String encodedPassword = passwordEncoder.encode(userSignupCommand.password());
         User newUser = User.create(userSignupCommand.username(),
                 userSignupCommand.email(),
-                userSignupCommand.password(),
-                binaryContentReference
+                encodedPassword,
+                binaryContentReference,
+                Role.USER
         );
 
-        // NOTE: user객체 생성후 userStatus도 넣어서 cascade 영향으로 같이 insert되도록
-        newUser.initUserStatus();
         User savedUser = userRepository.save(newUser);
 
         log.info("회원가입 완료 - userId={}, hasProfile={}", savedUser.getId(), profileBinaryId != null);
@@ -85,6 +81,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize(" #userId == principal.userResponseDto.id ")
     public void deleteUser(UUID userId) {
         if (userId == null) { // NOTE: 서비스 레이어 public API라 컨트롤러 외 테스트, 배치, 이벤트 핸들러에서 요청 가능하므로 최소 필수 가드로 남김
             throw new DiscodeitException(ErrorCode.INVALID_INPUT);
@@ -99,6 +96,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @PreAuthorize("#updateCommand.id() == principal.userResponseDto.id()")
     public UserResponseDto updateUser(UserUpdateCommand updateCommand) {
         if (updateCommand.id() == null) { // NOTE: update 는 부분 변경이므로 userId만 가드, 나머지는 Null 허용으로 미변경 정책으로 봄
             // NOTE: 서비스 레이어 public API라 컨트롤러 외 테스트, 배치, 이벤트 핸들러에서 요청 가능하므로 최소 필수 가드로 남김
@@ -125,6 +123,15 @@ public class BasicUserService implements UserService {
         log.info("회원 수정 완료 - userId={}, profileChanged={}", updateCommand.id(), profileBinaryId != null);
 
         return userMapper.toDto(userById); // NOTE: 멱등성, dirty checking 으로 바뀌던 안바뀌던 해당 객체 반환
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public UserResponseDto updateUserRole(RoleUpdateRequest request) {
+        User user = userReader.findUserOrThrow(request.userId());
+        user.updateRole(request.newRole());
+        return userMapper.toDto(user);
     }
 
     @Override

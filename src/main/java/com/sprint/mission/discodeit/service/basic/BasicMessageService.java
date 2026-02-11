@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -147,6 +148,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
+    @PreAuthorize("principal.userResponseDto.id() == @basicMessageService.getMessageById(#command.messageId()).author().id()")
     public MessageUpdateResponseDto updateMessage(MessageUpdateCommand command) {
         if (command.messageId() == null || command.content() == null || command.content().trim().isEmpty()) {
             throw new DiscodeitException(ErrorCode.INVALID_INPUT);
@@ -169,6 +171,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
+    @PreAuthorize("principal.userResponseDto.id() == @basicMessageService.getMessageById(#messageId).author().id()")
     public void deleteMessage(UUID messageId) {
         if (messageId == null) {
             throw new DiscodeitException(ErrorCode.INVALID_INPUT);

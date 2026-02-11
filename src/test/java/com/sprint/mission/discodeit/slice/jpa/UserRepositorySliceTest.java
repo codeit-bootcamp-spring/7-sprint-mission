@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.slice.jpa;
 
 import com.sprint.mission.discodeit.config.JpaAuditingConfig;
+import com.sprint.mission.discodeit.config.SecurityConfig;
 import com.sprint.mission.discodeit.dto.user.UserUpdateParams;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -75,26 +77,24 @@ class UserRepositorySliceTest {
     }
 
     @Nested
-    @DisplayName("findByUsernameAndPassword")
-    class FindByUsernameAndPassword {
+    @DisplayName("findByUsername")
+    class FindByUsername {
 
         @Test
-        @DisplayName("[Success] username/password 정확하면 User 반환")
+        @DisplayName("[Success] username 정확하면 User 반환")
         void shouldReturnUser_whenCorrect() {
             userRepository.saveAndFlush(User.create("u2", "u2@a.com", "pw123", null));
 
-            Optional<User> found = userRepository.findByUsernameAndPassword("u2", "pw123");
-
+            Optional<User> found = userRepository.findByUsername("u2");
             assertTrue(found.isPresent());
             assertEquals("u2@a.com", found.get().getEmail());
         }
 
         @Test
-        @DisplayName("[Fail] 비번 틀리면 empty")
+        @DisplayName("[Fail] 유저 username 없으면 empty")
         void shouldReturnEmpty_whenWrongPassword() {
             userRepository.saveAndFlush(User.create("u3", "u3@a.com", "pw123", null));
-
-            Optional<User> found = userRepository.findByUsernameAndPassword("u3", "wrong");
+            Optional<User> found = userRepository.findByUsername("failName");
 
             assertTrue(found.isEmpty());
         }

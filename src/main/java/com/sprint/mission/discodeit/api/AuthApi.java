@@ -1,31 +1,23 @@
 package com.sprint.mission.discodeit.api;
 
-import com.sprint.mission.discodeit.dto.auth.AuthLoginRequestDto;
+import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
+import org.springframework.security.web.csrf.CsrfToken;
+
+import java.util.Map;
 
 @Tag(name = "Auth API", description = "인증 관련 API")
 public interface AuthApi {
-    @Operation(summary = "로그인 요청")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "잘못된 요청",
-                    content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "찾을수없습니다",
-                    content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))
-            )
-    })
-    ResponseEntity<UserResponseDto> login(AuthLoginRequestDto authLoginRequestDto);
+
+    ResponseEntity<UserResponseDto> getMe(DiscodeitUserDetails principal);
+
+    ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken);
+
+    ResponseEntity<Map<String, Object>> getSessionInfo(HttpSession session);
+
+    ResponseEntity<UserResponseDto> updateUserRole(RoleUpdateRequest request);
 }

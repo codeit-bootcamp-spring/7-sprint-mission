@@ -42,8 +42,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     @Query("""
         select m
         from Message m
-        join fetch m.author a
-        join fetch a.userStatus
+        join fetch m.author a   
         left join fetch a.profile
         where m.channel.id = :channelId and m.createdAt < :cursor
 """)
