@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.exception.userstatus;
+/*package com.sprint.mission.discodeit.common.exception.userstatus;
 
 import com.sprint.mission.discodeit.common.exception.ErrorCode;
 
@@ -10,3 +10,5 @@ public class UserStatusNotFoundException extends UserStatusException {
         super(ErrorCode.USER_STATUS_NOT_FOUND, Map.of("userStatusId", userStatusId));
     }
 }
+
+ */

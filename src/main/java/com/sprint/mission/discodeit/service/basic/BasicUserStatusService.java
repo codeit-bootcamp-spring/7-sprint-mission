@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.basic;
+/*package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.common.exception.userstatus.InvalidUserStatusRequestException;
@@ -130,3 +130,5 @@ public class BasicUserStatusService implements UserStatusService {
         return true;
     }
 }
+
+ */

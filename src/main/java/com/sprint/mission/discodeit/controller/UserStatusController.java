@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.controller;
+/*package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.exception.userstatus.InvalidUserStatusRequestException;
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateByUserIdRequestDto;
 import com.sprint.mission.discodeit.dto.request.userstatus.UserStatusUpdateRequestDto;
@@ -59,3 +58,5 @@ public class UserStatusController {
         userStatusService.delete(id);
     }
 }
+
+ */

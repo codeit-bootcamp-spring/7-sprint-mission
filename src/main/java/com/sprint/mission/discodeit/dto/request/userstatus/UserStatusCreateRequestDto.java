@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.request.userstatus;
+/*package com.sprint.mission.discodeit.dto.request.userstatus;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -11,3 +11,5 @@ public record UserStatusCreateRequestDto(
 
         Instant lastActiveAt) {
 }
+
+ */

@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +35,7 @@ class MessageRepositoryTest {
     void findByChannelId_success() {
         // given
         User author = userRepository.save(
-                new User("user", "password1234", "user@naver.com", null));
+                new User("user", "password1234", "user@naver.com", null, UserRole.USER));
         Channel channel1 = channelRepository.save(
                 new Channel(ChannelType.PUBLIC, "channel1", false, 0, null));
         Channel channel2 = channelRepository.save(
@@ -74,7 +71,7 @@ class MessageRepositoryTest {
     void findByContentContainingIgnoreCase_success() {
         // given
         User author = userRepository.save(
-                new User("user", "password1234", "user@naver.com", null));
+                new User("user", "password1234", "user@naver.com", null, UserRole.USER));
         Channel channel = channelRepository.save(
                 new Channel(ChannelType.PUBLIC, "channel", false, 0, null));
         messageRepository.save(new Message("message1", author, channel, List.of()));
@@ -95,7 +92,7 @@ class MessageRepositoryTest {
     void findByContentContainingIgnoreCase_fail() {
         // given
         User author = userRepository.save(
-                new User("user", "password1234", "user@naver.com", null));
+                new User("user", "password1234", "user@naver.com", null, UserRole.USER));
         Channel channel = channelRepository.save(
                 new Channel(ChannelType.PUBLIC, "channel", false, 0, null));
         messageRepository.save(new Message("message", author, channel, List.of()));
@@ -113,7 +110,7 @@ class MessageRepositoryTest {
     void findByChannelIdOrderByCreatedAtDesc_success() {
         // given
         User author = userRepository.save(
-                new User("user", "password1234", "user@naver.com", null));
+                new User("user", "password1234", "user@naver.com", null, UserRole.USER));
         Channel channel = channelRepository.save(
                 new Channel(ChannelType.PUBLIC, "channel", false, 0, null));
         messageRepository.save(new Message("m1", author, channel, List.of()));

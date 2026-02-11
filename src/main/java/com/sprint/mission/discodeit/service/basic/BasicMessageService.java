@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.common.exception.message.InvalidMessageReque
 import com.sprint.mission.discodeit.common.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.common.exception.message.SlowModeViolationException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.common.security.SessionOnlineChecker;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,8 +46,8 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentService binaryContentService;
     private final ReadStatusRepository readStatusRepository;
     private final MessageMapper messageMapper;
-    private final UserStatusRepository userStatusRepository;
     private final PageResponseMapper pageResponseMapper;
+    private final SessionOnlineChecker sessionOnlineChecker;
 
     @Transactional
     @Override
@@ -142,7 +144,7 @@ public class BasicMessageService implements MessageService {
         Message save = messageRepository.save(message);
         log.info("메세지가 생성되었습니다. messageId = {}", save.getId());
 
-        return messageMapper.toDto(save, isAuthorOnline(user));
+        return messageMapper.toDto(save, sessionOnlineChecker.isOnline(user.getId()));
     }
 
     @Override
@@ -154,7 +156,10 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new MessageNotFoundException(messageId));
 
-        return messageMapper.toDto(message, isAuthorOnline(message.getAuthor()));
+        User author = message.getAuthor();
+        boolean online = author != null && sessionOnlineChecker.isOnline(author.getId());
+
+        return messageMapper.toDto(message, online);
     }
 
     @Override
@@ -174,6 +179,7 @@ public class BasicMessageService implements MessageService {
         return messageMapper.toDtoList(messages, authorOnlineMap(messages));
     }
 
+    @PreAuthorize("@authz.isMessageAuthor(authentication, #messageId)")
     @Transactional
     @Override
     public MessageResponseDto update(UUID messageId, MessageUpdateRequestDto messageUpdateRequestDto) {
@@ -195,10 +201,13 @@ public class BasicMessageService implements MessageService {
         }
 
         Message save = messageRepository.save(message);
+        User author = save.getAuthor();
+        boolean online = author != null && sessionOnlineChecker.isOnline(author.getId());
         log.info("메세지가 수정되었습니다. messageId = {}", message.getId());
-        return messageMapper.toDto(save, isAuthorOnline(message.getAuthor()));
+        return messageMapper.toDto(save, online);
     }
 
+    @PreAuthorize("@authz.isMessageAuthor(authentication, #messageId)")
     @Transactional
     @Override
     public boolean delete(UUID messageId) {
@@ -264,7 +273,14 @@ public class BasicMessageService implements MessageService {
 
         Slice<Message> slice = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
 
-        Slice<MessageResponseDto> sliceDto = slice.map(message -> messageMapper.toDto(message, isAuthorOnline(message.getAuthor())));
+        Map<UUID, Boolean> onlineMap = authorOnlineMap(slice.getContent());
+
+        Slice<MessageResponseDto> sliceDto = slice.map(message -> {
+            User author = message.getAuthor();
+            UUID authorId = author != null ? author.getId() : null;
+            boolean online = authorId != null && onlineMap.getOrDefault(authorId, false);
+            return messageMapper.toDto(message, online);
+        });
 
         return pageResponseMapper.fromSlice(sliceDto);
     }
@@ -279,28 +295,13 @@ public class BasicMessageService implements MessageService {
                 .map(m -> m.getAuthor())
                 .filter(u -> u != null)
                 .map(author -> author.getId())
+                .filter(authorId -> authorId != null)
                 .collect(Collectors.toSet());
 
         if (authorIds.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        List<UserStatus> statuses = userStatusRepository.findAllByUserIdIn(authorIds);
-
-        return statuses.stream()
-                .collect(Collectors.toMap(
-                        status -> status.getUser().getId(),
-                        us -> us.isOnlineNow()
-                ));
-    }
-
-    private boolean isAuthorOnline(User author) {
-        log.debug("Checking if author is online");
-        if (author == null) {
-            return false;
-        }
-        return userStatusRepository.findByUserId(author.getId())
-                .map(userStatus -> userStatus.isOnlineNow())
-                .orElse(false);
+        return sessionOnlineChecker.onlineMap(authorIds);
     }
 }

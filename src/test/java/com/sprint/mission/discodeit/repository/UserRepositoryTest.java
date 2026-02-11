@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserRole;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ class UserRepositoryTest {
     void findByUsername_success() {
         // given
         User save = userRepository.save(
-                new User("user", "password123", "user@naver.com", null));
+                new User("user", "password123", "user@naver.com", null, UserRole.USER));
 
         // when
         List<User> result = userRepository.findByUsername("user");
@@ -53,7 +54,7 @@ class UserRepositoryTest {
     @DisplayName("findByEmail 성공: 저장된 유저를 email로 조회")
     void findByEmail_success() {
         // given
-        userRepository.save(new User("user", "password1234", "user@naver.com", null));
+        userRepository.save(new User("user", "password1234", "user@naver.com", null, UserRole.USER));
 
         // when
         Optional<User> result = userRepository.findByEmail("user@naver.com");

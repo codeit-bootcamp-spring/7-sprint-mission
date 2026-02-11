@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.request.auth.UserRoleUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
@@ -25,7 +26,7 @@ public interface UserService {
     boolean delete(UUID userid);
     List<UserResponseDto> getUsersByName(String username);
     Optional<UserResponseDto> getUsersByEmail(String email);
-    void login(UUID userId);
-    void logout(UUID userId);
-    boolean isOnline(UUID userId);
+    UserResponseDto getMe(UUID userId);
+
+    UserResponseDto updateRole(UserRoleUpdateRequestDto userRoleUpdateRequestDto);
 }

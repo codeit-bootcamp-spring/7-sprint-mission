@@ -1,3 +1,10 @@
+DROP TABLE IF EXISTS message_attachments;
+DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS read_statuses;
+DROP TABLE IF EXISTS channels;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS binary_contents;
+
 CREATE TABLE binary_contents (
     id				UUID			PRIMARY KEY,
     created_at		TIMESTAMPTZ		NOT NULL,
@@ -16,6 +23,7 @@ CREATE TABLE users (
     email       VARCHAR(100)    NOT NULL UNIQUE,
     password    VARCHAR(60)     NOT NULL,
     profile_id  UUID	        UNIQUE,
+    role        VARCHAR(20)     NOT NULL,
 
     CONSTRAINT fk_users_profile
         FOREIGN KEY(profile_id)
@@ -54,7 +62,7 @@ CREATE TABLE messages (
           REFERENCES users(id)
           ON DELETE SET NULL
 );
-
+/*
 CREATE TABLE user_statuses (
     id				UUID			PRIMARY KEY,
     created_at		TIMESTAMPTZ		NOT NULL,
@@ -67,6 +75,8 @@ CREATE TABLE user_statuses (
             REFERENCES users(id)
             ON DELETE CASCADE
 );
+
+ */
 
 CREATE TABLE read_statuses (
     id				UUID			PRIMARY KEY,

@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.common.exception.user.InvalidUserRequestException;
 import com.sprint.mission.discodeit.common.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.common.security.SessionOnlineChecker;
+import com.sprint.mission.discodeit.dto.request.auth.UserRoleUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequestDto;
@@ -12,15 +14,17 @@ import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +32,11 @@ import java.util.*;
 @Slf4j
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapper userMapper;
     private final BinaryContentService binaryContentService;
+    private final PasswordEncoder passwordEncoder;
+    private final SessionOnlineChecker sessionOnlineChecker;
 
     @Transactional
     @Override
@@ -65,23 +70,21 @@ public class BasicUserService implements UserService {
             profile = binaryContentRepository.getReferenceById(binaryContentResponseDto.id());
         }
 
+        String hashedPassword = passwordEncoder.encode(userCreateRequestDto.password());
+
         User user = new User(
                 userCreateRequestDto.username(),
-                userCreateRequestDto.password(),
+                hashedPassword,
                 userCreateRequestDto.email(),
-                profile
+                profile,
+                UserRole.USER
         );
 
 
         User save = userRepository.save(user);
 
-        // 요구사항 - userStatus 같이 생성
-        userStatusRepository.save(new UserStatus(save));
-
-        boolean online = true;
-
         log.info("유저가 생성되었습니다! userId = {}, username = {}", save.getId(), save.getUsername());
-        return userMapper.toDto(save, online);
+        return userMapper.toDto(save, false);
     }
 
     @Override
@@ -92,19 +95,24 @@ public class BasicUserService implements UserService {
         log.debug("Getting user: userId = {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
-        boolean online = isOnline(user.getId());
+        boolean online = sessionOnlineChecker.isOnline(user.getId());
         return userMapper.toDto(user, online);
     }
 
     @Override
     public List<UserResponseDto> getAll() {
         log.debug("Getting all users");
-        return userRepository.findAll()
-                .stream()
-                .map(user -> userMapper.toDto(user, isOnline(user.getId())))
+        List<User> users = userRepository.findAll();
+        Set<UUID> ids = users.stream()
+                .map(u -> u.getId())
+                .collect(Collectors.toSet());
+        Map<UUID, Boolean> onlineMap = sessionOnlineChecker.onlineMap(ids);
+        return users.stream()
+                .map(user -> userMapper.toDto(user, onlineMap.getOrDefault(user.getId(), false)))
                 .toList();
     }
 
+    @PreAuthorize("@authz.isSelf(authentication, #userId)")
     @Transactional
     @Override
     public UserResponseDto update(UUID userId, UserUpdateRequestDto userUpdateRequestDto,
@@ -147,7 +155,7 @@ public class BasicUserService implements UserService {
         }
 
         if(userUpdateRequestDto.newPassword() != null) {
-            user.setPassword(userUpdateRequestDto.newPassword());
+            user.setPasswordHash(passwordEncoder.encode(userUpdateRequestDto.newPassword()));
             log.debug("Updating user password: userId = {}", userId);
         }
 
@@ -165,12 +173,13 @@ public class BasicUserService implements UserService {
         }
 
         User save = userRepository.save(user);
-        boolean online = isOnline(save.getId());
+        boolean online = sessionOnlineChecker.isOnline(user.getId());
 
         log.info("유저 정보가 수정되었습니다. userId = {}", save.getId());
         return userMapper.toDto(save, online);
     }
 
+    @PreAuthorize("@authz.isSelf(authentication, #userid)")
     @Transactional
     @Override
     public boolean delete(UUID userid) {
@@ -195,7 +204,7 @@ public class BasicUserService implements UserService {
         log.debug("Getting users by name {}", username);
         return userRepository.findByUsername(username)
                 .stream()
-                .map(user -> userMapper.toDto(user, isOnline(user.getId())))
+                .map(user -> userMapper.toDto(user, sessionOnlineChecker.isOnline(user.getId())))
                 .toList();
     }
 
@@ -207,36 +216,50 @@ public class BasicUserService implements UserService {
         }
         log.debug("Getting users by email {}", email);
         return userRepository.findByEmail(email)
-                .map(user -> userMapper.toDto(user, isOnline(user.getId())));
+                .map(user -> userMapper.toDto(user, sessionOnlineChecker.isOnline(user.getId())));
     }
 
-    // 로그인
+    @Override
+    public UserResponseDto getMe(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        boolean online = sessionOnlineChecker.isOnline(user.getId());
+        return  userMapper.toDto(user, online);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Override
-    public void login(UUID userId) {
-        if (userId == null) {
+    public UserResponseDto updateRole(UserRoleUpdateRequestDto userRoleUpdateRequestDto) {
+        if (userRoleUpdateRequestDto == null) {
+            throw new InvalidUserRequestException("userRoleUpdateRequestDto is null");
+        }
+
+        if (userRoleUpdateRequestDto.newRole() == null) {
+            throw new InvalidUserRequestException("newRole is null");
+        }
+
+        if (userRoleUpdateRequestDto.userId() == null) {
             throw new InvalidUserRequestException("userId is null");
         }
+
+        UUID userId = userRoleUpdateRequestDto.userId();
+        UserRole newRole = userRoleUpdateRequestDto.newRole();
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        userStatusRepository.findByUserId(userId)
-                .ifPresentOrElse(u -> {
-                    u.timeUpdated();
-                    }, () -> userStatusRepository.save(new UserStatus(user)));
-    }
-    // 로그아웃
-    @Override
-    public void logout(UUID userId) {
-    }
-
-    @Override
-    public boolean isOnline(UUID userId) {
-        if (userId == null) {
-            throw new InvalidUserRequestException("userId is null");
+        if (user.getRole() == newRole) {
+            boolean online = sessionOnlineChecker.isOnline(userId);
+            return userMapper.toDto(user, online);
         }
-        return userStatusRepository.findByUserId(userId)
-                .map(status -> status.isOnlineNow())
-                .orElse(false);
+
+        user.updateRole(newRole);
+        User saved = userRepository.save(user);
+        sessionOnlineChecker.expireSession(saved.getId());
+
+        boolean online = sessionOnlineChecker.isOnline(userId);
+
+        log.info("User role updated. userId = {}, newRole = {}",  saved.getId(), newRole);
+        return userMapper.toDto(saved, online);
     }
 }

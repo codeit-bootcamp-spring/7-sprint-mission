@@ -10,6 +10,6 @@ public record UserUpdateRequestDto(
         @Email
         String newEmail,
 
-        @Size(min = 4, max = 20)
+        @Size(min = 7, max = 50)
         String newPassword) {
 }

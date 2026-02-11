@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.common.exception.channel.ChannelNotFoundExce
 import com.sprint.mission.discodeit.common.exception.channel.InvalidChannelException;
 import com.sprint.mission.discodeit.common.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.common.security.SessionOnlineChecker;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PublicChannelCreateRequestDto;
@@ -14,6 +15,7 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +33,9 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
-    private final UserStatusRepository userStatusRepository;
+    private final SessionOnlineChecker sessionOnlineChecker;
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
     public ChannelResponseDto createPublic(PublicChannelCreateRequestDto channelCreateRequestDto) {
@@ -144,6 +147,7 @@ public class BasicChannelService implements ChannelService {
                 .toList();
     }
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
     public ChannelResponseDto update(UUID channelId, ChannelUpdateRequestDto channelUpdateRequestDto) {
@@ -181,6 +185,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toDto(save,lastMessageAt(save),userList,userOnlineMap(userList));
     }
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
     public void delete(UUID channelId) {
@@ -278,15 +283,6 @@ public class BasicChannelService implements ChannelService {
                 .map(user -> user.getId())
                 .collect(Collectors.toSet());
 
-        if (userIds.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        return userStatusRepository.findAllByUserIdIn(userIds)
-                .stream()
-                .collect(Collectors.toMap(
-                        userStatus -> userStatus.getUser().getId(),
-                        us -> us.isOnlineNow()
-                ));
+        return sessionOnlineChecker.onlineMap(userIds);
     }
 }

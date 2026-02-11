@@ -17,6 +17,11 @@ spring:
     activate:
       on-profile: prod
 
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
 server:
   port: 8081
 
