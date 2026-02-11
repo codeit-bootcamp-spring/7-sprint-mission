@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.WebUtils;
@@ -37,6 +38,7 @@ public class BasicAuthService implements AuthService {
     private final UserMapper  userMapper;
     private final SessionRegistry sessionRegistry;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder  passwordEncoder;
 
 
     @Override
@@ -88,7 +90,7 @@ public class BasicAuthService implements AuthService {
         String userName = loginRequestDto.username();
         String password = loginRequestDto.password();
         List<User> userList = userRepository.findAll();
-        Optional<User> optionalUser = userList.stream().filter(x -> x.getUserName().equals(userName) && x.getPassword().equals(password)).findFirst();
+        Optional<User> optionalUser = userList.stream().filter(x -> x.getUserName().equals(userName) && passwordEncoder.matches(password,x.getPassword())).findFirst();
         User existUser = optionalUser.orElseThrow(()->new UserNotExistException(null));
         UserDto userDto = userMapper.toDto(existUser);
 
@@ -107,7 +109,7 @@ public class BasicAuthService implements AuthService {
         String userName = loginRequestDto.username();
         String password = loginRequestDto.password();
         List<User> userList = userRepository.findAll();
-        Optional<User> optionalUser = userList.stream().filter(x -> x.getUserName().equals(userName) && x.getPassword().equals(password)).findFirst();
+        Optional<User> optionalUser = userList.stream().filter(x -> x.getUserName().equals(userName) && passwordEncoder.matches(password,x.getPassword())).findFirst();
         User existUser = optionalUser.orElseThrow(()->new UserNotExistException(null));
         return jwtTokenProvider.generateRefreshToken(existUser);
 

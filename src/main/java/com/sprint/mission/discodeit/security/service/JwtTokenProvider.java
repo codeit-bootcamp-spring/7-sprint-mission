@@ -129,7 +129,8 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return claims.get("user_id",UUID.class);
+        String userId = claims.get("user_id", String.class);
+        return UUID.fromString(userId);
     }
 
     public Date getRefreshTokenExpirationDate(String refreshToken){

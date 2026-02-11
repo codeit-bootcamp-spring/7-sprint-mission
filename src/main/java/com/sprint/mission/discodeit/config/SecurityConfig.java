@@ -93,8 +93,5 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
                 return chain;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+
 }

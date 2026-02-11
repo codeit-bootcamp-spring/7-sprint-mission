@@ -34,10 +34,10 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        LoginRequestDto loginRequest = objectMapper.readValue(
-                request.getInputStream(),
-                LoginRequestDto.class
-        );
+        String userName = request.getParameter("username");
+        String password = request.getParameter("password");
+        LoginRequestDto loginRequest = new LoginRequestDto(userName, password);
+
         JwtDto jwtDto = authService.createAccessToken(loginRequest);
         String refreshToken = authService.createRefreshToken(loginRequest);
 
