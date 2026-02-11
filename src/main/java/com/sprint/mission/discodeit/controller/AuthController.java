@@ -25,7 +25,7 @@ public class AuthController {
         // HandlerMethodArgumentResolver를 통해 csrfToken이 자동 주입
         String tokenValue = csrfToken.getToken();
         log.debug("CSRF 토큰 요청: {}", tokenValue);
-        return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/role")
