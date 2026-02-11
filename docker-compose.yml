@@ -22,6 +22,9 @@ services:
       - ADMIN_NAME=${ADMIN_NAME}
       - ADMIN_PASS=${ADMIN_PASS}
       - REMEMBER_ME_KEY=${REMEMBER_ME_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - ACCESS_TOKEN_EXPIRATION=${ACCESS_TOKEN_EXPIRATION}
+      - ISSUER=${ISSER}
     ports:
       - "8081:80"
     volumes:
