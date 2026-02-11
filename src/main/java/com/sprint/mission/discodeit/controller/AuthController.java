@@ -30,10 +30,6 @@ public class AuthController {
 
     @PutMapping("/role")
     public ResponseEntity<UserResponseDto> role(@RequestBody UserRoleUpdateRequest request) {
-        if (request == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
         UserResponseDto responseDto = authService.updateRole(request);
         return ResponseEntity.ok(responseDto);
     }
