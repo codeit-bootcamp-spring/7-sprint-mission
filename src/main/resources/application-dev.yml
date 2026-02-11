@@ -18,6 +18,7 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.springframework.web: debug
-
+    org.springframework.security: trace
+    
 server:
   port: 7777

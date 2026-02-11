@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.exception;
 
-import java.time.Instant;
-import java.util.Map;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -17,6 +17,22 @@ public class GlobalExceptionHandler {
     ErrorResponse errorResponse = ErrorResponse.from(e);
     return ResponseEntity
         .status(e.getErrorCode().getStatus())
+        .body(errorResponse);
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> accessDeniedException(AccessDeniedException e) {
+    ErrorResponse errorResponse = ErrorResponse.of(e, "FORBIDDEN", HttpStatus.FORBIDDEN);
+    return ResponseEntity
+        .status(HttpStatus.FORBIDDEN)
+        .body(errorResponse);
+  }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<ErrorResponse> authenticationException(AuthenticationException e) {
+    ErrorResponse errorResponse = ErrorResponse.of(e, "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+    return ResponseEntity
+        .status(HttpStatus.UNAUTHORIZED)
         .body(errorResponse);
   }
 
