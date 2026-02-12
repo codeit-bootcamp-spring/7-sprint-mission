@@ -203,7 +203,7 @@ public class JwtProvider {
         return jwtProperties.refreshTokenExpiration();
     }
 
-    public String extractUsername(String accessToken) {
+    public String extractSubject(String accessToken) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(accessToken);
             return signedJWT.getJWTClaimsSet().getSubject();

@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 4. 토큰에서 사용자 식별자 추출
-        String username = jwtProvider.extractUsername(accessToken);
+        String username = jwtProvider.extractSubject(accessToken);
 
         // 5. UserDetails 로드
         DiscodeitUserDetails userDetails =
