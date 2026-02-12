@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.global.config;
 
 import com.sprint.mission.discodeit.global.config.security.DiscodeitUserDetailsService;
-import com.sprint.mission.discodeit.global.config.security.handler.CustomAccessDeniedHandler;
-import com.sprint.mission.discodeit.global.config.security.handler.LoginFailureHandler;
-import com.sprint.mission.discodeit.global.config.security.handler.LoginSuccessHandler;
-import com.sprint.mission.discodeit.global.config.security.handler.SpaCsrfTokenRequestHandler;
+import com.sprint.mission.discodeit.global.config.security.handler.*;
 import com.sprint.mission.discodeit.global.config.security.repository.JpaPersistentTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,13 +25,13 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-
-    private final LoginSuccessHandler loginSuccessHandler;
+    
+    private final JwtLoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final CustomAccessDeniedHandler accessDeniedHandler;
-    private final SessionRegistry sessionRegistry;
     private final JpaPersistentTokenRepository persistentTokenRepository;
     private final DiscodeitUserDetailsService userDetailsService;
+
 
     @Value("${discodeit.remember-me.key}")
     private String rememberMeKey;
@@ -71,11 +68,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .sessionManagement(session -> session
-                        .sessionConcurrency(concurrency -> concurrency
-                                .maximumSessions(1) // 한 사용자 당 최대 세션 수
-                                .maxSessionsPreventsLogin(false) // 새 로그인 시 이전 세션 만료, true: 새 로그인 시 차단
-                                .sessionRegistry(sessionRegistry)
-                        )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .rememberMe(remember -> remember
                         .key(rememberMeKey)
