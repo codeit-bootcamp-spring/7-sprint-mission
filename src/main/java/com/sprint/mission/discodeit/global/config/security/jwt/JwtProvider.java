@@ -24,7 +24,7 @@ import java.util.Date;
 @Slf4j
 public class JwtProvider {
     // 쿠키 이름도 JWT 인증 규약의 일부
-    public static final String REFRESH_COOKIE_NAME = "refresh";
+    public static final String REFRESH_COOKIE_NAME = "REFRESH_TOKEN";
 
     private final JwtProperties jwtProperties;
 
