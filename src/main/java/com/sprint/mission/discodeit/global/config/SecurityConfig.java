@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.global.config;
 
 import com.sprint.mission.discodeit.global.config.security.DiscodeitUserDetailsService;
-import com.sprint.mission.discodeit.global.config.security.handler.*;
+import com.sprint.mission.discodeit.global.config.security.filter.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.global.config.security.handler.CustomAccessDeniedHandler;
+import com.sprint.mission.discodeit.global.config.security.handler.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.global.config.security.handler.LoginFailureHandler;
+import com.sprint.mission.discodeit.global.config.security.handler.SpaCsrfTokenRequestHandler;
 import com.sprint.mission.discodeit.global.config.security.repository.JpaPersistentTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -25,12 +30,13 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    
+
     private final JwtLoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final JpaPersistentTokenRepository persistentTokenRepository;
     private final DiscodeitUserDetailsService userDetailsService;
+    private final JwtAuthenticationFilter authenticationFilter;
 
 
     @Value("${discodeit.remember-me.key}")
@@ -78,7 +84,8 @@ public class SecurityConfig {
                         .rememberMeParameter("remember-me")
                         .rememberMeCookieName("remember-me")
                         .useSecureCookie(false)
-                );
+                )
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
