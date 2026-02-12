@@ -23,6 +23,9 @@ import java.util.UUID;
 @Component
 @Slf4j
 public class JwtProvider {
+    // 쿠키 이름도 JWT 인증 규약의 일부
+    public static final String REFRESH_COOKIE_NAME = "refresh";
+
     private final JwtProperties jwtProperties;
 
     // JWT 서명/검증을 위한 HMAC(MAC) 기반 컴포넌트
@@ -196,5 +199,8 @@ public class JwtProvider {
         }
     }
 
+    public long getRefreshTokenExpirationMills() {
+        return jwtProperties.refreshTokenExpiration();
+    }
 
 }
