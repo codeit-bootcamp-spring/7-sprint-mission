@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * 의도적으로 ACCESS 토큰과 REFRESH 토큰 메서드를 분리
@@ -59,14 +59,14 @@ public class JwtProvider {
         return secretKey;
     }
 
-    public String generateAccessToken(UUID userId) {
+    public String generateAccessToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.accessTokenExpiration());
 
         // PayLoad clams Set
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .issuer(jwtProperties.issuer())
-                .subject(userId.toString())
+                .subject(username)
                 .issueTime(now)
                 .expirationTime(expiryDate)
                 .claim("token_type", "access")
@@ -85,19 +85,19 @@ public class JwtProvider {
         }
 
         String token = signedJWT.serialize();
-        log.info("{}의 ACCESS 토큰 발급: {}", userId, token);
+        log.info("{}의 ACCESS 토큰 발급: {}", username, token);
 
         return token;
     }
 
-    public String generateRefreshToken(UUID userId) {
+    public String generateRefreshToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.refreshTokenExpiration());
 
         // PayLoad clams Set
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .issuer(jwtProperties.issuer())
-                .subject(userId.toString())
+                .subject(username.toString())
                 .issueTime(now)
                 .expirationTime(expiryDate)
                 .claim("token_type", "refresh")
@@ -116,7 +116,7 @@ public class JwtProvider {
         }
 
         String token = signedJWT.serialize();
-        log.info("{}의 Refresh 토큰 발급: {}", userId, token);
+        log.info("{}의 Refresh 토큰 발급: {}", username, token);
 
         return token;
     }
@@ -203,4 +203,13 @@ public class JwtProvider {
         return jwtProperties.refreshTokenExpiration();
     }
 
+    public String extractUsername(String accessToken) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(accessToken);
+            return signedJWT.getJWTClaimsSet().getSubject();
+
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
