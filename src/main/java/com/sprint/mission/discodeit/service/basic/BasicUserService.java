@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.exception.domain.DiscodeitException;
 import com.sprint.mission.discodeit.exception.domain.file.FileByteReadFailException;
 import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -21,12 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-
-import static com.sprint.mission.discodeit.service.util.StaticString.USER_NOT_EXIST;
 
 @Slf4j
 @Service
@@ -67,6 +62,19 @@ public class BasicUserService implements UserService {
     }
         User user = userRepository.save(
                 User.createUserFactory(userCreateRequestDto.username()
+                        , userCreateRequestDto.email()
+                        , password)
+        );
+        return userMapper.toDto(user);
+    }
+
+
+    @Override
+    @Transactional
+    public UserDto createAdmin(UserCreateRequestDto userCreateRequestDto){
+        String password = passwordEncoder.encode(userCreateRequestDto.password());
+        User user = userRepository.save(
+                User.createAdminFactory(userCreateRequestDto.username()
                         , userCreateRequestDto.email()
                         , password)
         );

@@ -45,6 +45,10 @@ public class User extends BaseUpdatableEntity implements Serializable {
 
         return new User(userName,email,password,Role.USER,null);
     }
+    public static User createAdminFactory(String userName, String email, String password){
+
+        return new User(userName,email,password,Role.ADMIN,null);
+    }
 
     public void updateUserRole(Role role){
         this.role = role;

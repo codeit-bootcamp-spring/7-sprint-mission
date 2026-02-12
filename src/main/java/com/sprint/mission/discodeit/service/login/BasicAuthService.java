@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.login;
 import com.sprint.mission.discodeit.dto.request.authService.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserRoleUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.jwt.JwtDto;
+import com.sprint.mission.discodeit.dto.response.jwt.JwtInformation;
 import com.sprint.mission.discodeit.dto.response.login.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
@@ -12,12 +13,14 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.Role;
+import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.security.service.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,12 +36,14 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     private final UserMapper  userMapper;
     private final SessionRegistry sessionRegistry;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder  passwordEncoder;
+    private final JwtRegistry jwtRegistry;
 
 
     @Override
@@ -122,18 +127,17 @@ public class BasicAuthService implements AuthService {
         Cookie refreshToken = WebUtils.getCookie(request, "REFRESH_TOKEN");
         String refreshTokenValue = refreshToken.getValue();
 
-
-
+        if(!jwtTokenProvider.isTokenValid(refreshTokenValue)) throw new InSufficientAccessException("invalid refresh token");
         UUID userId = jwtTokenProvider.getUserIdFromToken(refreshTokenValue);
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotExistException(userId));
-        if(!jwtTokenProvider.isTokenValid(refreshTokenValue)) throw new InSufficientAccessException("invalid refresh token");
+
 
         String newAccessToken = jwtTokenProvider.generateAccessToken(user);
         UserDto newUserDto = userMapper.toDto(user);
         Date refreshTokenExpirationDate = jwtTokenProvider.getRefreshTokenExpirationDate(refreshTokenValue);
         Instant tmp =  refreshTokenExpirationDate.toInstant();
         long seconds = Duration.between(Instant.now(),tmp).getSeconds();
-
+        log.info("Refresh token expiration date: {} seconds", seconds);
                 String newRefreshToken = jwtTokenProvider.updateRefreshToken(user,refreshTokenExpirationDate);
 
         Cookie refreshCookie = new Cookie("REFRESH_TOKEN", newRefreshToken);
@@ -144,7 +148,13 @@ public class BasicAuthService implements AuthService {
         refreshCookie.setHttpOnly(true);
 
         response.addCookie(refreshCookie);
-
+        jwtRegistry.invalidateJwtInformationByUserId(userId);
+        JwtInformation jwtInformation = new JwtInformation(
+                newUserDto,
+                newAccessToken,
+                newRefreshToken
+        );
+        jwtRegistry.registerJwtInformation(jwtInformation);
         return new JwtDto(
                 newUserDto,
                 newAccessToken

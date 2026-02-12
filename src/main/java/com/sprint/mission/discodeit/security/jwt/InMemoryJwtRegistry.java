@@ -42,7 +42,7 @@ public class InMemoryJwtRegistry implements JwtRegistry {
     @Override
     public void invalidateJwtInformationByUserId(UUID userId) {
     if(!origin.containsKey(userId)) throw new UserNotExistException(userId);
-    origin.get(userId).remove();
+    origin.remove(userId);
     }
 
 
@@ -70,6 +70,11 @@ public class InMemoryJwtRegistry implements JwtRegistry {
                         jwtInformation ->
                                 jwtInformation.accessToken().equals(refreshToken))
         );
+    }
+
+    @Override
+    public Queue<JwtInformation> getJwtInformationByUserId(UUID userId){
+        return origin.get(userId);
     }
 
     @Override
