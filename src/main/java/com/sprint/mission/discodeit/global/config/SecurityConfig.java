@@ -2,10 +2,7 @@ package com.sprint.mission.discodeit.global.config;
 
 import com.sprint.mission.discodeit.global.config.security.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.global.config.security.filter.JwtAuthenticationFilter;
-import com.sprint.mission.discodeit.global.config.security.handler.CustomAccessDeniedHandler;
-import com.sprint.mission.discodeit.global.config.security.handler.JwtLoginSuccessHandler;
-import com.sprint.mission.discodeit.global.config.security.handler.LoginFailureHandler;
-import com.sprint.mission.discodeit.global.config.security.handler.SpaCsrfTokenRequestHandler;
+import com.sprint.mission.discodeit.global.config.security.handler.*;
 import com.sprint.mission.discodeit.global.config.security.repository.JpaPersistentTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +34,7 @@ public class SecurityConfig {
     private final JpaPersistentTokenRepository persistentTokenRepository;
     private final DiscodeitUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter authenticationFilter;
-
+    private final JwtLogOutHandler jwtLogOutHandler;
 
     @Value("${discodeit.remember-me.key}")
     private String rememberMeKey;
@@ -64,6 +61,7 @@ public class SecurityConfig {
                         .failureHandler(loginFailureHandler))
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(jwtLogOutHandler)
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
                         .deleteCookies("JSESSIONID", "remember-me"))
                 .csrf(csrf -> csrf

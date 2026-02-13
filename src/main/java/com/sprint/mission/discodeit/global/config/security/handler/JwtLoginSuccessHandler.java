@@ -41,7 +41,7 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Cookie refreshCookie = new Cookie(JwtProvider.REFRESH_COOKIE_NAME, refreshToken);
 
-        refreshCookie.setHttpOnly(false);  // 자바스크립트로 접근 불가 (XSS 방어)
+        refreshCookie.setHttpOnly(true);  // 자바스크립트로 접근 불가 (XSS 방어)
         refreshCookie.setSecure(request.isSecure());    // HTTPS 환경에서만 전송 (로컬 개발시는 false로 테스트 가능)
         refreshCookie.setPath("/");       // 모든 경로에서 쿠키 전송
         refreshCookie.setMaxAge((int) (jwtProvider.getRefreshTokenExpirationMills() / 1000));
