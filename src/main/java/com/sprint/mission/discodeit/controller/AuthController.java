@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.doc.AuthDocs;
 import com.sprint.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
-import com.sprint.mission.discodeit.global.config.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.global.config.security.jwt.JwtDto;
 import com.sprint.mission.discodeit.global.config.security.jwt.JwtProvider;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,15 +29,6 @@ public class AuthController implements AuthDocs {
         log.debug("CSRF 토큰 요청: {}", tokenValue);
 
         return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).build();
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> getUserSession(@AuthenticationPrincipal DiscodeitUserDetails details) {
-        if (details == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 로그인하지 않은 경우, UnAuthorized return;
-        }
-        UserResponseDto userResponseDto = details.getUserResponseDto();
-        return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }
 
     @PutMapping("/role")
