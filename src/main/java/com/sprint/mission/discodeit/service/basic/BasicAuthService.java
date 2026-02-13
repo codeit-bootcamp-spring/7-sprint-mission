@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.config.security.config.SessionManager;
 import com.sprint.mission.discodeit.global.config.security.jwt.JwtDto;
 import com.sprint.mission.discodeit.global.config.security.jwt.JwtProvider;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.discodietException.auth.JwtTokenException;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -13,7 +15,6 @@ import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +45,7 @@ public class BasicAuthService implements AuthService {
 
     public JwtDto reIssuerAccessToken(String refreshToken) {
         if (!jwtProvider.validateRefreshToken(refreshToken)) {
-            throw new UsernameNotFoundException("Invalid refresh token");
+            throw JwtTokenException.byInvalidToken(ErrorCode.INVALID_TOKEN, refreshToken);
         }
         String username = jwtProvider.extractSubject(refreshToken);
         User user = userRepository.findByUsername(username)
