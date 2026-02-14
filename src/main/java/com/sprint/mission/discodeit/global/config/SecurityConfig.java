@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.global.config;
 
-import com.sprint.mission.discodeit.global.config.security.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.global.config.security.filter.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.global.config.security.handler.*;
-import com.sprint.mission.discodeit.global.config.security.repository.JpaPersistentTokenRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -31,13 +28,9 @@ public class SecurityConfig {
     private final JwtLoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final CustomAccessDeniedHandler accessDeniedHandler;
-    private final JpaPersistentTokenRepository persistentTokenRepository;
-    private final DiscodeitUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter authenticationFilter;
     private final JwtLogOutHandler jwtLogOutHandler;
 
-    @Value("${discodeit.remember-me.key}")
-    private String rememberMeKey;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -74,15 +67,6 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .rememberMe(remember -> remember
-                        .key(rememberMeKey)
-                        .tokenRepository(persistentTokenRepository)
-                        .tokenValiditySeconds(60 * 60 * 24)
-                        .userDetailsService(userDetailsService)
-                        .rememberMeParameter("remember-me")
-                        .rememberMeCookieName("remember-me")
-                        .useSecureCookie(false)
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
