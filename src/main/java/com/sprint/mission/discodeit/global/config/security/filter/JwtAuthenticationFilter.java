@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.global.config.security.filter;
 
 import com.sprint.mission.discodeit.global.config.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.global.config.security.jwt.JwtProvider;
+import com.sprint.mission.discodeit.global.config.security.jwt.JwtRegistry;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final JwtRegistry jwtRegistry;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -41,7 +43,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = authorizationHeader.substring(7);
 
         // 3. 토큰 유효성 검증
-        if (!jwtProvider.validateAccessToken(accessToken)) {
+        if (!jwtProvider.validateAccessToken(accessToken)
+                && jwtRegistry.hasActiveJwtInformationByAccessToken(accessToken)) {
             filterChain.doFilter(request, response);
             return;
         }

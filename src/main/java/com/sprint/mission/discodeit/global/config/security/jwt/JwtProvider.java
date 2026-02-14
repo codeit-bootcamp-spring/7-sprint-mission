@@ -212,4 +212,22 @@ public class JwtProvider {
             throw new RuntimeException(e);
         }
     }
+
+    // Token 만료 = true
+    public boolean isTokenExpired(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            Date expiration = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+            if (expiration == null) {
+                return true;
+            }
+
+            return expiration.before(new Date());
+
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
 }

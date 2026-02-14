@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.global.config.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.global.config.security.jwt.JwtDto;
+import com.sprint.mission.discodeit.global.config.security.jwt.JwtInformation;
 import com.sprint.mission.discodeit.global.config.security.jwt.JwtProvider;
+import com.sprint.mission.discodeit.global.config.security.jwt.JwtRegistry;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +26,7 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper;
+    private final JwtRegistry jwtRegistry;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -48,5 +51,11 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
         response.addCookie(refreshCookie); // 응답에 쿠키 추가
 
         response.getWriter().write(objectMapper.writeValueAsString(jwtDto));
+
+        jwtRegistry.registerJwtInformation(new JwtInformation(
+                userResponseDto,
+                accessToken,
+                refreshToken
+        ));
     }
 }

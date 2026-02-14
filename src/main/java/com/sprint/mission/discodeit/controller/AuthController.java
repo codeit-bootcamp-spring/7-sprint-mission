@@ -4,8 +4,11 @@ import com.sprint.mission.discodeit.controller.doc.AuthDocs;
 import com.sprint.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.global.config.security.jwt.JwtDto;
+import com.sprint.mission.discodeit.global.config.security.jwt.JwtInformation;
 import com.sprint.mission.discodeit.global.config.security.jwt.JwtProvider;
 import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,8 +42,22 @@ public class AuthController implements AuthDocs {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<JwtDto> replaceAccessToken(@CookieValue("REFRESH_TOKEN") String refreshToken) {
-        JwtDto jwtDto = authService.reIssuerAccessToken(refreshToken);
+    public ResponseEntity<JwtDto> replaceAccessToken(@CookieValue("REFRESH_TOKEN") String refreshToken, HttpServletResponse response) {
+        JwtInformation jwtInformation = authService.reIssuerAccessToken(refreshToken);
+        String refresh = jwtInformation.getRefreshToken();
+
+        Cookie refreshCookie = new Cookie(JwtProvider.REFRESH_COOKIE_NAME, refresh);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(false);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge((int) (jwtProvider.getRefreshTokenExpirationMills() / 1000));
+        response.addCookie(refreshCookie);
+
+        JwtDto jwtDto = new JwtDto(
+                jwtInformation.getUserDto(),
+                jwtInformation.getAccessToken()
+        );
+
         return ResponseEntity.status(HttpStatus.OK).body(jwtDto);
     }
 
