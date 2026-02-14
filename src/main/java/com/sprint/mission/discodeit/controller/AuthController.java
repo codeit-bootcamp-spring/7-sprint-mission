@@ -31,7 +31,9 @@ public class AuthController implements AuthDocs {
         String tokenValue = csrfToken.getToken();
         log.debug("CSRF 토큰 요청: {}", tokenValue);
 
-        return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).build();
+        // 미션 9 요구사항: 203
+        // PR 리뷰 피드백: 204
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/role")
