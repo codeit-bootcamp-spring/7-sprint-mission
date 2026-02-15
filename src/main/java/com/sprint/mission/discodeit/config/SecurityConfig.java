@@ -4,8 +4,9 @@ import com.sprint.mission.discodeit.repository.jpa.JpaPersistentTokenRepository;
 import com.sprint.mission.discodeit.security.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetailsService;
+import com.sprint.mission.discodeit.security.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.LoginFailureHandler;
-import com.sprint.mission.discodeit.security.LoginSuccessHandler;
+import com.sprint.mission.discodeit.trash.LoginSuccessHandler;
 import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +48,8 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final LoginSuccessHandler loginSuccessHandler;
+//    private final LoginSuccessHandler loginSuccessHandler;
+    private final JwtLoginSuccessHandler jwtLoginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final SessionRegistry sessionRegistry;
     private final DiscodeitUserDetailsService userDetailsService;
@@ -124,7 +126,7 @@ public class SecurityConfig {
 
             .formLogin(login -> login
                 .loginProcessingUrl("/api/auth/login")
-                .successHandler(loginSuccessHandler)
+                .successHandler(jwtLoginSuccessHandler)
                 .failureHandler(loginFailureHandler)
                 .permitAll()
             )
@@ -142,17 +144,17 @@ public class SecurityConfig {
                 .frameOptions(frame -> frame.sameOrigin())
             )
             .sessionManagement(session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) -> JWT는 세션 안씁니다.
-                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT는 세션 안씀
+//                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 //                    .invalidSessionUrl("/session-expired") // 세션 만료시 이동할 URL
 
-                    // 동시성 관련 설정은 이 블록 안에서 작성한다.
-                    .sessionConcurrency(concurrency -> concurrency
-                        .maximumSessions(1) // 한 사용자 당 최대 세션 수
-                        .maxSessionsPreventsLogin(false) // false: 새 로그인 시 이전 세션 만료, true: 이미 로그인 되어있다면 새 로그인 차단
-                        .sessionRegistry(sessionRegistry)
-//                        .expiredUrl("/session-expired")
-                    )
+//                    // 동시성 관련 설정은 이 블록 안에서 작성한다. JWT 에선 삭제
+//                    .sessionConcurrency(concurrency -> concurrency
+//                        .maximumSessions(1) // 한 사용자 당 최대 세션 수
+//                        .maxSessionsPreventsLogin(false) // false: 새 로그인 시 이전 세션 만료, true: 이미 로그인 되어있다면 새 로그인 차단
+//                        .sessionRegistry(sessionRegistry)
+////                        .expiredUrl("/session-expired")
+//                    )
 
                     .sessionFixation().changeSessionId() // 세션 ID만 변경하고 세션 객체는 그대로 유지
 //                        .sessionFixation().migrateSession() // 새 세션을 생성해서 기존 세션의 모든 속성을 복사 후 기존 세션 무효화
