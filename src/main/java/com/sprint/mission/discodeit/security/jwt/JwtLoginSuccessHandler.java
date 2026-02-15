@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.auth.JwtDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.jwt.config.JwtProperties;
+import com.sprint.mission.discodeit.service.RefreshTokenService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -23,16 +25,22 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
     private final JwtProperties jwtProperties;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
+
         UserResponseDto userResponseDto = userDetails.getUserResponseDto();
 
 
         String accessToken = jwtTokenProvider.generateAccessToken(userResponseDto.id(), userResponseDto.email(), userResponseDto.username(), userResponseDto.role());
         String refreshToken = jwtTokenProvider.generateRefreshToken(userResponseDto.id(), userResponseDto.email());
+
+
+        refreshTokenService.saveRefreshToken(userResponseDto.id(),  refreshToken);
+
 
         Cookie refreshTokenCookie = new Cookie("REFRESH_TOKEN", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
