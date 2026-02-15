@@ -80,6 +80,6 @@ public class AuthServiceImpl implements AuthService {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        return new JwtDto(userDto, accessToken);
+        return new JwtDto(userDto, accessToken, refreshToken);
     }
 }
