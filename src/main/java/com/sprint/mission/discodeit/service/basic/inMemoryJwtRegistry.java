@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -81,5 +83,13 @@ public class inMemoryJwtRegistry implements JwtRegistry {
         );
         origin.values().removeIf(Queue::isEmpty);
         log.info("만료된 JWT 삭제 완료");
+    }
+
+    @Override
+    public Set<UUID> getAllActiveUserIds() {
+        return origin.entrySet().stream()
+                .filter(entry -> !entry.getValue().isEmpty())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
     }
 }

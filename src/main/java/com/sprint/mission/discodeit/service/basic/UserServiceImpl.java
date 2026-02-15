@@ -117,22 +117,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(user, isOnline);
     }
 
-    @Override
-    public UserDto findUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("email", email));
-        boolean isOnline = authService.isOnline(user.getId());
-        return userMapper.toDto(user, isOnline);
-    }
-
-    @Override
-    public UserDto findUserByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("username", username));
-        boolean isOnline = authService.isOnline(user.getId());
-        return userMapper.toDto(user, isOnline);
-    }
-
     // 전체출력
     @Override
     @Transactional(readOnly = true)

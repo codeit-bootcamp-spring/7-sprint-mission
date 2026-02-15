@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.security;
 
-import com.sprint.mission.discodeit.dto.userDto.UserDto;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.JwtRegistry;
-import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +20,7 @@ public class JwtLogoutHandler implements LogoutHandler {
 
     private final JwtRegistry jwtRegistry;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Override
     public void logout(HttpServletRequest request,
@@ -35,10 +34,12 @@ public class JwtLogoutHandler implements LogoutHandler {
                 .ifPresent(cookie -> {
                     String refreshToken = cookie.getValue();
 
-                    if (jwtRegistry.hasActiveJwtInformationByRefreshToken(refreshToken)){
+                    if (jwtRegistry.hasActiveJwtInformationByRefreshToken(refreshToken)) {
                         String username = jwtTokenProvider.getUsername(refreshToken);
-                        UserDto userdto = userService.findUserByUsername(username);
-                        jwtRegistry.invalidateJwtInformationByUserId(userdto.id());
+                        userRepository.findByUsername(username)
+                                .ifPresent(user ->
+                                        jwtRegistry.invalidateJwtInformationByUserId(user.getId())
+                                );
                     }
                 });
 

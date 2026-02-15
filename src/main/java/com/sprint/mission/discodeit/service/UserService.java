@@ -16,8 +16,6 @@ public interface UserService {
 
     // 조회
     UserDto findUserById(UUID userId);
-    UserDto findUserByEmail(String email);
-    UserDto findUserByUsername(String username);
 
     List<UserDto> findAllUsers();
 
