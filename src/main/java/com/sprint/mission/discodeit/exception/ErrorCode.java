@@ -20,8 +20,10 @@ public enum ErrorCode {
     ILLEAGALARGUEMNTEXCEPTION("🚨IllegalArgumentException"),
 
     // 500 SERVER ERROR
-    INTERNAL_SERVER_ERROR("🚨서버 오류");
+    INTERNAL_SERVER_ERROR("🚨서버 오류"),
 
+    // JWT.UnAuthorizedErr
+    JWT_UNAUTHORIZED("🚨HTTPSTATUS_UNAUTHORIZED");
 
     private final String message;
 }

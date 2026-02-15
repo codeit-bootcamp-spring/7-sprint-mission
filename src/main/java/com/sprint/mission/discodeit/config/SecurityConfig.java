@@ -4,10 +4,12 @@ import com.sprint.mission.discodeit.repository.jpa.JpaPersistentTokenRepository;
 import com.sprint.mission.discodeit.security.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetailsService;
+import com.sprint.mission.discodeit.security.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.LoginFailureHandler;
 import com.sprint.mission.discodeit.trash.LoginSuccessHandler;
 import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,14 +17,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 // DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters:
 // DisableEncodeUrlFilter,
@@ -49,6 +57,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 public class SecurityConfig {
 
 //    private final LoginSuccessHandler loginSuccessHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtLoginSuccessHandler jwtLoginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final SessionRegistry sessionRegistry;
@@ -71,16 +80,8 @@ public class SecurityConfig {
                                            CustomAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
         http
-            // ✅ CSRF 설정. 쿠키 쓸 경우  = 위조 링크 클릭 -> 쿠키 전달해서 -> 위조된 요청보내
-            .csrf(csrf -> csrf
-                //디폴트 구현체 HttpSessionCsrfTokenRepository -> 구현체를 CookieCsrfTokenRepository로 설정
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-                // 토큰 발급 API는 예외 처리
-//                .ignoringRequestMatchers(
-//                    "/api/csrf", "/h2-console/**", "/api/auth/**"
-//                )
-            )
+            // JWT - CSRF 비활성화
+            .csrf(AbstractHttpConfigurer::disable)
             // ✅ 인증/인가
 //            다음의 요청은 인증하지 않도록 설정하세요.
 //            Csrf Token 발급
@@ -89,6 +90,8 @@ public class SecurityConfig {
 //            로그아웃
 //            API가 아닌 요청(Swagger, Actuator 등)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/refresh").permitAll()
+
                 .requestMatchers("/api/auth/csrf-token"
                 ).permitAll() // 토큰 발급용 엔드포인트는 로그인 없이 접근 가능
 
@@ -137,30 +140,20 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                 .permitAll()
             )
-            .httpBasic(basic -> basic.disable())
 
-            .headers(headers -> headers
-                // ✅ H2 콘솔용 = 같은 사이트에서 iframe을 사용하는 것을 허용해 달라.
-                .frameOptions(frame -> frame.sameOrigin())
-            )
-            .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT는 세션 안씀
-//                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-//                    .invalidSessionUrl("/session-expired") // 세션 만료시 이동할 URL
+            //JWT - HTTP 기본 인증 방식을 사용하지 않겠다.
+            .httpBasic(AbstractHttpConfigurer::disable)
 
-//                    // 동시성 관련 설정은 이 블록 안에서 작성한다. JWT 에선 삭제
-//                    .sessionConcurrency(concurrency -> concurrency
-//                        .maximumSessions(1) // 한 사용자 당 최대 세션 수
-//                        .maxSessionsPreventsLogin(false) // false: 새 로그인 시 이전 세션 만료, true: 이미 로그인 되어있다면 새 로그인 차단
-//                        .sessionRegistry(sessionRegistry)
-////                        .expiredUrl("/session-expired")
-//                    )
+            // CORS 설정
+//            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                    .sessionFixation().changeSessionId() // 세션 ID만 변경하고 세션 객체는 그대로 유지
-//                        .sessionFixation().migrateSession() // 새 세션을 생성해서 기존 세션의 모든 속성을 복사 후 기존 세션 무효화
-//                        .sessionFixation().newSession() // 새 세션을 생성, 기존 데이터 유지되지 않음!
-//                        .sessionFixation().none() // 사용하지 마세요. 아무것도 안 합니다.
-            )
+            // ✅ H2 콘솔용 = 같은 사이트에서 iframe을 사용하는 것을 허용해 달라.
+            .headers(header -> header.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
+            // JWT 세션 사용 안함
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // JWT 인증 필터 추가
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
             .rememberMe(remember -> remember
                 .rememberMeCookieName("remember-me") // 쿠키 이름
                 .rememberMeParameter("remember-me") // HTML 폼 파라미터 이름 (체크박스의 name과 정확히 일치하게 작성!)
@@ -172,4 +165,19 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080"));
+//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+//        configuration.setAllowedHeaders(List.of("*"));
+//        configuration.setExposedHeaders(List.of("Authorization"));
+//        configuration.setAllowCredentials(true);
+//        configuration.setMaxAge(3600L);
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/api/**", configuration);
+//        return source;
+//    }
 }
