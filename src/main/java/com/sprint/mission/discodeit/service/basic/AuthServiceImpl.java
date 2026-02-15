@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.JwtRegistry;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +26,11 @@ public class AuthServiceImpl implements AuthService {
 
     private final SessionRegistry sessionRegistry;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtRegistry jwtRegistry;
 
     @Override
     public boolean isOnline(UUID userId) {
-        return getOnlineUserIds().contains(userId);
+        return jwtRegistry.hasActiveJwtInformationByUserId(userId);
     }
 
     @Override
