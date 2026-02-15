@@ -6,7 +6,6 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.JWTClaimsSet.Builder;
 import com.nimbusds.jwt.SignedJWT;
 import java.util.Date;
 import java.text.ParseException;
@@ -31,12 +30,12 @@ public class JwtTokenProvider { // 토큰을 발급, 갱신, 유효성 검사를
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
 
-    private String createToken(UUID userId, String role, long accessTokenExpiration) {
+    private String createToken(String username, String role, long accessTokenExpiration) {
         try {
             Instant now = Instant.now();
 
             JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
-                .subject(userId.toString())
+                .subject(username)
                 .issueTime(Date.from(now))
                 .expirationTime(Date.from(now.plusSeconds(accessTokenExpiration)))
                 .jwtID(UUID.randomUUID().toString());
@@ -62,12 +61,12 @@ public class JwtTokenProvider { // 토큰을 발급, 갱신, 유효성 검사를
     }
 
 
-    public String createAccessToken(UUID userId, String role) {
-        return createToken(userId, role, accessTokenExpiration);
+    public String createAccessToken(String username, String role) {
+        return createToken(username, role, accessTokenExpiration);
     }
 
-    public String createRefreshToken(UUID userId) {
-        return createToken(userId, null, refreshTokenExpiration);
+    public String createRefreshToken(String username) {
+        return createToken(username, null, refreshTokenExpiration);
     }
 
     public boolean validateToken(String token) {
@@ -104,9 +103,8 @@ public class JwtTokenProvider { // 토큰을 발급, 갱신, 유효성 검사를
             throw new RuntimeException("🚨JWT 파싱 실패", e);
         }
     }
-
-    public UUID getUserId(String token) {
-        return UUID.fromString(getClaims(token).getSubject());
+    public String getUsername(String token) {
+        return getClaims(token).getSubject();
     }
 
     public String getRole(String token) {
@@ -120,7 +118,7 @@ public class JwtTokenProvider { // 토큰을 발급, 갱신, 유효성 검사를
             throw new IllegalArgumentException("🚨유효하지 않은 Refresh Token");
         }
 
-        UUID userId = getUserId(refreshToken);
-        return createAccessToken(userId, role);
+        String username = getUsername(refreshToken);
+        return createAccessToken(username, role);
     }
 }

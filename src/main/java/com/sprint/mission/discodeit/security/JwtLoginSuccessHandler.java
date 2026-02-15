@@ -36,12 +36,13 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
         DiscodeitUserDetails principal =
             (DiscodeitUserDetails) authentication.getPrincipal();
 
+        String username = principal.getUser().username();
         UUID userId = principal.getUser().id();
         Role role = principal.getUser().role();
 
         // 2️⃣ 토큰 발급
-        String accessToken = jwtTokenProvider.createAccessToken(userId, role.name());
-        String refreshToken = jwtTokenProvider.createRefreshToken(userId);
+        String accessToken = jwtTokenProvider.createAccessToken(username, role.name());
+        String refreshToken = jwtTokenProvider.createRefreshToken(username);
 
         // 3️⃣ Refresh Token → Cookie (HttpOnly + SameSite)
         Cookie refreshCookie = new Cookie(REFRESH_TOKEN_COOKIE, refreshToken);
