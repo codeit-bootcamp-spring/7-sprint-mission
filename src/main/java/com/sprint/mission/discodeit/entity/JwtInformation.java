@@ -10,10 +10,10 @@ public class JwtInformation {
 
     private UserDto userDto;
     private String accessToken;
-    private String refreshToke;
+    private String refreshToken;
 
     public void rotate(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
-        this.refreshToke = refreshToken;
+        this.refreshToken = refreshToken;
     }
 }
