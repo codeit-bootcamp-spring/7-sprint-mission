@@ -161,7 +161,8 @@ public class ChannelService implements InterfaceChannelService {
             boolean isAdmin = authentication
                 .getAuthorities()
                 .stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CHANNEL_MANAGER"));
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CHANNEL_MANAGER") ||
+                    grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
 
             if (!isAdmin) {
 

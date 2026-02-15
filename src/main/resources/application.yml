@@ -43,6 +43,11 @@ info:
   jpa:
     ddl-auto: ${spring.jpa.hibernate.ddl-auto}
 
+jwt:
+  secret: ${JWT_SECRET:test-JwtSecret}
+  access-token-expiration: 600 # 10분
+  refresh-token-expiration: 1800 # 30분
+
   storage:
     type: ${storage.type}
     path: ${storage.path}
