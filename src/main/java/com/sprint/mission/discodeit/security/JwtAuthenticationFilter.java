@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.security;
 
+import com.sprint.mission.discodeit.service.JwtRegistry;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final DiscodeitUserDetailsService userDetailsService;
+    private final JwtRegistry jwtRegistry;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -31,7 +33,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String jwt = extractJwtFromRequest(request);
-            if (jwt != null && jwtTokenProvider.isTokenValid(jwt)) {
+            if (jwt != null && jwtTokenProvider.isTokenValid(jwt) &&
+                    jwtRegistry.hasActiveJwtInformationByAccessToken(jwt)) {
+
                 authenticateUser(jwt, request);
             }
         } catch (Exception e) {
