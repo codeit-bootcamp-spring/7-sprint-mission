@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -43,6 +42,7 @@ public class BasicRefreshTokenService implements RefreshTokenService {
     }
 
     @Override
+    @Transactional
     public void revokeAll(UUID userId) {
         refreshTokenRepository.deleteByUserId(userId);
     }
@@ -65,6 +65,7 @@ public class BasicRefreshTokenService implements RefreshTokenService {
     }
 
     @Override
+    @Transactional
     public void deleteRefreshToken(String refreshToken) {
         refreshTokenRepository.deleteByToken(refreshToken);
     }

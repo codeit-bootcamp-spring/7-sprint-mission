@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.config;
 import com.sprint.mission.discodeit.security.*;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -50,8 +51,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(
             HttpSecurity http,
             CustomAuthenticationEntryPoint authenticationEntryPoint,
-            CustomAccessDeniedHandler accessDeniedHandler
-    ) throws Exception {
+            CustomAccessDeniedHandler accessDeniedHandler,
+            JwtLogoutHandler jwtLogoutHandler) throws Exception {
 
         http.authorizeHttpRequests(
                         auth -> auth
@@ -90,6 +91,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(jwtLogoutHandler)
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
                 )
                 .exceptionHandling(exception -> exception
@@ -100,12 +102,6 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .rememberMe(remember -> remember
-                        .key("spring-mission-remember-me-key")
-                        .tokenValiditySeconds(60 * 60 * 24 * 7) // 7일
-                        // NOTE: Customizer.withDefaults() 가 기본이라 다 설정되어있지만 바꿀려는부분만 이렇게 key, tokenValiditySeconds를 넣어준것, 저거 안넣어도 기본값으로 알아서 해주긴함
-                )
-
         ;
 
         return http.build();
