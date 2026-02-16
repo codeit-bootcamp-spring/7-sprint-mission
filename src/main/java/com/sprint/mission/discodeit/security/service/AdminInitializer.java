@@ -39,7 +39,7 @@ public class AdminInitializer {
                 adminPassword
 
         );
-        userService.createUser(requestDto,null);
+        userService.createAdmin(requestDto);
         log.info("Admin has been created : {}", requestDto);
 
     }

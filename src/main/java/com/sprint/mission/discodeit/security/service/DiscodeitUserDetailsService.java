@@ -19,10 +19,24 @@ public class DiscodeitUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+    public DiscodeitUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        if(!isUuid(username)){
+            User user = userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException(username));
+            String password = user.getPassword();
+            return new DiscodeitUserDetails(userMapper.toDto(user),password);
+        }
+        UUID userId = UUID.fromString(username);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + userId));
         String password = user.getPassword();
         return new DiscodeitUserDetails(userMapper.toDto(user),password);
+    }
+    private boolean isUuid(String value) {
+        try {
+            UUID.fromString(value);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }
