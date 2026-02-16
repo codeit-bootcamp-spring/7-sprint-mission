@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.security.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -7,11 +8,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,10 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
-
-    @Id
-    private UUID id;
+public class User extends BaseUpdatableEntity {
 
     @Column(nullable = true)
     private String username;
@@ -46,16 +42,7 @@ public class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private UserStatus status;
 
-    public User(UUID id, String username, String email, String password, UserRole role) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
     public User(String username, String email, String password, BinaryContent profile) {
-        this.id = UUID.randomUUID();
         this.username = username;
         this.email = email;
         this.password = password;
@@ -66,7 +53,9 @@ public class User {
     public void update(String username, String email, String password, BinaryContent profile) {
         this.username = username;
         this.email = email;
-        this.password = password;
+        if (password != null) {
+            this.password = password;
+        }
         this.profile = profile;
     }
 

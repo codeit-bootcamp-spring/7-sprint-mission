@@ -15,6 +15,9 @@ spring:
 
 logging:
   level:
+    org.springframework.dao: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
     root: INFO
 
 discodeit:
@@ -30,6 +33,12 @@ discodeit:
       region: ${AWS_S3_REGION:ap-northeast-2}
       bucket: ${AWS_S3_BUCKET:}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+
+jwt:
+  secret: ${JWT_SECRET:PLEASE_CHANGE_THIS_TO_A_LONG_RANDOM_SECRET_KEY_32BYTES_OR_MORE}
+  issuer: ${JWT_ISSUER:discodeit}
+  access-ttl-seconds: ${JWT_ACCESS_TTL_SECONDS:900}
+  refresh-ttl-seconds: ${JWT_REFRESH_TTL_SECONDS:604800}
 
 management:
   endpoints:
