@@ -60,6 +60,12 @@ discodeit:
 #  api-docs:
 #    path: /my-api # Swagger가 우리 API의 정보를 얻어오기 위해서 요청하는 url
 
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForJwtTokenGeneration1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
+  access-token-expiration: 900000
+  refresh-token-expiration: 1209600000
+  issuer: discodeit
+
 management:
   endpoints:
     web:

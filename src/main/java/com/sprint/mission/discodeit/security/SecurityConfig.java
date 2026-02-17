@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.security;
 
+import com.sprint.mission.discodeit.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.jwt.JwtLogoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -24,12 +29,12 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final LoginSuccessHandler loginSuccessHandler;
+    private final AuthenticationSuccessHandler jwtLoginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final AccessDeniedHandler accessDeniedHandler;
-    private final SessionRegistry sessionRegistry;
-    private final UserDetailsService userDetailsService;
+    private final JwtLogoutHandler jwtLogoutHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -62,11 +67,12 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginProcessingUrl("/api/auth/login")
-                        .successHandler(loginSuccessHandler)
+                        .successHandler(jwtLoginSuccessHandler)
                         .failureHandler(loginFailureHandler)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(jwtLogoutHandler)
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
                 )
                 .exceptionHandling(ex -> ex
@@ -74,16 +80,13 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .sessionManagement(session -> session
-                        .sessionConcurrency(concurrency -> concurrency
-                                .maximumSessions(1)
-                                .sessionRegistry(sessionRegistry)
-                        )
-
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .rememberMe(rememberMe -> rememberMe
-                        .tokenValiditySeconds(3600)
-                        .userDetailsService(userDetailsService)
-                );
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+//                .rememberMe(rememberMe -> rememberMe
+//                        .tokenValiditySeconds(3600)
+//                        .userDetailsService(userDetailsService)
+//                );
 
         ;
         return http.build();

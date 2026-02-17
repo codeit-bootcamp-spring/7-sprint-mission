@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -41,7 +42,7 @@ public class UserService {
     private final ReadStatusRepository readStatusRepository;
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
-    private final AuthService authService;
+    private final JwtRegistry jwtRegistry;
 
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
         log.info("UserService.createUser");
@@ -119,7 +120,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, new HashMap<>()));
 
         user.updateRole(roleUpdateRequest.newRole());
-        authService.invalidateUserSession(user.getId());
+        jwtRegistry.invalidateJwtInformationByUserId(user.getId());
         return mapper.toDto(user);
     }
 }
