@@ -166,4 +166,9 @@ public class JwtTokenProvider {
     public boolean validateRefreshToken(String token) {
         return validate(token) && !isExpired(token) && isTokenType(token, TokenType.REFRESH);
     }
+
+    public Instant getExpirationInstant(String token) {
+        Date exp = parseClaims(token).getExpiration();
+        return exp == null ? null : exp.toInstant();
+    }
 }

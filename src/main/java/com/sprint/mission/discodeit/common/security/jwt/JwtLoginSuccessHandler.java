@@ -33,6 +33,8 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final SessionOnlineChecker sessionOnlineChecker;
     private final UserMapper userMapper;
+    private final JwtRegistry jwtRegistry;
+    private final JwtOnlineChecker jwtOnlineChecker;
 
     @Override
     public void onAuthenticationSuccess(
@@ -51,8 +53,19 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         refreshTokenCookieManager.set(response, pair.refreshToken());
 
-        boolean online = sessionOnlineChecker.isOnline(userId);
+        boolean online = jwtOnlineChecker.isOnline(userId);
         UserResponseDto userDto = userMapper.toDto(user, online);
+
+        JwtInformation info = new JwtInformation(
+                userDto,
+                pair.accessToken(),
+                jwtTokenProvider.getExpirationInstant(pair.accessToken()),
+                pair.refreshToken(),
+                jwtTokenProvider.getExpirationInstant(pair.refreshToken())
+        );
+
+        jwtRegistry.registerJwtInformation(info);
+
         JwtDto jwtDto = new JwtDto(userDto, pair.accessToken());
 
         response.setStatus(HttpServletResponse.SC_OK);

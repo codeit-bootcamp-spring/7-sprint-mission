@@ -19,6 +19,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final DiscodeitUserDetailsService userDetailsService;
+    private final JwtRegistry jwtRegistry;
 
     @Override
     protected void doFilterInternal(
@@ -43,6 +44,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (!jwtTokenProvider.validate(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (!jwtRegistry.hasActiveJwtInformationByAccessToken(token)) {
             filterChain.doFilter(request, response);
             return;
         }
