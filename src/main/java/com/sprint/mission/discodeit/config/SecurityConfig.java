@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -23,9 +27,9 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final LoginSuccessHandler loginSuccessHandler;
+    private final JwtLoginSuccessHandler jwtLoginSuccessHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final LoginFailureHandler loginFailureHandler;
-    private final SessionRegistry sessionRegistry;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,13 +51,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(
             HttpSecurity http,
             CustomAuthenticationEntryPoint authenticationEntryPoint,
-            CustomAccessDeniedHandler accessDeniedHandler
-    ) throws Exception {
+            CustomAccessDeniedHandler accessDeniedHandler,
+            JwtLogoutHandler jwtLogoutHandler) throws Exception {
 
         http.authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-
                                 .requestMatchers("/",
                                         "/index.html",
                                         "/favicon.ico",
@@ -62,6 +65,7 @@ public class SecurityConfig {
                                         "/.well-known/**",
                                         "/api/auth/login",
                                         "/api/auth/csrf-token",
+                                        "/api/auth/refresh",
                                         "/api/auth/logout",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",
@@ -82,11 +86,12 @@ public class SecurityConfig {
                 )
                 .formLogin(login -> login
                         .loginProcessingUrl("/api/auth/login")
-                        .successHandler(loginSuccessHandler)
+                        .successHandler(jwtLoginSuccessHandler)
                         .failureHandler(loginFailureHandler)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(jwtLogoutHandler)
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
                 )
                 .exceptionHandling(exception -> exception
@@ -94,20 +99,9 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .sessionManagement(management -> management
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 명시해 놓기
-                        .sessionConcurrency(concurrency -> concurrency
-                                .sessionRegistry(sessionRegistry)
-                                .maximumSessions(1) // 사용자 당 동시 최대 세션수
-                                .maxSessionsPreventsLogin(false) // false:새 로그인시 이전 세션 만료
-                        )
-                        .sessionFixation().changeSessionId() // 명시해놓기, 세션 Id만 변경하고 세션 객체는 그대로 유지
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .rememberMe(remember -> remember
-                        .key("spring-mission-remember-me-key")
-                        .tokenValiditySeconds(60 * 60 * 24 * 7) // 7일
-                        // NOTE: Customizer.withDefaults() 가 기본이라 다 설정되어있지만 바꿀려는부분만 이렇게 key, tokenValiditySeconds를 넣어준것, 저거 안넣어도 기본값으로 알아서 해주긴함
-                )
-
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         ;
 
         return http.build();

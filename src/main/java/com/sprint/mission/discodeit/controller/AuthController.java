@@ -1,24 +1,25 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.api.AuthApi;
+import com.sprint.mission.discodeit.dto.auth.JwtDto;
 import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.auth.TokenResult;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.mapper.UserMapperManual;
+import com.sprint.mission.discodeit.security.jwt.config.JwtProperties;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -27,14 +28,8 @@ import java.util.UUID;
 public class AuthController implements AuthApi {
 
     private final UserService userService;
-
-    @Override
-    @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> getMe(@AuthenticationPrincipal DiscodeitUserDetails principal) {
-        UUID id = principal.getUserResponseDto().id();
-        UserResponseDto userResponseDto = userService.getUserById(id);
-        return ResponseEntity.ok(userResponseDto);
-    }
+    private final AuthService authService;
+    private final JwtProperties jwtProperties;
 
     @Override
     @GetMapping("/csrf-token")
@@ -43,6 +38,22 @@ public class AuthController implements AuthApi {
         log.debug("CSRF 토큰 요청: {}", tokenValue);
 
         return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(null);
+    }
+
+    @Override
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtDto> refreshAccessToken(@CookieValue("REFRESH_TOKEN") String refreshToken, HttpServletResponse response) {
+        TokenResult tokenResult = authService.refreshAccessToken(refreshToken);
+
+        Cookie cookie = new Cookie("REFRESH_TOKEN", tokenResult.refreshToken());
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setSecure(false);
+        cookie.setMaxAge(jwtProperties.getRefreshTokenExpirationMs().intValue() / 1000);
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok(new JwtDto(tokenResult.user(), tokenResult.accessToken()));
     }
 
     @Override

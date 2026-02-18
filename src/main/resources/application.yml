@@ -34,6 +34,12 @@ spring:
         instance:
           name: discodeit
 
+jwt:
+  secret-key: ${JWT_SECRET:mySecretKeyForJwtTokenGeneration1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
+  access-token-expiration-ms: 900000      # 15분
+  refresh-token-expiration-ms: 1209600000 # 2주
+  issuer: codeit
+
 logging:
   level:
     root: info

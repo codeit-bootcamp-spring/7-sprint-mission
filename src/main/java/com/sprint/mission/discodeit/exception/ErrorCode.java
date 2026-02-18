@@ -13,6 +13,8 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR("", HttpStatus.INTERNAL_SERVER_ERROR, "CM-005"),
     UNAUTHORIZED("인증 실패하였습니다.", HttpStatus.UNAUTHORIZED, "CM-006"),
     FORBIDDEN("권한이 없습니다.", HttpStatus.FORBIDDEN, "CM-007"),
+    INVALID_TOKEN("유효하지 않은 토큰입니다.",HttpStatus.UNAUTHORIZED, "CM-008" ),
+    EXPIRED_TOKEN("만료된 토큰입니다", HttpStatus.UNAUTHORIZED , "CM-009" ),
 
     // User
     USER_NOT_FOUND("유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND, "U-001"),
@@ -47,6 +49,7 @@ public enum ErrorCode {
     // UserStatus
     USER_STATUS_NOT_FOUND("유저 상태를 찾을 수 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR, "US-001"),
     USER_STATUS_ALREADY_EXISTS("해당 유저의 상태는 이미 등록되었습니다.", HttpStatus.CONFLICT, "US-002");
+
 
     private final String message;
     private final HttpStatus status;

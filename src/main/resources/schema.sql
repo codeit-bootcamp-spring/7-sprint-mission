@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS messages CASCADE;
 DROP TABLE IF EXISTS channels CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS binary_contents CASCADE;
+DROP TABLE IF EXISTS refresh_tokens CASCADE;
 
 --- 바이너리컨텐츠 테이블 DDL
 CREATE TABLE binary_contents
@@ -80,4 +81,18 @@ CREATE TABLE message_attachments
     PRIMARY KEY (message_id, attachment_id),
     CONSTRAINT fk_message_attachment_message FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE,
     CONSTRAINT fk_message_attachment_binary_content FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE
+);
+
+CREATE TABLE refresh_tokens
+(
+    id         UUID PRIMARY KEY,
+    token      VARCHAR(500)             NOT NULL UNIQUE,
+    user_id    UUID                     NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+
+    CONSTRAINT fk_refresh_token_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (id)
+            ON DELETE CASCADE
 );
