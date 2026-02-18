@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.JwtRegistry;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
+    private final JwtRegistry jwtRegistry;
 
     // 생성
     @Override
@@ -213,7 +215,7 @@ public class UserServiceImpl implements UserService {
 
         user.updateRole(roleUpdateRequest.newRole());
         userRepository.save(user);
-        authService.expireUserSession(user.getId());
+        jwtRegistry.invalidateJwtInformationByUserId(user.getId());
 
         log.info("유저 {} 권한 변경: {} -> {}", user.getUsername(), oldRole, roleUpdateRequest.newRole());
         boolean isOnline = authService.isOnline(user.getId());
