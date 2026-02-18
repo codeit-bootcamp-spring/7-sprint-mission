@@ -2,13 +2,14 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtDto;
 import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,34 +25,20 @@ public class AuthController {
         // HandlerMethodArgumentResolver를 통해 csrfToken이 자동 주입
         String tokenValue = csrfToken.getToken();
         log.debug("CSRF 토큰 요청: {}", tokenValue);
-        return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).build();
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> me(
-            @AuthenticationPrincipal DiscodeitUserDetails userDetails
-    ) {
-        if (userDetails == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
-        return ResponseEntity.ok(new UserResponseDto(
-                userDetails.getUserDto().id(),
-                userDetails.getUsername(),
-                userDetails.getUserDto().email(),
-                userDetails.getUserDto().profile(),
-                userDetails.getUserDto().online(),
-                userDetails.getUserDto().role()
-        ));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/role")
     public ResponseEntity<UserResponseDto> role(@RequestBody UserRoleUpdateRequest request) {
-        if (request == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
         UserResponseDto responseDto = authService.updateRole(request);
         return ResponseEntity.ok(responseDto);
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtDto> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
+        JwtDto responseDto = authService.refreshAccessToken(request, response);
+        return ResponseEntity.ok(responseDto);
+    }
+
+
 }

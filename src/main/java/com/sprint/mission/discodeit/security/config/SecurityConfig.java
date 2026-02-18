@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.security.config;
 
 import com.sprint.mission.discodeit.security.*;
-import com.sprint.mission.discodeit.security.repository.JpaPersistentTokenRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,9 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
@@ -23,18 +27,18 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-                                           LoginSuccessHandler loginSuccessHandler,
                                            LoginFailureHandler loginFailureHandler,
                                            CustomAuthenticationEntryPoint authenticationEntryPoint,
                                            CustomAccessDeniedHandler accessDeniedHandler,
-                                           SessionRegistry sessionRegistry,
-                                           DiscodeitUserDetailsService userDetailsService,
-                                           JpaPersistentTokenRepository persistentTokenRepository) throws Exception {
+                                           JwtLoginSuccessHandler jwtLoginSuccessHandler,
+                                           JwtAuthenticationFilter jwtAuthenticationFilter,
+                                           JwtLogoutHandler jwtLogoutHandler) throws Exception {
 
         http
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/","/index.html", "/assets/**").permitAll()
-                        .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/logout").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users").permitAll()
                         .requestMatchers("/swagger-ui/**", "/actuator/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
@@ -47,14 +51,15 @@ public class SecurityConfig {
                 )
                 .formLogin(login -> login
                         .loginProcessingUrl("/api/auth/login") // 로그인 처리 url
-                        .successHandler(loginSuccessHandler) // 로그인 인증 성공
+                        .successHandler(jwtLoginSuccessHandler) // 로그인 인증 성공
                         .failureHandler(loginFailureHandler) // 로그인 인증 실패
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
-                        .deleteCookies("JSESSIONID", "remember-me")
+                        .addLogoutHandler(jwtLogoutHandler)
+                        .deleteCookies("REFRESH_TOKEN")
                         .permitAll()
                 )
                 .csrf(csrf -> csrf
@@ -66,19 +71,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .sessionManagement(management -> management
-                        .sessionConcurrency(concurrency -> concurrency
-                                .maximumSessions(1)
-                                .sessionRegistry(sessionRegistry)
-                        )
-                )
-                .rememberMe(remember -> remember
-                        .key("DiscodeitRememberMeSecretKey2026")
-                        .tokenValiditySeconds(60 * 60 * 24 * 14)
-                        .userDetailsService(userDetailsService)
-                        .rememberMeParameter("remember-me")
-                        .rememberMeCookieName("remember-me")
-                        .useSecureCookie(false) // 개발 환경
-                        .tokenRepository(persistentTokenRepository)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
         return http.build();
