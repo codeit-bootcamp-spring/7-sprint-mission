@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.common.exception.message.MessageNotFoundExce
 import com.sprint.mission.discodeit.common.exception.message.SlowModeViolationException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.common.security.SessionOnlineChecker;
+import com.sprint.mission.discodeit.common.security.jwt.JwtOnlineChecker;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
@@ -48,6 +49,7 @@ public class BasicMessageService implements MessageService {
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
     private final SessionOnlineChecker sessionOnlineChecker;
+    private final JwtOnlineChecker jwtOnlineChecker;
 
     @Transactional
     @Override
@@ -144,7 +146,7 @@ public class BasicMessageService implements MessageService {
         Message save = messageRepository.save(message);
         log.info("메세지가 생성되었습니다. messageId = {}", save.getId());
 
-        return messageMapper.toDto(save, sessionOnlineChecker.isOnline(user.getId()));
+        return messageMapper.toDto(save, jwtOnlineChecker.isOnline(user.getId()));
     }
 
     @Override
@@ -157,7 +159,7 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new MessageNotFoundException(messageId));
 
         User author = message.getAuthor();
-        boolean online = author != null && sessionOnlineChecker.isOnline(author.getId());
+        boolean online = author != null && jwtOnlineChecker.isOnline(author.getId());
 
         return messageMapper.toDto(message, online);
     }
@@ -202,7 +204,7 @@ public class BasicMessageService implements MessageService {
 
         Message save = messageRepository.save(message);
         User author = save.getAuthor();
-        boolean online = author != null && sessionOnlineChecker.isOnline(author.getId());
+        boolean online = author != null && jwtOnlineChecker.isOnline(author.getId());
         log.info("메세지가 수정되었습니다. messageId = {}", message.getId());
         return messageMapper.toDto(save, online);
     }
@@ -302,6 +304,6 @@ public class BasicMessageService implements MessageService {
             return Collections.emptyMap();
         }
 
-        return sessionOnlineChecker.onlineMap(authorIds);
+        return jwtOnlineChecker.onlineMap(authorIds);
     }
 }

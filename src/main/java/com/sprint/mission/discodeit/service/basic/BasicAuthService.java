@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.common.security.SessionOnlineChecker;
-import com.sprint.mission.discodeit.common.security.jwt.JwtTokenProvider;
-import com.sprint.mission.discodeit.common.security.jwt.RefreshTokenCookieManager;
+import com.sprint.mission.discodeit.common.security.jwt.*;
 import com.sprint.mission.discodeit.dto.response.auth.AuthTokenResponseDto;
 import com.sprint.mission.discodeit.dto.response.auth.JwtDto;
 import com.sprint.mission.discodeit.dto.response.user.UserResponseDto;
@@ -10,12 +9,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.stereotype.Service;
 
@@ -32,12 +28,19 @@ public class BasicAuthService implements AuthService {
     private final SessionOnlineChecker sessionOnlineChecker;
     private final UserMapper userMapper;
     private final RefreshTokenCookieManager refreshTokenCookieManager;
+    private final JwtRegistry jwtRegistry;
+    private final JwtOnlineChecker jwtOnlineChecker;
 
     @Override
     public JwtDto refresh(String refreshToken, HttpServletResponse response) {
         if (refreshToken == null || refreshToken.isBlank()) {
             refreshTokenCookieManager.clear(response);
             throw new InsufficientAuthenticationException("Refresh token is empty");
+        }
+
+        if (!jwtRegistry.hasActiveJwtInformationByRefreshToken(refreshToken)) {
+            refreshTokenCookieManager.clear(response);
+            throw new InsufficientAuthenticationException("Refresh token is not active");
         }
 
         if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
@@ -65,8 +68,18 @@ public class BasicAuthService implements AuthService {
 
         refreshTokenCookieManager.set(response, pair.refreshToken());
 
-        boolean online = sessionOnlineChecker.isOnline(user.getId());
+        boolean online = jwtOnlineChecker.isOnline(userId);
         UserResponseDto userDto = userMapper.toDto(user, online);
+
+        JwtInformation newInfo = new JwtInformation(
+                userDto,
+                pair.accessToken(),
+                jwtTokenProvider.getExpirationInstant(pair.accessToken()),
+                pair.refreshToken(),
+                jwtTokenProvider.getExpirationInstant(pair.refreshToken())
+        );
+
+        jwtRegistry.rotateJwtInformation(refreshToken, newInfo);
 
         return new JwtDto(userDto, pair.accessToken());
     }

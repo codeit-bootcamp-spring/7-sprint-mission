@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.common.exception.user.InvalidUserRequestExce
 import com.sprint.mission.discodeit.common.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.common.security.SessionOnlineChecker;
+import com.sprint.mission.discodeit.common.security.jwt.JwtOnlineChecker;
+import com.sprint.mission.discodeit.common.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.dto.request.auth.UserRoleUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
@@ -37,6 +39,8 @@ public class BasicUserService implements UserService {
     private final BinaryContentService binaryContentService;
     private final PasswordEncoder passwordEncoder;
     private final SessionOnlineChecker sessionOnlineChecker;
+    private final JwtRegistry jwtRegistry;
+    private final JwtOnlineChecker jwtOnlineChecker;
 
     @Transactional
     @Override
@@ -95,7 +99,7 @@ public class BasicUserService implements UserService {
         log.debug("Getting user: userId = {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
-        boolean online = sessionOnlineChecker.isOnline(user.getId());
+        boolean online = jwtOnlineChecker.isOnline(userId);
         return userMapper.toDto(user, online);
     }
 
@@ -106,7 +110,7 @@ public class BasicUserService implements UserService {
         Set<UUID> ids = users.stream()
                 .map(u -> u.getId())
                 .collect(Collectors.toSet());
-        Map<UUID, Boolean> onlineMap = sessionOnlineChecker.onlineMap(ids);
+        Map<UUID, Boolean> onlineMap = jwtOnlineChecker.onlineMap(ids);
         return users.stream()
                 .map(user -> userMapper.toDto(user, onlineMap.getOrDefault(user.getId(), false)))
                 .toList();
@@ -173,7 +177,7 @@ public class BasicUserService implements UserService {
         }
 
         User save = userRepository.save(user);
-        boolean online = sessionOnlineChecker.isOnline(user.getId());
+        boolean online = jwtOnlineChecker.isOnline(user.getId());
 
         log.info("유저 정보가 수정되었습니다. userId = {}", save.getId());
         return userMapper.toDto(save, online);
@@ -204,7 +208,7 @@ public class BasicUserService implements UserService {
         log.debug("Getting users by name {}", username);
         return userRepository.findByUsername(username)
                 .stream()
-                .map(user -> userMapper.toDto(user, sessionOnlineChecker.isOnline(user.getId())))
+                .map(user -> userMapper.toDto(user, jwtOnlineChecker.isOnline(user.getId())))
                 .toList();
     }
 
@@ -216,13 +220,13 @@ public class BasicUserService implements UserService {
         }
         log.debug("Getting users by email {}", email);
         return userRepository.findByEmail(email)
-                .map(user -> userMapper.toDto(user, sessionOnlineChecker.isOnline(user.getId())));
+                .map(user -> userMapper.toDto(user, jwtOnlineChecker.isOnline(user.getId())));
     }
 
     @Override
     public UserResponseDto getMe(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        boolean online = sessionOnlineChecker.isOnline(user.getId());
+        boolean online = jwtOnlineChecker.isOnline(userId);
         return  userMapper.toDto(user, online);
     }
 
@@ -249,15 +253,15 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         if (user.getRole() == newRole) {
-            boolean online = sessionOnlineChecker.isOnline(userId);
+            boolean online = jwtOnlineChecker.isOnline(userId);
             return userMapper.toDto(user, online);
         }
 
         user.updateRole(newRole);
         User saved = userRepository.save(user);
-        sessionOnlineChecker.expireSession(saved.getId());
 
-        boolean online = sessionOnlineChecker.isOnline(userId);
+        boolean online = jwtOnlineChecker.isOnline(userId);
+        jwtRegistry.invalidateJwtInformationByUserId(userId);
 
         log.info("User role updated. userId = {}, newRole = {}",  saved.getId(), newRole);
         return userMapper.toDto(saved, online);

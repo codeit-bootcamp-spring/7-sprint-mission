@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.common.exception.channel.InvalidChannelExcep
 import com.sprint.mission.discodeit.common.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.common.security.SessionOnlineChecker;
+import com.sprint.mission.discodeit.common.security.jwt.JwtOnlineChecker;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PublicChannelCreateRequestDto;
@@ -34,6 +35,7 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
     private final SessionOnlineChecker sessionOnlineChecker;
+    private final JwtOnlineChecker jwtOnlineChecker;
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
@@ -283,6 +285,6 @@ public class BasicChannelService implements ChannelService {
                 .map(user -> user.getId())
                 .collect(Collectors.toSet());
 
-        return sessionOnlineChecker.onlineMap(userIds);
+        return jwtOnlineChecker.onlineMap(userIds);
     }
 }
