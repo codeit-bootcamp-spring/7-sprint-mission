@@ -30,12 +30,15 @@ public enum ErrorCode {
 
     // BINARY_CONTENT
     BINARY_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Binary Content를 찾을 수 없습니다."),
-    
+
     // INTERNAL
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 
     // VALID
-    VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "유효성 검사에 실패하였습니다.");
+    VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "유효성 검사에 실패하였습니다."),
+
+    // AUTH & Security
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
 
     private final HttpStatus status;
     private final String message;

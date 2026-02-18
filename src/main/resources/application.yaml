@@ -34,8 +34,11 @@ discodeit:
     admin-name: ${ADMIN_NAME:admin}
     admin-pass: ${ADMIN_PASS:admin}
 
-  remember-me:
-    key: ${REMEMBER_ME_KEY:test-key}
+  jwt:
+    secret: ${JWT_SECRET:mySecretKeyForJwtTokenGeneration1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
+    access-token-expiration: ${ACCESS_TOKEN_EXPIRATION:900000}
+    refresh-token-expiration: ${REFRESH_ACCESS_TOKEN_EXPIRATION:1209600000}
+    issuer: ${ISSUER:codeit}
 
 
 

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.global.config.security.config.SessionManager;
+import com.sprint.mission.discodeit.global.config.security.jwt.JwtRegistry;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 // componetModel을 spring으로 지정해줘야 bean으로 등록할 수 있음.
 public abstract class UserMapper {
     @Autowired
-    protected SessionManager sessionManager;
+    protected JwtRegistry jwtRegistry;
 
     //  source = from (입력)
     //  target = to (출력)
-    @Mapping(target = "online", expression = "java(sessionManager.isOnlineByUserId(user.getId()))")
+    @Mapping(target = "online", expression = "java(jwtRegistry.hasActiveJwtInformationByUserId(user.getId()))")
     public abstract UserResponseDto toResponseDto(User user);
 }

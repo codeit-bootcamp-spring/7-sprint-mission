@@ -100,7 +100,7 @@ public class BasicUserService implements UserService {
                 .orElse(null);
 
         user.updateUser(updateUserDto.newUsername(),
-                updateUserDto.newPassword(),
+                passwordEncoder.encode(updateUserDto.newPassword()),
                 updateUserDto.newEmail(),
                 profile
         );

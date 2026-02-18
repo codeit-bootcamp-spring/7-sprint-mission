@@ -3,7 +3,11 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.global.config.security.config.SessionManager;
+import com.sprint.mission.discodeit.global.config.security.jwt.JwtInformation;
+import com.sprint.mission.discodeit.global.config.security.jwt.JwtProvider;
+import com.sprint.mission.discodeit.global.config.security.jwt.JwtRegistry;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.discodietException.auth.JwtTokenException;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -20,7 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final SessionManager sessionManager;
+    private final JwtProvider jwtProvider;
+    private final JwtRegistry jwtRegistry;
 
     @Override
     @Transactional
@@ -34,7 +39,33 @@ public class BasicAuthService implements AuthService {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> UserNotFoundException.byId(request.userId()));
         user.updateRole(request.newRole());
-        sessionManager.expireSessionByUserId(user.getId());
+        jwtRegistry.invalidateJwtInformationByUserId(user.getId());
         return userMapper.toResponseDto(user);
+    }
+
+    public JwtInformation reIssuerAccessToken(String refreshToken) {
+        if (!jwtProvider.validateRefreshToken(refreshToken)
+                || !jwtRegistry.hasActiveJwtInformationByRefreshToken(refreshToken)) {
+            throw JwtTokenException.byInvalidToken(ErrorCode.INVALID_TOKEN, refreshToken);
+        }
+
+        String username = jwtProvider.extractSubject(refreshToken);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> UserNotFoundException.byUsername(username));
+
+        UserResponseDto userResponseDto = userMapper.toResponseDto(user);
+
+        String newAccessToken = jwtProvider.generateAccessToken(userResponseDto.username());
+        String newRefreshToken = jwtProvider.generateRefreshToken(userResponseDto.username());
+
+
+        JwtInformation jwtInformation = new JwtInformation(
+                userResponseDto,
+                newAccessToken,
+                newRefreshToken
+        );
+        jwtRegistry.rotateJwtInformation(refreshToken, jwtInformation);
+
+        return jwtInformation;
     }
 }
