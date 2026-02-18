@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.common.exception;
 
 import lombok.Getter;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -45,6 +46,8 @@ public enum ErrorCode {
     AUTH_USER_NOT_FOUND(HttpStatus.NOT_FOUND,"로그인 사용자를 찾을 수 없습니다."),
     AUTH_WRONG_PASSWORD(HttpStatus.BAD_REQUEST,"비밀번호가 올바르지 않습니다."),
     AUTH_ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
+    AUTH_ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 권한이 없습니다."),
+    AUTH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다."),
 
     // common
     INVALID_REQUEST(HttpStatus.BAD_REQUEST,"요청이 올바르지 않습니다."),

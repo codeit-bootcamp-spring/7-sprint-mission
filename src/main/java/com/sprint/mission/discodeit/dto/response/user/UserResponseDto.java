@@ -11,7 +11,5 @@ public record UserResponseDto(
         BinaryContentResponseDto profile,
         Boolean online
 ) {
-
-
 }
 
