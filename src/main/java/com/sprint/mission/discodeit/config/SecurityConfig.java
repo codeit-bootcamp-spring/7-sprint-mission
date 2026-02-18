@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.common.security.*;
-import com.sprint.mission.discodeit.common.security.jwt.JwtAuthenticationFilter;
-import com.sprint.mission.discodeit.common.security.jwt.JwtLoginSuccessHandler;
-import com.sprint.mission.discodeit.common.security.jwt.JwtLogoutHandler;
-import com.sprint.mission.discodeit.common.security.jwt.JwtTokenProvider;
+import com.sprint.mission.discodeit.common.security.jwt.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +32,7 @@ public class SecurityConfig {
     private final LoginFailureHandler loginFailureHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final JwtRegistry jwtRegistry;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
@@ -44,7 +42,7 @@ public class SecurityConfig {
                                            JwtTokenProvider jwtTokenProvider,
                                            DiscodeitUserDetailsService userDetailsService, JwtLogoutHandler jwtLogoutHandler) throws Exception {
 
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService, jwtRegistry);
         http
                 .sessionManagement(session -> session
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -62,6 +60,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/logout")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 )
