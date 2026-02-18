@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.common.security.*;
+import com.sprint.mission.discodeit.common.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.common.security.jwt.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.common.security.jwt.JwtLogoutHandler;
+import com.sprint.mission.discodeit.common.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,11 +16,13 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
@@ -33,15 +39,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            SessionRegistry sessionRegistry,
-                                           DiscodeitUserDetailsService discodeitUserDetailsService) throws Exception {
+                                           DiscodeitUserDetailsService discodeitUserDetailsService,
+                                           JwtLoginSuccessHandler jwtLoginSuccessHandler,
+                                           JwtTokenProvider jwtTokenProvider,
+                                           DiscodeitUserDetailsService userDetailsService, JwtLogoutHandler jwtLogoutHandler) throws Exception {
+
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService);
         http
                 .sessionManagement(session -> session
-                        .sessionConcurrency(concurrency -> concurrency
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        /*.sessionConcurrency(concurrency -> concurrency
                                 .maximumSessions(1)
                                 .maxSessionsPreventsLogin(false)
                                 .sessionRegistry(sessionRegistry)
                         )
+
+                         */
                 )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler)
@@ -60,6 +75,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
                         .requestMatchers("/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers("/swagger-ui/**",
@@ -81,12 +97,13 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(jwtLogoutHandler)
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
                         .deleteCookies("JSESSIONID", "remember-me", "XSRF-TOKEN")
                 )
                 .formLogin(login -> login
                         .loginProcessingUrl("/api/auth/login")
-                        .successHandler(loginSuccessHandler)
+                        .successHandler(jwtLoginSuccessHandler)
                         .failureHandler(loginFailureHandler)
                 );
         return http.build();
