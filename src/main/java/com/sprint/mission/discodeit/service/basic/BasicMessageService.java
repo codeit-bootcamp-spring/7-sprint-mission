@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.global.exception.discodietException.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.discodietException.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
@@ -19,8 +20,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,8 +44,8 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
 
     private final MessageMapper messageMapper;
-    private final BinaryContentStorage binaryContentStorage;
     private final PageResponseMapper pageResponseMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Override
@@ -70,7 +71,7 @@ public class BasicMessageService implements MessageService {
                                 .contentType(createBinaryContentDto.contentType())
                                 .build();
                         binaryContentRepository.save(binaryContent);
-                        binaryContentStorage.put(binaryContent.getId(), createBinaryContentDto.bytes());
+                        eventPublisher.publishEvent(new BinaryContentCreatedEvent(this, binaryContent.getId(), createBinaryContentDto.bytes()));
 
                         return binaryContent;
                     }
