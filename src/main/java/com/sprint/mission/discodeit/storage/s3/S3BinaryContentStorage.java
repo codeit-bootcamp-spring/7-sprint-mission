@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.storage.s3;
 
-import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,10 +93,10 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public ResponseEntity<Void> download(BinaryContentResponseDto dto) {
+    public ResponseEntity<Void> download(BinaryContent binaryContent) {
 
-        String key = dto.id().toString();
-        String contentType = dto.contentType();
+        String key = binaryContent.getId().toString();
+        String contentType = binaryContent.getContentType();
 
         String presignedUrl = generatePresignedUrl(key, contentType);
 

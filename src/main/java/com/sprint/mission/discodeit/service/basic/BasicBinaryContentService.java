@@ -2,15 +2,18 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
+import com.sprint.mission.discodeit.global.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -23,8 +26,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -36,8 +40,8 @@ public class BasicBinaryContentService implements BinaryContentService {
                     request.contentType()
             );
 
-            binaryContentRepository.save(file);
-            binaryContentStorage.put(file.getId(), request.bytes());
+            BinaryContent saved = binaryContentRepository.save(file);
+            eventPublisher.publishEvent(new BinaryContentCreatedEvent(saved.getId(), request.bytes()));
         }
     }
 
@@ -72,4 +76,26 @@ public class BasicBinaryContentService implements BinaryContentService {
         binaryContentRepository.deleteById(binaryContentId);
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public BinaryContentResponseDto updateStatus(UUID binaryContentId, BinaryContentStatus newStatus) {
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
+                .orElseThrow(() -> new BinaryContentNotFoundException(
+                        ErrorCode.BINARYCONTENT_NOT_FOUND,
+                        Map.of("binaryContentId", binaryContentId)));
+
+        binaryContent.updateStatus(newStatus);
+
+        return binaryContentMapper.toResponseDto(binaryContent);
+    }
+
+    @Override
+    @Transactional
+    public BinaryContent download(UUID binaryContentId) {
+        return binaryContentRepository.findById(binaryContentId)
+                .orElseThrow(() -> new BinaryContentNotFoundException(
+                        ErrorCode.BINARYCONTENT_NOT_FOUND,
+                        Map.of("binaryContentId", binaryContentId)
+                ));
+    }
 }

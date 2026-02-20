@@ -4,8 +4,6 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,9 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class BinaryContentMapper {
-    private final BinaryContentStorage binaryContentStorage;
 
     // 단일 binaryContent dto 변환
     public CreateBinaryContentRequestDto toRequestDto(MultipartFile attachment) {
@@ -67,20 +63,14 @@ public class BinaryContentMapper {
     public BinaryContentResponseDto toResponseDto(BinaryContent attachment) {
         if (attachment == null) return null;
 
-        try {
-            byte[] bytes = binaryContentStorage.get(attachment.getId()).readAllBytes();
+        return new BinaryContentResponseDto(
+                attachment.getId(),
+                attachment.getFileName(),
+                attachment.getSize(),
+                attachment.getContentType(),
+                attachment.getStatus()
+        );
 
-            return new BinaryContentResponseDto(
-                    attachment.getId(),
-                    attachment.getFileName(),
-                    attachment.getSize(),
-                    attachment.getContentType(),
-                    bytes
-            );
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public List<BinaryContentResponseDto> toResponseDto(List<BinaryContent> attachments) {
@@ -90,19 +80,13 @@ public class BinaryContentMapper {
 
         return attachments.stream()
                 .map(attachment -> {
-                    try {
-                        byte[] bytes = binaryContentStorage.get(attachment.getId()).readAllBytes();
-
-                        return new BinaryContentResponseDto(
-                                attachment.getId(),
-                                attachment.getFileName(),
-                                attachment.getSize(),
-                                attachment.getContentType(),
-                                bytes
-                        );
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    return new BinaryContentResponseDto(
+                            attachment.getId(),
+                            attachment.getFileName(),
+                            attachment.getSize(),
+                            attachment.getContentType(),
+                            attachment.getStatus()
+                    );
                 })
                 .toList();
     }

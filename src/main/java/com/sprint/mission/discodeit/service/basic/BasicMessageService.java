@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
+import com.sprint.mission.discodeit.global.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.channel.NotChannelMemberException;
 import com.sprint.mission.discodeit.global.exception.message.MessageNotFoundException;
@@ -15,9 +16,9 @@ import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.PageMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,7 +50,7 @@ public class BasicMessageService implements MessageService {
     private final MessageMapper messageMapper;
     private final PageMapper pageMapper;
 
-    private final BinaryContentStorage binaryContentStorage;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 새로운 메시지를 생성하여 Repository에 저장
@@ -94,8 +95,14 @@ public class BasicMessageService implements MessageService {
                                     file.contentType()
                             );
                             attachments.add(fileBytes);
-                            binaryContentRepository.save(fileBytes);
-                            binaryContentStorage.put(fileBytes.getId(), file.bytes());
+                        BinaryContent saved = binaryContentRepository.save(fileBytes);
+
+                        eventPublisher.publishEvent(
+                                    new BinaryContentCreatedEvent(
+                                            saved.getId(),
+                                            file.bytes()
+                                    )
+                            );
                         }
                     );
                     log.debug("메시지 첨부파일 저장 완료");

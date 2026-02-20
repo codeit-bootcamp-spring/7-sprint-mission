@@ -15,9 +15,11 @@ CREATE TABLE channels (
 CREATE TABLE binary_contents (
 	id           uuid,
 	created_at   timestamp with time zone NOT NULL,
+	updated_at   timestamp with time zone,
 	file_name    varchar(255) NOT NULL,
 	size         bigint NOT NULL,
 	content_type varchar(100) NOT NULL,
+	status       varchar(20) NOT NULL,
 
 	PRIMARY KEY (id)
 );
