@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.domain.channel.ChannelNotExistException;
 import com.sprint.mission.discodeit.exception.domain.file.FileByteReadFailException;
 import com.sprint.mission.discodeit.exception.domain.message.MessageNotExistException;
@@ -26,6 +27,7 @@ import com.sprint.mission.discodeit.subTable.MessageAttachment;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -55,10 +57,10 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final MessageAttachmentRepository messageAttachmentRepository;
     private final MessageMapper messageMapper;
-    private final BinaryContentStorage binaryContentStorage;
     private final PageResponseMapper<MessageDto> pageResponseMapper;
     private final PageResponseBasicMapper<MessageDto> pageResponseBasicMapper;
     private final ReadStatusRepository readStatusRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments   ) {
@@ -85,10 +87,17 @@ public class BasicMessageService implements MessageService {
                                    new BinaryContent(x.getOriginalFilename(),x.getContentType(),x.getSize())
                             );
                            attachmentList.add(binaryContent);
-                           binaryContentStorage.put(binaryContent.getId(),x.getBytes());
+                            BinaryContentCreatedEvent event = new BinaryContentCreatedEvent(
+                                    binaryContent.getFileName(),
+                                    binaryContent.getId(),
+                                    binaryContent.getContentType(),
+                                    x.getBytes()
+                            );
+                            eventPublisher.publishEvent(event);
                             MessageAttachment save = messageAttachmentRepository.save(new MessageAttachment(message, binaryContent));
                             messageAttachmentList.add(save);
                         }
+
 
                         catch (IOException e) {
                             throw new FileByteReadFailException(x.getName());

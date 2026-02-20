@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entityElement.BinaryContentStatus;
 import com.sprint.mission.discodeit.entityElement.BinaryContentUsage;
 import com.sprint.mission.discodeit.subTable.MessageAttachment;
 import jakarta.persistence.*;
@@ -35,10 +36,18 @@ public class BinaryContent extends BaseEntity implements Serializable {
     @OneToMany( mappedBy = "binaryContent",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<MessageAttachment> messageAttachment;
 
-    public BinaryContent(String fileName, String contentType, Long size){
+    @Column(name = "status",nullable = false)
+    private int status;
+
+    public BinaryContent(String fileName, String contentType, Long size) {
         this.fileName = fileName;
         this.contentType = contentType;
         this.size = size;
+        this.status = BinaryContentStatus.PROCESSING.getValue();
+    }
+
+    public void updateStatus(BinaryContentStatus status) {
+        this.status = status.getValue();
     }
 
 }

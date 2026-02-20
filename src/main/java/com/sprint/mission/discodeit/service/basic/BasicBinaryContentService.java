@@ -3,12 +3,14 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.binaryContent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.domain.file.FileNotExistException;
 import com.sprint.mission.discodeit.mapper.mapStruct.BinaryStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -32,7 +35,14 @@ public class BasicBinaryContentService implements BinaryContentService {
                 binaryContentCreateRequestDto.getSize()
         );
         BinaryContent saved = binaryContentRepository.save(binaryContent);
-        binaryContentStorage.put(binaryContent.getId(),binaryContentCreateRequestDto.getBytes());
+
+        BinaryContentCreatedEvent event = new BinaryContentCreatedEvent(
+                saved.getFileName(),
+                saved.getId(),
+                saved.getContentType(),
+                binaryContentCreateRequestDto.getBytes()
+        );
+        eventPublisher.publishEvent(event);
         return BinaryStruct.INSTANCE.toDto(saved);
 
 
