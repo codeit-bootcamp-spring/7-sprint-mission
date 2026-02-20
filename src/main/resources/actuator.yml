@@ -10,6 +10,9 @@ management:
       enabled: true
     env:
       enabled: true
+  observations:
+    annotations:
+      enabled: true
 
 
   server:

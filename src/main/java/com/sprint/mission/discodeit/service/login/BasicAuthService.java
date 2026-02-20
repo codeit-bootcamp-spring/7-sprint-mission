@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.response.jwt.JwtInformation;
 import com.sprint.mission.discodeit.dto.response.login.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.exception.domain.auth.InSufficientAccessException;
 import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -21,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,7 @@ public class BasicAuthService implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder  passwordEncoder;
     private final JwtRegistry jwtRegistry;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Override
@@ -71,6 +74,11 @@ public class BasicAuthService implements AuthService {
         Role newRole = userRoleUpdateRequestDto.newRole();
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotExistException(userId));
         user.updateUserRole(newRole);
+        RoleUpdatedEvent event = new RoleUpdatedEvent(
+                newRole,
+                user.getId()
+        );
+        eventPublisher.publishEvent(event);
         return userMapper.toDto(user);
     }
 

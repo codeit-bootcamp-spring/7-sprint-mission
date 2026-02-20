@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.exception.domain.channel.ChannelNotExistException;
 import com.sprint.mission.discodeit.exception.domain.file.FileByteReadFailException;
 import com.sprint.mission.discodeit.exception.domain.message.MessageNotExistException;
@@ -108,7 +109,13 @@ public class BasicMessageService implements MessageService {
             message.setMessageAttachment(messageAttachmentList);
         }
         log.error("message : {} 일단 에러를 뱉어",message);
+        MessageCreatedEvent event = new MessageCreatedEvent(
+                message.getContent(),
+                message.getAuthor().getId(),
+                message.getChannel().getId()
 
+        );
+        eventPublisher.publishEvent(event);
         return messageMapper.toDto(message);
     }
 
