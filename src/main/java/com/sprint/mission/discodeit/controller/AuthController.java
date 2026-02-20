@@ -4,14 +4,18 @@ import com.sprint.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.security.jwt.JwtDto;
 import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,9 +40,29 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtDto> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        JwtDto responseDto = authService.refreshAccessToken(request, response);
-        return ResponseEntity.ok(responseDto);
+        String refreshToken = extractRefreshTokenFromCookies(request);
+
+        Pair<JwtDto, String> result = authService.refreshAccessToken(refreshToken);
+
+        Cookie refreshTokenCookie = new Cookie("REFRESH_TOKEN", result.getSecond());
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(request.isSecure());
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(60 * 60 * 24 * 14);
+
+        response.addCookie(refreshTokenCookie);
+
+        return ResponseEntity.ok(result.getFirst());
     }
 
-
+    private String extractRefreshTokenFromCookies(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            return Arrays.stream(request.getCookies())
+                    .filter(cookie -> "REFRESH_TOKEN".equals(cookie.getName()))
+                    .map(Cookie::getValue)
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
+    }
 }

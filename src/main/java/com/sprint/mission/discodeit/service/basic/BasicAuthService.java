@@ -14,11 +14,9 @@ import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,9 +51,7 @@ public class BasicAuthService implements AuthService {
     }
 
     @Transactional
-    public JwtDto refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = extractRefreshTokenFromCookies(request);
-
+    public Pair<JwtDto, String> refreshAccessToken(String refreshToken) {
         if (refreshToken == null || !jwtTokenProvider.isTokenValid(refreshToken)) {
             throw new BusinessException(ErrorCode.EMPTY_OR_INVALID_TOKEN);
         }
@@ -77,25 +73,9 @@ public class BasicAuthService implements AuthService {
                 newRefreshToken
         ));
 
-        Cookie refreshTokenCookie = new Cookie("REFRESH_TOKEN", newRefreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(request.isSecure());
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(60 * 60 * 24 * 14);
 
-        response.addCookie(refreshTokenCookie);
+        JwtDto jwtDto = new JwtDto(userMapper.toResponseDto(user), newAccessToken);
 
-        return new JwtDto(userMapper.toResponseDto(user), newAccessToken);
-    }
-
-    private String extractRefreshTokenFromCookies(HttpServletRequest request) {
-        if (request.getCookies() != null) {
-            return Arrays.stream(request.getCookies())
-                    .filter(cookie -> "REFRESH_TOKEN".equals(cookie.getName()))
-                    .map(Cookie::getValue)
-                    .findFirst()
-                    .orElse(null);
-        }
-        return null;
+        return Pair.of(jwtDto, newRefreshToken);
     }
 }
