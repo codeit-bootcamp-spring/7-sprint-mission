@@ -11,7 +11,6 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "binary_contents")
 public final class BinaryContent extends BaseUpdatableEntity {
@@ -28,6 +27,14 @@ public final class BinaryContent extends BaseUpdatableEntity {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private BinaryContentStatus status;
+
+    @Builder
+    public BinaryContent(String fileName, Long size, String contentType) {
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+        this.status = BinaryContentStatus.PROCESSING;
+    }
 
     public void updateStatus(BinaryContentStatus status) {
         this.status = status;
