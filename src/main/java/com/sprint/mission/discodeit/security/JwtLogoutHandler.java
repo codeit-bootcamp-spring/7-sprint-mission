@@ -35,7 +35,7 @@ public class JwtLogoutHandler implements LogoutHandler {
                     String refreshToken = cookie.getValue();
 
                     if (jwtRegistry.hasActiveJwtInformationByRefreshToken(refreshToken)) {
-                        String username = jwtTokenProvider.getUsername(refreshToken);
+                        String username = jwtTokenProvider.getUsernameFromRefreshToken(refreshToken);
                         userRepository.findByUsername(username)
                                 .ifPresent(user ->
                                         jwtRegistry.invalidateJwtInformationByUserId(user.getId())

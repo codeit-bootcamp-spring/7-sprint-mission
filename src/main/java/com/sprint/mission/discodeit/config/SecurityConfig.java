@@ -61,8 +61,9 @@ public class SecurityConfig {
 
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        // SPA(React/Vue 등) 환경에서는 아래와 같은 핸들러가 필요할 수 있습니다.
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .ignoringRequestMatchers("/api/**")
+                        .ignoringRequestMatchers(PathRequest.toH2Console()) // 개발전용
                 )
 
                 .headers(headers -> headers

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class inMemoryJwtRegistry implements JwtRegistry {
+public class InMemoryJwtRegistry implements JwtRegistry {
 
     private final Map<UUID, Queue<JwtInformation>> origin = new ConcurrentHashMap<>();
     private final int maxActiveJwtCount = 1;
@@ -78,7 +78,7 @@ public class inMemoryJwtRegistry implements JwtRegistry {
     public void clearExpiredJwtInformation() {
         origin.values().forEach(queue ->
                 queue.removeIf(jwtInformation ->
-                        !jwtTokenProvider.isTokenValid(jwtInformation.getRefreshToken())
+                        !jwtTokenProvider.isRefreshTokenValid(jwtInformation.getRefreshToken())
                 )
         );
         origin.values().removeIf(Queue::isEmpty);

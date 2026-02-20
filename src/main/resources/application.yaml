@@ -94,8 +94,15 @@ info:
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:mySecretKeyForJwtTokenGeneration1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
+  access-secret: ${ACCESS_TOKEN}
+  refresh-secret: ${REFRESH_TOKEN}
   access-token-expiration: 900000      # 15분 (밀리초)
   refresh-token-expiration: 1209600000 # 2주 (밀리초)
   issuer: jwt-demo-api
+
+app:
+  admin:
+    username: ${ADMIN_USERNAME}
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
 

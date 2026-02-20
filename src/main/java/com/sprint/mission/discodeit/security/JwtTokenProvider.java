@@ -22,16 +22,16 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
-    private SecretKey key;
+
+    private SecretKey accessKey;
+    private SecretKey refreshKey;
 
     @PostConstruct
     private void init() {
-        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    public SecretKey getSecretKey() {
-        return this.key;
+        byte[] accessKeyBytes = jwtProperties.getAccessSecret().getBytes(StandardCharsets.UTF_8);
+        this.accessKey = Keys.hmacShaKeyFor(accessKeyBytes);
+        byte[] refreshKeyBytes = jwtProperties.getRefreshSecret().getBytes(StandardCharsets.UTF_8);
+        this.refreshKey = Keys.hmacShaKeyFor(refreshKeyBytes);
     }
 
     public String createAccessToken(UserDto userdto) {
@@ -40,19 +40,17 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .header()
-                    .type("JWT")
-                    .and()
+                .type("JWT")
+                .and()
                 .issuer(jwtProperties.getIssuer())
                 .subject(userdto.username())
                 .issuedAt(now)
                 .expiration(expiryDate)
 
                 .claim("userId", userdto.id())
-                .claim("username", userdto.username())
-                .claim("email", userdto.email())
                 .claim("roles", userdto.role())
                 .claim("tokenType", "access")
-                .signWith(getSecretKey())
+                .signWith(accessKey)
                 .compact();
     }
 
@@ -62,8 +60,8 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .header()
-                    .type("JWT")
-                    .and()
+                .type("JWT")
+                .and()
                 .issuer(jwtProperties.getIssuer())
                 .subject(userDto.username())
                 .issuedAt(now)
@@ -71,14 +69,14 @@ public class JwtTokenProvider {
 
                 .claim("userId", userDto.id())
                 .claim("tokenType", "refresh")
-                .signWith(getSecretKey())
+                .signWith(refreshKey)
                 .compact();
     }
 
-    public Claims validateToken(String token) {
+    private Claims parseToken(String token, SecretKey key) {
         try {
             return Jwts.parser()
-                    .verifyWith(getSecretKey())
+                    .verifyWith(key)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -100,16 +98,36 @@ public class JwtTokenProvider {
         }
     }
 
-    public boolean isTokenValid(String token) {
+    public Claims validateAccessToken(String token) {
+        return parseToken(token, accessKey);
+    }
+
+    public Claims validateRefreshToken(String token) {
+        return parseToken(token, refreshKey);
+    }
+
+    public boolean isAccessTokenValid(String token) {
         try {
-            validateToken(token);
+            validateAccessToken(token);
             return true;
         } catch (TokenException e) {
             return false;
         }
     }
 
-    public String getUsername(String token) {
-        return validateToken(token).getSubject();
+    public boolean isRefreshTokenValid(String token) {
+        try {
+            validateRefreshToken(token);
+            return true;
+        } catch (TokenException e) {
+            return false;
+        }
+    }
+
+    public String getUsernameFromAccessToken(String token) {
+        return validateAccessToken(token).getSubject();
+    }
+    public String getUsernameFromRefreshToken(String token) {
+        return validateRefreshToken(token).getSubject();
     }
 }
