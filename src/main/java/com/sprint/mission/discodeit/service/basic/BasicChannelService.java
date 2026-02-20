@@ -16,6 +16,10 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +39,7 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
     private final ChannelMapper channelMapper;
-
+    private final CacheManager  cacheManager;
     @Override
     public List<ChannelDto> readAllChannel() {
         return channelRepository.findAll().stream().map(x->channelMapper.toDto(x)).toList();
@@ -44,7 +48,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelDto createPrivateChannel(ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
-
+        Cache cache = cacheManager.getCache("channels");
         List<User> userList = channelPrivateCreateRequestDto.participantIds().stream().map(
                 x ->
                 {
@@ -55,11 +59,15 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = channelRepository.save(Channel.privateChannelFactory(channelPrivateCreateRequestDto.name(),channelPrivateCreateRequestDto.description()));
        userList.forEach(x->readStatusRepository.save(ReadStatus.createReadStatusFactory(x,channel)));
+       userList.forEach(
+               x-> cache.evict(x.getId())
+       );
         return channelMapper.toDto(channel);
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = "channels",allEntries = true)
     public ChannelDto createPublicChannel(ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
         List<User> users = userRepository.findAll();
     Channel channel = channelRepository.save(Channel.publicChannelFactory(
@@ -92,6 +100,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional(readOnly = true)
+    @CachePut(value = "channels",key = "#userId")
     public List<ChannelDto> findAllByUserId(UUID userId) {
         List<Channel> channelList = channelRepository.findAll();
         List<ReadStatus> readStatusList = readStatusRepository.findAll();
@@ -108,6 +117,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @CacheEvict(value = "channels",allEntries = true)
     public void deleteChannel(UUID channelID) {
         if(!channelRepository.existsById(channelID)) throw new ChannelNotExistException(channelID);
         log.warn("delete channel : {}",channelID);

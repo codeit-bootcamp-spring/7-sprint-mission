@@ -14,6 +14,9 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -98,6 +101,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    @CachePut(value = "users")
     public List<UserDto> readAllUser() {
         return userRepository.findAll().stream().map(userMapper::toDto).toList();
     }
@@ -105,6 +109,10 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or principal.username == #userId.toString() ")
+    @Caching(evict = {
+            @CacheEvict(value="users",allEntries = true),
+            @CacheEvict(value="notifications",key = "#userId")
+    })
     public void deleteUser(UUID userId) {
         if (!userRepository.existsById(userId)) throw new UserNotExistException(userId);
         log.info("deleteUser : {} info layer",userId);
