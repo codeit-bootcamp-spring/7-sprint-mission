@@ -3,13 +3,15 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.enums.BinaryContentStatus;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.binaryContent.FileNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +26,8 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
-    private final BinaryContentStorage binaryContentStorage;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -37,7 +40,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
                 .build();
 
         binaryContentRepository.save(newContent);
-        binaryContentStorage.put(newContent.getId(),requestDto.data());
+        eventPublisher.publishEvent(new BinaryContentCreatedEvent(newContent.getId(), requestDto.data()));
         return binaryContentMapper.toDto(newContent);
     }
 
@@ -55,6 +58,15 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         return binaryContentRepository.findAllByIdIn(ids).stream()
                 .map(binaryContentMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public BinaryContentDto updateStatus(UUID id, BinaryContentStatus status) {
+        BinaryContent binaryContent = binaryContentRepository.findById(id)
+                .orElseThrow(() -> new FileNotFoundException(id));
+        binaryContent.updateStatus(status);
+        return binaryContentMapper.toDto(binaryContent);
     }
 
     @Override
