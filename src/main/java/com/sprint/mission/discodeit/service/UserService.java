@@ -25,4 +25,5 @@ public interface UserService {
     List<UserDto> findAllUsers();
     UserDto patchUser(UUID userId, UserUpdateRequest dto, MultipartFile profile) ;
 
+    UUID getAdminId();
 }

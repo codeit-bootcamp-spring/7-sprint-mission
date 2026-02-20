@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +33,7 @@ public class BasicUserService implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
+    private UUID adminId;
 
     @Override
     @Transactional
@@ -86,6 +86,7 @@ public class BasicUserService implements UserService {
                         , userCreateRequestDto.email()
                         , password)
         );
+        adminId = user.getId();
         return userMapper.toDto(user);
     }
 
@@ -153,5 +154,9 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
 
+    @Override
+    public UUID getAdminId(){
+        return adminId;
+    }
 
 }

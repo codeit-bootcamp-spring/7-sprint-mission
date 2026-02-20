@@ -1,15 +1,22 @@
 package com.sprint.mission.discodeit.storage.s3;
 
+import com.sprint.mission.discodeit.dto.request.notification.NotificationDto;
 import com.sprint.mission.discodeit.dto.response.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.storage.NotificationStorage;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -29,6 +36,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.UUID;
 
 @Component
@@ -38,6 +46,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
     private final AwsProperties awsProperties;
     private final BinaryContentRepository binaryContentRepository;
+    private final NotificationStorage notificationStorage;
+    private final UserService userService;
 
     private S3Client s3Client;
     private S3Presigner s3Presigner;
@@ -68,6 +78,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
+    @Retryable(
+            retryFor = {Exception.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 3000)
+    )
     public UUID put(UUID id, byte[] bytes) {
 
         BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow();
@@ -138,5 +153,18 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         return presignedGetObjectRequest.url().toString();
     }
 
+    @Recover
+    public void createNotification(Exception e, UUID id){
+        String requestId = MDC.get("requestId");
+        String content = String.format("S3 저장 시도 전부 실패, 저장 원인 : %s \n 바이너리 파일 id: %s \n request id: %s",e.getMessage(),id.toString(),requestId);
+        NotificationDto notificationDto = new NotificationDto(
+                UUID.randomUUID(),
+                Instant.now(),
+                userService.getAdminId(),
+                "S3 저장 실패",
+                content
+        );
+        notificationStorage.save(notificationDto);
+    }
 
 }

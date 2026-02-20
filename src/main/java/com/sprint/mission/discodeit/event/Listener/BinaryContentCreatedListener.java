@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,6 @@ public class BinaryContentCreatedListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async("binaryContentExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Retryable
     public void handleBinaryContentCreated(BinaryContentCreatedEvent event) {
 
         log.info("[바이너리 데이터 저장 쓰레드] 파일 이름: {}",event.getFilename());
