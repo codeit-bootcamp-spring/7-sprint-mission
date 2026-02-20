@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.security.jwt;
 
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Role;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -65,12 +64,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 userId,
                 username,
                 email,
-                null,
+                null, // NPE 발생 가능
                 true,
                 role
         );
 
-        DiscodeitUserDetails userDetails = new DiscodeitUserDetails(dto, null);
+        DiscodeitUserDetails userDetails = new DiscodeitUserDetails(dto, null); // password NPE 발생 가능
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails,
