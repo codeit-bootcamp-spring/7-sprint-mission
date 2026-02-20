@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 3. 토큰 유효성 검증
         if (!jwtProvider.validateAccessToken(accessToken)
-                && jwtRegistry.hasActiveJwtInformationByAccessToken(accessToken)) {
+                || !jwtRegistry.hasActiveJwtInformationByAccessToken(accessToken)) {
             filterChain.doFilter(request, response);
             return;
         }

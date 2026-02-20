@@ -85,7 +85,7 @@ public class JwtProvider {
         }
 
         String token = signedJWT.serialize();
-        log.info("{}의 ACCESS 토큰 발급: {}", username, token);
+        log.info("{}의 ACCESS 토큰 발급", username);
 
         return token;
     }
@@ -97,7 +97,7 @@ public class JwtProvider {
         // PayLoad clams Set
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .issuer(jwtProperties.issuer())
-                .subject(username.toString())
+                .subject(username)
                 .issueTime(now)
                 .expirationTime(expiryDate)
                 .claim("token_type", "refresh")
@@ -116,7 +116,7 @@ public class JwtProvider {
         }
 
         String token = signedJWT.serialize();
-        log.info("{}의 Refresh 토큰 발급: {}", username, token);
+        log.info("{}의 Refresh 토큰 발급:", username);
 
         return token;
     }
@@ -156,7 +156,7 @@ public class JwtProvider {
 
         } catch (Exception e) {
             log.debug("JWT 파싱/검증 실패");
-            throw new RuntimeException(e);
+            return false;
         }
     }
 
@@ -195,7 +195,7 @@ public class JwtProvider {
 
         } catch (Exception e) {
             log.debug("JWT 파싱/검증 실패");
-            throw new RuntimeException(e);
+            return false;
         }
     }
 

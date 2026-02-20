@@ -23,7 +23,7 @@ services:
       - ADMIN_PASS=${ADMIN_PASS}
       - JWT_SECRET=${JWT_SECRET}
       - ACCESS_TOKEN_EXPIRATION=${ACCESS_TOKEN_EXPIRATION}
-      - ISSUER=${ISSER}
+      - ISSUER=${ISSUER}
     ports:
       - "8081:80"
     volumes:

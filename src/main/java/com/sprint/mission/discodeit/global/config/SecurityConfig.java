@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .logoutUrl("/api/auth/logout")
                         .addLogoutHandler(jwtLogOutHandler)
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
-                        .deleteCookies("JSESSIONID", "remember-me"))
+                        .deleteCookies("REFRESH_TOKEN"))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
