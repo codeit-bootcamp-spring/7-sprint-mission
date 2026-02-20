@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.JwtInformation;
-import com.sprint.mission.discodeit.security.JwtTokenProvider;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.JwtRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

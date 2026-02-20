@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.exception.token.TokenInvalidException;
 import com.sprint.mission.discodeit.security.CookieProvider;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetailsService;
-import com.sprint.mission.discodeit.security.JwtTokenProvider;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;

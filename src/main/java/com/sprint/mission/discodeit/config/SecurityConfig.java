@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.handler.CustomAccessDeniedHandler;
+import com.sprint.mission.discodeit.security.handler.LoginFailureHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;

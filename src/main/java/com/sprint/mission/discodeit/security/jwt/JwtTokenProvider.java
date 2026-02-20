@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit.security.jwt;
 
 import com.sprint.mission.discodeit.config.JwtProperties;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;

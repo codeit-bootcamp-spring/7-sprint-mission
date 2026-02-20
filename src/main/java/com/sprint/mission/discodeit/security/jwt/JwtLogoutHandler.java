@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit.security.jwt;
 
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.JwtRegistry;

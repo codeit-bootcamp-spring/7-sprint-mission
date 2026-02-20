@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.dto.channelDto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.role.ChannelType;
+import com.sprint.mission.discodeit.entity.enums.ChannelType;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;

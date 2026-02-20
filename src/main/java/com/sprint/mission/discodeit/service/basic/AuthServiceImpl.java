@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.jwt.JwtDto;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.entity.JwtInformation;
-import com.sprint.mission.discodeit.security.JwtTokenProvider;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.JwtRegistry;
 import lombok.RequiredArgsConstructor;

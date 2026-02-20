@@ -1,9 +1,8 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.dto.jwt.JwtDto;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
-import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,12 +17,9 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
+public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
-    private final AuthService authService;
-//    private final JwtRegistry jwtRegistry;
-    private final CookieProvider cookieProvider;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -33,15 +29,12 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
         DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
         UserDto userDto = userDetails.getUserDto();
 
-        JwtDto jwtDto = authService.rotateRefreshToken(userDto);
-
-        cookieProvider.setRefreshTokenCookie(request, response, jwtDto.refreshToken());
-
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        objectMapper.writeValue(response.getWriter(), jwtDto);
+        objectMapper.writeValue(response.getWriter(), userDto);
+
         log.info("로그인 성공: {}", userDto.username());
     }
 }

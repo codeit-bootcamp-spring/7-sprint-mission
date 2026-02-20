@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.role;
+package com.sprint.mission.discodeit.entity.enums;
 
 import lombok.Getter;
 

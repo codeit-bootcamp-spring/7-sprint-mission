@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.role.Role;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

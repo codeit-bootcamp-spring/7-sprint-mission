@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.role.Role;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.exception.binaryContent.FileOperationFailedException;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateNameException;
