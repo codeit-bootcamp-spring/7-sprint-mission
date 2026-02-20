@@ -21,8 +21,14 @@ public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
 
-    private SecretKey getSecretKey() {
-        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
+    private SecretKey getSecretKey(boolean isAccessToken) {
+        byte[] keyBytes;
+
+        if (isAccessToken) {
+            keyBytes = jwtProperties.getAccessSecret().getBytes(StandardCharsets.UTF_8);
+        } else {
+            keyBytes = jwtProperties.getRefreshSecret().getBytes(StandardCharsets.UTF_8);
+        }
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -44,7 +50,7 @@ public class JwtTokenProvider {
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole())
                 .claim("token_type", "access")
-                .signWith(getSecretKey())
+                .signWith(getSecretKey(true))
                 .compact();
     }
 
@@ -64,14 +70,15 @@ public class JwtTokenProvider {
 
                 .claim("userId", user.getId())
                 .claim("token_type", "refresh")
-                .signWith(getSecretKey())
+                .signWith(getSecretKey(false))
                 .compact();
     }
 
-    public Claims validateToken(String token) {
+    // refresh 토큰 검증
+    public Claims validateToken(String token, boolean isAccessToken) {
         try {
             return Jwts.parser()
-                    .verifyWith(getSecretKey()) // 문자열로 압축된 JWT를 파싱할 때 서명을 검
+                    .verifyWith(getSecretKey(isAccessToken)) // 문자열로 압축된 JWT를 파싱할 때 서명을 검
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -94,9 +101,18 @@ public class JwtTokenProvider {
     }
 
     // 토큰 유효성 검사
-    public boolean isTokenValid(String token) {
+    public boolean isRefreshTokenValid(String token) {
         try {
-            validateToken(token);
+            validateToken(token, false);
+            return true;
+        } catch (BusinessException e) {
+            return false;
+        }
+    }
+
+    public boolean isAccessTokenValid(String token) {
+        try {
+            validateToken(token, true);
             return true;
         } catch (BusinessException e) {
             return false;

@@ -99,7 +99,7 @@ public class InMemoryJwtRegistry implements JwtRegistry {
             Queue<JwtInformation> queue = entry.getValue();
 
             queue.removeIf(info ->
-                    !jwtTokenProvider.isTokenValid(info.getRefreshToken())
+                    !jwtTokenProvider.isRefreshTokenValid(info.getRefreshToken())
             );
 
             if (queue.isEmpty()) {

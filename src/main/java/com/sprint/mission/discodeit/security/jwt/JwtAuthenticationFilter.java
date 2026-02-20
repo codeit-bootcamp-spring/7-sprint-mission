@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = extractJwtFromRequest(request);
 
-            if (jwt != null && jwtTokenProvider.isTokenValid(jwt)) {
+            if (jwt != null && jwtTokenProvider.isAccessTokenValid(jwt)) {
 
                 if (!jwtRegistry.hasActiveJwtInformationByAccessToken(jwt)) {
                     log.warn("Registry에 존재하지 않는 JWT");
@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void authenticateUser(String jwt, HttpServletRequest request) {
-        Claims claims = jwtTokenProvider.validateToken(jwt);
+        Claims claims = jwtTokenProvider.validateToken(jwt, true);
 
         UUID userId = UUID.fromString(claims.get("userId", String.class));
         String username = claims.getSubject();

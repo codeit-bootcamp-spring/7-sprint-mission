@@ -21,8 +21,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -52,11 +50,11 @@ public class BasicAuthService implements AuthService {
 
     @Transactional
     public Pair<JwtDto, String> refreshAccessToken(String refreshToken) {
-        if (refreshToken == null || !jwtTokenProvider.isTokenValid(refreshToken)) {
+        if (refreshToken == null || !jwtTokenProvider.isRefreshTokenValid(refreshToken)) {
             throw new BusinessException(ErrorCode.EMPTY_OR_INVALID_TOKEN);
         }
 
-        Claims claims = jwtTokenProvider.validateToken(refreshToken);
+        Claims claims = jwtTokenProvider.validateToken(refreshToken, false);
         String username = claims.getSubject();
 
         User user = userRepository.findByUsername(username)
