@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +28,8 @@ public class DiscodeitUserDetailsService implements UserDetailsService {
     사용자를 찾지 못하면 UsernameNotFoundException을 던집니다.
      */
 
-//    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public DiscodeitUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         return usersRepository.findUserByUsername(username)

@@ -1,69 +1,103 @@
 package com.sprint.mission.discodeit.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.exception.ErrorResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@Component
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
-    private final DiscodeitUserDetailsService userDetailsService;
+    private final JwtTokenProvider tokenProvider;
+    private final UserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper;
 
     @Override
-    protected void doFilterInternal(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal( HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String authorizationHeader = request.getHeader("Authorization");
+        try {
+            String token = resolveToken(request);
 
-        // 1️⃣ Authorization 헤더 없거나 Bearer 아니면 패스
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            if (StringUtils.hasText(token)) {
+                if (tokenProvider.validateAccessToken(token)) {
+                    String username = tokenProvider.getUsernameFromToken(token);
+
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                    UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                        );
+
+                    authentication.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.debug("✅Set authentication for user: {}", username);
+                } else {
+                    log.debug("🚨Invalid JWT token");
+                    sendErrorResponse(response, "Invalid JWT token");
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            log.debug("🚨 JWT authentication failed: {}", e.getMessage());
+            SecurityContextHolder.clearContext();
+            sendErrorResponse(response, "JWT authentication failed");
             return;
         }
 
-        // 2️⃣ Bearer 토큰 추출
-        String token = authorizationHeader.substring(7);
-
-        // 3️⃣ 토큰 유효성 검사
-        if (!jwtTokenProvider.validateToken(token)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // 4️⃣ 토큰에서 사용자 정보 추출
-        String username = jwtTokenProvider.getUsername(token);
-
-        DiscodeitUserDetails userDetails =
-            userDetailsService.loadUserByUsername(username);
-
-        // 5️⃣ 인증 객체 생성
-        UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                userDetails.getAuthorities()
-            );
-
-        // 6️⃣ SecurityContext에 인증 정보 저장
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // 7️⃣ 다음 필터로
         filterChain.doFilter(request, response);
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, String message)
+        throws IOException {
+
+        ErrorResponse errorResponse = new ErrorResponse(
+            Instant.now(),
+            "🚨401",
+            "🚨" + message,
+            Map.of(),
+            "RuntimeException",
+            HttpServletResponse.SC_UNAUTHORIZED // 401
+        );
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+
+        String jsonResponse = objectMapper.writeValueAsString(errorResponse);
+        response.getWriter().write(jsonResponse);
     }
 }
