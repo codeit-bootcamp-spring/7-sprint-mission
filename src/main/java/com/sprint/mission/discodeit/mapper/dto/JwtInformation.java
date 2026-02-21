@@ -1,9 +1,18 @@
 package com.sprint.mission.discodeit.mapper.dto;
 
-public record JwtInformation(
-    UserDto userDto,
-    String accessToken,
-    String refreshToken
-) {
-    // Note: Refresh token will be stored in HttpOnly cookie, not in response body
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class JwtInformation {
+
+    private UserDto userDto;
+    private String accessToken;
+    private String refreshToken;
+
+    public void rotate(String newAccessToken, String newRefreshToken) {
+        this.accessToken = newAccessToken;
+        this.refreshToken = newRefreshToken;
+    }
 }

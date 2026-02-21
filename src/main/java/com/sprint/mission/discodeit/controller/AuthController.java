@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.mapper.dto.JwtDto;
 import com.sprint.mission.discodeit.mapper.dto.JwtInformation;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 //import com.sprint.mission.discodeit.security.DiscodeitUserDetailsService;
-import com.sprint.mission.discodeit.security.JwtTokenProvider;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.InterfaceAuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -79,20 +79,17 @@ public class AuthController { //  implements AuthDoc
 //    permitAll 설정에 포함하세요.
 //    리프레시 토큰을 활용한 엑세스 토큰 재발급
     @PostMapping("refresh")
-    public ResponseEntity<JwtDto> refresh(
-        @CookieValue("REFRESH_TOKEN") String refreshToken,
+    public ResponseEntity<JwtDto> refresh(@CookieValue("REFRESH_TOKEN") String refreshToken,
         HttpServletResponse response) {
-
         log.info("토큰 리프레시 요청");
-
-        JwtInformation refreshResult = authService.refreshToken(refreshToken);
+        JwtInformation jwtInformation = authService.refreshToken(refreshToken);
         Cookie refreshCookie = jwtTokenProvider.genereateRefreshTokenCookie(
-            refreshResult.refreshToken());
+            jwtInformation.getRefreshToken());
         response.addCookie(refreshCookie);
 
         JwtDto body = new JwtDto(
-            refreshResult.userDto(),
-            refreshResult.accessToken()
+            jwtInformation.getUserDto(),
+            jwtInformation.getAccessToken()
         );
         return ResponseEntity
             .status(HttpStatus.OK)

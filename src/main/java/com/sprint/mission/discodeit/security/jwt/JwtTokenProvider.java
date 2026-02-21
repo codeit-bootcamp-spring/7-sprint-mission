@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit.security.jwt;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -10,6 +10,7 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import jakarta.servlet.http.Cookie;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -19,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
-
 
 @Slf4j
 @Component
@@ -83,7 +83,7 @@ public class JwtTokenProvider {
             .build();
 
         SignedJWT signedJWT = new SignedJWT(
-            new JWSHeader(JWSAlgorithm.HS256), // HS256 = 최소 256bit (= 32바이트) 필요. so jwt.secret 는 길게!!
+            new JWSHeader(JWSAlgorithm.HS256),
             claimsSet
         );
 
@@ -146,6 +146,19 @@ public class JwtTokenProvider {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             return signedJWT.getJWTClaimsSet().getJWTID();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid JWT token", e);
+        }
+    }
+
+    public UUID getUserId(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            String userIdStr = (String) signedJWT.getJWTClaimsSet().getClaim("userId");
+            if (userIdStr == null) {
+                throw new IllegalArgumentException("User ID claim not found in JWT token");
+            }
+            return UUID.fromString(userIdStr);
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid JWT token", e);
         }

@@ -24,7 +24,7 @@ import com.sprint.mission.discodeit.mapper.dto.JwtInformation;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
-import com.sprint.mission.discodeit.security.JwtTokenProvider;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.InterfaceAuthService;
 import java.util.Map;
 import java.util.UUID;
