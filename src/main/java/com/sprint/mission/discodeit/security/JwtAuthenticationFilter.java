@@ -37,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String token = resolveToken(request);
+            log.debug("💙 token = {}", token);
 
             if (StringUtils.hasText(token)) {
                 if (tokenProvider.validateAccessToken(token)) {
@@ -63,6 +64,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
             }
+            else {
+                log.debug("💙 토큰이 없는 경우: 공개 엔드포인트는 SecurityConfig의 permitAll()이 처리하고");
+                log.debug("💙 보호된 엔드포인트는 AuthorizationFilter가 차단하도록 명시적으로 컨텍스트를 비워둠");
+                // 토큰이 없는 경우: 공개 엔드포인트는 SecurityConfig의 permitAll()이 처리하고,
+                // 보호된 엔드포인트는 AuthorizationFilter가 차단하도록 명시적으로 컨텍스트를 비워둠
+                log.debug("🔓 No JWT token found in request. Proceeding as anonymous.");
+                SecurityContextHolder.clearContext();
+            }
+
         } catch (Exception e) {
             log.debug("🚨 JWT authentication failed: {}", e.getMessage());
             SecurityContextHolder.clearContext();

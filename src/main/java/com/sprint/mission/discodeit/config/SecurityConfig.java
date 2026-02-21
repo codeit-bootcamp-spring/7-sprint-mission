@@ -104,7 +104,9 @@ public class SecurityConfig {
                     AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/auth/refresh"),
                     AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/auth/logout"),
 
-                    
+                    //💙 공개 엔드포인트는 반드시 permitAll() 설정
+                    AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/auth/**"),
+                    AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/users/register"),
                     AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/auth/**"),
                     AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/users/register"),
                     new NegatedRequestMatcher(AntPathRequestMatcher.antMatcher("/api/**"))
