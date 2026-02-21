@@ -15,7 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
@@ -23,44 +23,23 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 
-// DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters:
-// DisableEncodeUrlFilter,
-// WebAsyncManagerIntegrationFilter,
-// SecurityContextHolderFilter,
-// HeaderWriterFilter,
-// CsrfFilter,
-// LogoutFilter,
-// UsernamePasswordAuthenticationFilter,
-// DefaultResourcesFilter,
-// DefaultLoginPageGeneratingFilter,
-// DefaultLogoutPageGeneratingFilter,
-// RequestCacheAwareFilter,
-// SecurityContextHolderAwareRequestFilter,
-// AnonymousAuthenticationFilter,
-// ExceptionTranslationFilter,
-// AuthorizationFilter
-
 
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
 
-//    private final LoginSuccessHandler loginSuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtLoginSuccessHandler jwtLoginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final SessionRegistry sessionRegistry;
-//    private final DiscodeitUserDetailsService userDetailsService;
-//    private final JpaPersistentTokenRepository persistentTokenRepository;
 
     @Value("${security.remember-me.key}")
     private String rememberMeKey;
@@ -150,31 +129,6 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // JWT 인증 필터 추가
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-//            .rememberMe(remember -> remember
-//                .rememberMeCookieName("remember-me") // 쿠키 이름
-//                .rememberMeParameter("remember-me") // HTML 폼 파라미터 이름 (체크박스의 name과 정확히 일치하게 작성!)
-//                .tokenValiditySeconds(60 * 60 * 24 * 14) // 14일
-//                .userDetailsService(userDetailsService)
-//                .tokenRepository(persistentTokenRepository)
-//                .key(rememberMeKey)
-//            );
-
         return http.build();
     }
-
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080"));
-//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-//        configuration.setAllowedHeaders(List.of("*"));
-//        configuration.setExposedHeaders(List.of("Authorization"));
-//        configuration.setAllowCredentials(true);
-//        configuration.setMaxAge(3600L);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/api/**", configuration);
-//        return source;
-//    }
 }
