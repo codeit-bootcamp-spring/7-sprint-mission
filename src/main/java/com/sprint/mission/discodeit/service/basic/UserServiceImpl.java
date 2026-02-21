@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.enums.Role;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.exception.binaryContent.FileOperationFailedException;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateNameException;
@@ -20,6 +22,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,6 +47,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
     private final JwtRegistry jwtRegistry;
+    private final ApplicationEventPublisher eventPublisher;
 
     // 생성
     @Override
@@ -96,7 +100,8 @@ public class UserServiceImpl implements UserService {
         binaryContent = binaryContentRepository.save(binaryContent);
 
         try {
-            binaryContentStorage.put(binaryContent.getId(), profileImage.getBytes());
+            eventPublisher.publishEvent(new BinaryContentCreatedEvent(
+                    binaryContent.getId(), profileImage.getBytes()));
         } catch (IOException e) {
             log.debug("이미지 업로드 실패: {}", binaryContent.getId());
             throw new FileOperationFailedException(binaryContent.getId());
@@ -214,6 +219,8 @@ public class UserServiceImpl implements UserService {
         Role oldRole = user.getRole();
 
         user.updateRole(roleUpdateRequest.newRole());
+        eventPublisher.publishEvent(new RoleUpdatedEvent(
+                user.getId(), oldRole.name(), roleUpdateRequest.newRole().name()));
         userRepository.save(user);
         jwtRegistry.invalidateJwtInformationByUserId(user.getId());
 
