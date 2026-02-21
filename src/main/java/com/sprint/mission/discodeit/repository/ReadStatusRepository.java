@@ -22,4 +22,6 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
     // 채널에서 한 유저의 읽음 상태 제거
     void deleteByUserIdAndChannelId(UUID userId, UUID channelId);
+
+    List<ReadStatus> findAllByChannelIdAndNotificationEnabledTrue(UUID channelId);
 }

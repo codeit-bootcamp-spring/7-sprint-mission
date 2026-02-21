@@ -6,5 +6,8 @@ import lombok.NonNull;
 import java.time.Instant;
 
 @Builder
-public record ReadStatusUpdateRequest(@NonNull Instant newLastReadAt) {
+public record ReadStatusUpdateRequest(
+        @NonNull Instant newLastReadAt,
+        boolean notificationEnabled
+) {
 }
