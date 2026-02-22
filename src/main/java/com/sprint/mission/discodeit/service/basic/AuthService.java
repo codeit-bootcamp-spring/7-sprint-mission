@@ -66,22 +66,11 @@ public class AuthService implements InterfaceAuthService {
 
         user.updateRole(userRoleUpdateRequest.newRole());
 
-        // 현재 로그인 중이라면 세션 무효화
-        expireUserSessions(user.getId());
+        jwtRegistry.invalidateJwtInformationByUserId(user.getId());
 
         return userMapper.toDto(user);
     }
 
-    @Transactional
-    public void expireUserSessions(UUID userId) {
-
-        sessionRegistry.getAllPrincipals().stream()
-            .filter(DiscodeitUserDetails.class::isInstance)
-            .map(DiscodeitUserDetails.class::cast)
-            .filter(userDetails -> userDetails.getUser().id().equals(userId))
-            .flatMap(userDetails -> sessionRegistry.getAllSessions(userDetails, false).stream())
-            .forEach(SessionInformation::expireNow);
-    }
 
     @Override
     public JwtInformation refreshToken(String refreshToken) {

@@ -198,7 +198,6 @@ public class UserService implements InterfaceUserService {
 //            log.info("✅ UserService.userStatusRepository.deleteById = [" + user.getUsername() + "]");
 //        }
 
-        authService.expireUserSessions(userID);
 
         if (user.getProfile() != null && user.getProfile().getId() != null) {
             Optional<BinaryContent> optionalContents = binaryContentRepository.findById(user.getProfile().getId());
