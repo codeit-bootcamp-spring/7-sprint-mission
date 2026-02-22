@@ -80,7 +80,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusResponseDto updateReadStatus(UUID readStatusId, UpdateReadStatusDto updateReadStatusDto) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> ReadStatusNotFoundException.byId(readStatusId));
-        readStatus.update(updateReadStatusDto.newLastReadAt());
+        readStatus.update(updateReadStatusDto.newLastReadAt(), updateReadStatusDto.newNotificationEnabled());
 
         return ReadStatusResponseDto.from(readStatus);
     }
