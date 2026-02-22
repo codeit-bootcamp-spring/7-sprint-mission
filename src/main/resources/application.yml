@@ -46,10 +46,10 @@ info:
 jwt:
   access-token:
     secret: ${JWT_ACCESS_SECRET:your-access-token-secret-key-here-make-it-long-and-random}
-    expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:1800000} # 30 minutes
+    expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:180000} # minutes
   refresh-token:
     secret: ${JWT_REFRESH_SECRET:your-refresh-token-secret-key-here-make-it-different-and-long}
-    expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000} # 7 days
+    expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:600000} #
 
   storage:
     type: ${storage.type}

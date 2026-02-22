@@ -1,18 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-//import com.sprint.mission.discodeit.entity.User;
-//import com.sprint.mission.discodeit.exception.ErrorCode;
-//import com.sprint.mission.discodeit.exception.UserException;
-//import com.sprint.mission.discodeit.exception.UserNotFoundException;
-//import com.sprint.mission.discodeit.mapper.dto.LoginRequest;
-//import com.sprint.mission.discodeit.mapper.UserMapper;
-//import com.sprint.mission.discodeit.mapper.dto.UserDto;
-//import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
-//import com.sprint.mission.discodeit.service.InterfaceAuthService;
-//import java.util.Map;
-//import org.springframework.transaction.annotation.Transactional;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
 import com.nimbusds.jose.JOSEException;
 import com.sprint.mission.discodeit.dto.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
@@ -24,6 +11,7 @@ import com.sprint.mission.discodeit.mapper.dto.JwtInformation;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.InterfaceAuthService;
 import java.util.Map;
@@ -50,6 +38,7 @@ public class AuthService implements InterfaceAuthService {
     private final SessionRegistry sessionRegistry;
     private final JwtTokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
+    private final JwtRegistry jwtRegistry;
 
 //    @Transactional(readOnly = true)
 //    @Override
@@ -121,5 +110,10 @@ public class AuthService implements InterfaceAuthService {
             log.error("🚨 Failed to generate new tokens for user: {}", username, e);
             throw new DiscodeitException(ErrorCode.INTERNAL_SERVER_ERROR, Map.of("username", e));
         }
+    }
+
+    @Override
+    public void clearExpiredJwtInfo() {
+        jwtRegistry.clearExpiredJwtInformation();
     }
 }

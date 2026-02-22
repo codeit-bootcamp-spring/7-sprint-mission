@@ -11,4 +11,6 @@ public interface InterfaceAuthService  {
     UserDto userRoleUpdateRequest(UserRoleUpdateRequest userRoleUpdateRequest);
 
     JwtInformation refreshToken(String refreshToken);
+
+    void clearExpiredJwtInfo();
 }

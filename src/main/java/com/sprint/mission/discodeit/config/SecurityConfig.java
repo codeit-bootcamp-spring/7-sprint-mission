@@ -65,6 +65,17 @@ public class SecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
             )
+            .formLogin(login -> login
+                .loginProcessingUrl("/api/auth/login")
+                .successHandler(jwtLoginSuccessHandler)
+                .failureHandler(loginFailureHandler)
+            )
+            .logout(logout -> logout
+                .logoutUrl("/api/auth/logout")
+                .addLogoutHandler(jwtLogoutHandler)
+                .logoutSuccessHandler(
+                    new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+            )
 //            .csrf(AbstractHttpConfigurer::disable)
             //JWT - HTTP 기본 인증 방식을 사용하지 않겠다.
 //            .httpBasic(AbstractHttpConfigurer::disable)
@@ -86,29 +97,6 @@ public class SecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-
-//            DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CsrfFilter, LogoutFilter,                                                                                                                                    RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
-//            .formLogin(form -> form.disable()) // ✅ 로그인 비활성화 (CSR이니까)
-            // formLogin 을 기본값으로 활성화하고, 추가된 필터를 확인해보세요.
-//            .formLogin(Customizer.withDefaults())
-//            DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CsrfFilter, LogoutFilter, UsernamePasswordAuthenticationFilter, DefaultResourcesFilter, DefaultLoginPageGeneratingFilter, DefaultLogoutPageGeneratingFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
-
-            .formLogin(login -> login
-                .loginProcessingUrl("/api/auth/login")
-                .successHandler(jwtLoginSuccessHandler)
-                .failureHandler(loginFailureHandler)
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/api/auth/logout")
-                .addLogoutHandler(jwtLogoutHandler)
-                .logoutSuccessHandler(
-                    new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
-            )
-
-            // CORS 설정
-//            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(authenticationEntryPoint) // 인증
                 .accessDeniedHandler(accessDeniedHandler) // 인가

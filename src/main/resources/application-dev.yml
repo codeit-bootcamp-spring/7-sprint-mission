@@ -10,7 +10,8 @@ spring:
     driver-class-name: org.h2.Driver
 #    url: jdbc:h2:mem:testdb  #;MODE=PostgreSQL
 #    url: jdbc:h2:~/test;AUTO_SERVER=TRUE #Spring 실행 중에도 같이 쓰고 싶다 //??
-    url: jdbc:h2:~/test  #jdbc:h2:tcp://localhost/~/test
+#    url: jdbc:h2:~/test
+#    url: jdbc:h2:tcp://localhost/~/test
     username: sa
     password:
 
@@ -26,6 +27,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
 
   servlet:
     multipart:
