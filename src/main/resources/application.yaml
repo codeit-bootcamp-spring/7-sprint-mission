@@ -56,8 +56,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers #, evn # 꼭 필요한 것만 노출!
-      base-path: /management # 경로도 바꿔서 숨
+        include:
+          - health
+          - info
+          - metrics
+          - loggers
+      base-path: /management
+  observations:
+    annotations:
+      enabled: true
 
   endpoint:
     health:
