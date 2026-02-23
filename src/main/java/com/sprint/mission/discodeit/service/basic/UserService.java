@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.dto.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.dto.UserDto;
@@ -13,12 +14,11 @@ import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,6 +40,7 @@ public class UserService implements InterfaceUserService {
     private final PasswordEncoder passwordEncoder;
     private final SessionRegistry sessionRegistry;
     private final AuthService authService;
+    private final ApplicationEventPublisher eventPublisher;
 
 //    @Autowired
 //    EntityManager em;
@@ -78,10 +79,10 @@ public class UserService implements InterfaceUserService {
                     file.getContentType()
                 );
 
-                // 파일 저장
-                binaryContentStorage.put(file, binaryContent);
-                // DB 저장
-                return binaryContentRepository.save(binaryContent);
+                BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+                eventPublisher.publishEvent(new BinaryContentCreatedEvent(savedBinaryContent.getId(), file));
+
+                return savedBinaryContent;
             })
             .orElse(null);
 
@@ -168,10 +169,11 @@ public class UserService implements InterfaceUserService {
                         file.getSize(),
                         file.getContentType()
                     ));
-                //1. 파일 저장
-                binaryContentStorage.put(file, neoBinaryContent);
-                //2. DB 저장
-                return binaryContentRepository.save(neoBinaryContent);
+
+                BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+                eventPublisher.publishEvent(new BinaryContentCreatedEvent(savedBinaryContent.getId(), file));
+
+                return savedBinaryContent;
             })
             .orElse(null);
 

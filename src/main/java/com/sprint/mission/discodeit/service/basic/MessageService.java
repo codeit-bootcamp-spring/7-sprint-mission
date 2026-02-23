@@ -6,10 +6,10 @@ import com.sprint.mission.discodeit.exception.MessageException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.channelNotFoundException;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
+import com.sprint.mission.discodeit.mapper.dto.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
-import java.util.ArrayList;
 import java.util.Map;
-import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @Slf4j
 @Service
 //@Transactional(isolation = Isolation.READ_COMMITTED) // 영속성 컨텍스트
@@ -51,7 +52,7 @@ public class MessageService implements InterfaceMessageService {
     private final BinaryContentsRepository binaryContentRepository;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
-
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -80,10 +81,9 @@ public class MessageService implements InterfaceMessageService {
                     file.getOriginalFilename(),
                     file.getSize(),
                     file.getContentType());
-                //1. 파일 저장
-                binaryContentStorage.put(file, binaryContent);
-                //2. DB 저장
+
                 BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+                eventPublisher.publishEvent(new BinaryContentCreatedEvent(savedBinaryContent.getId(), file));
 
                 MessageAttachments messageAttachments = new MessageAttachments(
                     message,

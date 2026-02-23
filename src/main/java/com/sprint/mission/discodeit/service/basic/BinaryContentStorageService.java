@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.exception.BinaryContentException;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.dto.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
@@ -25,7 +25,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -41,22 +40,18 @@ public class BinaryContentStorageService implements BinaryContentStorage {
     }
 
     @Override
-    public BinaryContent put(MultipartFile file, BinaryContent binaryContent) {
+    public void put(BinaryContentCreatedEvent event) {
         try {
-            // DB 저장 -> id 찾기 위함. 실제 저장 안되니 put 후에 실제 DB 저장 필요!
-            BinaryContent newBinaryContent = binaryContentRepository.save(binaryContent);
-            Path filePath = root.resolve(newBinaryContent.getId().toString());
+            Path filePath = root.resolve(event.getBinaryContentId().toString());
 
             // 파일 저장
-            Files.write(filePath, file.getBytes());  // byte[] -> 실제 파일로 저장
+            Files.write(filePath, event.getFile().getBytes());  // byte[] -> 실제 파일로 저장
+            log.info("✅ 파일 저장 - file.name = {}", event.getFile().getOriginalFilename());
         } catch (IOException e) {
 
-            log.error("🚨파일 저장 실패 - file.name = {}", file.getOriginalFilename());
+            log.error("🚨파일 저장 실패 - file.name = {}", event.getFile().getOriginalFilename());
             throw new RuntimeException("🚨파일 저장 실패 I: " + e);
         }
-
-        log.info("✅ 파일 저장 - file.name = {}", file.getOriginalFilename());
-        return binaryContent;
     }
 
     @Override
