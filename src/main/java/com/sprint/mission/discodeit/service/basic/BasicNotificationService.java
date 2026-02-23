@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ public class BasicNotificationService {
                 .toList();
     }
 
+    @Transactional
     public void delete(UUID userId, UUID notificationId) {
 
         // 알림이 없는 경우 404 NOT FOUND 예외 발생

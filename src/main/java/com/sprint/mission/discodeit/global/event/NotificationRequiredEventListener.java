@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.global.exception.message.MessageNotFoundExce
 import com.sprint.mission.discodeit.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ public class NotificationRequiredEventListener {
     private final NotificationRepository notificationRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -82,4 +85,40 @@ public class NotificationRequiredEventListener {
         notificationRepository.save(notification);
     }
 
+    @EventListener
+    @Transactional
+    public void on(S3UploadFailEvent event) {
+
+        String requestId = MDC.get("requestId");
+
+        String errorMessage = String.format("""
+                [S3 Upload Fail]
+                
+                Task: S3 Binary Upload
+                RequestId: %s
+                BinaryContentId: %s
+                Error: %s
+                """,
+                requestId,
+                event.binaryContentId(),
+                event.errorMessage()
+        );
+
+        List<User> admins = userRepository.findAllByRole(Role.ADMIN);
+        List<Notification> notifications = new ArrayList<>();
+
+        admins.forEach(user -> {
+            Notification notification = new Notification(
+                    "S3 파일 업로드 실패",
+                    errorMessage,
+                    null,
+                    user.getId()
+                    );
+
+            notifications.add(notification);
+        });
+
+        notificationRepository.saveAll(notifications);
+        log.error("S3 업로드 최종 실패 - binaryContentId: {}", event.binaryContentId());
+    }
 }
