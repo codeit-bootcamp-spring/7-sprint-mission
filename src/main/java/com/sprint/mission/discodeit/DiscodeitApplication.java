@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 
+@EnableAsync
 @SpringBootApplication
 @EnableJpaAuditing // fix err. createdAt == null //2. @CreatedDate @LastModifiedDate 에 필요
 public class DiscodeitApplication {

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.exception.UserAlreadyExistsException;
@@ -73,12 +74,7 @@ public class UserService implements InterfaceUserService {
 
         BinaryContent profile = optionalProfileFile
             .map(file -> {
-                BinaryContent binaryContent = new BinaryContent(
-                    file.getOriginalFilename(),
-                    file.getSize(),
-                    file.getContentType()
-                );
-
+                BinaryContent binaryContent = new BinaryContent(file);
                 BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
                 eventPublisher.publishEvent(new BinaryContentCreatedEvent(savedBinaryContent.getId(), file));
 
@@ -163,14 +159,9 @@ public class UserService implements InterfaceUserService {
                 BinaryContent neoBinaryContent = null;
                 neoBinaryContent = binaryContentRepository
                     .findById(userId)
-                    .orElse(
-                        new BinaryContent(
-                        file.getOriginalFilename(),
-                        file.getSize(),
-                        file.getContentType()
-                    ));
+                    .orElse( new BinaryContent(file));
 
-                BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+                BinaryContent savedBinaryContent = binaryContentRepository.save(neoBinaryContent);
                 eventPublisher.publishEvent(new BinaryContentCreatedEvent(savedBinaryContent.getId(), file));
 
                 return savedBinaryContent;

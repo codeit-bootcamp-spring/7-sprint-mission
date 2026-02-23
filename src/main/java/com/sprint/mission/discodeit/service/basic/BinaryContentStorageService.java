@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.dto.BinaryContentCreatedEvent;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BinaryContentStorageService implements BinaryContentStorage {
+
     private final BinaryContentsRepository binaryContentRepository;
     private final Path root = Paths.get(System.getProperty("user.dir"), "data", "binary-content");
 
@@ -46,10 +48,13 @@ public class BinaryContentStorageService implements BinaryContentStorage {
 
             // 파일 저장
             Files.write(filePath, event.getFile().getBytes());  // byte[] -> 실제 파일로 저장
-            log.info("✅ 파일 저장 - file.name = {}", event.getFile().getOriginalFilename());
+            log.info("✅ 파일 저장 SUCCESS ⭕️- file.name = {}", event.getFile().getOriginalFilename());
+
+//            binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.SUCCESS);
         } catch (IOException e) {
 
-            log.error("🚨파일 저장 실패 - file.name = {}", event.getFile().getOriginalFilename());
+            log.error("🚨파일 저장 실패 ❌ - file.name = {}", event.getFile().getOriginalFilename());
+//            binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.FAIL);
             throw new RuntimeException("🚨파일 저장 실패 I: " + e);
         }
     }

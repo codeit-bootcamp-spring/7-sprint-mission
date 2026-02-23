@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
@@ -8,6 +9,7 @@ import com.sprint.mission.discodeit.service.InterfaceBinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,7 +25,6 @@ import org.springframework.stereotype.Service;
 public class BinaryContentService implements InterfaceBinaryContentService {
     private final BinaryContentsRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
-    private final BinaryContentStorage binaryContentStorage;
 
     @Override
     @Transactional(readOnly = true)
@@ -50,9 +51,13 @@ public class BinaryContentService implements InterfaceBinaryContentService {
     }
 
     @Override
-    public ResponseEntity<Resource> download(UUID binaryContentId) {
-        //💎🌱 파일 다운로드
-        return binaryContentStorage.download(binaryContentId);
-    }
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public BinaryContentDto updateStatus(UUID binaryContentId, BinaryContentStatus sataus) {
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
+            .orElseThrow(() -> new NoSuchElementException("🚨첨부파일[" + binaryContentId.toString() + "]을 찾을 수 없음"));
 
+        binaryContent.setStatus(sataus);
+
+        return binaryContentMapper.toDto(binaryContent);
+    }
 }

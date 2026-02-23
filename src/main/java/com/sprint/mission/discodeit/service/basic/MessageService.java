@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.MessageException;
@@ -44,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 //@Transactional(isolation = Isolation.READ_COMMITTED) // 영속성 컨텍스트
 @RequiredArgsConstructor //!! final 필드나 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성
 public class MessageService implements InterfaceMessageService {
+
     private final MessagesRepository messageRepository;
     private final ChannelsRepository channelRepository;
     private final UsersRepository userRepository;
@@ -57,11 +59,15 @@ public class MessageService implements InterfaceMessageService {
     @Override
     @Transactional
     public MessageDto create(MessageCreateRequest dtoMessage, List<MultipartFile> fileList) {
-        if (dtoMessage.channelId() == null)
-            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION, Map.of("dtoMessage.channelId", "isNull"));
+        if (dtoMessage.channelId() == null) {
+            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION,
+                Map.of("dtoMessage.channelId", "isNull"));
+        }
 
-        if (dtoMessage.authorId() == null)
-            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION, Map.of("MessageCreateRequest.authorId", "isNull"));
+        if (dtoMessage.authorId() == null) {
+            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION,
+                Map.of("MessageCreateRequest.authorId", "isNull"));
+        }
 
         Channel channel = channelRepository
             .findById(dtoMessage.channelId())
@@ -77,11 +83,7 @@ public class MessageService implements InterfaceMessageService {
 
         if (null != fileList && !fileList.isEmpty()) {
             for (MultipartFile file : fileList) {
-                BinaryContent binaryContent = new BinaryContent(
-                    file.getOriginalFilename(),
-                    file.getSize(),
-                    file.getContentType());
-
+                BinaryContent binaryContent = new BinaryContent(file);
                 BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
                 eventPublisher.publishEvent(new BinaryContentCreatedEvent(savedBinaryContent.getId(), file));
 
@@ -95,7 +97,6 @@ public class MessageService implements InterfaceMessageService {
 
         Message savedMessage = messageRepository.save(message);
 
-
         log.info("✅ 💌 MessageService.create.content = [" + message.getContent() + "] 💬");
         return messageMapper.toDto(message);
     }
@@ -105,13 +106,14 @@ public class MessageService implements InterfaceMessageService {
     @Transactional
     @PreAuthorize("@messageAuth.isOwner(#messageID, authentication)")
     public void deleteMessage(UUID messageID) {
-      Message message = messageRepository
-          .findById(messageID)
-          .map(model -> (Message)model)
-          .orElseThrow(() -> new NoSuchElementException("🚨Message [" + messageID.toString() + "] 를 찾을 수 없음"));
+        Message message = messageRepository
+            .findById(messageID)
+            .map(model -> (Message) model)
+            .orElseThrow(() -> new NoSuchElementException(
+                "🚨Message [" + messageID.toString() + "] 를 찾을 수 없음"));
 
-      messageRepository.deleteById(messageID);
-      log.info("✅ deleteMessage = [" + message.getContent() + "]");
+        messageRepository.deleteById(messageID);
+        log.info("✅ deleteMessage = [" + message.getContent() + "]");
     }
 
     @Override
@@ -119,7 +121,8 @@ public class MessageService implements InterfaceMessageService {
     public MessageDto find(UUID messageID) {
         Message message = messageRepository
             .findById(messageID)
-            .orElseThrow(() -> new MessageException(ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageID)));
+            .orElseThrow(() -> new MessageException(ErrorCode.MESSAGE_NOT_FOUND,
+                Map.of("messageId", messageID)));
 
         log.info("✅ MessageService.find = [" + message.getContent() + "]");
         return messageMapper.toDto(message);
@@ -145,7 +148,8 @@ public class MessageService implements InterfaceMessageService {
             .findById(messageId)
             .stream()
             .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("🚨Message [" + messageId.toString() + "]를 찾을 수 없음"));
+            .orElseThrow(() -> new NoSuchElementException(
+                "🚨Message [" + messageId.toString() + "]를 찾을 수 없음"));
 
         message.setContent(requestDto.newContent());
 
