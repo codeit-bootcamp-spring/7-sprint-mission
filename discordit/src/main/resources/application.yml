@@ -14,6 +14,11 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
+jwt:
+  secret:
+    access-token-expiration: ${JWT_SECRET}
+    refresh-token-expiration: 900000 # 15분
+
 
 validation:
   user:
