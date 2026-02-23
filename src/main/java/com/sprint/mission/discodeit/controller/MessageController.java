@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.page.Response.PageResponseDto;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class MessageController implements MessageControllerDocs {
     private final BinaryContentMapper binaryContentMapper;
 
     // 메시지 생성
+    @Timed("message.create.async")
     @PostMapping
     public ResponseEntity<MessageResponseDto> createMessage(
             @RequestPart("messageCreateRequest") CreateMessageRequestDto requestDto,

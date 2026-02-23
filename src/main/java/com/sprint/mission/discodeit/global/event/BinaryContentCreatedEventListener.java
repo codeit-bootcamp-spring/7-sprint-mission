@@ -29,7 +29,7 @@ public class BinaryContentCreatedEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Async
+    @Async("asyncTaskExecutor")
     public void handle(BinaryContentCreatedEvent event) {
         BinaryContent binaryContent = binaryContentRepository.findById(event.getBinaryContentId())
                 .orElseThrow(() -> new BinaryContentNotFoundException(ErrorCode.BINARYCONTENT_NOT_FOUND));

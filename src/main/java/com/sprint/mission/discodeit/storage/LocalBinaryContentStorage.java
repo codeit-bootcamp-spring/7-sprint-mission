@@ -40,6 +40,15 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
 
     @Override
     public UUID put(UUID binaryContentId, byte[] bytes) throws IOException {
+
+        // 동기, 비동기 테스트용 지연 발생 코드
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//            throw new RuntimeException("Thread interrupted while simulating delay", e);
+//        }
+
         Path path = resolvePath(binaryContentId);
 
         Files.createDirectories(path.getParent());
