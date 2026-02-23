@@ -14,6 +14,8 @@ public class BinaryContentMapperManual {
                 binaryContent.getId(),
                 binaryContent.getFileName(),
                 binaryContent.getContentType(),
-                binaryContent.getSize());
+                binaryContent.getSize(),
+                binaryContent.getStatus()
+                );
     }
 }
