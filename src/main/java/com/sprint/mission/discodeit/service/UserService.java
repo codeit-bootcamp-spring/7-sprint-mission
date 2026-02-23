@@ -19,7 +19,6 @@ public interface UserService {
     UserDto createAdmin(UserCreateRequestDto userCreateRequestDto);
 
     UserDto readUser(UUID userId);
-    List<UserDto> readAllUser();
     void deleteUser(UUID userId);
     void resetUserRepository();
     List<UserDto> findAllUsers();

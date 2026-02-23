@@ -99,12 +99,6 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    @CachePut(value = "users")
-    public List<UserDto> readAllUser() {
-        return userRepository.findAll().stream().map(userMapper::toDto).toList();
-    }
 
     @Override
     @Transactional
@@ -126,6 +120,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    @CachePut(value = "users")
     public List<UserDto> findAllUsers(){
         return userRepository.findAll().stream().map(userMapper::toDto).toList();
     }
