@@ -15,7 +15,9 @@ CREATE TABLE binary_contents
     size         BIGINT                   NOT NULL,
     content_type VARCHAR(100)             NOT NULL,
 --     bytes        BYTEA                    NOT NULL, -- 고도화 단계에서 이부분 지울것, 성능 및 공간 차지 비효율
-    created_at   TIMESTAMP WITH TIME ZONE NOT NULL
+    status       VARCHAR(20)              NOT NULL,
+    created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at   TIMESTAMP WITH TIME ZONE
 
 );
 

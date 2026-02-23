@@ -3,16 +3,19 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentUploadCommand;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.status.BinaryContentStatus;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -25,7 +28,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
-    private final BinaryContentStorage binaryContentStorage;
+    private final ApplicationEventPublisher eventPublisher;
 //    private final S3PrivateFileService s3PrivateFileService;
 
     @Override
@@ -35,21 +38,15 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = new BinaryContent(
                 command.fileName(),
                 command.contentType(),
-                command.size());
+                command.size(),
+                BinaryContentStatus.PROCESSING
+        );
 
-        BinaryContent saved = null;
-        saved = binaryContentRepository.save(binaryContent);
-        try {
-            binaryContentStorage.put(saved.getId(), command.bytes());
+        BinaryContent saved = binaryContentRepository.save(binaryContent);
 
-            // 만약 presigned url을 사용한다면 굳이 DB에 url을 저장할 필요가 없다.
-            // 파일명(객체 key)을 DB에 저장하고 데이터를 불러올 일이있다면 그때마다 presigned url을 얻어서 프론트에게 전달
-//            String url = s3PrivateFileService.uploadToFolder(command, "users/profile/");// TODO: s3업로드이후 url 값에 대해서 기존 코드 말고 쓰고 해당 필드 컬럼 어떻게 할지 정할것
+        BinaryContentCreatedEvent binaryContentCreatedEvent = new BinaryContentCreatedEvent(saved.getId(), command.bytes());
+        eventPublisher.publishEvent(binaryContentCreatedEvent);
 
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new RuntimeException("파일 저장 파일 실패", e);
-        }
         // 키id로 값 bytes 저장
         return saved.getId();
     }
@@ -70,6 +67,15 @@ public class BasicBinaryContentService implements BinaryContentService {
         return allByIds.stream()
                 .map(binaryContentMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public BinaryContentResponseDto updateStatus(UUID binaryContentId, BinaryContentStatus status) {
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new BinaryContentNotFoundException(binaryContentId));
+        binaryContent.updateStatus(status);
+        log.info("상태 변경 서비스 실행완료 binaryContentId={} status={}", binaryContentId, status);
+        return binaryContentMapper.toDto(binaryContent);
     }
 
     @Override
