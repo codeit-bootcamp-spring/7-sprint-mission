@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.UUID;
 
 
@@ -66,7 +65,6 @@ public class BasicAuthService implements AuthService {
         String role = user.getRole().name();
         AuthTokenResponseDto pair = jwtTokenProvider.issueTokenPair(user.getId(), role);
 
-        refreshTokenCookieManager.set(response, pair.refreshToken());
 
         boolean online = jwtOnlineChecker.isOnline(userId);
         UserResponseDto userDto = userMapper.toDto(user, online);
@@ -79,7 +77,14 @@ public class BasicAuthService implements AuthService {
                 jwtTokenProvider.getExpirationInstant(pair.refreshToken())
         );
 
-        jwtRegistry.rotateJwtInformation(refreshToken, newInfo);
+        boolean rotated = jwtRegistry.rotateJwtInformation(refreshToken, newInfo);
+        if (!rotated) {
+            refreshTokenCookieManager.clear(response);
+            throw new InsufficientAuthenticationException("Refresh token is not active");
+        }
+
+        refreshTokenCookieManager.set(response, pair.refreshToken());
+
 
         return new JwtDto(userDto, pair.accessToken());
     }
