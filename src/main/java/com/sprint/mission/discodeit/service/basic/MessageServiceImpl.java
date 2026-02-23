@@ -22,7 +22,6 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -50,7 +49,6 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final MessageMapper messageMapper;
-    private final BinaryContentStorage binaryContentStorage;
     private final ApplicationEventPublisher eventPublisher;
 
     private List<BinaryContent> saveAttachment(List<MultipartFile> files) {
