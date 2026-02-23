@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface BinaryContentStorage {
 
-    UUID put(MultipartFile file);
+    void put(String fileName, MultipartFile file);
     UrlResource getUrlResource(String fileName);
 
     void deleteFile(String fileName);

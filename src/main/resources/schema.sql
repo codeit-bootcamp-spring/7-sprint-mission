@@ -4,7 +4,10 @@ create table binary_contents
     file_name         varchar(100)                        not null,
     file_type         varchar(50)                         not null,
     file_size         bigint                              not null,
-    created_at        timestamp default current_timestamp not null
+    created_at        timestamp default current_timestamp not null,
+    updated_at        timestamp,
+    status            varchar(20)                         not null default 'PROCESSING'
+        check (status in ('PROCESSING', 'SUCCESS', 'FAIL'))
 );
 
 

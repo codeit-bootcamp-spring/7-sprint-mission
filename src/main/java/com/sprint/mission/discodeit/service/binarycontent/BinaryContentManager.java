@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.service.binarycontent;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,15 +27,17 @@ public class BinaryContentManager {
 
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentRepository binaryContentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public BinaryContent saveFileAndMeta(MultipartFile file) {
-        UUID fileName = binaryContentStorage.put(file);
+        validateContentType(file.getContentType());
         BinaryContent binaryContent = new BinaryContent(
-                fileName.toString(),
+                UUID.randomUUID().toString(),
                 file.getContentType(),
                 file.getSize());
-        binaryContentRepository.save(binaryContent);
-        return binaryContentRepository.save(binaryContent);
+        BinaryContent content = binaryContentRepository.save(binaryContent);
+        eventPublisher.publishEvent(new BinaryContentCreatedEvent(content.getId(), content.getFileName(), file));
+        return content;
     }
 
 
@@ -65,5 +69,14 @@ public class BinaryContentManager {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + binaryContent.getFileName() + "\"")
                 //attachment->inline
                 .body(urlResource);
+    }
+
+    private void validateContentType(String contentType) {
+        if (contentType == null ||
+                !(contentType.equals("image/png")
+                        || contentType.equals("image/jpeg")
+                        || contentType.equals("image/gif"))) {
+            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다: " + contentType);
+        }
     }
 }

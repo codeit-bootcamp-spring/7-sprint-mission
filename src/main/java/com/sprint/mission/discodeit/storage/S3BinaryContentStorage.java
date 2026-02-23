@@ -66,10 +66,9 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public UUID put(MultipartFile file) {
+    public void put(String fileName, MultipartFile file) {
         String contentType = file.getContentType();
         validateContentType(contentType);
-        String fileName = UUID.randomUUID().toString();
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(fileName)
@@ -83,7 +82,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         } catch (IOException e) {
             throw new RuntimeException("S3에 파일 저장 중 문제 발생");
         }
-        return UUID.fromString(fileName);
     }
 
     private void validateContentType(String contentType) {
