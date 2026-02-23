@@ -223,6 +223,7 @@ public class BasicUserService implements UserService {
                 .map(user -> userMapper.toDto(user, jwtOnlineChecker.isOnline(user.getId())));
     }
 
+    @PreAuthorize("@authz.isSelf(authentication, #userId)")
     @Override
     public UserResponseDto getMe(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
@@ -260,8 +261,8 @@ public class BasicUserService implements UserService {
         user.updateRole(newRole);
         User saved = userRepository.save(user);
 
-        boolean online = jwtOnlineChecker.isOnline(userId);
         jwtRegistry.invalidateJwtInformationByUserId(userId);
+        boolean online = jwtOnlineChecker.isOnline(userId);
 
         log.info("User role updated. userId = {}, newRole = {}",  saved.getId(), newRole);
         return userMapper.toDto(saved, online);
