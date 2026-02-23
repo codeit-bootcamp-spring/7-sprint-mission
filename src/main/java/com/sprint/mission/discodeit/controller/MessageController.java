@@ -38,7 +38,6 @@ public class MessageController {
     public ResponseEntity<MessageDto> updateMessage(
             @PathVariable UUID messageId,
             @RequestBody MessageUpdateRequest messageUpdateRequest) {
-        System.out.println("messageId = " + messageUpdateRequest.newContent());
         MessageDto messageDto = messageService.updateMessage(messageId, messageUpdateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
     }

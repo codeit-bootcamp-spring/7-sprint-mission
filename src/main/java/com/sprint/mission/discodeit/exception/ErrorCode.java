@@ -12,6 +12,7 @@ public enum ErrorCode {
     DUPLICATE_READ_STATUS("이미 참가중인 채널입니다."),
     READ_STATUS_NOT_FOUND("해당 채널 수신 정보를 찾을 수 없습니다."),
     LOGIN_PASSWORD("비밀번호가 일치하지 않습니다."),
+    INVALID_TOKEN("유효하지 않은 토큰입니다."),
     BINARY_CONTENT_NOT_FOUND("해당 파일을 찾을 수 없습니다.");
 
 

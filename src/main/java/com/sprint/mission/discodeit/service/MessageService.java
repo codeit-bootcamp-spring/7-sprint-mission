@@ -48,6 +48,7 @@ public class MessageService {
     private final BinaryContentManager binaryContentManager;
 
 
+    @PreAuthorize("#request.authorId == authentication.principal.userDto.id")
     public MessageDto sendMessage(MessageCreateRequest request, List<MultipartFile> attachments) {
         log.info("MessageService.sendMessage");
         User user =
@@ -80,7 +81,6 @@ public class MessageService {
         log.info("MessageService.updateMessage");
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, new HashMap<>()));
         message.updateContent(messageUpdateRequest.newContent());
-        System.out.println("messageUpdateRequest = " + messageUpdateRequest.newContent());
         return mapper.toDto(message);
     }
 

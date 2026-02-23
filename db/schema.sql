@@ -14,11 +14,12 @@ create table users
     username       varchar(100) unique                 not null,
     password       varchar(100)                        not null,
     email          varchar(100) unique                 not null,
+    role           varchar(20)                         not null default 'USER'
+        check (role in ('USER', 'CHANNEL_MANAGER', 'ADMIN')),
     last_active_at timestamp,
     profile_id     uuid,
     created_at     timestamp default current_timestamp not null,
     updated_at     timestamp,
-    role varchar(20) NOT NULL  DEFAULT 'USER' CHECK (role IN ('USER', 'CHANNEL_MANAGER', 'ADMIN'))
 
     constraint fk_users_binary_contents
         foreign key (profile_id)

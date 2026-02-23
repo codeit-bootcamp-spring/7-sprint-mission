@@ -79,7 +79,7 @@ public class UserService {
             user.updateUsername(updateDto.newUsername());
         }
         if (updateDto.newPassword() != null) {
-            user.updatePassword(updateDto.newPassword());
+            user.updatePassword(passwordEncoder.encode(updateDto.newPassword()));
         }
         if (updateDto.newEmail() != null) {
             user.updateEmail(updateDto.newEmail());
