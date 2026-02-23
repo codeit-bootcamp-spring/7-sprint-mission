@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.exception.advice;
 
 import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
 import com.sprint.mission.discodeit.service.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,19 @@ public class ExceptionControllerAdvice {
                 "BindException",
                 400);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(NotificationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> notificationNotFoundException(NotificationNotFoundException e) {
+        log.info("[ExceptionHandler] {}", e.getErrorCode());
+        ErrorResponse errorResponse = new ErrorResponse(
+                e.getTimestamp(),
+                e.getErrorCode().toString(),
+                e.getErrorCode().getMessage(),
+                e.getDetails(),
+                "NotificationNotFoundException",
+                404);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
 

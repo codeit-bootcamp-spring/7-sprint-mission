@@ -9,6 +9,7 @@ public enum ErrorCode {
     CHANNEL_NOT_FOUND("해당 채널을 찾을 수 없습니다."),
     PRIVATE_CHANNEL_UPDATE("DM은 수정할 수 없습니다."),
     MESSAGE_NOT_FOUND("해당 메세지를 찾을 수 없습니다."),
+    NOTIFICATION_NOT_FOUND("해당 알림을 찾을 수 없습니다."),
     DUPLICATE_READ_STATUS("이미 참가중인 채널입니다."),
     READ_STATUS_NOT_FOUND("해당 채널 수신 정보를 찾을 수 없습니다."),
     LOGIN_PASSWORD("비밀번호가 일치하지 않습니다."),
