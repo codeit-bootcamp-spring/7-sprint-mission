@@ -105,6 +105,7 @@ create table read_statuses
     last_read_at   timestamp,
     created_at     timestamp default current_timestamp not null,
     updated_at     timestamp,
+    notification_enabled boolean not null default false,
 
     constraint uq_read_statuses_user_channel
         unique (user_id, channel_id),

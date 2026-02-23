@@ -54,7 +54,7 @@ public class ChannelService {
         List<ReadStatus> readList = new ArrayList<>();
         userRepository.findAll()
                 .forEach(user -> {
-                    ReadStatus readStatus = new ReadStatus(user, save, Instant.now());
+                    ReadStatus readStatus = new ReadStatus(user, save, Instant.now(), false);
                     readList.add(readStatus);
                 });
         readStatusRepository.saveAll(readList);
@@ -72,7 +72,7 @@ public class ChannelService {
         List<ReadStatus> result = new ArrayList<>();
         List<UserDto> userDtos = new ArrayList<>();
         for (User user : users) {
-            ReadStatus readStatus = new ReadStatus(user, save, Instant.now());
+            ReadStatus readStatus = new ReadStatus(user, save, Instant.now(), true);
             result.add(readStatus);
             userDtos.add(userMapper.toDto(user));
         }

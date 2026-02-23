@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -20,6 +21,7 @@ import com.sprint.mission.discodeit.service.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.mapper.MessageMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +48,7 @@ public class MessageService {
     private final MessageMapper mapper;
     private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentManager binaryContentManager;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @PreAuthorize("#request.authorId == authentication.principal.userDto.id")
@@ -73,6 +76,13 @@ public class MessageService {
             }
         }
 
+        eventPublisher.publishEvent(new MessageCreatedEvent(
+                channel.getId(),
+                user.getId(),
+                user.getUsername(),
+                channel.getName(),
+                request.content()
+        ));
         return dto;
     }
 

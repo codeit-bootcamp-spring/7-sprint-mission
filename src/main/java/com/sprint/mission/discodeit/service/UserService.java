@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -21,6 +19,7 @@ import com.sprint.mission.discodeit.service.dto.response.UserDto;
 import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,6 +42,7 @@ public class UserService {
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtRegistry jwtRegistry;
+    private final ApplicationEventPublisher eventPublisher;
 
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
         log.info("UserService.createUser");
@@ -62,7 +62,7 @@ public class UserService {
         List<ReadStatus> readList = new ArrayList<>();
         channelRepository.findAllByType(ChannelType.PUBLIC)
                 .forEach(channel -> {
-                    ReadStatus readStatus = new ReadStatus(save, channel);
+                    ReadStatus readStatus = new ReadStatus(save, channel, false);
                     readList.add(readStatus);
                 });
         readStatusRepository.saveAll(readList);
@@ -119,8 +119,15 @@ public class UserService {
                 .findById(roleUpdateRequest.userId())
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, new HashMap<>()));
 
+        Role oldRole = user.getRole();
         user.updateRole(roleUpdateRequest.newRole());
         jwtRegistry.invalidateJwtInformationByUserId(user.getId());
+
+        eventPublisher.publishEvent(new RoleUpdatedEvent(
+                user.getId(),
+                oldRole,
+                roleUpdateRequest.newRole()
+        ));
         return mapper.toDto(user);
     }
 }
