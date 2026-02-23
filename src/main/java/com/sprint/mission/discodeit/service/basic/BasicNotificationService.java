@@ -33,6 +33,22 @@ public class BasicNotificationService implements NotificationService {
                 .build();
         notificationRepository.save(notification);
     }
+    
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createMultipleNotification(List<UUID> receiverIds, String title, String content) {
+        List<Notification> notificationList = receiverIds.stream().map(
+                receiverId -> {
+                    Notification notification = Notification.builder()
+                            .title(title)
+                            .content(content)
+                            .receiverId(receiverId)
+                            .build();
+                    return notification;
+                }
+        ).toList();
+
+        notificationRepository.saveAll(notificationList);
+    }
 
     @Override
     @Transactional(readOnly = true)

@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.event;
 
+import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -15,8 +19,26 @@ import java.util.UUID;
 @Slf4j
 public class NotificationRequiredEventListener {
     private final NotificationService notificationService;
-//    @TransactionalEventListener
-//    public void on(MessageCreatedEvent event) {...}
+    private final ReadStatusService readStatusService;
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void on(MessageCreatedEvent event) {
+        MessageResponseDto responseDto = event.getMessageResponseDto();
+        String authorName = responseDto.author().username();
+        String channelName = event.getChannelName() == null ? "" : event.getChannelName();
+        
+        String title = authorName + " (#" + channelName + ")";
+        String content = event.getMessageResponseDto().content();
+
+        List<UUID> receiverIdList = readStatusService.getAllNotificationEnabledByChannelId(responseDto.channelId())
+                .stream()
+                .map(ReadStatusResponseDto::userId)
+                .filter(uuid -> !uuid.equals(responseDto.author().id()))
+                .toList();
+
+        notificationService.createMultipleNotification(receiverIdList, title, content);
+        log.info("알림 생성 :{}", receiverIdList);
+    }
 
     @TransactionalEventListener(
             phase = TransactionPhase.AFTER_COMMIT
@@ -27,7 +49,7 @@ public class NotificationRequiredEventListener {
         Role to = event.getTo();
         String title = "권한이 변경되었습니다.";
         String message = from + " -> " + to;
-        log.info("{}의 권한 변경 {}", userId, title);
         notificationService.createNotification(userId, title, message);
+        log.info("{}의 권한 변경 {}", userId, title);
     }
 }

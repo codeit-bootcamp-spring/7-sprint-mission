@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.global.exception.discodietException.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.discodietException.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
@@ -86,8 +87,9 @@ public class BasicMessageService implements MessageService {
                 .build();
 
         messageRepository.save(message);
-
-        return messageMapper.toResponseDto(message);
+        MessageResponseDto messageResponseDto = messageMapper.toResponseDto(message);
+        eventPublisher.publishEvent(new MessageCreatedEvent(this, messageResponseDto, channel.getName()));
+        return messageResponseDto;
     }
 
     @Override

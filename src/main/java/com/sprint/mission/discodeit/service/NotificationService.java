@@ -9,6 +9,8 @@ public interface NotificationService {
 
     void createNotification(UUID receiverId, String title, String content);
 
+    void createMultipleNotification(List<UUID> receiverIds, String title, String content);
+
     List<NotificationResponseDto> getAllNotificationsByReceiverId(UUID receiverId);
 
     void deleteNotification(UUID notificationId, UUID receiverId);
