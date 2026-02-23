@@ -38,7 +38,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation 'org.springframework.kafka:spring-kafka'
+
     testImplementation 'org.springframework.security:spring-security-test'
+
 
     // JWT 라이브러리
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'        // API
