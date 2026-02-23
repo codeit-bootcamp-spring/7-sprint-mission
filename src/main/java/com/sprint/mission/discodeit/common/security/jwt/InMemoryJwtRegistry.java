@@ -6,11 +6,13 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class InMemoryJwtRegistry implements JwtRegistry {
     private final Map<UUID, Queue<JwtInformation>> origin = new ConcurrentHashMap<>();
     private final Map<String, UUID> accessIndex = new ConcurrentHashMap<>();
     private final Map<String, UUID> refreshIndex = new ConcurrentHashMap<>();
+    private final Map<UUID, ReentrantLock> userLocks = new ConcurrentHashMap<>();
     private final int maxActiveJwtCount;
 
     public InMemoryJwtRegistry(int maxActiveJwtCount) {
@@ -19,24 +21,35 @@ public class InMemoryJwtRegistry implements JwtRegistry {
         }
         this.maxActiveJwtCount = maxActiveJwtCount;
     }
+
+    private ReentrantLock lockOf(UUID userId) {
+        return userLocks.computeIfAbsent(userId, k -> new ReentrantLock());
+    }
+
     @Override
     public void registerJwtInformation(JwtInformation info) {
-        if (info ==null || info.userDto() == null | info.userDto().id() == null) {
+        if (info ==null || info.userDto() == null || info.userDto().id() == null) {
             return;
         }
 
         UUID userId = info.userDto().id();
-        Queue<JwtInformation> queue = origin.computeIfAbsent(userId, k -> new ArrayDeque<>());
+        ReentrantLock lock = lockOf(userId);
+        lock.lock();
 
-        while (queue.size() >= maxActiveJwtCount) {
-            JwtInformation removed = queue.poll();
-            if (removed != null) {
-                removeIndexes(removed);
+        try {
+            Queue<JwtInformation> queue = origin.computeIfAbsent(userId, k -> new ArrayDeque<>());
+            while (queue.size() >= maxActiveJwtCount) {
+                JwtInformation removed = queue.poll();
+                if (removed != null) {
+                    removeIndexes(removed);
+                }
             }
-        }
 
-        queue.offer(info);
-        putIndexes(info);
+            queue.offer(info);
+            putIndexes(info);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -82,63 +95,77 @@ public class InMemoryJwtRegistry implements JwtRegistry {
     }
 
     @Override
-    public void rotateJwtInformation(String refreshToken, JwtInformation newInfo) {
+    public boolean rotateJwtInformation(String refreshToken, JwtInformation newInfo) {
         if (refreshToken == null || refreshToken.isBlank()) {
-            return;
+            return false;
         }
         if (newInfo == null || newInfo.userDto() == null || newInfo.userDto().id() == null) {
-            return;
+            return false;
         }
 
         UUID userId = refreshIndex.get(refreshToken);
         if (userId == null) {
-            return;
+            return false;
         }
 
-        Queue<JwtInformation> queue = origin.get(userId);
-        if (queue == null || queue.isEmpty()) {
-            return;
-        }
+        ReentrantLock lock = lockOf(userId);
+        lock.lock();
 
-        queue.removeIf(old -> {
-            boolean match = refreshToken.equals(old.refreshToken());
-            if (match) {
-                removeIndexes(old);
+        try {
+            Queue<JwtInformation> queue = origin.get(userId);
+            if (queue == null || queue.isEmpty()) {
+                return false;
             }
-            return match;
-        });
 
-        while (queue.size() >= maxActiveJwtCount) {
-            JwtInformation removed = queue.poll();
-            if (removed != null) {
-                removeIndexes(removed);
+            queue.removeIf(old -> {
+                boolean match = refreshToken.equals(old.refreshToken());
+                if (match) {
+                    removeIndexes(old);
+                }
+                return match;
+            });
+
+            while (queue.size() >= maxActiveJwtCount) {
+                JwtInformation removed = queue.poll();
+                if (removed != null) {
+                    removeIndexes(removed);
+                }
             }
+            queue.offer(newInfo);
+            putIndexes(newInfo);
+            return true;
+        } finally {
+            lock.unlock();
         }
-        queue.offer(newInfo);
-        putIndexes(newInfo);
     }
 
     @Override
     public void clearExpiredJwtInformation() {
         Instant now = Instant.now();
 
-        for (Map.Entry<UUID, Queue<JwtInformation>> e : origin.entrySet()) {
-            UUID userId = e.getKey();
-            Queue<JwtInformation> queue = e.getValue();
-            if (queue == null) {
-                continue;
-            }
+        for (UUID userId : origin.keySet()) {
+            ReentrantLock lock = lockOf(userId);
+            lock.lock();
 
-            queue.removeIf(info -> {
-                boolean expired = info.refreshExpiresAt() != null && !info.refreshExpiresAt().isAfter(now);
-                if (expired) {
-                    removeIndexes(info);
+            try {
+                Queue<JwtInformation> queue = origin.get(userId);
+                if (queue == null) {
+                    continue;
                 }
-                return expired;
-            });
 
-            if (queue.isEmpty()) {
-                origin.remove(userId, queue);
+                queue.removeIf(info -> {
+                    boolean expired = info.refreshExpiresAt() != null && !info.refreshExpiresAt().isAfter(now);
+                    if (expired) {
+                        removeIndexes(info);
+                    }
+                    return expired;
+                });
+
+                if (queue.isEmpty()) {
+                    origin.remove(userId, queue);
+                }
+            } finally {
+                lock.unlock();
             }
         }
     }
