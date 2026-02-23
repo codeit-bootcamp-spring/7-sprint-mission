@@ -41,7 +41,7 @@ public class ReadStatus extends BaseUpdatableEntity {
     }
 
     public void readAt(Instant at) {
-        Instant time = VerifiedUtils.verifyNull(at);
+        Instant time = Objects.requireNonNull(at);
         if(time.isAfter(this.lastReadAt)) {
             this.lastReadAt = time;
         }
