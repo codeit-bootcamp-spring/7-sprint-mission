@@ -76,7 +76,7 @@ public class BasicChannelService implements ChannelService {
 
         users.forEach(user ->
                 readStatusRepository.save(
-                        new ReadStatus(user, channel, Instant.now())
+                        new ReadStatus(user, channel, Instant.now(), true)
                 ));
 
         log.info("비공개 채널 생성 완료: channelId = {}", saved.getId());

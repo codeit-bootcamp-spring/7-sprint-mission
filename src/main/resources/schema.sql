@@ -60,6 +60,7 @@ CREATE TABLE read_statuses (
 	user_id      uuid NOT NULL,
 	channel_id   uuid NOT NULL,
 	last_read_at timestamp with time zone NOT NULL,
+	notification_enabled boolean NOT NULL,
 
 	PRIMARY KEY (id),
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
@@ -88,6 +89,17 @@ CREATE TABLE message_attachments (
 
 	FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE,
 	FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE
+);
+
+CREATE TABLE notifications (
+    id         uuid,
+    created_at timestamp with time zone NOT NULL,
+    title      varchar(50) NOT NULL,
+    content    text NOT NULL,
+    channel_id uuid NOT NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE
 );
 
 -- Remember-Me 토큰 저장 테이블

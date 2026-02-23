@@ -1,0 +1,85 @@
+package com.sprint.mission.discodeit.global.event;
+
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.repository.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class NotificationRequiredEventListener {
+
+    private final NotificationRepository notificationRepository;
+    private final ReadStatusRepository readStatusRepository;
+    private final MessageRepository messageRepository;
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void on(MessageCreatedEvent event) {
+        UUID channelId = event.getChannelId();
+        UUID messageId = event.getMessageId();
+
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
+        User user = message.getAuthor();
+        Channel channel = message.getChannel();
+
+        String title = channel.getChannelType().equals(ChannelType.PRIVATE) ?
+                user.getUsername() + "의 개인 메시지" :
+                user.getUsername() + "(#" + channel.getChannelName() + ")";
+
+        String content = message.getContent().isEmpty() ?
+                "(첨부파일)" :
+                message.getContent();
+
+        // 채널 내 알림을 활성화한 인원 조회
+        List<UUID> users = readStatusRepository.findAllByChannelIdAndNotificationEnabled(event.getChannelId(), true).stream()
+                .map(readStatus -> readStatus.getUser().getId())
+                .filter(userId -> !userId.equals(event.getSenderId())) // 메시지를 보낸 사람은 제외
+                .toList();
+
+        List<Notification> notifications = new ArrayList<>();
+
+        // 인원 별 채널 알림 생성
+        users.forEach(userId -> {
+            Notification notification = new Notification(
+                    title,
+                    content,
+                    channelId,
+                    userId
+            );
+            notifications.add(notification);
+        });
+
+        notificationRepository.saveAll(notifications);
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void on(RoleUpdatedEvent event) {
+        String title = "권한이 변경되었습니다.";
+        String content = event.oldRole() + "->" + event.newRole();
+
+        Notification notification = new Notification(
+                title,
+                content,
+                null,
+                event.userId()
+        );
+
+        notificationRepository.save(notification);
+    }
+
+}

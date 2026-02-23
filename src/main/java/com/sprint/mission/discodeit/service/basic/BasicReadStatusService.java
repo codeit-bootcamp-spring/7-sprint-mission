@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.global.exception.channel.ChannelMemberAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.readstatus.ReadStatusNotFoundException;
@@ -54,7 +55,11 @@ public class BasicReadStatusService implements ReadStatusService {
                 ));
 
         if(!existsByUserIdAndChannelId(request.userId(), request.channelId())) {
-            newStatus = new ReadStatus(user, channel, request.lastReadAt());
+            if(channel.getChannelType().equals(ChannelType.PUBLIC)) {
+                newStatus = new ReadStatus(user, channel, request.lastReadAt(), false);
+            } else {
+                newStatus = new ReadStatus(user, channel, request.lastReadAt(), true);
+            }
             readStatusRepository.save(newStatus);
         } else {
             throw new ChannelMemberAlreadyExistsException(
@@ -90,7 +95,7 @@ public class BasicReadStatusService implements ReadStatusService {
                         ErrorCode.READSTATUS_NOT_FOUND,
                         Map.of("readStatusId", readStatusId)
                 ));
-        readStatus.update(request.newLastReadAt());
+        readStatus.update(request.newLastReadAt(), request.newNotificationEnabled());
         readStatusRepository.save(readStatus);
         return readStatusMapper.toResponseDto(readStatus);
     }

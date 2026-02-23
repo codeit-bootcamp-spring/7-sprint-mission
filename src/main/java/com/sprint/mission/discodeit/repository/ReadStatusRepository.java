@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -28,4 +27,6 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
     void deleteByChannelId(UUID id);
 
     boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
+
+    List<ReadStatus> findAllByChannelIdAndNotificationEnabled(UUID channelId, boolean notificationEnabled);
 }
