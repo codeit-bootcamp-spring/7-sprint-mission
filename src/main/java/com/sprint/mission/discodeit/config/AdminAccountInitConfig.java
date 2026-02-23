@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.UserRole;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +15,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 @Slf4j
 public class AdminAccountInitConfig {
-    private static final String ADMIN_USERNAME = "admin";
-    private static final String ADMIN_EMAIL = "admin@discodeit.com";
-    private static final String ADMIN_PASSWORD = "admin123!";
+    @Value("${discodeit.admin.bootstrap.enabled:false}")
+    private boolean bootstrapEnabled;
+
+    @Value("${discodeit.admin.bootstrap.username:admin}")
+    private String adminUsername;
+
+    @Value("${discodeit.admin.bootstrap.email:admin@discodeit.com}")
+    private String adminEmail;
+
+    @Value("${discodeit.admin.bootstrap.password:}")
+    private String adminPassword;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -27,22 +36,30 @@ public class AdminAccountInitConfig {
     }
 
     protected void initAdminAccountIfAbsent() {
-        if (userRepository.existsByRole(UserRole.ADMIN)) {
-            log.info("[AdminInit] ADMIN 계정이 이미 존재합니다.");
+        if (!bootstrapEnabled) {
+            log.info("bootstrap is disabled.");
             return;
         }
 
-        if (userRepository.existsByUsername(ADMIN_USERNAME)) {
+        if (adminPassword == null || adminPassword.isBlank()) {
+            throw new IllegalStateException("[AdminInit] admin_password is null or blank");
+        }
+
+        if (userRepository.existsByRole(UserRole.ADMIN)) {
+            log.info("[AdminInit] 이미 유저 권한이 ADMIN입니다.");
+            return;
+        }
+        if (userRepository.existsByUsername(adminUsername)) {
             log.info("[AdminInit] ADMIN  이름이 이미 존재합니다.");
             return;
         }
 
-        String encode = passwordEncoder.encode(ADMIN_PASSWORD);
+        String encode = passwordEncoder.encode(adminPassword);
 
         User admin = new User(
-                ADMIN_USERNAME,
+                adminUsername,
                 encode,
-                ADMIN_EMAIL,
+                adminEmail,
                 null,
                 UserRole.ADMIN
         );

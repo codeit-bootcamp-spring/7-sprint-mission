@@ -21,6 +21,12 @@ spring:
     open-in-view: false
 
 discodeit:
+  admin:
+    bootstrap:
+      enabled: true
+      username: admin
+      email: admin@discodeit.com
+      password: ${DISCODEIT_ADMIN_BOOTSTRAP_PASSWORD:}
   storage:
     type: ${STORAGE_TYPE:local}
     local:
@@ -31,6 +37,7 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+
 logging:
   level:
     root: info
