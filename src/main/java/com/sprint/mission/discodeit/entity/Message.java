@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,13 +36,17 @@ public class Message extends BaseUpdatableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "message", orphanRemoval = true, cascade = CascadeType.REMOVE)
-//    private List<MessageAttachments> messageAttachmentList;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "message", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<MessageAttachments> messageAttachmentList = new ArrayList<>();
 
-//    public Message(String content, Channel channel, User author, List<MessageAttachments> attachmentId) {
-//        this.content = content;
-//        this.channel = channel;
-//        this.author = author;
-//        this.attachmentId = attachmentId;
-//    }
+    public void addAttachment(MessageAttachments attachment) {
+        this.messageAttachmentList.add(attachment);
+        attachment.setMessage(this);
+    }
+
+    public Message(String content, Channel channel, User author) {
+        this.content = content;
+        this.channel = channel;
+        this.author = author;
+    }
 }

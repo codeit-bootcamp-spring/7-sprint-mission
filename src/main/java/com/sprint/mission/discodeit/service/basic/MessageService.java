@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.channelNotFoundException;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
+import java.util.ArrayList;
 import java.util.Map;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.data.domain.Pageable;
@@ -72,7 +73,6 @@ public class MessageService implements InterfaceMessageService {
         Message message = new Message(dtoMessage.content(),
             channel,
             user);
-        Message savedMessage = messageRepository.save(message);
 
         if (null != fileList && !fileList.isEmpty()) {
             for (MultipartFile file : fileList) {
@@ -86,12 +86,15 @@ public class MessageService implements InterfaceMessageService {
                 BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
                 MessageAttachments messageAttachments = new MessageAttachments(
-                    savedMessage,
+                    message,
                     savedBinaryContent
                 );
-                messageAttachmentsRepository.save(messageAttachments);
+                message.addAttachment(messageAttachments);
             }
         }
+
+        Message savedMessage = messageRepository.save(message);
+
 
         log.info("✅ 💌 MessageService.create.content = [" + message.getContent() + "] 💬");
         return messageMapper.toDto(message);
