@@ -8,10 +8,11 @@ DROP TABLE IF EXISTS binary_contents;
 CREATE TABLE binary_contents (
     id				UUID			PRIMARY KEY,
     created_at		TIMESTAMPTZ		NOT NULL,
+    updated_at		TIMESTAMPTZ,
     file_name		VARCHAR(255)	NOT NULL,
     size			BIGINT			NOT NULL,
     content_type	VARCHAR(100)	NOT NULL,
-    bytes			BYTEA			NOT NULL
+    status          VARCHAR(20)     NOT NULL
 );
 
 
