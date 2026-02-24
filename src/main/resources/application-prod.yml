@@ -34,6 +34,21 @@ logging:
     org.hibernate.SQL: debug
 
 
+# ===============================
+# Actuator 설정
+# ===============================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics #,loggers(보안위험) => /actuator/loggers로 로그 레벨을 런타임에 변경 가능
+  endpoint:
+    health:
+      show-details: never
+  observations:     # 비동기 Event Listener에 @Observed(name = "metric 이름을 써준다!") 적용
+    annotations:
+      enabled: true
+
 storage:
   type: s3
   path: s3://discodeit-bucket

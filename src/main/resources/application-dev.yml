@@ -46,6 +46,20 @@ logging:
     org.springframework.security: TRACE #⭐️ 각 요청마다 통과하는 필터 목록을 확인할 수 있습니다.
 
 
+# ===============================
+# Actuator 설정
+# ===============================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics ,loggers # loggers(보안위험) => /actuator/loggers로 로그 레벨을 런타임에 변경 가능
+  endpoint:
+    health:
+      show-details: always
+  observations:     # 비동기 Event Listener에 @Observed(name = "metric 이름을 써준다!") 적용
+    annotations:
+      enabled: true
 
 
 storage:
