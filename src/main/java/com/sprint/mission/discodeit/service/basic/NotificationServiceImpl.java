@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "notification", key = "#userId")
     public List<NotificationDto> findAllNotifications(UUID userId) {
         log.info("알람 전체 조회");
         return notificationRepository.findAllByUserIdOrderByCreatedAtDesc(userId)
@@ -31,8 +34,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Transactional
+    @CacheEvict(value = "notification", key = "#userId")
     public void deleteNotification(UUID id, UUID userId) {
-
         log.info("알람 삭제 요청: {}", id);
         Notification notification = notificationRepository.findById(id)
                 .orElseThrow(() -> {

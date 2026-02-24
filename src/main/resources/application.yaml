@@ -24,6 +24,20 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+  cache:
+    type: caffeine
+    cache-names:
+      - channel        # 단건 채널
+      - userChannels   # 유저별 채널 목록
+      - notification  # 유저별 알림 목록
+      - user           # 단건 유저
+      - allUsers       # 전체 유저 목록
+    caffeine:
+      spec: >
+        maximumSize=100,
+        expireAfterAccess=600s,
+        recordStats
+
 cloud:
   aws:
     credentials:

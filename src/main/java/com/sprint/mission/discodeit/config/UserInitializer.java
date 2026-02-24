@@ -34,8 +34,15 @@ public class UserInitializer implements ApplicationRunner {
                     .password(passwordEncoder.encode(adminPassword))
                     .role(Role.ADMIN)
                     .build();
-
             userRepository.save(admin);
+
+            User testUser = User.builder()
+                    .username("test")
+                    .email("a@a.a")
+                    .password(passwordEncoder.encode("A123123!"))
+                    .role(Role.USER)
+                    .build();
+            userRepository.save(testUser);
         }
     }
 }

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.JwtRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -27,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @CacheEvict(value = "allUsers", allEntries = true)
     public void expireUserSession(UUID userId) {
         jwtRegistry.invalidateJwtInformationByUserId(userId);
         log.info("JWT 무효화: userId={}", userId);
@@ -38,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @CacheEvict(value = "allUsers", allEntries = true)
     public JwtDto rotateRefreshToken(UserDto userDto) {
         String accessToken = jwtTokenProvider.createAccessToken(userDto);
         String refreshToken = jwtTokenProvider.createRefreshToken(userDto);

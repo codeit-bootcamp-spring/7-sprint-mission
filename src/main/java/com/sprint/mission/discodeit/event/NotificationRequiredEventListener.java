@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -17,6 +18,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -26,6 +28,7 @@ public class NotificationRequiredEventListener {
     private final ReadStatusRepository readStatusRepository;
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final CacheManager cacheManager;
 
     @Async("taskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -44,8 +47,14 @@ public class NotificationRequiredEventListener {
                         .content(event.content())
                         .build())
                 .toList();
-
         notificationRepository.saveAll(notifications);
+
+        if (cacheManager.getCache("notification") != null) {
+            notifications.forEach(n -> {
+                Objects.requireNonNull(cacheManager.getCache("notification")).evict(n.getUser().getId());
+                log.debug("메시지 알림 캐시 무효화: userId={}", n.getUser().getId());
+            });
+        }
     }
 
     @Async("taskExecutor")
@@ -61,5 +70,10 @@ public class NotificationRequiredEventListener {
                 .content(String.format("%s -> %s", event.oldRole(), event.newRole()))
                 .build();
         notificationRepository.save(notification);
+
+        if (cacheManager.getCache("notification") != null) {
+            Objects.requireNonNull(cacheManager.getCache("notification")).evict(user.getId());
+            log.info("알림 캐시 무효화: userId={}", user.getId());
+        }
     }
 }

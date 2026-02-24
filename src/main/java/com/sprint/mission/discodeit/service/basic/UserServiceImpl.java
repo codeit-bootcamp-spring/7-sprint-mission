@@ -19,9 +19,11 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.JwtRegistry;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,7 +45,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapper userMapper;
-    private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
     private final JwtRegistry jwtRegistry;
@@ -52,6 +53,7 @@ public class UserServiceImpl implements UserService {
     // 생성
     @Override
     @Transactional
+    @CacheEvict(value = "allUsers", allEntries = true)
     public UserDto createUser(UserCreateRequest requestDto, MultipartFile profileImage) {
 
         // email, 닉네임 공백 제거
@@ -114,6 +116,7 @@ public class UserServiceImpl implements UserService {
     // ID로 출력
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "user", key = "#userId")
     public UserDto findUserById(UUID userId) {
 
         User user = userRepository.findById(userId)
@@ -125,6 +128,7 @@ public class UserServiceImpl implements UserService {
     // 전체출력
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "allUsers")
     public List<UserDto> findAllUsers() {
 
         List<User> users = userRepository.findAll();
@@ -140,6 +144,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     @PreAuthorize("#userId == authentication.principal.id")
+    @Caching(evict = {
+        @CacheEvict(value = "user", key = "#userId"),
+        @CacheEvict(value = "allUsers", allEntries = true)
+    })
     public UserDto updateUserInfo(UUID userId, UserUpdateRequest updateDto, MultipartFile profileImage) {
 
         log.debug("회원 정보 수정 요청 - userId: {}", userId);
@@ -211,6 +219,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
+    @Caching(evict = {
+            @CacheEvict(value = "user", key = "#roleUpdateRequest.userId"),
+            @CacheEvict(value = "allUsers", allEntries = true)
+    })
     public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
 
         User user = userRepository.findById(roleUpdateRequest.userId())
@@ -234,6 +246,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     @PreAuthorize("#userId == authentication.principal.id")
+    @Caching(evict = {
+            @CacheEvict(value = "user", key = "#userId"),
+            @CacheEvict(value = "allUsers", allEntries = true)
+    })
     public void deleteUser(UUID userId) {
 
         log.info("유저 삭제 요청: {}", userId);
