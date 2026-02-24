@@ -22,6 +22,9 @@ management:
   endpoint:
     health:
       show-details: always
+  observations:     # 비동기 Event Listener에 @Observed(name = "metric 이름을 써준다!") 적용
+    annotations:
+      enabled: true
 
 # ===============================
 # Actuator Info 메타데이터

@@ -43,6 +43,9 @@ public class BinaryContentStorageService implements BinaryContentStorage {
     @Override
     public void put(BinaryContentCreatedEvent event) {
         try {
+            // 의도적 지연
+//            Thread.sleep(3000);
+
             Path filePath = root.resolve(event.getBinaryContentId().toString());
 
             // 파일 저장
@@ -50,11 +53,15 @@ public class BinaryContentStorageService implements BinaryContentStorage {
             log.info("✅ 파일 저장 SUCCESS ⭕️- file.name = {}", event.getFile().getOriginalFilename());
 
 //            binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.SUCCESS);
+//        } catch (InterruptedException e) {
+//
+//            Thread.currentThread().interrupt();
+//            throw new RuntimeException("🚨파일 저장 실패 I: 🚨 Thread interrupted while simulating delay ", e);
         } catch (IOException e) {
 
             log.error("🚨파일 저장 실패 ❌ - file.name = {}", event.getFile().getOriginalFilename());
 //            binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.FAIL);
-            throw new RuntimeException("🚨파일 저장 실패 I: " + e);
+            throw new RuntimeException("🚨파일 저장 실패 I: ", e);
         }
     }
 

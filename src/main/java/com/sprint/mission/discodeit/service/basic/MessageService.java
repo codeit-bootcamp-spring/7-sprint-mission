@@ -155,8 +155,6 @@ public class MessageService implements InterfaceMessageService {
 
         message.setContent(requestDto.newContent());
 
-        messageRepository.save(message);
-
         log.info("✅ updateMessage = [" + message.getContent() + "]");
 
         return messageMapper.toDto(message);

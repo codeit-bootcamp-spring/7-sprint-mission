@@ -155,22 +155,18 @@ public class UserService implements InterfaceUserService {
         }
 
         BinaryContent profile = optionalProfileFile.map(file -> {
-                BinaryContent neoBinaryContent = null;
-                neoBinaryContent = binaryContentRepository
+                BinaryContent neoBinaryContent = binaryContentRepository
                     .findById(userId)
                     .orElse( new BinaryContent(file));
 
-                BinaryContent savedBinaryContent = binaryContentRepository.save(neoBinaryContent);
-                eventPublisher.publishEvent(new BinaryContentCreatedEvent(savedBinaryContent.getId(), file));
+                eventPublisher.publishEvent(new BinaryContentCreatedEvent(neoBinaryContent.getId(), file));
 
-                return savedBinaryContent;
+                return neoBinaryContent;
             })
             .orElse(null);
 
         user.updateFrom(dtoUserUpdate, profile);
 
-        //!! 순서 유의_II
-        userRepository.save(user);
         log.info("✅ UserService.update = [" + userName + "]를 [" + dtoUserUpdate.newUsername() + "]로 변경 완료");
 
         return userMapper.toDto(user);

@@ -74,7 +74,7 @@ public class NotificationsService implements InterfaceNotificationsService {
 
             notificationsRepository.save(notification);
 
-            log.info("🟪🟪🟪🟪🟪 saved MessageCreatedEvent = {}", notification.toString());
+            log.info("🟪🟪🟪 saved MessageCreatedEvent = {}", notification.toString());
         });
     }
 
@@ -82,11 +82,11 @@ public class NotificationsService implements InterfaceNotificationsService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveRoleUpdateEvent(RoleUpdatedEvent event) {
 
-        log.info("🟧🟧 RoleUpdatedEvent = {}", event.toString());
+        log.info("🟧 RoleUpdatedEvent = {}", event.toString());
 
         Notifications savedNotification = notificationsRepository.save(
             new Notifications(event.getReceiverId(), event.getTitle(), event.getContent()));
 
-        log.debug("🟧🟧🟧🟧🟧 saved RoleUpdatedEvent = {}", savedNotification.toString());
+        log.debug("🟧 saved RoleUpdatedEvent = {}", savedNotification.toString());
     }
 }
