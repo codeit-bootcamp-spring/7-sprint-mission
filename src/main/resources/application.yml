@@ -32,6 +32,16 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
+  cache:
+    type: redis # caffeine or redis
+    redis:
+      enable-statistics: true
+
+data:
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+
 discodeit:
   storage:
     type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)

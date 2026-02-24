@@ -25,7 +25,9 @@ public class BasicNotificationService {
     private final NotificationRepository notificationRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable("notificationList")
+    // redis는 key를 string으로 지정해야한다.
+    // key를 지정하지 않으면 DiscodeUserDetails 객체를 key로 사용하려고 시도하여 예외 발생
+    @Cacheable(value = "notificationList", key = "#userDetails.getUserDto().id()")
     public List<NotificationDto> findAll(DiscodeitUserDetails userDetails) {
         List<Notification> notifications = notificationRepository.findAllByUserId(userDetails.getUserDto().id());
 
