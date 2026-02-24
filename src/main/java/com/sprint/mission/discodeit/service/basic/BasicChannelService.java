@@ -50,13 +50,13 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = channelFactory.create(command);
 
-        Channel saved = channelRepository.save(channel);
+        Channel savedChannel = channelRepository.save(channel);
 
-        if (saved.getType() == ChannelType.PRIVATE) {
+        if (savedChannel.getType() == ChannelType.PRIVATE) {
             List<User> users = userReader.findUsersByIds(command.memberIds());
             if (users.size() < MIN_PARTICIPANTS_FOR_PRIVATE_CHANNEL) {
                 log.warn("PRIVATE 채널 생성 실패 - 최소 인원 부족 channelId={} required={} actual={}",
-                        saved.getId(), MIN_PARTICIPANTS_FOR_PRIVATE_CHANNEL, users.size());
+                        savedChannel.getId(), MIN_PARTICIPANTS_FOR_PRIVATE_CHANNEL, users.size());
                 throw new ChannelMinimumMembersNotMetException(
                         users.size(),
                         MIN_PARTICIPANTS_FOR_PRIVATE_CHANNEL,
@@ -65,7 +65,7 @@ public class BasicChannelService implements ChannelService {
             }
             if (users.size() < command.memberIds().size()) {
                 log.warn("PRIVATE 채널 생성 실패 - 잘못된 참여 유저 존재 channelId={} requestedIds={} foundUsers={}",
-                        saved.getId(), command.memberIds().size(), users.size());
+                        savedChannel.getId(), command.memberIds().size(), users.size());
                 throw new ChannelInvalidParticipantsException(
                         command.memberIds().size(),
                         users.size()
@@ -73,14 +73,14 @@ public class BasicChannelService implements ChannelService {
             }
 
             List<ReadStatus> readStatuses = users.stream()
-                    .map(user -> new ReadStatus(user, saved, command.notificationEnabled())).toList();
+                    .map(user -> new ReadStatus(user, savedChannel, command.notificationEnabled())).toList();
 
             readStatusRepository.saveAll(readStatuses);
-            log.debug("PRIVATE 채널 ReadStatus 생성 channelId={} count={}", saved.getId(), readStatuses.size());
+            log.debug("PRIVATE 채널 ReadStatus 생성 channelId={} count={}", savedChannel.getId(), readStatuses.size());
         }
         log.info("채널 생성 성공 channelId={} type={} name={}",
-                saved.getId(), saved.getType(), saved.getName());
-        return channelMapper.toDto(saved);
+                savedChannel.getId(), savedChannel.getType(), savedChannel.getName());
+        return channelMapper.toDto(savedChannel);
     }
 
     @Override

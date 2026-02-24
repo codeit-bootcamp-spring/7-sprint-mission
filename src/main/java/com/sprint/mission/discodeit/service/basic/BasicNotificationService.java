@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.notification.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
+import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
@@ -21,6 +23,7 @@ public class BasicNotificationService implements NotificationService {
 
     private final ReadStatusRepository readStatusRepository;
     private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -36,5 +39,14 @@ public class BasicNotificationService implements NotificationService {
         } catch (Exception e) {
             log.error("notification 저장 실패", e);
         }
+    }
+
+    @Override
+    public List<NotificationDto> getMyNotifications(UUID userId) {
+
+        List<Notification> myNotifications = notificationRepository.findAllByReceiverId(userId);
+        return myNotifications.stream()
+                .map(notificationMapper::toDto)
+                .toList();
     }
 }

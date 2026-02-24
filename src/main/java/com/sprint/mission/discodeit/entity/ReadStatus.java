@@ -39,9 +39,9 @@ public class ReadStatus extends BaseUpdatableEntity {
 
     @Builder
     public ReadStatus(User user, Channel channel, boolean notificationEnabled) {
-        if (channel.getType() != ChannelType.PRIVATE) {
-            throw new ReadStatusCreateNotAllowedException(channel.getType());
-        }
+//        if (channel.getType() != ChannelType.PRIVATE) {
+//            throw new ReadStatusCreateNotAllowedException(channel.getType());
+//        }
         this.user = user;
         this.channel = channel;
         this.notificationEnabled = notificationEnabled;

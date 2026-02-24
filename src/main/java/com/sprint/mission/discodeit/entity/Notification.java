@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.base.BasicEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Table(name = "notifications")
+@Getter
 public class Notification extends BasicEntity {
 
     @Column(name = "receiver_id", nullable = false)
