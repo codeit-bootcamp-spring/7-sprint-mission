@@ -1,16 +1,13 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.dto_Neo;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
 
 public record ReadStatusCreateRequest( //all private final
-                                       @NotNull
-    UUID userId,
-                                       @NotNull
-    UUID channelId,
-                                       @NotNull
-    Instant lastReadAt
+   @NotNull UUID userId,
+   @NotNull UUID channelId,
+   @NotNull Instant lastReadAt
 ){
     public static ReadStatusCreateRequest from(UUID userId, UUID channelId) {
         return new ReadStatusCreateRequest(

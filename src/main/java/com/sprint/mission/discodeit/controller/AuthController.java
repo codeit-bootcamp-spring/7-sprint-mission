@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.UserRoleUpdateRequest;
-import com.sprint.mission.discodeit.mapper.dto.JwtDto;
-import com.sprint.mission.discodeit.mapper.dto.JwtInformation;
-import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.JwtDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.JwtInformation;
+import com.sprint.mission.discodeit.dto.dto_Neo.UserDto;
 //import com.sprint.mission.discodeit.security.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.InterfaceAuthService;

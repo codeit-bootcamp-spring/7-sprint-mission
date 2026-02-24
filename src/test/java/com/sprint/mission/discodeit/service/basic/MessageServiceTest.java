@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
-import com.sprint.mission.discodeit.mapper.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.MessageDto;
 import com.sprint.mission.discodeit.page.PageResponseDto;
 import com.sprint.mission.discodeit.repository.jpa.*;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;

@@ -2,28 +2,30 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.nimbusds.jose.JOSEException;
 import com.sprint.mission.discodeit.dto.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.RoleUpdatedEvent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.dto.JwtInformation;
-import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.JwtInformation;
+import com.sprint.mission.discodeit.dto.dto_Neo.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.InterfaceAuthService;
 import java.util.Map;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 //🚨✅로그인 처리는 SecurityFilterChain에서 모두 처리
@@ -39,6 +41,7 @@ public class AuthService implements InterfaceAuthService {
     private final JwtTokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
     private final JwtRegistry jwtRegistry;
+    private final ApplicationEventPublisher eventPublisher;
 
 //    @Transactional(readOnly = true)
 //    @Override
@@ -57,14 +60,18 @@ public class AuthService implements InterfaceAuthService {
 //    }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
+//    @Transactional
     @Override
+    @Transactional
     public UserDto userRoleUpdateRequest(UserRoleUpdateRequest userRoleUpdateRequest) {
 
         User user = userRepository.findById(userRoleUpdateRequest.userId())
             .orElseThrow(() -> new UserNotFoundException(userRoleUpdateRequest.userId()));
 
+        String content = user.getRole().toString() + " -> " + userRoleUpdateRequest.newRole().toString();
+
         user.updateRole(userRoleUpdateRequest.newRole());
+        eventPublisher.publishEvent(new RoleUpdatedEvent(user.getId(), content));
 
         jwtRegistry.invalidateJwtInformationByUserId(user.getId());
 

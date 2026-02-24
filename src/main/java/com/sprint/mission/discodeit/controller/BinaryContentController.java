@@ -1,17 +1,15 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentDto;
 import com.sprint.mission.discodeit.service.InterfaceBinaryContentService;
 import com.sprint.mission.discodeit.service.basic.BinaryContentDownloadService;
 import com.sprint.mission.discodeit.swaggerDocs.BinaryContentDoc;
-import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

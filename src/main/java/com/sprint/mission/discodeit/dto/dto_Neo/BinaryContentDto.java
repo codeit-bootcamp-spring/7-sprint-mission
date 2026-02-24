@@ -1,9 +1,8 @@
-package com.sprint.mission.discodeit.mapper.dto;
+package com.sprint.mission.discodeit.dto.dto_Neo;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 @Builder

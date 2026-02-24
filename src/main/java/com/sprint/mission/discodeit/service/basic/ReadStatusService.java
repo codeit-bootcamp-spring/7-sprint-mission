@@ -3,13 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.Dto_ReadStatusUpdate;
+import com.sprint.mission.discodeit.dto.dto_Neo.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.ReadStatusException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
-import com.sprint.mission.discodeit.mapper.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.ReadStatusDto;
 import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@Transactional // 영속성 컨텍스트
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ReadStatusService implements InterfaceReadStatusService {
     private final UsersRepository userRepository;
@@ -45,8 +45,6 @@ public class ReadStatusService implements InterfaceReadStatusService {
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("🚨Channel[" + dtoReadStatus.channelId().toString() + "] 를 찾을 수 없음 "));
 
-        // 이미 있으면 오류가 맞는걸까? => 그냥 이게 의도한 오류 한줄 던지니 깔끔! 요걸로 채택!
-        // 있는걸 되돌려줘도 되는걸까?  => 해봤더니 줄줄이 사탕 에러!
         Optional<ReadStatus> byUserAndChannelId = readStatusRepository.findReadStatusByUserIdAndChannelId(user.getId(), channel.getId())
             .stream()
             .findFirst();
@@ -57,7 +55,8 @@ public class ReadStatusService implements InterfaceReadStatusService {
 
         ReadStatus newReadStatus = new ReadStatus(user
                                                 , channel
-                                                , Instant.now());
+                                                , Instant.now()
+                                                , false);
 
         readStatusRepository.save(newReadStatus);
         log.info("✅ ReadStatusService.create = [" + newReadStatus + "]");
@@ -65,7 +64,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         return readStatusMapper.toDto(newReadStatus);
     }
 
-    @Transactional(readOnly = true)
+
     public ReadStatusDto find(UUID statusID) {
         //find
         //[ ] id로 조회합니다.
@@ -79,7 +78,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
         return dto;
     }
 
-    @Transactional(readOnly = true)
+
     public List<ReadStatusDto> findAllByUserId(UUID userID) {
         //[ ] userId를 조건으로 조회합니다.
         List<ReadStatus> readStatuses = readStatusRepository.findAll();
@@ -93,7 +92,7 @@ public class ReadStatusService implements InterfaceReadStatusService {
     }
 
     @Transactional
-    public ReadStatusDto update(UUID readStatusId, Dto_ReadStatusUpdate requestDto) {
+    public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest requestDto) {
         //update
         //[ ] DTO를 활용해 파라미터를 그룹화합니다.
         //수정 대상 객체의 readStatusID 파라미터, 수정할 값 파라미터

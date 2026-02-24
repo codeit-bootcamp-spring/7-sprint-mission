@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.service.InterfaceReadStatusService;
 import com.sprint.mission.discodeit.swaggerDocs.ReadStatusDoc;
-import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.Dto_ReadStatusUpdate;
-import com.sprint.mission.discodeit.mapper.dto.ReadStatusDto;
-import com.sprint.mission.discodeit.service.basic.ReadStatusService;
+import com.sprint.mission.discodeit.dto.dto_Neo.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.ReadStatusDto;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController //👍 @controller + @responsebody
 @RequiredArgsConstructor
 @RequestMapping("/api/readStatuses")
@@ -56,7 +57,7 @@ public class ReadStatusController implements ReadStatusDoc {
     @PatchMapping("/{readStatusId}")
     public ResponseEntity<ReadStatusDto> update(
         @PathVariable("readStatusId") UUID readStatusId,
-        @Valid @RequestBody Dto_ReadStatusUpdate requestDto) {
+        @Valid @RequestBody ReadStatusUpdateRequest requestDto) {
 
         //💎Message 읽음 상태 수정
         ReadStatusDto resReadStatus

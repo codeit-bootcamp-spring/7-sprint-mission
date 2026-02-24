@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.UserRoleUpdateRequest;
-import com.sprint.mission.discodeit.mapper.dto.JwtInformation;
-import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.JwtInformation;
+import com.sprint.mission.discodeit.dto.dto_Neo.UserDto;
 
 ////🚨✅로그인 처리는 SecurityFilterChain에서 모두 처리
 

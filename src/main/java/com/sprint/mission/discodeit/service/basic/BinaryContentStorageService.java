@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.mapper.dto.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
@@ -104,7 +103,8 @@ public class BinaryContentStorageService implements BinaryContentStorage {
                 .body(new InputStreamResource(inputStream));
         } catch (IOException e) {
             log.error("🚨download error! - binaryContentId = {}", binaryContentId.toString());
-            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION, Map.of("binaryContentId", binaryContentId.toString()));
+            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION,
+                Map.of("binaryContentId", binaryContentId.toString()));
         }
     }
 }

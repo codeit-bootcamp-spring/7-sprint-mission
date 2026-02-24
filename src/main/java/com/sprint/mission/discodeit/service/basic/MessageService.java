@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.BinaryContentStatus;
+import com.sprint.mission.discodeit.dto.dto_Neo.MessageCreatedEvent;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.MessageException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.channelNotFoundException;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
-import com.sprint.mission.discodeit.mapper.dto.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import java.util.Map;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,7 +20,7 @@ import com.sprint.mission.discodeit.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.MessageAttachments;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.mapper.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.MessageDto;
 import com.sprint.mission.discodeit.page.PageResponseDto;
 import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessageAttachmentsRepository;
@@ -60,13 +60,11 @@ public class MessageService implements InterfaceMessageService {
     @Transactional
     public MessageDto create(MessageCreateRequest dtoMessage, List<MultipartFile> fileList) {
         if (dtoMessage.channelId() == null) {
-            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION,
-                Map.of("dtoMessage.channelId", "isNull"));
+            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION, Map.of("dtoMessage.channelId", "isNull"));
         }
 
         if (dtoMessage.authorId() == null) {
-            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION,
-                Map.of("MessageCreateRequest.authorId", "isNull"));
+            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION, Map.of("MessageCreateRequest.authorId", "isNull"));
         }
 
         Channel channel = channelRepository
@@ -96,6 +94,10 @@ public class MessageService implements InterfaceMessageService {
         }
 
         Message savedMessage = messageRepository.save(message);
+
+        // "보낸 사람 (#채널명)"
+        String title = savedMessage.getAuthor().getUsername() + " (#" + savedMessage.getChannel().getName() + ")";
+        eventPublisher.publishEvent(new MessageCreatedEvent(savedMessage.getChannel().getId(), title, savedMessage.getContent()));
 
         log.info("✅ 💌 MessageService.create.content = [" + message.getContent() + "] 💬");
         return messageMapper.toDto(message);

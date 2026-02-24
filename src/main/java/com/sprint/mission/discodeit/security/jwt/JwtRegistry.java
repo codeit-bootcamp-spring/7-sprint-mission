@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.security.jwt;
 
-import com.sprint.mission.discodeit.mapper.dto.JwtInformation;
+import com.sprint.mission.discodeit.dto.dto_Neo.JwtInformation;
 import java.util.UUID;
 
 public interface JwtRegistry {

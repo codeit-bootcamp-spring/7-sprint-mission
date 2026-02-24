@@ -83,18 +83,20 @@ CREATE TABLE channels(
 -- DROP TABLE channels;
 
 
-CREATE TABLE read_statuses(
-                              id UUID,
-                              created_at timestamptz NOT NULL,
-                              updated_at timestamptz,
-                              user_id uuid NOT NULL,
-                              channel_id uuid NOT NULL,
-                              last_read_at timestamptz NOT NULL,
-                              CONSTRAINT read_statuses_pk PRIMARY KEY (id),
-                              CONSTRAINT read_statuses_user_id_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE,
-                              CONSTRAINT read_statuses_channel_id_fk FOREIGN KEY (channel_id) REFERENCES public.channels(id) ON DELETE CASCADE,
-                              CONSTRAINT read_statuses_user_id_N_channel_id_uk UNIQUE (user_id, channel_id)
+CREATE TABLE read_statuses
+(
+    id           uuid PRIMARY KEY,
+    created_at   timestamp with time zone NOT NULL,
+    updated_at   timestamp with time zone,
+    user_id      uuid                     NOT NULL,
+    channel_id   uuid                     NOT NULL,
+    last_read_at timestamp with time zone NOT NULL,
+    notification_enabled boolean NOT NULL,
+    UNIQUE (user_id, channel_id)
 );
+
+-- ALTER TABLE read_statuses
+--      ADD COLUMN notification_enabled boolean NOT NULL;
 
 -- DROP TABLE read_statuses;
 
@@ -145,8 +147,15 @@ CREATE TABLE binary_contents
 -- ALTER TABLE binary_contents
 --      ADD COLUMN status varchar(20) NOT NULL;
 
-
-
+-- Notification
+CREATE TABLE notifications
+(
+    id          uuid PRIMARY KEY,
+    created_at  timestamp with time zone NOT NULL,
+    receiver_id uuid                     NOT NULL,
+    title       varchar(255)             NOT NULL,
+    content     text                     NOT NULL
+);
 
 
 ---- ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅

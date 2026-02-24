@@ -8,12 +8,10 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReadStatusesRepository extends JpaRepository<ReadStatus, UUID> {
-//    void save(T model);
-//    void deleteById(UUID id);
-//    Optional<T> findById(UUID id);
-//    List<T> findAll();
 
     List<ReadStatus> findAllByChannelId(UUID channelId);
 
     Optional<ReadStatus> findReadStatusByUserIdAndChannelId(UUID userID, UUID channelID);
+
+    List<ReadStatus> findAllByChannelIdAndNotificationEnabledIsTrue(UUID channelId);
 }

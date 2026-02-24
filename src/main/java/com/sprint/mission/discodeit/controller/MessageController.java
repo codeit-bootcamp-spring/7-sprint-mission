@@ -1,14 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import static java.awt.SystemColor.info;
-
-import com.sprint.mission.discodeit.mapper.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.MessageDto;
 import com.sprint.mission.discodeit.page.PageResponseDto;
 import com.sprint.mission.discodeit.service.InterfaceMessageService;
 import com.sprint.mission.discodeit.swaggerDocs.MessageDoc;
 import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.service.basic.MessageService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;

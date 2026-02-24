@@ -9,10 +9,10 @@ import com.sprint.mission.discodeit.exception.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.channelNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
-import com.sprint.mission.discodeit.mapper.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.ChannelDto;
 import com.sprint.mission.discodeit.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.mapper.dto.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.mapper.dto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
@@ -51,7 +51,7 @@ public class ChannelService implements InterfaceChannelService {
             readStatusList = participantIds.stream()
                 .map(userId -> { User user = userRepository.findById(userId)
                     .orElseThrow(() -> new UserNotFoundException(userId));
-                    return new ReadStatus(user, channel, Instant.now());
+                    return new ReadStatus(user, channel, Instant.now(), true);
                 })
                 .map(readStatusRepository::save)
                 .peek(readStatus -> log.info("✅ Channel.PRIVATE.readStatusRepository.save! - readStatus.id = {}", readStatus.getId().toString()))
