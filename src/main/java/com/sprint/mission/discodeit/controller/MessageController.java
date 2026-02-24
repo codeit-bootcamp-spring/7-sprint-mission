@@ -7,12 +7,8 @@ import com.sprint.mission.discodeit.dto.message.request.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
-import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -20,63 +16,64 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
 public class MessageController implements MessageDocs {
 
-  private final MessageService messageService;
+    private final MessageService messageService;
 
-  @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<MessageResponseDto> createMessage(
-      @Valid @RequestPart("messageCreateRequest") CreateMessageDto createMessageDto,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
+    @Timed("message.create.async")
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MessageResponseDto> createMessage(
+            @Valid @RequestPart("messageCreateRequest") CreateMessageDto createMessageDto,
+            @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
-    List<CreateBinaryContentDto> createBinaryContentDtos =
-        Stream.ofNullable(attachments)
-            .flatMap(Collection::stream)
-            .flatMap(attachment -> CreateBinaryContentDto.of(attachment).stream())
-            .toList();
+        List<CreateBinaryContentDto> createBinaryContentDtos =
+                Stream.ofNullable(attachments)
+                        .flatMap(Collection::stream)
+                        .flatMap(attachment -> CreateBinaryContentDto.of(attachment).stream())
+                        .toList();
 
-    MessageResponseDto messageResponseDto = messageService.createMessage(createMessageDto,
-        createBinaryContentDtos);
-    return ResponseEntity.status(HttpStatus.CREATED).body(messageResponseDto);
-  }
+        MessageResponseDto messageResponseDto = messageService.createMessage(createMessageDto,
+                createBinaryContentDtos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(messageResponseDto);
+    }
 
-  @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
-  public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable UUID messageId,
-      @RequestBody UpdateMessageDto updateMessageDto) {
-    MessageResponseDto messageResponseDto = messageService.updateMessage(messageId,
-        updateMessageDto);
-    return ResponseEntity.status(HttpStatus.OK).body(messageResponseDto);
-  }
+    @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
+    public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable UUID messageId,
+            @RequestBody UpdateMessageDto updateMessageDto) {
+        MessageResponseDto messageResponseDto = messageService.updateMessage(messageId,
+                updateMessageDto);
+        return ResponseEntity.status(HttpStatus.OK).body(messageResponseDto);
+    }
 
-  @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
-  public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
-    messageService.deleteMessage(messageId);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-  }
+    @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+        messageService.deleteMessage(messageId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
 
-  @RequestMapping(method = RequestMethod.GET)
-  public ResponseEntity<PageResponse<MessageResponseDto>> getAllMessagesByChannelId(
-      @RequestParam UUID channelId,
-      @RequestParam(required = false) Instant cursor,
-      @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC) Pageable pageable
-  ) {
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<PageResponse<MessageResponseDto>> getAllMessagesByChannelId(
+            @RequestParam UUID channelId,
+            @RequestParam(required = false) Instant cursor,
+            @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC) Pageable pageable
+    ) {
 
-    PageResponse<MessageResponseDto> allMessageByChannelId = messageService.getAllMessageByChannelId(
-        channelId, cursor, pageable);
-    return ResponseEntity.status(HttpStatus.OK).body(allMessageByChannelId);
-  }
+        PageResponse<MessageResponseDto> allMessageByChannelId = messageService.getAllMessageByChannelId(
+                channelId, cursor, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(allMessageByChannelId);
+    }
 
 
 }
