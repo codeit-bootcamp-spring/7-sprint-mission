@@ -79,12 +79,12 @@ info:
       maxFileSize: ${spring.servlet.multipart.max-file-size:}
       maxRequestSize: ${spring.servlet.multipart.max-request-size:}
 
-  jwt:
-    issuer: discodeit
-    secret: ${JWT_SECRET}
-    access-token-seconds: 900 # 15분
-    refresh-token-seconds: 1209600 # 14일
-    refresh-cookie:
-      secure: false
-      same-site: Lax
-      max-age-seconds: 1209600
+jwt:
+  issuer: discodeit
+  secret: ${JWT_SECRET}
+  access-token-seconds: 900 # 15분
+  refresh-token-seconds: 1209600 # 14일
+  refresh-cookie:
+    secure: false
+    same-site: Lax
+    max-age-seconds: 1209600
