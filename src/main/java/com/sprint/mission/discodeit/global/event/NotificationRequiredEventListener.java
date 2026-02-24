@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Component
+// @Component // 카프카 발행시 리스너 제외
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationRequiredEventListener {
@@ -31,8 +30,8 @@ public class NotificationRequiredEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void on(MessageCreatedEvent event) {
-        UUID channelId = event.getChannelId();
-        UUID messageId = event.getMessageId();
+        UUID channelId = event.channelId();
+        UUID messageId = event.messageId();
 
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
@@ -48,9 +47,9 @@ public class NotificationRequiredEventListener {
                 message.getContent();
 
         // 채널 내 알림을 활성화한 인원 조회
-        List<UUID> users = readStatusRepository.findAllByChannelIdAndNotificationEnabled(event.getChannelId(), true).stream()
+        List<UUID> users = readStatusRepository.findAllByChannelIdAndNotificationEnabled(event.channelId(), true).stream()
                 .map(readStatus -> readStatus.getUser().getId())
-                .filter(userId -> !userId.equals(event.getSenderId())) // 메시지를 보낸 사람은 제외
+                .filter(userId -> !userId.equals(event.senderId())) // 메시지를 보낸 사람은 제외
                 .toList();
 
         List<Notification> notifications = new ArrayList<>();

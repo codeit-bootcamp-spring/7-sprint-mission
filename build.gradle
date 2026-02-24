@@ -69,6 +69,9 @@ dependencies {
     // Caffeine 캐시 의존성
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    // Spring kafka
+    implementation 'org.springframework.kafka:spring-kafka'
 }
 dependencyManagement {
     imports {
