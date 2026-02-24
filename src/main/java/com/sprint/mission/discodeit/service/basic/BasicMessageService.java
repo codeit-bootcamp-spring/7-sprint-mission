@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.type.ChannelType;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.message.MessageSendNotAllowed;
@@ -25,6 +26,7 @@ import com.sprint.mission.discodeit.service.reader.MessageReader;
 import com.sprint.mission.discodeit.service.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,6 +50,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentService binaryContentService;
     private final ReadStatusRepository readStatusRepository;
     private final MessageMapper messageMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional(readOnly = true)
@@ -139,6 +142,17 @@ public class BasicMessageService implements MessageService {
                 .build();
 
         Message savedMessage = messageRepository.save(message);
+
+        eventPublisher.publishEvent(
+                new MessageCreatedEvent(
+                        savedMessage.getId(),
+                        channel.getId(),
+                        sender.getId(),
+                        sender.getUsername(),
+                        channel.getName(),
+                        savedMessage.getContent()
+                )
+        );
 
         log.info("메시지 전송 성공 - messageId={}, channelId={}, senderId={}",
                 savedMessage.getId(), channel.getId(), sender.getId());

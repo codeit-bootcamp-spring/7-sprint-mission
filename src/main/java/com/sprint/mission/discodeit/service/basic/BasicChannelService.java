@@ -21,7 +21,6 @@ import com.sprint.mission.discodeit.service.reader.ChannelReader;
 import com.sprint.mission.discodeit.service.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +73,7 @@ public class BasicChannelService implements ChannelService {
             }
 
             List<ReadStatus> readStatuses = users.stream()
-                    .map(user -> new ReadStatus(user, saved)).toList();
+                    .map(user -> new ReadStatus(user, saved, command.notificationEnabled())).toList();
 
             readStatusRepository.saveAll(readStatuses);
             log.debug("PRIVATE 채널 ReadStatus 생성 channelId={} count={}", saved.getId(), readStatuses.size());
@@ -165,43 +164,43 @@ public class BasicChannelService implements ChannelService {
         };
     }
 
-    @Override
-    @Transactional
-    public void joinChannel(UUID channelId, UUID userId) {
-        if (channelId == null || userId == null) {
-            throw new DiscodeitException(ErrorCode.INVALID_INPUT);
-        }
-        log.info("채널 참여 시도 channelId={} userId={}", channelId, userId);
-        Channel channel = channelReader.findChannelOrThrow(channelId);
+//    @Override
+//    @Transactional
+//    public void joinChannel(UUID channelId, UUID userId) {
+//        if (channelId == null || userId == null) {
+//            throw new DiscodeitException(ErrorCode.INVALID_INPUT);
+//        }
+//        log.info("채널 참여 시도 channelId={} userId={}", channelId, userId);
+//        Channel channel = channelReader.findChannelOrThrow(channelId);
+//
+//        User user = userReader.findUserOrThrow(userId);
+//        // 이미 참여했는지 체크 (메서드 없으면 아래 existsBy...를 리포지토리에 추가)
+//        if (readStatusRepository.existsByUserAndChannel(user, channel)) {
+//            throw new ChannelAlreadyJoinedException(user.getId(), channel.getId());
+//        }
+//
+//        // 참여 = ReadStatus 한 줄 생성
+//        ReadStatus readStatus = new ReadStatus(user, channel);
+//        readStatusRepository.save(readStatus);
+//        log.info("채널 참여 성공 channelId={} userId={}", channelId, userId);
+//    }
 
-        User user = userReader.findUserOrThrow(userId);
-        // 이미 참여했는지 체크 (메서드 없으면 아래 existsBy...를 리포지토리에 추가)
-        if (readStatusRepository.existsByUserAndChannel(user, channel)) {
-            throw new ChannelAlreadyJoinedException(user.getId(), channel.getId());
-        }
-
-        // 참여 = ReadStatus 한 줄 생성
-        ReadStatus readStatus = new ReadStatus(user, channel);
-        readStatusRepository.save(readStatus);
-        log.info("채널 참여 성공 channelId={} userId={}", channelId, userId);
-    }
-
-    @Override
-    @Transactional
-    public void leaveChannel(UUID channelId, UUID userId) {
-        if (channelId == null || userId == null) {
-            throw new DiscodeitException(ErrorCode.INVALID_INPUT);
-        }
-        log.info("채널 탈퇴 시도 channelId={} userId={}", channelId, userId);
-        Channel channel = channelReader.findChannelOrThrow(channelId);
-
-        User user = userReader.findUserOrThrow(userId);
-
-        ReadStatus readStatus = readStatusRepository.findByUserAndChannel(user, channel)
-                .orElseThrow(() -> new ChannelNotJoinedException(user.getId(), channel.getId()));
-        readStatusRepository.delete(readStatus);
-        log.info("채널 탈퇴 성공 channelId={} userId={}", channelId, userId);
-    }
+//    @Override
+//    @Transactional
+//    public void leaveChannel(UUID channelId, UUID userId) {
+//        if (channelId == null || userId == null) {
+//            throw new DiscodeitException(ErrorCode.INVALID_INPUT);
+//        }
+//        log.info("채널 탈퇴 시도 channelId={} userId={}", channelId, userId);
+//        Channel channel = channelReader.findChannelOrThrow(channelId);
+//
+//        User user = userReader.findUserOrThrow(userId);
+//
+//        ReadStatus readStatus = readStatusRepository.findByUserAndChannel(user, channel)
+//                .orElseThrow(() -> new ChannelNotJoinedException(user.getId(), channel.getId()));
+//        readStatusRepository.delete(readStatus);
+//        log.info("채널 탈퇴 성공 channelId={} userId={}", channelId, userId);
+//    }
 
     @Override
     @Transactional(readOnly = true)

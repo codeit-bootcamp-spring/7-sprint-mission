@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS channels CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS binary_contents CASCADE;
 DROP TABLE IF EXISTS refresh_tokens CASCADE;
+DROP TABLE IF EXISTS notifications CASCADE;
 
 --- 바이너리컨텐츠 테이블 DDL
 CREATE TABLE binary_contents
@@ -64,12 +65,13 @@ CREATE TABLE messages
 
 CREATE TABLE read_statuses
 (
-    id           UUID PRIMARY KEY,
-    user_id      UUID                     NOT NULL,
-    channel_id   UUID                     NOT NULL,
-    last_read_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at   TIMESTAMP WITH TIME ZONE,
+    id                   UUID PRIMARY KEY,
+    user_id              UUID                     NOT NULL,
+    channel_id           UUID                     NOT NULL,
+    last_read_at         TIMESTAMP WITH TIME ZONE NOT NULL,
+    notification_enabled BOOLEAN                  NOT NULL,
+    created_at           TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at           TIMESTAMP WITH TIME ZONE,
 
     CONSTRAINT fk_read_status_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT fk_read_status_channel FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE,
@@ -97,4 +99,14 @@ CREATE TABLE refresh_tokens
         FOREIGN KEY (user_id)
             REFERENCES users (id)
             ON DELETE CASCADE
+);
+
+CREATE TABLE notifications
+(
+    id          UUID PRIMARY KEY,
+    receiver_id UUID                     NOT NULL,
+    title       VARCHAR(200)             NOT NULL,
+    content     VARCHAR(200)             NOT NULL,
+    created_at  TIMESTAMP WITH TIME ZONE NOT NULL,
+    CONSTRAINT fk_notification_user FOREIGN KEY (receiver_id) REFERENCES users (id) ON DELETE CASCADE
 );
