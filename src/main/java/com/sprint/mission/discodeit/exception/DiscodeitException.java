@@ -33,5 +33,6 @@ public class DiscodeitException extends RuntimeException {
         this.details = details == null ? Map.of() : Map.copyOf(details);
 
     }
+
 }
 

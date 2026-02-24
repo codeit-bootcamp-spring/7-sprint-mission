@@ -10,4 +10,6 @@ public interface NotificationService {
     void createForMessageCreated (MessageCreatedEvent event);
 
     List<NotificationDto> getMyNotifications(UUID userId);
+
+    void deleteNotification(UUID notificationId, UUID userId);
 }

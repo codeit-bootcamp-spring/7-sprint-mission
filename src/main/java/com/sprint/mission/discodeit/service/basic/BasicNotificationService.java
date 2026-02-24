@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.notification.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
+import com.sprint.mission.discodeit.exception.notification.NotificationAccessDeniedException;
+import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -48,5 +50,17 @@ public class BasicNotificationService implements NotificationService {
         return myNotifications.stream()
                 .map(notificationMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void deleteNotification(UUID notificationId, UUID userId) {
+
+        Notification notification = notificationRepository.findById(notificationId).orElseThrow(() -> new NotificationNotFoundException(notificationId));
+        if (!notification.getReceiverId().equals(userId)) {
+            throw new NotificationAccessDeniedException(userId, notificationId);
+        }
+        notificationRepository.delete(notification);
+
     }
 }
