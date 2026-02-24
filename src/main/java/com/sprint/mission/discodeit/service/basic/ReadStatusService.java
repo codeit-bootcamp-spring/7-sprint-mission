@@ -99,10 +99,9 @@ public class ReadStatusService implements InterfaceReadStatusService {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(() -> new NoSuchElementException("🚨Message[" + readStatusId.toString() + "] 읽음 상태를 찾을 수 없음"));
 
-        readStatus.setLastReadAt(requestDto.newLastReadAt());
-        readStatusRepository.save(readStatus);
+        readStatus.update(requestDto);
 
-        log.info("✅ readStatusRepository.update = [" + readStatus + "]");
+        log.info("🟪 readStatusRepository.update = [" + readStatus + "]");
 
         return readStatusMapper.toDto(readStatus);
     }

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.dto_Neo.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +24,7 @@ import lombok.Setter;
         name = "read_statuses_user_id_N_channel_id_uk",
         columnNames = {"user_id", "channel_id"}
     ))
-@Getter @Setter
+@Getter // @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 🔥 추가 필수
 @AllArgsConstructor
 public class ReadStatus extends BaseUpdatableEntity {
@@ -41,4 +42,13 @@ public class ReadStatus extends BaseUpdatableEntity {
 
     @Column(name = "notification_enabled", nullable = false)
     boolean notificationEnabled = false; // private channel = true/ public channel = false
+
+    public void update(ReadStatusUpdateRequest requestDto) {
+        if (requestDto.newLastReadAt() != null) {
+            this.lastReadAt = requestDto.newLastReadAt();
+        }
+        if (requestDto.newNotificationEnabled() != null) {
+            this.notificationEnabled = requestDto.newNotificationEnabled();
+        }
+    }
 }

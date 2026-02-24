@@ -4,10 +4,10 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 
 public record ReadStatusUpdateRequest( //all private final
-    @NotNull Instant newLastReadAt,
-    @NotNull boolean newNotificationEnabled
+    Instant newLastReadAt,
+    Boolean newNotificationEnabled // 래퍼(null 허용)
 ) {
-  public ReadStatusUpdateRequest(Instant newLastReadAt, boolean newNotificationEnabled) {
+  public ReadStatusUpdateRequest(Instant newLastReadAt, Boolean newNotificationEnabled) {
     this.newLastReadAt = newLastReadAt;
     this.newNotificationEnabled = newNotificationEnabled;
   }

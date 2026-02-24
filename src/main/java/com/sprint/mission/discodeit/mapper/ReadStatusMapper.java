@@ -12,6 +12,7 @@ public class ReadStatusMapper {
             .userId(readStatus.getUser().getId())
             .channelId(readStatus.getChannel().getId())
             .lastReadAt(readStatus.getLastReadAt())
+            .notificationEnabled(readStatus.isNotificationEnabled())
             .build();
     }
 }
