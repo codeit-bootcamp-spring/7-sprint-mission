@@ -13,9 +13,11 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +36,13 @@ public class BasicChannelService implements ChannelService {
     private final BinaryContentRepository binaryContentRepository;
 
     private final ChannelMapper channelMapper;
+    private final CacheManager cacheManager;
 
     // API 스펙에 맞는 공개 채널 및 비공개 채널 생성 메서드 추가
     @Override
     @Transactional
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
+    @CacheEvict(value = "channelList", allEntries = true)
     public ChannelDto create(CreatePublicChannelRequestDto request) {
         String name = request.name();
         String description = request.description();
@@ -79,6 +83,11 @@ public class BasicChannelService implements ChannelService {
                         new ReadStatus(user, channel, Instant.now(), true)
                 ));
 
+        // 비공개 채널이 새로 생성된 사용자들의 캐시만 삭제
+        Cache cache = cacheManager.getCache("channelList");
+        request.participantIds()
+                .forEach(userId -> cache.evict(userId));
+
         log.info("비공개 채널 생성 완료: channelId = {}", saved.getId());
         return channelMapper.toResponseDto(saved);
     }
@@ -86,6 +95,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
+    @CacheEvict(value = "channelList", allEntries = true)
     public ChannelDto update(UUID channelId, UpdatePublicChannelRequestDto request) {
 
         log.debug("채널 수정 요청: channelId = {}", channelId);
@@ -128,6 +138,7 @@ public class BasicChannelService implements ChannelService {
     // Public 채널 목록은 전체 조회 + Private 채널은 User가 참여한 채널만 조회
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "channelList", key = "#userId")
     public List<ChannelDto> findAllByUserId(UUID userId) {
         // 공개 채널 조회
         List<Channel> publicChannels = channelRepository.findAllByChannelType(ChannelType.PUBLIC);
@@ -154,6 +165,7 @@ public class BasicChannelService implements ChannelService {
         @channelSecurity.isPrivate(#channelId)
         or hasRole('CHANNEL_MANAGER')
     """)
+    @CacheEvict(value = "channelList", allEntries = true)
     public void delete(UUID channelId) {
 
         log.debug("채널 삭제 요청: channelId = {}", channelId);

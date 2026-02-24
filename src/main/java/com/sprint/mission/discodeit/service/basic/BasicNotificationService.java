@@ -8,7 +8,8 @@ import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class BasicNotificationService {
     private final NotificationRepository notificationRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("notificationList")
     public List<NotificationDto> findAll(DiscodeitUserDetails userDetails) {
         List<Notification> notifications = notificationRepository.findAllByUserId(userDetails.getUserDto().id());
 
@@ -39,6 +41,7 @@ public class BasicNotificationService {
     }
 
     @Transactional
+    @CacheEvict(value = "notificationList", allEntries = true)
     public void delete(UUID userId, UUID notificationId) {
 
         // 알림이 없는 경우 404 NOT FOUND 예외 발생

@@ -18,6 +18,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +47,7 @@ public class BasicUserService implements UserService{
 
     @Override
     @Transactional
+    @CacheEvict(value = "userList", allEntries = true)
     public UserResponseDto create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
 
         log.debug("신규 사용자 생성 요청: username = {}, email = {}",
@@ -89,6 +92,7 @@ public class BasicUserService implements UserService{
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable("userList")
     public List<UserResponseDto> findAll() {
         // fetch join 적용
         return userRepository.findAllWithProfile().stream()
@@ -99,6 +103,7 @@ public class BasicUserService implements UserService{
     @Override
     @Transactional
     @PreAuthorize("#userId == authentication.principal.getUserDto.id")
+    @CacheEvict(value = "userList", allEntries = true)
     public UserResponseDto update(UUID userId, UpdateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
 
         User user = userRepository.findById(userId)
@@ -138,6 +143,7 @@ public class BasicUserService implements UserService{
     @Override
     @Transactional
     @PreAuthorize("#userId == authentication.principal.getUserDto.id")
+    @CacheEvict(value = "userList", allEntries = true)
     public void delete(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(

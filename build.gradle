@@ -65,6 +65,10 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'       // JSON 파싱
 
     implementation 'org.springframework.retry:spring-retry'
+
+    // Caffeine 캐시 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 }
 dependencyManagement {
     imports {
