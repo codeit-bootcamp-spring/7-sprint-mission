@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.notification.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
+import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.exception.notification.NotificationAccessDeniedException;
 import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
@@ -32,14 +33,30 @@ public class BasicNotificationService implements NotificationService {
     public void createForMessageCreated(MessageCreatedEvent event) {
         List<UUID> targetIds = readStatusRepository.findReceiverIds(event.getChannelId(), event.getSenderId());
         String title = event.getSenderName() + " (#" + event.getChannelName() + ")";
-        System.out.println("targetIDS: " + targetIds);
         List<Notification> notificationList = targetIds.stream().map(targetId -> Notification.create(targetId, title, event.getContent())).toList();
-        System.out.println("NotificationList: " + notificationList);
         try {
             notificationRepository.saveAll(notificationList);
-            log.info("notification 저장 성공");
+            log.info("메세지 생성 notification 저장 성공");
         } catch (Exception e) {
-            log.error("notification 저장 실패", e);
+            log.error("메세지 생성 notification 저장 실패", e);
+        }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createForRoleUpdate(RoleUpdatedEvent event) {
+        String content = event.getOldRole().name() + " -> " + event.getNewRole().name();
+        String title = "권한이 변경되었습니다.";
+        Notification notification = Notification.create(
+                event.getReceiverId(),
+                title,
+                content
+        );
+        try {
+            notificationRepository.save(notification);
+            log.info("권한 변경 notification 저장 성공");
+        } catch (Exception e) {
+            log.error("권한 변경 notification 저장 실패", e);
         }
     }
 

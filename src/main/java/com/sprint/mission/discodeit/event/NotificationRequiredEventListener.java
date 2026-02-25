@@ -16,13 +16,12 @@ public class NotificationRequiredEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void on(MessageCreatedEvent event) {
-        System.out.println("here for message event");
         notificationService.createForMessageCreated(event);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void on(RoleUpdatedEvent event) {
-
+        notificationService.createForRoleUpdate(event);
     }
 
 }
