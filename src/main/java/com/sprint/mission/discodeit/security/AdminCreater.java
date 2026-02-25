@@ -26,7 +26,7 @@ public class AdminCreater implements ApplicationRunner {
         boolean isAdmin = userRepository.existsByRole(Role.ADMIN);
         if (!isAdmin) {
 
-            String name = "admin123";
+            String name = "admin";
             String encodePassword = passwordEncoder.encode(name); //!! 🛠️
 
             User newUser = new User(name,

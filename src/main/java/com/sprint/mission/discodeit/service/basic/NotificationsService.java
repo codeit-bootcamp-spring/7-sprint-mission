@@ -6,11 +6,13 @@ import com.sprint.mission.discodeit.dto.dto_Neo.NotificationDto;
 import com.sprint.mission.discodeit.dto.dto_Neo.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.entity.Notifications;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.NotificationsMapper;
 import com.sprint.mission.discodeit.repository.jpa.NotificationsRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
+import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.InterfaceNotificationsService;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +33,7 @@ public class NotificationsService implements InterfaceNotificationsService {
     private final NotificationsRepository notificationsRepository;
     private final NotificationsMapper notificationsMapper;
     private final ReadStatusesRepository readStatusesRepository;
+    private final UsersRepository userRepository;
 
     @Override
     public List<NotificationDto> getNotifications(DiscodeitUserDetails userDetails) {
@@ -99,10 +103,14 @@ public class NotificationsService implements InterfaceNotificationsService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveBinaryContentStorageErrorEvent(BinaryContentStorageErrorEvent event) {
-        log.error("❎❎❎❎❎❎");
+        log.info("❎ saveBinaryContentStorageErrorEvent");
+
+        User admin = userRepository.findUserByUsername("admin")
+            .orElseThrow(() -> new UsernameNotFoundException("🚨 사용자를 찾을 수 없습니다: "));
+
         Notifications savedNotification = notificationsRepository.save(
             new Notifications(
-                event.getRequestId(),
+                admin.getId(),
                 event.getTitle(), // "S3 파일 업로드 실패",
                 event.getErrorMessage()));
     }
