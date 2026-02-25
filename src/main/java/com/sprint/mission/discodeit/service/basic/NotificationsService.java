@@ -111,7 +111,7 @@ public class NotificationsService implements InterfaceNotificationsService {
         Notifications savedNotification = notificationsRepository.save(
             new Notifications(
                 admin.getId(),
-                event.getTitle(), // "S3 파일 업로드 실패",
-                event.getErrorMessage()));
+                "S3 파일 업로드 실패",
+                "RequestId: " + event.getRequestId().toString()));
     }
 }

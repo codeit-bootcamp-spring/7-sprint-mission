@@ -95,7 +95,6 @@ public class BinaryContentStorageService implements BinaryContentStorage {
         log.debug("❎");
         eventPublisher.publishEvent(new BinaryContentStorageErrorEvent(
                                             event.getBinaryContentId(),
-                                            "S3 파일 업로드 실패",
                                             "🚨Error: " + e.getMessage()));
     }
 

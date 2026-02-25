@@ -10,6 +10,5 @@ import lombok.ToString;
 @ToString
 public class BinaryContentStorageErrorEvent {
     UUID requestId;
-    String title;
     String errorMessage;
 }
