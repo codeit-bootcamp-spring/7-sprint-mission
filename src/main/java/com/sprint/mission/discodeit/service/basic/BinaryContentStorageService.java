@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentStorageErrorEvent;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentCreatedEvent;
@@ -9,21 +11,27 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -33,6 +41,9 @@ public class BinaryContentStorageService implements BinaryContentStorage {
 
     private final BinaryContentsRepository binaryContentRepository;
     private final Path root = Paths.get(System.getProperty("user.dir"), "data", "binary-content");
+    private final ApplicationEventPublisher eventPublisher;
+
+    private final BinaryContentService binaryContentService;
 
     @PostConstruct
     public void init() throws IOException {
@@ -40,7 +51,13 @@ public class BinaryContentStorageService implements BinaryContentStorage {
         log.info("✅ Files.createDirectories ok!");
     }
 
+
     @Override
+    @Retryable(
+        retryFor = {UncheckedIOException.class},  // 이 예외가 터지면 재시도
+        maxAttempts = 2,
+        backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
     public void put(BinaryContentCreatedEvent event) {
         try {
             // 의도적 지연
@@ -49,27 +66,44 @@ public class BinaryContentStorageService implements BinaryContentStorage {
             Path filePath = root.resolve(event.getBinaryContentId().toString());
 
             // 파일 저장
-            Files.write(filePath, event.getFile().getBytes());  // byte[] -> 실제 파일로 저장
-            log.info("✅ 파일 저장 SUCCESS ⭕️- file.name = {}", event.getFile().getOriginalFilename());
+            Files.write(
+                filePath,
+                event.getFile().getBytes(),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING
+            );
 
-//            binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.SUCCESS);
-//        } catch (InterruptedException e) {
-//
-//            Thread.currentThread().interrupt();
-//            throw new RuntimeException("🚨파일 저장 실패 I: 🚨 Thread interrupted while simulating delay ", e);
+            log.info("✅ 파일 저장 SUCCESS ⭕️- id = {}", event.getBinaryContentId());
+
+            binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.SUCCESS);
         } catch (IOException e) {
-
-            log.error("🚨파일 저장 실패 ❌ - file.name = {}", event.getFile().getOriginalFilename());
-//            binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.FAIL);
-            throw new RuntimeException("🚨파일 저장 실패 I: ", e);
+            throw new UncheckedIOException(e);
         }
+    }
+
+    @Recover
+    public void recover(UncheckedIOException e, BinaryContentCreatedEvent event) {
+        log.error(
+            "🚨파일 저장 최종 실패 - binaryContentId={}, fileName={}",
+            event.getBinaryContentId(),
+            event.getFile().getOriginalFilename(),
+            e
+        );
+
+        binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.FAIL);
+
+        log.debug("❎");
+        eventPublisher.publishEvent(new BinaryContentStorageErrorEvent(
+                                            event.getBinaryContentId(),
+                                            "S3 파일 업로드 실패",
+                                            "🚨Error: " + e.getMessage()));
     }
 
     @Override
     public InputStream get(UUID binaryContentId) {
 
         if (binaryContentId == null) {
-            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION, Map.of("binaryContentId", binaryContentId.toString()));
+            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION, Map.of("binaryContentId", "null"));
         }
 
         Path filePath = root.resolve(binaryContentId.toString());
@@ -93,7 +127,9 @@ public class BinaryContentStorageService implements BinaryContentStorage {
         try {
             Path filePath = root.resolve(binaryContentId.toString());
 
-            BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId).orElse(null);
+            BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
+                .orElseThrow(() -> new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION,
+                    Map.of("BinaryContent not found", binaryContentId.toString())));
 
             InputStream inputStream = get(binaryContentId);
 
@@ -110,8 +146,8 @@ public class BinaryContentStorageService implements BinaryContentStorage {
                 .body(new InputStreamResource(inputStream));
         } catch (IOException e) {
             log.error("🚨download error! - binaryContentId = {}", binaryContentId.toString());
-            throw new DiscodeitException(ErrorCode.ILLEAGALARGUEMNTEXCEPTION,
-                Map.of("binaryContentId", binaryContentId.toString()));
+            throw new DiscodeitException(ErrorCode.FILE_NOT_FOUND,
+                Map.of("binaryContentId", "null"));
         }
     }
 }

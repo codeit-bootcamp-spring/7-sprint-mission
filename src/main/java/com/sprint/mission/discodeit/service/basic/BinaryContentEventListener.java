@@ -5,11 +5,13 @@ import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BinaryContentEventListener {
@@ -18,15 +20,8 @@ public class BinaryContentEventListener {
 
     @Async("myAsync")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Observed(name = "message.create.async")
+//    @Observed(name = "message.create.async")
     public void handleBinaryContent(BinaryContentCreatedEvent event) {
-        try {
-
-            binaryContentStorage.put(event);
-            binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.SUCCESS);
-        } catch (Exception e) {
-            binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.FAIL);
-            throw new RuntimeException(e);
-        }
+        binaryContentStorage.put(event);
     }
 }

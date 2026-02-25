@@ -32,6 +32,7 @@ logging:
     com.sprint.mission: info
     # SQL 로그 (유지)
     org.hibernate.SQL: debug
+    org.springframework.retry: DEBUG
 
 
 # ===============================

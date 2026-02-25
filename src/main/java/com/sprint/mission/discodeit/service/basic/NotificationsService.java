@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentStorageErrorEvent;
 import com.sprint.mission.discodeit.dto.dto_Neo.MessageCreatedEvent;
 import com.sprint.mission.discodeit.dto.dto_Neo.NotificationDto;
 import com.sprint.mission.discodeit.dto.dto_Neo.RoleUpdatedEvent;
@@ -69,8 +70,10 @@ public class NotificationsService implements InterfaceNotificationsService {
             event.getChannelId());
 
         readStatusList.forEach(readStatus -> {
-            Notifications notification = new Notifications(readStatus.getUser().getId(),
-                event.getTitle(), event.getContent());
+            Notifications notification = new Notifications(
+                readStatus.getUser().getId(),
+                event.getTitle(),
+                event.getContent());
 
             notificationsRepository.save(notification);
 
@@ -85,8 +88,22 @@ public class NotificationsService implements InterfaceNotificationsService {
         log.info("🟧 RoleUpdatedEvent = {}", event.toString());
 
         Notifications savedNotification = notificationsRepository.save(
-            new Notifications(event.getReceiverId(), event.getTitle(), event.getContent()));
+            new Notifications(
+                event.getReceiverId(),
+                event.getTitle(),
+                event.getContent()));
 
         log.debug("🟧 saved RoleUpdatedEvent = {}", savedNotification.toString());
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void saveBinaryContentStorageErrorEvent(BinaryContentStorageErrorEvent event) {
+        log.error("❎❎❎❎❎❎");
+        Notifications savedNotification = notificationsRepository.save(
+            new Notifications(
+                event.getRequestId(),
+                event.getTitle(), // "S3 파일 업로드 실패",
+                event.getErrorMessage()));
     }
 }

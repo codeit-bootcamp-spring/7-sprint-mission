@@ -19,6 +19,8 @@ public enum ErrorCode {
 
     ILLEAGALARGUEMNTEXCEPTION("🚨IllegalArgumentException"),
 
+    FILE_NOT_FOUND("🚨FILE NOT FOUND"),
+
     // 500 SERVER ERROR
     INTERNAL_SERVER_ERROR("🚨서버 오류"),
 
