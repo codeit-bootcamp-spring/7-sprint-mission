@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -56,6 +57,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(
                         auth -> auth
+                                .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                                 .requestMatchers("/",
                                         "/index.html",

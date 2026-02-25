@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.event;
 import com.sprint.mission.discodeit.entity.status.BinaryContentStatus;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -18,6 +20,8 @@ public class BinaryContentEventListener {
     private final BinaryContentService binaryContentService;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Timed("job.binary.upload")
+    @Async(value = "binaryExecutor")
     public void handleUploadBinaryContent(BinaryContentCreatedEvent event) {
         try {
 

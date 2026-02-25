@@ -94,6 +94,31 @@ public class AsyncConfig implements AsyncConfigurer {
         return executor;
     }
 
+    @Bean(name = "binaryExecutor")
+    public ThreadPoolTaskExecutor binaryExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(200);
+        executor.setKeepAliveSeconds(60);
+
+        executor.setThreadNamePrefix("binaryExecutor-");
+
+        executor.setTaskDecorator(
+                new CompositeTaskDecorator(List.of(
+                        new SecurityContextTaskDecorator(),
+                        new LoggingTaskDecorator()
+                ))
+        );
+
+        // 업로드는 버리면 데이터 유실 느낌이라 보통 CallerRuns/Abort 중 선택
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+
+        executor.initialize();
+        return executor;
+    }
+
     // TODO: 실패 예외처리
 
 }
