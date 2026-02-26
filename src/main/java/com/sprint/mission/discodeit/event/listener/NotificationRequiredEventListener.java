@@ -5,14 +5,14 @@ import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponseDt
 import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
+import com.sprint.mission.discodeit.event.S3UploadFailedEvent;
 import com.sprint.mission.discodeit.service.NotificationService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -26,6 +26,7 @@ import java.util.UUID;
 public class NotificationRequiredEventListener {
     private final NotificationService notificationService;
     private final ReadStatusService readStatusService;
+    private final UserService userService;
 
     @Async(value = "eventExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -52,16 +53,32 @@ public class NotificationRequiredEventListener {
             phase = TransactionPhase.AFTER_COMMIT
     )
     public void on(RoleUpdatedEvent event) {
-
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication auth = context.getAuthentication();
-
         UUID userId = event.getUserId();
         Role from = event.getFrom();
         Role to = event.getTo();
-        String title = auth.getName() + "(으)로부터 권한이 변경되었습니다.";
+        String title = "권한이 변경되었습니다.";
         String message = from + " -> " + to;
         notificationService.createNotification(userId, title, message);
         log.info("{}의 권한 변경 {}", userId, title);
     }
+
+    @Async(value = "eventExecutor")
+    @EventListener
+    public void on(S3UploadFailedEvent event) {
+        String title = "S3 파일 업로드 실패";
+        String requestId = event.getRequestId() + "\n";
+        String BinaryContentId = event.getBinaryContentId().toString() + "\n";
+        String message = event.getSdkClientException().getMessage() + "\n";
+
+        String content = requestId + BinaryContentId + message;
+
+        List<UUID> adminList = userService.getAllUsers().stream()
+                .filter(user -> user.role().equals(Role.ADMIN))
+                .map(user -> user.id())
+                .toList();
+
+        adminList.forEach(adminId -> notificationService.createNotification(adminId, title, content));
+    }
+
+
 }
