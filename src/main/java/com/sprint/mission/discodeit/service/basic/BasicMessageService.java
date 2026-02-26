@@ -62,6 +62,7 @@ public class BasicMessageService implements MessageService {
     private final PageResponseBasicMapper<MessageDto> pageResponseBasicMapper;
     private final ReadStatusRepository readStatusRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Transactional
     public MessageDto createMessage(MessageCreateRequestDto messageCreateRequestDto, List<MultipartFile> attachments   ) {
@@ -94,6 +95,7 @@ public class BasicMessageService implements MessageService {
                                     binaryContent.getContentType(),
                                     x.getBytes()
                             );
+                            binaryContentStorage.put(binaryContent.getId(),x.getBytes());
                             eventPublisher.publishEvent(event);
                             MessageAttachment save = messageAttachmentRepository.save(new MessageAttachment(message, binaryContent));
                             messageAttachmentList.add(save);
