@@ -56,3 +56,12 @@ jwt:
 security:
   remember-me:
     key: ${REMEMBER_ME_KEY:test-RememberMeKey}
+
+login:
+  account:
+    user-admin: ${ACCOUNT_ADMIN:admin123}
+    user-admin-password: ${ACCOUNT_ADMIN_PASSWORD:admin123}
+    user-admin-email: ${ACCOUNT_ADMIN_EMAIL:admin123@email.com}
+    user-default: ${ACCOUNT_DEFAULT:user1}
+    user-default-password: ${ACCOUNT_DEFAULT_PASSWORD:user1}
+    user-default-email: ${ACCOUNT_DEFAULT_EMAIL:user1@email.com}

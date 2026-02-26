@@ -26,6 +26,7 @@ dependencies {
     implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework:spring-aspects' //for. @Retryable
+    implementation 'me.paulschwarz:spring-dotenv:3.0.0'
 
 
     compileOnly 'org.projectlombok:lombok'

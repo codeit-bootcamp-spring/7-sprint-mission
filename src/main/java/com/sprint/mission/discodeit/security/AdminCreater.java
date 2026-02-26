@@ -4,16 +4,20 @@ import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AdminCreater implements ApplicationRunner {
     private final UsersRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LoginAccountProperties loginProperties;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -26,11 +30,10 @@ public class AdminCreater implements ApplicationRunner {
         boolean isAdmin = userRepository.existsByRole(Role.ADMIN);
         if (!isAdmin) {
 
-            String name = "admin";
-            String encodePassword = passwordEncoder.encode(name); //!! 🛠️
+            String encodePassword = passwordEncoder.encode(loginProperties.getUserAdminPassword()); //!! 🛠️
 
-            User newUser = new User(name,
-                name + "@mail.com",
+            User newUser = new User(loginProperties.getUserAdmin(),
+                loginProperties.getUserAdminEmail(),
                 encodePassword,
                 null);
 
@@ -41,11 +44,14 @@ public class AdminCreater implements ApplicationRunner {
 
     private void createDefUser() {
 
-        String name = "1";
-        String encodePassword = passwordEncoder.encode(name); //!! 🛠️
+        log.debug("🐳 user = {}", loginProperties.getUserDefault());
+        log.debug("🐳 pass= {}", loginProperties.getUserDefaultPassword());
+        log.debug("🐳 email = {}", loginProperties.getUserDefaultEmail());
 
-        User newUser = new User(name,
-            name + "@mail.com",
+        String encodePassword = passwordEncoder.encode(loginProperties.getUserDefaultPassword()); //!! 🛠️
+
+        User newUser = new User(loginProperties.getUserDefault(),
+            loginProperties.getUserDefaultEmail(),
             encodePassword,
             null);
 
