@@ -41,7 +41,7 @@ public class BasicUserService implements UserService {
 
     private final UserMapper userMapper;
 
-    @CacheEvict(value = "users", allEntries = true)
+    @CacheEvict(value = "users", key = "'all'")
     @Override
     @Transactional
     public UserResponseDto createUser(CreateUserDto createUserDto, Optional<CreateBinaryContentDto> createBinaryContentDto) {
@@ -73,7 +73,7 @@ public class BasicUserService implements UserService {
         return userMapper.toResponseDto(user);
     }
 
-    @Cacheable(value = "users")
+    @Cacheable(value = "users", key = "'all'", unless = "#result.isEmpty()")
     @Transactional(readOnly = true)
     @Override
     public List<UserResponseDto> getAllUsers() {
