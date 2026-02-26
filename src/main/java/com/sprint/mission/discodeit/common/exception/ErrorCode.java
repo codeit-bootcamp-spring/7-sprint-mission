@@ -49,6 +49,10 @@ public enum ErrorCode {
     AUTH_ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 권한이 없습니다."),
     AUTH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다."),
 
+    // Notification
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다."),
+    NOTIFICATION_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
+
     // common
     INVALID_REQUEST(HttpStatus.BAD_REQUEST,"요청이 올바르지 않습니다."),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED,"신뢰할 수 없습니다."),
