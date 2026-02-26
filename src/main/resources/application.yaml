@@ -25,7 +25,8 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   cache:
-    type: caffeine
+#    type: caffeine
+    type: redis
     cache-names:
       - channel        # 단건 채널
       - userChannels   # 유저별 채널 목록
@@ -37,6 +38,12 @@ spring:
         maximumSize=100,
         expireAfterAccess=600s,
         recordStats
+    redis:
+      enable-statistics: true
+    data:
+      redis:
+        host: ${REDIS_HOST:localhost}
+        port: ${REDIS_PORT:6379}
 
   kafka:
     bootstrap-servers: localhost:9092
