@@ -65,6 +65,11 @@ dependencies {
 
     implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
 
+    // 1. Spring Cache 추상화 레이어 (Caffeine을 Spring에서 쓰기 위해 필요)
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    // 2. Caffeine 캐시 엔진 본체
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 
 }
 dependencyManagement {
