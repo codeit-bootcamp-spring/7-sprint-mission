@@ -16,6 +16,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +41,7 @@ public class BasicUserService implements UserService {
 
     private final UserMapper userMapper;
 
+    @CacheEvict(value = "users", allEntries = true)
     @Override
     @Transactional
     public UserResponseDto createUser(CreateUserDto createUserDto, Optional<CreateBinaryContentDto> createBinaryContentDto) {
@@ -70,6 +73,7 @@ public class BasicUserService implements UserService {
         return userMapper.toResponseDto(user);
     }
 
+    @Cacheable(value = "users")
     @Transactional(readOnly = true)
     @Override
     public List<UserResponseDto> getAllUsers() {
@@ -80,6 +84,7 @@ public class BasicUserService implements UserService {
                 .toList();
     }
 
+    @CacheEvict(value = "users", key = "'all'")
     @Override
     @Transactional
     @PreAuthorize("#userId == authentication.principal.userResponseDto.id")
@@ -109,6 +114,7 @@ public class BasicUserService implements UserService {
         return userMapper.toResponseDto(user);
     }
 
+    @CacheEvict(value = "users", key = "'all'")
     @Override
     @Transactional
     @PreAuthorize("#userId == authentication.principal.userResponseDto.id")
