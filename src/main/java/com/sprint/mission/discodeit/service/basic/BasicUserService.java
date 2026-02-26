@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.common.exception.user.InvalidUserRequestException;
 import com.sprint.mission.discodeit.common.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
@@ -20,6 +21,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,7 @@ public class BasicUserService implements UserService {
     private final SessionOnlineChecker sessionOnlineChecker;
     private final JwtRegistry jwtRegistry;
     private final JwtOnlineChecker jwtOnlineChecker;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     @Override
@@ -253,13 +256,21 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        if (user.getRole() == newRole) {
+        UserRole oldRole = user.getRole();
+
+        if (oldRole == newRole) {
             boolean online = jwtOnlineChecker.isOnline(userId);
             return userMapper.toDto(user, online);
         }
 
         user.updateRole(newRole);
         User saved = userRepository.save(user);
+
+        eventPublisher.publishEvent(new RoleUpdatedEvent(
+                saved.getId(),
+                oldRole,
+                newRole
+        ));
 
         jwtRegistry.invalidateJwtInformationByUserId(userId);
         boolean online = jwtOnlineChecker.isOnline(userId);
