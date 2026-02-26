@@ -3,5 +3,7 @@ package com.sprint.mission.discodeit.dto.request.readstatus;
 import java.time.Instant;
 
 public record ReadStatusUpdateRequestDto(
-        Instant newLastReadAt) {
+        Instant newLastReadAt,
+        Boolean newNotificationEnabled
+) {
 }
