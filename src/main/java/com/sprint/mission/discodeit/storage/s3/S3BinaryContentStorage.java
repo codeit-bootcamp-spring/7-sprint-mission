@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.storage.NotificationStorage;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -41,6 +42,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
@@ -88,6 +90,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     )
     public UUID put(UUID id, byte[] bytes) {
 
+        log.info("S3Content pushing");
         BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow();
         String fileName = binaryContent.getFileName();
         String uniqueName = id+"_"+fileName;
