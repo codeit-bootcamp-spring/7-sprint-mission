@@ -19,11 +19,11 @@ public class AsyncConfig implements AsyncConfigurer {
 
     @Override
     public Executor getAsyncExecutor() {
-        return messageExecutor(); // @Async 만사용시 일단 messageExecutor로 사용, 추후 리펙토링 가능
+        return notificationExecutor(); // @Async 만사용시 일단 messageExecutor로 사용, 추후 리펙토링 가능
     }
 
-    @Bean(name = "messageExecutor")
-    public ThreadPoolTaskExecutor messageExecutor() {
+    @Bean(name = "notificationExecutor")
+    public ThreadPoolTaskExecutor notificationExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
         executor.setCorePoolSize(10);
@@ -31,7 +31,7 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setQueueCapacity(100);
         executor.setKeepAliveSeconds(60);
 
-        executor.setThreadNamePrefix("messageExecutor-");
+        executor.setThreadNamePrefix("notificationExecutor-");
 
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
@@ -49,42 +49,6 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.initialize();
 
         log.info("messageExecutor Initialized: corePoolSize={}, maxPoolSize={}, queueCapacity={}, keepAliveSeconds={}",
-                executor.getCorePoolSize(),
-                executor.getMaxPoolSize(),
-                executor.getQueueCapacity(),
-                executor.getKeepAliveSeconds()
-        );
-
-        return executor;
-    }
-
-    @Bean(name = "roleExecutor")
-    public ThreadPoolTaskExecutor roleExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(20);
-        executor.setQueueCapacity(100);
-        executor.setKeepAliveSeconds(60);
-
-        executor.setThreadNamePrefix("roleExecutor-");
-
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setAwaitTerminationSeconds(60);
-
-        executor.setTaskDecorator(
-                new CompositeTaskDecorator(List.of(
-                        new SecurityContextTaskDecorator(),
-                        new LoggingTaskDecorator()
-
-                ))
-        );
-
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy()); // 큐/스레드가 꽉차면 호출한 스레드가 직접 실행하도록
-
-        executor.initialize();
-
-        log.info("roleExecutor Initialized: corePoolSize={}, maxPoolSize={}, queueCapacity={}, keepAliveSeconds={}",
                 executor.getCorePoolSize(),
                 executor.getMaxPoolSize(),
                 executor.getQueueCapacity(),

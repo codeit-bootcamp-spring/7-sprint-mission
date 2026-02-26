@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -17,7 +18,7 @@ public class NotificationRequiredEventListener {
     private final NotificationService notificationService;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Async(value = "messageExecutor")
+    @Async(value = "notificationExecutor")
     public void on(MessageCreatedEvent event) {
         log.info("[listener] thread={}, requestId={}",
                 Thread.currentThread().getName(),
@@ -26,9 +27,15 @@ public class NotificationRequiredEventListener {
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Async(value = "roleExecutor")
+    @Async(value = "notificationExecutor")
     public void on(RoleUpdatedEvent event) {
         notificationService.createForRoleUpdate(event);
+    }
+
+    @EventListener
+    @Async(value = "notificationExecutor")
+    public void handleFailedUploadBinaryContent(BinaryContentUploadFailedEvent event) {
+        notificationService.createForFailedUpload(event);
     }
 
 }
