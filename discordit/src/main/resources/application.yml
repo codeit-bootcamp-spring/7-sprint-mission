@@ -20,6 +20,7 @@ jwt:
     access-token-expiration: 3600000 # 1시간
     refresh-token-expiration: 900000 # 15분
     issuer: discodeit
+  maximum-active-count: 10
 
 
 validation:

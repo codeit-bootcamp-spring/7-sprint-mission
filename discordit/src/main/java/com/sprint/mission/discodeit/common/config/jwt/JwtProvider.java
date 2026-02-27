@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.common.config.jwt;
 
-import com.sprint.mission.discodeit.common.config.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

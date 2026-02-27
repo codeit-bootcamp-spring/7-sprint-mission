@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.config.properties;
+package com.sprint.mission.discodeit.common.config.jwt;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,4 +12,5 @@ public class JwtProperties {
     private Long accessTokenExpiration;
     private Long refreshTokenExpiration;
     private String issuer;
+    private int maxActiveJwtAccount;
 }
