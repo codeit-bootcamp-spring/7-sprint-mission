@@ -8,6 +8,11 @@ import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -18,11 +23,14 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicNotificationService implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
+    private final CacheManager cacheManager;
 
+    @CacheEvict(value = "notifications", key = "#receiverId")
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createNotification(UUID receiverId, String title, String content) {
@@ -33,7 +41,8 @@ public class BasicNotificationService implements NotificationService {
                 .build();
         notificationRepository.save(notification);
     }
-    
+
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createMultipleNotification(List<UUID> receiverIds, String title, String content) {
         List<Notification> notificationList = receiverIds.stream().map(
@@ -48,8 +57,10 @@ public class BasicNotificationService implements NotificationService {
         ).toList();
 
         notificationRepository.saveAll(notificationList);
+        evictCache(receiverIds);
     }
 
+    @Cacheable(value = "notifications", key = "#receiverId")
     @Override
     @Transactional(readOnly = true)
     public List<NotificationResponseDto> getAllNotificationsByReceiverId(UUID receiverId) {
@@ -59,6 +70,7 @@ public class BasicNotificationService implements NotificationService {
                 .toList();
     }
 
+    @CacheEvict(value = "notifications", key = "#receiverId")
     @Override
     @Transactional
     @PreAuthorize("#receiverId == authentication.principal.userResponseDto.id")
@@ -71,5 +83,15 @@ public class BasicNotificationService implements NotificationService {
         }
 
         notificationRepository.delete(notification);
+    }
+
+    private void evictCache(List<UUID> receiverIds) {
+        Cache cache = cacheManager.getCache("notifications");
+        if (cache != null) {
+            for (UUID receiverId : receiverIds) {
+                cache.evict(receiverId);
+                log.debug("알림 캐시 제거 : {} ", receiverId);
+            }
+        }
     }
 }
