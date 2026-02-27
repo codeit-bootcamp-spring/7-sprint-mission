@@ -28,10 +28,10 @@ public class BinaryContentEventListener {
         try {
             binaryContentStorage.put(binaryContentId, data);
             binaryContentService.updateBinaryContentStatus(binaryContentId, BinaryContentStatus.SUCCESS);
-            log.info("BinaryContent {} 업로드 성공", binaryContentId);
+            log.debug("BinaryContent {} 업로드 성공", binaryContentId);
         } catch (Exception e) {
             binaryContentService.updateBinaryContentStatus(event.getBinaryContentId(), BinaryContentStatus.FAIL);
-            log.info("BinaryContent {} 업로드 실패", binaryContentId);
+            log.debug("BinaryContent {} 업로드 실패", binaryContentId);
         }
     }
 }

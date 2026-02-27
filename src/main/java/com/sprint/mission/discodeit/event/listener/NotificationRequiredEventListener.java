@@ -45,7 +45,7 @@ public class NotificationRequiredEventListener {
                 .toList();
 
         notificationService.createMultipleNotification(receiverIdList, title, content);
-        log.info("알림 생성 :{}", receiverIdList);
+        log.debug("알림 생성 :{}", receiverIdList);
     }
 
     @Async(value = "eventExecutor")
@@ -59,7 +59,7 @@ public class NotificationRequiredEventListener {
         String title = "권한이 변경되었습니다.";
         String message = from + " -> " + to;
         notificationService.createNotification(userId, title, message);
-        log.info("{}의 권한 변경 {}", userId, title);
+        log.debug("{}의 권한 변경 {}", userId, title);
     }
 
     @Async(value = "eventExecutor")

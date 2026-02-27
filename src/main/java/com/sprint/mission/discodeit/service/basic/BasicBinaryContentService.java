@@ -78,6 +78,5 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> BinaryContentNotFoundException.byId(binaryContentId));
         binaryContent.updateStatus(status);
-        log.info("BinaryContent {} status updated to {}", binaryContentId, status);
     }
 }
