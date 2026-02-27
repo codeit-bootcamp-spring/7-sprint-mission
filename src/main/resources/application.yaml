@@ -14,8 +14,7 @@ spring:
     database: postgresql
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate:
+
   cache:
     type: caffeine
     cache-names:
@@ -46,10 +45,10 @@ discodeit:
     admin-pass: ${ADMIN_PASS:admin}
 
   jwt:
-    secret: ${JWT_SECRET:mySecretKeyForJwtTokenGeneration1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
-    access-token-expiration: ${ACCESS_TOKEN_EXPIRATION:900000}
-    refresh-token-expiration: ${REFRESH_ACCESS_TOKEN_EXPIRATION:1209600000}
-    issuer: ${ISSUER:codeit}
+    secret: ${JWT_SECRET}
+    access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
+    refresh-token-expiration: ${REFRESH_ACCESS_TOKEN_EXPIRATION}
+    issuer: ${ISSUER}
 
 
 
