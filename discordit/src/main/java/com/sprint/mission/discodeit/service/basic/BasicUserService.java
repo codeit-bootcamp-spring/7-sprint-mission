@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.config.SessionManager;
 import com.sprint.mission.discodeit.common.enums.Roles;
 import com.sprint.mission.discodeit.common.exceptions.binaryContent.fileStorage.FileStorageIOException;
 import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
@@ -35,7 +34,6 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
-    private final SessionManager sessionManager;
     private final UserMapper userMapper;
 
     @Override
@@ -130,7 +128,6 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         user.updateRole(role);
-        sessionManager.invalidateUserSessions(user.getUsername());
         return userMapper.toDto(user);
     }
 
