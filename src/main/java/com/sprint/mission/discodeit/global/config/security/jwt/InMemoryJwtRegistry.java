@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.global.config.security.jwt;
 
+import com.sprint.mission.discodeit.event.UserCacheEvictEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +22,7 @@ public class InMemoryJwtRegistry implements JwtRegistry {
     private final Map<UUID, Queue<JwtInformation>> origin = new ConcurrentHashMap<>();
     private final int maxActiveJwtCount = 1;
     private final JwtProvider jwtProvider;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void registerJwtInformation(JwtInformation jwtInformation) {
@@ -28,11 +31,14 @@ public class InMemoryJwtRegistry implements JwtRegistry {
         if (queue.size() > maxActiveJwtCount) {
             queue.poll();
         }
+        // users 캐시 clear
+        eventPublisher.publishEvent(new UserCacheEvictEvent(this));
     }
 
     @Override
     public void invalidateJwtInformationByUserId(UUID userId) {
         origin.remove(userId);
+        eventPublisher.publishEvent(new UserCacheEvictEvent(this));
     }
 
     @Override
