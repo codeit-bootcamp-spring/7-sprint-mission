@@ -56,7 +56,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toResponseDto(channel);
     }
 
-
+    @CacheEvict(value = "channels", allEntries = true)
     @Override
     @Transactional
     public ChannelResponseDto createChannel(CreatePrivateChannelDto createPrivateChannelDto) {

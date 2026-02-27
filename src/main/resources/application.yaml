@@ -18,6 +18,10 @@ spring:
       hibernate:
   cache:
     type: caffeine
+    cache-names:
+      - channels
+      - notifications
+      - users
     caffeine:
       spec: >
         maximumSize=100,
@@ -64,7 +68,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers
+        include: health, info, metrics, loggers, caches
   endpoint:
     health:
       show-details: always
