@@ -12,12 +12,14 @@ spring:
     password: discodeit1234
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
 jwt:
   secret:
-    access-token-expiration: ${JWT_SECRET}
+    key: ${JWT_SECRET}
+    access-token-expiration: 3600000 # 1시간
     refresh-token-expiration: 900000 # 15분
+    issuer: discodeit
 
 
 validation:
@@ -41,9 +43,7 @@ admin:
   username: ${ADMIN_USERNAME}
   password: ${ADMIN_PASSWORD}
   email: ${ADMIN_EMAIL}
-remember-me:
-  key: ${REMEMBER_ME_KEY}
-  token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
+
 aws:
   s3:
     access-key: ${AWS_S3_ACCESS_KEY}
