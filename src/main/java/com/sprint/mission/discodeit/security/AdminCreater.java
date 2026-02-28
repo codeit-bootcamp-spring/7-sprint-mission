@@ -44,10 +44,6 @@ public class AdminCreater implements ApplicationRunner {
 
     private void createDefUser() {
 
-        log.debug("🐳 user = {}", loginProperties.getUserDefault());
-        log.debug("🐳 pass= {}", loginProperties.getUserDefaultPassword());
-        log.debug("🐳 email = {}", loginProperties.getUserDefaultEmail());
-
         String encodePassword = passwordEncoder.encode(loginProperties.getUserDefaultPassword()); //!! 🛠️
 
         User newUser = new User(loginProperties.getUserDefault(),

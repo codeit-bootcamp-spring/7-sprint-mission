@@ -18,6 +18,10 @@ import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceChannelService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.Authentication;
@@ -63,6 +67,7 @@ public class ChannelService implements InterfaceChannelService {
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
+    @CacheEvict(cacheNames = {"channelsByUser"}, allEntries = true)
     public ChannelDto createPublic(PublicChannelCreateRequest dtoCreateChannel) {
         Channel channel = new Channel(PUBLIC
                                     , dtoCreateChannel.name()
@@ -76,6 +81,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Transactional
     @Override
+    @CacheEvict(cacheNames = {"channelsByUser"}, allEntries = true)
     public ChannelDto createPrivate(PrivateChannelCreateRequest dtoCreateChannel) {
 //        PRIVATE 채널과 PUBLIC 채널을 생성하는 메소드를 분리합니다.
 //        [ ] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
@@ -97,6 +103,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Transactional(readOnly = true)
     @Override
+    @Cacheable(cacheNames = "channelsByUser", key = "#userID")
     public List<ChannelDto> findAllByUserId(UUID userID) {
 //        [ ] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
 //        [ ] PRIVATE 채널인 경우 참여한 User의 readStatusID 정보를 포함합니다.
@@ -124,6 +131,7 @@ public class ChannelService implements InterfaceChannelService {
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
+    @CacheEvict(cacheNames = "channelsByUser", allEntries = true)
     public ChannelDto update(UUID channelId, ChannelDto_Update channelDtoUpdate) {
         Channel channel = channelRepository
             .findById(channelId)
@@ -147,6 +155,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Transactional
     @Override
+    @CacheEvict( cacheNames = {"channelsByUser"}, allEntries = true) //???
     public void delete(UUID channelID) {
 //        [ ] 관련된 도메인도 같이 삭제합니다.
         Channel findedChannel = channelRepository.findById(channelID)

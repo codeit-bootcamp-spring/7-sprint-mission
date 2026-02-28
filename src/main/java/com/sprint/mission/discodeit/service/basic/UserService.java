@@ -14,6 +14,8 @@ import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.session.SessionRegistry;
@@ -56,6 +58,7 @@ public class UserService implements InterfaceUserService {
     //    @PreAuthorize("hasRole('USER')")
     @Transactional
     @Override
+    @CacheEvict(cacheNames = "users", allEntries = true)
     public UserDto create(UserCreateRequest userCreateRequest, Optional<MultipartFile> optionalProfileFile) {
 //    public User create(String newUsername, Optional<BufferedImage> profileImageBytes) {
 //        [ ] 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
@@ -108,9 +111,10 @@ public class UserService implements InterfaceUserService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "users")
     public List<UserDto> findAll() {
 //        DTO를 활용하여:
-//        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
+//        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요. =>온라인 상태를 findAll()에 포함하고 있다면 로그인/로그아웃 때도 반드시 캐시 삭제해야 함.
 //        [ ] 패스워드 정보는 제외하세요.
 
         return userRepository.findAll().stream()
@@ -132,6 +136,7 @@ public class UserService implements InterfaceUserService {
     @Transactional
     @Override
     @PreAuthorize("#userId == authentication.principal.user.id") // SpEL
+    @CacheEvict(cacheNames = "users", allEntries = true)
     public UserDto update(UUID userId, UserUpdateRequest dtoUserUpdate, Optional<MultipartFile> optionalProfileFile) {
 //        [ ] 선택적으로 프로필 이미지를 대체할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
@@ -175,6 +180,7 @@ public class UserService implements InterfaceUserService {
     @Transactional
     @Override
     @PreAuthorize("#userID == authentication.principal.user.id") // SpEL
+    @CacheEvict(cacheNames = "users", allEntries = true)
     public void delete(UUID userID) {
 //        [ ] 관련된 도메인도 같이 삭제합니다.
         User user = userRepository.findById(userID)

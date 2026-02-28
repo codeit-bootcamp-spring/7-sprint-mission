@@ -20,6 +20,10 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -34,8 +38,10 @@ public class NotificationsService implements InterfaceNotificationsService {
     private final NotificationsMapper notificationsMapper;
     private final ReadStatusesRepository readStatusesRepository;
     private final UsersRepository userRepository;
+    private final CacheManager cacheManager;
 
     @Override
+    @Cacheable(cacheNames = "notificationsByUser", key = "#userDetails.user.id")
     public List<NotificationDto> getNotifications(DiscodeitUserDetails userDetails) {
 
         List<NotificationDto> notificationDtos = notificationsRepository.findAllByReceiverId(userDetails.getUser().id())
@@ -49,6 +55,10 @@ public class NotificationsService implements InterfaceNotificationsService {
 
     @Override
     @Transactional
+    @CacheEvict(
+        cacheNames = "notificationsByUser",
+        key = "#userDetails.user.id"
+    )
     public void deleteNotification(UUID notificationId, DiscodeitUserDetails userDetails) {
         Notifications notification = notificationsRepository.findById(notificationId).orElseThrow(
             () -> new DiscodeitException(ErrorCode.ERROR_RESPONSE_404,
@@ -70,6 +80,8 @@ public class NotificationsService implements InterfaceNotificationsService {
 
         log.info("🟪🟪 MessageCreatedEvent = {}", event.toString());
 
+        Cache cache = cacheManager.getCache("notificationsByUser");
+
         List<ReadStatus> readStatusList = readStatusesRepository.findAllByChannelIdAndNotificationEnabledIsTrue(
             event.getChannelId());
 
@@ -81,12 +93,20 @@ public class NotificationsService implements InterfaceNotificationsService {
 
             notificationsRepository.save(notification);
 
+            if (cache != null) {
+                cache.evict(readStatus.getUser().getId());
+            }
+
             log.info("🟪🟪🟪 saved MessageCreatedEvent = {}", notification.toString());
         });
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @CacheEvict(
+        cacheNames = "notificationsByUser",
+        key = "#event.receiverId"
+    )
     public void saveRoleUpdateEvent(RoleUpdatedEvent event) {
 
         log.info("🟧 RoleUpdatedEvent = {}", event.toString());
@@ -101,7 +121,10 @@ public class NotificationsService implements InterfaceNotificationsService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)@CacheEvict(
+        cacheNames = "notificationsByUser",
+        key = "#admin.id"
+    )
     public void saveBinaryContentStorageErrorEvent(BinaryContentStorageErrorEvent event) {
         log.info("❎ saveBinaryContentStorageErrorEvent");
 
