@@ -11,12 +11,15 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -26,10 +29,12 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper;
     private final JwtProperties jwtProperties;
     private final RefreshTokenService refreshTokenService;
+    private final CacheManager cacheManager;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-
+        Optional.ofNullable( cacheManager.getCache("users"))
+                .ifPresent(Cache::clear);
         DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
 
         UserResponseDto userResponseDto = userDetails.getUserResponseDto();

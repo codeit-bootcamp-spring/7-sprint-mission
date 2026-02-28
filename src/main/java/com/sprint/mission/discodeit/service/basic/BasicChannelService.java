@@ -21,6 +21,11 @@ import com.sprint.mission.discodeit.service.reader.ChannelReader;
 import com.sprint.mission.discodeit.service.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +45,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final ChannelFactory channelFactory;
     private final ChannelMapper channelMapper;
+    private final CacheManager cacheManager;
 
     @Override
     @Transactional
@@ -80,10 +86,21 @@ public class BasicChannelService implements ChannelService {
         }
         log.info("채널 생성 성공 channelId={} type={} name={}",
                 savedChannel.getId(), savedChannel.getType(), savedChannel.getName());
+
+        evictChannelsByUserCaches(command);
         return channelMapper.toDto(savedChannel);
     }
 
+    private void evictChannelsByUserCaches(ChannelCreateCommand command) {
+        Cache cache = cacheManager.getCache("channelsByUserId"); // NOTE: cacheManger로 해당 캐시 관리, 역선 get한후 해당 member evict
+        if (cache == null) return;
+        for (UUID memberId : command.memberIds()) {
+            cache.evict(memberId);
+        }
+    }
+
     @Override
+    @CacheEvict(cacheNames = "channelsByUserId", allEntries = true)
     @Transactional
     public void updateChannel(UUID channelId, ChannelUpdateRequestDto request) {
         if (channelId == null) { // NOTE: 서비스 레이어 public API라 컨트롤러 외 테스트, 배치, 이벤트 핸들러에서 요청 가능하므로 최소 필수 가드로 남김
@@ -104,6 +121,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "channelsByUserId", allEntries = true)
     @Transactional
     public void deleteChannel(UUID channelId) {
         if (channelId == null) {
@@ -148,6 +166,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Cacheable(value = "channelsByUserId", key = "#userId")
     @Transactional(readOnly = true)
     public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
         log.debug("사용자 기준 채널 목록 조회 시도 userId={}", userId);

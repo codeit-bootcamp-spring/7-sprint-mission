@@ -16,11 +16,15 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,6 +36,7 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
     private final UserRepository userRepository;
+    private final CacheManager cacheManager;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -41,10 +46,17 @@ public class BasicNotificationService implements NotificationService {
         List<Notification> notificationList = targetIds.stream().map(targetId -> Notification.create(targetId, title, event.getContent())).toList();
         try {
             notificationRepository.saveAll(notificationList);
+            evictNotificationCaches(targetIds); // NOTE: 캐시 무효화
             log.info("메세지 생성 notification 저장 성공");
         } catch (Exception e) {
             log.error("메세지 생성 notification 저장 실패", e);
         }
+    }
+
+    private void evictNotificationCaches(List<UUID> targetIds) {
+
+        Optional.ofNullable(cacheManager.getCache("notificationsByUserId"))
+                .ifPresent(cache -> targetIds.forEach(cache::evict));
     }
 
     @Override
@@ -59,6 +71,8 @@ public class BasicNotificationService implements NotificationService {
         );
         try {
             notificationRepository.save(notification);
+            Optional.ofNullable(cacheManager.getCache("notificationsByUserId"))
+                    .ifPresent(cache -> cache.evict(event.getReceiverId()));
             log.info("권한 변경 notification 저장 성공");
         } catch (Exception e) {
             log.error("권한 변경 notification 저장 실패", e);
@@ -78,6 +92,7 @@ public class BasicNotificationService implements NotificationService {
         ).toList();
         try {
             notificationRepository.saveAll(notificationList);
+            evictNotificationCaches(targetIds); // NOTE: 캐시 무효화
             log.info("파일 업로드 실패 생성 notification 저장 성공");
         } catch (Exception e) {
             log.error("파일 업로드 실패 생성 notification 저장 실패", e);
@@ -86,6 +101,7 @@ public class BasicNotificationService implements NotificationService {
     }
 
     @Override
+    @Cacheable(value = "notificationsByUserId", key = "#userId")
     public List<NotificationDto> getMyNotifications(UUID userId) {
 
         List<Notification> myNotifications = notificationRepository.findAllByReceiverId(userId);
@@ -95,6 +111,7 @@ public class BasicNotificationService implements NotificationService {
     }
 
     @Override
+    @CacheEvict(value = "notificationsByUserId", key = "#userId")
     @Transactional
     public void deleteNotification(UUID notificationId, UUID userId) {
 

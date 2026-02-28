@@ -61,6 +61,11 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.3'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    // cache implementations으로 카페인사용
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
     // Swagger/OpenAPI 추가
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
     // AWS SDK for java
@@ -74,6 +79,8 @@ dependencies {
 
     implementation "org.springframework.retry:spring-retry"
     implementation "org.springframework:spring-aspects"
+
+
 
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'

@@ -20,6 +20,8 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,6 +45,7 @@ public class BasicUserService implements UserService {
 
 
     @Override
+    @CacheEvict(cacheNames="users", allEntries=true)
     @Transactional
     public UserResponseDto signUp(UserSignupCommand userSignupCommand) {
 
@@ -82,6 +85,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames="users", allEntries=true)
     @Transactional
     @PreAuthorize(" #userId == principal.userResponseDto.id ")
     public void deleteUser(UUID userId) {
@@ -97,6 +101,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames="users", allEntries=true)
     @Transactional
     @PreAuthorize("#updateCommand.id() == principal.userResponseDto.id()")
     public UserResponseDto updateUser(UserUpdateCommand updateCommand) {
@@ -128,6 +133,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames="users", allEntries=true)
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public UserResponseDto updateUserRole(RoleUpdateRequest request) {
@@ -146,6 +152,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Cacheable(value = "users")
     @Transactional(readOnly = true)
     public List<UserResponseDto> getAllUsers() {
 
