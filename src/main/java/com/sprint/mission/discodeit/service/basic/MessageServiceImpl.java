@@ -24,6 +24,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -71,8 +72,9 @@ public class MessageServiceImpl implements MessageService {
             BinaryContent savedBinary = binaryContentRepository.save(binaryContent);
             attachments.add(savedBinary);
             try {
+                String requestId = MDC.get("requestId");
                 eventPublisher.publishEvent(new BinaryContentCreatedEvent(
-                        savedBinary.getId(), file.getBytes()));
+                        savedBinary.getId(), file.getBytes(), requestId));
             } catch (IOException e) {
                 throw new FileOperationFailedException(savedBinary.getId());
             }

@@ -21,6 +21,7 @@ import com.sprint.mission.discodeit.service.JwtRegistry;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -102,8 +103,9 @@ public class UserServiceImpl implements UserService {
         binaryContent = binaryContentRepository.save(binaryContent);
 
         try {
+            String requestId = MDC.get("requestId");
             eventPublisher.publishEvent(new BinaryContentCreatedEvent(
-                    binaryContent.getId(), profileImage.getBytes()));
+                    binaryContent.getId(), profileImage.getBytes(), requestId));
         } catch (IOException e) {
             log.debug("이미지 업로드 실패: {}", binaryContent.getId());
             throw new FileOperationFailedException(binaryContent.getId());

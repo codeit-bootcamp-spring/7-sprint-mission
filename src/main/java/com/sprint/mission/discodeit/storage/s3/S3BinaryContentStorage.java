@@ -1,16 +1,12 @@
 package com.sprint.mission.discodeit.storage.s3;
 
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.Notification;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.exception.binaryContent.FileOperationFailedException;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -112,23 +108,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
     @Recover
     public void recover(Exception e, UUID id, byte[] bytes) {
-        log.error("모든 재시도 실패...");
-        String requestId = MDC.get("requestId");
-
-        User admin = userRepository.findByRole(Role.ADMIN).stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("관리자를 찾을 수 없습니다."));
-        String title = "S3 파일 업로드 실패";
-        String content = String.format("RequestId: %s\nBinaryContentId: %s\nError: %s",
-                requestId, id, e.getMessage());
-
-        Notification notification = Notification.builder()
-                .user(admin)
-                .title(title)
-                .content(content)
-                .build();
-
-        notificationRepository.save(notification);
+        log.error("모든 재시도 실패... id={}", id);
         throw new FileOperationFailedException(id);
     }
 

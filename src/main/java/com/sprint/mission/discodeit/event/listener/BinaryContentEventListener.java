@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.UUID;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -37,7 +39,10 @@ public class BinaryContentEventListener {
             log.info("BinaryContent 업로드 실패 - id: {}", event.binaryContentId());
             binaryContentService.updateStatus(event.binaryContentId(), BinaryContentStatus.FAIL);
 
-            eventPublisher.publishEvent(new S3UploadFailedEvent(event.binaryContentId()));
+            String requestId = event.requesterId();
+            UUID binaryContentId = event.binaryContentId();
+            String errorMessage = e.getMessage();
+            eventPublisher.publishEvent(new S3UploadFailedEvent(requestId, binaryContentId, errorMessage));
         }
     }
 }

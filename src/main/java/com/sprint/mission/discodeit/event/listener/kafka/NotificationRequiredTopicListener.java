@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -114,6 +115,21 @@ public class NotificationRequiredTopicListener {
         try {
             S3UploadFailedEvent event = objectMapper.readValue(kafkaEvent,
                     S3UploadFailedEvent.class);
+
+            User admin = userRepository.findByRole(Role.ADMIN).stream()
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("관리자를 찾을 수 없습니다."));
+            String title = "S3 파일 업로드 실패";
+            String content = String.format("RequestId: %s\nBinaryContentId: %s\nError: %s",
+                    event.requestId(), event.binaryContentId(), event.errorMessage());
+
+            Notification notification = Notification.builder()
+                    .user(admin)
+                    .title(title)
+                    .content(content)
+                    .build();
+
+            notificationRepository.save(notification);
 
             log.debug("Kafka: S3 업로드 실패 알림 - id={}", event.binaryContentId());
 
