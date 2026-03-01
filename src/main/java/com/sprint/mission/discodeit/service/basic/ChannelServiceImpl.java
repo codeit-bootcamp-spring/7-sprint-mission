@@ -67,7 +67,7 @@ public class ChannelServiceImpl implements ChannelService {
 
         log.info("프라이빗 채널 생성 요청");
         Channel newChannel = new Channel(ChannelType.PRIVATE);
-        channelRepository.save(newChannel); // -> 참여자 ID가 비어있어요
+        channelRepository.save(newChannel);
 
         if (requestDto.participantIds() != null && !requestDto.participantIds().isEmpty()) {
 
@@ -75,11 +75,11 @@ public class ChannelServiceImpl implements ChannelService {
             List<ReadStatus> readStatuses = users.stream()
                     .map(user -> new ReadStatus(user, newChannel))
                     .collect(Collectors.toList());
-            newChannel.getReadStatuses().addAll(readStatuses); // 양방향 연관관계 해결, 영속성 컨텍스트
-            readStatusRepository.saveAll(readStatuses); // 참여자 ID가 생성
+            newChannel.getReadStatuses().addAll(readStatuses);
+            readStatusRepository.saveAll(readStatuses);
         }
         log.info("프라이빗 채널 생성 완료");
-        return channelMapper.toDto(newChannel); // 채널
+        return channelMapper.toDto(newChannel);
     }
 
     @Override
