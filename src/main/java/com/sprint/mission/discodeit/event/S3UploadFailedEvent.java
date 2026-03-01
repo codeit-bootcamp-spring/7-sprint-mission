@@ -1,19 +1,17 @@
 package com.sprint.mission.discodeit.event;
 
 import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
 import software.amazon.awssdk.core.exception.SdkClientException;
 
 import java.util.UUID;
 
 @Getter
-public class S3UploadFailedEvent extends ApplicationEvent {
+public class S3UploadFailedEvent {
     UUID binaryContentId;
     SdkClientException sdkClientException;
     String requestId;
 
-    public S3UploadFailedEvent(Object source, UUID binaryContentId, SdkClientException sdkClientException, String requestId) {
-        super(source);
+    public S3UploadFailedEvent(UUID binaryContentId, SdkClientException sdkClientException, String requestId) {
         this.binaryContentId = binaryContentId;
         this.sdkClientException = sdkClientException;
         this.requestId = requestId;

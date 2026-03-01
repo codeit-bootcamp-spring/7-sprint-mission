@@ -32,13 +32,13 @@ public class InMemoryJwtRegistry implements JwtRegistry {
             queue.poll();
         }
         // users 캐시 clear
-        eventPublisher.publishEvent(new UserCacheEvictEvent(this));
+        eventPublisher.publishEvent(new UserCacheEvictEvent());
     }
 
     @Override
     public void invalidateJwtInformationByUserId(UUID userId) {
         origin.remove(userId);
-        eventPublisher.publishEvent(new UserCacheEvictEvent(this));
+        eventPublisher.publishEvent(new UserCacheEvictEvent());
     }
 
     @Override

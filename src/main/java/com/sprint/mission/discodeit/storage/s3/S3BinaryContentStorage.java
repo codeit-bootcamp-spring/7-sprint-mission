@@ -59,7 +59,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
                     .bucket(bucket)
                     .key(fileName)
                     .build();
-            
+
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
 
             return binaryContentId;
@@ -84,7 +84,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     public UUID putRecover(SdkClientException e, UUID binaryContentId, byte[] bytes) {
         log.warn("S3 upload 최종 실패 - 파일: {}, 에러메세지: {}", binaryContentId, e.getMessage(), e);
         String requestId = MDC.get(MDCLoggingInterceptor.REQUEST_ID_KEY);
-        eventPublisher.publishEvent(new S3UploadFailedEvent(this, binaryContentId, e, requestId));
+        eventPublisher.publishEvent(new S3UploadFailedEvent(binaryContentId, e, requestId));
 
         throw new RuntimeException(e);
     }

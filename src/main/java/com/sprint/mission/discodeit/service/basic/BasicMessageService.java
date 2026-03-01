@@ -88,7 +88,7 @@ public class BasicMessageService implements MessageService {
 
         messageRepository.save(message);
         MessageResponseDto messageResponseDto = messageMapper.toResponseDto(message);
-        eventPublisher.publishEvent(new MessageCreatedEvent(this, messageResponseDto, channel.getName()));
+        eventPublisher.publishEvent(new MessageCreatedEvent(messageResponseDto, channel.getName()));
         return messageResponseDto;
     }
 
