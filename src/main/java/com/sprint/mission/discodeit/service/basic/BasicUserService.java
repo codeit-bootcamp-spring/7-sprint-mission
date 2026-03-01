@@ -21,6 +21,8 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +47,7 @@ public class BasicUserService implements UserService {
     private final JwtOnlineChecker jwtOnlineChecker;
     private final ApplicationEventPublisher eventPublisher;
 
+    @CacheEvict(cacheNames = "userListCache", key = "'all'")
     @Transactional
     @Override
     public UserResponseDto create(UserCreateRequestDto userCreateRequestDto,
@@ -107,6 +110,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Cacheable(cacheNames = "userListCache", key = "'all'")
     public List<UserResponseDto> getAll() {
         log.debug("Getting all users");
         List<User> users = userRepository.findAll();
@@ -119,6 +123,7 @@ public class BasicUserService implements UserService {
                 .toList();
     }
 
+    @CacheEvict(cacheNames = "userListCache", key = "'all'")
     @PreAuthorize("@authz.isSelf(authentication, #userId)")
     @Transactional
     @Override
@@ -186,6 +191,7 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(save, online);
     }
 
+    @CacheEvict(cacheNames = "userListCache", key = "'all'")
     @PreAuthorize("@authz.isSelf(authentication, #userid)")
     @Transactional
     @Override
@@ -234,6 +240,7 @@ public class BasicUserService implements UserService {
         return  userMapper.toDto(user, online);
     }
 
+    @CacheEvict(cacheNames = "userListCache", key = "'all'")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Override
