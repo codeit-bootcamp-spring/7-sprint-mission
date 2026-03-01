@@ -8,7 +8,7 @@ import lombok.ToString;
 @Getter
 @AllArgsConstructor
 @ToString
-public class BinaryContentStorageErrorEvent {
+public class S3UploadFailedEvent {
     UUID requestId;
     String errorMessage;
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentStorageErrorEvent;
+import com.sprint.mission.discodeit.dto.dto_Neo.S3UploadFailedEvent;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
@@ -93,7 +93,7 @@ public class BinaryContentStorageService implements BinaryContentStorage {
         binaryContentService.updateStatus(event.getBinaryContentId(), BinaryContentStatus.FAIL);
 
         log.debug("❎");
-        eventPublisher.publishEvent(new BinaryContentStorageErrorEvent(
+        eventPublisher.publishEvent(new S3UploadFailedEvent(
                                             event.getBinaryContentId(),
                                             "🚨Error: " + e.getMessage()));
     }

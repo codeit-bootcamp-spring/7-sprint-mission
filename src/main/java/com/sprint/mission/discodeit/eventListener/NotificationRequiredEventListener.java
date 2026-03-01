@@ -1,23 +1,16 @@
-import com.sprint.mission.discodeit.service.basic.NotificationsService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
-
 //package com.sprint.mission.discodeit.service.basic;
 //
-//import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentStorageErrorEvent;
-//import com.sprint.mission.discodeit.dto.dto_Neo.MessageCreatedEvent;
-//import com.sprint.mission.discodeit.dto.dto_Neo.RoleUpdatedEvent;
 //import lombok.RequiredArgsConstructor;
 //import lombok.extern.slf4j.Slf4j;
-//import org.springframework.context.event.EventListener;
 //import org.springframework.scheduling.annotation.Async;
 //import org.springframework.stereotype.Component;
 //import org.springframework.transaction.event.TransactionPhase;
 //import org.springframework.transaction.event.TransactionalEventListener;
+//
+//import com.sprint.mission.discodeit.dto.dto_Neo.S3UploadFailedEvent;
+//import com.sprint.mission.discodeit.dto.dto_Neo.MessageCreatedEvent;
+//import com.sprint.mission.discodeit.dto.dto_Neo.RoleUpdatedEvent;
+//import org.springframework.context.event.EventListener;
 //
 //@Slf4j
 //@Component
@@ -39,8 +32,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 //
 //    @Async("myAsync")
 //    @EventListener
-//    public void on(BinaryContentStorageErrorEvent event) {
-//        log.error("❎❎❎ BinaryContentStorageErrorEvent = {}", event.toString(), e);
+//    public void on(S3UploadFailedEvent event) {
+//        log.error("❎❎❎ S3UploadFailedEvent = {}", event.toString());
 //        notificationsService.saveBinaryContentStorageErrorEvent(event);
 //    }
 //}

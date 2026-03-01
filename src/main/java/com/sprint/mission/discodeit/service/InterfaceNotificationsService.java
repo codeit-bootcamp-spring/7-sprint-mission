@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentStorageErrorEvent;
+import com.sprint.mission.discodeit.dto.dto_Neo.S3UploadFailedEvent;
 import com.sprint.mission.discodeit.dto.dto_Neo.MessageCreatedEvent;
 import com.sprint.mission.discodeit.dto.dto_Neo.NotificationDto;
 import com.sprint.mission.discodeit.dto.dto_Neo.RoleUpdatedEvent;
@@ -15,5 +15,5 @@ public interface InterfaceNotificationsService {
 
     void saveMessageCreatedEvent(MessageCreatedEvent event);
     void saveRoleUpdateEvent(RoleUpdatedEvent event);
-    void saveBinaryContentStorageErrorEvent(BinaryContentStorageErrorEvent event);
+    void saveBinaryContentStorageErrorEvent(S3UploadFailedEvent event);
 }

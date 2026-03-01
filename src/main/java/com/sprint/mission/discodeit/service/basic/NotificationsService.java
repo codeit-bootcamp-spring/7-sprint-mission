@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentStorageErrorEvent;
+import com.sprint.mission.discodeit.dto.dto_Neo.S3UploadFailedEvent;
 import com.sprint.mission.discodeit.dto.dto_Neo.MessageCreatedEvent;
 import com.sprint.mission.discodeit.dto.dto_Neo.NotificationDto;
 import com.sprint.mission.discodeit.dto.dto_Neo.RoleUpdatedEvent;
@@ -125,7 +125,7 @@ public class NotificationsService implements InterfaceNotificationsService {
         cacheNames = "notificationsByUser",
         key = "#admin.id"
     )
-    public void saveBinaryContentStorageErrorEvent(BinaryContentStorageErrorEvent event) {
+    public void saveBinaryContentStorageErrorEvent(S3UploadFailedEvent event) {
         log.info("❎ saveBinaryContentStorageErrorEvent");
 
         User admin = userRepository.findUserByUsername("admin")

@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission.discodeit.eventListener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentStorageErrorEvent;
+import com.sprint.mission.discodeit.dto.dto_Neo.S3UploadFailedEvent;
 import com.sprint.mission.discodeit.dto.dto_Neo.MessageCreatedEvent;
 import com.sprint.mission.discodeit.dto.dto_Neo.RoleUpdatedEvent;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,7 @@ public class KafkaProduceRequiredEventListener {
      */
     @Async("myAsync")
     @EventListener
-    public void on(BinaryContentStorageErrorEvent event) { // S3UploadFailedEvent
+    public void on(S3UploadFailedEvent event) {
         publishEvent( S3_UPLOAD_FAILED_TOPIC, event);
     }
 
@@ -57,17 +57,7 @@ public class KafkaProduceRequiredEventListener {
         try {
             String payload = objectMapper.writeValueAsString(event);
 
-            kafkaTemplate.send(topic, payload)
-                .whenComplete((result, ex) -> {
-                    if (ex != null) {
-                        log.error("🚨 Kafka send failed. topic={}", topic, ex);
-                    } else {
-                        log.info("✅ Kafka send success. topic={}, partition={}, offset={}",
-                            topic,
-                            result.getRecordMetadata().partition(),
-                            result.getRecordMetadata().offset());
-                    }
-                });
+            kafkaTemplate.send(topic, payload);
 
         } catch (Exception e) {
             log.error("🚨 Event serialization failed. topic={}, event={}", topic, event, e);
