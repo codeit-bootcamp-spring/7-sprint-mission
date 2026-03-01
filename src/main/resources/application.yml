@@ -20,6 +20,15 @@ spring:
         format_sql: true
     open-in-view: false
 
+  cache:
+    type: caffeine
+    cache-names: userListCache,userChannelsCache,notificationListCache
+    caffeine:
+      spec: >
+        maximumSize=100, 
+        expireAfterWrite=600s,
+        recordStats
+
 discodeit:
   admin:
     bootstrap:
@@ -46,7 +55,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers,env
+        include: health,info,metrics,loggers,env,caches
   endpoint:
     health:
       show-details: always
