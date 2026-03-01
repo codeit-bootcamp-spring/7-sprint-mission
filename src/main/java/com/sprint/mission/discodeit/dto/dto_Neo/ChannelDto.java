@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.dto.dto_Neo;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record ChannelDto(
+public record ChannelDto (
       UUID id,
       ChannelType type,
       String name,
