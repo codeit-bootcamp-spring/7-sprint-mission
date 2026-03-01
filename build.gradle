@@ -71,6 +71,8 @@ dependencies {
     // 2. Caffeine 캐시 엔진 본체
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
+    implementation 'org.springframework.kafka:spring-kafka'
+
 }
 dependencyManagement {
     imports {
