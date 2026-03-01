@@ -11,7 +11,7 @@ spring:
 logging:
   level:
     com.sprint.mission.discodeit: info
-    com.p6spy: off
+    p6spy: off
 
 management:
   endpoint:
