@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -41,7 +42,8 @@ public class BinaryContentServiceImpl implements BinaryContentService {
                 .build();
 
         binaryContentRepository.save(newContent);
-        eventPublisher.publishEvent(new BinaryContentCreatedEvent(newContent.getId(), requestDto.data()));
+        String requestId = MDC.get("requestId");
+        eventPublisher.publishEvent(new BinaryContentCreatedEvent(newContent.getId(), requestDto.data(), requestId));
         return binaryContentMapper.toDto(newContent);
     }
 
