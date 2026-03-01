@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import io.micrometer.core.annotation.Timed;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,6 +32,7 @@ public class MessageController implements MessageApi {
 
     private final MessageService messageService;
 
+    @Timed("message.create.async")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> create(
             @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,

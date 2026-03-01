@@ -11,12 +11,11 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.UUID;
 
 @Primary
 @Service
@@ -62,7 +61,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
         ReadStatus readStatus = readRepo.findById(readStatusId)
                 .orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
 
-        readStatus.update(request.newLastReadAt());
+        readStatus.update(request.newLastReadAt(), request.newNotificationEnabled());
         return ReadStatusDto.from(readStatus);
     }
 

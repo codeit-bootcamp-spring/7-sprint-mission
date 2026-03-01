@@ -3,16 +3,17 @@ package com.sprint.mission.discodeit.service.jpa;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
 @Primary
 @Service
@@ -21,19 +22,19 @@ import java.util.UUID;
 public class BinaryContentServiceImpl implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage storage;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public BinaryContentDto create(BinaryContentCreateRequest request) {
 
-        BinaryContent binary = BinaryContent.builder()
-                .fileName(request.fileName())
-                .size((long) request.bytes().length)
-                .contentType(request.contentType())
-                .build();
+        BinaryContent binary = new BinaryContent(
+                request.fileName(),
+                (long) request.bytes().length,
+                request.contentType()
+        );
 
         binaryContentRepository.save(binary);
-        storage.put(binary.getId(), request.bytes());
+        eventPublisher.publishEvent(new BinaryContentCreatedEvent(binary.getId(), request.bytes()));
 
         return BinaryContentDto.from(binary);
     }
@@ -50,6 +51,15 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         return binaryContentRepository.findAllById(binaryContentIds).stream()
                 .map(BinaryContentDto::from)
                 .toList();
+    }
+
+    @Override
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public BinaryContentDto updateStatus(UUID binaryContentId, BinaryContentStatus status) {
+        BinaryContent binary = binaryContentRepository.findById(binaryContentId)
+                .orElseThrow(() -> new IllegalArgumentException("BinaryContent not found"));
+        binary.updateStatus(status);
+        return BinaryContentDto.from(binary);
     }
 
     @Override

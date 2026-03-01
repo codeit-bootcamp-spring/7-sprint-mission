@@ -1,3 +1,14 @@
+CREATE TABLE binary_contents
+(
+    id           uuid PRIMARY KEY,
+    created_at   timestamp with time zone NOT NULL,
+    updated_at   timestamp with time zone,
+    file_name    varchar(255)             NOT NULL,
+    size         bigint                   NOT NULL,
+    content_type varchar(100)             NOT NULL,
+    status       varchar(20)              NOT NULL DEFAULT 'PROCESSING'
+);
+
 CREATE TABLE users
 (
     id         uuid PRIMARY KEY,
@@ -7,15 +18,6 @@ CREATE TABLE users
     email      varchar(100) UNIQUE      NOT NULL,
     password   varchar(60)              NOT NULL,
     profile_id uuid
-);
-
-CREATE TABLE binary_contents
-(
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    file_name    varchar(255)             NOT NULL,
-    size         bigint                   NOT NULL,
-    content_type varchar(100)             NOT NULL
 );
 
 CREATE TABLE user_statuses
@@ -57,12 +59,13 @@ CREATE TABLE message_attachments
 
 CREATE TABLE read_statuses
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    updated_at   timestamp with time zone,
-    user_id      uuid                     NOT NULL,
-    channel_id   uuid                     NOT NULL,
-    last_read_at timestamp with time zone NOT NULL,
+    id                    uuid PRIMARY KEY,
+    created_at            timestamp with time zone NOT NULL,
+    updated_at            timestamp with time zone,
+    user_id               uuid                     NOT NULL,
+    channel_id            uuid                     NOT NULL,
+    last_read_at          timestamp with time zone NOT NULL,
+    notification_enabled  boolean                  NOT NULL DEFAULT false,
     UNIQUE (user_id, channel_id)
 );
 
@@ -106,4 +109,20 @@ ALTER TABLE read_statuses
     ADD CONSTRAINT fk_read_status_channel
         FOREIGN KEY (channel_id)
             REFERENCES channels (id)
+            ON DELETE CASCADE;
+
+CREATE TABLE notifications
+(
+    id          uuid PRIMARY KEY,
+    created_at  timestamp with time zone NOT NULL,
+    updated_at  timestamp with time zone,
+    receiver_id uuid                     NOT NULL,
+    title       varchar(200)             NOT NULL,
+    content     varchar(1000)            NOT NULL
+);
+
+ALTER TABLE notifications
+    ADD CONSTRAINT fk_notification_receiver
+        FOREIGN KEY (receiver_id)
+            REFERENCES users (id)
             ON DELETE CASCADE;

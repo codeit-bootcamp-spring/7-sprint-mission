@@ -9,23 +9,23 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 @Primary
 @Service
@@ -37,8 +37,8 @@ public class MessageServiceImpl implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage storage;
     private final PageResponseMapper pageResponseMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public MessageDto create(
@@ -67,8 +67,15 @@ public class MessageServiceImpl implements MessageService {
                     br.contentType()
             );
             binaryContentRepository.save(binary);
-            storage.put(binary.getId(), br.bytes());
+            eventPublisher.publishEvent(new BinaryContentCreatedEvent(binary.getId(), br.bytes()));
         }
+
+        eventPublisher.publishEvent(new MessageCreatedEvent(
+                message.getId(),
+                channel.getId(),
+                user.getId(),
+                message.getContent()
+        ));
 
         return MessageDto.from(message);
     }
@@ -99,10 +106,7 @@ public class MessageServiceImpl implements MessageService {
 
         var dtoSlice = slice.map(MessageDto::from);
         return pageResponseMapper.fromSlice(dtoSlice, nextCursor);
-
-
     }
-
 
     @Override
     public MessageDto update(UUID messageId, MessageUpdateRequest request) {
@@ -117,5 +121,4 @@ public class MessageServiceImpl implements MessageService {
     public void delete(UUID messageId) {
         messageRepository.deleteById(messageId);
     }
-
 }
