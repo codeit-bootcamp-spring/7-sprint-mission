@@ -4,6 +4,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,7 @@ public class JwtLogoutHandler implements LogoutHandler {
     private final RefreshTokenCookieManager refreshTokenCookieManager;
     private final JwtRegistry jwtRegistry;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CacheManager cacheManager;
 
     @Override
     public void logout(
@@ -53,5 +56,10 @@ public class JwtLogoutHandler implements LogoutHandler {
         }
 
         jwtRegistry.invalidateJwtInformationByUserId(userId);
+
+        Cache cache = cacheManager.getCache("userListCache");
+        if (cache != null) {
+            cache.evict("all");
+        }
     }
 }

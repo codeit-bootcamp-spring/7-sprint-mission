@@ -13,6 +13,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,6 +36,7 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final UserMapper userMapper;
     private final JwtRegistry jwtRegistry;
     private final JwtOnlineChecker jwtOnlineChecker;
+    private final CacheManager cacheManager;
 
     @Override
     public void onAuthenticationSuccess(
@@ -66,6 +69,11 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
         jwtRegistry.registerJwtInformation(info);
 
         JwtDto jwtDto = new JwtDto(userDto, pair.accessToken());
+
+        Cache cache = cacheManager.getCache("userListCache");
+        if (cache != null) {
+            cache.evict("all");
+        }
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
