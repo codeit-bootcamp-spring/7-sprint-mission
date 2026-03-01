@@ -108,16 +108,14 @@ public class BinaryContentStorageService implements BinaryContentStorage {
         Path filePath = root.resolve(binaryContentId.toString());
 
         if (!Files.exists(filePath)) {
-            log.error("🚨파일이 존재하지 않습니다: - filePath = {}", filePath);
-            throw new NoSuchElementException("파일이 존재하지 않습니다: " + filePath);
+            throw new NoSuchElementException("🚨 파일이 존재하지 않습니다: " + filePath);
         }
 
         try {
             log.info("✅ 파일 get - binaryContentId = {}", binaryContentId.toString());
             return Files.newInputStream(filePath);   // InputStream 반환
         } catch (IOException e) {
-            log.error("🚨파일 읽기 실패! - filePath = {}", filePath);
-            throw new RuntimeException("파일 읽기 실패: " + filePath, e);
+            throw new RuntimeException("🚨파일 읽기 실패: " + filePath, e);
         }
     }
 
@@ -144,7 +142,6 @@ public class BinaryContentStorageService implements BinaryContentStorage {
                 .contentLength((null == binaryContent.getSize()) ? Files.size(filePath) : binaryContent.getSize())
                 .body(new InputStreamResource(inputStream));
         } catch (IOException e) {
-            log.error("🚨download error! - binaryContentId = {}", binaryContentId.toString());
             throw new DiscodeitException(ErrorCode.FILE_NOT_FOUND,
                 Map.of("binaryContentId", "null"));
         }

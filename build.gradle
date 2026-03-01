@@ -26,9 +26,11 @@ dependencies {
     implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework:spring-aspects' //for. @Retryable
-    implementation 'me.paulschwarz:spring-dotenv:3.0.0' //for. build.gradle
+    implementation 'me.paulschwarz:spring-dotenv:3.0.0' //for. .env -> .yml
     implementation 'org.springframework.boot:spring-boot-starter-cache' //for. Caffeine 캐시
     implementation 'com.github.ben-manes.caffeine:caffeine'             //for. Caffeine 캐시
+    implementation 'org.springframework.kafka:spring-kafka'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 
     compileOnly 'org.projectlombok:lombok'
@@ -47,7 +49,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    runtimeOnly 'com.h2database:h2'
+//    runtimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {

@@ -138,7 +138,6 @@ public class ChannelService implements InterfaceChannelService {
             .orElseThrow(() -> new channelNotFoundException(channelId));
 
         if (channel.getType() == PRIVATE) {
-            log.error("🚨PRIVATE.so update error! - channelId = {}", channelId.toString());
             throw new PrivateChannelUpdateException(channelId);
         }
         else {
@@ -175,7 +174,7 @@ public class ChannelService implements InterfaceChannelService {
 
             if (!isAdmin) {
 
-                throw new AuthorizationDeniedException("권한이 없습니다.");
+                throw new AuthorizationDeniedException("🚨권한이 없습니다.");
             }
         }
 

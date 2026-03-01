@@ -8,7 +8,7 @@ logging:
 
 spring:
   profiles:
-    active: dev
+    active: local
   application:
     name: discodeit
   cache:                #//for. Caffeine 캐시
@@ -19,6 +19,16 @@ spring:
       - notificationsByUser
     caffeine:
       spec: maximumSize=100,expireAfterWrite=600s,recordStats
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 #
 ## ===============================
 ## Actuator 설정

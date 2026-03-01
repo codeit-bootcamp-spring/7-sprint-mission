@@ -151,12 +151,12 @@ public class UserService implements InterfaceUserService {
 
         if (!userId.equals(user.getId())
                 && userRepository.findUserByUsername(dtoUserUpdate.newUsername()).isPresent()) {
-            throw new UserAlreadyExistsException("username", dtoUserUpdate.newUsername());
+            throw new UserAlreadyExistsException("🚨username", dtoUserUpdate.newUsername());
         }
 
         if (!userId.equals(user.getId())
                 && userRepository.findUserByEmail(dtoUserUpdate.newEmail()).isPresent()) {
-            throw new UserAlreadyExistsException("email", dtoUserUpdate.newEmail());
+            throw new UserAlreadyExistsException("🚨email", dtoUserUpdate.newEmail());
         }
 
         BinaryContent profile = optionalProfileFile.map(file -> {
@@ -200,7 +200,7 @@ public class UserService implements InterfaceUserService {
                 log.info("✅ UserService.binaryContentRepository.deleteById = [" + user.getUsername() + "]");
             }
 //            else {
-//                log.error("🚨UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
+//                log.error("🚨UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]", e);
 //            }
         }
 

@@ -1,7 +1,7 @@
 -- USER 생성은 관리자 계정에서만 가능
 
 -- user 생성
-CREATE USER discodeit_user WITH PASSWORD 'discodeit1234';
+CREATE USER discodeit_user WITH PASSWORD 'discodeit_1234';
 
 -- db 생성
 CREATE DATABASE discodeit OWNER discodeit_user;

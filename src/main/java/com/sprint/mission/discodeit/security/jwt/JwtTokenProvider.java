@@ -138,7 +138,7 @@ public class JwtTokenProvider {
             SignedJWT signedJWT = SignedJWT.parse(token);
             return signedJWT.getJWTClaimsSet().getSubject();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JWT token", e);
+            throw new IllegalArgumentException("🚨Invalid JWT token", e);
         }
     }
 
@@ -147,7 +147,7 @@ public class JwtTokenProvider {
             SignedJWT signedJWT = SignedJWT.parse(token);
             return signedJWT.getJWTClaimsSet().getJWTID();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JWT token", e);
+            throw new IllegalArgumentException("🚨Invalid JWT token", e);
         }
     }
 
@@ -156,11 +156,11 @@ public class JwtTokenProvider {
             SignedJWT signedJWT = SignedJWT.parse(token);
             String userIdStr = (String) signedJWT.getJWTClaimsSet().getClaim("userId");
             if (userIdStr == null) {
-                throw new IllegalArgumentException("User ID claim not found in JWT token");
+                throw new IllegalArgumentException("🚨User ID claim not found in JWT token");
             }
             return UUID.fromString(userIdStr);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JWT token", e);
+            throw new IllegalArgumentException("🚨Invalid JWT token", e);
         }
     }
 

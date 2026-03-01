@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.security;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,14 +45,19 @@ public class AdminCreater implements ApplicationRunner {
 
     private void createDefUser() {
 
-        String encodePassword = passwordEncoder.encode(loginProperties.getUserDefaultPassword()); //!! 🛠️
+        Optional<User> optionalUser = userRepository.findUserByUsername(
+            loginProperties.getUserDefault());
 
-        User newUser = new User(loginProperties.getUserDefault(),
-            loginProperties.getUserDefaultEmail(),
-            encodePassword,
-            null);
+        if (!optionalUser.isPresent()) {
+            String encodePassword = passwordEncoder.encode(loginProperties.getUserDefaultPassword()); //!! 🛠️
 
-        newUser.updateRole(Role.USER);
-        userRepository.save(newUser);
+            User newUser = new User(loginProperties.getUserDefault(),
+                loginProperties.getUserDefaultEmail(),
+                encodePassword,
+                null);
+
+            newUser.updateRole(Role.USER);
+            userRepository.save(newUser);
+        }
     }
 }

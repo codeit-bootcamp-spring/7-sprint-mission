@@ -1,33 +1,21 @@
 spring:
   application:
     name: discodeit
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/discodeit
-#    driver-class-name: org.postgresql.Driver
-#    username: discodeit_user
-#    password: discodeit1234
+  #  datasource:
+  #    url: jdbc:postgresql://localhost:5432/discodeit
+  #    driver-class-name: org.postgresql.Driver
+  #    username: discodeit_user
+  #    password: discodeit1234
   datasource:
-    driver-class-name: org.h2.Driver
-#    url: jdbc:h2:mem:testdb  #;MODE=PostgreSQL
-#    url: jdbc:h2:~/test;AUTO_SERVER=TRUE #Spring 실행 중에도 같이 쓰고 싶다 //??
-    url: jdbc:h2:~/test
-#    url: jdbc:h2:tcp://localhost/~/test
-    username: sa
-    password:
-
-#  http://localhost:4444/h2-console
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit_1234
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
-        format_sql: true
 
 
   servlet:
