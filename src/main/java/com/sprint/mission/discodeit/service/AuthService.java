@@ -10,7 +10,7 @@ public interface AuthService {
 
     boolean isOnline(UUID userId);
 
-    void expireUserSession(UUID userId);
+    void expireUserSession(String refreshToken);
 
     Set<UUID> getOnlineUserIds();
 

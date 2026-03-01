@@ -93,6 +93,7 @@ management:
           - info
           - metrics
           - loggers
+          - caches
       base-path: /management
   observations:
     annotations:

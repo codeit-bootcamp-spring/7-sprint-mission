@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.JwtRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -74,6 +75,7 @@ public class InMemoryJwtRegistry implements JwtRegistry {
     }
 
     @Scheduled(fixedDelay = 1000 * 60 * 5)
+    @CacheEvict(value = "allUsers", allEntries = true)
     @Override
     public void clearExpiredJwtInformation() {
         origin.values().forEach(queue ->

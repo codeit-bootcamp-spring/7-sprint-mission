@@ -24,7 +24,6 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
     private final AuthService authService;
-//    private final JwtRegistry jwtRegistry;
     private final CookieProvider cookieProvider;
 
     @Override

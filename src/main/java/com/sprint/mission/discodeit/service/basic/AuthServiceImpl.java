@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.jwt.JwtDto;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.entity.JwtInformation;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.JwtRegistry;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
+    private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtRegistry jwtRegistry;
 
@@ -29,9 +31,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @CacheEvict(value = "allUsers", allEntries = true)
-    public void expireUserSession(UUID userId) {
-        jwtRegistry.invalidateJwtInformationByUserId(userId);
-        log.info("JWT 무효화: userId={}", userId);
+    public void expireUserSession(String refreshToken) {
+        if (jwtRegistry.hasActiveJwtInformationByRefreshToken(refreshToken)) {
+            String username = jwtTokenProvider.getUsernameFromRefreshToken(refreshToken);
+            userRepository.findByUsername(username)
+                    .ifPresent(user ->
+                            jwtRegistry.invalidateJwtInformationByUserId(user.getId())
+                    );
+        }
     }
 
     @Override
