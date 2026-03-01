@@ -28,9 +28,10 @@ dependencies {
     implementation 'org.springframework:spring-aspects' //for. @Retryable
     implementation 'me.paulschwarz:spring-dotenv:3.0.0' //for. .env -> .yml
     implementation 'org.springframework.boot:spring-boot-starter-cache' //for. Caffeine 캐시
-    implementation 'com.github.ben-manes.caffeine:caffeine'             //for. Caffeine 캐시
+//    implementation 'com.github.ben-manes.caffeine:caffeine'             //for. Caffeine 캐시
     implementation 'org.springframework.kafka:spring-kafka'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 
 
     compileOnly 'org.projectlombok:lombok'

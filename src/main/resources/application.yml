@@ -12,13 +12,19 @@ spring:
   application:
     name: discodeit
   cache:                #//for. Caffeine 캐시
-    type: caffeine
+    type: redis         #caffeine
     cache-names:
       - users
       - channelsByUser
       - notificationsByUser
     caffeine:
       spec: maximumSize=100,expireAfterWrite=600s,recordStats
+    redis:
+      enable-statistics: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   kafka:
     bootstrap-servers: localhost:9092
     producer:
