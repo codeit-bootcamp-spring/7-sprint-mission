@@ -38,7 +38,12 @@ public class LocalBinaryContentStorge implements BinaryContentStorage {
 
     @Override
     public void put(String fileName, MultipartFile file) {
-        String contentType = file.getContentType();
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread interrupted while simulating delay", e);
+        }
         Path filePath = ROOT_PATH.resolve(fileName);
         try {
             file.transferTo(filePath);

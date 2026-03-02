@@ -19,6 +19,8 @@ import com.sprint.mission.discodeit.service.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,7 @@ public class ChannelService {
 
     @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
     @Transactional
+    @CacheEvict(cacheNames = "userChannels", allEntries = true)
     public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
         log.info("ChannelService.createPublicChannel");
         Channel channel = new Channel(
@@ -63,6 +66,7 @@ public class ChannelService {
 
     @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
     @Transactional
+    @CacheEvict(cacheNames = "userChannels", allEntries = true)
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
         log.info("ChannelService.createPrivateChannel");
         Channel channel = new Channel("dm", "description", ChannelType.PRIVATE);
@@ -87,6 +91,7 @@ public class ChannelService {
 
     @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
     @Transactional
+    @CacheEvict(cacheNames = "userChannels", allEntries = true)
     public ChannelDto updateChannel(UUID channelId, ChannelUpdateRequest requestDto) {
         log.info("ChannelService.updateChannel");
         Channel channel =
@@ -103,6 +108,7 @@ public class ChannelService {
 
     @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
     @Transactional
+    @CacheEvict(cacheNames = "userChannels", allEntries = true)
     public void deleteChannel(UUID id) {
         log.info("ChannelService.deleteChannel");
         Channel channel = channelRepository.findById(id).orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, new HashMap<>()));
@@ -110,6 +116,7 @@ public class ChannelService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "userChannels", key = "#userId")
     public List<ChannelDto> getAllByUser(UUID userId) {
         List<ReadStatus> readStatuses = readStatusRepository.findAllWithChannelByUserId(userId);
 

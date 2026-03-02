@@ -19,6 +19,8 @@ import com.sprint.mission.discodeit.service.dto.response.UserDto;
 import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,6 +46,7 @@ public class UserService {
     private final JwtRegistry jwtRegistry;
     private final ApplicationEventPublisher eventPublisher;
 
+    @CacheEvict(cacheNames = "usersAll", allEntries = true)
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
         log.info("UserService.createUser");
         if (userRepository.existsByEmailOrUsername(request.email(), request.username())) {
@@ -71,6 +74,7 @@ public class UserService {
     }
 
     @PreAuthorize("#id == authentication.principal.userDto.id")
+    @CacheEvict(cacheNames = "usersAll", allEntries = true)
     public UserDto updateUserInfo(UUID id, UserUpdateRequest updateDto, MultipartFile file) {
         log.info("UserService.updateUserInfo");
         User user = userRepository.findByIdWithBinaryContent(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, new HashMap<>()));
@@ -96,6 +100,7 @@ public class UserService {
     }
 
     @PreAuthorize("#id == authentication.principal.userDto.id")
+    @CacheEvict(cacheNames = "usersAll", allEntries = true)
     public void deleteUser(UUID id) {
         log.info("UserService.deleteUser");
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
@@ -106,6 +111,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "usersAll")
     public List<UserDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -114,6 +120,7 @@ public class UserService {
     }
 
 
+    @CacheEvict(cacheNames = "usersAll", allEntries = true)
     public UserDto updateRole(RoleUpdateRequest roleUpdateRequest){
         User user = userRepository
                 .findById(roleUpdateRequest.userId())

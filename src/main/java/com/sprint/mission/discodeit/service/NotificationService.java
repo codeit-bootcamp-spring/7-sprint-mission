@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundE
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.service.dto.response.NotificationDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,12 +23,14 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "userNotifications", key = "#receiverId")
     public List<NotificationDto> getNotifications(UUID receiverId){
         List<Notification> result = notificationRepository.findNotificationsByReceiverId(receiverId);
         return result.stream().map(NotificationDto::from).toList();
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "userNotifications", key = "#requesterId")
     public void checkNotification(UUID notificationId, UUID requesterId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new NotificationNotFoundException(

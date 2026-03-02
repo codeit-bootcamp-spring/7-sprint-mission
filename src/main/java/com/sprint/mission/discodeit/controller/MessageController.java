@@ -5,8 +5,10 @@ import com.sprint.mission.discodeit.service.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.response.MessageDto;
 import com.sprint.mission.discodeit.service.dto.response.PageResponse;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +27,8 @@ public class MessageController {
 
     private final MessageService messageService;
 
-
-    @PostMapping
+    @Timed("message.create.async")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> sendMessage(@RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
                                                   @RequestPart(required = false) List<MultipartFile> attachments) {
 
