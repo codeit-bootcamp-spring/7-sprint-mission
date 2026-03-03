@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entityElement.ChannelType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -32,13 +33,18 @@ public class ReadStatus extends BaseUpdatableEntity {
     @Column(name="last_read_at",nullable = false) @CreationTimestamp
     private Instant readLastTime;
 
+    @Column(name="notification_enabled",nullable = false)
+    private boolean notificationEnabled;
+
     public static ReadStatus createReadStatusFactory(User user,Channel channel){
+        if(channel.getType()== ChannelType.PRIVATE) return new ReadStatus(user,channel,Instant.now(),true);
         return new ReadStatus(user,channel
-                ,Instant.now().minus(Duration.ofDays(1)));
+                ,Instant.now(),false);
     }
     public static ReadStatus createReadStatusWithDtoFactory(User user,Channel channel,Instant readLastTime){
+        if(channel.getType()== ChannelType.PRIVATE) return new ReadStatus(user,channel,readLastTime,true);
         return new ReadStatus(user,channel
-                ,readLastTime);
+                ,readLastTime,false);
     }
 
 }

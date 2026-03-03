@@ -79,7 +79,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public ReadStatusDto patchReadStatus(UUID readStatusId, ReadStatusPatchRequestDto readStatusPatchRequestDto) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(()->new ReadStatusNotExistException(readStatusId));
-        readStatus.setReadLastTime(readStatusPatchRequestDto.newLastReadAt());
+        if(readStatusPatchRequestDto.newLastReadAt()!=null)readStatus.setReadLastTime(readStatusPatchRequestDto.newLastReadAt());
         readStatusRepository.save(readStatus);
         return readStatusMapper.toDto(readStatus);
     }

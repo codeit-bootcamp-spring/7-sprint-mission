@@ -5,15 +5,19 @@ import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.domain.file.FileByteReadFailException;
 import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,8 +34,9 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapper userMapper;
-    private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
+    private UUID adminId;
 
     @Override
     @Transactional
@@ -44,7 +49,13 @@ public class BasicUserService implements UserService {
         );
 
         try {
-            binaryContentStorage.put(binaryContent.getId(),profile.getBytes());
+            BinaryContentCreatedEvent event = new BinaryContentCreatedEvent(
+                    binaryContent.getFileName(),
+                    binaryContent.getId(),
+                    binaryContent.getContentType(),
+                    profile.getBytes()
+            );
+            eventPublisher.publishEvent(event);
         } catch (Exception e) {
             throw new FileByteReadFailException(profile.getName());
         }
@@ -78,6 +89,7 @@ public class BasicUserService implements UserService {
                         , userCreateRequestDto.email()
                         , password)
         );
+        adminId = user.getId();
         return userMapper.toDto(user);
     }
 
@@ -87,15 +99,14 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<UserDto> readAllUser() {
-        return userRepository.findAll().stream().map(userMapper::toDto).toList();
-    }
 
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or principal.username == #userId.toString() ")
+    @Caching(evict = {
+            @CacheEvict(value="users",allEntries = true),
+            @CacheEvict(value="notifications",key = "#userId")
+    })
     public void deleteUser(UUID userId) {
         if (!userRepository.existsById(userId)) throw new UserNotExistException(userId);
         log.info("deleteUser : {} info layer",userId);
@@ -109,6 +120,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    @CachePut(value = "users")
     public List<UserDto> findAllUsers(){
         return userRepository.findAll().stream().map(userMapper::toDto).toList();
     }
@@ -128,7 +140,13 @@ public class BasicUserService implements UserService {
                     new BinaryContent(profile.getName(), profile.getContentType(), profile.getSize())
             );
             try {
-                binaryContentStorage.put(tmpBinaryContent.getId(),profile.getBytes());
+                BinaryContentCreatedEvent event = new BinaryContentCreatedEvent(
+                        tmpBinaryContent.getFileName(),
+                        tmpBinaryContent.getId(),
+                        tmpBinaryContent.getContentType(),
+                        profile.getBytes()
+                );
+                eventPublisher.publishEvent(event);
             } catch (Exception e) {
                 throw new FileByteReadFailException(profile.getName());
             }
@@ -139,5 +157,9 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
 
+    @Override
+    public UUID getAdminId(){
+        return adminId;
+    }
 
 }
