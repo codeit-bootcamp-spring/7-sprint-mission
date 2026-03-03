@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ public class ChannelServiceImpl implements ChannelService {
     private final ChannelRepository channelRepository;
 
     @Override
+    @CacheEvict(cacheNames = "userChannels", allEntries = true)
     public ChannelDto create(ChannelCreateRequest request) {
         if (request.type() == ChannelType.PRIVATE) {
             if (request.participantIds() == null || request.participantIds().isEmpty()) {
@@ -49,6 +52,7 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "userChannels", allEntries = true)
     public ChannelDto update(UUID channelId, ChannelUpdateRequest request) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelNotFoundException(channelId));
@@ -62,6 +66,7 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "userChannels", allEntries = true)
     public void delete(UUID id) {
         if (!channelRepository.existsById(id)) {
             throw new ChannelNotFoundException(id);
@@ -85,6 +90,7 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
+    @Cacheable(cacheNames = "userChannels", key = "#userId")
     public List<ChannelDto> findByUserId(UUID userId) {
         if (userId == null) {
             throw new ChannelException(ErrorCode.BAD_REQUEST, Map.of("reason", "userId is null"));

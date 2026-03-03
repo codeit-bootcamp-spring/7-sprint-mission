@@ -13,6 +13,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -61,5 +63,9 @@ public class BasicBinaryContentService implements BinaryContentService {
       throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
     }
     binaryContentRepository.deleteById(binaryContentId);
+  }
+  @Override
+  public BinaryContentDto updateStatus(UUID binaryContentId, BinaryContentStatus status) {
+      return null;
   }
 }

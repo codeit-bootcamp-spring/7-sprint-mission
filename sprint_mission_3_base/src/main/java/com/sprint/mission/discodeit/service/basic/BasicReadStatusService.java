@@ -76,7 +76,7 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
-    readStatus.update(newLastReadAt);
+    readStatus.update(newLastReadAt, null);
     return readStatusMapper.toDto(readStatus);
   }
 

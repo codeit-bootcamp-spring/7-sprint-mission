@@ -7,19 +7,22 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,11 +36,11 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryRepo;
-    private final BinaryContentStorage storage;
-
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @CacheEvict(cacheNames = "users", allEntries = true)
     public UserDto create(UserCreateRequest req, Optional<BinaryContentCreateRequest> profileReq) {
 
         if (userRepository.existsByUsername(req.username())) {
@@ -58,7 +61,7 @@ public class UserServiceImpl implements UserService {
         );
 
         profileReq.ifPresent(p -> {
-            BinaryContent profile = saveProfileAndReturn(user, p);
+            BinaryContent profile = saveProfileAndReturn(p);
             user.setProfile(profile);
         });
 
@@ -70,8 +73,8 @@ public class UserServiceImpl implements UserService {
         return UserDto.from(user);
     }
 
-
     @Override
+    @CacheEvict(cacheNames = "users", allEntries = true)
     public UserDto update(UUID id,
                           UserUpdateRequest req,
                           Optional<BinaryContentCreateRequest> profileReq) {
@@ -80,7 +83,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
 
         BinaryContent newProfile = profileReq
-                .map(p -> saveProfileAndReturn(user, p))
+                .map(this::saveProfileAndReturn)
                 .orElse(null);
 
         String newPassword = req.newPassword();
@@ -106,6 +109,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(cacheNames = "users")
     public List<UserDto> findAll() {
         return userRepository.findAll().stream()
                 .map(UserDto::from)
@@ -113,6 +117,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "users", allEntries = true)
     public void delete(UUID userId) {
 
         User user = userRepository.findById(userId)
@@ -121,16 +126,16 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
     }
 
-    private BinaryContent saveProfileAndReturn(User user, BinaryContentCreateRequest req) {
+    private BinaryContent saveProfileAndReturn(BinaryContentCreateRequest req) {
 
-        BinaryContent binary = BinaryContent.builder()
-                .fileName(req.fileName())
-                .contentType(req.contentType())
-                .size((long) req.bytes().length)
-                .build();
+        BinaryContent binary = new BinaryContent(
+                req.fileName(),
+                (long) req.bytes().length,
+                req.contentType()
+        );
 
         binaryRepo.save(binary);
-        storage.put(binary.getId(), req.bytes());
+        eventPublisher.publishEvent(new BinaryContentCreatedEvent(binary.getId(), req.bytes()));
 
         return binary;
     }
