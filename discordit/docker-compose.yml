@@ -25,8 +25,7 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-      - REMEMBER_ME_KEY=${REMEMBER_ME_KEY}
-      - REMEMBER_ME_TOKEN_VALIDITY_SECONDS=${REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
+      - JWT_SECRET=${JWT_SECRET}
     volumes:
       - app_storage:/app/storage
     depends_on:
