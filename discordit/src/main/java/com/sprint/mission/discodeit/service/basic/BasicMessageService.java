@@ -12,15 +12,16 @@ import com.sprint.mission.discodeit.dto.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.event.dto.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.event.dto.MessageCreatedEvent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,6 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
     private final ApplicationEventPublisher publisher;
@@ -92,26 +92,27 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
-    public MessageDto send(MessageCreateRequest messageCreateRequest, List<MultipartFile> attachmentFiles) {
+    public MessageDto send(MessageCreateRequest messageCreateRequest, List<MultipartFile> files) {
         log.info("메세지 생성(발신) 요청 들어옴. \n\t송신자\t : {}\n\t채널\t : {}\n\t첨부파일 {}개",
                 messageCreateRequest.authorId(),
                 messageCreateRequest.channelId(),
-                attachmentFiles == null ? 0 : attachmentFiles.size());
+                files == null ? 0 : files.size());
         Message message = messageRepository.save(new Message(
                 userRepository.findById(messageCreateRequest.authorId())
                         .orElseThrow(() -> new UserNotFoundException(messageCreateRequest.authorId())),
                 channelRepository.findById(messageCreateRequest.channelId())
                         .orElseThrow(() -> new ChannelNotFoundException(messageCreateRequest.channelId())),
                 messageCreateRequest.content(),
-                attachmentFiles == null ? null : attachmentFiles.stream()
+                files == null ? null : files.stream()
                         .map(f -> {
+                            BinaryContent attachment = new BinaryContent(f.getOriginalFilename(), f.getSize(), f.getContentType());
                             try {
-                                BinaryContent saved = binaryContentRepository.save(new BinaryContent(f.getOriginalFilename(), f.getSize(), f.getContentType()));
-                                binaryContentStorage.put(saved.getId(), f.getBytes());
-                                return saved;
+                                publisher.publishEvent(new BinaryContentCreatedEvent(attachment, f.getBytes()));
                             } catch (IOException e) {
-                                throw new RuntimeException(e);
+                                log.error("파일 저장 중 예상치 못한 오류 발생 : {}", attachment.getId());
+                                attachment.uploadFailed();
                             }
+                            return attachment;
                         }).toList()
         ));
         log.info("메세지 발신 완료.");
