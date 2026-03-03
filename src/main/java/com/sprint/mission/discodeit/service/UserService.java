@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -21,6 +19,9 @@ import com.sprint.mission.discodeit.service.dto.response.UserDto;
 import com.sprint.mission.discodeit.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,9 @@ public class UserService {
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtRegistry jwtRegistry;
+    private final ApplicationEventPublisher eventPublisher;
 
+    @CacheEvict(cacheNames = "usersAll", allEntries = true)
     public UserDto createUser(UserCreateRequest request, MultipartFile file) {
         log.info("UserService.createUser");
         if (userRepository.existsByEmailOrUsername(request.email(), request.username())) {
@@ -62,7 +65,7 @@ public class UserService {
         List<ReadStatus> readList = new ArrayList<>();
         channelRepository.findAllByType(ChannelType.PUBLIC)
                 .forEach(channel -> {
-                    ReadStatus readStatus = new ReadStatus(save, channel);
+                    ReadStatus readStatus = new ReadStatus(save, channel, false);
                     readList.add(readStatus);
                 });
         readStatusRepository.saveAll(readList);
@@ -71,6 +74,7 @@ public class UserService {
     }
 
     @PreAuthorize("#id == authentication.principal.userDto.id")
+    @CacheEvict(cacheNames = "usersAll", allEntries = true)
     public UserDto updateUserInfo(UUID id, UserUpdateRequest updateDto, MultipartFile file) {
         log.info("UserService.updateUserInfo");
         User user = userRepository.findByIdWithBinaryContent(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, new HashMap<>()));
@@ -79,7 +83,7 @@ public class UserService {
             user.updateUsername(updateDto.newUsername());
         }
         if (updateDto.newPassword() != null) {
-            user.updatePassword(updateDto.newPassword());
+            user.updatePassword(passwordEncoder.encode(updateDto.newPassword()));
         }
         if (updateDto.newEmail() != null) {
             user.updateEmail(updateDto.newEmail());
@@ -96,6 +100,7 @@ public class UserService {
     }
 
     @PreAuthorize("#id == authentication.principal.userDto.id")
+    @CacheEvict(cacheNames = "usersAll", allEntries = true)
     public void deleteUser(UUID id) {
         log.info("UserService.deleteUser");
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,new HashMap<>()));
@@ -106,6 +111,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "usersAll")
     public List<UserDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -114,13 +120,21 @@ public class UserService {
     }
 
 
+    @CacheEvict(cacheNames = "usersAll", allEntries = true)
     public UserDto updateRole(RoleUpdateRequest roleUpdateRequest){
         User user = userRepository
                 .findById(roleUpdateRequest.userId())
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, new HashMap<>()));
 
+        Role oldRole = user.getRole();
         user.updateRole(roleUpdateRequest.newRole());
         jwtRegistry.invalidateJwtInformationByUserId(user.getId());
+
+        eventPublisher.publishEvent(new RoleUpdatedEvent(
+                user.getId(),
+                oldRole,
+                roleUpdateRequest.newRole()
+        ));
         return mapper.toDto(user);
     }
 }

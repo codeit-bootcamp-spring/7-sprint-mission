@@ -37,25 +37,18 @@ public class LocalBinaryContentStorge implements BinaryContentStorage {
     }
 
     @Override
-    public UUID put(MultipartFile file) {
-        String contentType = file.getContentType();
-        validateContentType(contentType);
-        String fileName = UUID.randomUUID().toString();
+    public void put(String fileName, MultipartFile file) {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread interrupted while simulating delay", e);
+        }
         Path filePath = ROOT_PATH.resolve(fileName);
         try {
             file.transferTo(filePath);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        return UUID.fromString(fileName);
-    }
-
-    private void validateContentType(String contentType) {
-        if (contentType == null ||
-                !(contentType.equals("image/png")
-                        || contentType.equals("image/jpeg")
-                        || contentType.equals("image/gif"))) {
-            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다: " + contentType);
         }
     }
 

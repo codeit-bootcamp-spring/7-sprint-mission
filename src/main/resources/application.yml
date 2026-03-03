@@ -67,6 +67,9 @@ jwt:
   issuer: discodeit
 
 management:
+  observations:
+    annotations:
+      enabled: true
   endpoints:
     web:
       exposure:

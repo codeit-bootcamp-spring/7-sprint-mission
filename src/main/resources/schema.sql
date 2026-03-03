@@ -4,7 +4,10 @@ create table binary_contents
     file_name         varchar(100)                        not null,
     file_type         varchar(50)                         not null,
     file_size         bigint                              not null,
-    created_at        timestamp default current_timestamp not null
+    created_at        timestamp default current_timestamp not null,
+    updated_at        timestamp,
+    status            varchar(20)                         not null default 'PROCESSING'
+        check (status in ('PROCESSING', 'SUCCESS', 'FAIL'))
 );
 
 
@@ -14,6 +17,8 @@ create table users
     username       varchar(100) unique                 not null,
     password       varchar(100)                        not null,
     email          varchar(100) unique                 not null,
+    role           varchar(20)                         not null default 'USER'
+        check (role in ('USER', 'CHANNEL_MANAGER', 'ADMIN')),
     last_active_at timestamp,
     profile_id     uuid,
     created_at     timestamp default current_timestamp not null,
@@ -100,6 +105,7 @@ create table read_statuses
     last_read_at   timestamp,
     created_at     timestamp default current_timestamp not null,
     updated_at     timestamp,
+    notification_enabled boolean not null default false,
 
     constraint uq_read_statuses_user_channel
         unique (user_id, channel_id),

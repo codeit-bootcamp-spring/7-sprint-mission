@@ -12,5 +12,6 @@ public record ReadStatusCreateRequest(
         UUID channelId,
         @NotNull
         Instant lastReadAt
+
 ) {
 }

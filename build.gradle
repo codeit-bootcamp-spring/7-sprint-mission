@@ -36,6 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
     testImplementation 'org.springframework.security:spring-security-test'
 
     //Spring Boot Admin Client
@@ -64,6 +65,8 @@ dependencies {
     //s3
 //    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
     implementation 'software.amazon.awssdk:s3:2.31.7'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation 'org.springframework.retry:spring-retry'
 
     //jwt
 //    implementation 'com.nimbusds:nimbus-jose-jwt:10.3'

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -44,11 +45,13 @@ public class ReadStatusService {
                 channelRepository.findById(request.channelId()).orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, new HashMap<>()));
 
 
+
         ReadStatus readStatus =
                 new ReadStatus(
                         user,
                         channel,
-                        request.lastReadAt()
+                        request.lastReadAt(),
+                        channel.getType() == ChannelType.PRIVATE
                 );
         ReadStatus saved
                 = readStatusRepository.save(readStatus);

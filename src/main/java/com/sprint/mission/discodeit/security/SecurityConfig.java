@@ -53,7 +53,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
-                                "/webjars/**", "/my-api"
+                                "/webjars/**", "/my-api","/management/**"
                         ).permitAll()
                         .requestMatchers("/index.html", "/static/**", "/assets/**", "/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*").permitAll()
                         .requestMatchers("/h2-console/**", "/session-expired", "/error").permitAll()
