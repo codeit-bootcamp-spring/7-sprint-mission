@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.dto.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.event.dto.MessageCreatedEvent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -41,6 +42,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public PageResponse<Message> getAllByChannelId(MessageGetRequest request) {
@@ -113,6 +115,7 @@ public class BasicMessageService implements MessageService {
                         }).toList()
         ));
         log.info("메세지 발신 완료.");
+        publisher.publishEvent(new MessageCreatedEvent(message.getCreatedAt(), message.getChannel().getId(), message.getAuthor().getId(), message.getContent()));
         return messageMapper.toDto(message);
     }
 }
