@@ -8,18 +8,21 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateParams;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.type.Role;
+import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserDuplicateException;
 import com.sprint.mission.discodeit.mapper.UserMapperManual;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,9 +41,11 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapperManual userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Override
+    @CacheEvict(cacheNames="users", allEntries=true)
     @Transactional
     public UserResponseDto signUp(UserSignupCommand userSignupCommand) {
 
@@ -80,6 +85,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames="users", allEntries=true)
     @Transactional
     @PreAuthorize(" #userId == principal.userResponseDto.id ")
     public void deleteUser(UUID userId) {
@@ -95,6 +101,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames="users", allEntries=true)
     @Transactional
     @PreAuthorize("#updateCommand.id() == principal.userResponseDto.id()")
     public UserResponseDto updateUser(UserUpdateCommand updateCommand) {
@@ -126,15 +133,26 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames="users", allEntries=true)
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public UserResponseDto updateUserRole(RoleUpdateRequest request) {
         User user = userReader.findUserOrThrow(request.userId());
+        Role oldRole = user.getRole();
         user.updateRole(request.newRole());
+
+        eventPublisher.publishEvent(
+                new RoleUpdatedEvent(
+                        user.getId(),
+                        request.newRole(),
+                        oldRole
+                )
+        );
         return userMapper.toDto(user);
     }
 
     @Override
+    @Cacheable(value = "users")
     @Transactional(readOnly = true)
     public List<UserResponseDto> getAllUsers() {
 

@@ -1,13 +1,23 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.event.BinaryContentUploadFailedEvent;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -25,8 +35,9 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.UUID;
 
-
+@Slf4j
 @Component
+@RequiredArgsConstructor
 @ConditionalOnProperty(
         prefix = "discodeit.storage",
         name = "type",
@@ -50,9 +61,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     @Value("${spring.cloud.aws.s3.presigned-url-expiration}")
     private long presignedExpiration;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     @PostConstruct // NOTE: 클래스 기반으로 객체가 생성된 후 1번 자동 실행되도록 설정
     private void initializeAmazonS3Client() {
-        // 액세스 키와 시크릿 키를 이용해서 계정 인증 받기
+        // 액세스 키와 시크릿 키를 이용해서 AWS 요청에 사용할 자격 증명 객체 생성
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
 
         // 지역 설정 및 인증 정보를 담은 S3Client 객체를 위의 변수에 세팅
@@ -64,7 +77,14 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Retryable(
+            retryFor = RuntimeException.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
     public UUID put(UUID binaryId, byte[] bytes) {
+        log.info("S3 put 시도 binaryId={}", binaryId);
         String key = "binary/" + binaryId;
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -74,11 +94,29 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
                 .build();
         try {
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
+            log.info("S3 put 성공 binaryId={} key={}", binaryId, key);
             return binaryId;
         } catch (S3Exception e) {
-            System.out.println("e = " + e);
+            log.error("S3Exception 발생 attempt binaryId={}", binaryId, e);
             throw new RuntimeException("S3 putObject failed. bucket =" + bucket + ", key =" + key, e);
         }
+    }
+
+    @Recover
+    public UUID recover(RuntimeException e, UUID binaryId, byte[] bytes) {
+        log.error("S3 최종 실패 message={}, binaryId={}", e.getMessage(), binaryId);
+        String requestId = MDC.get("requestId");
+        String error = e.getMessage();
+
+        eventPublisher.publishEvent(
+                new BinaryContentUploadFailedEvent(
+                        requestId,
+                        binaryId,
+                        error
+                )
+        );
+
+        throw new RuntimeException("S3 업로드 최종 실패 binaryId=" + binaryId, e);
     }
 
     @Override

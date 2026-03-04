@@ -89,7 +89,8 @@ public class BasicReadStatusService implements ReadStatusService {
         log.debug("읽음 상태 수정 시도 - readStatusId={}", command.id());
         ReadStatus readStatusById = readStatusRepository.findById(command.id()).orElseThrow();
 
-        boolean isUpdated = readStatusById.updateReadAt(command.readAt());
+        boolean isUpdated = readStatusById.applyPatch(command.readAt(), command.notificationEnabled());
+
         if (isUpdated) {
             ReadStatus saved = readStatusRepository.save(readStatusById);
             log.info("읽음 상태 수정 완료 - readStatusId={}, readAt={}", saved.getId(), command.readAt());

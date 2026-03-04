@@ -34,13 +34,36 @@ public class ReadStatus extends BaseUpdatableEntity {
     @CreatedDate
     private Instant lastReadAt;
 
+    @Column(name = "notification_enabled", nullable = false)
+    private boolean notificationEnabled;
+
     @Builder
-    public ReadStatus(User user, Channel channel) {
-        if (channel.getType() != ChannelType.PRIVATE) {
-            throw new ReadStatusCreateNotAllowedException(channel.getType());
-        }
+    public ReadStatus(User user, Channel channel, boolean notificationEnabled) {
+//        if (channel.getType() != ChannelType.PRIVATE) {
+//            throw new ReadStatusCreateNotAllowedException(channel.getType());
+//        }
         this.user = user;
         this.channel = channel;
+        this.notificationEnabled = notificationEnabled;
+    }
+
+    public boolean applyPatch(Instant readAt, Boolean notificationEnabled) {
+        boolean isChanged = false;
+        isChanged |= updateReadAt(readAt);
+        isChanged |= updateNotificationEnabled(notificationEnabled);
+        return isChanged;
+    }
+
+
+    public boolean updateNotificationEnabled(Boolean notificationEnabled) {
+        if (notificationEnabled == null) {
+            return false;
+        }
+        if (this.notificationEnabled == notificationEnabled) {
+            return false;
+        }
+        this.notificationEnabled = notificationEnabled;
+        return true;
     }
 
     public boolean updateReadAt(Instant readAt) {

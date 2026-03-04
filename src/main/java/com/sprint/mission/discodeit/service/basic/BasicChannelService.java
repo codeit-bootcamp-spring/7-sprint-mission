@@ -21,7 +21,11 @@ import com.sprint.mission.discodeit.service.reader.ChannelReader;
 import com.sprint.mission.discodeit.service.reader.UserReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +45,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final ChannelFactory channelFactory;
     private final ChannelMapper channelMapper;
+    private final CacheManager cacheManager;
 
     @Override
     @Transactional
@@ -51,13 +56,13 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = channelFactory.create(command);
 
-        Channel saved = channelRepository.save(channel);
+        Channel savedChannel = channelRepository.save(channel);
 
-        if (saved.getType() == ChannelType.PRIVATE) {
+        if (savedChannel.getType() == ChannelType.PRIVATE) {
             List<User> users = userReader.findUsersByIds(command.memberIds());
             if (users.size() < MIN_PARTICIPANTS_FOR_PRIVATE_CHANNEL) {
                 log.warn("PRIVATE 채널 생성 실패 - 최소 인원 부족 channelId={} required={} actual={}",
-                        saved.getId(), MIN_PARTICIPANTS_FOR_PRIVATE_CHANNEL, users.size());
+                        savedChannel.getId(), MIN_PARTICIPANTS_FOR_PRIVATE_CHANNEL, users.size());
                 throw new ChannelMinimumMembersNotMetException(
                         users.size(),
                         MIN_PARTICIPANTS_FOR_PRIVATE_CHANNEL,
@@ -66,7 +71,7 @@ public class BasicChannelService implements ChannelService {
             }
             if (users.size() < command.memberIds().size()) {
                 log.warn("PRIVATE 채널 생성 실패 - 잘못된 참여 유저 존재 channelId={} requestedIds={} foundUsers={}",
-                        saved.getId(), command.memberIds().size(), users.size());
+                        savedChannel.getId(), command.memberIds().size(), users.size());
                 throw new ChannelInvalidParticipantsException(
                         command.memberIds().size(),
                         users.size()
@@ -74,17 +79,28 @@ public class BasicChannelService implements ChannelService {
             }
 
             List<ReadStatus> readStatuses = users.stream()
-                    .map(user -> new ReadStatus(user, saved)).toList();
+                    .map(user -> new ReadStatus(user, savedChannel, command.notificationEnabled())).toList();
 
             readStatusRepository.saveAll(readStatuses);
-            log.debug("PRIVATE 채널 ReadStatus 생성 channelId={} count={}", saved.getId(), readStatuses.size());
+            log.debug("PRIVATE 채널 ReadStatus 생성 channelId={} count={}", savedChannel.getId(), readStatuses.size());
         }
         log.info("채널 생성 성공 channelId={} type={} name={}",
-                saved.getId(), saved.getType(), saved.getName());
-        return channelMapper.toDto(saved);
+                savedChannel.getId(), savedChannel.getType(), savedChannel.getName());
+
+        evictChannelsByUserCaches(command);
+        return channelMapper.toDto(savedChannel);
+    }
+
+    private void evictChannelsByUserCaches(ChannelCreateCommand command) {
+        Cache cache = cacheManager.getCache("channelsByUserId"); // NOTE: cacheManger로 해당 캐시 관리, 역선 get한후 해당 member evict
+        if (cache == null) return;
+        for (UUID memberId : command.memberIds()) {
+            cache.evict(memberId);
+        }
     }
 
     @Override
+    @CacheEvict(cacheNames = "channelsByUserId", allEntries = true)
     @Transactional
     public void updateChannel(UUID channelId, ChannelUpdateRequestDto request) {
         if (channelId == null) { // NOTE: 서비스 레이어 public API라 컨트롤러 외 테스트, 배치, 이벤트 핸들러에서 요청 가능하므로 최소 필수 가드로 남김
@@ -105,6 +121,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "channelsByUserId", allEntries = true)
     @Transactional
     public void deleteChannel(UUID channelId) {
         if (channelId == null) {
@@ -149,6 +166,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Cacheable(value = "channelsByUserId", key = "#userId")
     @Transactional(readOnly = true)
     public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
         log.debug("사용자 기준 채널 목록 조회 시도 userId={}", userId);
@@ -165,43 +183,43 @@ public class BasicChannelService implements ChannelService {
         };
     }
 
-    @Override
-    @Transactional
-    public void joinChannel(UUID channelId, UUID userId) {
-        if (channelId == null || userId == null) {
-            throw new DiscodeitException(ErrorCode.INVALID_INPUT);
-        }
-        log.info("채널 참여 시도 channelId={} userId={}", channelId, userId);
-        Channel channel = channelReader.findChannelOrThrow(channelId);
+//    @Override
+//    @Transactional
+//    public void joinChannel(UUID channelId, UUID userId) {
+//        if (channelId == null || userId == null) {
+//            throw new DiscodeitException(ErrorCode.INVALID_INPUT);
+//        }
+//        log.info("채널 참여 시도 channelId={} userId={}", channelId, userId);
+//        Channel channel = channelReader.findChannelOrThrow(channelId);
+//
+//        User user = userReader.findUserOrThrow(userId);
+//        // 이미 참여했는지 체크 (메서드 없으면 아래 existsBy...를 리포지토리에 추가)
+//        if (readStatusRepository.existsByUserAndChannel(user, channel)) {
+//            throw new ChannelAlreadyJoinedException(user.getId(), channel.getId());
+//        }
+//
+//        // 참여 = ReadStatus 한 줄 생성
+//        ReadStatus readStatus = new ReadStatus(user, channel);
+//        readStatusRepository.save(readStatus);
+//        log.info("채널 참여 성공 channelId={} userId={}", channelId, userId);
+//    }
 
-        User user = userReader.findUserOrThrow(userId);
-        // 이미 참여했는지 체크 (메서드 없으면 아래 existsBy...를 리포지토리에 추가)
-        if (readStatusRepository.existsByUserAndChannel(user, channel)) {
-            throw new ChannelAlreadyJoinedException(user.getId(), channel.getId());
-        }
-
-        // 참여 = ReadStatus 한 줄 생성
-        ReadStatus readStatus = new ReadStatus(user, channel);
-        readStatusRepository.save(readStatus);
-        log.info("채널 참여 성공 channelId={} userId={}", channelId, userId);
-    }
-
-    @Override
-    @Transactional
-    public void leaveChannel(UUID channelId, UUID userId) {
-        if (channelId == null || userId == null) {
-            throw new DiscodeitException(ErrorCode.INVALID_INPUT);
-        }
-        log.info("채널 탈퇴 시도 channelId={} userId={}", channelId, userId);
-        Channel channel = channelReader.findChannelOrThrow(channelId);
-
-        User user = userReader.findUserOrThrow(userId);
-
-        ReadStatus readStatus = readStatusRepository.findByUserAndChannel(user, channel)
-                .orElseThrow(() -> new ChannelNotJoinedException(user.getId(), channel.getId()));
-        readStatusRepository.delete(readStatus);
-        log.info("채널 탈퇴 성공 channelId={} userId={}", channelId, userId);
-    }
+//    @Override
+//    @Transactional
+//    public void leaveChannel(UUID channelId, UUID userId) {
+//        if (channelId == null || userId == null) {
+//            throw new DiscodeitException(ErrorCode.INVALID_INPUT);
+//        }
+//        log.info("채널 탈퇴 시도 channelId={} userId={}", channelId, userId);
+//        Channel channel = channelReader.findChannelOrThrow(channelId);
+//
+//        User user = userReader.findUserOrThrow(userId);
+//
+//        ReadStatus readStatus = readStatusRepository.findByUserAndChannel(user, channel)
+//                .orElseThrow(() -> new ChannelNotJoinedException(user.getId(), channel.getId()));
+//        readStatusRepository.delete(readStatus);
+//        log.info("채널 탈퇴 성공 channelId={} userId={}", channelId, userId);
+//    }
 
     @Override
     @Transactional(readOnly = true)

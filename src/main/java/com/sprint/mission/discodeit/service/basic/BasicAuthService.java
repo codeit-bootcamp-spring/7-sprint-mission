@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -82,6 +83,7 @@ public class BasicAuthService implements AuthService {
     }
 
     @Override
+    @CacheEvict(cacheNames="users", allEntries=true)
     public void logout(String refreshToken) {
         refreshTokenService.deleteRefreshToken(refreshToken);
     }

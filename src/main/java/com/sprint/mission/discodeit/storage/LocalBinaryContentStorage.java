@@ -1,16 +1,24 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.event.BinaryContentUploadFailedEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,15 +31,18 @@ import java.util.UUID;
 
 @Slf4j
 @Component
+
 @ConditionalOnProperty(
         prefix = "discodeit.storage",
         name = "type",
         havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
     private final Path root;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String rootPath) {
+    public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String rootPath, ApplicationEventPublisher eventPublisher) {
         this.root = Paths.get(rootPath);
+        this.eventPublisher = eventPublisher;
     }
 
     @PostConstruct
@@ -39,7 +50,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         if (Files.notExists(root)) {
             try {
                 Files.createDirectories(root);
-            log.info("로컬 스토리지 디렉토리 생성 root={}", root.toAbsolutePath());
+                log.info("로컬 스토리지 디렉토리 생성 root={}", root.toAbsolutePath());
             } catch (IOException e) {
                 log.error("로컬 스토리지 초기화 실패 root={}", root.toAbsolutePath(), e);
                 throw new RuntimeException("로컬 스토리지 초기화 실패: " + root.toAbsolutePath(), e);
@@ -52,9 +63,16 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Retryable(
+            retryFor = RuntimeException.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
     public UUID put(UUID binaryId, byte[] bytes) {
         Path path = resolvePath(binaryId);
         try {
+            Thread.sleep(3000);
             log.debug("binary content 저장 시도 id={} path={} size={}",
                     binaryId,
                     path,
@@ -66,7 +84,27 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         } catch (IOException e) {
             log.error("binary content 저장 실패 id={} path={}", binaryId, path, e);
             throw new RuntimeException("파일 저장 실패: " + binaryId, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread interrupted while simulating delay", e);
         }
+    }
+
+    @Recover
+    public UUID recover(RuntimeException e, UUID binaryId, byte[] bytes) {
+        log.error("local 파일 업로드 최종 실패 message={}, binaryId={}", e.getMessage(), binaryId);
+        String requestId = MDC.get("requestId");
+        String error = e.getMessage();
+
+        eventPublisher.publishEvent(
+                new BinaryContentUploadFailedEvent(
+                        requestId,
+                        binaryId,
+                        error
+                )
+        );
+
+        throw new RuntimeException("로컬 업로드 최종 실패 binaryId=" + binaryId, e);
     }
 
     @Override

@@ -33,11 +33,11 @@ public interface ChannelService {
 
     List<ChannelResponseDto> getAllChannelsByUserId(UUID userId);
 
-    // 채널 입장
-    void joinChannel(UUID channelId, UUID userId);
-
-    // 채널 퇴장
-    void leaveChannel(UUID channelId, UUID userId);
+//    // 채널 입장
+//    void joinChannel(UUID channelId, UUID userId);
+//
+//    // 채널 퇴장
+//    void leaveChannel(UUID channelId, UUID userId);
 
 
     // 참여인원조회 getAllMembers

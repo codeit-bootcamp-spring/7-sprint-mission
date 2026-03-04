@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.auth.JwtDto;
 import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.auth.TokenResult;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.mapper.UserMapperManual;
 import com.sprint.mission.discodeit.security.jwt.config.JwtProperties;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -70,7 +69,7 @@ public class AuthController implements AuthApi {
 
     @Override
     @PutMapping("/role")
-    public ResponseEntity<UserResponseDto> updateUserRole(RoleUpdateRequest request) {
+    public ResponseEntity<UserResponseDto> updateUserRole(@RequestBody RoleUpdateRequest request) {
         UserResponseDto userResponseDto = userService.updateUserRole(request);
         return ResponseEntity.ok(userResponseDto);
     }
