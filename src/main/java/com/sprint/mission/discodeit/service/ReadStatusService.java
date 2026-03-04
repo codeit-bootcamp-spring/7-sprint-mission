@@ -18,5 +18,5 @@ public interface ReadStatusService {
 
     void deleteReadStatus(UUID readStatusId);
 
-
+    public List<ReadStatusResponseDto> getAllNotificationEnabledByChannelId(UUID channelId);
 }

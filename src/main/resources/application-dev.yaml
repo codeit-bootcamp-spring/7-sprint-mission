@@ -10,11 +10,9 @@ spring:
 
 logging:
   level:
-    root: info
     org.springframework.security: debug
     com.sprint.mission.discodeit: debug
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+    com.p6spy: debug
 
 management:
   endpoint:
@@ -23,3 +21,13 @@ management:
   info:
     env:
       enabled: true
+  observations:
+    annotations:
+      enabled: true
+
+discodeit:
+  jwt:
+    secret: mySecretKeyForJwtTokenGeneration1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+    access-token-expiration: 900000
+    refresh-token-expiration: 1209600000
+    issuer: codeit

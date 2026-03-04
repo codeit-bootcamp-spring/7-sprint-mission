@@ -19,6 +19,8 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,7 @@ public class BasicChannelService implements ChannelService {
 
     private final ChannelMapper channelMapper;
 
+    @CacheEvict(value = "channels", allEntries = true)
     @Override
     @Transactional
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
@@ -53,7 +56,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toResponseDto(channel);
     }
 
-
+    @CacheEvict(value = "channels", allEntries = true)
     @Override
     @Transactional
     public ChannelResponseDto createChannel(CreatePrivateChannelDto createPrivateChannelDto) {
@@ -95,9 +98,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toResponseDto(channel);
     }
 
-    // TODO: 여기 부분도 N+1 문제가 심각하게 발생
-    // Return 할 때, 매번 쿼리를 수행하니, 채널만큼 쿼리가 돌아감. 수정 필요
-    // How??
+    @Cacheable(value = "channels", key = "#userId")
     @Override
     @Transactional(readOnly = true)
     public List<ChannelResponseDto> getAllChannelByUserId(UUID userId) {
@@ -117,7 +118,7 @@ public class BasicChannelService implements ChannelService {
                 .toList();
     }
 
-
+    @CacheEvict(value = "channels", allEntries = true)
     @Override
     @Transactional
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
@@ -134,6 +135,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toResponseDto(channel);
     }
 
+    @CacheEvict(value = "channels", allEntries = true)
     @Override
     @Transactional
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")

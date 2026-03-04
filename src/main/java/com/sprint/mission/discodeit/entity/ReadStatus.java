@@ -1,47 +1,53 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import com.sprint.mission.discodeit.entity.enums.ChannelType;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.Instant;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(
-    name = "read_statuses",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "channel_id"})
-    }
+        name = "read_statuses",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+        }
 )
 public class ReadStatus extends BaseUpdatableEntity {
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "channel_id", nullable = false)
-  private Channel channel;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
 
-  @Column(name = "last_read_at", nullable = false)
-  private Instant lastReadAt;
+    @Column(name = "last_read_at", nullable = false)
+    private Instant lastReadAt;
 
-  public void update(Instant lastReadAt) {
-    if (lastReadAt != null && !lastReadAt.equals(this.lastReadAt)) {
-      this.lastReadAt = lastReadAt;
+    @Column(name = "notification_enabled", nullable = false)
+    private boolean notificationEnabled;
+
+    @Builder
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = lastReadAt;
+        this.notificationEnabled = channel.getType().equals(ChannelType.PRIVATE);
     }
-  }
+
+    public void update(Instant lastReadAt, Boolean notificationEnabled) {
+        if (lastReadAt != null && !lastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = lastReadAt;
+        }
+
+        if (notificationEnabled != null) {
+            this.notificationEnabled = notificationEnabled;
+        }
+    }
 }

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.global.aop;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -7,24 +9,20 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-
 @Slf4j
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class LoggingAspect {
 
-    @Around("execution(public * com.sprint.mission.discodeit.controller..*(..))")
-    public Object logController(ProceedingJoinPoint joinPoint) throws Throwable {
-        return logExecution(joinPoint, "CONTROLLER", true);
-    }
+    private final ObjectMapper objectMapper;
 
-    @Around("execution(public * com.sprint.mission.discodeit.service..*(..))")
+    @Around("@within(org.springframework.stereotype.Service)")
     public Object logService(ProceedingJoinPoint joinPoint) throws Throwable {
-        return logExecution(joinPoint, "SERVICE", false);
+        return logExecution(joinPoint, "SERVICE");
     }
 
-    private Object logExecution(ProceedingJoinPoint joinPoint, String layer, boolean isInfo)
+    private Object logExecution(ProceedingJoinPoint joinPoint, String layer)
             throws Throwable {
         long start = System.currentTimeMillis();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -34,37 +32,27 @@ public class LoggingAspect {
 
         Object[] args = joinPoint.getArgs();
 
-        if (isInfo)
-            log.info("[{}] {}.{}() Request: {}", layer, className, methodName, Arrays.toString(args));
-        else
-            log.debug("[{}] {}.{}() Request: {}", layer, className, methodName, Arrays.toString(args));
-
+        log.info("[{}] {}.{}() Request: {}", layer, className, methodName, safeSerialize(args));
 
         try {
             Object result = joinPoint.proceed();
             long duration = System.currentTimeMillis() - start;
 
-            if (isInfo)
-                log.info("[{}] {}.{}() Response: {} ({} ms)", layer, className, methodName, formatResult(result), duration);
-            else
-                log.debug("[{}] {}.{}() Response: {} ({} ms)", layer, className, methodName, formatResult(result), duration);
-
+            log.info("[{}] {}.{}() Response: {} ({} ms)", layer, className, methodName, safeSerialize(result), duration);
             return result;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             long duration = System.currentTimeMillis() - start;
-            log.warn("[{}] {}.{}() Exception: {} ({} ms)",
-                    layer, className, methodName, e.getMessage(), duration);
+            log.warn("[{}] {}.{}() Exception ({} ms)", layer, className, methodName, duration, e);
             throw e;
         }
     }
 
-    private String formatResult(Object result) {
-        if (result == null) return "null";
-
+    private String safeSerialize(Object obj) {
+        if (obj == null) return "null";
         try {
-            return result.toString();
+            return objectMapper.writeValueAsString(obj);
         } catch (Exception e) {
-            return "[toString() failed: " + e.getClass().getSimpleName() + "]";
+            return "[Serialization failed: " + e.getMessage() + "]";
         }
     }
 }

@@ -10,13 +10,16 @@ spring:
 
 logging:
   level:
-    root: info
     com.sprint.mission.discodeit: info
+    p6spy: off
 
 management:
   endpoint:
     health:
       show-details: never
+    web:
+      exposure:
+        include: health
   info:
     env:
       enabled: false

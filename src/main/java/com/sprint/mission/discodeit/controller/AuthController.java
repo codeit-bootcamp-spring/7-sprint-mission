@@ -38,7 +38,7 @@ public class AuthController implements AuthDocs {
 
     @PutMapping("/role")
     public ResponseEntity<UserResponseDto> updateUserRole(@RequestBody UserRoleUpdateRequest userRoleUpdateRequest) {
-        log.info("권한 수정 요청");
+        log.debug("권한 수정 요청");
         UserResponseDto userResponseDto = authService.updateRoleForAdmin(userRoleUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }

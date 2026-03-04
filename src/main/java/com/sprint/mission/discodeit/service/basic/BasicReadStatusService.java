@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.global.exception.discodietException.channel.
 import com.sprint.mission.discodeit.global.exception.discodietException.readStatus.ReadStatusAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.discodietException.readStatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -29,6 +30,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final ReadStatusMapper readStatusMapper;
 
     @Override
     @Transactional
@@ -55,7 +57,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
         readStatusRepository.save(readStatus);
 
-        return ReadStatusResponseDto.from(readStatus);
+        return readStatusMapper.toResponseDto(readStatus);
     }
 
     @Override
@@ -64,14 +66,14 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> ReadStatusNotFoundException.byId(readStatusId));
 
-        return ReadStatusResponseDto.from(readStatus);
+        return readStatusMapper.toResponseDto(readStatus);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ReadStatusResponseDto> getAllReadStatusByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId).stream()
-                .map(ReadStatusResponseDto::from)
+                .map(readStatusMapper::toResponseDto)
                 .toList();
     }
 
@@ -80,9 +82,9 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusResponseDto updateReadStatus(UUID readStatusId, UpdateReadStatusDto updateReadStatusDto) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> ReadStatusNotFoundException.byId(readStatusId));
-        readStatus.update(updateReadStatusDto.newLastReadAt());
+        readStatus.update(updateReadStatusDto.newLastReadAt(), updateReadStatusDto.newNotificationEnabled());
 
-        return ReadStatusResponseDto.from(readStatus);
+        return readStatusMapper.toResponseDto(readStatus);
     }
 
     @Override
@@ -92,5 +94,14 @@ public class BasicReadStatusService implements ReadStatusService {
             throw ReadStatusNotFoundException.byId(readStatusId);
         }
         readStatusRepository.deleteById(readStatusId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReadStatusResponseDto> getAllNotificationEnabledByChannelId(UUID channelId) {
+        return readStatusRepository.findAllByChannelIdAndNotificationEnabledIsTrue(channelId)
+                .stream()
+                .map(readStatusMapper::toResponseDto)
+                .toList();
     }
 }

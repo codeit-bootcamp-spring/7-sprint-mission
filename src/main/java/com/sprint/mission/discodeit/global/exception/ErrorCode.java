@@ -31,6 +31,10 @@ public enum ErrorCode {
     // BINARY_CONTENT
     BINARY_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Binary Content를 찾을 수 없습니다."),
 
+    // NOTIFICATION
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Notification을 찾을 수 없습니다."),
+    NOTIFICATION_FORBIDDEN(HttpStatus.FORBIDDEN, "사용자의 알림이 아닙니다."),
+
     // INTERNAL
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 

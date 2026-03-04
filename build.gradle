@@ -9,7 +9,7 @@ ext {
 }
 
 group = 'com.sprint.mission'
-version = '2.1-M10'
+version = '2.2-M11'
 description = 'Demo project for Spring Boot'
 
 java {
@@ -61,9 +61,20 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.31.7'
     testImplementation 'io.findify:s3mock_2.13:0.2.6'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    implementation 'org.springframework.retry:spring-retry'
 
     implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
 
+    // 1. Spring Cache 추상화 레이어 (Caffeine을 Spring에서 쓰기 위해 필요)
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+//    // 2. Caffeine 캐시 엔진 본체
+//    implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 }
 dependencyManagement {

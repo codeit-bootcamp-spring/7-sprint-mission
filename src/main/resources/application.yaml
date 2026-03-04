@@ -14,8 +14,34 @@ spring:
     database: postgresql
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate:
+
+  cache:
+    type: redis
+    cache-names:
+      - channels
+      - notifications
+      - users
+    caffeine:
+      spec: >
+        maximumSize=100,
+        expireAfterAccess=600s,
+        recordStats
+    redis:
+      enable-statistics: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 discodeit:
   storage:
@@ -35,10 +61,10 @@ discodeit:
     admin-pass: ${ADMIN_PASS:admin}
 
   jwt:
-    secret: ${JWT_SECRET:mySecretKeyForJwtTokenGeneration1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
-    access-token-expiration: ${ACCESS_TOKEN_EXPIRATION:900000}
-    refresh-token-expiration: ${REFRESH_ACCESS_TOKEN_EXPIRATION:1209600000}
-    issuer: ${ISSUER:codeit}
+    secret: ${JWT_SECRET}
+    access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
+    refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
+    issuer: ${ISSUER}
 
 
 
@@ -57,7 +83,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers
+        include: health, info, metrics, loggers, caches
   endpoint:
     health:
       show-details: always
