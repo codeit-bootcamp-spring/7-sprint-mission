@@ -1,11 +1,13 @@
-package com.sprint.mission.discodeit.event.lilstener;
+package com.sprint.mission.discodeit.event.listener;
 
 import com.sprint.mission.discodeit.common.enums.ChannelScope;
+import com.sprint.mission.discodeit.common.enums.Roles;
 import com.sprint.mission.discodeit.common.exceptions.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.common.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.dto.BinaryContentCreateFailedEvent;
 import com.sprint.mission.discodeit.event.dto.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.dto.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -13,6 +15,7 @@ import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -21,6 +24,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationRequiredEventListener {
 
     private final ChannelRepository channelRepository;
@@ -57,5 +61,24 @@ public class NotificationRequiredEventListener {
         String title = "권한이 변경되었습니다.";
         String content = String.format("%s → %s", event.before(), event.after());
         notificationRepository.save(new Notification(user, title, content));
+    }
+
+    @TransactionalEventListener
+    @Async
+    public void on(BinaryContentCreateFailedEvent event) {
+        List<User> admins = userRepository.findAllByRole(Roles.ADMIN);
+        String title = "파일 업로드 실패";
+        String content = String.format("""
+                BinaryContentId : %s,
+                Error : %s,
+                ErrorMessage : %s
+                """,
+                event.contentId(),
+                event.exception().getClass().getSimpleName(),
+                event.exception().getMessage());
+        log.error("{}\n{}", title, content);
+        notificationRepository.saveAll(admins.stream()
+                .map(u -> new Notification(u, title, content))
+                .toList());
     }
 }
