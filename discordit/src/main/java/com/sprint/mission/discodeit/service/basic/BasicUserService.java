@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.mapper.UserMapper;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.dto.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.dto.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -123,8 +125,10 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public UserDto updateRole(UUID id, Roles role) {
+        log.info("권한 변경 요청 들어옴. : {}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+        publisher.publishEvent(new RoleUpdatedEvent(Instant.now(), id, user.getRole(), role));
         user.updateRole(role);
         return userMapper.toDto(user);
     }

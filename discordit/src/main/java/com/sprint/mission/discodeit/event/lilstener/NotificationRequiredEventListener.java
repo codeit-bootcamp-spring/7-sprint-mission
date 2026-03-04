@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.dto.MessageCreatedEvent;
+import com.sprint.mission.discodeit.event.dto.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -44,5 +45,14 @@ public class NotificationRequiredEventListener {
                 .map(u -> new Notification(u, title, summary))
                 .toList();
         notificationRepository.saveAll(notis);
+    }
+
+    @TransactionalEventListener
+    public void on(RoleUpdatedEvent event) {
+        User user = userRepository.findById(event.userId())
+                .orElseThrow(() -> new UserNotFoundException(event.userId()));
+        String title = "권한이 변경되었습니다.";
+        String content = String.format("%s → %s", event.before(), event.after());
+        notificationRepository.save(new Notification(user, title, content));
     }
 }
