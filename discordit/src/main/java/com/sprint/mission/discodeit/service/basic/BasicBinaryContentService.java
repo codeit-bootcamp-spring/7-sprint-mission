@@ -5,11 +5,12 @@ import com.sprint.mission.discodeit.dto.entity.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.entity.binaryContent.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.event.dto.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +24,8 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository contentRepository;
-    private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     public BinaryContentDto create(BinaryContentCreateRequest dto) {
@@ -34,9 +35,8 @@ public class BasicBinaryContentService implements BinaryContentService {
                 (long) dto.bytes().length,
                 dto.type()
         );
-        binaryContentStorage.put(content.getId(), dto.bytes());
-        contentRepository.save(content);
-        log.info("파일 저장 완료 : {}", content.getId());
+        publisher.publishEvent(new BinaryContentCreatedEvent(content, dto.bytes()));
+        log.info("파일 저장 이벤트 발행 : {}", content.getId());
         return binaryContentMapper.toDto(content);
     }
 

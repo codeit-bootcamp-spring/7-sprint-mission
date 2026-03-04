@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
@@ -20,4 +19,7 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
     void deleteAllByUser(User user);
 
     void deleteAllByChannel(Channel channel);
+
+    @Query("select r.user from ReadStatus r where r.channel.id = :id and r.notificationEnabled = true")
+    List<User> findNotificationEnabledUserByChannelId(UUID channelId);
 }

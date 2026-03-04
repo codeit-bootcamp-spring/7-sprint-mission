@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.entity.message.request.MessageCreateRequ
 import com.sprint.mission.discodeit.dto.entity.message.request.MessageEditRequest;
 import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getAllByChannelId(new MessageGetRequest(channelId, pageable)));
     }
 
+    @Timed("message.create.async")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> send(@Valid @RequestPart(name = "messageCreateRequest") MessageCreateRequest messageCreateRequest, @RequestPart(name = "attachments", required = false) List<MultipartFile> attachments) {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageService.send(messageCreateRequest, attachments));
