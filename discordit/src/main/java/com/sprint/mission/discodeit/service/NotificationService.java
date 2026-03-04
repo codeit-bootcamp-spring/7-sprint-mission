@@ -1,8 +1,14 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.entity.notification.NotificationDto;
-import com.sprint.mission.discodeit.dto.entity.notification.request.NotificationCreateRequest;
+
+import java.util.List;
+import java.util.UUID;
 
 public interface NotificationService {
-    NotificationDto getByUserId(NotificationCreateRequest request);
+    List<NotificationDto> getAllByUserId(UUID userId);
+
+    List<NotificationDto> getAll();
+
+    void confirm(UUID requestedUserId, UUID id);
 }
