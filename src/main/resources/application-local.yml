@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: discodeit
+  #  datasource:
+  #    url: jdbc:postgresql://localhost:5432/discodeit
+  #    driver-class-name: org.postgresql.Driver
+  #    username: discodeit_user
+  #    password: discodeit1234
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit_1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+
+logging:
+  level:
+    root: info
+    # 우리가 작성한 패키지
+    com.sprint.mission: debug
+    # SQL 로그 (유지)
+    org.hibernate.SQL: debug
+    org.springframework.security: TRACE #⭐️ 각 요청마다 통과하는 필터 목록을 확인할 수 있습니다.
+    org.springframework.retry: DEBUG
+
+
+# ===============================
+# Actuator 설정
+# ===============================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics ,loggers # loggers(보안위험) => /actuator/loggers로 로그 레벨을 런타임에 변경 가능
+  endpoint:
+    health:
+      show-details: always
+  observations:     # 비동기 Event Listener에 @Observed(name = "metric 이름을 써준다!") 적용
+    annotations:
+      enabled: true
+
+
+storage:
+  type: local
+  path: ./storage/dev
+
+server:
+  port: 4444
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: info,health,metrics,loggers

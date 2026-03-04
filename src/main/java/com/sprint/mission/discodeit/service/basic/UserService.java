@@ -5,20 +5,22 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.dto.dto_Neo.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.InterfaceUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,6 +42,7 @@ public class UserService implements InterfaceUserService {
     private final PasswordEncoder passwordEncoder;
     private final SessionRegistry sessionRegistry;
     private final AuthService authService;
+    private final ApplicationEventPublisher eventPublisher;
 
 //    @Autowired
 //    EntityManager em;
@@ -55,6 +58,7 @@ public class UserService implements InterfaceUserService {
     //    @PreAuthorize("hasRole('USER')")
     @Transactional
     @Override
+    @CacheEvict(cacheNames = "users", allEntries = true)
     public UserDto create(UserCreateRequest userCreateRequest, Optional<MultipartFile> optionalProfileFile) {
 //    public User create(String newUsername, Optional<BufferedImage> profileImageBytes) {
 //        [ ] 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
@@ -72,16 +76,11 @@ public class UserService implements InterfaceUserService {
 
         BinaryContent profile = optionalProfileFile
             .map(file -> {
-                BinaryContent binaryContent = new BinaryContent(
-                    file.getOriginalFilename(),
-                    file.getSize(),
-                    file.getContentType()
-                );
+                BinaryContent binaryContent = new BinaryContent(file);
+                BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+                eventPublisher.publishEvent(new BinaryContentCreatedEvent(savedBinaryContent.getId(), file));
 
-                // 파일 저장
-                binaryContentStorage.put(file, binaryContent);
-                // DB 저장
-                return binaryContentRepository.save(binaryContent);
+                return savedBinaryContent;
             })
             .orElse(null);
 
@@ -112,9 +111,10 @@ public class UserService implements InterfaceUserService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "users")
     public List<UserDto> findAll() {
 //        DTO를 활용하여:
-//        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
+//        [ ] 사용자의 온라인 상태 정보를 같이 포함하세요. =>온라인 상태를 findAll()에 포함하고 있다면 로그인/로그아웃 때도 반드시 캐시 삭제해야 함.
 //        [ ] 패스워드 정보는 제외하세요.
 
         return userRepository.findAll().stream()
@@ -136,6 +136,7 @@ public class UserService implements InterfaceUserService {
     @Transactional
     @Override
     @PreAuthorize("#userId == authentication.principal.user.id") // SpEL
+    @CacheEvict(cacheNames = "users", allEntries = true)
     public UserDto update(UUID userId, UserUpdateRequest dtoUserUpdate, Optional<MultipartFile> optionalProfileFile) {
 //        [ ] 선택적으로 프로필 이미지를 대체할 수 있습니다.
 //        [ ] DTO를 활용해 파라미터를 그룹화합니다.
@@ -150,35 +151,27 @@ public class UserService implements InterfaceUserService {
 
         if (!userId.equals(user.getId())
                 && userRepository.findUserByUsername(dtoUserUpdate.newUsername()).isPresent()) {
-            throw new UserAlreadyExistsException("username", dtoUserUpdate.newUsername());
+            throw new UserAlreadyExistsException("🚨username", dtoUserUpdate.newUsername());
         }
 
         if (!userId.equals(user.getId())
                 && userRepository.findUserByEmail(dtoUserUpdate.newEmail()).isPresent()) {
-            throw new UserAlreadyExistsException("email", dtoUserUpdate.newEmail());
+            throw new UserAlreadyExistsException("🚨email", dtoUserUpdate.newEmail());
         }
 
         BinaryContent profile = optionalProfileFile.map(file -> {
-                BinaryContent neoBinaryContent = null;
-                neoBinaryContent = binaryContentRepository
+                BinaryContent neoBinaryContent = binaryContentRepository
                     .findById(userId)
-                    .orElse(
-                        new BinaryContent(
-                        file.getOriginalFilename(),
-                        file.getSize(),
-                        file.getContentType()
-                    ));
-                //1. 파일 저장
-                binaryContentStorage.put(file, neoBinaryContent);
-                //2. DB 저장
-                return binaryContentRepository.save(neoBinaryContent);
+                    .orElse( new BinaryContent(file));
+
+                eventPublisher.publishEvent(new BinaryContentCreatedEvent(neoBinaryContent.getId(), file));
+
+                return neoBinaryContent;
             })
             .orElse(null);
 
         user.updateFrom(dtoUserUpdate, profile);
 
-        //!! 순서 유의_II
-        userRepository.save(user);
         log.info("✅ UserService.update = [" + userName + "]를 [" + dtoUserUpdate.newUsername() + "]로 변경 완료");
 
         return userMapper.toDto(user);
@@ -187,6 +180,7 @@ public class UserService implements InterfaceUserService {
     @Transactional
     @Override
     @PreAuthorize("#userID == authentication.principal.user.id") // SpEL
+    @CacheEvict(cacheNames = "users", allEntries = true)
     public void delete(UUID userID) {
 //        [ ] 관련된 도메인도 같이 삭제합니다.
         User user = userRepository.findById(userID)
@@ -198,7 +192,6 @@ public class UserService implements InterfaceUserService {
 //            log.info("✅ UserService.userStatusRepository.deleteById = [" + user.getUsername() + "]");
 //        }
 
-        authService.expireUserSessions(userID);
 
         if (user.getProfile() != null && user.getProfile().getId() != null) {
             Optional<BinaryContent> optionalContents = binaryContentRepository.findById(user.getProfile().getId());
@@ -207,7 +200,7 @@ public class UserService implements InterfaceUserService {
                 log.info("✅ UserService.binaryContentRepository.deleteById = [" + user.getUsername() + "]");
             }
 //            else {
-//                log.error("🚨UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]");
+//                log.error("🚨UserService.binaryContentRepository.deleteById = [" + user.getUserName() + "]", e);
 //            }
         }
 

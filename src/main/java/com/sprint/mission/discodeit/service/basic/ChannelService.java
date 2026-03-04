@@ -9,15 +9,19 @@ import com.sprint.mission.discodeit.exception.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.channelNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
-import com.sprint.mission.discodeit.mapper.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.ChannelDto;
 import com.sprint.mission.discodeit.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.mapper.dto.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.mapper.dto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.repository.jpa.ChannelsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessagesRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusesRepository;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.service.InterfaceChannelService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.Authentication;
@@ -51,7 +55,7 @@ public class ChannelService implements InterfaceChannelService {
             readStatusList = participantIds.stream()
                 .map(userId -> { User user = userRepository.findById(userId)
                     .orElseThrow(() -> new UserNotFoundException(userId));
-                    return new ReadStatus(user, channel, Instant.now());
+                    return new ReadStatus(user, channel, Instant.now(), true);
                 })
                 .map(readStatusRepository::save)
                 .peek(readStatus -> log.info("✅ Channel.PRIVATE.readStatusRepository.save! - readStatus.id = {}", readStatus.getId().toString()))
@@ -63,6 +67,7 @@ public class ChannelService implements InterfaceChannelService {
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
+    @CacheEvict(cacheNames = {"channelsByUser"}, allEntries = true)
     public ChannelDto createPublic(PublicChannelCreateRequest dtoCreateChannel) {
         Channel channel = new Channel(PUBLIC
                                     , dtoCreateChannel.name()
@@ -76,6 +81,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Transactional
     @Override
+    @CacheEvict(cacheNames = {"channelsByUser"}, allEntries = true)
     public ChannelDto createPrivate(PrivateChannelCreateRequest dtoCreateChannel) {
 //        PRIVATE 채널과 PUBLIC 채널을 생성하는 메소드를 분리합니다.
 //        [ ] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
@@ -97,6 +103,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Transactional(readOnly = true)
     @Override
+    @Cacheable(cacheNames = "channelsByUser", key = "#userID")
     public List<ChannelDto> findAllByUserId(UUID userID) {
 //        [ ] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
 //        [ ] PRIVATE 채널인 경우 참여한 User의 readStatusID 정보를 포함합니다.
@@ -124,13 +131,13 @@ public class ChannelService implements InterfaceChannelService {
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
+    @CacheEvict(cacheNames = "channelsByUser", allEntries = true)
     public ChannelDto update(UUID channelId, ChannelDto_Update channelDtoUpdate) {
         Channel channel = channelRepository
             .findById(channelId)
             .orElseThrow(() -> new channelNotFoundException(channelId));
 
         if (channel.getType() == PRIVATE) {
-            log.error("🚨PRIVATE.so update error! - channelId = {}", channelId.toString());
             throw new PrivateChannelUpdateException(channelId);
         }
         else {
@@ -147,6 +154,7 @@ public class ChannelService implements InterfaceChannelService {
 
     @Transactional
     @Override
+    @CacheEvict( cacheNames = {"channelsByUser"}, allEntries = true) //???
     public void delete(UUID channelID) {
 //        [ ] 관련된 도메인도 같이 삭제합니다.
         Channel findedChannel = channelRepository.findById(channelID)
@@ -161,11 +169,12 @@ public class ChannelService implements InterfaceChannelService {
             boolean isAdmin = authentication
                 .getAuthorities()
                 .stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CHANNEL_MANAGER"));
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CHANNEL_MANAGER") ||
+                    grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
 
             if (!isAdmin) {
 
-                throw new AuthorizationDeniedException("권한이 없습니다.");
+                throw new AuthorizationDeniedException("🚨권한이 없습니다.");
             }
         }
 

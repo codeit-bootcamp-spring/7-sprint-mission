@@ -2,7 +2,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers
+        include: health,info,metrics #,loggers(보안위험) => /actuator/loggers로 로그 레벨을 런타임에 변경 가능
   info:
     java:
       enabled: true

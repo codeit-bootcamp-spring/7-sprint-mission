@@ -4,24 +4,41 @@ server:
 logging:
   level:
     root: info
+    org.springframework.retry: DEBUG
 
 spring:
   profiles:
-    active: dev
+    active: local
   application:
     name: discodeit
-
-# ===============================
-# Actuator 설정
-# ===============================
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,loggers
-  endpoint:
-    health:
-      show-details: always
+  cache:                #//for. Caffeine 캐시
+    type: redis         #caffeine
+    cache-names:
+      - users
+      - channelsByUser
+      - notificationsByUser
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=600s,recordStats
+    redis:
+      enable-statistics: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#
+## ===============================
+## Actuator 설정
+## ===============================
 
 # ===============================
 # Actuator Info 메타데이터
@@ -43,6 +60,14 @@ info:
   jpa:
     ddl-auto: ${spring.jpa.hibernate.ddl-auto}
 
+jwt:
+  access-token:
+    secret: ${JWT_ACCESS_SECRET:your-access-token-secret-key-here-make-it-long-and-random}
+    expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:600_000} # 10 minutes
+  refresh-token:
+    secret: ${JWT_REFRESH_SECRET:your-refresh-token-secret-key-here-make-it-different-and-long}
+    expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604_800_000} # 7 days
+
   storage:
     type: ${storage.type}
     path: ${storage.path}
@@ -55,3 +80,13 @@ info:
 security:
   remember-me:
     key: ${REMEMBER_ME_KEY:test-RememberMeKey}
+
+login:
+  account:
+    user-admin: ${ACCOUNT_ADMIN:admin123}
+    user-admin-password: ${ACCOUNT_ADMIN_PASSWORD:admin123}
+    user-admin-email: ${ACCOUNT_ADMIN_EMAIL:admin123@email.com}
+    user-default: ${ACCOUNT_DEFAULT:user1}
+    user-default-password: ${ACCOUNT_DEFAULT_PASSWORD:user1}
+    user-default-email: ${ACCOUNT_DEFAULT_EMAIL:user1@email.com}
+

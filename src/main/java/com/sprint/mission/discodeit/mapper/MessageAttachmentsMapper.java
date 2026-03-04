@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.entity.MessageAttachments;
-import com.sprint.mission.discodeit.mapper.dto.MessageAttachmentsDto;
-import java.util.UUID;
+import com.sprint.mission.discodeit.dto.dto_Neo.MessageAttachmentsDto;
 import org.springframework.stereotype.Component;
 
 @Component

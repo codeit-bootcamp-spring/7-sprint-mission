@@ -1,9 +1,7 @@
-package com.sprint.mission.discodeit.mapper.dto;
+package com.sprint.mission.discodeit.dto.dto_Neo;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 
 public record UserUpdateRequest(
     @NotBlank

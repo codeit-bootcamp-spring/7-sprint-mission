@@ -3,17 +3,22 @@ package com.sprint.mission.discodeit.security;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AdminCreater implements ApplicationRunner {
     private final UsersRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LoginAccountProperties loginProperties;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -26,11 +31,10 @@ public class AdminCreater implements ApplicationRunner {
         boolean isAdmin = userRepository.existsByRole(Role.ADMIN);
         if (!isAdmin) {
 
-            String name = "admin123";
-            String encodePassword = passwordEncoder.encode(name); //!! 🛠️
+            String encodePassword = passwordEncoder.encode(loginProperties.getUserAdminPassword()); //!! 🛠️
 
-            User newUser = new User(name,
-                name + "@mail.com",
+            User newUser = new User(loginProperties.getUserAdmin(),
+                loginProperties.getUserAdminEmail(),
                 encodePassword,
                 null);
 
@@ -41,15 +45,19 @@ public class AdminCreater implements ApplicationRunner {
 
     private void createDefUser() {
 
-        String name = "1";
-        String encodePassword = passwordEncoder.encode(name); //!! 🛠️
+        Optional<User> optionalUser = userRepository.findUserByUsername(
+            loginProperties.getUserDefault());
 
-        User newUser = new User(name,
-            name + "@mail.com",
-            encodePassword,
-            null);
+        if (!optionalUser.isPresent()) {
+            String encodePassword = passwordEncoder.encode(loginProperties.getUserDefaultPassword()); //!! 🛠️
 
-        newUser.updateRole(Role.USER);
-        userRepository.save(newUser);
+            User newUser = new User(loginProperties.getUserDefault(),
+                loginProperties.getUserDefaultEmail(),
+                encodePassword,
+                null);
+
+            newUser.updateRole(Role.USER);
+            userRepository.save(newUser);
+        }
     }
 }

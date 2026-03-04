@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.mapper.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +12,7 @@ public class ReadStatusMapper {
             .userId(readStatus.getUser().getId())
             .channelId(readStatus.getChannel().getId())
             .lastReadAt(readStatus.getLastReadAt())
+            .notificationEnabled(readStatus.isNotificationEnabled())
             .build();
     }
 }

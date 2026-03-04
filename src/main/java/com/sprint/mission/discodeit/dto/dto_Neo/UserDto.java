@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.mapper.dto;
+package com.sprint.mission.discodeit.dto.dto_Neo;
 
 import com.sprint.mission.discodeit.entity.Role;
 import java.util.UUID;

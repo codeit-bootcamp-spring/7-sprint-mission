@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.mapper.dto.UserUpdateRequest;
-import jakarta.persistence.CascadeType;
+import com.sprint.mission.discodeit.dto.dto_Neo.UserUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

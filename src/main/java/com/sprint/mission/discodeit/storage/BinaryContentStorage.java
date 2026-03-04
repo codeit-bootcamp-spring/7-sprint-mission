@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.storage;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentCreatedEvent;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface BinaryContentStorage {
-    BinaryContent put(MultipartFile file, BinaryContent binaryContent);
+    void put(BinaryContentCreatedEvent event);
     InputStream get(UUID bianryContentId);
     ResponseEntity<Resource> download(UUID binaryContentId); // HTTP API로 다운로드 기능을 제공
 }

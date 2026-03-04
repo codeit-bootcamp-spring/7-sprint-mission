@@ -2,11 +2,10 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.MessageAttachments;
-import com.sprint.mission.discodeit.mapper.dto.AttachmentsDto;
-import com.sprint.mission.discodeit.mapper.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.mapper.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentsRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessageAttachmentsRepository;
 import java.util.List;

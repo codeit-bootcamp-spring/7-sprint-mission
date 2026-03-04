@@ -10,22 +10,25 @@ spring:
     driver-class-name: org.h2.Driver
 #    url: jdbc:h2:mem:testdb  #;MODE=PostgreSQL
 #    url: jdbc:h2:~/test;AUTO_SERVER=TRUE #Spring 실행 중에도 같이 쓰고 싶다 //??
-    url: jdbc:h2:~/test  #jdbc:h2:tcp://localhost/~/test
+    url: jdbc:h2:~/test
+#    url: jdbc:h2:tcp://localhost/~/test
     username: sa
     password:
 
+#  http://localhost:4444/h2-console
   h2:
     console:
       enabled: true
       path: /h2-console
-
   jpa:
     hibernate:
       ddl-auto: create
     show-sql: true
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
+
 
   servlet:
     multipart:
@@ -41,8 +44,23 @@ logging:
     # SQL 로그 (유지)
     org.hibernate.SQL: debug
     org.springframework.security: TRACE #⭐️ 각 요청마다 통과하는 필터 목록을 확인할 수 있습니다.
+    org.springframework.retry: DEBUG
 
 
+# ===============================
+# Actuator 설정
+# ===============================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics ,loggers # loggers(보안위험) => /actuator/loggers로 로그 레벨을 런타임에 변경 가능
+  endpoint:
+    health:
+      show-details: always
+  observations:     # 비동기 Event Listener에 @Observed(name = "metric 이름을 써준다!") 적용
+    annotations:
+      enabled: true
 
 
 storage:

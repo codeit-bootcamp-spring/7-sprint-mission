@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.security;
 
-import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.UserDto;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @RequiredArgsConstructor
+@EqualsAndHashCode
 public class DiscodeitUserDetails implements UserDetails {
 
 //    private final User user;
@@ -58,17 +60,17 @@ public class DiscodeitUserDetails implements UserDetails {
 
     - equals()를 재정의하지 않으면 자바는 주소값으로 비교합니다. ID가 같더라도 주소가 다르기 때문에 서로 다른 계정으로 인식합니다.
      */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DiscodeitUserDetails that = (DiscodeitUserDetails) o;
-        // DB의 유니크한 ID나 username으로 비교
-        return Objects.equals(userDto.username(), that.userDto.username());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(userDto.username());
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        DiscodeitUserDetails that = (DiscodeitUserDetails) o;
+//        // DB의 유니크한 ID나 username으로 비교
+//        return Objects.equals(userDto.username(), that.userDto.username());
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(userDto.username());
+//    }
 }

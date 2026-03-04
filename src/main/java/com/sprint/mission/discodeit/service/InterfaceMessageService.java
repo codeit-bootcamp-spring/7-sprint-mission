@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.Dto_MessageUpdate;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
 import org.springframework.data.domain.Pageable;
-import com.sprint.mission.discodeit.mapper.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.MessageDto;
 import com.sprint.mission.discodeit.page.PageResponseDto;
 import java.util.List;
 import java.util.UUID;

@@ -1,34 +1,31 @@
 package com.sprint.mission.discodeit.service.basic;
 
-//import com.sprint.mission.discodeit.entity.User;
-//import com.sprint.mission.discodeit.exception.ErrorCode;
-//import com.sprint.mission.discodeit.exception.UserException;
-//import com.sprint.mission.discodeit.exception.UserNotFoundException;
-//import com.sprint.mission.discodeit.mapper.dto.LoginRequest;
-//import com.sprint.mission.discodeit.mapper.UserMapper;
-//import com.sprint.mission.discodeit.mapper.dto.UserDto;
-//import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
-//import com.sprint.mission.discodeit.service.InterfaceAuthService;
-//import java.util.Map;
-//import org.springframework.transaction.annotation.Transactional;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
+import com.nimbusds.jose.JOSEException;
 import com.sprint.mission.discodeit.dto.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.RoleUpdatedEvent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.dto.UserDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.JwtInformation;
+import com.sprint.mission.discodeit.dto.dto_Neo.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.UsersRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.InterfaceAuthService;
-import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 //🚨✅로그인 처리는 SecurityFilterChain에서 모두 처리
@@ -41,6 +38,10 @@ public class AuthService implements InterfaceAuthService {
     private final UsersRepository userRepository;
     private final UserMapper userMapper;
     private final SessionRegistry sessionRegistry;
+    private final JwtTokenProvider tokenProvider;
+    private final UserDetailsService userDetailsService;
+    private final JwtRegistry jwtRegistry;
+    private final ApplicationEventPublisher eventPublisher;
 
 //    @Transactional(readOnly = true)
 //    @Override
@@ -59,29 +60,56 @@ public class AuthService implements InterfaceAuthService {
 //    }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
+//    @Transactional
     @Override
+    @Transactional
     public UserDto userRoleUpdateRequest(UserRoleUpdateRequest userRoleUpdateRequest) {
 
         User user = userRepository.findById(userRoleUpdateRequest.userId())
             .orElseThrow(() -> new UserNotFoundException(userRoleUpdateRequest.userId()));
 
-        user.updateRole(userRoleUpdateRequest.newRole());
+        String content = user.getRole().toString() + " -> " + userRoleUpdateRequest.newRole().toString();
 
-        // 현재 로그인 중이라면 세션 무효화
-        expireUserSessions(user.getId());
+        user.updateRole(userRoleUpdateRequest.newRole());
+        eventPublisher.publishEvent(new RoleUpdatedEvent(user.getId(), content));
+
+        jwtRegistry.invalidateJwtInformationByUserId(user.getId());
 
         return userMapper.toDto(user);
     }
 
-    @Transactional
-    public void expireUserSessions(UUID userId) {
 
-        sessionRegistry.getAllPrincipals().stream()
-            .filter(DiscodeitUserDetails.class::isInstance)
-            .map(DiscodeitUserDetails.class::cast)
-            .filter(userDetails -> userDetails.getUser().id().equals(userId))
-            .flatMap(userDetails -> sessionRegistry.getAllSessions(userDetails, false).stream())
-            .forEach(SessionInformation::expireNow);
+    @Override
+    public JwtInformation refreshToken(String refreshToken) {
+        // Validate refresh token
+        if (!tokenProvider.validateRefreshToken(refreshToken)) {
+            throw new DiscodeitException(ErrorCode.INVALID_TOKEN, Map.of());
+        }
+
+        String username = tokenProvider.getUsernameFromToken(refreshToken);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        if (!(userDetails instanceof DiscodeitUserDetails discodeitUserDetails)) {
+            throw new DiscodeitException(ErrorCode.INVALID_USER_DETAILS, Map.of());
+        }
+
+        try {
+            String newAccessToken = tokenProvider.generateAccessToken(discodeitUserDetails);
+            String newRefreshToken = tokenProvider.generateRefreshToken(discodeitUserDetails);
+            log.info("Access token refreshed for user: {}", username);
+            return new JwtInformation(
+                discodeitUserDetails.getUserDto(),
+                newAccessToken,
+                newRefreshToken
+            );
+        } catch (JOSEException e) {
+            log.error("🚨 Failed to generate new tokens for user: {}", username, e);
+            throw new DiscodeitException(ErrorCode.INTERNAL_SERVER_ERROR, Map.of("username", e));
+        }
+    }
+
+    @Override
+    public void clearExpiredJwtInfo() {
+        jwtRegistry.clearExpiredJwtInformation();
     }
 }

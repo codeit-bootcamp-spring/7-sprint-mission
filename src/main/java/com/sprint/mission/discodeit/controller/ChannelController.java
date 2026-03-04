@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.mapper.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.dto_Neo.ChannelDto;
 import com.sprint.mission.discodeit.service.InterfaceChannelService;
 import com.sprint.mission.discodeit.swaggerDocs.ChannelDoc;
 import com.sprint.mission.discodeit.dto.ChannelDto_Update;
-import com.sprint.mission.discodeit.mapper.dto.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.mapper.dto.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.service.basic.ChannelService;
+import com.sprint.mission.discodeit.dto.dto_Neo.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.dto_Neo.PublicChannelCreateRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
