@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.common.enums.Roles;
 import com.sprint.mission.discodeit.entity.User;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByUsername(String username);
 
+    List<User> findAllByRole(Roles roles);
 }
