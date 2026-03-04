@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class BinaryContentCreatedEventListener {
 
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Async
     public void onBinaryContentCreated(BinaryContentCreatedEvent event) {
         BinaryContent content = event.content();
         log.info("파일 저장 이벤트 수신 : {}", content.getId());

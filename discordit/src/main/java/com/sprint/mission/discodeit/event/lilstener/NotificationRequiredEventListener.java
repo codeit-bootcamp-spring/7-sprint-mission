@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -28,6 +29,7 @@ public class NotificationRequiredEventListener {
     private final NotificationRepository notificationRepository;
 
     @TransactionalEventListener
+    @Async
     public void on(MessageCreatedEvent event) {
         Channel channel = channelRepository.findById(event.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(event.channelId()));
@@ -48,6 +50,7 @@ public class NotificationRequiredEventListener {
     }
 
     @TransactionalEventListener
+    @Async
     public void on(RoleUpdatedEvent event) {
         User user = userRepository.findById(event.userId())
                 .orElseThrow(() -> new UserNotFoundException(event.userId()));
