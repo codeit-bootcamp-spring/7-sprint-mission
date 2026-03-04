@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.global.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.global.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.global.exception.user.UsernameAlreadyExistsException;
@@ -15,9 +16,11 @@ import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,12 +42,12 @@ public class BasicUserService implements UserService{
 
     private final UserMapper userMapper;
 
-    private final BinaryContentStorage binaryContentStorage;
-
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
+    @CacheEvict(value = "userList", allEntries = true)
     public UserResponseDto create(CreateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
 
         log.debug("신규 사용자 생성 요청: username = {}, email = {}",
@@ -76,6 +79,7 @@ public class BasicUserService implements UserService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponseDto find(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -87,6 +91,8 @@ public class BasicUserService implements UserService{
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @Cacheable("userList")
     public List<UserResponseDto> findAll() {
         // fetch join 적용
         return userRepository.findAllWithProfile().stream()
@@ -97,6 +103,7 @@ public class BasicUserService implements UserService{
     @Override
     @Transactional
     @PreAuthorize("#userId == authentication.principal.getUserDto.id")
+    @CacheEvict(value = "userList", allEntries = true)
     public UserResponseDto update(UUID userId, UpdateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
 
         User user = userRepository.findById(userId)
@@ -115,7 +122,7 @@ public class BasicUserService implements UserService{
         if (Optional.ofNullable(userRequest).isPresent()) {
             username = userRequest.newUsername();
             email = userRequest.newEmail();
-            password = userRequest.newPassword();
+            password = passwordEncoder.encode(userRequest.newPassword());
 
             // username, email 중복 검사 (사용자의 기존 정보인 경우 제외)
             if(!user.getUsername().equals(username)) validateUsernameDuplicate(username);
@@ -136,6 +143,7 @@ public class BasicUserService implements UserService{
     @Override
     @Transactional
     @PreAuthorize("#userId == authentication.principal.getUserDto.id")
+    @CacheEvict(value = "userList", allEntries = true)
     public void delete(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -204,9 +212,15 @@ public class BasicUserService implements UserService{
         );
 
         BinaryContent saved = binaryContentRepository.save(newProfile);
-        binaryContentStorage.put(saved.getId(), request.bytes());
 
-        log.info("프로필 이미지 저장 완료: {}", saved.getFileName());
+        eventPublisher.publishEvent(
+                new BinaryContentCreatedEvent(
+                        saved.getId(),
+                        request.bytes()
+                )
+        );
+
+        log.info("프로필 이미지 메타 정보 저장 완료: {}", saved.getFileName());
 
         return saved;
     }

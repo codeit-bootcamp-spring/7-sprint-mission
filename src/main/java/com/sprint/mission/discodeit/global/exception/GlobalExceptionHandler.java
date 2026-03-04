@@ -76,6 +76,8 @@ public class GlobalExceptionHandler {
             customMessage = "채널 관리자(CHANNEL_MANAGER) 권한이 필요합니다.";
         } else if(request.getRequestURI().contains("/auth/role")) {
             customMessage = "관리자(ADMIN) 권한이 필요합니다.";
+        } else if(request.getRequestURI().contains("/api/notifications")) {
+            customMessage = "요청자 본인의 알림에 대해서만 요청이 가능합니다.";
         }
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN)

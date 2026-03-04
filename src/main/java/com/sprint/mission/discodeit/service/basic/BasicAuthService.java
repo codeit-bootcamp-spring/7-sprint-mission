@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.global.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.jwt.BusinessException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
@@ -14,16 +16,13 @@ import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.util.Pair;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -36,14 +35,24 @@ public class BasicAuthService implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtRegistry jwtRegistry;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponseDto updateRole(UserRoleUpdateRequest request) {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
+        Role oldRole = user.getRole();
+
         user.updateRole(request.newRole());
         User saved = userRepository.save(user);
+
+        eventPublisher.publishEvent(new RoleUpdatedEvent(
+                request.userId(),
+                oldRole,
+                request.newRole()
+        ));
 
        jwtRegistry.invalidateJwtInformationByUserId(user.getId());
 
@@ -53,14 +62,12 @@ public class BasicAuthService implements AuthService {
     }
 
     @Transactional
-    public JwtDto refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = extractRefreshTokenFromCookies(request);
-
-        if (refreshToken == null || !jwtTokenProvider.isTokenValid(refreshToken)) {
+    public Pair<JwtDto, String> refreshAccessToken(String refreshToken) {
+        if (refreshToken == null || !jwtTokenProvider.isRefreshTokenValid(refreshToken)) {
             throw new BusinessException(ErrorCode.EMPTY_OR_INVALID_TOKEN);
         }
 
-        Claims claims = jwtTokenProvider.validateToken(refreshToken);
+        Claims claims = jwtTokenProvider.validateToken(refreshToken, false);
         String username = claims.getSubject();
 
         User user = userRepository.findByUsername(username)
@@ -77,25 +84,9 @@ public class BasicAuthService implements AuthService {
                 newRefreshToken
         ));
 
-        Cookie refreshTokenCookie = new Cookie("REFRESH_TOKEN", newRefreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(request.isSecure());
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(60 * 60 * 24 * 14);
 
-        response.addCookie(refreshTokenCookie);
+        JwtDto jwtDto = new JwtDto(userMapper.toResponseDto(user), newAccessToken);
 
-        return new JwtDto(userMapper.toResponseDto(user), newAccessToken);
-    }
-
-    private String extractRefreshTokenFromCookies(HttpServletRequest request) {
-        if (request.getCookies() != null) {
-            return Arrays.stream(request.getCookies())
-                    .filter(cookie -> "REFRESH_TOKEN".equals(cookie.getName()))
-                    .map(Cookie::getValue)
-                    .findFirst()
-                    .orElse(null);
-        }
-        return null;
+        return Pair.of(jwtDto, newRefreshToken);
     }
 }

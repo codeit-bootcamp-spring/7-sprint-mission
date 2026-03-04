@@ -58,6 +58,10 @@ public enum ErrorCode {
     //===== BINARY_CONTENT =====//
     BINARYCONTENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "파일을 찾을 수 없습니다."),
 
+    //===== NOTIFICATION =====//
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "알림이 없습니다."),
+
+
     // 400 Bad Request
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "요청 데이터가 유효하지 않습니다."),
 

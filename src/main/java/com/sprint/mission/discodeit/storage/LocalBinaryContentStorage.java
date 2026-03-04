@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.binarycontent.Response.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.common.FileReadFailedException;
 import com.sprint.mission.discodeit.global.exception.common.FileSaveFailedException;
@@ -38,18 +39,20 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
     }
 
     @Override
-    public UUID put(UUID binaryContentId, byte[] bytes) {
+    public UUID put(UUID binaryContentId, byte[] bytes) throws IOException {
+
+        // 동기, 비동기 테스트용 지연 발생 코드
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//            throw new RuntimeException("Thread interrupted while simulating delay", e);
+//        }
+
         Path path = resolvePath(binaryContentId);
 
-        try {
-            Files.createDirectories(path.getParent());
-            Files.write(path, bytes);
-        } catch (IOException e) {
-            throw new FileSaveFailedException(
-                    ErrorCode.FILE_SAVE_FAILED,
-                    Map.of("binaryContentId", binaryContentId)
-            );
-        }
+        Files.createDirectories(path.getParent());
+        Files.write(path, bytes);
 
         return binaryContentId;
     }
@@ -69,15 +72,26 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
     }
 
     @Override
-    public ResponseEntity<Resource> download(BinaryContentResponseDto dto) {
+    public ResponseEntity<Resource> download(BinaryContent binaryContent) {
 
-        log.debug("파일 다운로드: binaryContentId = {}", dto.id());
+        log.debug("파일 다운로드: binaryContentId = {}", binaryContent.getId());
 
-        ByteArrayResource resource = new ByteArrayResource(dto.bytes());
+        byte[] bytes;
+
+        try {
+            bytes = get(binaryContent.getId()).readAllBytes();
+        } catch (IOException e) {
+            throw new FileReadFailedException(
+                    ErrorCode.FILE_READ_FAILED,
+                    Map.of("binaryContentId", binaryContent.getId())
+            );
+        }
+
+        ByteArrayResource resource = new ByteArrayResource(bytes);
 
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(dto.contentType()))
-                .header("Content-Disposition", "attachment; filename=\"" + dto.fileName() + "\"")
+                .contentType(MediaType.parseMediaType(binaryContent.getContentType()))
+                .header("Content-Disposition", "attachment; filename=\"" + binaryContent.getFileName() + "\"")
                 .body(resource);
     }
 

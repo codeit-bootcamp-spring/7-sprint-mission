@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.security.jwt;
 
 import com.sprint.mission.discodeit.dto.user.response.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Role;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -36,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = extractJwtFromRequest(request);
 
-            if (jwt != null && jwtTokenProvider.isTokenValid(jwt)) {
+            if (jwt != null && jwtTokenProvider.isAccessTokenValid(jwt)) {
 
                 if (!jwtRegistry.hasActiveJwtInformationByAccessToken(jwt)) {
                     log.warn("Registry에 존재하지 않는 JWT");
@@ -54,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void authenticateUser(String jwt, HttpServletRequest request) {
-        Claims claims = jwtTokenProvider.validateToken(jwt);
+        Claims claims = jwtTokenProvider.validateToken(jwt, true);
 
         UUID userId = UUID.fromString(claims.get("userId", String.class));
         String username = claims.getSubject();
@@ -65,12 +64,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 userId,
                 username,
                 email,
-                null,
+                null, // NPE 발생 가능
                 true,
                 role
         );
 
-        DiscodeitUserDetails userDetails = new DiscodeitUserDetails(dto, null);
+        DiscodeitUserDetails userDetails = new DiscodeitUserDetails(dto, null); // password NPE 발생 가능
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails,
