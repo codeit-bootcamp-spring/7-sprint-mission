@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.common.exception.channel.InvalidChannelExcep
 import com.sprint.mission.discodeit.common.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.common.security.SessionOnlineChecker;
+import com.sprint.mission.discodeit.common.security.jwt.JwtOnlineChecker;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.channel.PublicChannelCreateRequestDto;
@@ -15,6 +16,8 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +37,9 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
     private final SessionOnlineChecker sessionOnlineChecker;
+    private final JwtOnlineChecker jwtOnlineChecker;
 
+    @CacheEvict(cacheNames = "userChannelsCache", allEntries = true)
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
@@ -66,6 +71,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toDto(save,lastMessageAt(save),userList,userOnlineMap(userList));
     }
 
+    @CacheEvict(cacheNames = "userChannelsCache", allEntries = true)
     @Transactional
     @Override
     public ChannelResponseDto createPrivate(PrivateChannelCreateRequestDto channelCreateRequestDto) {
@@ -125,6 +131,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Cacheable(cacheNames = "userChannelsCache", key = "#userId")
     public List<ChannelResponseDto> getAllByUserId(UUID userId) {
         log.debug("Getting All By User Id: userId = {}", userId);
         List<ReadStatus> users = readStatusRepository.findAllByUserId(userId);
@@ -147,6 +154,7 @@ public class BasicChannelService implements ChannelService {
                 .toList();
     }
 
+    @CacheEvict(cacheNames = "userChannelsCache", allEntries = true)
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
@@ -185,6 +193,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toDto(save,lastMessageAt(save),userList,userOnlineMap(userList));
     }
 
+    @CacheEvict(cacheNames = "userChannelsCache", allEntries = true)
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
@@ -209,6 +218,7 @@ public class BasicChannelService implements ChannelService {
     }
 
 
+    @CacheEvict(cacheNames = "userChannelsCache", allEntries = true)
     @Transactional
     @Override
     public boolean join(UUID channelId, UUID userId) {
@@ -228,6 +238,7 @@ public class BasicChannelService implements ChannelService {
         return true;
     }
 
+    @CacheEvict(cacheNames = "userChannelsCache", allEntries = true)
     @Transactional
     @Override
     public boolean leave(UUID channelId, UUID userId) {
@@ -283,6 +294,6 @@ public class BasicChannelService implements ChannelService {
                 .map(user -> user.getId())
                 .collect(Collectors.toSet());
 
-        return sessionOnlineChecker.onlineMap(userIds);
+        return jwtOnlineChecker.onlineMap(userIds);
     }
 }

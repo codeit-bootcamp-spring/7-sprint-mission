@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.response.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.response.page.PageResponseDto;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class MessageController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
+    @Timed("message.create.async")
     public MessageResponseDto create(
             @Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto messageCreateRequestDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {

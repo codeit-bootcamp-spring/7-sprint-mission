@@ -20,7 +20,22 @@ spring:
         format_sql: true
     open-in-view: false
 
+  cache:
+    type: caffeine
+    cache-names: userListCache,userChannelsCache,notificationListCache
+    caffeine:
+      spec: >
+        maximumSize=100, 
+        expireAfterWrite=600s,
+        recordStats
+
 discodeit:
+  admin:
+    bootstrap:
+      enabled: true
+      username: admin
+      email: admin@discodeit.com
+      password: ${DISCODEIT_ADMIN_BOOTSTRAP_PASSWORD:}
   storage:
     type: ${STORAGE_TYPE:local}
     local:
@@ -31,6 +46,7 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+
 logging:
   level:
     root: info
@@ -39,12 +55,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers,env
+        include: health,info,metrics,loggers,env,caches
   endpoint:
     health:
       show-details: always
   info:
     env:
+      enabled: true
+  observations:
+    annotations:
       enabled: true
 
 
@@ -71,3 +90,13 @@ info:
     multipart:
       maxFileSize: ${spring.servlet.multipart.max-file-size:}
       maxRequestSize: ${spring.servlet.multipart.max-request-size:}
+
+jwt:
+  issuer: discodeit
+  secret: ${JWT_SECRET}
+  access-token-seconds: 900 # 15분
+  refresh-token-seconds: 1209600 # 14일
+  refresh-cookie:
+    secure: false
+    same-site: Lax
+    max-age-seconds: 1209600

@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.entity;
 
 public final class VerifiedUtils {
@@ -56,3 +57,5 @@ public final class VerifiedUtils {
         return value.trim();
     }
 }
+
+ */

@@ -117,6 +117,10 @@ public class BasicReadStatusService implements ReadStatusService {
             }
         }
 
+        if (readStatusUpdateRequestDto.newNotificationEnabled() != null) {
+            readStatus.updateNotificationEnabled(readStatusUpdateRequestDto.newNotificationEnabled());
+        }
+
         ReadStatus save = readStatusRepository.save(readStatus);
         log.info("유저 읽기 상태가 수정되었습니다. readStatusId = {}", save.getId());
         return readStatusMapper.toDto(save);

@@ -27,7 +27,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
         ErrorResponse body = ErrorResponse.from(
                 Instant.now(),
-                ErrorCode.INVALID_CREDENTIALS,
+                ErrorCode.AUTH_ACCESS_DENIED,
                 ErrorCode.AUTH_ACCESS_DENIED.getMessage(),
                 Map.of(),
                 accessDeniedException.getClass().getSimpleName(),

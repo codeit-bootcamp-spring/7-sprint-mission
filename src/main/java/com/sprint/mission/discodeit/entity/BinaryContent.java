@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
@@ -15,7 +13,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "binary_contents")
-public class BinaryContent extends BaseEntity {
+public class BinaryContent extends BaseUpdatableEntity {
     @Column(name = "file_name", nullable = false, length = 255)
     private String fileName;
 
@@ -24,6 +22,10 @@ public class BinaryContent extends BaseEntity {
 
     @Column(name = "size", nullable = false)
     private Long size;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private BinaryContentStatus status;
 
     protected BinaryContent() {}
 
@@ -35,5 +37,10 @@ public class BinaryContent extends BaseEntity {
         }
         this.contentType = Objects.requireNonNull(contentType);
         this.size = (long) size;
+        this.status = BinaryContentStatus.PROCESSING;
+    }
+
+    public void updateStatus(BinaryContentStatus status) {
+        this.status = Objects.requireNonNull(status);
     }
 }

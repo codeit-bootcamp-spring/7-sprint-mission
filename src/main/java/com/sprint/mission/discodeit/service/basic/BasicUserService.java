@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.common.exception.user.InvalidUserRequestException;
 import com.sprint.mission.discodeit.common.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.common.security.SessionOnlineChecker;
+import com.sprint.mission.discodeit.common.security.jwt.JwtOnlineChecker;
+import com.sprint.mission.discodeit.common.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.dto.request.auth.UserRoleUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequestDto;
@@ -18,6 +21,9 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,7 +43,11 @@ public class BasicUserService implements UserService {
     private final BinaryContentService binaryContentService;
     private final PasswordEncoder passwordEncoder;
     private final SessionOnlineChecker sessionOnlineChecker;
+    private final JwtRegistry jwtRegistry;
+    private final JwtOnlineChecker jwtOnlineChecker;
+    private final ApplicationEventPublisher eventPublisher;
 
+    @CacheEvict(cacheNames = "userListCache", key = "'all'")
     @Transactional
     @Override
     public UserResponseDto create(UserCreateRequestDto userCreateRequestDto,
@@ -95,23 +105,25 @@ public class BasicUserService implements UserService {
         log.debug("Getting user: userId = {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
-        boolean online = sessionOnlineChecker.isOnline(user.getId());
+        boolean online = jwtOnlineChecker.isOnline(userId);
         return userMapper.toDto(user, online);
     }
 
     @Override
+    @Cacheable(cacheNames = "userListCache", key = "'all'")
     public List<UserResponseDto> getAll() {
         log.debug("Getting all users");
         List<User> users = userRepository.findAll();
         Set<UUID> ids = users.stream()
                 .map(u -> u.getId())
                 .collect(Collectors.toSet());
-        Map<UUID, Boolean> onlineMap = sessionOnlineChecker.onlineMap(ids);
+        Map<UUID, Boolean> onlineMap = jwtOnlineChecker.onlineMap(ids);
         return users.stream()
                 .map(user -> userMapper.toDto(user, onlineMap.getOrDefault(user.getId(), false)))
                 .toList();
     }
 
+    @CacheEvict(cacheNames = "userListCache", key = "'all'")
     @PreAuthorize("@authz.isSelf(authentication, #userId)")
     @Transactional
     @Override
@@ -173,12 +185,13 @@ public class BasicUserService implements UserService {
         }
 
         User save = userRepository.save(user);
-        boolean online = sessionOnlineChecker.isOnline(user.getId());
+        boolean online = jwtOnlineChecker.isOnline(user.getId());
 
         log.info("유저 정보가 수정되었습니다. userId = {}", save.getId());
         return userMapper.toDto(save, online);
     }
 
+    @CacheEvict(cacheNames = "userListCache", key = "'all'")
     @PreAuthorize("@authz.isSelf(authentication, #userid)")
     @Transactional
     @Override
@@ -204,7 +217,7 @@ public class BasicUserService implements UserService {
         log.debug("Getting users by name {}", username);
         return userRepository.findByUsername(username)
                 .stream()
-                .map(user -> userMapper.toDto(user, sessionOnlineChecker.isOnline(user.getId())))
+                .map(user -> userMapper.toDto(user, jwtOnlineChecker.isOnline(user.getId())))
                 .toList();
     }
 
@@ -216,16 +229,18 @@ public class BasicUserService implements UserService {
         }
         log.debug("Getting users by email {}", email);
         return userRepository.findByEmail(email)
-                .map(user -> userMapper.toDto(user, sessionOnlineChecker.isOnline(user.getId())));
+                .map(user -> userMapper.toDto(user, jwtOnlineChecker.isOnline(user.getId())));
     }
 
+    @PreAuthorize("@authz.isSelf(authentication, #userId)")
     @Override
     public UserResponseDto getMe(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        boolean online = sessionOnlineChecker.isOnline(user.getId());
+        boolean online = jwtOnlineChecker.isOnline(userId);
         return  userMapper.toDto(user, online);
     }
 
+    @CacheEvict(cacheNames = "userListCache", key = "'all'")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Override
@@ -248,16 +263,24 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        if (user.getRole() == newRole) {
-            boolean online = sessionOnlineChecker.isOnline(userId);
+        UserRole oldRole = user.getRole();
+
+        if (oldRole == newRole) {
+            boolean online = jwtOnlineChecker.isOnline(userId);
             return userMapper.toDto(user, online);
         }
 
         user.updateRole(newRole);
         User saved = userRepository.save(user);
-        sessionOnlineChecker.expireSession(saved.getId());
 
-        boolean online = sessionOnlineChecker.isOnline(userId);
+        eventPublisher.publishEvent(new RoleUpdatedEvent(
+                saved.getId(),
+                oldRole,
+                newRole
+        ));
+
+        jwtRegistry.invalidateJwtInformationByUserId(userId);
+        boolean online = jwtOnlineChecker.isOnline(userId);
 
         log.info("User role updated. userId = {}, newRole = {}",  saved.getId(), newRole);
         return userMapper.toDto(saved, online);
