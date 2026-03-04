@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.handler.CustomAccessDeniedHandler;
+import com.sprint.mission.discodeit.security.handler.LoginFailureHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -61,8 +66,9 @@ public class SecurityConfig {
 
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        // SPA(React/Vue 등) 환경에서는 아래와 같은 핸들러가 필요할 수 있습니다.
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .ignoringRequestMatchers("/api/**")
+                        .ignoringRequestMatchers(PathRequest.toH2Console()) // 개발전용
                 )
 
                 .headers(headers -> headers

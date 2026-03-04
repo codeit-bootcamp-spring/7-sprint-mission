@@ -6,8 +6,8 @@ import com.sprint.mission.discodeit.dto.channelDto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channelDto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.role.ChannelType;
-import com.sprint.mission.discodeit.entity.role.Role;
+import com.sprint.mission.discodeit.entity.enums.ChannelType;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;

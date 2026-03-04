@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit.security.jwt;
 
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.JwtRegistry;
+import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,9 +17,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class JwtLogoutHandler implements LogoutHandler {
 
-    private final JwtRegistry jwtRegistry;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
+    private final AuthService authService;
 
     @Override
     public void logout(HttpServletRequest request,
@@ -31,17 +28,9 @@ public class JwtLogoutHandler implements LogoutHandler {
         Arrays.stream(request.getCookies())
                 .filter(cookie -> cookie.getName().equals("REFRESH_TOKEN"))
                 .findFirst()
-                .ifPresent(cookie -> {
-                    String refreshToken = cookie.getValue();
-
-                    if (jwtRegistry.hasActiveJwtInformationByRefreshToken(refreshToken)) {
-                        String username = jwtTokenProvider.getUsername(refreshToken);
-                        userRepository.findByUsername(username)
-                                .ifPresent(user ->
-                                        jwtRegistry.invalidateJwtInformationByUserId(user.getId())
-                                );
-                    }
-                });
+                .ifPresent(cookie ->
+                        authService.expireUserSession(cookie.getValue())
+                );
 
         Cookie cookie = new Cookie("REFRESH_TOKEN", "");
         cookie.setMaxAge(0);

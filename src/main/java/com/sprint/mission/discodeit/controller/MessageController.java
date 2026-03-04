@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.messageDto.MessageDto;
 import com.sprint.mission.discodeit.dto.messageDto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,7 @@ public class MessageController {
 
     // --- 메시지 관리 ---
     // (채널)메시지 생성
+    @Timed("message.create.async")
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<MessageDto> channelMessageCreate(
             @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageRequestDto,

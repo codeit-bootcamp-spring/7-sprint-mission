@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.exception.binaryContent.FileOperationFailedException;
 import com.sprint.mission.discodeit.exception.binaryContent.FileUploadLimitExceedException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
@@ -20,9 +22,10 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,7 +50,7 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final MessageMapper messageMapper;
-    private final BinaryContentStorage binaryContentStorage;
+    private final ApplicationEventPublisher eventPublisher;
 
     private List<BinaryContent> saveAttachment(List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
@@ -69,9 +72,10 @@ public class MessageServiceImpl implements MessageService {
             BinaryContent savedBinary = binaryContentRepository.save(binaryContent);
             attachments.add(savedBinary);
             try {
-                binaryContentStorage.put(savedBinary.getId(), file.getBytes());
+                String requestId = MDC.get("requestId");
+                eventPublisher.publishEvent(new BinaryContentCreatedEvent(
+                        savedBinary.getId(), file.getBytes(), requestId));
             } catch (IOException e) {
-                log.warn("파일 업로드 실패: {}", savedBinary.getId());
                 throw new FileOperationFailedException(savedBinary.getId());
             }
         }
@@ -110,6 +114,9 @@ public class MessageServiceImpl implements MessageService {
                 .attachments(attachments)
                 .build();
         messageRepository.save(message);
+
+        eventPublisher.publishEvent(new MessageCreatedEvent(
+                channel.getId(), channel.getName(), author.getUsername(), message.getContent()));
 
         log.info("메시지 생성 완료: {}", message.getId());
         return messageMapper.toDto(message);

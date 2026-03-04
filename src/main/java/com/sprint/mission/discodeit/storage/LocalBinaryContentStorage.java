@@ -58,13 +58,14 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     @Override
     public void put(UUID id, byte[] bytes) {
-        log.debug("로컬 스토리지 저장 시작 - id: {}, bytes: {}", id, bytes.length);
         Path path = resolvePath(id);
         try {
+            Thread.sleep(3000);
             Files.write(path, bytes);
-            log.info("파일 저장 성공 - id: {}", id);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread interrupted while simulating delay", e);
         } catch (IOException e) {
-            log.warn("파일 저장 실패 - id: {}", id);
             throw new FileOperationFailedException(id);
         }
     }

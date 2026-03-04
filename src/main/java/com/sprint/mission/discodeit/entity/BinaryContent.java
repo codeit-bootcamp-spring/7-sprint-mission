@@ -1,18 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.enums.BinaryContentStatus;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
 @Entity
 @Table(name = "binary_contents")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class BinaryContent extends BaseEntity {
+public class BinaryContent extends BaseUpdatableEntity {
     /* 10MB, 500MB 업로드 제한
     private static final long BASIC_MAX_FILE_SIZE = 10 * 1024 * 1024;
     private static final long NITRO_MAX_FILE_SIZE = 500 * 1024 * 1024;
@@ -31,4 +30,13 @@ public class BinaryContent extends BaseEntity {
 
     @Column(length = 100, nullable = false)
     private String contentType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default()
+    private BinaryContentStatus status = BinaryContentStatus.PROCESSING;
+
+    public void updateStatus(BinaryContentStatus status) {
+        this.status = status;
+    }
 }

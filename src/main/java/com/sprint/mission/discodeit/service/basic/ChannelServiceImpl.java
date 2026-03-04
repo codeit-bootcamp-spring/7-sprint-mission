@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.dto.channelDto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.role.ChannelType;
+import com.sprint.mission.discodeit.entity.enums.ChannelType;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -18,6 +18,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +43,7 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
+    @CacheEvict(value = "userChannels", allEntries = true)
     public ChannelDto createPublicChannel(PublicChannelCreateRequest requestDto) {
 
         log.debug("공개 채널 생성 요청 - name: {}, description: {}",
@@ -58,6 +62,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "userChannels", allEntries = true)
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest requestDto) {
 
         log.info("프라이빗 채널 생성 요청");
@@ -70,6 +75,7 @@ public class ChannelServiceImpl implements ChannelService {
             List<ReadStatus> readStatuses = users.stream()
                     .map(user -> new ReadStatus(user, newChannel))
                     .collect(Collectors.toList());
+            newChannel.getReadStatuses().addAll(readStatuses);
             readStatusRepository.saveAll(readStatuses);
         }
         log.info("프라이빗 채널 생성 완료");
@@ -78,6 +84,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "channel", key = "#id")
     public ChannelDto findChannelById(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new ChannelNotFoundException(id));
@@ -87,6 +94,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "userChannels", key = "#userId")
     public List<ChannelDto> findAllByUserId(UUID userId) {
 
         if(!userRepository.existsById(userId)) {
@@ -114,6 +122,10 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     @Transactional
     @PreAuthorize( "hasRole('CHANNEL_MANAGER')")
+    @Caching(evict = {
+        @CacheEvict(value = "channel", key = "#channelId"),
+        @CacheEvict(value = "userChannels", allEntries = true)
+    })
     public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest updateDto) {
 
         log.debug("채널 수정 요청 - channelId: {}", channelId);
@@ -139,6 +151,10 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     @Transactional
     @PreAuthorize( "hasRole('CHANNEL_MANAGER')")
+    @Caching(evict = {
+        @CacheEvict(value = "channel", key = "#id"),
+        @CacheEvict(value = "userChannels", allEntries = true)
+    })
     public void deleteChannel(UUID id) {
         log.info("채널 삭제 요청: {}", id);
         channelRepository.findById(id)

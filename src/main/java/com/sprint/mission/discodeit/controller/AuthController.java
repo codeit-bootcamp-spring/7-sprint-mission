@@ -4,11 +4,13 @@ import com.sprint.mission.discodeit.dto.jwt.JwtDto;
 import com.sprint.mission.discodeit.dto.userDto.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.exception.token.TokenInvalidException;
+import com.sprint.mission.discodeit.security.CookieProvider;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetailsService;
-import com.sprint.mission.discodeit.security.JwtTokenProvider;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,21 +29,25 @@ public class AuthController {
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
     private final DiscodeitUserDetailsService userDetailsService;
+    private final CookieProvider cookieProvider;
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtDto> refreshToken(
             @CookieValue(value = "REFRESH_TOKEN", required = false) String refreshToken,
+            HttpServletRequest request,
             HttpServletResponse response
     ) {
-        if(refreshToken == null || !jwtTokenProvider.isTokenValid(refreshToken)) {
+        if(refreshToken == null || !jwtTokenProvider.isRefreshTokenValid(refreshToken)) {
             throw new TokenInvalidException("토큰이 유효하지 않습니다.");
         }
 
-        String username = jwtTokenProvider.getUsername(refreshToken);
+        String username = jwtTokenProvider.getUsernameFromRefreshToken(refreshToken);
         DiscodeitUserDetails userDetails = (DiscodeitUserDetails) userDetailsService.loadUserByUsername(username);
         UserDto userDto = userDetails.getUserDto();
 
-        JwtDto jwtDto = authService.rotateRefreshToken(userDto, response);
+        JwtDto jwtDto = authService.rotateRefreshToken(userDto);
+        cookieProvider.setRefreshTokenCookie(request, response, jwtDto.refreshToken());
+
         return ResponseEntity.ok(jwtDto);
     }
 

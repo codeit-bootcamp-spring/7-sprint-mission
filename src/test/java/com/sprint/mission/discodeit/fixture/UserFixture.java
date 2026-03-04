@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.fixture;
 import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.userDto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.role.Role;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.UUID;

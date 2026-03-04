@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.role.Role;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

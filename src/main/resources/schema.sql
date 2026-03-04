@@ -3,10 +3,17 @@ CREATE TABLE IF NOT EXISTS binary_contents
 (
     id           UUID PRIMARY KEY,
     created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at   TIMESTAMP WITH TIME ZONE,
     file_name    VARCHAR(255)             NOT NULL,
     size         BIGINT                   NOT NULL,
-    content_type VARCHAR(100)             NOT NULL
+    content_type VARCHAR(100)             NOT NULL,
+    status       VARCHAR(20)              NOT NULL
 );
+
+-- ALTER TABLE binary_contents
+--      ADD COLUMN updated_at timestamp with time zone;
+-- ALTER TABLE binary_contents
+--      ADD COLUMN status varchar(20) NOT NULL;
 
 ------------------ users ----------------------
 CREATE TABLE IF NOT EXISTS users
@@ -54,9 +61,12 @@ CREATE TABLE IF NOT EXISTS read_statuses
     user_id      UUID                     NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     channel_id   UUID                     NOT NULL REFERENCES channels (id) ON DELETE CASCADE,
     last_read_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    notification_enabled boolean NOT NULL,
     UNIQUE (user_id, channel_id)
 );
 
+-- ALTER TABLE read_statuses
+--      ADD COLUMN notification_enabled boolean NOT NULL;
 -------------------- message_attachments ------------------
 CREATE TABLE IF NOT EXISTS message_attachments
 (

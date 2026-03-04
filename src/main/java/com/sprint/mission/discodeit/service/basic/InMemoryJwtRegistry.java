@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.JwtInformation;
-import com.sprint.mission.discodeit.security.JwtTokenProvider;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.JwtRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class inMemoryJwtRegistry implements JwtRegistry {
+public class InMemoryJwtRegistry implements JwtRegistry {
 
     private final Map<UUID, Queue<JwtInformation>> origin = new ConcurrentHashMap<>();
     private final int maxActiveJwtCount = 1;
@@ -74,11 +75,12 @@ public class inMemoryJwtRegistry implements JwtRegistry {
     }
 
     @Scheduled(fixedDelay = 1000 * 60 * 5)
+    @CacheEvict(value = "allUsers", allEntries = true)
     @Override
     public void clearExpiredJwtInformation() {
         origin.values().forEach(queue ->
                 queue.removeIf(jwtInformation ->
-                        !jwtTokenProvider.isTokenValid(jwtInformation.getRefreshToken())
+                        !jwtTokenProvider.isRefreshTokenValid(jwtInformation.getRefreshToken())
                 )
         );
         origin.values().removeIf(Queue::isEmpty);

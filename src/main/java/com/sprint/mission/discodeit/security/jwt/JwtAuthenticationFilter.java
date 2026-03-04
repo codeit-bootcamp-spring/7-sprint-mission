@@ -1,5 +1,7 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit.security.jwt;
 
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.service.JwtRegistry;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -33,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String jwt = extractJwtFromRequest(request);
-            if (jwt != null && jwtTokenProvider.isTokenValid(jwt) &&
+            if (jwt != null && jwtTokenProvider.isAccessTokenValid(jwt) &&
                     jwtRegistry.hasActiveJwtInformationByAccessToken(jwt)) {
 
                 authenticateUser(jwt, request);
@@ -45,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void authenticateUser(String jwt, HttpServletRequest request) {
-        Claims claims = jwtTokenProvider.validateToken(jwt);
+        Claims claims = jwtTokenProvider.validateAccessToken(jwt);
 
         String username = claims.getSubject();
         DiscodeitUserDetails principal = (DiscodeitUserDetails) userDetailsService.loadUserByUsername(username);
@@ -58,7 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        log.info("JWT 인증 성공: user: {}", principal.getUserDto());
+        log.info("JWT 인증 성공: user: {}", principal.getUsername());
     }
 
     private String extractJwtFromRequest(HttpServletRequest request) {

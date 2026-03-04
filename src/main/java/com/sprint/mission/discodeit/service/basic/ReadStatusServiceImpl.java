@@ -75,8 +75,11 @@ public class ReadStatusServiceImpl implements ReadStatusService {
         ReadStatus status = readStatusRepository.findById(id)
                 .orElseThrow(() -> new ReadNotFoundException(id));
 
-        status.updateReadStatus(updateDto.newLastReadAt());
+        if (updateDto.newLastReadAt() != null)
+            status.updateReadStatus(updateDto.newLastReadAt());
+        status.updateNotificationEnabled(updateDto.newNotificationEnabled());
         readStatusRepository.save(status);
+
         return readStatusMapper.toDto(status);
     }
 

@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.storage.s3;
 
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.binaryContent.FileOperationFailedException;
+import com.sprint.mission.discodeit.repository.NotificationRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -30,6 +36,9 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
 public class S3BinaryContentStorage implements BinaryContentStorage {
 
+    private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
+
     private S3Client s3Client;
 
     private S3Presigner s3Presigner;
@@ -43,11 +52,15 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     private long presignedUrlExpiration;
 
     public S3BinaryContentStorage(
+            UserRepository userRepository,
+            NotificationRepository notificationRepository,
             @Value("${discodeit.storage.s3.access-key}") String accessKey,
             @Value("${discodeit.storage.s3.secret-key}") String secretKey,
             @Value("${discodeit.storage.s3.bucket}") String bucketName,
             @Value("${discodeit.storage.s3.region}") String region
     ) {
+        this.userRepository = userRepository;
+        this.notificationRepository = notificationRepository;
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.bucketName = bucketName;
@@ -72,6 +85,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
+    @Retryable(
+            retryFor = { Exception.class }, // 이 예외가 터지면 재시도
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2) // 대기시간 설정
+    )
     public void put(UUID id, byte[] bytes) {
 
         String fileName = id.toString();
@@ -86,6 +104,12 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
                 request,
                 RequestBody.fromBytes(bytes)
         );
+    }
+
+    @Recover
+    public void recover(Exception e, UUID id, byte[] bytes) {
+        log.error("모든 재시도 실패... id={}", id);
+        throw new FileOperationFailedException(id);
     }
 
     @Override

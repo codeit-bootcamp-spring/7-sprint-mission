@@ -24,6 +24,38 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+  cache:
+#    type: caffeine
+    type: redis
+    cache-names:
+      - channel        # 단건 채널
+      - userChannels   # 유저별 채널 목록
+      - notification  # 유저별 알림 목록
+      - user           # 단건 유저
+      - allUsers       # 전체 유저 목록
+    caffeine:
+      spec: >
+        maximumSize=100,
+        expireAfterAccess=600s,
+        recordStats
+    redis:
+      enable-statistics: true
+    data:
+      redis:
+        host: ${REDIS_HOST:localhost}
+        port: ${REDIS_PORT:6379}
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
 cloud:
   aws:
     credentials:
@@ -56,8 +88,16 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers #, evn # 꼭 필요한 것만 노출!
-      base-path: /management # 경로도 바꿔서 숨
+        include:
+          - health
+          - info
+          - metrics
+          - loggers
+          - caches
+      base-path: /management
+  observations:
+    annotations:
+      enabled: true
 
   endpoint:
     health:
@@ -94,8 +134,15 @@ info:
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:mySecretKeyForJwtTokenGeneration1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ}
+  access-secret: ${ACCESS_TOKEN}
+  refresh-secret: ${REFRESH_TOKEN}
   access-token-expiration: 900000      # 15분 (밀리초)
   refresh-token-expiration: 1209600000 # 2주 (밀리초)
   issuer: jwt-demo-api
+
+app:
+  admin:
+    username: ${ADMIN_USERNAME}
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
 

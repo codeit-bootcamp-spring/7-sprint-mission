@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.0-M10'
+version = '2.2-M11'
 description = 'Demo project for Spring Boot'
 
 java {
@@ -89,6 +89,20 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'        // API
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'          // 구현체
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'       // JSON 파싱
+
+    // Retry
+    implementation 'org.springframework.retry:spring-retry'
+
+    // Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    // redis
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 }
 

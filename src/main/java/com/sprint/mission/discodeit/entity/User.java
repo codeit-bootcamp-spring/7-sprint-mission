@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.entity.role.Role;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

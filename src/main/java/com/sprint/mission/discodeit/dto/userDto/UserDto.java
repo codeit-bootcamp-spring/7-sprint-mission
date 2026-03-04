@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.dto.userDto;
 
 import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.role.Role;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import lombok.Builder;
 
 import java.util.UUID;

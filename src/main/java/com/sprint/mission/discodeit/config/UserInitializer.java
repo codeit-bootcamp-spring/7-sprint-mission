@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.role.Role;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,8 +34,15 @@ public class UserInitializer implements ApplicationRunner {
                     .password(passwordEncoder.encode(adminPassword))
                     .role(Role.ADMIN)
                     .build();
-
             userRepository.save(admin);
+
+            User testUser = User.builder()
+                    .username("test")
+                    .email("a@a.a")
+                    .password(passwordEncoder.encode("A123123!"))
+                    .role(Role.USER)
+                    .build();
+            userRepository.save(testUser);
         }
     }
 }
