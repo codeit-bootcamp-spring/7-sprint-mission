@@ -16,11 +16,9 @@ public class ContextCopyingTaskDecorator implements TaskDecorator {
         Map<String, String> mdcContext = MDC.getCopyOfContextMap();
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        Runnable securityRunnable = new DelegatingSecurityContextRunnable(runnable, securityContext);
-
         log.debug("컨텍스트 캡처 - MDC: {}, Security: {}", mdcContext, securityContext);
 
-        return () -> {
+        return new DelegatingSecurityContextRunnable(() -> {
             try {
                 if (mdcContext != null) MDC.setContextMap(mdcContext);
 
@@ -29,12 +27,12 @@ public class ContextCopyingTaskDecorator implements TaskDecorator {
                         securityContext,
                         MDC.get("traceId"));
 
-                securityRunnable.run();
+                runnable.run();
 
             } finally {
                 MDC.clear();
                 log.debug("컨텍스트 정리 완료");
             }
-        };
+        });
     }
 }
