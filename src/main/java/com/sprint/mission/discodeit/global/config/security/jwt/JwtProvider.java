@@ -199,6 +199,10 @@ public class JwtProvider {
         }
     }
 
+    public long getAccessTokenExpirationMills() {
+        return jwtProperties.accessTokenExpiration();
+    }
+
     public long getRefreshTokenExpirationMills() {
         return jwtProperties.refreshTokenExpiration();
     }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -20,47 +21,72 @@ public class InMemoryJwtRegistry implements JwtRegistry {
     // 1. 단일 값은 동시 로그인이 불가 -> 후보: List, Set, Queue, Stack 등
     // 2. Queue는 Fifo 구조이기 때문에 queue.poll()로 가장 먼저 발급된 Jwt를 제거할 수 있음
     private final Map<UUID, Queue<JwtInformation>> origin = new ConcurrentHashMap<>();
+    private final Set<String> accessTokenIndexes = ConcurrentHashMap.newKeySet();
+    private final Set<String> refreshTokenIndexes = ConcurrentHashMap.newKeySet();
+
     private final int maxActiveJwtCount = 1;
     private final JwtProvider jwtProvider;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void registerJwtInformation(JwtInformation jwtInformation) {
-        Queue<JwtInformation> queue = origin.computeIfAbsent(jwtInformation.getUserDto().id(), key -> new ConcurrentLinkedQueue<>());
-        queue.offer(jwtInformation);
-        if (queue.size() > maxActiveJwtCount) {
-            queue.poll();
-        }
-        // users 캐시 clear
-        eventPublisher.publishEvent(new UserCacheEvictEvent());
+        origin.compute(jwtInformation.getUserDto().id(), (key, queue) -> {
+            if (queue == null) {
+                queue = new ConcurrentLinkedQueue<>();
+            }
+            queue.offer(jwtInformation);
+
+            while (queue.size() > maxActiveJwtCount) {
+                JwtInformation deprecatedJwtInformation = queue.poll();
+                if (deprecatedJwtInformation != null) {
+                    removeTokenIndex(
+                            deprecatedJwtInformation.getAccessToken(),
+                            deprecatedJwtInformation.getRefreshToken()
+                    );
+                }
+            }
+
+            addTokenIndex(
+                    jwtInformation.getAccessToken(),
+                    jwtInformation.getRefreshToken()
+            );
+
+            // users 캐시 clear
+            eventPublisher.publishEvent(new UserCacheEvictEvent());
+
+            return queue;
+        });
     }
 
     @Override
     public void invalidateJwtInformationByUserId(UUID userId) {
-        origin.remove(userId);
+        origin.computeIfPresent(userId, (key, queue) -> {
+            queue.forEach(jwtInformation -> {
+                removeTokenIndex(
+                        jwtInformation.getAccessToken(),
+                        jwtInformation.getRefreshToken()
+                );
+            });
+            queue.clear(); // Clear the queue for this user
+            return null; // Remove the user from the registry
+        });
+
         eventPublisher.publishEvent(new UserCacheEvictEvent());
     }
 
     @Override
     public boolean hasActiveJwtInformationByUserId(UUID userId) {
-        Queue<JwtInformation> queue = origin.get(userId);
-        return queue != null && !queue.isEmpty();
+        return origin.containsKey(userId);
     }
 
     @Override
     public boolean hasActiveJwtInformationByAccessToken(String accessToken) {
-        return origin.values().stream()
-                .flatMap(Queue::stream)
-                .anyMatch(jwtInformation -> jwtInformation.getAccessToken().equals(accessToken));
-
+        return accessTokenIndexes.contains(accessToken);
     }
 
     @Override
     public boolean hasActiveJwtInformationByRefreshToken(String refreshToken) {
-        return origin.values().stream()
-                .flatMap(Queue::stream)
-                .anyMatch(jwtInformation -> jwtInformation.getRefreshToken().equals(refreshToken));
-
+        return refreshTokenIndexes.contains(refreshToken);
     }
 
     @Override
@@ -70,7 +96,13 @@ public class InMemoryJwtRegistry implements JwtRegistry {
                     .filter(jwtInformation -> jwtInformation.getRefreshToken().equals(refreshToken))
                     .findFirst()
                     .ifPresent(jwtInformation -> {
+                        removeTokenIndex(jwtInformation.getAccessToken(), jwtInformation.getRefreshToken());
                         jwtInformation.rotate(newJwtInformation.getAccessToken(), newJwtInformation.getRefreshToken());
+                        addTokenIndex(
+                                newJwtInformation.getAccessToken(),
+                                newJwtInformation.getRefreshToken()
+                        );
+
                     });
 
             return queue;
@@ -82,13 +114,30 @@ public class InMemoryJwtRegistry implements JwtRegistry {
     public void clearExpiredJwtInformation() {
         origin.entrySet().removeIf(entry -> {
             Queue<JwtInformation> queue = entry.getValue();
-            queue.removeIf(jwtInformation ->
-                    jwtProvider.isTokenExpired(
+            queue.removeIf(jwtInformation -> {
+                boolean isExpired =
+                        !jwtProvider.validateAccessToken(jwtInformation.getAccessToken()) ||
+                                !jwtProvider.validateRefreshToken(jwtInformation.getRefreshToken());
+                if (isExpired) {
+                    removeTokenIndex(
+                            jwtInformation.getAccessToken(),
                             jwtInformation.getRefreshToken()
-                    )
-            );
-            return queue.isEmpty();
+                    );
+                }
+                return isExpired;
+            });
+            return queue.isEmpty(); // Remove the entry if the queue is empty
         });
+    }
+
+    private void addTokenIndex(String accessToken, String refreshToken) {
+        accessTokenIndexes.add(accessToken);
+        refreshTokenIndexes.add(refreshToken);
+    }
+
+    private void removeTokenIndex(String accessToken, String refreshToken) {
+        accessTokenIndexes.remove(accessToken);
+        refreshTokenIndexes.remove(refreshToken);
     }
 
 }
