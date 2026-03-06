@@ -34,6 +34,13 @@ spring:
         instance:
           name: discodeit
 
+  cache:
+  # type은 각 환경에 맞게 바꾸기위해 공통된 cache-names만 추가
+    cache-names:
+      - channelsByUserId
+      - notificationsByUserId
+      - users
+
   kafka:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer

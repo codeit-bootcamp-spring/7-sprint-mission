@@ -83,6 +83,9 @@ dependencies {
     // Kafka 의존성
     implementation 'org.springframework.kafka:spring-kafka'
 
+    // redis 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
