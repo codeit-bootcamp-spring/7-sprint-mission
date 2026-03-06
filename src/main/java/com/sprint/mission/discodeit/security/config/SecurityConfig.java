@@ -37,6 +37,7 @@ public class SecurityConfig {
         http
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/","/index.html", "/assets/**").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()
