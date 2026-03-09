@@ -1,13 +1,16 @@
 package com.sprint.mission.discodeit.global.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.dto.readstatus.response.NotificationDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.sse.service.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -29,6 +32,8 @@ public class NotificationRequiredTopicListener {
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final NotificationMapper notificationMapper;
+    private final SseService sseService;
 
     @KafkaListener(topics = "discodeit.MessageCreatedEvent")
     @Transactional
@@ -72,7 +77,20 @@ public class NotificationRequiredTopicListener {
                 notifications.add(notification);
             });
 
-            notificationRepository.saveAll(notifications);
+            // SSE 이벤트 전송
+            List<Notification> saved = notificationRepository.saveAll(notifications);
+
+            List<NotificationDto> dtos = saved.stream()
+                    .map(notificationMapper::toNotificationDto)
+                    .toList();
+
+            dtos.forEach(dto -> {
+                sseService.send(
+                        List.of(dto.receiverId()),
+                        "notifications.created",
+                        dto
+                );
+            });
 
             log.info("Notification created for MessageCreatedEvent: {}", messageId);
         } catch (Exception e) {
@@ -97,6 +115,12 @@ public class NotificationRequiredTopicListener {
             );
 
             notificationRepository.save(notification);
+
+            sseService.send(
+                    List.of(event.userId()),
+                    "notification.created",
+                    notificationMapper.toNotificationDto(notification)
+            );
 
             log.info("Notification created for RoleUpdatedEvent: {}", event.userId());
         } catch (Exception e) {
@@ -137,6 +161,8 @@ public class NotificationRequiredTopicListener {
 
                 notifications.add(notification);
             });
+
+            // sse 이벤트 추가 필요
 
             notificationRepository.saveAll(notifications);
             log.error("S3 업로드 최종 실패 - binaryContentId: {}", event.binaryContentId());
