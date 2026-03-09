@@ -110,7 +110,6 @@ public class BasicSseService implements SseService {
                 log.warn("전송 실패 - 사용자: {}, 이벤트: {}", receiverId, eventName);
                 sseEmitterRepository.deleteByUserId(receiverId, emitter);
                 log.error(e.getMessage(), e);
-                emitter.completeWithError(e);
             }
         }
     }
