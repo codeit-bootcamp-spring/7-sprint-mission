@@ -2,19 +2,23 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readStatusDto.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.auth.AccessDeniedException;
 import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.service.basic.sse.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -23,6 +27,40 @@ import java.util.UUID;
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final SseService sseService;
+    private final RedisCacheManager cacheManager;
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "notification", key = "#user.id")
+    public void createNotification(User user, String title, String content) {
+
+        log.info("알림 생성 및 SSE 전송 - userId={}", user.getId());
+        Notification notification = Notification.builder()
+                .user(user)
+                .title(title)
+                .content(content)
+                .build();
+        notificationRepository.save(notification);
+        NotificationDto dto = NotificationMapper.toDto(notification);
+
+        sseService.send(List.of(user.getId()), "notifications.created", dto);
+    }
+
+    @Override
+    @Transactional
+    public void createNotifications(List<Notification> notifications) {
+        notificationRepository.saveAll(notifications);
+        for (Notification notification : notifications) {
+            UUID userId = notification.getUser().getId();
+            NotificationDto dto = NotificationMapper.toDto(notification);
+
+            if (cacheManager.getCache("notification") != null)
+                Objects.requireNonNull(cacheManager.getCache("notification")).evict(userId);
+
+            sseService.send(List.of(userId), "notifications.created", dto);
+        }
+    }
 
     @Override
     @Transactional(readOnly = true)

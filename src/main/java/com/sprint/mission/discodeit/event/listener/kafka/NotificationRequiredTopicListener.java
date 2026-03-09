@@ -9,18 +9,16 @@ import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
-import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,9 +27,8 @@ public class NotificationRequiredTopicListener {
 
     private final ObjectMapper objectMapper;
     private final ReadStatusRepository readStatusRepository;
-    private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
-    private final CacheManager cacheManager;
+    private final NotificationService notificationService;
 
     /* 알림 확인
     /opt/kafka/bin $ ./kafka-console-consumer.sh --topic discodeit.MessageCreatedEvent --from-beginning --bootstrap-server broker:29092
@@ -60,14 +57,8 @@ public class NotificationRequiredTopicListener {
                             .content(event.content())
                             .build())
                     .toList();
-            notificationRepository.saveAll(notifications);
 
-            if (cacheManager.getCache("notification") != null) {
-                notifications.forEach(n -> {
-                    Objects.requireNonNull(cacheManager.getCache("notification")).evict(n.getUser().getId());
-                    log.debug("메시지 알림 캐시 무효화: userId={}", n.getUser().getId());
-                });
-            }
+            notificationService.createNotifications(notifications);
 
         } catch (JsonProcessingException e) {
             log.error("Kafka message parsing error: ", e);
@@ -90,18 +81,9 @@ public class NotificationRequiredTopicListener {
 
             User user = userRepository.findById(event.userId())
                     .orElseThrow(() -> new UserNotFoundException(event.userId()));
-
-            Notification notification = Notification.builder()
-                    .user(user)
-                    .title("권한이 변경되었습니다.")
-                    .content(String.format("%s -> %s", event.oldRole(), event.newRole()))
-                    .build();
-            notificationRepository.save(notification);
-
-            if (cacheManager.getCache("notification") != null) {
-                Objects.requireNonNull(cacheManager.getCache("notification")).evict(user.getId());
-                log.info("권한 알림 캐시 무효화: userId={}", user.getId());
-            }
+            String title = "권한이 변경되었습니다.";
+            String content = String.format("%s -> %s", event.oldRole(), event.newRole());
+            notificationService.createNotification(user, title, content);
 
         } catch (JsonProcessingException e) {
             log.error("Kafka message parsing error: ", e);
@@ -123,13 +105,7 @@ public class NotificationRequiredTopicListener {
             String content = String.format("RequestId: %s\nBinaryContentId: %s\nError: %s",
                     event.requestId(), event.binaryContentId(), event.errorMessage());
 
-            Notification notification = Notification.builder()
-                    .user(admin)
-                    .title(title)
-                    .content(content)
-                    .build();
-
-            notificationRepository.save(notification);
+            notificationService.createNotification(admin, title, content);
 
             log.debug("Kafka: S3 업로드 실패 알림 - id={}", event.binaryContentId());
 
