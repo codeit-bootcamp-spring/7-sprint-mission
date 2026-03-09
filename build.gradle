@@ -86,6 +86,12 @@ dependencies {
     // redis 의존성
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // 웹소켓 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    
+
+
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
