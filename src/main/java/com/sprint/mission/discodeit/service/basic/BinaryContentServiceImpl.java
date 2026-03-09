@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.exception.binaryContent.FileNotFoundExceptio
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.basic.sse.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -28,6 +29,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
+    private final SseService sseService;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -69,7 +71,12 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new FileNotFoundException(id));
         binaryContent.updateStatus(status);
-        return binaryContentMapper.toDto(binaryContent);
+
+        BinaryContentDto dto = binaryContentMapper.toDto(binaryContent);
+
+        sseService.broadcast("binaryContents.updated", dto);
+
+        return dto;
     }
 
     @Override
