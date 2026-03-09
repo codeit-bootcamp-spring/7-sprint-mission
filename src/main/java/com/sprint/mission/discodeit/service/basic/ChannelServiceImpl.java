@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.basic.sse.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -35,10 +36,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ChannelServiceImpl implements ChannelService {
 
+    private static final int CREATED = 0;
+    private static final int UPDATED = 1;
+    private static final int DELETED = 2;
+
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
     private final ChannelMapper channelMapper;
+    private final SseService sseService;
 
     @Override
     @Transactional
@@ -53,33 +59,48 @@ public class ChannelServiceImpl implements ChannelService {
                 requestDto.name(),
                 requestDto.description(),
                 ChannelType.PUBLIC
-                );
+        );
 
         channelRepository.save(newChannel);
         log.info("공개 채널 생성 완료");
-        return channelMapper.toDto(newChannel);
+        ChannelDto dto = channelMapper.toDto(newChannel);
+
+        SseBroadcast(CREATED, dto);
+
+        return dto;
     }
 
     @Override
     @Transactional
     @CacheEvict(value = "userChannels", allEntries = true)
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest requestDto) {
-
         log.info("프라이빗 채널 생성 요청");
+
+        if (requestDto.participantIds() == null || !requestDto.participantIds().isEmpty()) {
+            log.warn("프라이빗 채널 생성 실패 - 참여자가 없습니다.");
+            throw new IllegalArgumentException("프라이빗 채널은 1명 이상의 참여자가 필요합니다.");
+        }
+
         Channel newChannel = new Channel(ChannelType.PRIVATE);
         channelRepository.save(newChannel);
 
-        if (requestDto.participantIds() != null && !requestDto.participantIds().isEmpty()) {
+        List<User> users = userRepository.findAllById(requestDto.participantIds());
+        List<ReadStatus> readStatuses = users.stream()
+                .map(user -> new ReadStatus(user, newChannel))
+                .collect(Collectors.toList());
+        newChannel.getReadStatuses().addAll(readStatuses);
+        readStatusRepository.saveAll(readStatuses);
 
-            List<User> users = userRepository.findAllById(requestDto.participantIds());
-            List<ReadStatus> readStatuses = users.stream()
-                    .map(user -> new ReadStatus(user, newChannel))
-                    .collect(Collectors.toList());
-            newChannel.getReadStatuses().addAll(readStatuses);
-            readStatusRepository.saveAll(readStatuses);
-        }
         log.info("프라이빗 채널 생성 완료");
-        return channelMapper.toDto(newChannel);
+        ChannelDto dto = channelMapper.toDto(newChannel);
+
+        sseService.send(
+                requestDto.participantIds(),
+                "channels.created",
+                dto
+        );
+
+        return dto;
     }
 
     @Override
@@ -97,7 +118,7 @@ public class ChannelServiceImpl implements ChannelService {
     @Cacheable(value = "userChannels", key = "#userId")
     public List<ChannelDto> findAllByUserId(UUID userId) {
 
-        if(!userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
 
@@ -121,17 +142,17 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     @Transactional
-    @PreAuthorize( "hasRole('CHANNEL_MANAGER')")
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Caching(evict = {
-        @CacheEvict(value = "channel", key = "#channelId"),
-        @CacheEvict(value = "userChannels", allEntries = true)
+            @CacheEvict(value = "channel", key = "#channelId"),
+            @CacheEvict(value = "userChannels", allEntries = true)
     })
     public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest updateDto) {
 
         log.debug("채널 수정 요청 - channelId: {}", channelId);
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> {
-                    log.warn("채널 수정 실패 - 채널을 찾을 수 없음: {}",  channelId);
+                    log.warn("채널 수정 실패 - 채널을 찾을 수 없음: {}", channelId);
                     return new ChannelNotFoundException(channelId);
                 });
 
@@ -144,25 +165,42 @@ public class ChannelServiceImpl implements ChannelService {
 
         channelRepository.save(channel);
         log.info("채널 수정 성공: {}", channelId);
-        return channelMapper.toDto(channel);
+        ChannelDto dto = channelMapper.toDto(channel);
+
+        SseBroadcast(UPDATED, dto);
+
+        return dto;
 
     }
 
     @Override
     @Transactional
-    @PreAuthorize( "hasRole('CHANNEL_MANAGER')")
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Caching(evict = {
-        @CacheEvict(value = "channel", key = "#id"),
-        @CacheEvict(value = "userChannels", allEntries = true)
+            @CacheEvict(value = "channel", key = "#id"),
+            @CacheEvict(value = "userChannels", allEntries = true)
     })
     public void deleteChannel(UUID id) {
         log.info("채널 삭제 요청: {}", id);
         channelRepository.findById(id)
-                        .orElseThrow(() -> {
-                            log.warn("채널 삭제 실패 - 채널을 찾을 수 없음: {}", id);
-                            return new ChannelNotFoundException(id);
-                        });
+                .orElseThrow(() -> {
+                    log.warn("채널 삭제 실패 - 채널을 찾을 수 없음: {}", id);
+                    return new ChannelNotFoundException(id);
+                });
         log.info("채널 삭제 성공: {}", id);
+        SseBroadcast(DELETED, id);
         channelRepository.deleteById(id);
+    }
+
+    private void SseBroadcast(int type, Object data) {
+
+        String eventName = switch (type) {
+            case CREATED -> "channels.created";
+            case UPDATED -> "channels.updated";
+            case DELETED -> "channels.deleted";
+            default -> throw new IllegalArgumentException("Unexpected value: " + type);
+        };
+
+        sseService.broadcast(eventName, data);
     }
 }
