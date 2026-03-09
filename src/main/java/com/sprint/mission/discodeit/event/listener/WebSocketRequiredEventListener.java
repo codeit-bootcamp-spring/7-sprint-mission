@@ -1,6 +1,7 @@
-package com.sprint.mission.discodeit.event;
+package com.sprint.mission.discodeit.event.listener;
 
 import com.sprint.mission.discodeit.dto.message.response.MessageResponseDto;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

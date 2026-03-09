@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.event.S3UploadFailedEvent;
+import com.sprint.mission.discodeit.event.SseEvent;
+import com.sprint.mission.discodeit.global.sse.SseService;
 import com.sprint.mission.discodeit.service.NotificationService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -28,6 +30,7 @@ public class NotificationRequiredTopicListener {
     private final NotificationService notificationService;
     private final ReadStatusService readStatusService;
     private final UserService userService;
+    private final SseService sseService;
 
     @KafkaListener(topics = "discodeit.MessageCreatedEvent")
     public void onMessageCreatedEvent(String kafkaEvent) {
@@ -96,5 +99,22 @@ public class NotificationRequiredTopicListener {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @KafkaListener(topics = "discodeit.SseEvent")
+    public void onSseEvent(String kafkaEvent) {
+        try {
+            SseEvent event = objectMapper.readValue(kafkaEvent, SseEvent.class);
+            log.debug("SSE 이벤트 실행: {}", event.eventName());
+            if (event.isBroadCast()) {
+                sseService.broadcast(event.eventName(), event.data());
+            } else {
+                sseService.send(event.receiverId(), event.eventName(), event.data());
+            }
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
