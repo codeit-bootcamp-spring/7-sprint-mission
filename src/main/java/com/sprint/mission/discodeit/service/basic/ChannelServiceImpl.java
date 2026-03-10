@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.basic.sse.SseEventType;
 import com.sprint.mission.discodeit.service.basic.sse.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +36,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ChannelServiceImpl implements ChannelService {
-
-    private static final int CREATED = 0;
-    private static final int UPDATED = 1;
-    private static final int DELETED = 2;
 
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
@@ -65,7 +62,7 @@ public class ChannelServiceImpl implements ChannelService {
         log.info("공개 채널 생성 완료");
         ChannelDto dto = channelMapper.toDto(newChannel);
 
-        SseBroadcast(CREATED, dto);
+        sseChannelBroadcast(SseEventType.CREATED, dto);
 
         return dto;
     }
@@ -167,7 +164,7 @@ public class ChannelServiceImpl implements ChannelService {
         log.info("채널 수정 성공: {}", channelId);
         ChannelDto dto = channelMapper.toDto(channel);
 
-        SseBroadcast(UPDATED, dto);
+        sseChannelBroadcast(SseEventType.UPDATED, dto);
 
         return dto;
 
@@ -188,19 +185,15 @@ public class ChannelServiceImpl implements ChannelService {
                     return new ChannelNotFoundException(id);
                 });
         log.info("채널 삭제 성공: {}", id);
-        SseBroadcast(DELETED, id);
+        sseChannelBroadcast(SseEventType.DELETED, id);
         channelRepository.deleteById(id);
     }
 
-    private void SseBroadcast(int type, Object data) {
+    private void sseChannelBroadcast(SseEventType type, Object data) {
 
-        String eventName = switch (type) {
-            case CREATED -> "channels.created";
-            case UPDATED -> "channels.updated";
-            case DELETED -> "channels.deleted";
-            default -> throw new IllegalArgumentException("Unexpected value: " + type);
-        };
-
-        sseService.broadcast(eventName, data);
+        sseService.broadcast(
+                "channels." + type.getValue(),
+                data
+        );
     }
 }
