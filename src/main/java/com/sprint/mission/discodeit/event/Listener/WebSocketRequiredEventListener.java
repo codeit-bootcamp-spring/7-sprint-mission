@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.event.Listener;
 
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.response.message.MessageDto;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,6 @@ public class WebSocketRequiredEventListener {
         UUID channelId = event.getChannelId();
         UUID authorId = event.getAuthorId();
         String content = event.getContent();
-
         simpMessagingTemplate.convertAndSend("/sub/channels."+channelId.toString()+".messages",event);
 
     }

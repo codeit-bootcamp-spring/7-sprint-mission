@@ -13,5 +13,7 @@ public class BinaryContentCreatedEvent {
     private final UUID binaryContentId;
     private final String contentType;
     private final byte [] bytes;
+    private final UUID ownerId;
+
 
 }

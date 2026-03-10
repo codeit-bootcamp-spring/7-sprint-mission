@@ -23,7 +23,6 @@ public class MessageWebSocketController {
     private final MessageService  messageService;
 
     @MessageMapping("/pub/messages")
-    @SendTo("/sub/channels.{channelId}.messages")
     public ResponseEntity<MessageDto> sendOnlyTestMessage(@DestinationVariable String channelId,
                                                           @Payload MessageCreateRequestDto request) {
         log.info("채널 - 메세지 생성, 채널 id - {}", channelId);

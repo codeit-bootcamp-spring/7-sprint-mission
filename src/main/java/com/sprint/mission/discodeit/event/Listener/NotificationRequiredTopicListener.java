@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.request.notification.NotificationDto;
+import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -13,6 +14,7 @@ import com.sprint.mission.discodeit.event.S3UploadFailedEvent;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.sse.SseService;
 import com.sprint.mission.discodeit.storage.NotificationStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,7 @@ public class NotificationRequiredTopicListener {
     private final ReadStatusRepository readStatusRepository;
     private final ChannelRepository channelRepository;
     private final UserService userService;
+    private final SseService sseService;
 
     @KafkaListener(topics = "discodeit.MessageCreatedEvent")
     @Async("notificationExecutor")
@@ -72,6 +75,8 @@ public class NotificationRequiredTopicListener {
                                 content
                         );
                         notificationStorage.save(notificationDto);
+                        sseService.send(List.of(user.getId()),"notifications.created",notificationDto);
+
                     }
             );
         } catch (JsonProcessingException e) {
