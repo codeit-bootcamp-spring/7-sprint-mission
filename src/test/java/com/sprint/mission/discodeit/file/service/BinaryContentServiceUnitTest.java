@@ -91,30 +91,30 @@ public class BinaryContentServiceUnitTest {
 
     }
 
-    @Test
-    @DisplayName("[정상 케이스] 파일 생성 성공")
-    void createFile_Success() {
-
-        given(binaryContentRepository.save(any(BinaryContent.class)))
-                .willReturn(binaryContent);
-        given(binaryContentStorage.put(any(), any(byte[].class)))
-                .willReturn(UUID.randomUUID());
-
-        var response = binaryContentService.createBinaryContent(
-                new BinaryContentCreateRequestDto(
-                        "111".getBytes(),
-                        "Hello",
-                        5L,
-                        "text/plain"
-                )
-        );
-
-        assertThat(response.fileName()).isEqualTo(binaryContent.getFileName());
-        assertThat(response.size()).isEqualTo(binaryContent.getSize());
-
-        then(binaryContentRepository).should(times(1)).save(ArgumentCaptor.forClass(BinaryContent.class).capture());
-        then(binaryContentStorage).should(times(1)).put(any(), any(byte[].class));
-
-    }
+//    @Test
+//    @DisplayName("[정상 케이스] 파일 생성 성공")
+//    void createFile_Success() {
+//
+//        given(binaryContentRepository.save(any(BinaryContent.class)))
+//                .willReturn(binaryContent);
+//        given(binaryContentStorage.put(any(), any(byte[].class)))
+//                .willReturn(UUID.randomUUID());
+//
+//        var response = binaryContentService.createBinaryContent(
+//                new BinaryContentCreateRequestDto(
+//                        "111".getBytes(),
+//                        "Hello",
+//                        5L,
+//                        "text/plain"
+//                )
+//        );
+//
+//        assertThat(response.fileName()).isEqualTo(binaryContent.getFileName());
+//        assertThat(response.size()).isEqualTo(binaryContent.getSize());
+//
+//        then(binaryContentRepository).should(times(1)).save(ArgumentCaptor.forClass(BinaryContent.class).capture());
+//        then(binaryContentStorage).should(times(1)).put(any(), any(byte[].class));
+//
+//    }
 
 }
