@@ -9,6 +9,7 @@ services:
       - app
     networks:
       - backend-network
+      - public-network   # 외부(사용자)와 통신하는 통로
   app:
     build:
       context: .          # 애플리케이션 Dockerfile 위치
@@ -37,6 +38,7 @@ services:
       - ISSUER=${ISSUER}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=broker:${KAFKA_PORT}
     #    ports:
     #      - "8081:80" // nginx로 인해 삭제
     volumes:
@@ -46,6 +48,7 @@ services:
     networks:
       - backend-network
 
+
   db:
     image: postgres:15
     container_name: discodeit-db
@@ -53,8 +56,8 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
+    #    ports:
+    #      - "5432:5432"
     volumes:
       # PostgreSQL 데이터 유지
       - db-data:/var/lib/postgresql/data
@@ -66,6 +69,11 @@ services:
 networks:
   backend-network:
     name: backend-network  #이름을 폴더명 없이 'backend-network'로 고정
+    driver: bridge
+    internal: true
+
+  public-network:
+    name: public-network
     driver: bridge
 
 volumes:
