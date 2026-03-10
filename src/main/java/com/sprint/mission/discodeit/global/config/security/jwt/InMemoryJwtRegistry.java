@@ -51,11 +51,12 @@ public class InMemoryJwtRegistry implements JwtRegistry {
                     jwtInformation.getRefreshToken()
             );
 
-            // users 캐시 clear
-            eventPublisher.publishEvent(new UserCacheEvictEvent());
-
             return queue;
         });
+
+        // users 캐시 clear
+        eventPublisher.publishEvent(new UserCacheEvictEvent());
+
     }
 
     @Override

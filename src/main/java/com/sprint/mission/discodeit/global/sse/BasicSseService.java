@@ -83,6 +83,7 @@ public class BasicSseService implements SseService {
         }
     }
 
+
     private boolean ping(SseEmitter emitter) {
         try {
             emitter.send(
@@ -93,6 +94,22 @@ public class BasicSseService implements SseService {
             return true;
         } catch (IOException e) {
             return false;
+        }
+    }
+
+
+    @Scheduled(fixedRate = 15000)
+    public void heartbeat() {
+        for (SseEmitter emitter : sseEmitterRepository.findAll()) {
+            try {
+                emitter.send(
+                        SseEmitter.event()
+                                .comment("heartbeat")
+                );
+            } catch (IOException e) {
+                emitter.complete();
+                sseEmitterRepository.deleteByEmitter(emitter);
+            }
         }
     }
 
@@ -109,7 +126,6 @@ public class BasicSseService implements SseService {
             } catch (IOException e) {
                 log.warn("전송 실패 - 사용자: {}, 이벤트: {}", receiverId, eventName);
                 sseEmitterRepository.deleteByUserId(receiverId, emitter);
-                log.error(e.getMessage(), e);
             }
         }
     }

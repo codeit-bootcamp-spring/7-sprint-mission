@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class UserCacheEventListener {
     private final CacheManager cacheManager;
 
+    @Async("eventExecutor")
     @EventListener
     public void on(UserCacheEvictEvent event) {
         Cache cache = cacheManager.getCache("users");
