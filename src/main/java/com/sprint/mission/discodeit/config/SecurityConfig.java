@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.security.*;
+import com.sprint.mission.discodeit.security.CustomAccessDeniedHandler;
+import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
+import com.sprint.mission.discodeit.security.LoginFailureHandler;
+import com.sprint.mission.discodeit.security.SpaCsrfTokenRequestHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
@@ -14,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,6 +61,7 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                                .requestMatchers("/ws/**").permitAll()
                                 .requestMatchers("/",
                                         "/index.html",
                                         "/favicon.ico",
