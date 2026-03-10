@@ -1,4 +1,14 @@
 services:
+  #Reverse Proxy (Nginx) - 유일한 외부 통로
+  nginx:
+    build: ./nginx
+    container_name: nginx-api-gateway
+    ports:
+      - "3000:80"  # 외부에서 3000번으로 접속
+    depends_on:
+      - app
+    networks:
+      - backend-network
   app:
     build:
       context: .          # 애플리케이션 Dockerfile 위치
@@ -25,12 +35,16 @@ services:
       - ACCESS_TOKEN_EXPIRATION=${ACCESS_TOKEN_EXPIRATION}
       - REFRESH_TOKEN_EXPIRATION=${REFRESH_TOKEN_EXPIRATION}
       - ISSUER=${ISSUER}
-    ports:
-      - "8081:80"
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+    #    ports:
+    #      - "8081:80" // nginx로 인해 삭제
     volumes:
       - storage_data:${STORAGE_PATH}
     depends_on:
       - db
+    networks:
+      - backend-network
 
   db:
     image: postgres:15
@@ -46,6 +60,13 @@ services:
       - db-data:/var/lib/postgresql/data
       # schema.sql 자동 실행 (컨테이너 시작 시)
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    name: backend-network  #이름을 폴더명 없이 'backend-network'로 고정
+    driver: bridge
 
 volumes:
   db-data:

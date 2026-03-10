@@ -9,6 +9,12 @@ services:
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
+    networks:
+      - backend-network
 
 volumes:
   redis-data:
+
+networks:
+  backend-network:
+    external: true
