@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.event.Listener;
 
 import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entityElement.ChannelType;
 import com.sprint.mission.discodeit.event.ChannelUpdatedEvent;
@@ -29,17 +30,16 @@ public class ChannelEventListener {
     @Async
     public void handleChannelUpdate(ChannelUpdatedEvent  event) {
 
-        Channel channel = channelRepository.findById(event.channelId()).orElseThrow();
-        ChannelDto dto = channelMapper.toDto(channel);
+        ChannelDto channelDto = event.channelDto();
         String eventName = event.eventName();
-        if(event.type()== ChannelType.PUBLIC) {
-            sseService.broadcast(eventName, dto);
+        if(channelDto.type()== ChannelType.PUBLIC) {
+            sseService.broadcast(eventName, channelDto);
             return;
         }
-        List<UUID> participants = event.participants().stream()
-                .map(x -> x.id())
+        List<UUID> participants = channelDto.participants().stream()
+                .map(UserDto::id)
                 .toList();
-        sseService.send(participants,eventName,dto);
+        sseService.send(participants,eventName,channelDto);
         return;
     }
 }

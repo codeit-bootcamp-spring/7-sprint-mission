@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.UserUpdatedEvent;
 import com.sprint.mission.discodeit.exception.domain.file.FileByteReadFailException;
 import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -47,36 +48,49 @@ public class BasicUserService implements UserService {
         BinaryContent binaryContent = binaryContentRepository.save(
                 new BinaryContent(profile.getName(), profile.getContentType(), profile.getSize())
         );
+        User user = userRepository.save(User.createUserWithProfileFactory(
+                userCreateRequestDto.username(),
+                userCreateRequestDto.email(),
+                password,
+                binaryContent
+        ));
 
         try {
             BinaryContentCreatedEvent event = new BinaryContentCreatedEvent(
                     binaryContent.getFileName(),
                     binaryContent.getId(),
                     binaryContent.getContentType(),
-                    profile.getBytes()
+                    profile.getBytes(),
+                    user.getId()
+
             );
             eventPublisher.publishEvent(event);
         } catch (Exception e) {
             throw new FileByteReadFailException(profile.getName());
         }
 
-        User user = userRepository.save(User.createUserWithProfileFactory(
-                userCreateRequestDto.username(),
-                userCreateRequestDto.email(),
-               password,
-                binaryContent
-        ));
+        UserDto userDto = userMapper.toDto(user);
+        UserUpdatedEvent userEvent = new UserUpdatedEvent(
+                userDto,
+                "users.created"
+        );
+        eventPublisher.publishEvent(userEvent);
 
-
-
-        return userMapper.toDto(user);
+        return userDto;
     }
         User user = userRepository.save(
                 User.createUserFactory(userCreateRequestDto.username()
                         , userCreateRequestDto.email()
                         , password)
         );
-        return userMapper.toDto(user);
+
+        UserDto userDto = userMapper.toDto(user);
+        UserUpdatedEvent userEvent = new UserUpdatedEvent(
+                userDto,
+                "users.created"
+        );
+        eventPublisher.publishEvent(userEvent);
+        return userDto;
     }
 
 
@@ -90,7 +104,13 @@ public class BasicUserService implements UserService {
                         , password)
         );
         adminId = user.getId();
-        return userMapper.toDto(user);
+        UserDto userDto = userMapper.toDto(user);
+        UserUpdatedEvent userEvent = new UserUpdatedEvent(
+                userDto,
+                "users.created"
+        );
+        eventPublisher.publishEvent(userEvent);
+        return userDto;
     }
 
     @Override
@@ -110,6 +130,13 @@ public class BasicUserService implements UserService {
     public void deleteUser(UUID userId) {
         if (!userRepository.existsById(userId)) throw new UserNotExistException(userId);
         log.info("deleteUser : {} info layer",userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotExistException(userId));
+        UserDto userDto = userMapper.toDto(user);
+        UserUpdatedEvent userEvent = new UserUpdatedEvent(
+                userDto,
+                "users.deleted"
+        );
+        eventPublisher.publishEvent(userEvent);
         userRepository.deleteById(userId);
     }
 
@@ -144,7 +171,8 @@ public class BasicUserService implements UserService {
                         tmpBinaryContent.getFileName(),
                         tmpBinaryContent.getId(),
                         tmpBinaryContent.getContentType(),
-                        profile.getBytes()
+                        profile.getBytes(),
+                        userId
                 );
                 eventPublisher.publishEvent(event);
             } catch (Exception e) {
@@ -154,7 +182,14 @@ public class BasicUserService implements UserService {
         }
         userRepository.save(user);
         log.debug("patchUser : {} siuuuuuuuu!!!",user);
-        return userMapper.toDto(user);
+
+        UserDto userDto = userMapper.toDto(user);
+        UserUpdatedEvent userEvent = new UserUpdatedEvent(
+                userDto,
+                "users.updated"
+        );
+        eventPublisher.publishEvent(userEvent);
+        return userDto;
     }
 
     @Override

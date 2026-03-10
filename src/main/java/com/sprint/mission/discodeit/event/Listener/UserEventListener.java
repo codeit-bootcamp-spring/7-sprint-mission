@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.event.Listener;
 
+import com.sprint.mission.discodeit.dto.response.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.UserUpdatedEvent;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -29,6 +31,7 @@ public class UserEventListener {
     public void handleUserUpdatedEvent(UserUpdatedEvent userUpdatedEvent) {
 
 
-        User user = userRepository.findById(userUpdatedEvent.userId()).orElseThrow();
+        UserDto userDto = userUpdatedEvent.userDto();
+        sseService.send(List.of(userDto.id()),userUpdatedEvent.eventName(),userDto);
     }
 }

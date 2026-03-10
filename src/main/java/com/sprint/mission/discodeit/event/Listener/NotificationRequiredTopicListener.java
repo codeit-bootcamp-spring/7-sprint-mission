@@ -75,7 +75,7 @@ public class NotificationRequiredTopicListener {
                                 content
                         );
                         notificationStorage.save(notificationDto);
-                        sseService.send(List.of(user.getId()),"notifications.created",notificationDto);
+                        sseService.send(List.of(notificationDto.receiverId()),"notifications.created",notificationDto);
 
                     }
             );
@@ -103,6 +103,7 @@ public class NotificationRequiredTopicListener {
                     content
             );
             notificationStorage.save(notificationDto);
+            sseService.send(List.of(notificationDto.receiverId()),"notifications.created",notificationDto);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -125,6 +126,7 @@ public class NotificationRequiredTopicListener {
                     event.getError()
             );
             notificationStorage.save(notificationDto);
+            sseService.send(List.of(notificationDto.receiverId()),"notifications.created",notificationDto);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
