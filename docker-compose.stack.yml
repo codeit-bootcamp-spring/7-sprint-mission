@@ -22,11 +22,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   # ====================== Backend (Spring Boot) ======================
   backend:
     build: .
-    container_name: backend
     restart: always
     expose:
       - "8080"
@@ -68,6 +68,11 @@ services:
       timeout: 5s
       retries: 10
       start_period: 60s
+
+    deploy:
+      replicas: 3 # Backend 3대를 컨테이너로 띄운다
+      restart_policy:
+        condition: on-failure
 
   # ====================== PostgreSQL ======================
   postgres:
