@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.service.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
@@ -32,6 +33,8 @@ import java.util.UUID;
 @Slf4j
 public class BasicNotificationService implements NotificationService {
 
+
+    private final SseService sseService;
     private final ReadStatusRepository readStatusRepository;
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
@@ -47,6 +50,17 @@ public class BasicNotificationService implements NotificationService {
         try {
             notificationRepository.saveAll(notificationList);
             evictNotificationCaches(targetIds); // NOTE: 캐시 무효화
+
+
+            for (Notification notification : notificationList) {
+                NotificationDto dto = notificationMapper.toDto(notification);
+                sseService.send(
+                        List.of(notification.getReceiverId()),
+                        "notifications.created",
+                        dto
+                );
+            }
+
             log.info("메세지 생성 notification 저장 성공");
         } catch (Exception e) {
             log.error("메세지 생성 notification 저장 실패", e);
