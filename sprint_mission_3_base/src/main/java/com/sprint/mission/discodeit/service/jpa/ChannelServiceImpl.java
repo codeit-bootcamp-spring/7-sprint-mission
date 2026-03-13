@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.event.ChannelChangedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.ChannelException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
@@ -18,6 +19,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 public class ChannelServiceImpl implements ChannelService {
 
     private final ChannelRepository channelRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @CacheEvict(cacheNames = "userChannels", allEntries = true)
@@ -48,7 +51,9 @@ public class ChannelServiceImpl implements ChannelService {
         );
 
         channelRepository.save(channel);
-        return ChannelDto.from(channel);
+        ChannelDto dto = ChannelDto.from(channel);
+        eventPublisher.publishEvent(new ChannelChangedEvent("channels.created", dto));
+        return dto;
     }
 
     @Override
@@ -62,16 +67,19 @@ public class ChannelServiceImpl implements ChannelService {
         }
 
         channel.update(request.name(), null);
-        return ChannelDto.from(channel);
+        ChannelDto dto = ChannelDto.from(channel);
+        eventPublisher.publishEvent(new ChannelChangedEvent("channels.updated", dto));
+        return dto;
     }
 
     @Override
     @CacheEvict(cacheNames = "userChannels", allEntries = true)
     public void delete(UUID id) {
-        if (!channelRepository.existsById(id)) {
-            throw new ChannelNotFoundException(id);
-        }
-        channelRepository.deleteById(id);
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new ChannelNotFoundException(id));
+        ChannelDto dto = ChannelDto.from(channel);
+        channelRepository.delete(channel);
+        eventPublisher.publishEvent(new ChannelChangedEvent("channels.deleted", dto));
     }
 
     @Override

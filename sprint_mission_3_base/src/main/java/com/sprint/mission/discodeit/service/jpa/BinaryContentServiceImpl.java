@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.BinaryContentStatusUpdatedEvent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import jakarta.transaction.Transactional;
@@ -26,7 +27,6 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
     @Override
     public BinaryContentDto create(BinaryContentCreateRequest request) {
-
         BinaryContent binary = new BinaryContent(
                 request.fileName(),
                 (long) request.bytes().length,
@@ -59,7 +59,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         BinaryContent binary = binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new IllegalArgumentException("BinaryContent not found"));
         binary.updateStatus(status);
-        return BinaryContentDto.from(binary);
+        BinaryContentDto dto = BinaryContentDto.from(binary);
+        eventPublisher.publishEvent(new BinaryContentStatusUpdatedEvent(dto));
+        return dto;
     }
 
     @Override

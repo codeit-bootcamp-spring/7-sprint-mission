@@ -30,4 +30,13 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
       WHERE m.channel.id = :channelId
       """)
     Optional<Instant> findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
+
+    @Query("""
+      SELECT DISTINCT m FROM Message m
+      JOIN FETCH m.author
+      JOIN FETCH m.channel
+      LEFT JOIN FETCH m.attachments
+      WHERE m.id = :messageId
+      """)
+    Optional<Message> findDetailById(@Param("messageId") UUID messageId);
 }

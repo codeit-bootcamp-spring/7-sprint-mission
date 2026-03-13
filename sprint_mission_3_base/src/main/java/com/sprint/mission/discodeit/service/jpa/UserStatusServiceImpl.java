@@ -5,17 +5,18 @@ import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.event.UserChangedEvent;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class UserStatusServiceImpl implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
     private final UserStatusMapper userStatusMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public UserStatusDto create(UserStatusCreateRequest request) {
@@ -38,6 +40,10 @@ public class UserStatusServiceImpl implements UserStatusService {
         );
 
         userStatusRepository.save(status);
+        eventPublisher.publishEvent(new UserChangedEvent(
+                "users.updated",
+                com.sprint.mission.discodeit.dto.data.UserDto.from(user)
+        ));
         return userStatusMapper.toDto(status);
     }
 
@@ -69,11 +75,19 @@ public class UserStatusServiceImpl implements UserStatusService {
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
 
         status.update(request.newLastActiveAt());
+        eventPublisher.publishEvent(new UserChangedEvent(
+                "users.updated",
+                com.sprint.mission.discodeit.dto.data.UserDto.from(status.getUser())
+        ));
         return userStatusMapper.toDto(status);
     }
 
     @Override
     public void delete(UUID userStatusId) {
-        userStatusRepository.deleteById(userStatusId);
+        UserStatus status = userStatusRepository.findById(userStatusId)
+                .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
+        com.sprint.mission.discodeit.dto.data.UserDto dto = com.sprint.mission.discodeit.dto.data.UserDto.from(status.getUser());
+        userStatusRepository.delete(status);
+        eventPublisher.publishEvent(new UserChangedEvent("users.updated", dto));
     }
 }

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.UserChangedEvent;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -42,7 +43,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @CacheEvict(cacheNames = "users", allEntries = true)
     public UserDto create(UserCreateRequest req, Optional<BinaryContentCreateRequest> profileReq) {
-
         if (userRepository.existsByUsername(req.username())) {
             throw new UserAlreadyExistsException(req.username());
         }
@@ -70,7 +70,12 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        return UserDto.from(user);
+        UserDto dto = UserDto.from(user);
+        eventPublisher.publishEvent(new UserChangedEvent(
+                "users.created",
+                com.sprint.mission.discodeit.dto.data.UserDto.from(user)
+        ));
+        return dto;
     }
 
     @Override
@@ -87,7 +92,7 @@ public class UserServiceImpl implements UserService {
                 .orElse(null);
 
         String newPassword = req.newPassword();
-        String encodedNewPassword = (newPassword != null) ? passwordEncoder.encode(newPassword) : null;
+        String encodedNewPassword = newPassword != null ? passwordEncoder.encode(newPassword) : null;
 
         user.update(
                 req.newUsername(),
@@ -96,12 +101,16 @@ public class UserServiceImpl implements UserService {
                 newProfile
         );
 
-        return UserDto.from(user);
+        UserDto dto = UserDto.from(user);
+        eventPublisher.publishEvent(new UserChangedEvent(
+                "users.updated",
+                com.sprint.mission.discodeit.dto.data.UserDto.from(user)
+        ));
+        return dto;
     }
 
     @Override
     public UserDto find(UUID userId) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
@@ -119,15 +128,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @CacheEvict(cacheNames = "users", allEntries = true)
     public void delete(UUID userId) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
+        com.sprint.mission.discodeit.dto.data.UserDto dto = com.sprint.mission.discodeit.dto.data.UserDto.from(user);
         userRepository.delete(user);
+        eventPublisher.publishEvent(new UserChangedEvent("users.deleted", dto));
     }
 
     private BinaryContent saveProfileAndReturn(BinaryContentCreateRequest req) {
-
         BinaryContent binary = new BinaryContent(
                 req.fileName(),
                 (long) req.bytes().length,

@@ -32,10 +32,12 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/ws/**")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 )
@@ -54,6 +56,7 @@ public class SecurityConfig {
                                 "/static/**",
                                 "/error"
                         ).permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/logout", "/api/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
