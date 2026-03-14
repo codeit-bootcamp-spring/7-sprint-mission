@@ -3,12 +3,14 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentUploadCommand;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -77,14 +79,16 @@ public class BinaryContentController implements BinaryContentApi {
     @Override
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UUID> createBinaryContent(
-            @RequestPart MultipartFile file
+            @RequestPart MultipartFile file,
+            @AuthenticationPrincipal DiscodeitUserDetails userDetails
     ) {
         log.debug("binary content 생성 요청 fileName={} size={} contentType={}",
                 file.getOriginalFilename(),
                 file.getSize(),
                 file.getContentType()
         );
-        BinaryContentUploadCommand fileCommand = BinaryContentUploadCommand.from(file);
+        UUID userId = userDetails.getUserResponseDto().id();
+        BinaryContentUploadCommand fileCommand = BinaryContentUploadCommand.from(file, userId);
         UUID binaryId = binaryContentService.uploadBinaryContent(fileCommand);
         log.debug("binary content 생성 성공 binaryId={}", binaryId);
         return ResponseEntity.ok(binaryId);

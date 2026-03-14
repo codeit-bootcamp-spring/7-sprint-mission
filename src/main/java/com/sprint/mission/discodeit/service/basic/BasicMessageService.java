@@ -114,7 +114,7 @@ public class BasicMessageService implements MessageService {
 
         log.debug("메시지 전송 시도 - channelId={}, senderId={}, attachments={}",
                 command.channelId(), command.senderId(),
-                command.profiles() == null ? 0 : command.profiles().size());
+                command.attachments() == null ? 0 : command.attachments().size());
 
         // NOTE: 1. 보내려는 유저가 맞는지 확인
         User sender = userReader.findUserOrThrow(command.senderId());
@@ -129,11 +129,11 @@ public class BasicMessageService implements MessageService {
             }
         }
 
-        List<UUID> profileBinaryIds = command.profiles().stream()
-                .map(binaryContentService::uploadBinaryContent).toList();
+        List<UUID> BinaryIds = command.attachments().stream()
+                .map(binaryCommand -> binaryContentService.uploadBinaryContent(binaryCommand)).toList();
 
         // UUID → BinaryContent 조회
-        List<BinaryContent> attachments = binaryContentRepository.findAllById(profileBinaryIds);
+        List<BinaryContent> attachments = binaryContentRepository.findAllById(BinaryIds);
         Message message = Message.builder()
                 .content(command.content())
                 .author(sender)

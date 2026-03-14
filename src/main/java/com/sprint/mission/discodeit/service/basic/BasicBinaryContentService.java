@@ -44,7 +44,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         BinaryContent saved = binaryContentRepository.save(binaryContent);
 
-        BinaryContentCreatedEvent binaryContentCreatedEvent = new BinaryContentCreatedEvent(saved.getId(), command.bytes());
+        BinaryContentCreatedEvent binaryContentCreatedEvent = new BinaryContentCreatedEvent(saved.getId(), command.bytes(), command.userId());
         eventPublisher.publishEvent(binaryContentCreatedEvent);
 
         // 키id로 값 bytes 저장

@@ -69,8 +69,6 @@ public class BasicSseService implements SseService {
 
     @Override
     public void send(Collection<UUID> receiverIds, String eventName, Object data) {
-
-
         receiverIds.forEach(receiverId -> {
             UUID eventId = sseMessageRepository.save(receiverId, eventName, data);
             sseEmitterRepository.findByUserId(receiverId)
