@@ -1,10 +1,14 @@
 package com.sprint.mission.discodeit.global.config;
 
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.global.config.security.interceptor.AuthChannelInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.security.messaging.access.intercept.AuthorizationChannelInterceptor;
+import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
 import org.springframework.security.messaging.context.SecurityContextChannelInterceptor;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -37,7 +41,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(
                 authChannelInterceptor,
-                new SecurityContextChannelInterceptor()
+                securityContextChannelInterceptor(),
+                authorizationChannelInterceptor()
         );
     }
 
@@ -49,4 +54,19 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setSendTimeLimit(20 * 1000)            // 전송 타임아웃: 20초
                 .setTimeToFirstMessage(30 * 1000);      // 첫 메시지 타임아웃: 30초
     }
+
+    @Bean
+    public AuthorizationChannelInterceptor authorizationChannelInterceptor() {
+        return new AuthorizationChannelInterceptor(
+                MessageMatcherDelegatingAuthorizationManager.builder()
+                        .anyMessage().hasRole(Role.USER.name())
+                        .build()
+        );
+    }
+
+    @Bean
+    public SecurityContextChannelInterceptor securityContextChannelInterceptor() {
+        return new SecurityContextChannelInterceptor();
+    }
+
 }
