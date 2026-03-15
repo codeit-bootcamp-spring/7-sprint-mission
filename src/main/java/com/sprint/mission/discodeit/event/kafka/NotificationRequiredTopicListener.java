@@ -2,14 +2,23 @@ package com.sprint.mission.discodeit.event.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.entity.type.ChannelType;
 import com.sprint.mission.discodeit.event.BinaryContentUploadFailedEvent;
+import com.sprint.mission.discodeit.event.ChannelCreatedEvent;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.service.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -17,6 +26,8 @@ import org.springframework.stereotype.Component;
 public class NotificationRequiredTopicListener {
     private final NotificationService notificationService;
     private final ObjectMapper objectMapper;
+    private final ChannelService channelService;
+    private final SseService sseService;
 
     @KafkaListener(topics = "discodeit.MessageCreatedEvent")
     public void onMessageCreatedEvent(String kafkaEvent) {
@@ -50,4 +61,5 @@ public class NotificationRequiredTopicListener {
             throw new RuntimeException(e);
         }
     }
+
 }

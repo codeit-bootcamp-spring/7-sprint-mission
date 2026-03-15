@@ -2,7 +2,11 @@ package com.sprint.mission.discodeit.event.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.entity.type.ChannelType;
 import com.sprint.mission.discodeit.event.BinaryContentUploadFailedEvent;
+import com.sprint.mission.discodeit.event.ChannelCreatedEvent;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +42,12 @@ public class KafkaProduceRequiredEventListener {
     @Async(value = "eventTaskExecutor")
     public void handleFailedUploadBinaryContent(BinaryContentUploadFailedEvent event) {
         sendToKafka(event, "discodeit.BinaryUploadFailedEvent");
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Async("eventTaskExecutor")
+    public void handleChannelCreated(ChannelCreatedEvent event) {
+        sendToKafka(event, "discodeit.ChannelCreatedEvent");
     }
 
     private <T> void sendToKafka(T event, String topic) {

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -33,5 +34,9 @@ public class SseEmitterRepository {
 
     public ConcurrentMap<UUID, List<SseEmitter>> findAll() {
         return data;
+    }
+
+    public Set<UUID> findConnectedUserIds() {
+        return data.keySet();
     }
 }

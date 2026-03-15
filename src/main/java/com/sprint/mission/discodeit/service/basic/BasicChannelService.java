@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.type.ChannelType;
+import com.sprint.mission.discodeit.event.ChannelCreatedEvent;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.*;
@@ -24,8 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +47,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelFactory channelFactory;
     private final ChannelMapper channelMapper;
     private final CacheManager cacheManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -84,8 +86,11 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.saveAll(readStatuses);
             log.debug("PRIVATE 채널 ReadStatus 생성 channelId={} count={}", savedChannel.getId(), readStatuses.size());
         }
+
         log.info("채널 생성 성공 channelId={} type={} name={}",
                 savedChannel.getId(), savedChannel.getType(), savedChannel.getName());
+
+        eventPublisher.publishEvent(new ChannelCreatedEvent(savedChannel.getId()));
 
         evictChannelsByUserCaches(command);
         return channelMapper.toDto(savedChannel);
