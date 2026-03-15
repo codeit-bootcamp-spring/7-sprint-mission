@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.global.config.security.jwt;
 
-import com.sprint.mission.discodeit.event.UserCacheEvictEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "discodeit.jwt-registry-type", havingValue = "local", matchIfMissing = true)
 public class InMemoryJwtRegistry implements JwtRegistry {
 
     // Queue 자료구조로 JwtInformation을 관리하는 이유
@@ -55,7 +56,7 @@ public class InMemoryJwtRegistry implements JwtRegistry {
         });
 
         // users 캐시 clear
-        eventPublisher.publishEvent(new UserCacheEvictEvent());
+        eventPublisher.publishEvent("USER_CACHE_EVICT");
 
     }
 
@@ -72,7 +73,7 @@ public class InMemoryJwtRegistry implements JwtRegistry {
             return null; // Remove the user from the registry
         });
 
-        eventPublisher.publishEvent(new UserCacheEvictEvent());
+        eventPublisher.publishEvent("USER_CACHE_EVICT");
     }
 
     @Override
