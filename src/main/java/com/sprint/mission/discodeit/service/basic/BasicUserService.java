@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.type.Role;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
+import com.sprint.mission.discodeit.event.user.UserUpdatedEvent;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserDuplicateException;
@@ -129,6 +130,8 @@ public class BasicUserService implements UserService {
 
         log.info("회원 수정 완료 - userId={}, profileChanged={}", updateCommand.id(), profileBinaryId != null);
 
+        eventPublisher.publishEvent(new UserUpdatedEvent(userById.getId()));
+
         return userMapper.toDto(userById); // NOTE: 멱등성, dirty checking 으로 바뀌던 안바뀌던 해당 객체 반환
     }
 
@@ -148,6 +151,9 @@ public class BasicUserService implements UserService {
                         oldRole
                 )
         );
+
+        eventPublisher.publishEvent(new UserUpdatedEvent(user.getId()));
+
         return userMapper.toDto(user);
     }
 

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.event.channel.ChannelDeletedEvent;
 import com.sprint.mission.discodeit.event.channel.ChannelUpdatedEvent;
 import com.sprint.mission.discodeit.event.message.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
+import com.sprint.mission.discodeit.event.user.UserUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -49,16 +50,22 @@ public class KafkaProduceRequiredEventListener {
         sendToKafka(event, "discodeit.ChannelCreatedEvent");
     }
 
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async("eventTaskExecutor")
     public void handleChannelUpdated(ChannelUpdatedEvent event) {
         sendToKafka(event, "discodeit.ChannelUpdatedEvent");
     }
 
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async("eventTaskExecutor")
     public void handleChannelDeleted(ChannelDeletedEvent event) {
         sendToKafka(event, "discodeit.ChannelDeletedEvent");
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Async("eventTaskExecutor")
+    public void handleUserUpdated(UserUpdatedEvent event) {
+        sendToKafka(event, "discodeit.UserUpdatedEvent");
     }
 
 
