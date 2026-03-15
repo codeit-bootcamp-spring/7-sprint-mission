@@ -2,12 +2,11 @@ package com.sprint.mission.discodeit.event.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.entity.type.ChannelType;
-import com.sprint.mission.discodeit.event.BinaryContentUploadFailedEvent;
-import com.sprint.mission.discodeit.event.ChannelCreatedEvent;
-import com.sprint.mission.discodeit.event.MessageCreatedEvent;
+import com.sprint.mission.discodeit.event.binaryContent.BinaryContentUploadFailedEvent;
+import com.sprint.mission.discodeit.event.channel.ChannelCreatedEvent;
+import com.sprint.mission.discodeit.event.channel.ChannelDeletedEvent;
+import com.sprint.mission.discodeit.event.channel.ChannelUpdatedEvent;
+import com.sprint.mission.discodeit.event.message.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +48,19 @@ public class KafkaProduceRequiredEventListener {
     public void handleChannelCreated(ChannelCreatedEvent event) {
         sendToKafka(event, "discodeit.ChannelCreatedEvent");
     }
+
+    @EventListener
+    @Async("eventTaskExecutor")
+    public void handleChannelUpdated(ChannelUpdatedEvent event) {
+        sendToKafka(event, "discodeit.ChannelUpdatedEvent");
+    }
+
+    @EventListener
+    @Async("eventTaskExecutor")
+    public void handleChannelDeleted(ChannelDeletedEvent event) {
+        sendToKafka(event, "discodeit.ChannelDeletedEvent");
+    }
+
 
     private <T> void sendToKafka(T event, String topic) {
         try {

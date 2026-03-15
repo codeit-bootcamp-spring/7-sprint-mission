@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.event;
+package com.sprint.mission.discodeit.event.binaryContent;
 
 import com.sprint.mission.discodeit.entity.status.BinaryContentStatus;
 import com.sprint.mission.discodeit.service.BinaryContentService;

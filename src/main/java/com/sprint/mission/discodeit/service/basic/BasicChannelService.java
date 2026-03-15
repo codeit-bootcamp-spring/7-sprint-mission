@@ -8,7 +8,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.type.ChannelType;
-import com.sprint.mission.discodeit.event.ChannelCreatedEvent;
+import com.sprint.mission.discodeit.event.channel.ChannelCreatedEvent;
+import com.sprint.mission.discodeit.event.channel.ChannelDeletedEvent;
+import com.sprint.mission.discodeit.event.channel.ChannelUpdatedEvent;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.*;
@@ -122,6 +124,7 @@ public class BasicChannelService implements ChannelService {
         channelById.update(params); // TODO: api ChannelDto 형식으로
 
         channelRepository.save(channelById);
+        eventPublisher.publishEvent(new ChannelUpdatedEvent(channelById.getId()));
         log.info("채널 수정 성공 channelId={}", channelId);
     }
 
@@ -137,6 +140,8 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = channelReader.findChannelOrThrow(channelId);
 
+        ChannelResponseDto responseDto = channelMapper.toDto(channel);
+
         messageRepository.deleteByChannelId(channel.getId());
 
         readStatusRepository.deleteByChannelId(channel.getId());
@@ -145,6 +150,9 @@ public class BasicChannelService implements ChannelService {
                 channel.getId());
 
         channelRepository.deleteById(channel.getId()); // NOTE : Channel쪽에 연관관계가없어서 CASCADE 발생이안됨 따라서 위에 명시적으로 삭제
+
+        eventPublisher.publishEvent(new ChannelDeletedEvent(responseDto));
+
         log.info("채널 삭제 성공 channelId={}", channelId);
     }
 

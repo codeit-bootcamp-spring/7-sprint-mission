@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.event;
+package com.sprint.mission.discodeit.event.channel;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
