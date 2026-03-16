@@ -81,7 +81,8 @@ public class MessageService {
                 user.getId(),
                 user.getUsername(),
                 channel.getName(),
-                request.content()
+                request.content(),
+                dto
         ));
         return dto;
     }
