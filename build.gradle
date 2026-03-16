@@ -76,6 +76,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'        // API
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'          // 구현체
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'       // JSON 파싱
+
+    //web socket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('test') {
