@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface NotificationService {
     List<NotificationDto> findAllByReceiverId(UUID receiverId);
     void deleteById(UUID notificationId, UUID receiverId);
-    void create(User receiver, String title, String content);
+    NotificationDto create(User receiver, String title, String content);
 }

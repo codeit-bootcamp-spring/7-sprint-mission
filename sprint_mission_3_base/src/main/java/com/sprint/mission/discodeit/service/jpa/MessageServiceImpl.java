@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -48,18 +49,27 @@ public class MessageServiceImpl implements MessageService {
         User user = userRepository.findById(request.authorId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        Channel channel = channelRepository.findById(request.channelId())
+        return createInternal(user, request.channelId(), request.content(), binaryRequests);
+    }
+
+    @Override
+    public MessageDto createWithAuthorId(UUID authorId, MessageCreateRequest request) {
+        User user = userRepository.findById(authorId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return createInternal(user, request.channelId(), request.content(), List.of());
+    }
+
+    private MessageDto createInternal(
+            User user,
+            UUID channelId,
+            String content,
+            List<BinaryContentCreateRequest> binaryRequests
+    ) {
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
-        Message message = new Message(
-                request.content(),
-                channel,
-                user,
-                List.of()
-        );
-
-        messageRepository.save(message);
-
+        List<BinaryContent> attachments = new ArrayList<>();
         for (BinaryContentCreateRequest br : binaryRequests) {
             BinaryContent binary = new BinaryContent(
                     br.fileName(),
@@ -67,8 +77,18 @@ public class MessageServiceImpl implements MessageService {
                     br.contentType()
             );
             binaryContentRepository.save(binary);
+            attachments.add(binary);
             eventPublisher.publishEvent(new BinaryContentCreatedEvent(binary.getId(), br.bytes()));
         }
+
+        Message message = new Message(
+                content,
+                channel,
+                user,
+                attachments
+        );
+
+        messageRepository.save(message);
 
         eventPublisher.publishEvent(new MessageCreatedEvent(
                 message.getId(),
@@ -77,12 +97,12 @@ public class MessageServiceImpl implements MessageService {
                 message.getContent()
         ));
 
-        return MessageDto.from(message);
+        return MessageDto.from(messageRepository.findDetailById(message.getId()).orElse(message));
     }
 
     @Override
     public MessageDto find(UUID messageId) {
-        return messageRepository.findById(messageId)
+        return messageRepository.findDetailById(messageId)
                 .map(MessageDto::from)
                 .orElseThrow(() -> new IllegalArgumentException("Message not found"));
     }
@@ -114,7 +134,7 @@ public class MessageServiceImpl implements MessageService {
                 .orElseThrow(() -> new IllegalArgumentException("Message not found"));
 
         message.update(request.newContent());
-        return MessageDto.from(message);
+        return MessageDto.from(messageRepository.findDetailById(message.getId()).orElse(message));
     }
 
     @Override

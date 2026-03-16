@@ -1,4 +1,39 @@
 services:
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    container_name: discodeit-nginx
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    networks:
+      - public
+      - internal
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit-backend
+    depends_on:
+      - db
+      - redis
+      - broker
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/discodeit
+      SPRING_DATASOURCE_USERNAME: discodeit_user
+      SPRING_DATASOURCE_PASSWORD: discodeit1234
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:29092
+    networks:
+      - internal
+
   db:
     image: postgres:17
     container_name: discodeit-db
@@ -6,26 +41,47 @@ services:
       POSTGRES_DB: discodeit
       POSTGRES_USER: discodeit_user
       POSTGRES_PASSWORD: discodeit1234
-    ports:
-      - "5432:5432"
     volumes:
       - discodeit_pg:/var/lib/postgresql/data
       - "./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro"
+    networks:
+      - internal
 
-  discodeit:
-    build: .
-    container_name: discodeit-app
-    depends_on:
-      - db
-    ports:
-      - "8080:8080"
-    env_file:
-      - .env
+  redis:
+    image: redis:7-alpine
+    container_name: discodeit-redis
+    networks:
+      - internal
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: discodeit-zookeeper
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/discodeit
-      SPRING_DATASOURCE_USERNAME: discodeit_user
-      SPRING_DATASOURCE_PASSWORD: discodeit1234
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - internal
+
+  broker:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: discodeit-kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - internal
 
 volumes:
   discodeit_pg:
+
+networks:
+  public:
+  internal:
+    internal: true
