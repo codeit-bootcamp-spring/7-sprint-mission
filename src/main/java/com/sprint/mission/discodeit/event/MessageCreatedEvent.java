@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.event;
 
+import com.sprint.mission.discodeit.service.dto.response.MessageDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,4 +14,5 @@ public class MessageCreatedEvent {
     private String senderName;
     private String channelName;
     private String content;
+    private MessageDto messageDto;
 }
