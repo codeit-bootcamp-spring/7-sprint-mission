@@ -4,11 +4,17 @@ services:
   redis:
     image: redis:7.2-alpine
     container_name: redis
-    ports:
-      - "6379:6379"
+    #    ports:
+    #      - "6379:6379"
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
+    networks:
+      - backend-network
 
 volumes:
   redis-data:
+
+networks:
+  backend-network:
+    external: true

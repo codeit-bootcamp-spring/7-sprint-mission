@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.SseEvent;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.discodietException.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -60,6 +61,7 @@ public class BasicUserService implements UserService {
         User user = new User(createUserDto.username(), createUserDto.email(), encryptedPassword, profile);
 
         userRepository.save(user);
+        eventPublisher.publishEvent(SseEvent.broadcast("users.created", userMapper.toResponseDto(user)));
 
         return userMapper.toResponseDto(user);
     }
@@ -110,7 +112,7 @@ public class BasicUserService implements UserService {
                 updateUserDto.newEmail(),
                 profile
         );
-
+        eventPublisher.publishEvent(SseEvent.broadcast("users.updated", userMapper.toResponseDto(user)));
         return userMapper.toResponseDto(user);
     }
 
@@ -121,7 +123,7 @@ public class BasicUserService implements UserService {
     public void deleteUser(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> UserNotFoundException.byId(userId));
-
+        eventPublisher.publishEvent(SseEvent.broadcast("users.deleted", userMapper.toResponseDto(user)));
         userRepository.delete(user);
     }
 

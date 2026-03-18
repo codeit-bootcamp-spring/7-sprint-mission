@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.notification.NotificationResponseDto;
 import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.event.SseEvent;
 import com.sprint.mission.discodeit.global.exception.discodietException.notification.NotificationForbiddenException;
 import com.sprint.mission.discodeit.global.exception.discodietException.notification.NotificationNotFoundException;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
@@ -13,6 +14,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,6 +31,7 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
     private final CacheManager cacheManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @CacheEvict(value = "notifications", key = "#receiverId")
     @Override
@@ -39,25 +42,32 @@ public class BasicNotificationService implements NotificationService {
                 .content(content)
                 .receiverId(receiverId)
                 .build();
+
         notificationRepository.save(notification);
+
+        NotificationResponseDto notificationResponseDto = notificationMapper.toResponseDto(notification);
+
+        eventPublisher.publishEvent(SseEvent.send(List.of(receiverId), "notifications.created", notificationResponseDto));
     }
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createMultipleNotification(List<UUID> receiverIds, String title, String content) {
-        List<Notification> notificationList = receiverIds.stream().map(
-                receiverId -> {
-                    Notification notification = Notification.builder()
-                            .title(title)
-                            .content(content)
-                            .receiverId(receiverId)
-                            .build();
-                    return notification;
-                }
-        ).toList();
+        List<Notification> notificationList = receiverIds.stream()
+                .map(receiverId -> Notification.builder()
+                        .title(title)
+                        .content(content)
+                        .receiverId(receiverId)
+                        .build())
+                .toList();
 
         notificationRepository.saveAll(notificationList);
         evictCache(receiverIds);
+
+        notificationList.forEach(notification -> {
+            NotificationResponseDto dto = notificationMapper.toResponseDto(notification);
+            eventPublisher.publishEvent(SseEvent.send(List.of(notification.getReceiverId()), "notifications.created", dto));
+        });
     }
 
     @Cacheable(value = "notifications", key = "#receiverId")

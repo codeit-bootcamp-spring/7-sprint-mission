@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.event.listener;
 
-import com.sprint.mission.discodeit.event.UserCacheEvictEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,8 +14,9 @@ import org.springframework.stereotype.Component;
 public class UserCacheEventListener {
     private final CacheManager cacheManager;
 
-    @EventListener
-    public void on(UserCacheEvictEvent event) {
+    @Async("eventExecutor")
+    @EventListener(condition = "#event.equals('USER_CACHE_EVICT')")
+    public void on(String event) {
         Cache cache = cacheManager.getCache("users");
         if (cache != null) {
             cache.clear();

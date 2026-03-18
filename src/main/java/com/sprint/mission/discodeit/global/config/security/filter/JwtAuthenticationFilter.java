@@ -70,4 +70,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 8. 다음 필터
         filterChain.doFilter(request, response);
     }
+
+    @Override
+    protected boolean shouldNotFilterAsyncDispatch() {
+        return false;
+    }
 }

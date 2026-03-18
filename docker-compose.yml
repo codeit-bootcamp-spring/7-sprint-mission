@@ -1,9 +1,20 @@
 services:
+  #Reverse Proxy (Nginx) - 유일한 외부 통로
+  nginx:
+    build: ./nginx
+    container_name: nginx-api-gateway
+    ports:
+      - "3000:80"  # 외부에서 3000번으로 접속
+    depends_on:
+      - app
+    networks:
+      - backend-network
+      - public-network   # 외부(사용자)와 통신하는 통로
   app:
     build:
       context: .          # 애플리케이션 Dockerfile 위치
       dockerfile: Dockerfile
-    container_name: discodeit-container
+    #    container_name: discodeit-container
     environment:
       - PROJECT_NAME=${PROJECT_NAME}
       - PROJECT_VERSION=${PROJECT_VERSION}
@@ -25,12 +36,21 @@ services:
       - ACCESS_TOKEN_EXPIRATION=${ACCESS_TOKEN_EXPIRATION}
       - REFRESH_TOKEN_EXPIRATION=${REFRESH_TOKEN_EXPIRATION}
       - ISSUER=${ISSUER}
-    ports:
-      - "8081:80"
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=broker:${KAFKA_PORT}
+      - JWT_REGISTRY_TYPE=${REDIS}
+    #    ports:
+    #      - "8081:80" // nginx로 인해 삭제
     volumes:
       - storage_data:${STORAGE_PATH}
     depends_on:
       - db
+    networks:
+      - backend-network
+    deploy:
+      replicas: 3   # Backend 인스턴스를 3개로 복제
+
 
   db:
     image: postgres:15
@@ -39,13 +59,25 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
+    #    ports:
+    #      - "5432:5432"
     volumes:
       # PostgreSQL 데이터 유지
       - db-data:/var/lib/postgresql/data
       # schema.sql 자동 실행 (컨테이너 시작 시)
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    name: backend-network  #이름을 폴더명 없이 'backend-network'로 고정
+    driver: bridge
+    internal: true
+
+  public-network:
+    name: public-network
+    driver: bridge
 
 volumes:
   db-data:
