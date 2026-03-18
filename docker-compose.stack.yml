@@ -1,0 +1,164 @@
+version: '3.9'
+
+services:
+
+  # ====================== Reverse Proxy (Nginx) ======================
+  nginx:
+    image: nginx:alpine
+    container_name: reverse-proxy
+    restart: always
+    ports:
+      - "3000:80"
+    volumes:
+      - ./build/resources/main/static:/usr/share/nginx/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - discodeit-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ====================== Backend (Spring Boot) ======================
+  backend:
+    build: .
+    restart: always
+    expose:
+      - "8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+
+      - STORAGE_TYPE=${STORAGE_TYPE}
+      - STORAGE_LOCAL_ROOT_PATH=${STORAGE_LOCAL_ROOT_PATH}
+
+      - ACCESS_SECRET=${ACCESS_SECRET}
+      - REFRESH_SECRET=${REFRESH_SECRET}
+
+      - SPRING_REDIS_HOST=${SPRING_REDIS_HOST}
+      - SPRING_REDIS_PORT=${SPRING_REDIS_PORT}
+
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=broker:29092
+      - SPRING_KAFKA_CONSUMER_AUTO_OFFSET_RESET=earliest
+
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
+
+    networks:
+      - discodeit-net
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep UP || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+    deploy:
+      replicas: 3 # Backend 3대를 컨테이너로 띄운다
+      restart_policy:
+        condition: on-failure
+
+  # ====================== PostgreSQL ======================
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    networks:
+      - discodeit-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ====================== Redis ======================
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: always
+    expose:
+      - "6379"
+    networks:
+      - discodeit-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ====================== Kafka (KRaft mode) ======================
+  broker:
+    image: apache/kafka:3.7.0
+    hostname: broker
+    container_name: broker
+    restart: always
+
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:29093
+
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+
+    expose:
+      - "29092"
+
+    networks:
+      - discodeit-net
+
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 29092 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
+networks:
+  discodeit-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  kafka-data:

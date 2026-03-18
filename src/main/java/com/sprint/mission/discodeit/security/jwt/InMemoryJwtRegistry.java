@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.security.jwt;
 
-import io.jsonwebtoken.Claims;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

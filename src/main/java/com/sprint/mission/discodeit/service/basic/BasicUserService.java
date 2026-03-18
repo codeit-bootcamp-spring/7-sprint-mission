@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.request.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelDto;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.global.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.global.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.global.exception.user.UsernameAlreadyExistsException;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequestDto;
@@ -14,12 +17,17 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.sse.service.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,6 +52,10 @@ public class BasicUserService implements UserService{
 
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
+
+    private final SseService sseService;
+    private final ReadStatusRepository readStatusRepository;
+    private final ChannelMapper channelMapper;
 
     @Override
     @Transactional
@@ -71,11 +83,16 @@ public class BasicUserService implements UserService{
 
         // 사용자 저장
         User saved = userRepository.save(newUser);
+        UserResponseDto dto = userMapper.toResponseDto(saved);
+        sseService.broadcast(
+                "users.created",
+                dto
+        );
 
         log.info("새 유저 생성 완료: userId = {}, username = {}, email = {}",
                 saved.getId(), saved.getUsername(), saved.getEmail());
 
-        return userMapper.toResponseDto(newUser);
+        return dto;
     }
 
     @Override
@@ -103,7 +120,10 @@ public class BasicUserService implements UserService{
     @Override
     @Transactional
     @PreAuthorize("#userId == authentication.principal.getUserDto.id")
-    @CacheEvict(value = "userList", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "userList", allEntries = true),
+            @CacheEvict(value = "channelList", allEntries = true) // 사용자 정보 업데이트시 채널 참여자 정보 업데이트를 위해 채널 캐시 삭제
+    })
     public UserResponseDto update(UUID userId, UpdateUserRequestDto userRequest, CreateBinaryContentRequestDto profileRequest) {
 
         User user = userRepository.findById(userId)
@@ -122,7 +142,10 @@ public class BasicUserService implements UserService{
         if (Optional.ofNullable(userRequest).isPresent()) {
             username = userRequest.newUsername();
             email = userRequest.newEmail();
-            password = passwordEncoder.encode(userRequest.newPassword());
+
+            if(userRequest.newPassword() != null && !userRequest.newPassword().isEmpty()) {
+                password = passwordEncoder.encode(userRequest.newPassword());
+            }
 
             // username, email 중복 검사 (사용자의 기존 정보인 경우 제외)
             if(!user.getUsername().equals(username)) validateUsernameDuplicate(username);
@@ -135,9 +158,33 @@ public class BasicUserService implements UserService{
         user.update(username, email, password, profileImage);
         User saved = userRepository.save(user);
 
+        UserResponseDto dto = userMapper.toResponseDto(saved);
+        sseService.broadcast(
+                "users.updated",
+                dto
+        );
+
+        // 업데이트된 사용자가 속한 비공개 채널의 정보도 SSE로 업데이트해서 전달
+        List<ChannelDto> dtos = readStatusRepository.findAllByUserIdWithChannel(userId).stream()
+                .map(rs -> rs.getChannel())
+                .filter(channel -> channel.getChannelType() == ChannelType.PRIVATE)
+                .map(channel -> channelMapper.toResponseDto(channel))
+                .toList();
+
+        dtos.forEach(channelDto -> {
+            List<UUID> participantsIds = channelDto.participants().stream()
+                            .map(participant -> participant.id())
+                            .toList();
+            sseService.send(
+                    participantsIds,
+                    "channels.updated",
+                    channelDto
+            );
+        });
+
         log.info("사용자 정보 수정 완료: userId = {}, username = {}", saved.getId(), saved.getUsername());
 
-        return userMapper.toResponseDto(saved);
+        return dto;
     }
 
     @Override
@@ -150,6 +197,7 @@ public class BasicUserService implements UserService{
                         ErrorCode.USER_NOT_FOUND,
                         Map.of("userId", userId)
                 ));
+        UserResponseDto dto = userMapper.toResponseDto(user);
 
         log.debug("사용자 삭제 요청: userId = {}, username = {}", user.getId(), user.getUsername());
 
@@ -161,6 +209,11 @@ public class BasicUserService implements UserService{
         }
 
         userRepository.deleteById(userId);
+
+        sseService.broadcast(
+                "users.deleted",
+                dto
+        );
 
         log.info("사용자 삭제 완료: userId = {}", userId);
     }

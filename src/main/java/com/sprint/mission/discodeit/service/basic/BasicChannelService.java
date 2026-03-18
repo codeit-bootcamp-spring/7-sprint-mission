@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.sse.service.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -38,6 +39,8 @@ public class BasicChannelService implements ChannelService {
     private final ChannelMapper channelMapper;
     private final CacheManager cacheManager;
 
+    private final SseService sseService;
+
     // API 스펙에 맞는 공개 채널 및 비공개 채널 생성 메서드 추가
     @Override
     @Transactional
@@ -55,8 +58,15 @@ public class BasicChannelService implements ChannelService {
         Channel channel = new Channel(name, ChannelType.PUBLIC, description);
         Channel saved = channelRepository.save(channel);
 
+        ChannelDto dto = channelMapper.toResponseDto(saved);
+
+        sseService.broadcast(
+                "channels.created",
+                dto
+        );
+
         log.info("공개 채널 생성 완료: channelId = {}, channelName = {}", saved.getId(), saved.getChannelName());
-        return channelMapper.toResponseDto(saved);
+        return dto;
     }
 
     @Override
@@ -88,8 +98,16 @@ public class BasicChannelService implements ChannelService {
         request.participantIds()
                 .forEach(userId -> cache.evict(userId));
 
+
+        ChannelDto dto = channelMapper.toResponseDto(saved);
+        sseService.send(
+                request.participantIds(),
+                "channels.created",
+                dto
+        );
+
         log.info("비공개 채널 생성 완료: channelId = {}", saved.getId());
-        return channelMapper.toResponseDto(saved);
+        return dto;
     }
 
     @Override
@@ -120,8 +138,15 @@ public class BasicChannelService implements ChannelService {
         channel.update(request.newName(), request.newDescription());
         Channel saved = channelRepository.save(channel);
 
+        ChannelDto dto = channelMapper.toResponseDto(saved);
+
+        sseService.broadcast(
+                "channels.updated",
+                dto
+        );
+
         log.info("채널 수정 완료: channelId = {}", channelId);
-        return channelMapper.toResponseDto(saved);
+        return dto;
     }
 
     @Override
@@ -170,11 +195,16 @@ public class BasicChannelService implements ChannelService {
 
         log.debug("채널 삭제 요청: channelId = {}", channelId);
 
-        channelRepository.findById(channelId)
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelNotFoundException(
                         ErrorCode.CHANNEL_NOT_FOUND,
                         Map.of("channelId", channelId)
                 ));
+
+        ChannelDto dto = channelMapper.toResponseDto(channel);
+        List<UUID> userIds = readStatusRepository.findAllByChannelWithUser(channel).stream()
+                .map(readStatus -> readStatus.getUser().getId())
+                .toList();
 
         // 채널 메시지 연관 파일 UUID 저장
         List<UUID> binaryContentIds = messageRepository.findAllByChannelId(channelId).stream()
@@ -186,6 +216,19 @@ public class BasicChannelService implements ChannelService {
         messageRepository.deleteAllByChannelId(channelId); // 채널의 모든 메시지 삭제
         binaryContentRepository.deleteByIdIn(binaryContentIds); // 채널 메시지 연관 파일들 삭제
         channelRepository.deleteById(channelId); // 채널 삭제
+
+        if(channel.getChannelType() == ChannelType.PUBLIC) {
+            sseService.broadcast(
+                    "channels.deleted",
+                    dto
+            );
+        } else {
+            sseService.send(
+                    userIds,
+                    "channels.deleted",
+                    dto
+            );
+        }
 
         log.info("채널 삭제 완료: channelId = {}", channelId);
     }
