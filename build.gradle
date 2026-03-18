@@ -80,6 +80,16 @@ dependencies {
     implementation "org.springframework.retry:spring-retry"
     implementation "org.springframework:spring-aspects"
 
+    // Kafka 의존성
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    // redis 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // 웹소켓 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    
 
 
     testImplementation 'org.springframework.security:spring-security-test'

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.security.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.auth.JwtDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.event.user.UserUpdatedEvent;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.jwt.config.JwtProperties;
 import com.sprint.mission.discodeit.service.RefreshTokenService;
@@ -13,10 +14,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -30,21 +31,23 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtProperties jwtProperties;
     private final RefreshTokenService refreshTokenService;
     private final CacheManager cacheManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        Optional.ofNullable( cacheManager.getCache("users"))
+        Optional.ofNullable(cacheManager.getCache("users"))
                 .ifPresent(Cache::clear);
         DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
 
         UserResponseDto userResponseDto = userDetails.getUserResponseDto();
 
+        eventPublisher.publishEvent(new UserUpdatedEvent(userResponseDto.id()));
 
         String accessToken = jwtTokenProvider.generateAccessToken(userResponseDto.id(), userResponseDto.email(), userResponseDto.username(), userResponseDto.role());
         String refreshToken = jwtTokenProvider.generateRefreshToken(userResponseDto.id(), userResponseDto.email());
 
 
-        refreshTokenService.saveRefreshToken(userResponseDto.id(),  refreshToken);
+        refreshTokenService.saveRefreshToken(userResponseDto.id(), refreshToken);
 
 
         Cookie refreshTokenCookie = new Cookie("REFRESH_TOKEN", refreshToken);

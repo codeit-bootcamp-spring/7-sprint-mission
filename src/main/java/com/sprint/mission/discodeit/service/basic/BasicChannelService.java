@@ -8,6 +8,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.type.ChannelType;
+import com.sprint.mission.discodeit.event.channel.ChannelCreatedEvent;
+import com.sprint.mission.discodeit.event.channel.ChannelDeletedEvent;
+import com.sprint.mission.discodeit.event.channel.ChannelUpdatedEvent;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.*;
@@ -24,8 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +49,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelFactory channelFactory;
     private final ChannelMapper channelMapper;
     private final CacheManager cacheManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -84,8 +88,11 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.saveAll(readStatuses);
             log.debug("PRIVATE 채널 ReadStatus 생성 channelId={} count={}", savedChannel.getId(), readStatuses.size());
         }
+
         log.info("채널 생성 성공 channelId={} type={} name={}",
                 savedChannel.getId(), savedChannel.getType(), savedChannel.getName());
+
+        eventPublisher.publishEvent(new ChannelCreatedEvent(savedChannel.getId()));
 
         evictChannelsByUserCaches(command);
         return channelMapper.toDto(savedChannel);
@@ -117,6 +124,7 @@ public class BasicChannelService implements ChannelService {
         channelById.update(params); // TODO: api ChannelDto 형식으로
 
         channelRepository.save(channelById);
+        eventPublisher.publishEvent(new ChannelUpdatedEvent(channelById.getId()));
         log.info("채널 수정 성공 channelId={}", channelId);
     }
 
@@ -132,6 +140,8 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = channelReader.findChannelOrThrow(channelId);
 
+        ChannelResponseDto responseDto = channelMapper.toDto(channel);
+
         messageRepository.deleteByChannelId(channel.getId());
 
         readStatusRepository.deleteByChannelId(channel.getId());
@@ -140,6 +150,9 @@ public class BasicChannelService implements ChannelService {
                 channel.getId());
 
         channelRepository.deleteById(channel.getId()); // NOTE : Channel쪽에 연관관계가없어서 CASCADE 발생이안됨 따라서 위에 명시적으로 삭제
+
+        eventPublisher.publishEvent(new ChannelDeletedEvent(responseDto));
+
         log.info("채널 삭제 성공 channelId={}", channelId);
     }
 

@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.api;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,6 +59,6 @@ public interface BinaryContentApi {
                     content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))
             )
     })
-    ResponseEntity<UUID> createBinaryContent(MultipartFile file);
+    ResponseEntity<UUID> createBinaryContent(MultipartFile file, DiscodeitUserDetails userDetails);
 
 }

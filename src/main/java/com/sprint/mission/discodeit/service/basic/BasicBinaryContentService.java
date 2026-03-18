@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentUploadCommand;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.status.BinaryContentStatus;
-import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.binaryContent.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
@@ -44,7 +44,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         BinaryContent saved = binaryContentRepository.save(binaryContent);
 
-        BinaryContentCreatedEvent binaryContentCreatedEvent = new BinaryContentCreatedEvent(saved.getId(), command.bytes());
+        BinaryContentCreatedEvent binaryContentCreatedEvent = new BinaryContentCreatedEvent(saved.getId(), command.bytes(), command.userId());
         eventPublisher.publishEvent(binaryContentCreatedEvent);
 
         // 키id로 값 bytes 저장

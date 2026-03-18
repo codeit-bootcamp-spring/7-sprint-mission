@@ -22,7 +22,7 @@ public class AsyncConfig implements AsyncConfigurer {
         return notificationExecutor(); // @Async 만사용시 일단 messageExecutor로 사용, 추후 리펙토링 가능
     }
 
-    @Bean(name = "notificationExecutor")
+    @Bean(name = "eventTaskExecutor")
     public ThreadPoolTaskExecutor notificationExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
@@ -31,7 +31,7 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setQueueCapacity(100);
         executor.setKeepAliveSeconds(60);
 
-        executor.setThreadNamePrefix("notificationExecutor-");
+        executor.setThreadNamePrefix("eventTaskExecutor-");
 
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
