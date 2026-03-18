@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.config;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -17,10 +18,9 @@ public class ContextCopyingTaskDecorator implements TaskDecorator {
 
         log.debug("컨텍스트 캡처 - MDC: {}, Security: {}", mdcContext, securityContext);
 
-        return () -> {
+        return new DelegatingSecurityContextRunnable(() -> {
             try {
                 if (mdcContext != null) MDC.setContextMap(mdcContext);
-                SecurityContextHolder.setContext(securityContext);
 
                 log.debug("컨텍스트 전파 완료 - Thread: {}, Security: {}, TraceId: {}",
                         Thread.currentThread().getName(),
@@ -31,9 +31,8 @@ public class ContextCopyingTaskDecorator implements TaskDecorator {
 
             } finally {
                 MDC.clear();
-                SecurityContextHolder.clearContext();
                 log.debug("컨텍스트 정리 완료");
             }
-        };
+        });
     }
 }

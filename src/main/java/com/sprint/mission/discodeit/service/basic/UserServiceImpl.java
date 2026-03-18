@@ -19,6 +19,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.JwtRegistry;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.sse.SseEventType;
+import com.sprint.mission.discodeit.service.basic.sse.SseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -50,6 +52,7 @@ public class UserServiceImpl implements UserService {
     private final AuthService authService;
     private final JwtRegistry jwtRegistry;
     private final ApplicationEventPublisher eventPublisher;
+    private final SseService sseService;
 
     // 생성
     @Override
@@ -88,7 +91,13 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(newUser);
         log.info("회원가입 완료 - userId: {}", newUser.getId());
-        return userMapper.toDto(newUser, false);
+        UserDto dto = userMapper.toDto(newUser, false);
+
+        sseUserBroadcast(SseEventType.CREATED, dto);
+
+        return dto;
+
+
     }
 
     private BinaryContent saveProfileImage(MultipartFile profileImage) {
@@ -215,7 +224,11 @@ public class UserServiceImpl implements UserService {
             log.info("유저 정보 수정 완료: {}", user.getId());
         }
         boolean isOnline = authService.isOnline(userId);
-        return userMapper.toDto(user, isOnline);
+        UserDto dto = userMapper.toDto(user, isOnline);
+
+        sseUserBroadcast(SseEventType.UPDATED, dto);
+
+        return dto;
     }
 
     @Override
@@ -240,8 +253,11 @@ public class UserServiceImpl implements UserService {
 
         log.info("유저 {} 권한 변경: {} -> {}", user.getUsername(), oldRole, roleUpdateRequest.newRole());
         boolean isOnline = authService.isOnline(user.getId());
+        UserDto dto = userMapper.toDto(user, isOnline);
 
-        return userMapper.toDto(user, isOnline);
+        sseUserBroadcast(SseEventType.UPDATED, dto);
+
+        return dto;
     }
 
     // 삭제
@@ -262,6 +278,16 @@ public class UserServiceImpl implements UserService {
                 });
 
         log.info("유저 삭제 성공: {}", userId);
+        sseUserBroadcast(SseEventType.DELETED, userId);
         userRepository.deleteById(userId);
     }
+
+    private void sseUserBroadcast(SseEventType type, Object data) {
+
+        sseService.broadcast(
+                "users." + type.getValue(),
+                data
+        );
+    }
+
 }
