@@ -40,7 +40,9 @@ public class BasicBinaryContentService implements BinaryContentService {
                 saved.getFileName(),
                 saved.getId(),
                 saved.getContentType(),
-                binaryContentCreateRequestDto.getBytes()
+                binaryContentCreateRequestDto.getBytes(),
+                UUID.randomUUID()
+
         );
         eventPublisher.publishEvent(event);
         return BinaryStruct.INSTANCE.toDto(saved);

@@ -29,10 +29,13 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.31.7'
     implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.5'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-messaging'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     implementation 'io.lettuce:lettuce-core'

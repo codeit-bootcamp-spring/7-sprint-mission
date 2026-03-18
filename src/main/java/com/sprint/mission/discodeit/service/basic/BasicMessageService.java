@@ -93,7 +93,8 @@ public class BasicMessageService implements MessageService {
                                     binaryContent.getFileName(),
                                     binaryContent.getId(),
                                     binaryContent.getContentType(),
-                                    x.getBytes()
+                                    x.getBytes(),
+                                    authorId
                             );
                             binaryContentStorage.put(binaryContent.getId(),x.getBytes());
                             eventPublisher.publishEvent(event);

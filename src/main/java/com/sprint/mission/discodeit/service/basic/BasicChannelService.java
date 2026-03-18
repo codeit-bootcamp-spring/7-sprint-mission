@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.channel.ChannelPublicCreateReque
 import com.sprint.mission.discodeit.dto.response.channel.ChannelDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entityElement.ChannelType;
+import com.sprint.mission.discodeit.event.ChannelUpdatedEvent;
 import com.sprint.mission.discodeit.exception.domain.channel.ChannelNotExistException;
 import com.sprint.mission.discodeit.exception.domain.user.UserNotExistException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -20,6 +21,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +42,8 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final ChannelMapper channelMapper;
     private final CacheManager  cacheManager;
+    private final ApplicationEventPublisher publisher;
+
     @Override
     public List<ChannelDto> readAllChannel() {
         return channelRepository.findAll().stream().map(x->channelMapper.toDto(x)).toList();
@@ -62,7 +66,13 @@ public class BasicChannelService implements ChannelService {
        userList.forEach(
                x-> cache.evict(x.getId())
        );
-        return channelMapper.toDto(channel);
+        ChannelDto channelDto= channelMapper.toDto(channel);
+        ChannelUpdatedEvent event = new ChannelUpdatedEvent(
+                channelDto,
+                "channels.created"
+        );
+        publisher.publishEvent(event);
+        return channelDto;
     }
 
     @Override
@@ -79,10 +89,15 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.save(ReadStatus.createReadStatusFactory(x,channel)
         )
         );
-
+        ChannelDto channelDto= channelMapper.toDto(channel);
+        ChannelUpdatedEvent event = new ChannelUpdatedEvent(
+                channelDto,
+                "channels.created"
+        );
+        publisher.publishEvent(event);
 
         log.info("channel : {} ",channel);
-    return channelMapper.toDto(channel);
+    return channelDto;
     }
 
     @Override
@@ -121,6 +136,13 @@ public class BasicChannelService implements ChannelService {
     public void deleteChannel(UUID channelID) {
         if(!channelRepository.existsById(channelID)) throw new ChannelNotExistException(channelID);
         log.warn("delete channel : {}",channelID);
+        Channel channel = channelRepository.findById(channelID).orElseThrow(()->new UserNotExistException(channelID));
+        ChannelDto channelDto= channelMapper.toDto(channel);
+        ChannelUpdatedEvent event = new ChannelUpdatedEvent(
+                channelDto,
+                "channels.deleted"
+        );
+        publisher.publishEvent(event);
         channelRepository.deleteById(channelID);
     }
 
@@ -132,7 +154,13 @@ public class BasicChannelService implements ChannelService {
         channel.setName(dto.newName()==null?channel.getName():dto.newName());
         channelRepository.save(channel);
         log.info("updated channel : {}",channel);
-        return channelMapper.toDto(channel);
+        ChannelDto channelDto= channelMapper.toDto(channel);
+        ChannelUpdatedEvent event = new ChannelUpdatedEvent(
+                channelDto,
+                "channels.updated"
+        );
+        publisher.publishEvent(event);
+        return channelDto;
     }
 
     @Override

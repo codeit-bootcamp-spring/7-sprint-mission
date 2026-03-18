@@ -35,7 +35,7 @@ discodeit:
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
 server:
-  port: ${PORT:8081}
+  port: ${PORT:8080}
   address: 0.0.0.0
 
 springdoc:
